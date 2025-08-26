@@ -1,59 +1,12 @@
 <template>
-  <div
-    v-if="isExecutingQuery"
-    class="results-container"
-  >
-    <div class="mb-6">
-      <div
-        class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
-      >
-        <h4 class="text-base font-semibold text-color flex items-center gap-2">
-          <i class="pi pi-list text-primary"></i>
-          Query Results
-          <i class="pi pi-spin pi-spinner text-primary text-sm ml-2"></i>
-        </h4>
-      </div>
-
-      <div class="border-round-lg shadow-sm border-1 surface-border overflow-hidden">
-        <DataTable
-          :value="Array(5)"
-          scrollable
-          scrollHeight="300px"
-          class="w-full"
-        >
-          <Column
-            v-for="col in 4"
-            :key="col"
-            :header="`Column ${col}`"
-            style="min-width: 120px"
-          >
-            <template #body>
-              <Skeleton class="h-4" />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-    </div>
-  </div>
-  <div
-    v-else-if="!responseQuery[0]?.rows?.length"
-    class="flex flex-col items-center justify-center text-center p-8 min-h-[300px]"
-  >
-    <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
-    <h3 class="text-xl font-medium text-color mb-2">Ready to execute</h3>
-    <p class="text-color-secondary">Execute a query to see the results here</p>
-  </div>
-
-  <div
-    v-else
-    class="results-container"
-  >
+  <div>
     <div
       v-for="(result, index) in responseQuery"
       :key="index"
       class="mb-6"
     >
       <div
+        v-if="result.columns?.length"
         class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
       >
         <h4 class="text-base font-semibold text-color flex items-center gap-2">
@@ -94,101 +47,45 @@
           />
         </div>
       </div>
-
-      <div
-        v-if="result.columns?.length"
-        class="border-round-lg shadow-sm border-1 surface-border overflow-hidden"
-      >
-        <DataTable
-          :value="formatResultData(result)"
-          v-model:selection="selectedRows"
-          dataKey="_rowId"
-          class="w-full"
-          selectionMode="checkbox"
-          :metaKeySelection="false"
-          :paginator="true"
-          :rows="rowsPerPage"
-          :rowsPerPageOptions="[10, 20, 50, 100]"
-          @page="onPageChange"
-          :pt="{
-            bodyRow: {
-              class: ({ instance }) => {
-                return instance.isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-              }
-            }
-          }"
-        >
-          <Column
-            selectionMode="multiple"
-            headerStyle="width: 2rem"
-            bodyStyle="width: 2rem"
-            :exportable="false"
-            :frozen="true"
-            alignFrozen="left"
-          ></Column>
-
-          <Column
-            v-for="(column, colIndex) in formatResultColumns(result)"
-            :key="column.field"
-            :field="column.field"
-            :style="{ maxWidth: '300px', minWidth: '120px' }"
-            :frozen="colIndex === 0 && isPrimaryKey(column.field)"
-            :alignFrozen="colIndex === 0 && isPrimaryKey(column.field) ? 'left' : undefined"
-          >
-            <template #header>
-              <span>{{ column.header }}</span>
-            </template>
-
-            <template #body="{ data, field, index }">
-              <div
-                class="table-cell-content cursor-pointer"
-                @click="handleCellClickWithStopPropagation(data, field, $event)"
-                @dblclick="handleCellDoubleClickWithStopPropagation(data, index, field, $event)"
-                :title="`Click to copy • Double-click to edit`"
-              >
-                <span
-                  class="cell-value"
-                  :class="{
-                    'text-color-secondary italic': data[field] === null || data[field] === undefined
-                  }"
-                >
-                  {{ data[field] }}
-                </span>
-              </div>
-            </template>
-          </Column>
-        </DataTable>
-
-        <div
-          v-if="!result.rows?.length"
-          class="text-center p-4 text-color-secondary bg-surface-50 dark:bg-surface-800"
-        >
-          <i class="pi pi-info-circle mr-2"></i>
-          No results found
-        </div>
-      </div>
     </div>
+    <ListTableBlock
+      isTabs
+      hiddenHeader
+      v-if="hasContentToList"
+      :isLoading="isExecutingQuery"
+      :listService="listTableService"
+      :columns="columns"
+      addButtonLabel="Insert"
+      createPagePath="edge-sql/insert"
+      ref="refListTable"
+      @on-load-data="handleLoadData"
+      emptyListMessage="No results found."
+      @on-row-click-edit-redirect="handleEditRedirect"
+      enableEditCustomRedirect
+    >
+    </ListTableBlock>
+
+    <EmptyResultsBlock
+      v-else
+      title="Ready to execute"
+      class="mt-4"
+      description="Execute a query to see the results here"
+      :showLearnMoreButton="false"
+    ></EmptyResultsBlock>
   </div>
 </template>
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
 
   defineOptions({ name: 'results-block' })
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
-  import Skeleton from 'primevue/skeleton'
   import Tag from 'primevue/tag'
   import Button from 'primevue/button'
+  import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
 
   const emit = defineEmits(['open-insert-row-drawer', 'open-edit-row-drawer'])
   const selectedRows = ref([])
-
-  const rowsPerPage = ref(6)
-  const currentPage = ref(0)
-  const onPageChange = (event) => {
-    currentPage.value = event.page
-    rowsPerPage.value = event.rows
-  }
+  const hasContentToList = ref(false)
 
   const props = defineProps({
     queryResults: {
@@ -205,15 +102,32 @@
     }
   })
 
+  const columns = computed(() => {
+    if (!responseQuery.value[0]?.columns) return []
+    return responseQuery.value[0].columns.map((col) => {
+      return {
+        field: col,
+        header: col
+      }
+    })
+  })
+
+  const handleEditRedirect = (row) => {
+    emit('open-edit-row-drawer', row)
+  }
+
   const responseQuery = ref(props.queryResults)
 
-  const handleCellDoubleClickWithStopPropagation = (data, index, field, event) => {
-    event.stopPropagation()
-    emit('open-edit-row-drawer', data, index, field)
+  const listTableService = () => {
+    return responseQuery.value[0].rows
   }
 
   const openInsertRowDrawer = () => {
     emit('open-insert-row-drawer')
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 
   const formatResultData = (result) => {
@@ -285,25 +199,19 @@
     downloadCSV(csv, `edge-sql-selected-rows-${new Date().toISOString().split('T')[0]}.csv`)
   }
 
-  const formatResultColumns = (result) => {
-    return (
-      result.columns?.map((col) => ({
-        field: col,
-        header: col
-      })) || []
-    )
-  }
-
-  const isPrimaryKey = (columnName) => {
-    if (!props.selectedTableSchema?.columns) return false
-    const columnInfo = props.selectedTableSchema.columns.find((col) => col[1] === columnName)
-    return columnInfo ? columnInfo[5] === 1 : false
-  }
-
   watch(
     () => props.queryResults,
     (newQueryResults) => {
       responseQuery.value = newQueryResults
+    }
+  )
+
+  watch(
+    () => props.isExecutingQuery,
+    (newValue) => {
+      if (!newValue) {
+        hasContentToList.value = true
+      }
     }
   )
 </script>

@@ -18,7 +18,8 @@
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
     noBorder: { type: Boolean, required: false },
-    noShowBorderTop: { type: Boolean, required: false, default: false }
+    noShowBorderTop: { type: Boolean, required: false, default: false },
+    showLearnMoreButton: { type: Boolean, required: false, default: true }
   })
   function openDocumentation() {
     props.documentationService()
@@ -74,6 +75,7 @@
           icon="pi pi-external-link"
           label="Learn more"
           link
+          v-if="showLearnMoreButton"
           @click="openDocumentation"
         />
       </div>

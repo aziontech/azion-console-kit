@@ -37,6 +37,16 @@ const formatCellValue = (value) => {
   return value
 }
 
+function mapRowsToObjects(columns, rows) {
+  return rows.map((row) => {
+    const obj = {}
+    columns.forEach((column, index) => {
+      obj[column] = row[index]
+    })
+    return obj
+  })
+}
+
 const getStatusSeverity = (status) => {
   switch (status) {
     case 'created':
@@ -146,6 +156,10 @@ export const EdgeSQLAdapter = {
         rowsRead: item.results?.rows_read,
         rowsWritten: item.results?.rows_written
       }
+    })
+
+    results.forEach((result) => {
+      result.rows = mapRowsToObjects(result.columns, result.rows)
     })
 
     return {

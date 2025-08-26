@@ -415,6 +415,10 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    isLoading: {
+      type: Boolean,
+      default: () => false
     }
   })
   const firstItemIndex = ref(0)
@@ -428,7 +432,7 @@
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-  const isLoading = ref(false)
+  const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
@@ -679,4 +683,11 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
+
+  watch(
+    () => props.isLoading,
+    (newValue) => {
+      isLoading.value = newValue
+    }
+  )
 </script>

@@ -32,7 +32,8 @@ export const documentationCatalog = {
   customPages: () => openSearchResult('Error Responses'),
   mfaManagement: () => openSearchResult('MFA Management'),
   edgeConnectors: () => openSearchResult('Origins'),
-  workload: () => openSearchResult('workload')
+  workload: () => openSearchResult('workload'),
+  edgeSQL: () => openSearchResult('edge-sql')
 }
 
 export const documentationGuideProducts = {
