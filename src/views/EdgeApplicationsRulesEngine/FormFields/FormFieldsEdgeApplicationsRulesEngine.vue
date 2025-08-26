@@ -24,7 +24,7 @@
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Edge Connectors', value: 'set_connector', requires: false }]
+      return [{ label: 'Set Connectors', value: 'set_connector', requires: false }]
     } else {
       return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
     }
