@@ -120,9 +120,27 @@ const parseRule = (rule) => {
 
 const parseAndGroupMultipleRules = (logs, isDescription = false) => {
   const grouped = {}
+  const ipHitCount = {}
+  const countryHitCount = {}
+  const pathHitCount = {}
 
   logs.forEach((entry) => {
     if (!entry.ruleId || entry.ruleId === '-') return
+
+    if (!ipHitCount[`${entry.ip}`]) {
+      ipHitCount[`${entry.ip}`] = 0
+    }
+    ipHitCount[`${entry.ip}`] += entry.count
+
+    if (!countryHitCount[entry.country]) {
+      countryHitCount[entry.country] = 0
+    }
+    countryHitCount[entry.country] += entry.count
+
+    if (!pathHitCount[entry.path]) {
+      pathHitCount[entry.path] = 0
+    }
+    pathHitCount[entry.path] += entry.count
 
     entry.ruleId.split(',').forEach((ruleStr) => {
       const { ruleId, location, context } = parseRule(ruleStr)
@@ -152,7 +170,10 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
     ...item,
     topIps: [...item.ips],
     topCountries: [...item.countries],
-    topPaths: [...item.paths]
+    topPaths: [...item.paths],
+    ipHitCount: ipHitCount,
+    countryHitCount: countryHitCount,
+    pathHitCount: pathHitCount
   }))
 }
 
@@ -161,7 +182,8 @@ const groupByMatchValueAndPath = (rules) => {
 
   rules.forEach((rule) => {
     rule.topPaths.forEach((path) => {
-      const key = `${rule.matchValue}::${path}`
+      const pathWithoutQueryString = path.split('?')?.[0]
+      const key = `${rule.matchValue}::${pathWithoutQueryString}`
 
       if (!grouped[key]) {
         grouped[key] = {
@@ -172,7 +194,10 @@ const groupByMatchValueAndPath = (rules) => {
           countries: new Set(),
           topIps: new Set(),
           topCountries: new Set(),
-          topPaths: new Set()
+          topPaths: new Set(),
+          ipHitCount: rule.ipHitCount,
+          countryHitCount: rule.countryHitCount,
+          pathHitCount: rule.pathHitCount
         }
       }
 
@@ -188,20 +213,33 @@ const groupByMatchValueAndPath = (rules) => {
         grouped[key].topCountries.add(country)
       })
 
-      grouped[key].topPaths.add(path)
+      grouped[key].topPaths.add(pathWithoutQueryString)
     })
   })
 
-  return Object.values(grouped).map((group) => ({
-    matchValue: group.matchValue,
-    condition: group.condition,
-    hitCount: group.hitCount,
-    ipCount: group.ips.size,
-    countryCount: group.countries.size,
-    topIps: [...group.topIps],
-    topCountries: [...group.topCountries],
-    topPaths: [...group.topPaths]
-  }))
+  return Object.values(grouped).map((group) => {
+    const topIps = [...group.topIps]
+    const topIpsWithHits = topIps.map((el) => `${el} (${group.ipHitCount[el]} hits)`)
+
+    const topCountries = [...group.topCountries]
+    const topCountriesWithHits = topCountries.map(
+      (el) => `${el} (${group.countryHitCount[el]} hits)`
+    )
+
+    const topPaths = [...group.topPaths]
+    const topPathsWithHits = topPaths.map((el) => `${el} (${group.pathHitCount[el]} hits)`)
+
+    return {
+      matchValue: group.matchValue,
+      condition: group.condition,
+      hitCount: group.hitCount,
+      ipCount: group.ips.size,
+      countryCount: group.countries.size,
+      topIps: [...topIpsWithHits],
+      topCountries: [...topCountriesWithHits],
+      topPaths: [...topPathsWithHits]
+    }
+  })
 }
 
 const normalizeCondition = (str) => {

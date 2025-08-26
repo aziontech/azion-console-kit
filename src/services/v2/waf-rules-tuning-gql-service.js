@@ -114,6 +114,8 @@ export class WafRulesTuningGqlService {
 
   listWafRulesTuning = async (params) => {
     let allowedRules = []
+    if (!params?.wafId) return { data: [], recordsFound: 0 }
+
     if (params?.wafId) {
       allowedRules = await this.listWafRulesAllowed(params)
     }
@@ -126,7 +128,7 @@ export class WafRulesTuningGqlService {
         query: `
           query wafEvents (${queryParams.join(', ')}) {
             logs: httpEvents(
-              limit: 10,
+              limit: 10000,
               filter: {
                 ${filters.join('\n                ')}
               }
