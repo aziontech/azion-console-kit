@@ -23,10 +23,11 @@ export class EdgeFirewallFunctionService {
       url: this.#getUrl(edgeFirewallId),
       params
     })
+    const transformed = this.#getTransformed('transformListFunction', data.results)
 
     return {
       count: data.count,
-      body: this.#getTransformed('transformListFunction', data.results)
+      body: transformed
     }
   }
 
@@ -53,7 +54,7 @@ export class EdgeFirewallFunctionService {
     const enrichedFunctions = await enrichByMatchingReference({
       items: functionInstances,
       fetchReferencePage: this.#listFunctionNames,
-      getReferenceId: (item) => item.functionId,
+      getReferenceId: (item) => item.edgeFunctionId,
       merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
