@@ -16,8 +16,8 @@
     <div class="flex justify-content-between align-items-center">
       <div class="flex align-items-center gap-3">
         <Button
-          :label="isExecutingQuery ? 'Executing...' : 'Execute Query'"
-          :icon="isExecutingQuery ? 'pi pi-spin pi-spinner' : 'pi pi-play'"
+          :label="label"
+          :icon="icon"
           severity="secondary"
           :loading="isExecutingQuery"
           @click="executeQuery"
@@ -76,7 +76,7 @@
 
 <script setup>
   defineOptions({ name: 'query-editor-block' })
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import Button from 'primevue/button'
 
   const emit = defineEmits(['execute-query'])
@@ -127,6 +127,16 @@
     padding: { top: 10, bottom: 10 }
   }
 
+  const label = computed(() => {
+    if (props.isExecutingQuery) return 'Executing...'
+    return 'Execute Query'
+  })
+
+  const icon = computed(() => {
+    if (props.isExecutingQuery) return 'pi pi-spin pi-spinner'
+    return 'pi pi-play'
+  })
+
   const getQueryStats = computed(() => {
     if (!props.queryResults || props.queryResults.length === 0) return null
 
@@ -148,4 +158,11 @@
 
     return stats
   })
+
+  watch(
+    () => props.sqlQuery,
+    (newQuery) => {
+      sqlQueryCommand.value = newQuery
+    }
+  )
 </script>

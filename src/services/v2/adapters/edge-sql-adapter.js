@@ -1,6 +1,42 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
+const truncate = (str, len) => (str.length > len ? `${str.substring(0, len - 3)}...` : str)
+
+const formatters = {
+  Array: (arr) => {
+    if (arr.length <= 5) return `[${arr.join(', ')}]`
+    return `Array[${arr.length}] [${arr.slice(0, 3).join(', ')}, ...]`
+  },
+  Blob: (blob) => `BLOB(${blob.byteLength || blob.length} bytes)`,
+  Object: (obj) => {
+    if (obj.type && obj.data) {
+      return `${obj.type}(${obj.data.length || 'unknown size'})`
+    }
+    try {
+      const jsonStr = JSON.stringify(obj)
+      return truncate(jsonStr, 100)
+    } catch {
+      return `Object{${Object.keys(obj).length} keys}`
+    }
+  }
+}
+
+const formatCellValue = (value) => {
+  const simpleValues = {
+    null: 'NULL',
+    undefined: 'UNDEFINED',
+    '': '(empty)'
+  }
+  if (value in simpleValues) return simpleValues[value]
+  if (value == null) return String(value).toUpperCase()
+
+  if (Array.isArray(value)) return formatters.Array(value)
+  if (value instanceof Uint8Array || value instanceof ArrayBuffer) return formatters.Blob(value)
+  if (typeof value === 'object') return formatters.Object(value)
+  return value
+}
+
 const getStatusSeverity = (status) => {
   switch (status) {
     case 'created':
@@ -100,10 +136,11 @@ export const EdgeSQLAdapter = {
   },
 
   adaptQueryResult({ data }) {
+    const formatRows = (rows) => rows.map((row) => row.map(formatCellValue))
     const results = data.map((item) => {
       return {
         columns: item.results?.columns || [],
-        rows: item.results?.rows || [],
+        rows: formatRows(item.results?.rows) || [],
         statement: item.results?.statement,
         queryDurationMs: item.results?.query_duration_ms,
         rowsRead: item.results?.rows_read,

@@ -36,7 +36,7 @@
     </div>
   </div>
   <div
-    v-else-if="!queryResults[0]?.rows?.length"
+    v-else-if="!responseQuery[0]?.rows?.length"
     class="flex flex-col items-center justify-center text-center p-8 min-h-[300px]"
   >
     <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
@@ -49,7 +49,7 @@
     class="results-container"
   >
     <div
-      v-for="(result, index) in queryResults"
+      v-for="(result, index) in responseQuery"
       :key="index"
       class="mb-6"
     >
@@ -58,7 +58,7 @@
       >
         <h4 class="text-base font-semibold text-color flex items-center gap-2">
           <i class="pi pi-list text-primary"></i>
-          {{ queryResults.length > 1 ? `Result ${index + 1}` : 'Query Results' }}
+          {{ responseQuery.length > 1 ? `Result ${index + 1}` : 'Query Results' }}
           <Tag
             v-if="result.rows?.length"
             :value="`${result.rows.length} row${result.rows.length > 1 ? 's' : ''}`"
@@ -92,29 +92,8 @@
             :disabled="!selectedRows.length"
             v-tooltip.top="`Export ${selectedRows.length || 0} selected row(s)`"
           />
-          <Button
-            icon="pi pi-times-circle"
-            severity="danger"
-            class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
-            @click="deleteSelectedRows"
-            :disabled="!selectedRows.length"
-            v-tooltip.top="`Delete ${selectedRows.length || 0} selected row(s)`"
-          />
         </div>
       </div>
-
-      <!-- <div
-        v-if="hasResultError(result)"
-        class="text-center p-6 bg-surface-50 dark:bg-surface-800 border-round-lg border-1 surface-border"
-      >
-        <i class="pi pi-exclamation-triangle text-3xl text-orange-500 mb-3"></i>
-        <p class="text-lg font-semibold text-color mb-2">Query Error</p>
-        <p
-          class="text-sm text-color-secondary font-mono bg-surface-100 dark:bg-surface-700 px-3 py-2 border-round inline-block"
-        >
-          {{ getResultError(result) }}
-        </p>
-      </div> -->
 
       <div
         v-if="result.columns?.length"
@@ -173,7 +152,7 @@
                     'text-color-secondary italic': data[field] === null || data[field] === undefined
                   }"
                 >
-                  {{ formatCellValue(data[field]) }}
+                  {{ data[field] }}
                 </span>
               </div>
             </template>
@@ -192,12 +171,24 @@
   </div>
 </template>
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
 
   defineOptions({ name: 'results-block' })
+  import DataTable from 'primevue/datatable'
+  import Column from 'primevue/column'
+  import Skeleton from 'primevue/skeleton'
+  import Tag from 'primevue/tag'
+  import Button from 'primevue/button'
 
-  const emit = defineEmits(['open-insert-row-drawer'])
+  const emit = defineEmits(['open-insert-row-drawer', 'open-edit-row-drawer'])
   const selectedRows = ref([])
+
+  const rowsPerPage = ref(6)
+  const currentPage = ref(0)
+  const onPageChange = (event) => {
+    currentPage.value = event.page
+    rowsPerPage.value = event.rows
+  }
 
   const props = defineProps({
     queryResults: {
@@ -214,6 +205,12 @@
     }
   })
 
+  const responseQuery = ref(props.queryResults)
+
+  const handleCellDoubleClickWithStopPropagation = (data, index, field, event) => {
+    event.stopPropagation()
+    emit('open-edit-row-drawer', data, index, field)
+  }
 
   const openInsertRowDrawer = () => {
     emit('open-insert-row-drawer')
@@ -261,7 +258,6 @@
     URL.revokeObjectURL(url)
   }
 
-
   const exportAllResults = () => {
     if (!props.queryResults.length) return
 
@@ -303,4 +299,11 @@
     const columnInfo = props.selectedTableSchema.columns.find((col) => col[1] === columnName)
     return columnInfo ? columnInfo[5] === 1 : false
   }
+
+  watch(
+    () => props.queryResults,
+    (newQueryResults) => {
+      responseQuery.value = newQueryResults
+    }
+  )
 </script>

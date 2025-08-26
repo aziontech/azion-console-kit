@@ -5,10 +5,9 @@
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ResultsBlock from './FormFields/blocks/ResultsBlock.vue'
 
   import Button from 'primevue/button'
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
   import Tag from 'primevue/tag'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -53,7 +52,7 @@
     }
     return name || null
   })
-  const sqlQuery = ref('SELECT 1 as test_column;')
+  const sqlQuery = ref('SELECT * FROM users')
   const isExecutingQuery = ref(false)
   const isLoadingTables = ref(false)
   const queryResults = ref([])
@@ -74,22 +73,10 @@
   const selectedTable = ref(null)
   const selectedRows = ref([])
 
-  const rowsPerPage = ref(6)
-  const currentPage = ref(0)
-  const onPageChange = (event) => {
-    currentPage.value = event.page
-    rowsPerPage.value = event.rows
-  }
   const loadDatabaseInfo = async () => {
     try {
       await edgeSQLService.getDatabase(databaseId.value)
     } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message,
-        life: 5000
-      })
       router.push('/edge-sql')
     }
   }
@@ -111,40 +98,17 @@
         data: table,
         children: []
       }))
-    } catch (error) {
-      toast.add({
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Error loading tables: ' + error.message,
-        life: 3000
-      })
     } finally {
       isLoadingTables.value = false
     }
   }
 
-  const executeQuery = async (showToast = true) => {
+  const executeQuery = async () => {
     if (!sqlQuery.value.trim()) {
-      if (showToast) {
-        toast.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Enter a query to execute',
-          life: 3000
-        })
-      }
       return
     }
 
     if (!databaseId.value) {
-      if (showToast) {
-        toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Database not loaded. Please reload the page.',
-          life: 5000
-        })
-      }
       return
     }
 
@@ -174,8 +138,6 @@
       editingRowData.value = {}
       editingRowIndex.value = -1
 
-      currentPage.value = 0
-
       sqlStore.addQueryResult({
         query: sqlQuery.value,
         results,
@@ -186,18 +148,6 @@
 
       activeTabIndex.value = 0
 
-      if (showToast) {
-        const stats = getQueryStats(queryResults.value)
-        const apiDuration = stats?.duration || executionTime.value
-
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: `Query executed in ${apiDuration}ms`,
-          life: 3000
-        })
-      }
-
       if (
         !isSelectQuery &&
         (sqlQuery.value.toLowerCase().includes('create table') ||
@@ -206,14 +156,6 @@
       ) {
         await loadTables()
       }
-    } catch (error) {
-      const errorMessage = error.message || 'An unexpected error occurred'
-      toast.add({
-        severity: 'error',
-        summary: 'Query Error',
-        detail: errorMessage,
-        life: 6000
-      })
     } finally {
       isExecutingQuery.value = false
     }
@@ -423,26 +365,11 @@
   const copyTableDefinition = async () => {
     if (!selectedTableDefinition.value) return
 
-    try {
-      if (!selectedTableDefinition.value) {
-        await loadTableDefinition(selectedTableSchema.value.name)
-      }
-
-      await navigator.clipboard.writeText(selectedTableDefinition.value || '')
-      toast.add({
-        severity: 'success',
-        summary: 'Copied',
-        detail: 'Table definition copied to clipboard',
-        life: 2000
-      })
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to copy table definition',
-        life: 3000
-      })
+    if (!selectedTableDefinition.value) {
+      await loadTableDefinition(selectedTableSchema.value.name)
     }
+
+    await navigator.clipboard.writeText(selectedTableDefinition.value || '')
   }
 
   const deleteTableService = async (tableName) => {
@@ -507,306 +434,6 @@
     return tableActionManager.generateMenuItems(selectedTable.value.key)
   })
 
-  const formatResultColumns = (result) => {
-    return (
-      result.columns?.map((col) => ({
-        field: col,
-        header: col
-      })) || []
-    )
-  }
-
-  const isPrimaryKey = (columnName) => {
-    if (!selectedTableSchema.value?.columns) return false
-    const columnInfo = selectedTableSchema.value.columns.find((col) => col[1] === columnName)
-    return columnInfo ? columnInfo[5] === 1 : false
-  }
-
-  const formatResultData = (result) => {
-    if (!result.rows || !result.columns) return []
-
-    return result.rows.map((row, rowIndex) => {
-      const obj = { _rowId: rowIndex, _originalRow: row }
-      result.columns.forEach((col, index) => {
-        const value = row[index]
-        obj[col] = value
-      })
-      return obj
-    })
-  }
-
-  const hasResultError = (result) => {
-    if (result?.errors && Array.isArray(result.errors) && result.errors.length > 0) {
-      return true
-    }
-
-    if (result?.error && typeof result.error === 'string') {
-      return true
-    }
-
-    return false
-  }
-
-  const getResultError = (result) => {
-    if (!hasResultError(result)) return null
-
-    if (result?.errors && Array.isArray(result.errors) && result.errors.length > 0) {
-      const error = result.errors[0]
-      return error.detail || error.title || 'Unknown error occurred'
-    }
-
-    if (result?.error && typeof result.error === 'string') {
-      return result.error
-    }
-
-    return 'Unknown error occurred'
-  }
-
-  const getQueryStats = (results) => {
-    if (!Array.isArray(results) || results.length === 0) return null
-
-    const stats = results.reduce(
-      (acc, result) => {
-        return {
-          duration: Math.max(acc.duration, result.query_duration_ms || 0),
-          rowsRead: acc.rowsRead + (result.rows_read || 0),
-          rowsWritten: acc.rowsWritten + (result.rows_written || 0),
-          totalRows: acc.totalRows + (result.rows?.length || 0)
-        }
-      },
-      { duration: 0, rowsRead: 0, rowsWritten: 0, totalRows: 0 }
-    )
-
-    return stats
-  }
-
-  const formatCellValue = (value) => {
-    if (value === null) return 'NULL'
-    if (value === undefined) return 'UNDEFINED'
-    if (value === '') return '(empty)'
-
-    if (value !== null && value !== undefined && typeof value === 'object') {
-      if (value.type && value.data) {
-        return `${value.type}(${value.data.length || 'unknown size'})`
-      } else if (Array.isArray(value)) {
-        if (value.length <= 5) {
-          return `[${value.join(', ')}]`
-        } else {
-          return `Array[${value.length}] [${value.slice(0, 3).join(', ')}, ...]`
-        }
-      } else if (value.constructor === Uint8Array || value.constructor === ArrayBuffer) {
-        return `BLOB(${value.byteLength || value.length} bytes)`
-      } else {
-        const keys = Object.keys(value)
-        if (keys.length === 1) {
-          const firstKey = keys[0]
-          const firstValue = value[firstKey]
-
-          if (typeof firstValue === 'string' || typeof firstValue === 'number') {
-            if (typeof firstValue === 'string' && firstValue.length > 50) {
-              return `"${firstValue.substring(0, 47)}..."`
-            } else {
-              return String(firstValue)
-            }
-          }
-        }
-
-        try {
-          const jsonStr = JSON.stringify(value)
-          if (jsonStr.length <= 100) {
-            return jsonStr
-          } else {
-            return `${jsonStr.substring(0, 97)}...`
-          }
-        } catch {
-          return `Object{${keys.length} keys}`
-        }
-      }
-    }
-
-    return value
-  }
-
-  const deleteRowsService = async (selectedID, selectedItemData) => {
-    try {
-      if (!selectedTableName.value || !selectedTableSchema.value?.columns) {
-        throw new Error('Table information not available')
-      }
-
-      const tableName = selectedTableName.value
-      const columnInfo = selectedTableSchema.value.columns
-
-      const rowsToDelete = Array.isArray(selectedItemData) ? selectedItemData : [selectedItemData]
-
-      const deleteQueries = rowsToDelete.map((rowData) => {
-        const whereConditions = []
-
-        const primaryKeys = columnInfo.filter((col) => col[5] === 1)
-
-        let usePrimaryKeys = false
-        if (primaryKeys.length > 0) {
-          primaryKeys.forEach((col) => {
-            const columnName = col[1]
-            const columnType = col[2]
-            const value = rowData[columnName]
-
-            if (value !== undefined && value !== null && value !== '') {
-              const escapedValue = escapeValue(value, columnType)
-              whereConditions.push(`${columnName} = ${escapedValue}`)
-              usePrimaryKeys = true
-            }
-          })
-        }
-
-        if (!usePrimaryKeys) {
-          Object.keys(rowData).forEach((columnName) => {
-            if (columnName !== '_rowId') {
-              const value = rowData[columnName]
-
-              if (value !== undefined && value !== null && value !== '') {
-                const columnType = getColumnTypeFromInfo(columnName, columnInfo)
-                const escapedValue = escapeValue(value, columnType)
-                whereConditions.push(`${columnName} = ${escapedValue}`)
-              }
-            }
-          })
-        }
-
-        if (whereConditions.length === 0) {
-          throw new Error('Cannot delete row: no valid conditions found')
-        }
-
-        return `DELETE FROM ${tableName} WHERE ${whereConditions.join(' AND ')};`
-      })
-
-      const result = await edgeSQLService.executeDatabase(databaseId.value, {
-        statements: deleteQueries
-      })
-
-      if (result.statusCode === 200) {
-        const successMessage = `Successfully deleted ${rowsToDelete.length} row(s)`
-        return successMessage
-      } else {
-        throw new Error(result.error || 'Failed to delete rows')
-      }
-    } catch (error) {
-      throw new Error(`Delete failed: ${error.message}`)
-    }
-  }
-
-  const escapeValue = (value, columnType) => {
-    if (value === null || value === undefined || value === '') {
-      return 'NULL'
-    }
-
-    const strValue = value.toString().trim()
-
-    if (
-      columnType &&
-      (columnType.toUpperCase().includes('INTEGER') ||
-        columnType.toUpperCase().includes('REAL') ||
-        columnType.toUpperCase().includes('NUMERIC'))
-    ) {
-      if (!isNaN(strValue) && strValue !== '') {
-        return strValue
-      }
-    }
-
-    return `'${strValue.replace(/'/g, "''")}'`
-  }
-
-  const getColumnTypeFromInfo = (columnName, columnInfo) => {
-    const info = columnInfo.find((col) => col[1] === columnName)
-    return info ? info[2] : 'TEXT'
-  }
-
-  const deleteSelectedRows = () => {
-    if (selectedRows.value.length === 0) return
-
-    const selectedCount = selectedRows.value.length
-
-    const selectedRowsData = selectedRows.value.map((row) => {
-      const cleanRow = { ...row }
-      delete cleanRow._rowId
-      return cleanRow
-    })
-
-    dialog.open(DeleteDialog, {
-      data: {
-        title: `row${selectedCount > 1 ? 's' : ''}`,
-        selectedID: selectedCount,
-        selectedItemData: selectedRowsData,
-        deleteService: deleteRowsService,
-        deleteConfirmationText: 'DELETE',
-        entityDeleteMessage: `The selected ${selectedCount} row${
-          selectedCount > 1 ? 's' : ''
-        } will be permanently deleted from the table. This action cannot be undone.`,
-        onSuccess: async () => {
-          selectedRows.value = []
-          if (selectedTableName.value && sqlQuery.value) {
-            await executeQuery(false)
-          }
-        }
-      }
-    })
-  }
-
-  const exportSelectedRows = () => {
-    if (selectedRows.value.length === 0) return
-
-    const exportData = selectedRows.value.map((row) => {
-      const cleanRow = { ...row }
-      delete cleanRow._rowId
-      return cleanRow
-    })
-
-    const csv = convertToCSV(exportData)
-    downloadCSV(csv, `edge-sql-selected-rows-${new Date().toISOString().split('T')[0]}.csv`)
-  }
-
-  const exportAllResults = () => {
-    if (queryResults.value.length === 0) return
-
-    const result = queryResults.value[0]
-    const exportData = formatResultData(result).map((row) => {
-      const cleanRow = { ...row }
-      delete cleanRow._rowId
-      return cleanRow
-    })
-
-    const csv = convertToCSV(exportData)
-    downloadCSV(csv, `edge-sql-all-results-${new Date().toISOString().split('T')[0]}.csv`)
-  }
-
-  const downloadCSV = (csv, filename) => {
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const downloadLink = document.createElement('a')
-    downloadLink.href = url
-    downloadLink.download = filename
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
-    URL.revokeObjectURL(url)
-  }
-
-  const convertToCSV = (data) => {
-    if (!data.length) return ''
-
-    const headers = Object.keys(data[0])
-    const csvHeaders = headers.join(',')
-    const csvRows = data.map((row) =>
-      headers
-        .map((header) => {
-          const value = row[header]
-          return typeof value === 'string' && value.includes(',') ? `"${value}"` : value
-        })
-        .join(',')
-    )
-
-    return [csvHeaders, ...csvRows].join('\n')
-  }
-
   const clearRowFormState = () => {
     editingRowData.value = {}
     editingRowIndex.value = -1
@@ -855,82 +482,6 @@
     if (selectedTableName.value && sqlQuery.value) {
       await executeQuery(false)
     }
-  }
-
-  const clickTimeout = ref(null)
-
-  const copyToClipboard = async (rowData, fieldName) => {
-    try {
-      const originalRow = rowData._originalRow
-      const result = queryResults.value[0]
-
-      if (originalRow && result?.columns) {
-        const fieldIndex = result.columns.indexOf(fieldName)
-        const originalValue = fieldIndex >= 0 ? originalRow[fieldIndex] : rowData[fieldName]
-
-        let textToCopy = ''
-        if (originalValue === null || originalValue === undefined) {
-          textToCopy = 'NULL'
-        } else if (typeof originalValue === 'object') {
-          try {
-            textToCopy = JSON.stringify(originalValue, null, 2)
-          } catch {
-            textToCopy = String(originalValue)
-          }
-        } else {
-          textToCopy = String(originalValue)
-        }
-
-        await navigator.clipboard.writeText(textToCopy)
-
-        toast.add({
-          severity: 'success',
-          summary: 'Copied',
-          detail: `${fieldName}: value copied to clipboard`,
-          life: 2000
-        })
-      } else {
-        throw new Error('Could not access original data')
-      }
-    } catch (error) {
-      toast.add({
-        severity: 'warn',
-        summary: 'Copy failed',
-        detail: 'Could not copy to clipboard',
-        life: 2000
-      })
-    }
-  }
-
-  const handleCellClick = (rowData, fieldName) => {
-    if (clickTimeout.value) {
-      clearTimeout(clickTimeout.value)
-    }
-
-    clickTimeout.value = setTimeout(() => {
-      copyToClipboard(rowData, fieldName)
-      clickTimeout.value = null
-    }, 250)
-  }
-
-  const handleCellDoubleClick = (data, index, field) => {
-    if (clickTimeout.value) {
-      clearTimeout(clickTimeout.value)
-      clickTimeout.value = null
-    }
-
-    openEditRowDrawer(data, index, field)
-  }
-
-  // Wrapper functions para resolver conflito com o formatter
-  const handleCellClickWithStopPropagation = (data, field, event) => {
-    handleCellClick(data, field)
-    event.stopPropagation()
-  }
-
-  const handleCellDoubleClickWithStopPropagation = (data, index, field, event) => {
-    handleCellDoubleClick(data, index, field)
-    event.stopPropagation()
   }
 
   const handleKeyDown = (event) => {
@@ -1137,7 +688,6 @@
                           <span class="font-semibold text-color">Query Editor</span>
                         </div>
                       </template>
-                      sqlQuery: {{ sqlQuery }}
                       <QueryEditorBlock
                         :sqlQuery="sqlQuery"
                         :queryResults="queryResults"
@@ -1162,215 +712,13 @@
                           Results
                         </div>
                       </template>
-                      <div
-                        v-if="isExecutingQuery"
-                        class="results-container"
-                      >
-                        <div class="mb-6">
-                          <div
-                            class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
-                          >
-                            <h4 class="text-base font-semibold text-color flex items-center gap-2">
-                              <i class="pi pi-list text-primary"></i>
-                              Query Results
-                              <i class="pi pi-spin pi-spinner text-primary text-sm ml-2"></i>
-                            </h4>
-                          </div>
-
-                          <div
-                            class="border-round-lg shadow-sm border-1 surface-border overflow-hidden"
-                          >
-                            <DataTable
-                              :value="Array(5)"
-                              scrollable
-                              scrollHeight="300px"
-                              class="w-full"
-                            >
-                              <Column
-                                v-for="col in 4"
-                                :key="col"
-                                :header="`Column ${col}`"
-                                style="min-width: 120px"
-                              >
-                                <template #body>
-                                  <Skeleton class="h-4" />
-                                </template>
-                              </Column>
-                            </DataTable>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        v-else-if="!queryResults[0]?.rows?.length"
-                        class="flex flex-col items-center justify-center text-center p-8 min-h-[300px]"
-                      >
-                        <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
-                        <h3 class="text-xl font-medium text-color mb-2">Ready to execute</h3>
-                        <p class="text-color-secondary">Execute a query to see the results here</p>
-                      </div>
-
-                      <div
-                        v-else
-                        class="results-container"
-                      >
-                        <div
-                          v-for="(result, index) in queryResults"
-                          :key="index"
-                          class="mb-6"
-                        >
-                          <div
-                            class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
-                          >
-                            <h4 class="text-base font-semibold text-color flex items-center gap-2">
-                              <i class="pi pi-list text-primary"></i>
-                              {{
-                                queryResults.length > 1 ? `Result ${index + 1}` : 'Query Results'
-                              }}
-                              <Tag
-                                v-if="result.rows?.length"
-                                :value="`${result.rows.length} row${
-                                  result.rows.length !== 1 ? 's' : ''
-                                }`"
-                                severity="info"
-                                class="text-xs"
-                              />
-                            </h4>
-
-                            <div class="flex items-center gap-2">
-                              <Button
-                                v-if="result.columns?.length"
-                                label="Insert"
-                                icon="pi pi-plus"
-                                severity="primary"
-                                class="p-button-sm font-medium"
-                                @click="openInsertRowDrawer"
-                              />
-                              <Button
-                                icon="pi pi-file-export"
-                                severity="secondary"
-                                class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
-                                @click="exportAllResults"
-                                :disabled="!result.rows?.length"
-                                v-tooltip.top="'Export all results to CSV'"
-                              />
-                              <Button
-                                icon="pi pi-download"
-                                severity="secondary"
-                                class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
-                                @click="exportSelectedRows"
-                                :disabled="selectedRows.length === 0"
-                                v-tooltip.top="`Export ${selectedRows.length || 0} selected row(s)`"
-                              />
-                              <Button
-                                icon="pi pi-trash"
-                                severity="danger"
-                                class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
-                                @click="deleteSelectedRows"
-                                :disabled="selectedRows.length === 0"
-                                v-tooltip.top="`Delete ${selectedRows.length || 0} selected row(s)`"
-                              />
-                            </div>
-                          </div>
-
-                          <div
-                            v-if="hasResultError(result)"
-                            class="text-center p-6 bg-surface-50 dark:bg-surface-800 border-round-lg border-1 surface-border"
-                          >
-                            <i class="pi pi-exclamation-triangle text-3xl text-orange-500 mb-3"></i>
-                            <p class="text-lg font-semibold text-color mb-2">Query Error</p>
-                            <p
-                              class="text-sm text-color-secondary font-mono bg-surface-100 dark:bg-surface-700 px-3 py-2 border-round inline-block"
-                            >
-                              {{ getResultError(result) }}
-                            </p>
-                          </div>
-
-                          <div
-                            v-else-if="result.columns?.length"
-                            class="border-round-lg shadow-sm border-1 surface-border overflow-hidden"
-                          >
-                            <DataTable
-                              :value="formatResultData(result)"
-                              v-model:selection="selectedRows"
-                              dataKey="_rowId"
-                              class="w-full"
-                              selectionMode="checkbox"
-                              :metaKeySelection="false"
-                              :paginator="true"
-                              :rows="rowsPerPage"
-                              :rowsPerPageOptions="[10, 20, 50, 100]"
-                              @page="onPageChange"
-                              :pt="{
-                                bodyRow: {
-                                  class: ({ instance }) => {
-                                    return instance.isSelected
-                                      ? 'bg-primary-50 dark:bg-primary-900/20'
-                                      : ''
-                                  }
-                                }
-                              }"
-                            >
-                              <Column
-                                selectionMode="multiple"
-                                headerStyle="width: 2rem"
-                                bodyStyle="width: 2rem"
-                                :exportable="false"
-                                :frozen="true"
-                                alignFrozen="left"
-                              ></Column>
-
-                              <Column
-                                v-for="(column, colIndex) in formatResultColumns(result)"
-                                :key="column.field"
-                                :field="column.field"
-                                :style="{ maxWidth: '300px', minWidth: '120px' }"
-                                :frozen="colIndex === 0 && isPrimaryKey(column.field)"
-                                :alignFrozen="
-                                  colIndex === 0 && isPrimaryKey(column.field) ? 'left' : undefined
-                                "
-                              >
-                                <template #header>
-                                  <span>{{ column.header }}</span>
-                                </template>
-
-                                <template #body="{ data, field, index }">
-                                  <div
-                                    class="table-cell-content cursor-pointer"
-                                    @click="handleCellClickWithStopPropagation(data, field, $event)"
-                                    @dblclick="
-                                      handleCellDoubleClickWithStopPropagation(
-                                        data,
-                                        index,
-                                        field,
-                                        $event
-                                      )
-                                    "
-                                    :title="`Click to copy • Double-click to edit`"
-                                  >
-                                    <span
-                                      class="cell-value"
-                                      :class="{
-                                        'text-color-secondary italic':
-                                          data[field] === null || data[field] === undefined
-                                      }"
-                                    >
-                                      {{ formatCellValue(data[field]) }}
-                                    </span>
-                                  </div>
-                                </template>
-                              </Column>
-                            </DataTable>
-
-                            <div
-                              v-if="!result.rows?.length"
-                              class="text-center p-4 text-color-secondary bg-surface-50 dark:bg-surface-800"
-                            >
-                              <i class="pi pi-info-circle mr-2"></i>
-                              No results found
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <ResultsBlock
+                        :queryResults="queryResults"
+                        :isExecutingQuery="isExecutingQuery"
+                        :selectedTableSchema="selectedTableSchema"
+                        @open-insert-row-drawer="openInsertRowDrawer"
+                        @open-edit-row-drawer="openEditRowDrawer"
+                      />
                     </TabPanel>
 
                     <TabPanel>
