@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-1 bg-[var(--surface-100)] rounded-lg p-1">
+  <div class="p-inputgroup w-fit">
     <QuickSelect
       v-model="model"
       @select="emit('select', $event)"

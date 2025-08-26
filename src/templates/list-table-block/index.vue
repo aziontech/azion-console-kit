@@ -131,9 +131,18 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+            <PrimeButton
+              v-if="hasExportToCsvMapper && props.hiddenHeader"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full ml-auto"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
             <PrimeButton
               outlined
               icon="ai ai-column"

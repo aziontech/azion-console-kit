@@ -1,12 +1,10 @@
 <script setup>
-  import PrimeTag from 'primevue/tag'
-
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
   import FilterTagsDisplay from '@/components/base/advanced-filter-system/filterTagsDisplay'
+  import PrimeButton from 'primevue/button'
 
-  import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { ref, onMounted, defineModel } from 'vue'
 
@@ -98,6 +96,7 @@
           v-model="filterDataRange"
           @select="filterSearch"
         />
+        
       </div>
       <div class="flex-1 w-full">
         <FilterTagsDisplay

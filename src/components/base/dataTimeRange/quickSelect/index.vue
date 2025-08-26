@@ -1,68 +1,66 @@
 <template>
-  <div class="relative">
-    <PrimeButton
-      icon="pi pi-calendar"
-      outlined
-      size="small"
-      @click="toggleOverlayPanel"
-    />
+  <PrimeButton
+    icon="pi pi-calendar"
+    outlined
+    size="small"
+    @click="toggleOverlayPanel"
+  />
 
-    <OverlayPanel
-      ref="overlayPanelQuickSelect"
-      :showCloseIcon="false"
-      class="max-w-[500px]"
-    >
-      <div>
-        <div class="mb-6">
-          <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
+  <OverlayPanel
+    ref="overlayPanelQuickSelect"
+    :showCloseIcon="false"
+    class="max-w-[500px]"
+  >
+    <div>
+      <div class="mb-6">
+        <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
 
-          <div class="flex items-center gap-3">
-            <Dropdown
-              v-model="quickSelectDirection"
-              :options="[
-                { label: 'Last', value: 'last' },
-                { label: 'Next', value: 'next' }
-              ]"
-              optionLabel="label"
-              optionValue="value"
-            />
-            <InputNumber
-              v-model="quickSelectValue"
-              :min="1"
-            />
-            <Dropdown
-              v-model="quickSelectUnit"
-              :options="RELATIVE_UNITS"
-              optionLabel="label"
-              optionValue="value"
-            />
-            <PrimeButton
-              label="Apply"
-              outlined
-              size="small"
-              @click="applyQuickSelect"
-            />
-          </div>
-        </div>
-
-        <div class="mb-6">
-          <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <PrimeButton
-              v-for="range in commonDateRanges"
-              :key="range.value"
-              size="small"
-              link
-              class="justify-start text-left w-full"
-              @click="applyCommonRange(range)"
-            >
-              {{ range.label }}
-            </PrimeButton>
-          </div>
+        <div class="flex items-center gap-3">
+          <Dropdown
+            v-model="quickSelectDirection"
+            :options="[
+              { label: 'Last', value: 'last' },
+              { label: 'Next', value: 'next' }
+            ]"
+            optionLabel="label"
+            optionValue="value"
+          />
+          <InputNumber
+            v-model="quickSelectValue"
+            :min="1"
+          />
+          <Dropdown
+            v-model="quickSelectUnit"
+            :options="RELATIVE_UNITS"
+            optionLabel="label"
+            optionValue="value"
+          />
+          <PrimeButton
+            label="Apply"
+            outlined
+            size="small"
+            @click="applyQuickSelect"
+          />
         </div>
       </div>
-    </OverlayPanel>
-  </div>
+
+      <div class="mb-6">
+        <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <PrimeButton
+            v-for="range in commonDateRanges"
+            :key="range.value"
+            size="small"
+            link
+            class="justify-start text-left w-full"
+            @click="applyCommonRange(range)"
+          >
+            {{ range.label }}
+          </PrimeButton>
+        </div>
+      </div>
+    </div>
+  </OverlayPanel>
 </template>
 
 <script setup>

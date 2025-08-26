@@ -1,186 +1,182 @@
 <template>
-  <div class="relative">
+  <template v-if="!model.label">
     <div
-      v-if="!model.label"
-      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg"
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
-      <div class="relative w-full sm:w-auto">
-        <InputText
-          :value="startDateInput"
-          readonly
-          @click="selectStartDate"
-        />
-      </div>
+      <InputText
+        class="w-min"
+        :value="startDateInput"
+        readonly
+        @click="selectStartDate"
+      />
       <div class="flex items-center text-color-secondary text-sm">
         <i class="pi pi-arrow-right text-xs"></i>
       </div>
-      <div class="relative w-full sm:w-auto">
-        <InputText
-          :value="endDateInput"
-          readonly
-          @click="selectEndDate"
-        />
-      </div>
-    </div>
-
-    <div v-else>
       <InputText
-        :value="model.label"
-        @click="selectStartDate"
+        class="w-min"
+        :value="endDateInput"
         readonly
+        @click="selectEndDate"
       />
     </div>
+  </template>
 
-    <OverlayPanel
-      ref="overlayPanel"
-      class="min-w-[200px] max-w-[400px]"
-      :showCloseIcon="false"
+  <InputText
+    v-else
+    :value="model.label"
+    @click="selectStartDate"
+    readonly
+  />
+
+  <OverlayPanel
+    ref="overlayPanel"
+    class="min-w-[200px] max-w-[400px]"
+    :showCloseIcon="false"
+  >
+    <TabView
+      v-model:activeIndex="activeTab"
+      :pt="{
+        navcontent: { class: 'mb-2 pb-1 border-b surface-border' }
+      }"
     >
-      <TabView
-        v-model:activeIndex="activeTab"
-        :pt="{
-          navcontent: { class: 'mb-2 pb-1 border-b surface-border' }
-        }"
-      >
-        <TabPanel header="Absolute">
-          <div class="flex justify-center">
-            <div class="flex items-center gap-3">
-              <PrimeButton
-                icon="pi pi-chevron-left"
-                size="small"
-                outlined
-                @click="previousMonth"
-              />
-              <div class="flex items-center gap-2">
-                <Dropdown
-                  v-model="selectedMonth"
-                  :options="MONTHS"
-                  optionLabel="label"
-                  optionValue="value"
-                  class="min-w-[120px]"
-                  @change="onMonthChange"
-                />
-                <Dropdown
-                  v-model="selectedYear"
-                  :options="years"
-                  class="min-w-[100px]"
-                  @change="onYearChange"
-                />
-              </div>
-              <PrimeButton
-                icon="pi pi-chevron-right"
-                size="small"
-                outlined
-                @click="nextMonth"
-              />
-            </div>
-          </div>
-
-          <div class="flex gap-3 mt-2">
-            <Calendar
-              v-model="selectedDate"
-              :inline="true"
-              :showIcon="false"
-              :showButtonBar="false"
-              :showWeek="false"
-              :dateFormat="'dd/mm/yy'"
-              class="w-full"
-              @date-select="onDateSelect"
-              :pt="{
-                header: { class: 'hidden' },
-                table: { class: 'w-full' },
-                daylabel: {
-                  style: {
-                    padding: '0px !important',
-                    margin: '0px !important',
-                    fontSize: '0.875rem'
-                  }
-                }
-              }"
-            />
-
-            <!-- Time selector -->
-            <div class="border surface-border rounded-lg p-1 w-min">
-              <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
-                <PrimeButton
-                  :label="timeSlot"
-                  v-for="timeSlot in TIME_SLOTS"
-                  :key="timeSlot"
-                  class="m-1"
-                  severity="secondary"
-                  size="small"
-                  :outlined="selectedTime !== timeSlot"
-                  @click="selectTime(timeSlot)"
-                  :pt="{
-                    label: { class: 'text-xs font-normal' }
-                  }"
-                />
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-        <TabPanel header="Relative">
-          <div class="flex flex-col gap-4">
-            <InputNumber
-              v-model="relativeValue"
-              @input="updateRelativeRange"
-              :min="1"
-            />
-            <Dropdown
-              v-model="relativeUnit"
-              :options="RELATIVE_UNITS"
-              optionLabel="label"
-              optionValue="value"
-              @change="updateRelativeRange"
-            />
-            <Dropdown
-              v-model="relativeDirection"
-              :options="RELATIVE_DIRECTIONS"
-              @change="updateRelativeRange"
-              optionLabel="label"
-              optionValue="value"
-            />
-          </div>
-        </TabPanel>
-        <TabPanel header="Now">
-          <div class="flex flex-col gap-4 items-center">
-            <p>Use current time as end date</p>
+      <TabPanel header="Absolute">
+        <div class="flex justify-center">
+          <div class="flex items-center gap-3">
             <PrimeButton
-              label="Set to Now"
-              icon="pi pi-clock"
-              @click="setToNow"
-            />
-          </div>
-        </TabPanel>
-      </TabView>
-
-      <div
-        class="mt-4 pt-4 border-t surface-border"
-        v-if="activeTab !== 2"
-      >
-        <div class="flex flex-col gap-1">
-          <label class="text-xs font-medium text-color">
-            {{ editingField === 'start' ? 'Start date' : 'End date' }}
-          </label>
-          <div class="flex items-center gap-2">
-            <InputText
-              v-model="inputValue"
-              :placeholder="editingField === 'start' ? startDateInput : endDateInput"
-              class="w-full"
-              @keydown.enter="updateRange"
-            />
-            <PrimeButton
-              v-if="hasChanges"
-              icon="pi pi-check"
+              icon="pi pi-chevron-left"
               size="small"
               outlined
-              @click="updateRange"
+              @click="previousMonth"
+            />
+            <div class="flex items-center gap-2">
+              <Dropdown
+                v-model="selectedMonth"
+                :options="MONTHS"
+                optionLabel="label"
+                optionValue="value"
+                class="min-w-[120px]"
+                @change="onMonthChange"
+              />
+              <Dropdown
+                v-model="selectedYear"
+                :options="years"
+                class="min-w-[100px]"
+                @change="onYearChange"
+              />
+            </div>
+            <PrimeButton
+              icon="pi pi-chevron-right"
+              size="small"
+              outlined
+              @click="nextMonth"
             />
           </div>
         </div>
+
+        <div class="flex gap-3 mt-2">
+          <Calendar
+            v-model="selectedDate"
+            :inline="true"
+            :showIcon="false"
+            :showButtonBar="false"
+            :showWeek="false"
+            :dateFormat="'dd/mm/yy'"
+            class="w-full"
+            @date-select="onDateSelect"
+            :pt="{
+              header: { class: 'hidden' },
+              table: { class: 'w-full' },
+              daylabel: {
+                style: {
+                  padding: '0px !important',
+                  margin: '0px !important',
+                  fontSize: '0.875rem'
+                }
+              }
+            }"
+          />
+
+          <!-- Time selector -->
+          <div class="border surface-border rounded-lg p-1 w-min">
+            <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
+              <PrimeButton
+                :label="timeSlot"
+                v-for="timeSlot in TIME_SLOTS"
+                :key="timeSlot"
+                class="m-1"
+                severity="secondary"
+                size="small"
+                :outlined="selectedTime !== timeSlot"
+                @click="selectTime(timeSlot)"
+                :pt="{
+                  label: { class: 'text-xs font-normal' }
+                }"
+              />
+            </div>
+          </div>
+        </div>
+      </TabPanel>
+      <TabPanel header="Relative">
+        <div class="flex flex-col gap-4">
+          <InputNumber
+            v-model="relativeValue"
+            @input="updateRelativeRange"
+            :min="1"
+          />
+          <Dropdown
+            v-model="relativeUnit"
+            :options="RELATIVE_UNITS"
+            optionLabel="label"
+            optionValue="value"
+            @change="updateRelativeRange"
+          />
+          <Dropdown
+            v-model="relativeDirection"
+            :options="RELATIVE_DIRECTIONS"
+            @change="updateRelativeRange"
+            optionLabel="label"
+            optionValue="value"
+          />
+        </div>
+      </TabPanel>
+      <TabPanel header="Now">
+        <div class="flex flex-col gap-4 items-center">
+          <p>Use current time as end date</p>
+          <PrimeButton
+            label="Set to Now"
+            icon="pi pi-clock"
+            @click="setToNow"
+          />
+        </div>
+      </TabPanel>
+    </TabView>
+
+    <div
+      class="mt-4 pt-4 border-t surface-border"
+      v-if="activeTab !== 2"
+    >
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-color">
+          {{ editingField === 'start' ? 'Start date' : 'End date' }}
+        </label>
+        <div class="flex items-center gap-2">
+          <InputText
+            v-model="inputValue"
+            :placeholder="editingField === 'start' ? startDateInput : endDateInput"
+            class="w-full"
+            @keydown.enter="updateRange"
+          />
+          <PrimeButton
+            v-if="hasChanges"
+            icon="pi pi-check"
+            size="small"
+            outlined
+            @click="updateRange"
+          />
+        </div>
       </div>
-    </OverlayPanel>
-  </div>
+    </div>
+  </OverlayPanel>
 </template>
 
 <script setup>

@@ -18,16 +18,6 @@
           ref="editable"
           data-testid="azion-query-language-input"
         />
-        <div class="h-auto w-full md:max-w-fit">
-          <PrimeButton
-            label="Search"
-            size="small"
-            class="h-auto w-full md:max-w-fit"
-            @click="executeQuery"
-            :disabled="handleErrorsQuery.length"
-            data-testid="azion-query-language-search"
-          />
-        </div>
       </div>
       <div
         class="flex flex-col mt-2 gap-1"
@@ -73,7 +63,6 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, watch } from 'vue'
   import ContentEditable from './content-editable.vue'
-  import PrimeButton from 'primevue/button'
   import Listbox from 'primevue/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
@@ -250,14 +239,7 @@
     props.searchAdvancedFilter(filter)
   }
 
-  const handleExternalLink = () => {
-    // Handle external link functionality
-    // You can customize this based on your requirements
-    console.log('External link clicked')
-  }
-
   const handleSearch = () => {
-    // Execute the same search as the main search button
     executeQuery()
   }
 

@@ -15,7 +15,6 @@
     }
   })
 
-  // Processa os filtros para exibição
   const processedFilters = computed(() => {
     if (!props.filters?.length) return []
 
