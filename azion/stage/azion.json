@@ -29,44 +29,19 @@
   },
   "origin": [
     {
-      "origin-id": 198604,
-      "origin-key": "265d39ed-7ff8-4329-9e91-864ab678beb3",
-      "name": "origin-script-runner"
-    },
-    {
-      "origin-id": 198606,
-      "origin-key": "5e9245bf-39c5-4722-bc4e-b7389204f012",
-      "name": "origin-iam-api"
-    },
-    {
-      "origin-id": 149080,
-      "origin-key": "7f1dcf08-9e37-476c-8f55-f61e48faab11",
-      "name": "origin-marketplace"
-    },
-    {
-      "origin-id": 146192,
-      "origin-key": "94b3632f-e70d-4104-8a82-e424d014603d",
-      "name": "origin-storage-default"
-    },
-    {
       "origin-id": 146191,
       "origin-key": "a21a7881-6408-473a-a632-d4daff3647f7",
       "name": "console-kit-2024-08-21-stage_single"
     },
     {
-      "origin-id": 199297,
-      "origin-key": "affdd612-c68e-40db-b4f6-304f37a3eaeb",
-      "name": "origin-billing"
-    },
-    {
-      "origin-id": 146196,
-      "origin-key": "ba01498b-9831-468d-8886-b89b2b6a0f4a",
-      "name": "origin-sso"
-    },
-    {
       "origin-id": 146197,
       "origin-key": "bd236c86-efb4-4e8a-a5e9-851c1788917f",
       "name": "origin-api"
+    },
+    {
+      "origin-id": 199297,
+      "origin-key": "affdd612-c68e-40db-b4f6-304f37a3eaeb",
+      "name": "origin-billing"
     },
     {
       "origin-id": 146195,
@@ -79,6 +54,31 @@
       "name": "origin-console-feedback"
     },
     {
+      "origin-id": 198606,
+      "origin-key": "5e9245bf-39c5-4722-bc4e-b7389204f012",
+      "name": "origin-iam-api"
+    },
+    {
+      "origin-id": 149080,
+      "origin-key": "7f1dcf08-9e37-476c-8f55-f61e48faab11",
+      "name": "origin-marketplace"
+    },
+    {
+      "origin-id": 198604,
+      "origin-key": "265d39ed-7ff8-4329-9e91-864ab678beb3",
+      "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 146196,
+      "origin-key": "ba01498b-9831-468d-8886-b89b2b6a0f4a",
+      "name": "origin-sso"
+    },
+    {
+      "origin-id": 146192,
+      "origin-key": "94b3632f-e70d-4104-8a82-e424d014603d",
+      "name": "origin-storage-default"
+    },
+    {
       "origin-id": 198605,
       "origin-key": "e967f66e-0198-4d32-93b6-1f2f3f5a2571",
       "name": "origin-template-engine"
@@ -88,13 +88,18 @@
     "created": false,
     "rules": [
       {
+        "id": 371432,
+        "name": "API Version 4 Routing",
+        "phase": "request"
+      },
+      {
         "id": 277548,
         "name": "Apply Common Configuration for All Requests",
         "phase": "request"
       },
       {
-        "id": 277549,
-        "name": "Set Storage Origin for All Requests",
+        "id": 380751,
+        "name": "Billing PDF",
         "phase": "request"
       },
       {
@@ -113,23 +118,8 @@
         "phase": "request"
       },
       {
-        "id": 277553,
-        "name": "Route Specific API Services to Marketplace Origin",
-        "phase": "request"
-      },
-      {
-        "id": 277554,
-        "name": "Route Specific API Services to Template Engine Origin",
-        "phase": "request"
-      },
-      {
-        "id": 277555,
-        "name": "Route Specific API Services to Script Runner Origin",
-        "phase": "request"
-      },
-      {
-        "id": 277557,
-        "name": "Route User Authentication and Account Management to SSO Origin",
+        "id": 312030,
+        "name": "Route API Identity Providers",
         "phase": "request"
       },
       {
@@ -143,19 +133,49 @@
         "phase": "request"
       },
       {
-        "id": 312030,
-        "name": "Route API Identity Providers",
+        "id": 277553,
+        "name": "Route Specific API Services to Marketplace Origin",
         "phase": "request"
       },
       {
-        "id": 371432,
-        "name": "API Version 4 Routing",
+        "id": 277555,
+        "name": "Route Specific API Services to Script Runner Origin",
         "phase": "request"
       },
       {
-        "id": 380751,
-        "name": "Billing PDF",
+        "id": 277554,
+        "name": "Route Specific API Services to Template Engine Origin",
         "phase": "request"
+      },
+      {
+        "id": 277557,
+        "name": "Route User Authentication and Account Management to SSO Origin",
+        "phase": "request"
+      },
+      {
+        "id": 277549,
+        "name": "Set Storage Origin for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 467684,
+        "name": "OAuth Security Headers - GitHub Connection",
+        "phase": "response"
+      },
+      {
+        "id": 467683,
+        "name": "OAuth Security Headers - Login and Signup",
+        "phase": "response"
+      },
+      {
+        "id": 368017,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368018,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
       },
       {
         "id": 368013,
@@ -175,26 +195,6 @@
       {
         "id": 368016,
         "name": "Rewrite azsid Cookie in azionedge.net",
-        "phase": "response"
-      },
-      {
-        "id": 368017,
-        "name": "Rewrite azat Cookie in azion.com",
-        "phase": "response"
-      },
-      {
-        "id": 368018,
-        "name": "Rewrite azat Cookie in azionedge.net",
-        "phase": "response"
-      },
-      {
-        "id": 467683,
-        "name": "OAuth Security Headers - Login and Signup",
-        "phase": "response"
-      },
-      {
-        "id": 467684,
-        "name": "OAuth Security Headers - GitHub Connection",
         "phase": "response"
       },
       {
