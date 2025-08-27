@@ -158,26 +158,6 @@
         "phase": "request"
       },
       {
-        "id": 467684,
-        "name": "OAuth Security Headers - GitHub Connection",
-        "phase": "response"
-      },
-      {
-        "id": 467683,
-        "name": "OAuth Security Headers - Login and Signup",
-        "phase": "response"
-      },
-      {
-        "id": 368017,
-        "name": "Rewrite azat Cookie in azion.com",
-        "phase": "response"
-      },
-      {
-        "id": 368018,
-        "name": "Rewrite azat Cookie in azionedge.net",
-        "phase": "response"
-      },
-      {
         "id": 368013,
         "name": "Rewrite azrt Cookie in azion.com",
         "phase": "response"
@@ -195,6 +175,26 @@
       {
         "id": 368016,
         "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368017,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368018,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 467683,
+        "name": "OAuth Security Headers - Login and Signup",
+        "phase": "response"
+      },
+      {
+        "id": 467684,
+        "name": "OAuth Security Headers - GitHub Connection",
         "phase": "response"
       },
       {
