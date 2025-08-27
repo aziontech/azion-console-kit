@@ -10,7 +10,7 @@
 
   defineOptions({ name: 'advanced-filter-system' })
 
-  const emit = defineEmits(['updatedFilter'])
+  const emit = defineEmits(['updatedFilter', 'openGraphQLDialog'])
 
   const props = defineProps({
     fieldsInFilter: {
@@ -69,6 +69,10 @@
     }
   }
 
+  const openGraphQLDialog = () => {
+    emit('openGraphQLDialog')
+  }
+
   onMounted(() => {
     filterDataRange.value = {
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
@@ -80,30 +84,51 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-col items-center">
-      <div class="flex w-full gap-2 items-center align-items-center">
-        <DialogFilter
-          v-model:filterAdvanced="filterData.fields"
-          :fieldsInFilter="props.fieldsInFilter"
-          @applyFilter="filterSearch"
-        />
-        <AzionQueryLanguage
-          :fieldsInFilter="props.fieldsInFilter"
-          :searchAdvancedFilter="searchAdvancedFilter"
-          :filterAdvanced="filterData.fields"
-        />
+    <div class="flex w-full flex-column md:flex-col items-center gap-6 md:gap-2">
+      <div class="flex w-full gap-2 items-center align-items-center md:flex-row flex-col">
+        <div></div>
+        <div class="flex-1 flex gap-2 items-center">
+          <DialogFilter
+            v-model:filterAdvanced="filterData.fields"
+            :fieldsInFilter="props.fieldsInFilter"
+            @applyFilter="filterSearch"
+          />
+          <AzionQueryLanguage
+            :fieldsInFilter="props.fieldsInFilter"
+            :searchAdvancedFilter="searchAdvancedFilter"
+            :filterAdvanced="filterData.fields"
+          />
+        </div>
         <DataTimeRange
           v-model="filterDataRange"
           @select="filterSearch"
         />
-        
       </div>
-      <div class="flex-1 w-full">
+      <div
+        class="flex lex-1 w-full"
+        :class="{ 'justify-between': filterData.fields.length }"
+      >
         <FilterTagsDisplay
           :filters="filterData.fields"
           :fieldsInFilter="props.fieldsInFilter"
           @removeFilter="removeFilter"
         />
+        <div class="flex items-end gap-2">
+          <PrimeButton
+            icon="pi pi-external-link"
+            iconPos="right"
+            link
+            class="text-xs"
+            label="GraphQL"
+            size="small"
+            :pt="{
+              icon: {
+                class: 'text-xs'
+              }
+            }"
+            @click="openGraphQLDialog"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -9,55 +9,55 @@
   <OverlayPanel
     ref="overlayPanelQuickSelect"
     :showCloseIcon="false"
-    class="max-w-[500px]"
+    class="max-w-[430px]"
   >
-    <div>
-      <div class="mb-6">
-        <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
+    <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
 
-        <div class="flex items-center gap-3">
-          <Dropdown
-            v-model="quickSelectDirection"
-            :options="[
-              { label: 'Last', value: 'last' },
-              { label: 'Next', value: 'next' }
-            ]"
-            optionLabel="label"
-            optionValue="value"
-          />
-          <InputNumber
-            v-model="quickSelectValue"
-            :min="1"
-          />
-          <Dropdown
-            v-model="quickSelectUnit"
-            :options="RELATIVE_UNITS"
-            optionLabel="label"
-            optionValue="value"
-          />
-          <PrimeButton
-            label="Apply"
-            outlined
-            size="small"
-            @click="applyQuickSelect"
-          />
-        </div>
+    <div class="flex gap-2">
+      <div class="flex gap-2 flex-1">
+        <Dropdown
+          v-model="quickSelectDirection"
+          :options="[
+            { label: 'Last', value: 'last' },
+            { label: 'Next', value: 'next' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+        />
+        <InputNumber
+          v-model="quickSelectValue"
+          :min="1"
+          :pt="{ input: { class: 'w-full' } }"
+        />
+        <Dropdown
+          v-model="quickSelectUnit"
+          :options="RELATIVE_UNITS"
+          optionLabel="label"
+          optionValue="value"
+        />
       </div>
+      <PrimeButton
+        label="Apply"
+        outlined
+        class="whitespace-nowrap px-4"
+        size="small"
+        @click="applyQuickSelect"
+      />
+    </div>
 
-      <div class="mb-6">
-        <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <PrimeButton
-            v-for="range in commonDateRanges"
-            :key="range.value"
-            size="small"
-            link
-            class="justify-start text-left w-full"
-            @click="applyCommonRange(range)"
-          >
-            {{ range.label }}
-          </PrimeButton>
-        </div>
+    <div class="mt-4">
+      <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2">
+        <PrimeButton
+          v-for="range in commonDateRanges"
+          :key="range.value"
+          size="small"
+          link
+          class="justify-start text-left w-full"
+          @click="applyCommonRange(range)"
+        >
+          {{ range.label }}
+        </PrimeButton>
       </div>
     </div>
   </OverlayPanel>

@@ -118,7 +118,7 @@
         </p>
       </div>
     </div>
-    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
+    <div class="border-1 p-3.5 surface-border rounded-md mb-2">
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
@@ -130,7 +130,7 @@
     <ListTableBlock
       lazyLoad
       hiddenHeader
-      :pt="{ root: { class: 'rounded-t-none' }, bodyRow: { 'data-testid': 'table-body-row' } }"
+      :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
       isGraphql
       frozenSize="3rem"
       ref="listTableBlockRef"
