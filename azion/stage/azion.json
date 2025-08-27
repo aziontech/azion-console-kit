@@ -34,26 +34,6 @@
       "name": "origin-script-runner"
     },
     {
-      "origin-id": 146197,
-      "origin-key": "bd236c86-efb4-4e8a-a5e9-851c1788917f",
-      "name": "origin-api"
-    },
-    {
-      "origin-id": 199297,
-      "origin-key": "affdd612-c68e-40db-b4f6-304f37a3eaeb",
-      "name": "origin-billing"
-    },
-    {
-      "origin-id": 146195,
-      "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
-      "name": "origin-cities"
-    },
-    {
-      "origin-id": 153761,
-      "origin-key": "f1f976fb-0558-4592-a930-dcad70ab2e7c",
-      "name": "origin-console-feedback"
-    },
-    {
       "origin-id": 198606,
       "origin-key": "5e9245bf-39c5-4722-bc4e-b7389204f012",
       "name": "origin-iam-api"
@@ -74,9 +54,29 @@
       "name": "console-kit-2024-08-21-stage_single"
     },
     {
+      "origin-id": 199297,
+      "origin-key": "affdd612-c68e-40db-b4f6-304f37a3eaeb",
+      "name": "origin-billing"
+    },
+    {
+      "origin-id": 146195,
+      "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
+      "name": "origin-cities"
+    },
+    {
+      "origin-id": 153761,
+      "origin-key": "f1f976fb-0558-4592-a930-dcad70ab2e7c",
+      "name": "origin-console-feedback"
+    },
+    {
       "origin-id": 146196,
       "origin-key": "ba01498b-9831-468d-8886-b89b2b6a0f4a",
       "name": "origin-sso"
+    },
+    {
+      "origin-id": 146197,
+      "origin-key": "bd236c86-efb4-4e8a-a5e9-851c1788917f",
+      "name": "origin-api"
     },
     {
       "origin-id": 198605,
@@ -95,6 +95,11 @@
       {
         "id": 277548,
         "name": "Apply Common Configuration for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 277549,
+        "name": "Set Storage Origin for All Requests",
         "phase": "request"
       },
       {
@@ -150,11 +155,6 @@
       {
         "id": 277557,
         "name": "Route User Authentication and Account Management to SSO Origin",
-        "phase": "request"
-      },
-      {
-        "id": 277549,
-        "name": "Set Storage Origin for All Requests",
         "phase": "request"
       },
       {
