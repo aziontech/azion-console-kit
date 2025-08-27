@@ -20,6 +20,9 @@
     },
     disabled: {
       type: Boolean
+    },
+    counter: {
+      type: Number
     }
   })
 
@@ -104,6 +107,15 @@
 
   const disabledSubmit = computed(() => {
     return !meta.value.valid
+  })
+
+  const counterFilter = computed(() => {
+    return props.counter
+      ? {
+          badge: props.counter.toString(),
+          badgeClass: 'p-badge-lg text-color bg-transparent h-5 min-w-[20px]'
+        }
+      : null
   })
 
   const componentRender = computed(() => {
@@ -205,10 +217,15 @@
   <ButtonPrime
     ref="buttonOverPanel"
     icon="pi pi-plus"
-    v-tooltip.bottom="{ value: 'Add filter', showDelay: 200 }"
-    outlined
+    label="Filter"
+    type="button"
+    class="min-w-fit md:rounded-[6px_0px_0px_6px] h-full"
+    severity="secondary"
+    badgeClass="!text-xl"
     size="small"
     :disabled="disabled"
+    outlined
+    v-bind="counterFilter"
     @click="toggle"
     data-testid="filter-button"
   />

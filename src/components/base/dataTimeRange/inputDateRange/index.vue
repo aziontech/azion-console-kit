@@ -122,6 +122,7 @@
             v-model="relativeValue"
             @input="updateRelativeRange"
             :min="1"
+            showButtons
           />
           <Dropdown
             v-model="relativeUnit"
@@ -180,7 +181,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed, defineModel, onMounted } from 'vue'
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
@@ -420,6 +421,12 @@
   if (model.value.endDate) {
     model.value.endDate = new Date(model.value.endDate)
   }
+
+  onMounted(() => {
+    if (activeTab.value === 1) {
+      updateRelativeRange()
+    }
+  })
 
   defineExpose({
     selectStartDate,
