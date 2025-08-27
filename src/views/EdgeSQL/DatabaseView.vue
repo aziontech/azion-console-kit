@@ -8,14 +8,14 @@
   import ResultsBlock from './FormFields/blocks/ResultsBlock.vue'
   import ListTablesBlock from './FormFields/blocks/ListTablesBlock.vue'
   import Button from 'primevue/button'
-  import Tag from 'primevue/tag'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import Skeleton from 'primevue/skeleton'
   import Menu from 'primevue/menu'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import QueryEditorBlock from './FormFields/blocks/QueryEditorBlock.vue'
+  import SqlDefinition from './FormFields/blocks/SqlDefinition.vue'
+  import TableInfo from './FormFields/blocks/TableInfo.vue'
 
   import { useDialog } from 'primevue/usedialog'
 
@@ -24,8 +24,6 @@
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import RowFormDrawer from './components/RowFormDrawer.vue'
-  import InfoDrawerBlock from '@templates/info-drawer-block'
-  import InfoSection from '@templates/info-drawer-block/info-section'
   import { SQLITE_QUERIES } from './constants'
   import { TableActionManager } from './utils'
   import { useAccountStore } from '@/stores/account'
@@ -160,17 +158,17 @@
     }
   }
 
-  // const useTemplate = (template) => {
-  //   sqlQuery.value = template.query
-  //   activeTabIndex.value = 0
+  const useTemplate = (template) => {
+    sqlQuery.value = template.query
+    activeTabIndex.value = 0
 
-  //   selectedTableName.value = null
-  //   sqlStore.setSelectedTable(null)
+    selectedTableName.value = null
+    sqlStore.setSelectedTable(null)
 
-  //   if (isEditorCollapsed.value) {
-  //     isEditorCollapsed.value = false
-  //   }
-  // }
+    if (isEditorCollapsed.value) {
+      isEditorCollapsed.value = false
+    }
+  }
 
   const rerunQuery = async (query) => {
     sqlQuery.value = query
@@ -217,15 +215,11 @@
         statement: SQLITE_QUERIES.TABLE_INFO(tableName),
         parameters: []
       })
-
-      if (result.statusCode === 200 && result.body.results?.length > 0) {
-        selectedTableSchema.value = {
-          name: tableName,
-          columns: result.body.results[0].rows || []
-        }
+      selectedTableSchema.value = {
+        name: tableName,
+        columns: result.results[0].columns || [],
+        rows: result.results[0].rows || []
       }
-      // eslint-disable-next-line no-empty
-    } catch (error) {
     } finally {
       isLoadingSchema.value = false
     }
@@ -257,58 +251,9 @@
     }
   }
 
-  const copyDefinition = () => {
-    if (!selectedTableDefinition.value) return
-
-    navigator.clipboard.writeText(selectedTableDefinition.value).then(() => {
-      toast.add({
-        severity: 'success',
-        summary: 'Copied',
-        detail: 'Table definition copied to clipboard',
-        life: 2000
-      })
-    })
-  }
-
   const monacoTheme = computed(() => {
     return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
-
-  const sqlMonacoOptions = {
-    readOnly: true,
-    minimap: { enabled: false },
-    tabSize: 2,
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    fontSize: 14,
-    lineNumbers: 'on',
-    folding: false,
-    glyphMargin: false,
-    lineDecorationsWidth: 6,
-    lineNumbersMinChars: 3,
-    renderLineHighlight: 'none',
-    padding: { top: 10, bottom: 10 },
-    wordWrap: 'on',
-    contextmenu: false,
-    selectOnLineNumbers: false,
-    overviewRulerLanes: 0,
-    hideCursorInOverviewRuler: true,
-    overviewRulerBorder: false,
-    rulers: [],
-    bracketPairColorization: { enabled: false },
-    matchBrackets: 'never',
-    renderIndentGuides: false,
-    guides: {
-      indentation: false,
-      bracketPairs: false,
-      bracketPairsHorizontal: false,
-      highlightActiveIndentation: false
-    },
-    scrollbar: {
-      vertical: 'hidden',
-      horizontal: 'hidden'
-    }
-  }
 
   const showTableMenu = (event, table) => {
     if (selectedTable.value?.key === table.key) {
@@ -333,16 +278,6 @@
   const isEditingRow = ref(false)
   const editingRowData = ref({})
   const editingRowIndex = ref(-1)
-
-  const copyTableDefinition = async () => {
-    if (!selectedTableDefinition.value) return
-
-    if (!selectedTableDefinition.value) {
-      await loadTableDefinition(selectedTableSchema.value.name)
-    }
-
-    await navigator.clipboard.writeText(selectedTableDefinition.value || '')
-  }
 
   const deleteTableService = async (tableName) => {
     try {
@@ -525,7 +460,7 @@
       </template>
       <template #content>
         <div class="h-full overflow-hidden">
-          <div class="flex h-full gap-3">
+          <div class="flex flex-col sm:flex-row h-full gap-3">
             <ListTablesBlock
               :tablesTree="tablesTree"
               :isLoadingTables="isLoadingTables"
@@ -534,6 +469,7 @@
               @select-table="selectTable"
               @show-table-menu="showTableMenu"
               @toggle-templates="toggleTemplates"
+              @use-template="useTemplate"
             />
 
             <div class="flex-1 min-w-0">
@@ -601,288 +537,20 @@
       </template>
     </ContentBlock>
 
-    <InfoDrawerBlock
-      v-model:visible="drawerVisible"
-      :title="selectedTableSchema ? `Table Info: ${selectedTableSchema.name}` : 'Table Information'"
-    >
-      <template #body>
-        <div class="w-full flex flex-col gap-8 max-md:gap-6">
-          <div
-            v-if="isLoadingSchema"
-            class="w-full"
-          >
-            <div class="flex flex-col gap-8 max-md:gap-6">
-              <div
-                class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
-              >
-                <div class="flex items-center gap-3 mb-4">
-                  <Skeleton class="w-32 h-6" />
-                  <Skeleton class="w-20 h-6 rounded-full" />
-                </div>
-                <div class="flex justify-content-between align-items-center w-full">
-                  <Skeleton class="w-24 h-6 rounded-full" />
-                  <Skeleton class="w-32 h-8 rounded" />
-                </div>
-              </div>
+    <TableInfo
+      :selected-table-schema="selectedTableSchema"
+      :is-loading-schema="isLoadingSchema"
+      :schema-visible="drawerVisible"
+      @close="drawerVisible = false"
+    />
 
-              <div
-                class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
-              >
-                <Skeleton class="w-20 h-6 mb-4" />
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-                  <div
-                    v-for="i in 6"
-                    :key="i"
-                    class="p-4 border-round-md surface-border border-1"
-                  >
-                    <div class="flex flex-column gap-3">
-                      <div class="flex align-items-center gap-2">
-                        <Skeleton class="w-4 h-4" />
-                        <Skeleton class="w-24 h-4" />
-                      </div>
-                      <Skeleton class="w-16 h-5 rounded" />
-                      <div class="flex gap-1">
-                        <Skeleton class="w-16 h-4 rounded-full" />
-                        <Skeleton class="w-12 h-4 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else-if="selectedTableSchema"
-            class="w-full"
-          >
-            <InfoSection
-              :title="selectedTableSchema.name"
-              :loading="false"
-              hideDivider
-            >
-              <template #body>
-                <div class="flex justify-content-between align-items-center w-full">
-                  <div class="flex align-items-center gap-2">
-                    <Tag
-                      icon="pi pi-table"
-                      :value="`${selectedTableSchema.columns.length} columns`"
-                      severity="info"
-                    />
-                  </div>
-                  <Button
-                    icon="pi pi-copy"
-                    label="Copy Definition"
-                    severity="secondary"
-                    outlined
-                    size="small"
-                    @click="copyTableDefinition"
-                  />
-                </div>
-              </template>
-            </InfoSection>
-
-            <InfoSection
-              title="Columns"
-              :loading="false"
-            >
-              <template #body>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-                  <div
-                    v-for="(column, index) in selectedTableSchema.columns"
-                    :key="index"
-                    class="p-4 border-round-md surface-border border-1 hover:surface-100 dark:hover:surface-700 transition-colors"
-                  >
-                    <div class="flex flex-column gap-3">
-                      <div class="flex align-items-center gap-2">
-                        <i class="pi pi-bookmark text-primary text-sm"></i>
-                        <span class="font-semibold text-color">{{ column[1] }}</span>
-                      </div>
-
-                      <div class="text-xs text-color-secondary">
-                        <span
-                          class="font-mono bg-surface-100 dark:bg-surface-700 px-2 py-1 border-round"
-                        >
-                          {{ column[2] }}
-                        </span>
-                      </div>
-
-                      <div class="flex gap-1 flex-wrap">
-                        <Tag
-                          v-if="column[3]"
-                          value="NOT NULL"
-                          severity="warning"
-                          class="text-xs"
-                          style="font-size: 0.65rem; padding: 0.125rem 0.25rem"
-                        />
-                        <Tag
-                          v-if="column[5]"
-                          value="PRIMARY KEY"
-                          severity="info"
-                          class="text-xs"
-                          style="font-size: 0.65rem; padding: 0.125rem 0.25rem"
-                        />
-                        <Tag
-                          v-if="column[4]"
-                          value="DEFAULT"
-                          severity="secondary"
-                          class="text-xs"
-                          style="font-size: 0.65rem; padding: 0.125rem 0.25rem"
-                          v-tooltip.top="`Default: ${column[4]}`"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </InfoSection>
-          </div>
-
-          <div
-            v-else
-            class="flex flex-col items-center justify-center p-8 text-center"
-          >
-            <i class="pi pi-table text-6xl text-primary mb-4 opacity-50"></i>
-            <h4 class="text-lg font-medium text-color mb-2">Select a table</h4>
-            <p class="text-color-secondary">
-              Choose a table from the sidebar to view its definition
-            </p>
-          </div>
-        </div>
-      </template>
-    </InfoDrawerBlock>
-
-    <InfoDrawerBlock
-      v-model:visible="definitionDrawerVisible"
-      :title="selectedTable?.key ? `SQL Definition: ${selectedTable.key}` : 'SQL Definition'"
-    >
-      <template #body>
-        <div class="w-full flex flex-col gap-8 max-md:gap-6">
-          <div
-            v-if="isLoadingDefinition"
-            class="w-full"
-          >
-            <div class="flex flex-col gap-8 max-md:gap-6">
-              <div
-                class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
-              >
-                <div class="flex items-center gap-3 mb-4">
-                  <Skeleton class="w-32 h-6" />
-                </div>
-                <div class="flex justify-content-between align-items-center w-full">
-                  <Skeleton class="w-40 h-6 rounded-full" />
-                  <Skeleton class="w-32 h-8 rounded" />
-                </div>
-              </div>
-
-              <div
-                class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
-              >
-                <Skeleton class="w-40 h-6 mb-4" />
-                <div class="bg-surface-50 dark:bg-surface-800 border-round-lg p-4">
-                  <div class="flex flex-col gap-2">
-                    <Skeleton class="w-48 h-4" />
-                    <Skeleton class="w-full h-4" />
-                    <Skeleton class="w-56 h-4" />
-                    <Skeleton class="w-40 h-4" />
-                    <Skeleton class="w-64 h-4" />
-                    <Skeleton class="w-32 h-4" />
-                    <Skeleton class="w-24 h-4" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else-if="selectedTableDefinition"
-            class="w-full"
-          >
-            <InfoSection
-              :title="selectedTable?.key || 'Table'"
-              :loading="false"
-              hideDivider
-            >
-              <template #body>
-                <div class="flex justify-content-between align-items-center w-full">
-                  <div class="flex align-items-center gap-2">
-                    <Tag
-                      icon="pi pi-code"
-                      value="CREATE TABLE Statement"
-                      severity="info"
-                    />
-                  </div>
-                  <Button
-                    icon="pi pi-copy"
-                    label="Copy Statement"
-                    severity="secondary"
-                    outlined
-                    size="small"
-                    @click="copyDefinition"
-                  />
-                </div>
-              </template>
-            </InfoSection>
-
-            <InfoSection
-              title="CREATE TABLE Statement"
-              :loading="false"
-            >
-              <template #body>
-                <div
-                  v-if="selectedTableDefinition"
-                  class="sql-definition-display border-round-lg border-1 surface-border overflow-hidden w-full bg-surface-ground"
-                >
-                  <div
-                    class="sql-definition-header p-2 border-bottom-1 surface-border bg-surface-50 dark:bg-surface-800 flex justify-content-between align-items-center"
-                  >
-                    <span class="text-xs text-color-secondary font-mono">SQLite</span>
-                    <Button
-                      icon="pi pi-copy"
-                      class="p-button-text p-button-sm text-color-secondary hover:text-primary"
-                      @click="copyDefinition"
-                      v-tooltip.top="'Copy SQL'"
-                    />
-                  </div>
-                  <div
-                    class="sql-monaco-container border-round-lg overflow-hidden"
-                    style="height: 350px"
-                  >
-                    <vue-monaco-editor
-                      :key="selectedTableDefinition"
-                      :value="selectedTableDefinition"
-                      language="sql"
-                      :theme="monacoTheme"
-                      :options="sqlMonacoOptions"
-                      class="w-full h-full"
-                    />
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="flex items-center justify-center h-24 text-color-secondary"
-                >
-                  <i class="pi pi-spin pi-spinner mr-2"></i>
-                  Loading definition...
-                </div>
-              </template>
-            </InfoSection>
-          </div>
-
-          <div
-            v-else
-            class="flex flex-col items-center justify-center p-8 text-center"
-          >
-            <i class="pi pi-code text-6xl text-primary mb-4 opacity-50"></i>
-            <h4 class="text-lg font-medium text-color mb-2">No definition loaded</h4>
-            <p class="text-color-secondary">
-              Select a table and click "View Definition" from the menu to view its CREATE TABLE
-              statement
-            </p>
-          </div>
-        </div>
-      </template>
-    </InfoDrawerBlock>
+    <SqlDefinition
+      :selected-table="selectedTable"
+      :selected-table-definition="selectedTableDefinition"
+      :is-loading-definition="isLoadingDefinition"
+      :definition-visible="definitionDrawerVisible"
+      @close="definitionDrawerVisible = false"
+    />
 
     <RowFormDrawer
       v-model:visible="rowFormDrawerVisible"
