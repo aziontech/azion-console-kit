@@ -29,6 +29,31 @@
   },
   "origin": [
     {
+      "origin-id": 142752,
+      "origin-key": "ef85b806-9eac-4e47-99a6-f9267a5bd9a4",
+      "name": "origin-storage-default"
+    },
+    {
+      "origin-id": 142756,
+      "origin-key": "dcd816a3-8680-4281-96b9-ce1e8cb05e0d",
+      "name": "origin-sso"
+    },
+    {
+      "origin-id": 199947,
+      "origin-key": "0b7d0aa1-15d0-45c8-8cae-7414007f5798",
+      "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 152310,
+      "origin-key": "1b3c2fd6-4ac1-4063-9ff5-e2b4352f917c",
+      "name": "origin-marketplace"
+    },
+    {
+      "origin-id": 142757,
+      "origin-key": "2654d973-9e40-4b07-ab04-79064c2f6dce",
+      "name": "origin-api"
+    },
+    {
       "origin-id": 142751,
       "origin-key": "4c361d2f-dbb5-42c0-a6b6-28b0e6e50d91",
       "name": "console_kit_31-07-2024_single"
@@ -37,11 +62,6 @@
       "origin-id": 241517,
       "origin-key": "9bb0c254-e07e-45d2-9e5d-13d0dc703d07",
       "name": "maintaince-origin"
-    },
-    {
-      "origin-id": 142757,
-      "origin-key": "2654d973-9e40-4b07-ab04-79064c2f6dce",
-      "name": "origin-api"
     },
     {
       "origin-id": 199946,
@@ -62,26 +82,6 @@
       "origin-id": 199949,
       "origin-key": "bbd3561e-ba36-4227-be0b-bcbfd0bd32bd",
       "name": "origin-iam-api"
-    },
-    {
-      "origin-id": 152310,
-      "origin-key": "1b3c2fd6-4ac1-4063-9ff5-e2b4352f917c",
-      "name": "origin-marketplace"
-    },
-    {
-      "origin-id": 199947,
-      "origin-key": "0b7d0aa1-15d0-45c8-8cae-7414007f5798",
-      "name": "origin-script-runner"
-    },
-    {
-      "origin-id": 142756,
-      "origin-key": "dcd816a3-8680-4281-96b9-ce1e8cb05e0d",
-      "name": "origin-sso"
-    },
-    {
-      "origin-id": 142752,
-      "origin-key": "ef85b806-9eac-4e47-99a6-f9267a5bd9a4",
-      "name": "origin-storage-default"
     },
     {
       "origin-id": 199948,
