@@ -64,8 +64,8 @@
       "name": "console_kit_31-07-2024_single"
     },
     {
-      "origin-id": 234047,
-      "origin-key": "65cbbdf9-59cb-47c1-913c-03342f97e4aa",
+      "origin-id": 241517,
+      "origin-key": "9bb0c254-e07e-45d2-9e5d-13d0dc703d07",
       "name": "maintaince-origin"
     },
     {
@@ -87,6 +87,11 @@
       "origin-id": 199948,
       "origin-key": "bd1c28b8-dc47-4ac4-8079-f05686d4bdee",
       "name": "origin-template-engine"
+    },
+    {
+      "origin-id": 190316,
+      "origin-key": "ef3d81b4-2d71-4de5-869c-70be2da14d8c",
+      "name": "siem-bb"
     }
   ],
   "rules-engine": {
@@ -153,11 +158,6 @@
         "phase": "request"
       },
       {
-        "id": 364147,
-        "name": "Route SIEM Azion (BB)",
-        "phase": "request"
-      },
-      {
         "id": 372222,
         "name": "API Version 4 Routing",
         "phase": "request"
@@ -165,11 +165,6 @@
       {
         "id": 381598,
         "name": "Billing PDF",
-        "phase": "request"
-      },
-      {
-        "id": 458299,
-        "name": "Maintaince Page",
         "phase": "request"
       },
       {
