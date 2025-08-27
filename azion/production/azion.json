@@ -98,11 +98,6 @@
     "created": false,
     "rules": [
       {
-        "id": 372222,
-        "name": "API Version 4 Routing",
-        "phase": "request"
-      },
-      {
         "id": 269748,
         "name": "Apply Common Configuration for All Requests",
         "phase": "request"
@@ -163,29 +158,14 @@
         "phase": "request"
       },
       {
-        "id": 468657,
-        "name": "OAuth Security Headers - GitHub Connection",
-        "phase": "response"
-      },
-      {
-        "id": 468656,
-        "name": "OAuth Security Headers - Login and Signup",
-        "phase": "response"
+        "id": 372222,
+        "name": "API Version 4 Routing",
+        "phase": "request"
       },
       {
         "id": 381598,
         "name": "Billing PDF",
         "phase": "request"
-      },
-      {
-        "id": 368279,
-        "name": "Rewrite azat Cookie in azion.com",
-        "phase": "response"
-      },
-      {
-        "id": 368280,
-        "name": "Rewrite azat Cookie in azionedge.net",
-        "phase": "response"
       },
       {
         "id": 368275,
@@ -205,6 +185,26 @@
       {
         "id": 368278,
         "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368279,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368280,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 468656,
+        "name": "OAuth Security Headers - Login and Signup",
+        "phase": "response"
+      },
+      {
+        "id": 468657,
+        "name": "OAuth Security Headers - GitHub Connection",
         "phase": "response"
       },
       {
