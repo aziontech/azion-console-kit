@@ -64,11 +64,6 @@
       "name": "console_kit_31-07-2024_single"
     },
     {
-      "origin-id": 241517,
-      "origin-key": "9bb0c254-e07e-45d2-9e5d-13d0dc703d07",
-      "name": "maintaince-origin"
-    },
-    {
       "origin-id": 154233,
       "origin-key": "8c16e835-20af-41d5-a688-cac8e6aefa94",
       "name": "origin-console-feedback"
@@ -87,11 +82,6 @@
       "origin-id": 199948,
       "origin-key": "bd1c28b8-dc47-4ac4-8079-f05686d4bdee",
       "name": "origin-template-engine"
-    },
-    {
-      "origin-id": 190316,
-      "origin-key": "ef3d81b4-2d71-4de5-869c-70be2da14d8c",
-      "name": "siem-bb"
     }
   ],
   "rules-engine": {
