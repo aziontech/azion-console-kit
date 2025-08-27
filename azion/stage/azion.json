@@ -148,11 +148,6 @@
         "phase": "request"
       },
       {
-        "id": 368013,
-        "name": "Rewrite azrt Cookie in azion.com",
-        "phase": "response"
-      },
-      {
         "id": 371432,
         "name": "API Version 4 Routing",
         "phase": "request"
@@ -161,6 +156,11 @@
         "id": 380751,
         "name": "Billing PDF",
         "phase": "request"
+      },
+      {
+        "id": 368013,
+        "name": "Rewrite azrt Cookie in azion.com",
+        "phase": "response"
       },
       {
         "id": 368014,
