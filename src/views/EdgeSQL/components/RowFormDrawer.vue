@@ -309,7 +309,6 @@
         :isDrawer="true"
       >
         <template #inputs>
-          {{ columnInfo }}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             <div
               v-for="(column, index) in columnInfo"
