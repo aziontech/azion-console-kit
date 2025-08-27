@@ -98,11 +98,6 @@
         "phase": "request"
       },
       {
-        "id": 380751,
-        "name": "Billing PDF",
-        "phase": "request"
-      },
-      {
         "id": 277550,
         "name": "Deliver Static Assets from Storage",
         "phase": "request"
@@ -133,11 +128,6 @@
         "phase": "request"
       },
       {
-        "id": 371432,
-        "name": "API Version 4 Routing",
-        "phase": "request"
-      },
-      {
         "id": 277557,
         "name": "Route User Authentication and Account Management to SSO Origin",
         "phase": "request"
@@ -161,6 +151,16 @@
         "id": 368013,
         "name": "Rewrite azrt Cookie in azion.com",
         "phase": "response"
+      },
+      {
+        "id": 371432,
+        "name": "API Version 4 Routing",
+        "phase": "request"
+      },
+      {
+        "id": 380751,
+        "name": "Billing PDF",
+        "phase": "request"
       },
       {
         "id": 368014,
