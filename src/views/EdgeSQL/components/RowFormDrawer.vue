@@ -5,6 +5,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
@@ -55,13 +56,40 @@
   const databaseId = computed(() => route.params.id)
 
   const validationSchema = computed(() => {
-    const schema = {}
-    props.columns.forEach((column) => {
-      if (!isFieldBlobType(column)) {
-        schema[column] = yup.string().label(column)
+    const schemaShape = {}
+
+    props.columnInfo.forEach((column) => {
+      let fieldValidator
+
+      switch (column.type.toUpperCase()) {
+        case 'TEXT':
+          fieldValidator = yup.string()
+          break
+        case 'INTEGER':
+          fieldValidator = yup.number().integer(`Field '${column.name}' must be an integer.`)
+          break
+        case 'REAL':
+        case 'NUMERIC':
+          fieldValidator = yup.number()
+          break
+        case 'BOOLEAN':
+          fieldValidator = yup.boolean()
+          break
+        default:
+          fieldValidator = yup.mixed()
+          break
       }
+
+      if (column.notnull === 1) {
+        fieldValidator = fieldValidator.required(`Field '${column.name}' is required.`)
+      } else {
+        fieldValidator = fieldValidator.nullable()
+      }
+
+      schemaShape[column.name] = fieldValidator
     })
-    return yup.object(schema)
+
+    return yup.object().shape(schemaShape)
   })
 
   const initialValues = computed(() => {
@@ -85,164 +113,29 @@
     return `edit-${dataString.substring(0, 20)}-${Date.now().toString().slice(-6)}`
   })
 
-  const escapeValue = (value, columnType) => {
-    if (value === null || value === undefined || value === '') {
-      return 'NULL'
-    }
-
-    const strValue = value.toString().trim()
-
-    if (
-      columnType &&
-      (columnType.toUpperCase().includes('INTEGER') ||
-        columnType.toUpperCase().includes('REAL') ||
-        columnType.toUpperCase().includes('NUMERIC'))
-    ) {
-      if (!isNaN(strValue) && strValue !== '') {
-        return strValue
-      }
-    }
-
-    return `'${strValue.replace(/'/g, "''")}'`
-  }
-
-  const buildInsertQuery = (tableName, columns, formData) => {
-    const columnsWithValues = columns.filter(
-      (col) => formData[col] !== undefined && formData[col] !== null && formData[col] !== ''
-    )
-
-    if (columnsWithValues.length === 0) {
-      throw new Error('No values provided for insert')
-    }
-
-    const columnNames = columnsWithValues.join(', ')
-    const values = columnsWithValues
-      .map((col) => escapeValue(formData[col], getColumnType(col)))
-      .join(', ')
-    return `INSERT INTO ${tableName} (${columnNames}) VALUES (${values});`
-  }
-
-  const buildUpdateQuery = (tableName, changedData, whereCondition) => {
-    const setClause = Object.keys(changedData)
-      .map((col) => `${col} = ${escapeValue(changedData[col], getColumnType(col))}`)
-      .join(', ')
-    return `UPDATE ${tableName} SET ${setClause} WHERE ${whereCondition};`
-  }
-
-  const buildWhereCondition = (formData, columnInfo) => {
-    const whereConditions = []
-
-    const primaryKeys = columnInfo.filter((col) => col[5] === 1)
-
-    let usePrimaryKeys = false
-    if (primaryKeys.length > 0) {
-      primaryKeys.forEach((col) => {
-        const columnName = col[1]
-        const columnType = col[2]
-        const value = formData[columnName]
-
-        if (value !== undefined && value !== null && value !== '') {
-          const escapedValue = escapeValue(value, columnType)
-          whereConditions.push(`${columnName} = ${escapedValue}`)
-          usePrimaryKeys = true
-        }
-      })
-    }
-
-    if (!usePrimaryKeys) {
-      Object.keys(formData).forEach((columnName) => {
-        const value = formData[columnName]
-        if (value !== undefined && value !== null && value !== '') {
-          const columnType = getColumnType(columnName)
-          const escapedValue = escapeValue(value, columnType)
-          whereConditions.push(`${columnName} = ${escapedValue}`)
-        }
-      })
-    }
-
-    if (whereConditions.length === 0) {
-      throw new Error('Cannot build WHERE condition: no valid conditions found')
-    }
-
-    return whereConditions.join(' AND ')
-  }
-
   const realCreateService = async (formData) => {
-    try {
-      if (!props.tableName) {
-        throw new Error('Table name is required')
-      }
+    await edgeSQLService.insertRow(databaseId.value, {
+      tableName: props.tableName,
+      dataToInsert: formData,
+      tableSchema: props.columnInfo
+    })
 
-      const cleanFormData = {}
-      Object.keys(formData).forEach((key) => {
-        if (
-          !isFieldBlobType(key) &&
-          formData[key] !== undefined &&
-          formData[key] !== null &&
-          formData[key] !== ''
-        ) {
-          cleanFormData[key] = formData[key]
-        }
-      })
-
-      const query = buildInsertQuery(props.tableName, props.columns, cleanFormData)
-
-      const result = await edgeSQLService.executeDatabase(databaseId.value, {
-        statements: [query]
-      })
-
-      if (result.statusCode === 200) {
-        return {
-          feedback: 'Row inserted successfully',
-          data: cleanFormData
-        }
-      } else {
-        throw new Error(result.error || 'Failed to insert row')
-      }
-    } catch (error) {
-      throw new Error(`Insert failed: ${error.message}`)
+    return {
+      feedback: 'Row inserted successfully'
     }
   }
 
   const realEditService = async (formData) => {
-    try {
-      if (!props.tableName) {
-        throw new Error('Table name is required')
-      }
+    const originalData = props.initialData
 
-      const originalData = props.initialData
-      const whereCondition = buildWhereCondition(originalData, props.columnInfo)
+    await edgeSQLService.updatedRow(databaseId.value, {
+      tableName: props.tableName,
+      newData: formData,
+      whereData: originalData,
+      tableSchema: props.columnInfo
+    })
 
-      const changedData = {}
-      props.columns.forEach((column) => {
-        if (!isFieldBlobType(column)) {
-          const originalValue = originalData[column] || ''
-          const newValue = formData[column] || ''
-
-          if (originalValue !== newValue) {
-            changedData[column] = newValue
-          }
-        }
-      })
-
-      if (Object.keys(changedData).length === 0) {
-        return 'No changes detected'
-      }
-
-      const query = buildUpdateQuery(props.tableName, changedData, whereCondition)
-
-      const result = await edgeSQLService.executeDatabase(databaseId.value, {
-        statements: [query]
-      })
-
-      if (result.statusCode === 200) {
-        return `Successfully updated ${Object.keys(changedData).length} field(s)`
-      } else {
-        throw new Error(result.error || 'Failed to update row')
-      }
-    } catch (error) {
-      throw new Error(`Update failed: ${error.message}`)
-    }
+    return `Successfully updated.`
   }
 
   const realLoadService = async () => {
@@ -385,6 +278,10 @@
     }
   )
 
+  const getFieldComponent = (type) => {
+    return ['INTEGER', 'REAL', 'NUMERIC'].includes(type) ? FieldNumber : FieldText
+  }
+
   watch(
     () => props.initialData,
     () => {},
@@ -412,26 +309,27 @@
         :isDrawer="true"
       >
         <template #inputs>
+          {{ columnInfo }}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             <div
-              v-for="(column, index) in columns"
+              v-for="(column, index) in columnInfo"
               :key="column"
               class="flex flex-col gap-2"
             >
               <div
-                v-if="isFieldBlobType(column)"
+                v-if="isFieldBlobType(column.name)"
                 class="field"
               >
                 <label class="text-sm font-medium text-color mb-2 block">
-                  {{ getEnhancedLabel(column) }}
+                  {{ getEnhancedLabel(column.name) }}
                 </label>
                 <InputText
-                  :value="formatSpecialTypeValue(initialData[column])"
+                  :value="formatSpecialTypeValue(initialData[column.name])"
                   disabled
                   class="w-full font-mono text-sm"
                 />
                 <small class="text-color-secondary mt-2 block">
-                  {{ getFieldDescription(column) }}
+                  {{ getFieldDescription(column.name) }}
                 </small>
                 <div class="flex gap-1 flex-wrap mt-2">
                   <Tag
@@ -444,23 +342,24 @@
               </div>
 
               <template v-else>
-                <FieldText
-                  :label="getEnhancedLabel(column)"
-                  :name="column"
-                  :placeholder="`Enter ${column} value`"
+                <component
+                  :is="getFieldComponent(column.type)"
+                  :label="getEnhancedLabel(column.name)"
+                  :name="column.name"
+                  :placeholder="`Enter ${column.name} value`"
                   :disabled="disabledFields"
-                  :description="getFieldDescription(column)"
+                  :description="getFieldDescription(column.name)"
                   :data-testid="`row-form__field-${index}`"
-                  :data-field="column"
+                  :data-field="column.name"
                 />
               </template>
 
               <div
-                v-if="getColumnConstraints(column).length > 0"
+                v-if="getColumnConstraints(column.name).length > 0"
                 class="flex gap-1 flex-wrap mt-1"
               >
                 <Tag
-                  v-for="constraint in getColumnConstraints(column)"
+                  v-for="constraint in getColumnConstraints(column.name)"
                   :key="constraint.value"
                   :value="constraint.value"
                   :severity="constraint.severity"
