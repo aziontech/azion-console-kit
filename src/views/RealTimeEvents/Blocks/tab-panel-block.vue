@@ -4,6 +4,7 @@
   import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
+  import { eventsPlaygroundOpener } from '@/helpers'
 
   defineOptions({ name: 'TabPanelBlock' })
 
@@ -125,6 +126,7 @@
         :downloadCSV="exportTableCSV"
         :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
+        @openGraphQLDialog="eventsPlaygroundOpener"
       />
     </div>
     <ListTableBlock

@@ -103,6 +103,13 @@
           v-model="filterDataRange"
           @select="filterSearch"
         />
+        <PrimeButton
+          icon="pi pi-refresh"
+          outlined
+          size="small"
+          label="Refresh"
+          @click="filterSearch"
+        />
       </div>
       <div
         class="flex lex-1 w-full"
@@ -119,7 +126,7 @@
             iconPos="right"
             link
             class="text-xs"
-            label="GraphQL"
+            label="View on GraphQL"
             size="small"
             :pt="{
               icon: {
