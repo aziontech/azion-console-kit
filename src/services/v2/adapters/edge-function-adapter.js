@@ -2,6 +2,7 @@ import {
   adaptServiceDataResponse,
   adaptServiceDataResponseToLoad
 } from '@/services/v2/utils/adaptServiceDataResponse'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const STATUS_AS_TAG = {
   true: {
@@ -106,7 +107,8 @@ export const EdgeFunctionsAdapter = {
           lastEditor: parseLastEditor(edgeFunction),
           name: parseName(edgeFunction),
           vendor: edgeFunction.vendor,
-          referenceCount: edgeFunction.reference_count
+          referenceCount: edgeFunction.reference_count,
+          lastModified: formatDateToDayMonthYearHour(edgeFunction.last_modified)
         }
       }) || []
     )

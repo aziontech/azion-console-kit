@@ -15,7 +15,6 @@
       <ListTableBlock
         ref="listPurgeRef"
         v-if="hasContentToList"
-        disabledList
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         addButtonLabel="Purge"

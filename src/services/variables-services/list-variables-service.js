@@ -1,5 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeVariablesBaseUrl } from './make-variables-base-url'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { sortDate } from '@/utils/date-sort'
 
 export const listVariablesService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -29,15 +31,13 @@ const adapt = (httpResponse) => {
           content: variable.value
         },
         lastEditor: variable.last_editor,
-        updatedAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          new Date(variable.updated_at)
-        ),
+        updatedAt: formatDateToDayMonthYearHour(variable.updated_at),
         updatedAtDate: variable.updated_at
       }))
     : []
 
   return {
-    body: parsedVariables,
+    body: sortDate(parsedVariables, 'updatedAtDate'),
     statusCode: httpResponse.statusCode
   }
 }
