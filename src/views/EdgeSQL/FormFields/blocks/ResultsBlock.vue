@@ -51,13 +51,13 @@
     <ListTableBlock
       isTabs
       hiddenHeader
+      ref="refListTable"
       v-if="hasContentToList"
       :isLoading="isExecutingQuery"
       :listService="listTableService"
       :columns="columns"
       addButtonLabel="Insert"
       createPagePath="edge-sql/insert"
-      ref="refListTable"
       @on-load-data="handleLoadData"
       emptyListMessage="No results found."
       @on-row-click-edit-redirect="handleEditRedirect"
@@ -86,6 +86,8 @@
   const emit = defineEmits(['open-insert-row-drawer', 'open-edit-row-drawer'])
   const selectedRows = ref([])
   const hasContentToList = ref(false)
+
+  const refListTable = ref('')
 
   const props = defineProps({
     queryResults: {
@@ -186,6 +188,12 @@
     downloadCSV(csv, `edge-sql-all-results-${new Date().toISOString().split('T')[0]}.csv`)
   }
 
+  const reloadTable = () => {
+    if (refListTable.value) {
+      refListTable.value.reload({})
+    }
+  }
+
   const exportSelectedRows = () => {
     if (!selectedRows.value.length) return
 
@@ -203,6 +211,7 @@
     () => props.queryResults,
     (newQueryResults) => {
       responseQuery.value = newQueryResults
+      reloadTable()
     }
   )
 
