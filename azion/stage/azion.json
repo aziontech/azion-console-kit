@@ -88,11 +88,6 @@
     "created": false,
     "rules": [
       {
-        "id": 371432,
-        "name": "API Version 4 Routing",
-        "phase": "request"
-      },
-      {
         "id": 277548,
         "name": "Apply Common Configuration for All Requests",
         "phase": "request"
@@ -138,8 +133,13 @@
         "phase": "request"
       },
       {
-        "id": 312030,
-        "name": "Route API Identity Providers",
+        "id": 371432,
+        "name": "API Version 4 Routing",
+        "phase": "request"
+      },
+      {
+        "id": 277557,
+        "name": "Route User Authentication and Account Management to SSO Origin",
         "phase": "request"
       },
       {
@@ -153,8 +153,8 @@
         "phase": "request"
       },
       {
-        "id": 277557,
-        "name": "Route User Authentication and Account Management to SSO Origin",
+        "id": 312030,
+        "name": "Route API Identity Providers",
         "phase": "request"
       },
       {
