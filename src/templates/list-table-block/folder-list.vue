@@ -5,34 +5,22 @@
     data-testid="data-table-container"
   >
     <DataTable
+      v-if="!isLoading"
+      ref="dataTableRef"
+      :pt="parsedDatatablePt"
+      class="overflow-clip rounded-md"
       scrollable
       removableSort
-      :lazy="props.lazy"
-      :rowHover="!disabledList"
-      ref="dataTableRef"
-      class="overflow-clip rounded-md"
-      dataKey="id"
-      data-testid="data-table"
-      v-if="!isLoading"
-      :pt="props.pt"
-      :value="data"
-      v-model:filters="filtersDynamically"
-      v-model:sortField="sortFieldValue"
-      v-model:sortOrder="sortOrderValue"
-      :paginator="havePagination"
-      :rowsPerPageOptions="props.rowsPerPageOptions"
-      :rows="itemsByPage"
-      :globalFilterFields="filterBy"
-      :selection="selectedItems"
-      :exportFilename="exportFileName"
-      :exportFunction="exportFunctionMapper"
-      :loading="isLoading"
-      :totalRecords="totalRecords"
-      @rowReorder="onRowReorder"
-      @row-click="editItemSelected"
+      :value="filterData"
+      :paginator="paginator"
+      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rows="minimumOfItemsPerPage"
+      v-model:selection="selectedItems"
       @page="changeNumberOfLinesPerPage"
-      @sort="fetchOnSort"
-      :first="firstItemIndex"
+      :globalFilterFields="filterBy"
+      :loading="isLoading"
+      data-testid="data-table"
+      rowHover
     >
       <template
         #header
@@ -56,33 +44,16 @@
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"
-                @keyup.enter="fetchOnSearch"
-                @input="handleSearchValue(false)"
               />
-              <div class="ml-3">
-                <slot name="select-buttons" />
-              </div>
             </span>
-
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
 
             <slot
               name="addButton"
               data-testid="data-table-add-button"
-              :reload="reload"
-              :data="data"
             >
               <PrimeButton
                 class="max-sm:w-full"
-                :disabled="disabledAddButton"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -93,39 +64,70 @@
           </div>
         </slot>
       </template>
-
       <Column
-        v-if="reorderableRows"
-        rowReorder
-        headerStyle="width: 3rem"
-        data-testid="data-table-reorder-column"
-      />
-
-      <Column
-        v-if="showSelectionMode"
+        :class="{ '!hover:cursor-pointer': !disabledList }"
         selectionMode="multiple"
+        :pt="{
+          rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+        }"
         headerStyle="width: 3rem"
       />
-
       <Column
-        :sortable="!col.disableSort"
-        v-for="col of selectedColumns"
+        :sortable="selectedItems.length > 0 ? false : !col.disableSort"
+        v-for="(col, index) of selectedColumns"
         :key="col.field"
         :field="col.field"
-        :header="col.header"
-        :sortField="col?.sortField"
-        :class="{ 'hover:cursor-pointer': !col.disableSort || !disabledList }"
+        :header="selectedItems.length === 0 ? col.header : ''"
+        :sortField="selectedItems.length > 0 ? null : col?.sortField"
+        headerClass="relative h-16 w-[20rem]"
+        :class="{ 'hover:cursor-pointer ': !disabledList }"
         data-testid="data-table-column"
       >
+        <template
+          #header
+          v-if="selectedItems.length > 0 && index === 0"
+        >
+          <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
+            <span class="text-sm">{{ selectedItems.length }} files selected</span>
+            <div class="flex gap-2">
+              <PrimeButton
+                size="small"
+                outlined
+                icon="pi pi-arrow-right-arrow-left"
+                label="Move"
+                class="px-4"
+              />
+              <PrimeButton
+                size="small"
+                outlined
+                :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
+                label="Download"
+                class="px-4"
+                :disabled="isDownloading"
+                @click="emit('download-selected-items')"
+              />
+              <PrimeButton
+                size="small"
+                icon="pi pi-trash"
+                label="Delete"
+                severity="danger"
+                class="px-4"
+                @click="emit('delete-selected-items')"
+              />
+            </div>
+          </div>
+        </template>
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
+              @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
           <template v-else>
             <component
+              @click="editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -149,7 +151,7 @@
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -163,7 +165,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
+                :options="[{ label: 'Hidden Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -276,8 +278,8 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
-                :disabled="disabledAddButton"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -316,20 +318,22 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
-  import { getCsvCellContentFromRowData } from '@/helpers'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-
   defineOptions({ name: 'list-table-block-new' })
 
   const emit = defineEmits([
     'on-load-data',
-    'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
-    'update:selectedItensData'
+    'update:selectedItensData',
+    'on-row-click-edit-folder',
+    'delete-selected-items'
   ])
 
   const props = defineProps({
+    disabledList: {
+      type: Boolean
+    },
     hiddenHeader: {
       type: Boolean
     },
@@ -337,20 +341,7 @@
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
     },
-    hiddenByDefault: {
-      type: Array,
-      default: () => []
-    },
-    loadDisabled: {
-      type: Boolean
-    },
-    disabledAddButton: {
-      type: Boolean
-    },
-    disabledList: {
-      type: Boolean
-    },
-    isGraphql: {
+    lazyLoad: {
       type: Boolean
     },
     createPagePath: {
@@ -364,27 +355,13 @@
     editInDrawer: {
       type: Function
     },
-    addButtonLabel: {
-      type: String,
-      default: () => ''
-    },
     listService: {
       required: true,
       type: Function
     },
-    enableEditClick: {
-      type: Boolean,
-      default: true
-    },
-    reorderableRows: {
-      type: Boolean
-    },
-    onReorderService: {
-      type: Function
-    },
-    isReorderAllEnabled: {
-      type: Boolean,
-      default: false
+    addButtonLabel: {
+      type: String,
+      default: () => ''
     },
     emptyListMessage: {
       type: String,
@@ -398,56 +375,43 @@
       type: Boolean,
       default: false
     },
-    showSelectionMode: {
-      type: Boolean
-    },
     selectedItensData: {
       type: Array,
       default: () => []
-    },
-    csvMapper: {
-      type: Function
-    },
-    exportFileName: {
-      type: String
     },
     pt: {
       type: Object,
       default: () => ({})
     },
-    apiFields: {
-      type: Array,
-      default: () => []
-    },
-    defaultOrderingFieldName: {
-      type: String,
-      default: () => 'id'
-    },
-    rowsPerPageOptions: {
-      type: Array,
-      default: () => [10, 20, 50, 100]
-    },
-    lazy: {
+    paginator: {
       type: Boolean,
       default: true
+    },
+    enableEditClickFolder: {
+      type: Boolean,
+      default: false
+    },
+    selectedBucket: {
+      type: Object,
+      default: () => ({})
+    },
+    isDownloading: {
+      type: Boolean,
+      default: false
+    },
+    searchFilter: {
+      type: String,
+      default: () => ''
     }
   })
 
   const tableDefinitions = useTableDefinitionsStore()
-  const havePagination = ref(true)
-  const getSpecificPageCount = computed(() => {
-    if (props.rowsPerPageOptions.length === 1) {
-      return props.rowsPerPageOptions[0]
-    }
-    return tableDefinitions.getNumberOfLinesPerPage
-  })
 
-  const itemsByPage = ref(getSpecificPageCount.value)
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
-
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -456,25 +420,11 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
-  const hasExportToCsvMapper = ref(!!props.csvMapper)
+  const toast = useToast()
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
-  const toast = useToast()
-  const firstLoadData = ref(true)
-
-  const sortFieldValue = ref(null)
-  const sortOrderValue = ref(null)
-
-  const totalRecords = ref()
-  const savedSearch = ref('')
-  const savedOrdering = ref('')
-  const firstItemIndex = ref(0)
-
-  const filtersDynamically = computed(() => {
-    return props.lazy ? {} : filters.value
-  })
 
   const selectedItems = computed({
     get: () => {
@@ -485,51 +435,33 @@
     }
   })
 
-  /**
-   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
-   */
-  const exportFunctionMapper = (rowData) => {
-    if (!hasExportToCsvMapper.value) {
-      return
+  const parsedDatatablePt = computed(() => ({
+    ...props.pt,
+    rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+  }))
+
+  const filterData = computed(() => {
+    return data.value.filter((item) => {
+      return item.name.toLowerCase().includes(props.searchFilter.toLowerCase())
+    })
+  })
+
+  onMounted(() => {
+    if (!props.lazyLoad) {
+      loadData({ page: 1 })
     }
-    const columnMapper = props.csvMapper(rowData)
-    return getCsvCellContentFromRowData({ columnMapper, rowData })
-  }
+    selectedColumns.value = props.columns
+  })
 
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
   }
-
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
 
-  /**
-   * Moves an item within the original array based on updated positions in a reference array.
-   *
-   * @param {Array} originalData - The array to be modified.
-   * @param {Array} referenceArray - The reference array with the new order.
-   * @param {number} fromIndex - The index of the item to move in the reference array.
-   * @param {number} toIndex - The target index  in the reference array.
-   * @returns {Array} The updated array with the item moved.
-   */
-  const moveItem = (originalData, referenceArray, fromIndex, toIndex) => {
-    const originalArray = [...originalData]
-    const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
-    const itemToMoveId = referenceArray[toIndex]
-    const targetItemId = referenceArray[oldItemMove]
-
-    const originalItemIndex = originalArray.findIndex((item) => item.id === itemToMoveId.id)
-    const targetItemIndex = originalArray.findIndex((item) => item.id === targetItemId.id)
-
-    const [itemToMove] = originalArray.splice(originalItemIndex, 1)
-    originalArray.splice(targetItemIndex, 0, itemToMove)
-
-    return originalArray
-  }
-
-  const onRowReorder = async (event) => {
-    emit('on-reorder', { event, data, moveItem })
+  const reload = (query = {}) => {
+    loadData({ page: 1, ...query })
   }
 
   const openDialog = (dialogComponent, body) => {
@@ -556,7 +488,6 @@
                 closeCallback: (opt) => {
                   if (opt.data.updated) {
                     reload()
-                    updateDataTablePagination()
                   }
                 }
               })
@@ -576,45 +507,23 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }, service) => {
-    try {
-      isLoading.value = true
-      if (service) {
-        const { count = 0, body = [] } = props.isGraphql
-          ? await service()
-          : await service({ page, ...query })
-
-        data.value = body
-        totalRecords.value = count
-      } else {
-        const { count = 0, body = [] } = props.isGraphql
-          ? await props.listService()
-          : await props.listService({ page, ...query })
-
-        data.value = body
-        totalRecords.value = count
-      }
-    } catch (error) {
-      // Check if error is an ErrorHandler instance (from v2 services)
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        // Fallback for legacy errors or non-ErrorHandler errors
+  const loadData = async () => {
+    if (props.listService) {
+      try {
+        isLoading.value = true
+        data.value = await props.listService()
+      } catch (error) {
+        data.value = []
         const errorMessage = error.message || error
         toast.add({
           closable: true,
           severity: 'error',
-          summary: 'Error',
+          summary: 'error',
           detail: errorMessage
         })
+      } finally {
+        isLoading.value = false
       }
-    } finally {
-      isLoading.value = false
-      if (firstLoadData.value) {
-        const hasData = data.value?.length > 0
-        emit('on-load-data', !!hasData)
-      }
-      firstLoadData.value = false
     }
   }
 
@@ -631,12 +540,13 @@
     menuRef.value[selectedID].toggle(event)
   }
 
-  const editItemSelected = ({ data: item }) => {
+  const editItemSelected = (item) => {
     emit('on-before-go-to-edit', item)
+
     if (props.editInDrawer) {
       props.editInDrawer(item)
-    } else if (props.enableEditClick && !item?.disableEditClick) {
-      router.push({ path: `${props.editPagePath}/${item.id}` })
+    } else if (props.enableEditClickFolder) {
+      emit('on-row-click-edit-folder', item)
     }
   }
 
@@ -653,25 +563,7 @@
     }
   }
 
-  const reload = async (query = {}, listService = props.listService) => {
-    if (!savedOrdering.value) {
-      savedOrdering.value = props.defaultOrderingFieldName
-    }
-
-    const commonParams = {
-      page: 1,
-      pageSize: itemsByPage.value,
-      fields: props.apiFields,
-      ordering: savedOrdering.value,
-      ...query
-    }
-
-    if (props.lazy) {
-      commonParams.search = savedSearch.value
-    }
-
-    loadData(commonParams, listService)
-  }
+  defineExpose({ reload, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -688,9 +580,7 @@
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-    itemsByPage.value = numberOfLinesPerPage
-    firstItemIndex.value = event.first
-    reload({ page: event.page + 1 })
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
   }
 
   const filterBy = computed(() => {
@@ -700,57 +590,8 @@
     return [...filters, ...filtersPath]
   })
 
-  const fetchOnSort = async (event) => {
-    const { sortField, sortOrder } = event
-    let ordering = sortOrder === -1 ? `-${sortField}` : sortField
-    ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-    const firstPage = 1
-    firstItemIndex.value = firstPage
-    await reload({ ordering })
-    savedOrdering.value = ordering
-    sortFieldValue.value = sortField
-    sortOrderValue.value = sortOrder
-  }
-
-  const fetchOnSearch = () => {
-    if (!props.lazy) return
-
-    const firstPage = 1
-    firstItemIndex.value = firstPage
-    reload()
-  }
-
-  const updateDataTablePagination = () => {
-    const FIRST_NUMBER_PAGE = 1
-    firstItemIndex.value = FIRST_NUMBER_PAGE
-  }
-
-  const handleSearchValue = () => {
-    const search = filters.value.global.value
-    savedSearch.value = search
-  }
-
-  onMounted(() => {
-    if (!props.loadDisabled) {
-      loadData({
-        page: 1,
-        pageSize: itemsByPage.value,
-        fields: props.apiFields,
-        ordering: props.defaultOrderingFieldName
-      })
-    }
-    selectedColumns.value = props.columns.filter(
-      (col) => !props.hiddenByDefault?.includes(col.field)
-    )
+  watch(data, (currentState) => {
+    const hasData = currentState?.length > 0
+    emit('on-load-data', !!hasData)
   })
-
-  watch(
-    () => props.columns,
-    (newColumns) => {
-      selectedColumns.value = newColumns
-    },
-    { deep: true }
-  )
-
-  defineExpose({ reload, handleExportTableDataToCSV })
 </script>

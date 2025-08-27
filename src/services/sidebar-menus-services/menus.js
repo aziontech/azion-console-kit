@@ -204,6 +204,19 @@ function createMarketplaceProductsItems() {
   ]
 }
 
+//  Uncoment this when store is ready
+// function createStoreItems() {
+//   return [
+//     {
+//       label: 'Edge Storage',
+//       to: '/edge-storage',
+//       icon: 'ai ai-edge-storage',
+//       id: 'edge-storage',
+//       tag: 'Preview'
+//     }
+//   ]
+// }
+
 export function getMenuItens(showMarketplaceProductsItens) {
   const menus = [
     createHomeItem(),
@@ -217,6 +230,11 @@ export function getMenuItens(showMarketplaceProductsItens) {
       label: 'Secure',
       items: createSecureItems()
     },
+    // Uncomment this when store is ready
+    // {
+    //   label: 'Store',
+    //   items: createStoreItems()
+    // },
     {
       label: 'Deploy',
       items: createDeployItems()

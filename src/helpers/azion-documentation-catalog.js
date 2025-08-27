@@ -33,7 +33,8 @@ export const documentationCatalog = {
   mfaManagement: () => openSearchResult('MFA Management'),
   edgeConnectors: () => openSearchResult('Origins'),
   workload: () => openSearchResult('workload'),
-  edgeSQL: () => openSearchResult('edge-sql')
+  edgeSQL: () => openSearchResult('edge-sql'),
+  edgeStorage: () => openSearchResult('edge storage')
 }
 
 export const documentationGuideProducts = {
@@ -60,7 +61,8 @@ export const documentationGuideProducts = {
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-methods'),
   paymentHistory: () =>
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
-  customPages: () => openDocumentationProducts('guides/customizing-error-response-page')
+  customPages: () => openDocumentationProducts('guides/customizing-error-response-page'),
+  edgeStorage: () => openDocumentationProducts('store/edge-storage')
 }
 
 export const documentationStoreProducts = {
