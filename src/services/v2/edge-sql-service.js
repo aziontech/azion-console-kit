@@ -130,4 +130,30 @@ export class EdgeSQLService {
 
     return this.adapter?.adaptExecuteResult?.(data)
   }
+
+  updatedRow = async (databaseId, { tableName, newData, whereData, tableSchema }) => {
+    const body = this.adapter?.adaptUpdateRow?.({ tableName, newData, whereData, tableSchema })
+
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body,
+      processError: false
+    })
+
+    return this.adapter?.adaptExecuteResult?.(data)
+  }
+
+  insertRow = async (databaseId, { tableName, dataToInsert, tableSchema }) => {
+    const body = this.adapter?.adaptInsertRow?.({ tableName, dataToInsert, tableSchema })
+
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body,
+      processError: false
+    })
+
+    return this.adapter?.adaptExecuteResult?.(data)
+  }
 }

@@ -3,6 +3,23 @@ import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 const truncate = (str, len) => (str.length > len ? `${str.substring(0, len - 3)}...` : str)
 
+const formatSqlValue = (value, fieldName, schema) => {
+  const column = schema.find((column) => column.name === fieldName)
+  const type = column ? column.type.toUpperCase() : 'TEXT'
+
+  if (value === null || String(value).toUpperCase() === 'NULL') {
+    return 'NULL'
+  }
+
+  if (['INTEGER', 'REAL', 'NUMERIC'].includes(type)) {
+    const num = Number(value)
+    return isNaN(num) ? 'NULL' : num
+  }
+
+  const stringValue = String(value)
+  return `'${stringValue.replace(/'/g, "''")}'`
+}
+
 const formatters = {
   Array: (arr) => {
     if (arr.length <= 5) return `[${arr.join(', ')}]`
@@ -228,6 +245,47 @@ export const EdgeSQLAdapter = {
         return total + (result.rows?.length || 0)
       }, 0) || 0
     )
+  },
+
+  adaptUpdateRow({ tableName, newData, whereData, tableSchema }) {
+    const setClause = Object.keys(newData)
+      .map((key) => {
+        const formattedValue = formatSqlValue(newData[key], key, tableSchema)
+        return `"${key}" = ${formattedValue}`
+      })
+      .join(', ')
+
+    const whereClause = Object.keys(whereData)
+      .map((key) => {
+        const originalValue = whereData[key]
+        if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+          return `"${key}" IS NULL`
+        }
+        const formattedValue = formatSqlValue(originalValue, key, tableSchema)
+        return `"${key}" = ${formattedValue}`
+      })
+      .join(' AND ')
+
+    const query = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause};`
+
+    return {
+      statements: [query]
+    }
+  },
+
+  adaptInsertRow({ tableName, dataToInsert, tableSchema }) {
+    const columns = Object.keys(dataToInsert)
+
+    const columnsPart = columns.map((col) => `"${col}"`).join(', ')
+
+    const valuesPart = columns
+      .map((col) => {
+        const value = dataToInsert[col]
+        return formatSqlValue(value, col, tableSchema)
+      })
+      .join(', ')
+
+    return { statements: [`INSERT INTO "${tableName}" (${columnsPart}) VALUES (${valuesPart});`] }
   },
 
   adaptDatabaseDelete(httpResponse) {

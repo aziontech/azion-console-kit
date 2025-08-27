@@ -348,9 +348,10 @@
     focusedField.value = ''
   }
 
-  const openInsertRowDrawer = () => {
+  const openInsertRowDrawer = async () => {
     if (queryResults.value.length === 0) return
 
+    await loadTableSchema(selectedTableName.value)
     clearRowFormState()
     rowFormDrawerVisible.value = true
   }
@@ -555,7 +556,7 @@
     <RowFormDrawer
       v-model:visible="rowFormDrawerVisible"
       :columns="queryResults[0]?.columns || []"
-      :columnInfo="selectedTableSchema?.columns || []"
+      :columnInfo="selectedTableSchema?.rows || []"
       :tableName="selectedTableName || ''"
       :initialData="editingRowData || {}"
       :isEditing="isEditingRow"
