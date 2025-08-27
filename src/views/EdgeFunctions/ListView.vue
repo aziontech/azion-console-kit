@@ -151,6 +151,7 @@
       field: 'lastEditor',
       header: 'Last Editor'
     },
+    { field: 'lastModified', header: 'Last Modified' },
     {
       field: 'lastModified',
       header: 'Last Modified'

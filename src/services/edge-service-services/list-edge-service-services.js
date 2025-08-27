@@ -46,7 +46,7 @@ const adapt = (httpResponse) => {
   })
 
   return {
-    body: parsedEdgeServices,
+    body: sortDate(parsedEdgeServices, 'lastModifiedDate'),
     statusCode: httpResponse.statusCode
   }
 }
