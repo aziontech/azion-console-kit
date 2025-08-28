@@ -276,7 +276,7 @@
             class="overflow-clip surface-border border rounded-md"
             :initialValue="schemaAzionFormString"
             :errors="false"
-            @update:modelValue="function (value) {
+            @update:modelValue="(value) => {
                 setAzionFormSchema(value)
                 setAzionFormEmptyState(value)
               }

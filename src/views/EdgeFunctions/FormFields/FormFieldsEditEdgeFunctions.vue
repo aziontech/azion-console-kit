@@ -107,6 +107,11 @@
     }
   ]
 
+  const codeEditorValueUpdate = (value) => {
+    setAzionFormSchema(value)
+    setAzionFormEmptyState(value)
+  }
+
   const formBuilderToggle = () => {
     showFormBuilder.value = showFormBuilder.value === false ? true : false
   }
@@ -289,11 +294,7 @@
             class="overflow-clip surface-border border rounded-md"
             :initialValue="schemaAzionFormString"
             :errors="false"
-            @update:modelValue="function (value) {
-                setAzionFormSchema(value)
-                setAzionFormEmptyState(value)
-              }
-            "
+            @update:modelValue="codeEditorValueUpdate"
           />
         </SplitterPanel>
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
