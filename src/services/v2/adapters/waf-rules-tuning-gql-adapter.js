@@ -21,14 +21,14 @@ export const WafRulesTuningGqlAdapter = {
     }
   },
 
-  transformWafRulesTuningAttacks(data) {
+  transformWafRulesTuningAttacks(data, tuningId) {
     const {
       data: { logs }
     } = data
     if (!logs.length) return { data: [], recordsFound: 0 }
 
     const results = parseAndGroupMultipleRules(logs, true)
-    const grouped = groupByMatchValueAndPath(results)
+    const grouped = groupByMatchValueAndPath(results, tuningId)
 
     return {
       data: grouped,

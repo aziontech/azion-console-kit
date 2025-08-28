@@ -182,6 +182,6 @@ export class WafRulesTuningGqlService {
         variables
       }
     })
-    return this.adapter.transformWafRulesTuningAttacks(data)
+    return this.adapter.transformWafRulesTuningAttacks(data, params?.tuningId)
   }
 }
