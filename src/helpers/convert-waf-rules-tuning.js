@@ -161,9 +161,9 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
   return Object.values(grouped).map((item) => {
     return {
       ...item,
-      topIps: [...item.ips],
-      topCountries: [...item.countries],
-      topPaths: [...item.paths],
+      topIps: [...item.ips].slice(0, 10),
+      topCountries: [...item.countries].slice(0, 10),
+      topPaths: [...item.paths].slice(0, 10),
       ipHitCount: item.ipHitCount,
       countryHitCount: item.countryHitCount,
       pathHitCount: item.pathHitCount
@@ -216,15 +216,15 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
   return Object.values(grouped).map((group) => {
     const matchingRule = rulesFiltered.find((rule) => rule.matchValue === group.matchValue)
 
-    const topIps = [...group.topIps]
+    const topIps = [...group.topIps].slice(0, 10)
     const topIpsWithHits = topIps.map((el) => `${el} (${matchingRule[`ipHitCount${el}`]} hits)`)
 
-    const topCountries = [...group.topCountries]
+    const topCountries = [...group.topCountries].slice(0, 10)
     const topCountriesWithHits = topCountries.map(
       (el) => `${el} (${matchingRule[`countryHitCount${el}`]} hits)`
     )
 
-    const topPaths = [...group.topPaths]
+    const topPaths = [...group.topPaths].slice(0, 10)
     const topPathsWithHits = topPaths.map(
       (el) => `${el} (${matchingRule[`pathHitCount${el}`]} hits)`
     )
