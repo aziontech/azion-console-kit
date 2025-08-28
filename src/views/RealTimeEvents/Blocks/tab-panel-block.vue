@@ -5,6 +5,8 @@
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
 
   defineOptions({ name: 'TabPanelBlock' })
 
@@ -99,6 +101,10 @@
     refreshFilterData()
   })
 
+  const totalRecordsFound = computed(() => {
+    return `${recordsFound.value} records found`
+  })
+
   onMounted(() => {
     reloadListTable()
   })
@@ -143,6 +149,21 @@
       :csvMapper="props.tabSelected.customColumnMapper"
       :exportFileName="`${props.tabSelected.tabRouter}-logs`"
       data-testid="table-tab-panel-block"
-    />
+    >
+      <template #actions-header="{ exportTableCSV }">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+        <PrimeButton
+          outlined
+          icon="pi pi-download"
+          class="min-w-max"
+          @click="exportTableCSV"
+          v-tooltip.top="{ value: 'Export to CSV', showDelay: 200 }"
+          data-testid="data-table-actions-column-header-toggle-columns"
+        />
+      </template>
+    </ListTableBlock>
   </data>
 </template>

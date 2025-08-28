@@ -57,10 +57,8 @@
   watch(
     () => props.modelValue,
     (newVal) => {
-      if (newVal) {
-        if (editable.value) {
-          editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
-        }
+      if (editable.value) {
+        editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
       }
     }
   )
