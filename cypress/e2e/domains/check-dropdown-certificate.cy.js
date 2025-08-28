@@ -3,7 +3,7 @@ import generateUniqueName from '../../support/utils'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
-describe('Domains - Certificate Dropdown', { tags: ['@dev8', '@dont_run_prod'] }, () => {
+describe('Domains - Certificate Dropdown', { tags: ['@dev8'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
       fixture: '/account/info/domain_flags.json'
