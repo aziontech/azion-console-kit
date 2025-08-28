@@ -140,16 +140,6 @@
           />
         </div>
       </TabPanel>
-      <TabPanel header="Now">
-        <div class="flex flex-col gap-4 items-center">
-          <p>Use current time as end date</p>
-          <PrimeButton
-            label="Set to Now"
-            icon="pi pi-clock"
-            @click="setToNow"
-          />
-        </div>
-      </TabPanel>
     </TabView>
 
     <div
@@ -173,6 +163,14 @@
             size="small"
             outlined
             @click="updateRange"
+          />
+          <PrimeButton
+            v-else
+            label="Set today"
+            class="min-w-max"
+            size="small"
+            outlined
+            @click="setToNow"
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, watch, defineModel } from 'vue'
+  import { computed, defineModel } from 'vue'
   import dialogFilter from './dialog-filter.vue'
 
   import { OPERATOR_MAPPING } from '../filterRow/component'
@@ -16,32 +16,33 @@
     }
   })
 
-  // Computed para processar os dados de exibição a partir de filterAdvanced
   const displayFilter = computed(() => {
     if (!filterAdvanced.value?.length) return []
 
-    return filterAdvanced.value.map((item) => {
-      const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
+    return filterAdvanced.value
+      .map((item) => {
+        const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
 
-      if (!selectedFields?.length) return null
-      
-      const selectedField = selectedFields.find(({ operator }) => {
-        return operator.find(({ value }) => value === item.operator)
+        if (!selectedFields?.length) return null
+
+        const selectedField = selectedFields.find(({ operator }) => {
+          return operator.find(({ value }) => value === item.operator)
+        })
+
+        if (!selectedField) return null
+
+        const { label, disabled, operator } = selectedField
+        const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
+
+        if (disabled || disabledOp) return null
+
+        return {
+          ...item,
+          field: label,
+          format: OPERATOR_MAPPING[item.operator]?.format
+        }
       })
-
-      if (!selectedField) return null
-
-      const { label, disabled, operator } = selectedField
-      const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
-
-      if (disabled || disabledOp) return null
-
-      return {
-        ...item,
-        field: label,
-        format: OPERATOR_MAPPING[item.operator]?.format
-      }
-    }).filter(Boolean)
+      .filter(Boolean)
   })
 
   const listField = computed(() => {
@@ -79,7 +80,7 @@
         (item) => item.valueField === value.valueField && item.operator === value.operator
       )
       if (index !== -1) {
-        filterAdvanced.value[index] = { 
+        filterAdvanced.value[index] = {
           valueField: value.valueField,
           operator: value.operator,
           value: value.value,
@@ -89,20 +90,13 @@
       return
     }
 
-    filterAdvanced.value.push({ 
+    filterAdvanced.value.push({
       valueField: value.valueField,
       operator: value.operator,
       value: value.value,
       type: value.type
     })
   }
-
-  watch(
-    () => props.fieldsInFilter,
-    () => {
-      // Não é mais necessário updateDisplayFilter pois displayFilter é computed
-    }
-  )
 </script>
 
 <template>

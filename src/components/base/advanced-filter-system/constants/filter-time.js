@@ -5,5 +5,3 @@ export const removeAmountOfHours = (offset, userUTC) => {
 
   return [begin.toUTC(userUTC), end.toUTC(userUTC)]
 }
-
-export 

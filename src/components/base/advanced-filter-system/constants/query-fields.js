@@ -14,6 +14,7 @@ const buildOperatorQuery = (dataset) => `
     }
   }
 `
+
 const ALIAS_MAPPING_OPERATOR = {
   configurationIdIn: TEXT_DOMAIN_WORKLOAD().singularLabel
 }
