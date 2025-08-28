@@ -22,13 +22,13 @@ No slots available
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import DataTimeRange from '@/components/base/dataTimeRange'
+  import { ref } from 'vue'
+  import DataTimeRange from '@/components/base/dataTimeRange'
 
-const dateRange = ref({
-  start: new Date(),
-  end: new Date()
-})
+  const dateRange = ref({
+    start: new Date(),
+    end: new Date()
+  })
 </script>
 ```
 
@@ -41,5 +41,6 @@ const dateRange = ref({
 ## Internal Components
 
 The component uses internal subcomponents that are not exported publicly:
+
 - `QuickSelect`: Manages quick date range selection with common options
 - `InputDateRange`: Manages manual date range input with date pickers

@@ -56,7 +56,6 @@
               />
             </span>
 
-
             <PrimeButton
               v-if="hasExportToCsvMapper"
               @click="handleExportTableDataToCSV"

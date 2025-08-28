@@ -13,7 +13,7 @@
 
   defineOptions({ name: 'dialog-filter' })
   const emit = defineEmits(['applyFilter'])
-  
+
   const props = defineProps({
     filtersOptions: {
       type: Array,

@@ -189,7 +189,7 @@ export const parseDateSimple = (dateString) => {
     const timeComponents = timePart.split(':')
     const hours = parseInt(timeComponents[0])
     const minutes = parseInt(timeComponents[1])
-    
+
     let seconds = 0
     if (timeComponents[2]) {
       const secondsPart = timeComponents[2].split('.')[0]
@@ -197,7 +197,7 @@ export const parseDateSimple = (dateString) => {
     }
 
     date.setHours(hours, minutes, seconds, 0)
-    
+
     return date
   } catch (error) {
     return null
