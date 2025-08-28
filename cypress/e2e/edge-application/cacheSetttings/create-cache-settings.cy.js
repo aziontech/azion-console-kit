@@ -72,4 +72,61 @@ describe('Edge Application', { tags: ['@dev8'] }, () => {
       fixtures.cacheSettingName
     )
   })
+  it('should edit a cache setting', () => {
+    cy.openProduct('Edge Application')
+    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings*').as('getCacheSettings')
+    cy.intercept('PATCH', '/v4/edge_application/applications').as('updateCacheSettings')
+
+    // Assert - Verify the edge application was created
+    cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
+    cy.get(selectors.list.filteredRow.column('name')).should(
+      'have.text',
+      fixtures.edgeApplicationName
+    )
+    // Act - Navigate to the created edge application
+    cy.get(selectors.list.filteredRow.column('name')).click()
+
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('tieredCacheEnabled')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@updateCacheSettings')
+    cy.verifyToast('success', 'Your edge application has been updated')
+    // Act - create a cache setting
+    cy.get(selectors.edgeApplication.tabs('Cache Settings')).click()
+    cy.wait('@getCacheSettings')
+    cy.get(selectors.edgeApplication.cacheSettings.createButton).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).clear()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(
+      fixtures.cacheSettingName
+    )
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your cache setting has been created')
+    cy.wait('@getCacheSettings')
+
+    // Assert
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(`${fixtures.cacheSettingName}{enter}`)
+    cy.get(selectors.edgeApplication.cacheSettings.firstFilteredNameRow).should(
+      'have.text',
+      fixtures.cacheSettingName
+    )
+
+    // Act - Edit the cache setting
+    cy.get(selectors.edgeApplication.cacheSettings.firstFilteredNameRow).click()
+    cy.get(selectors.edgeApplication.cacheSettings.editButton).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).clear()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(
+      fixtures.cacheSettingName
+    )
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your cache setting has been updated')
+    cy.wait('@getCacheSettings')
+
+    // Assert
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(`${fixtures.cacheSettingName}{enter}`)
+    cy.get(selectors.edgeApplication.cacheSettings.firstFilteredNameRow).should(
+      'have.text',
+      fixtures.cacheSettingName
+    )
+  })
 })
