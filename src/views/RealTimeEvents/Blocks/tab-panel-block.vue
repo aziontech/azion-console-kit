@@ -74,10 +74,6 @@
     reloadListTable()
   }
 
-  const exportTableCSV = () => {
-    listTableBlockRef.value?.handleExportTableDataToCSV()
-  }
-
   const refreshFilterData = () => {
     const filter = getFiltersFromHash()
     filterData.value = defaultFilter
@@ -125,14 +121,11 @@
         </p>
       </div>
     </div>
-    <div class="border-1 p-3.5 surface-border rounded-md mb-2">
+    <div class="border-1 p-4 surface-border rounded-md mb-2">
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :downloadCSV="exportTableCSV"
-        :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
-        @openGraphQLDialog="eventsPlaygroundOpener"
       />
     </div>
     <ListTableBlock
@@ -154,6 +147,14 @@
         <PrimeTag
           :value="totalRecordsFound"
           severity="info"
+        />
+        <PrimeButton
+          outlined
+          icon="ai ai-graphql"
+          class="min-w-max"
+          @click="eventsPlaygroundOpener"
+          v-tooltip.top="{ value: 'View on GraphQL', showDelay: 200 }"
+          data-testid="data-table-actions-column-header-toggle-columns"
         />
         <PrimeButton
           outlined
