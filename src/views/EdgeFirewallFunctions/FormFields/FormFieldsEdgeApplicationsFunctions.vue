@@ -1,26 +1,27 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, markRaw } from 'vue'
+  import { useField } from 'vee-validate'
 
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
 
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import SelectPanel from '@/components/select-panel'
   import DescriptionText from '@/components/description-text/descriptionText'
   import TitleDescriptionArea from '@/components/title-description-area'
 
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
-  import { useField } from 'vee-validate'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
+
   import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer'])
-  const renderers = Object.freeze([...vanillaRenderers])
+
+  const renderers = markRaw([...vanillaRenderers])
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
@@ -66,7 +67,7 @@
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
   const argsValue = ref('{}')
-  const selectPanelOptions = ['Form', 'JSON']
+  const selectPanelOptions = ['Visual', 'Raw JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const indentJsonStringify = (json, indentation = 2) => {
@@ -77,10 +78,10 @@
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
   }
 
-  const isToShowFormBuilder = (value) => {
-    showFormBuilder.value = value
+  const formBuilderToggle = () => {
+    showFormBuilder.value = showFormBuilder.value === false ? true : false
 
-    if (!value) {
+    if (showFormBuilder.value === false) {
       setAzionFormSchema(JSON.parse(schemaAzionFormString.value))
     }
   }
@@ -144,7 +145,7 @@
           name="name"
           v-model="name"
           description="Give a unique and descriptive name to identify the edge firewall function instance."
-          placeholder="My edge firewall function instance"
+          placeholder="My edge firewalel function instance"
           data-testid="edge-firewall-functions-form__name-field"
         />
       </div>
@@ -209,24 +210,15 @@
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
-              <div v-show="selectPanelValue === 'Form'">
-                <div id="azionform">
+              <div v-show="selectPanelValue === selectPanelOptions[0]">
+                <div
+                  id="azionform"
+                  class="azion-json-form"
+                >
                   <div
                     v-if="schemaAzionFormString"
                     class="flex flex-col gap-4"
                   >
-                    <FieldSwitchBlock
-                      title="Form builder"
-                      name="formBuilder"
-                      nameField="formBuilder"
-                      description="Use the enable/disable switch to toggle between form builder and visual editing modes."
-                      @onSwitchChange="
-                        (value) => {
-                          isToShowFormBuilder(value)
-                        }
-                      "
-                    />
-
                     <div>
                       <div
                         v-show="showFormBuilder && schemaAzionFormString"
@@ -241,7 +233,10 @@
                           :minimap="false"
                         />
                       </div>
-                      <div v-show="!showFormBuilder">
+                      <div
+                        class="max-w-[320px]"
+                        v-show="!showFormBuilder"
+                      >
                         <JsonForms
                           :renderers="renderers"
                           :data="azionFormData"
@@ -253,7 +248,7 @@
                   </div>
                 </div>
               </div>
-              <div v-show="selectPanelValue === 'JSON'">
+              <div v-show="selectPanelValue === selectPanelOptions[1]">
                 <div class="resize-y overflow-y-auto">
                   <CodeEditor
                     v-model="argsValue"
@@ -312,4 +307,16 @@
       </div>
     </template>
   </FormHorizontal>
+
+  <div
+    class="flex justify-end mt-[-1rem]"
+    v-if="selectPanelValue === selectPanelOptions[0]"
+  >
+    <PrimeButton
+      @click="formBuilderToggle()"
+      :label="showFormBuilder ? 'Visual form' : 'Edit form'"
+      class="text-sm p-0"
+      link
+    />
+  </div>
 </template>

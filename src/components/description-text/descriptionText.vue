@@ -11,8 +11,7 @@
     :class="classData.normal"
     style="white-space: pre-line"
     v-html="description"
-  >
-  </p>
+  ></p>
 
   <p
     v-if="size === 'small' && !isHtml"
@@ -46,6 +45,6 @@
 
   const classData = {
     small: 'text-xs text-color-secondary font-normal leading-5',
-    normal: 'text-color-secondary text-sm font-normal flex flex-col gap-2',
+    normal: 'text-color-secondary text-sm font-normal flex flex-col gap-2'
   }
 </script>

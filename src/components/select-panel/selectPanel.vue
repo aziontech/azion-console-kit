@@ -1,22 +1,27 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="flex flex-row justify-between w-full">
+    <div class="flex flex-col gap-4 sm:flex-row md:gap-0 justify-between w-full">
       <TitleDescriptionArea
         :title="title"
         :description="description"
       />
 
-      <div>
-        <SelectButton
-          v-model="value"
-          :options="options"
-          ariaLabel="Select Button"
-          @update:modelValue="emit('update:modelValue', $event)"
-        />
+      <div class="min-w-[164px]">
+        <div class="flex sm:flex sm:justify-end">
+          <SelectButton
+            v-model="value"
+            :options="options"
+            ariaLabel="Select Button"
+            @update:modelValue="emit('update:modelValue', $event)"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="mt-6">
+    <div
+      class="mt-6"
+      v-if="$slots.content"
+    >
       <slot name="content"></slot>
     </div>
   </div>

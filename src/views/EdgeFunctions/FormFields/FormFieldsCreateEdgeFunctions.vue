@@ -1,19 +1,27 @@
 <script setup>
+  import { computed, ref, markRaw } from 'vue'
+  import { useField } from 'vee-validate'
+
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import TabPanel from 'primevue/tabpanel'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PrimeButton from 'primevue/button'
+
+  import { JsonForms } from '@jsonforms/vue'
+  import { vanillaRenderers } from '@jsonforms/vue-vanilla'
+
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
-  import HelloWorldSample from '@/helpers/edge-function-hello-world'
+
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
 
-  import { computed, ref } from 'vue'
-  import { useField } from 'vee-validate'
+  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
+  import HelloWorldSample from '@/helpers/edge-function-hello-world'
 
   defineProps({
     isDrawer: {
@@ -30,21 +38,46 @@
   const SPLITTER_PROPS = {
     height: '50vh',
     layout: 'horizontal',
-    panelsSizes: [66, 34]
+    panelsSizes: [60, 40]
   }
 
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
   const showPreview = ref(true)
+  const showFormBuilder = ref(false)
+  const azionFormData = ref({})
+  const schemaAzionFormString = ref('')
+  const emptySchemaAzionForm = ref(true)
+  const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
-
+  const { value: schemaAzionForm } = useField('azionForm', null, {
+    initialValue: null
+  })
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs', null, {
     initialValue: ARGS_INITIAL_STATE
   })
   const { value: code, errorMessage: codeError } = useField('code', null, {
     initialValue: HelloWorldSample
   })
+
+  const formBuilderToggle = () => {
+    showFormBuilder.value = showFormBuilder.value === false ? true : false
+  }
+
+  const setAzionFormEmptyState = function (value) {
+    emptySchemaAzionForm.value = !value ? true : false
+  }
+
+  const setAzionFormSchema = (formSchema) => {
+    schemaAzionForm.value = formSchema
+      ? JSON.parse(formSchema)
+      : {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+  }
 
   const hasCodeError = computed(() => {
     return !!codeError.value
@@ -156,6 +189,7 @@
         </template>
       </FormHorizontal>
     </TabPanel>
+
     <TabPanel header="Code">
       <Splitter
         :style="{ height: SPLITTER_PROPS.height }"
@@ -189,7 +223,6 @@
           />
         </SplitterPanel>
       </Splitter>
-
       <div class="flex flex-col mt-8 surface-border border rounded-md gap-2 md:hidden h-[50vh]">
         <CodeEditor
           v-model="code"
@@ -213,6 +246,7 @@
         @resizestart="showPreview = false"
         @resizeend="showPreview = true"
         :layout="SPLITTER_PROPS.layout"
+        v-if="!showFormBuilder"
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
@@ -222,14 +256,71 @@
             :errors="hasArgsError"
           />
         </SplitterPanel>
+      </Splitter>
 
-        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
-          <CodePreview
-            v-if="showPreview"
-            :updateObject="updateObject"
+      <Splitter
+        :style="{ height: SPLITTER_PROPS.height }"
+        class="mt-8 surface-border border rounded-md hidden md:flex"
+        @resizestart="showPreview = false"
+        @resizeend="showPreview = true"
+        :layout="SPLITTER_PROPS.layout"
+        v-if="showFormBuilder"
+      >
+        <SplitterPanel
+          :size="SPLITTER_PROPS.panelsSizes[0]"
+          class="flex flex-col h-full gap-2"
+        >
+          <CodeEditor
+            v-model="schemaAzionFormString"
+            runtime="json"
+            class="overflow-clip surface-border border rounded-md"
+            :initialValue="schemaAzionFormString"
+            :errors="false"
+            @update:modelValue="function (value) {
+                setAzionFormSchema(value)
+                setAzionFormEmptyState(value)
+              }
+            "
           />
         </SplitterPanel>
+        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
+          <div class="overflow-y-auto h-full p-4 md:p-8">
+            <div
+              id="azionform"
+              class="azion-json-form"
+              v-if="!emptySchemaAzionForm"
+            >
+              <JsonForms
+                :data="azionFormData"
+                :renderers="renderers"
+                :schema="schemaAzionForm"
+              />
+            </div>
+            <div
+              v-else
+              class="flex flex-col items-center justify-center h-full gap-2"
+            >
+              <p>Configure the form builder.</p>
+              <PrimeButton
+                outlined
+                @click="azionJsonFormWindowOpener()"
+                label="Read documentation"
+                size="small"
+              />
+            </div>
+          </div>
+        </SplitterPanel>
       </Splitter>
+
+      <div class="flex justify-end mt-[1rem]">
+        <PrimeButton
+          @click="formBuilderToggle()"
+          :label="showFormBuilder ? 'Back to arguments' : 'Form builder configuration'"
+          class="text-sm p-0"
+          link
+        />
+      </div>
+
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
           v-model="defaultArgs"

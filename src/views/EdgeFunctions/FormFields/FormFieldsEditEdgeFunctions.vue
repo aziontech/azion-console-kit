@@ -1,17 +1,26 @@
 <script setup>
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
+  import { computed, ref, watch, markRaw } from 'vue'
+  import { useField } from 'vee-validate'
+
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import PrimeButton from 'primevue/button'
+
+  import { JsonForms } from '@jsonforms/vue'
+  import { vanillaRenderers } from '@jsonforms/vue-vanilla'
+
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
-  import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+
+  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
 
   defineProps(['previewData', 'run'])
   const emit = defineEmits(['update:previewData', 'update:run', 'update:name'])
@@ -19,14 +28,25 @@
   const SPLITTER_PROPS = {
     height: '50vh',
     layout: 'horizontal',
-    panelsSizes: [66, 34]
+    panelsSizes: [60, 40]
   }
   const ARGS_INITIAL_STATE = '{}'
 
   const previewState = ref(true)
+  const showFormBuilder = ref(false)
+  const azionFormData = ref({})
+  const schemaAzionFormString = ref('')
+  // const schemaAzionForm = ref(null)
+  const emptySchemaAzionForm = ref(true)
+  const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
-
+  const {
+    value: schemaAzionForm
+    // errorMessage: {}
+  } = useField('azionForm', null, {
+    initialValue: null
+  })
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs')
   const { value: code, errorMessage: codeError } = useField('code')
@@ -43,6 +63,10 @@
   const unwatch = watch(name, () => {
     initialCodeValue = code.value
     initialJsonArgsValue = defaultArgs.value
+
+    schemaAzionFormString.value = schemaAzionForm.value
+    setAzionFormSchema(schemaAzionForm.value)
+    setAzionFormEmptyState(schemaAzionForm.value)
 
     emit('update:name', name.value)
     emit('update:run', runtime.value)
@@ -82,6 +106,24 @@
       inputValue: 'firewall'
     }
   ]
+
+  const formBuilderToggle = () => {
+    showFormBuilder.value = showFormBuilder.value === false ? true : false
+  }
+
+  const setAzionFormEmptyState = function (value) {
+    emptySchemaAzionForm.value = !value ? true : false
+  }
+
+  const setAzionFormSchema = (formSchema) => {
+    schemaAzionForm.value = formSchema
+      ? JSON.parse(formSchema)
+      : {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+  }
 </script>
 
 <template>
@@ -217,6 +259,7 @@
         @resizestart="previewState = false"
         @resizeend="previewState = true"
         :layout="SPLITTER_PROPS.layout"
+        v-if="!showFormBuilder"
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
@@ -226,14 +269,71 @@
             :errors="hasArgsError"
           />
         </SplitterPanel>
+      </Splitter>
 
+      <Splitter
+        :style="{ height: SPLITTER_PROPS.height }"
+        class="mt-8 surface-border border rounded-md hidden md:flex"
+        @resizestart="showPreview = false"
+        @resizeend="showPreview = true"
+        :layout="SPLITTER_PROPS.layout"
+        v-if="showFormBuilder"
+      >
         <SplitterPanel
-          v-if="showPreview"
-          :size="SPLITTER_PROPS.panelsSizes[1]"
+          :size="SPLITTER_PROPS.panelsSizes[0]"
+          class="flex flex-col h-full gap-2"
         >
-          <CodePreview :updateObject="updateObject" />
+          <CodeEditor
+            v-model="schemaAzionFormString"
+            runtime="json"
+            class="overflow-clip surface-border border rounded-md"
+            :initialValue="schemaAzionFormString"
+            :errors="false"
+            @update:modelValue="function (value) {
+                setAzionFormSchema(value)
+                setAzionFormEmptyState(value)
+              }
+            "
+          />
+        </SplitterPanel>
+        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
+          <div class="overflow-y-auto h-full p-4 md:p-8">
+            <div
+              id="azionform"
+              class="azion-json-form"
+              v-if="!emptySchemaAzionForm"
+            >
+              <JsonForms
+                :data="azionFormData"
+                :renderers="renderers"
+                :schema="schemaAzionForm"
+              />
+            </div>
+            <div
+              v-else
+              class="flex flex-col items-center justify-center h-full gap-2"
+            >
+              <p>Configure the form builder.</p>
+              <PrimeButton
+                outlined
+                @click="azionJsonFormWindowOpener()"
+                label="Read documentation"
+                size="small"
+              />
+            </div>
+          </div>
         </SplitterPanel>
       </Splitter>
+
+      <div class="flex justify-end mt-[1rem]">
+        <PrimeButton
+          @click="formBuilderToggle()"
+          :label="showFormBuilder ? 'Back to arguments' : 'Form builder configuration'"
+          class="text-sm p-0"
+          link
+        />
+      </div>
+
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
           v-model="defaultArgs"
