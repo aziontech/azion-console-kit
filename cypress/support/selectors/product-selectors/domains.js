@@ -20,13 +20,15 @@ export default {
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
   digitalCertificateDropdownFilter:
     '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
-  createDigitalCertificateButton: '[data-testid="domains-form__create-digital-certificate-button"]',
+  createDigitalCertificateButton: '.p-dropdown-panel ul li [data-testid="domains-form__create-digital-certificate-button"]',
   digitalCertificateActionBar: '[data-testid="digital-certificates-drawer__action-bar"]',
   edgeFirewallActionBar: '[data-testid="edge-firewall-drawer__action-bar"]',
   cnameAccessOnlyField: '[data-testid="domains-form__cname-access-only-field"]',
   copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
   confirmButton: '[data-testid="domains-dialog__confirm__button"]',
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+  digitalCertificateDropdownOpen: '[data-testid="domains-form__edge-certificate-field__dropdown"]',
+  digitalCertificateDropdownList: '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-panel .p-dropdown-items-wrapper #edgeCertificate_list li',
   digitalCertificateFieldSelectedValue:
     ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   digitalCertificateDropdownSearch:
