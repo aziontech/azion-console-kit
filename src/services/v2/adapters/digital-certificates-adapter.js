@@ -167,6 +167,8 @@ export const DigitalCertificatesAdapter = {
         { label: 'My certificates', items: parsedDigitalCertificates }
       ]
       count += filteredDefaultCertificates.length
+    } else {
+      bodyParser = parsedDigitalCertificates
     }
 
     return {
