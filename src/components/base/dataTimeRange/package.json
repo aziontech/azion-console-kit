@@ -1,0 +1,20 @@
+{
+  "name": "@azion/data-time-range",
+  "version": "1.0.0",
+  "description": "Component for date range selection",
+  "main": "index.js",
+  "types": "dataTimeRange.d.ts",
+  "keywords": [
+    "vue",
+    "component",
+    "date",
+    "range",
+    "time",
+    "filter"
+  ],
+  "author": "Azion",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}

@@ -84,7 +84,7 @@
 </script>
 
 <template>
-  <div class="flex flex-column mt-8 gap-4">
+  <div class="flex flex-column mt-4 gap-4">
     <SelectButton
       class="w-full whitespace-nowrap overflow-x-auto"
       :modelValue="selectedDashboard"

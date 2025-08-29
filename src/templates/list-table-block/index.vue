@@ -131,9 +131,13 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+            <slot
+              name="actions-header"
+              :exportTableCSV="handleExportTableDataToCSV"
+            />
             <PrimeButton
               outlined
               icon="ai ai-column"

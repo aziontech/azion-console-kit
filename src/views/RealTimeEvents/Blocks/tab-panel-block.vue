@@ -1,9 +1,12 @@
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import { computed, onBeforeMount, onMounted, ref } from 'vue'
-  import ContentFilterBlock from '@/views/RealTimeEvents/Blocks/content-filter-block'
+  import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
+  import { eventsPlaygroundOpener } from '@/helpers'
+  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
 
   defineOptions({ name: 'TabPanelBlock' })
 
@@ -35,7 +38,11 @@
   const recordsFound = ref(0)
 
   const defaultFilter = {
-    tsRange: {},
+    tsRange: {
+      tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
+      tsRangeEnd: new Date(),
+      label: 'Last 5 minutes'
+    },
     fields: [],
     dataset: ''
   }
@@ -67,10 +74,6 @@
     reloadListTable()
   }
 
-  const exportTableCSV = () => {
-    listTableBlockRef.value?.handleExportTableDataToCSV()
-  }
-
   const refreshFilterData = () => {
     const filter = getFiltersFromHash()
     filterData.value = defaultFilter
@@ -94,6 +97,10 @@
     refreshFilterData()
   })
 
+  const totalRecordsFound = computed(() => {
+    return `${recordsFound.value} records found`
+  })
+
   onMounted(() => {
     reloadListTable()
   })
@@ -114,19 +121,17 @@
         </p>
       </div>
     </div>
-    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
-      <ContentFilterBlock
+    <div class="border-1 p-4 surface-border rounded-md mb-2">
+      <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :downloadCSV="exportTableCSV"
-        :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
     <ListTableBlock
       lazyLoad
       hiddenHeader
-      :pt="{ root: { class: 'rounded-t-none' }, bodyRow: { 'data-testid': 'table-body-row' } }"
+      :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
       isGraphql
       frozenSize="3rem"
       ref="listTableBlockRef"
@@ -137,6 +142,29 @@
       :csvMapper="props.tabSelected.customColumnMapper"
       :exportFileName="`${props.tabSelected.tabRouter}-logs`"
       data-testid="table-tab-panel-block"
-    />
+    >
+      <template #actions-header="{ exportTableCSV }">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+        <PrimeButton
+          outlined
+          icon="ai ai-graphql"
+          class="min-w-max"
+          @click="eventsPlaygroundOpener"
+          v-tooltip.top="{ value: 'View on GraphQL', showDelay: 200 }"
+          data-testid="data-table-actions-column-header-toggle-columns"
+        />
+        <PrimeButton
+          outlined
+          icon="pi pi-download"
+          class="min-w-max"
+          @click="exportTableCSV"
+          v-tooltip.top="{ value: 'Export to CSV', showDelay: 200 }"
+          data-testid="data-table-actions-column-header-toggle-columns"
+        />
+      </template>
+    </ListTableBlock>
   </data>
 </template>
