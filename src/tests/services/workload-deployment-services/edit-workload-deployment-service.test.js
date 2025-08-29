@@ -7,8 +7,8 @@ const DOMAINID = 123
 const fixtures = {
   workloadDeploymentPayload: {
     current: true,
-    edgeApplication: 12213,
-    edgeFirewall: 11120,
+    application: 12213,
+    firewall: 11120,
     id: 12,
     tag: 'default'
   }
@@ -37,8 +37,8 @@ describe('WorkloadDeploymentServices', () => {
       method: 'PATCH',
       body: {
         binds: {
-          edge_application: fixtures.workloadDeploymentPayload.edgeApplication,
-          edge_firewall: fixtures.workloadDeploymentPayload.edgeFirewall
+          application: fixtures.workloadDeploymentPayload.application,
+          firewall: fixtures.workloadDeploymentPayload.firewall
         }
       }
     })
