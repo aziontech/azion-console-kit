@@ -29,8 +29,8 @@ const adapt = (payload) => {
   const dataRequest = {
     name: payload.name,
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
-    edge_application: payload.edgeApplication,
-    edge_firewall: payload.edgeFirewall,
+    application: payload.application,
+    firewall: payload.firewall,
     active: payload.active,
     mtls: {
       verification: payload.mtlsVerification,

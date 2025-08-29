@@ -111,7 +111,7 @@
     'last_editor',
     'last_modified',
     'version',
-    'edge_function'
+    'function'
   ]
 
   const getColumns = computed(() => {
@@ -146,10 +146,11 @@
   })
 
   const listFunctionsInstance = async (query) => {
-    return await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
+    const data = await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
       props.edgeFirewallID,
       query
     )
+    return data
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {

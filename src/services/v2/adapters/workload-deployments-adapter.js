@@ -5,8 +5,8 @@ export const WorkloadDeploymentAdapter = {
       strategy: {
         type: 'default',
         attributes: {
-          edge_application: payload.edgeApplication,
-          edge_firewall: payload.edgeFirewall || null,
+          application: payload.application,
+          firewall: payload.firewall || null,
           custom_page: payload.customPage || null
         }
       }
@@ -17,8 +17,8 @@ export const WorkloadDeploymentAdapter = {
       strategy: {
         type: 'default',
         attributes: {
-          edge_application: payload.edgeApplication,
-          edge_firewall: payload.edgeFirewall || null,
+          application: payload.application,
+          firewall: payload.firewall || null,
           custom_page: payload.customPage || null
         }
       }
@@ -29,8 +29,8 @@ export const WorkloadDeploymentAdapter = {
       id: workload.id,
       current: workload.current,
       name: workload.name,
-      edgeApplication: workload.strategy.attributes.edge_application,
-      edgeFirewall: workload.strategy.attributes.edge_firewall,
+      application: workload.strategy.attributes.application,
+      firewall: workload.strategy.attributes.firewall,
       customPage: workload.strategy.attributes.custom_page
     }))
   },
@@ -38,8 +38,8 @@ export const WorkloadDeploymentAdapter = {
     return {
       id: data.id,
       name: data.name,
-      edgeApplication: data.strategy.attributes.edge_application,
-      edgeFirewall: data.strategy.attributes.edge_firewall,
+      application: data.strategy.attributes.application,
+      firewall: data.strategy.attributes.firewall,
       customPage: data.strategy.attributes.custom_page,
       current: data.current
     }

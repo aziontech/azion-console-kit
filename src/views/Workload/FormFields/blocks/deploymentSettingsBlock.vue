@@ -10,8 +10,8 @@
   import { edgeAppService, edgeFirewallService, customPageService } from '@/services/v2'
   import { ref } from 'vue'
 
-  const { value: edgeApplication } = useField('edgeApplication')
-  const { value: edgeFirewall } = useField('edgeFirewall')
+  const { value: application } = useField('application')
+  const { value: firewall } = useField('firewall')
   const { value: customPage } = useField('customPage')
 
   const drawerRef = ref('')
@@ -21,7 +21,7 @@
   const hasEdgeFirewallAccess = ref(true)
 
   const handleEdgeFirewallClear = () => {
-    edgeFirewall.value = null
+    firewall.value = null
   }
 
   const handleCustomPageClear = () => {
@@ -45,7 +45,7 @@
   }
 
   const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
+    application.value = id
   }
 
   const handleCustomPagesCreated = (id) => {
@@ -78,7 +78,7 @@
   }
 
   const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
+    firewall.value = id
   }
 </script>
 <template>
@@ -96,12 +96,12 @@
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
+          name="application"
           :service="listEdgeApplicationsDecorator"
           :loadService="edgeAppService.loadEdgeApplicationService"
           optionLabel="name"
           optionValue="value"
-          :value="edgeApplication"
+          :value="application"
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -134,9 +134,9 @@
         />
         <FieldDropdownLazyLoader
           label="Edge Firewall"
-          :enableClearOption="!!edgeFirewall"
+          :enableClearOption="!!firewall"
           data-testid="domains-form__edge-firewall-field"
-          name="edgeFirewall"
+          name="firewall"
           @onClear="handleEdgeFirewallClear"
           :service="listEdgeFirewallDropdown"
           :loadService="edgeFirewallService.loadEdgeFirewallService"
@@ -144,7 +144,7 @@
           v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
-          :value="edgeFirewall"
+          :value="firewall"
           appendTo="self"
           placeholder="Select an edge firewall"
         >

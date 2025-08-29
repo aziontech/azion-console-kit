@@ -38,7 +38,7 @@
     },
     {
       title: 'Edge Storage',
-      inputValue: 'edge_storage',
+      inputValue: 'storage',
       subtitle: 'Link your Edge Storage bucket for fast, low-latency data retrieval at the edge.'
     },
     {

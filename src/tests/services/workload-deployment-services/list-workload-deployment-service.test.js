@@ -7,8 +7,8 @@ const fixtures = {
     id: 10,
     tag: 'default',
     binds: {
-      edge_application: 1,
-      edge_firewall: 0
+      application: 1,
+      firewall: 0
     },
     current: true
   }
@@ -57,8 +57,8 @@ describe('WorkloadDeploymentServices', () => {
 
     expect(result).toEqual({
       current: fixtures.workloadDeploymentMock.current,
-      edgeApplication: fixtures.workloadDeploymentMock.binds.edge_application,
-      edgeFirewall: fixtures.workloadDeploymentMock.binds.edge_firewall,
+      application: fixtures.workloadDeploymentMock.binds.application,
+      firewall: fixtures.workloadDeploymentMock.binds.firewall,
       id: fixtures.workloadDeploymentMock.id,
       tag: fixtures.workloadDeploymentMock.tag
     })

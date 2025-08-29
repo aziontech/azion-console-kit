@@ -98,10 +98,10 @@
 
   const initialValues = {
     name: '',
-    edgeApplication: null,
+    application: null,
     active: true,
     infrastructure: '1',
-    edgeFirewall: null,
+    firewall: null,
     tls: {
       certificate: 0,
       ciphers: 7,

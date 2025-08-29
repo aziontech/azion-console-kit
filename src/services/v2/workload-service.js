@@ -64,8 +64,8 @@ export class WorkloadService {
     const deployPayload = {
       id: workloadId,
       name: 'workload-deployment',
-      edgeApplication: payload.edgeApplication,
-      edgeFirewall: payload.edgeFirewall,
+      application: payload.application,
+      firewall: payload.firewall,
       customPage: payload.customPage
     }
 
@@ -200,8 +200,8 @@ export class WorkloadService {
   #updateDeployment = async (payload) => {
     const deployPayload = {
       id: payload.workloadDeploymentId,
-      edgeApplication: payload.edgeApplication,
-      edgeFirewall: payload.edgeFirewall,
+      application: payload.application,
+      firewall: payload.firewall,
       customPage: payload.customPage
     }
     await this.workloadDeployment.updateWorkloadDeployment(payload.id, deployPayload)

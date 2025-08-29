@@ -23,10 +23,11 @@ export class EdgeFirewallFunctionService {
       url: this.#getUrl(edgeFirewallId),
       params
     })
+    const transformed = this.#getTransformed('transformListFunction', data.results)
 
     return {
       count: data.count,
-      body: this.#getTransformed('transformListFunction', data.results)
+      body: transformed
     }
   }
 
