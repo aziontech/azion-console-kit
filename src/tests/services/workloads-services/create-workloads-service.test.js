@@ -7,8 +7,8 @@ const fixtures = {
   domainMock: {
     name: 'testv4t',
     environment: '1',
-    edgeApplication: 1732640034,
-    edgeFirewall: 21532,
+    application: 1732640034,
+    firewall: 21532,
     deliveryProtocol: 'https',
     httpPort: [
       {
@@ -79,8 +79,8 @@ describe('DomainsServicesV4', () => {
       body: {
         name: fixtures.domainMock.name,
         alternate_domains: [fixtures.domainMock.cnames],
-        edge_application: fixtures.domainMock.edgeApplication,
-        edge_firewall: fixtures.domainMock.edgeFirewall,
+        application: fixtures.domainMock.application,
+        firewall: fixtures.domainMock.firewall,
         active: fixtures.domainMock.active,
         tls: {
           ciphers: fixtures.domainMock.supportedCiphers,
@@ -125,8 +125,8 @@ describe('DomainsServicesV4', () => {
       body: {
         name: fixtures.domainMock.name,
         alternate_domains: [fixtures.domainMock.cnames],
-        edge_application: fixtures.domainMock.edgeApplication,
-        edge_firewall: fixtures.domainMock.edgeFirewall,
+        application: fixtures.domainMock.application,
+        firewall: fixtures.domainMock.firewall,
         active: fixtures.domainMock.active,
         tls: {
           ciphers: fixtures.domainMock.supportedCiphers,
@@ -173,8 +173,8 @@ describe('DomainsServicesV4', () => {
       body: {
         name: fixtures.domainMock.name,
         alternate_domains: [fixtures.domainMock.cnames],
-        edge_application: fixtures.domainMock.edgeApplication,
-        edge_firewall: fixtures.domainMock.edgeFirewall,
+        application: fixtures.domainMock.application,
+        firewall: fixtures.domainMock.firewall,
         active: fixtures.domainMock.active,
         tls: {
           certificate: fixtures.domainMock.edgeCertificate,
