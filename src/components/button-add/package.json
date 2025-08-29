@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./buttonAdd.d.ts",
+  "browser": {
+    "./sfc": "./buttonAdd.vue"
+  }
+}

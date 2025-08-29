@@ -3,7 +3,7 @@
     v-model:value="code"
     :language="runtime"
     :theme="theme"
-    class="!w-[99%] h-full surface-border border-r"
+    class="w-full min-h-[200px] h-full surface-border border-r"
     :class="{
       'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors,
       'cursor-not-allowed': EDITOR_OPTIONS.readOnly
@@ -48,6 +48,7 @@
     minimap: { enabled: props.minimap },
     tabSize: 2,
     formatOnPaste: true,
+    automaticLayout: true,
     readOnly: props.readOnly
   })
 
