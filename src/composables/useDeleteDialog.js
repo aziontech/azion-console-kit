@@ -9,12 +9,12 @@ import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
 const getDeleteConfirmationText = (data) =>
   !data
     ? 'delete'
-    : data.deleteConfirmationText ??
+    : (data.deleteConfirmationText ??
       data.name?.text ??
       data.name ??
       data.key ??
       (data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined) ??
-      'delete'
+      'delete')
 
 /**
  * Composable for opening delete confirmation dialogs.
