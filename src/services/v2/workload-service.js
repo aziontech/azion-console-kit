@@ -9,10 +9,10 @@ export class WorkloadService {
     this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
-    ;((this.baseURL = 'v4/workspace/workloads'),
+    ;(this.baseURL = 'v4/workspace/workloads'),
       (this.workloadDeployment = workloadDeployment),
       (this.digitalCertificate = digitalCertificate),
-      (this.digitalCertificateAdapter = digitalCertificateAdapter))
+      (this.digitalCertificateAdapter = digitalCertificateAdapter)
   }
 
   #ensureCertificate = async (payload) => {
