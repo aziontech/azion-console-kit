@@ -72,7 +72,7 @@ describe('Edge Application', { tags: ['@dev8'] }, () => {
       fixtures.cacheSettingName
     )
   })
-  it.only('should edit a cache setting', () => {
+  it('should edit a cache setting', () => {
     cy.openProduct('Edge Application')
     cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings*').as('getCacheSettings')
     cy.intercept('PATCH', '/v4/edge_application/applications/*').as('updateEdgeApp')
