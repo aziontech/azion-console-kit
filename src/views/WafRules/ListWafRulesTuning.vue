@@ -18,7 +18,8 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import { networkListsService, wafService } from '@/services/v2'
+  import { networkListsService, wafService, wafRulesTuningGqlService } from '@/services/v2'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
@@ -169,24 +170,20 @@
       header: 'Hits'
     },
     {
-      field: 'pathCount',
-      header: 'Paths'
-    },
-    {
-      field: 'ipCount',
-      header: 'IPs'
-    },
-    {
-      field: 'countryCount',
-      header: 'Countries'
-    },
-    {
       field: 'topIps',
-      header: 'Top 10 IP Addresses'
+      header: 'Top 10 IP Addresses',
+      type: 'component',
+      disableSort: true,
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
       field: 'topCountries',
-      header: 'Top 10 Countries'
+      header: 'Top 10 Countries',
+      disableSort: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     }
   ])
 
@@ -195,7 +192,7 @@
   })
 
   const listService = async (params) => {
-    const response = await props.listWafRulesTuningService(params)
+    const response = await wafRulesTuningGqlService.listWafRulesTuning(params)
     totalRecordsFound.value = response.recordsFound
     return response.data
   }
@@ -270,7 +267,11 @@
     selectedDomainsNames.value = domainsOptions.value.options
       .filter((item) => selectedDomainIds.value.includes(item.id))
       .map((domain) => domain.name)
-    selectedFilter.value.domains = selectedDomainIds.value || []
+
+    selectedFilter.value.domains =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .map((domain) => domain.domain) || []
     filterTuning()
   }
 
