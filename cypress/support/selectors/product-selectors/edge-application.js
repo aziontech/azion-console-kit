@@ -1,5 +1,7 @@
 export default {
   tabs: (tabName) => `[data-testid="edge-application-details-tab-panel__${tabName}__tab"] a`,
+  edgeApplicationTable:
+    '[data-testid="edge-applications-list-table-block"] [data-pc-section="bodyrow"]',
   mainSettings: {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
@@ -9,8 +11,8 @@ export default {
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
     l2CachingSwitch:
       '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
-    tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
-
+    tieredCacheEnabled:
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
   },
   accordionStepEdgeConnector: {
     createEdgeConnector: '[data-testid="create-edge-connector-accordion"]',
@@ -19,11 +21,13 @@ export default {
   },
   accordionStepCache: {
     createCache: '[data-testid="create-cache-accordion"]',
-    browserCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
-    cdnCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
+    browserCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
+    cdnCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
   },
   accordionStepDomain: {
-    createDomain: '[data-testid="create-domain-accordion"]',
+    createDomain: '[data-testid="create-domain-accordion"]'
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',
@@ -32,7 +36,7 @@ export default {
   },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
-    
+
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     createCachePolicyButton:
       '[data-testid="edge-applications-rules-engine-form__create-cache-policy-button"]',
@@ -86,7 +90,8 @@ export default {
     reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
     reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
     saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label',
-    edgeConnectorsDropdown: '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
+    edgeConnectorsDropdown:
+      '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
     edgeConnectorsDropdownItem: '#behaviors\\[0\\]\\.edgeConnectorId_0'
   },
   origins: {
