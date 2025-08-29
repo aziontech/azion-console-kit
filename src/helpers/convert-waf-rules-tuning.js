@@ -127,6 +127,7 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
     entry.ruleId.split(',').forEach((ruleStr) => {
       const { ruleId, location, context } = parseRule(ruleStr)
       const key = isDescription ? `${ruleId}|${location}|${context}` : `${ruleId}|${location}`
+      const pathWithoutQueryString = entry.path.split('?')?.[0]
 
       if (!grouped[key]) {
         grouped[key] = {
@@ -135,7 +136,7 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
           hitCount: 0,
           [`ipHitCount${[entry.ip]}`]: 0,
           [`countryHitCount${[entry.country]}`]: 0,
-          [`pathHitCount${[entry.path]}`]: 0,
+          [`pathHitCount${[pathWithoutQueryString]}`]: 0,
           ips: new Set(),
           countries: new Set(),
           condition: parserWafWatchs(ruleStr, isDescription)?.[0].location,
@@ -149,8 +150,8 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
         (grouped[key][`ipHitCount${[entry.ip]}`] || 0) + entry.count
       grouped[key][`countryHitCount${[entry.country]}`] =
         (grouped[key][`countryHitCount${[entry.country]}`] || 0) + entry.count
-      grouped[key][`pathHitCount${[entry.path]}`] =
-        (grouped[key][`pathHitCount${[entry.path]}`] || 0) + entry.count
+      grouped[key][`pathHitCount${[pathWithoutQueryString]}`] =
+        (grouped[key][`pathHitCount${[pathWithoutQueryString]}`] || 0) + entry.count
 
       grouped[key].ips.add(entry.ip)
       grouped[key].countries.add(entry.country)
