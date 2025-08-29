@@ -17,9 +17,7 @@ describe('Edge Application Tabs Visibility - Mock Test', { tags: ['@dev2'] }, ()
 
       cy.wait('@edgeApplicationsListApi', { timeout: 30000 })
 
-      cy.get('[data-testid="edge-applications-list-table-block"] [data-pc-section="bodyrow"]')
-        .first()
-        .click()
+      cy.get(selectors.edgeApplication.edgeApplicationTable).first().click()
 
       cy.intercept('GET', '/v4/edge_application/applications/*', {
         fixture: '/edge-application/edge-application-item-v4.json'
@@ -70,9 +68,7 @@ describe('Edge Application Tabs Visibility - Mock Test', { tags: ['@dev2'] }, ()
       cy.openProduct('Edge Application')
       cy.wait('@edgeApplicationsListApi', { timeout: 30000 })
 
-      cy.get('[data-testid="edge-applications-list-table-block"] [data-pc-section="bodyrow"]')
-        .first()
-        .click()
+      cy.get(selectors.edgeApplication.edgeApplicationTable).first().click()
 
       cy.intercept('GET', '/api/v3/edge_applications/*', {
         fixture: '/edge-application/edge-application-item-v3.json'
