@@ -3,6 +3,8 @@ import {
   transformSnakeToCamel
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { defaultConditions } from '@/views/WafRules/Config'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { sortDate } from '@/utils/date-sort'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -39,6 +41,8 @@ const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
   name: (value) => value.name,
+  lastEditor: (value) => value.last_editor,
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
@@ -54,7 +58,8 @@ const getPrefix = ({ match }) => {
 
 export const WafAdapter = {
   transformListWafRules(data, fields) {
-    return adaptServiceDataResponse(data, fields, transformMap)
+    const result = adaptServiceDataResponse(data, fields, transformMap)
+    return sortDate(result, 'lastModified')
   },
   adaptWafRulePayload(payload) {
     const camelToSnakeMap = {
