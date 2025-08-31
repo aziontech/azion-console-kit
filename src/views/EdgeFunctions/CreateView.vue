@@ -51,7 +51,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    azionForm: yup.object(),
+    azionForm: yup.object().nullable(true),
     defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
@@ -73,7 +73,7 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
-    azionForm: {},
+    azionForm: null,
     executionEnvironment: 'application'
   }
 

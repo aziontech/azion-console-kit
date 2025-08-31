@@ -1,32 +1,23 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-
   import PrimeButton from 'primevue/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
-
   import SelectPanel from '@/components/select-panel'
   import DescriptionText from '@/components/description-text/descriptionText'
   import TitleDescriptionArea from '@/components/title-description-area'
-
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
-
+  import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer'])
 
   const renderers = markRaw([...vanillaRenderers])
-
-  const onChangeAzionForm = (event) => {
-    azionFormData.value = event.data
-    argsValue.value = JSON.stringify(event.data, null, 2)
-  }
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -54,13 +45,14 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'default_args']
+      fields: ['id', 'name', 'default_args', 'azion_form']
     })
   }
 
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
+  // const { value: azionForm } = useField('azionForm')
 
   const schemaAzionForm = ref(null)
   const schemaAzionFormString = ref('')
@@ -70,8 +62,9 @@
   const selectPanelOptions = ['Visual', 'Raw JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
-  const indentJsonStringify = (json, indentation = 2) => {
-    return JSON.stringify(json, null, indentation)
+  const onChangeAzionForm = (event) => {
+    azionFormData.value = event.data
+    argsValue.value = JSON.stringify(event.data, null, 2)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -122,6 +115,10 @@
     setAzionFormSchema(getAzionFormData(args))
     setFuntionArgs(args)
   })
+
+  // watch(azionForm, (azionForm) => {
+  //   console.log('WATCH azionForm', azionForm)
+  // })
 
   watch(
     () => drawerRef.value.showCreateDrawer,

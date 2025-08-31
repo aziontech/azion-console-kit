@@ -1,16 +1,36 @@
 <script setup>
+  import { computed, ref, watch, markRaw } from 'vue'
+  import { useField } from 'vee-validate'
+  import PrimeButton from 'primevue/button'
+  import { JsonForms } from '@jsonforms/vue'
+  import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import PrimeButton from 'primevue/button'
+  import SelectPanel from '@/components/select-panel'
+  import DescriptionText from '@/components/description-text/descriptionText'
+  import TitleDescriptionArea from '@/components/title-description-area'
+  import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
+  import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
-  import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
-
   const emit = defineEmits(['toggleDrawer'])
+
+  const renderers = markRaw([...vanillaRenderers])
+
+  const { value: name } = useField('name')
+  const { value: edgeFunctionID } = useField('edgeFunctionID')
+  const { value: args, errorMessage: argsError } = useField('args')
+  // const { value: azionForm } = useField('azionForm')
+
+  const schemaAzionForm = ref(null)
+  const schemaAzionFormString = ref('')
+  const azionFormData = ref({})
+  const showFormBuilder = ref(false)
+  const argsValue = ref('{}')
+  const selectPanelOptions = ['Visual', 'Raw JSON']
+  const selectPanelValue = ref(selectPanelOptions[0])
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -42,13 +62,63 @@
     })
   }
 
-  const { value: name } = useField('name')
-  const { value: edgeFunctionID } = useField('edgeFunctionID')
-  const { value: args, errorMessage: argsError } = useField('args')
+  const onChangeAzionForm = (event) => {
+    azionFormData.value = event.data
+    argsValue.value = JSON.stringify(event.data, null, 2)
+  }
+
+  const selectPanelUpdateModelValue = (value) => {
+    selectPanelValue.value = !value ? selectPanelOptions[0] : value
+  }
+
+  const formBuilderToggle = () => {
+    showFormBuilder.value = showFormBuilder.value === false ? true : false
+
+    if (showFormBuilder.value === false) {
+      setAzionFormSchema(JSON.parse(schemaAzionFormString.value))
+    }
+  }
+
+  const setAzionFormSchema = (formSchema) => {
+    schemaAzionForm.value = formSchema
+    schemaAzionFormString.value = indentJsonStringify(formSchema)
+  }
+
+  const setFuntionArgs = (jsonargs) => {
+    const jsonArgs = argsJsonParser(jsonargs)
+
+    delete jsonArgs.azion_form
+
+    argsValue.value = indentJsonStringify(jsonArgs)
+    azionFormData.value = jsonArgs
+  }
+
+  const argsJsonParser = (args) => {
+    try {
+      return JSON.parse(args)
+    } catch (error) {
+      console.error(`argsJsonParser error: `, error) // eslint-disable-line
+
+      return {}
+    }
+  }
+
+  const getAzionFormData = (jsonArgs) => {
+    return argsJsonParser(jsonArgs).azion_form
+  }
 
   const hasArgsError = computed(() => {
     return !!argsError.value
   })
+
+  watch(args, (args) => {
+    setAzionFormSchema(getAzionFormData(args))
+    setFuntionArgs(args)
+  })
+
+  // watch(azionForm, (azionForm) => {
+  //   console.log('WATCH azionForm', azionForm)
+  // })
 
   watch(
     () => drawerRef.value.showCreateDrawer,
@@ -128,23 +198,121 @@
       </div>
 
       <div class="flex flex-col gap-2 w-full">
-        <CodeEditor
-          v-model="args"
-          runtime="json"
-          class="min-h-[200px] overflow-clip surface-border border rounded-md"
-          :errors="hasArgsError"
-          :minimap="false"
-        />
-        <small
-          v-if="argsError"
-          class="p-error text-xs font-normal leading-tight"
+        <div v-if="schemaAzionForm">
+          <SelectPanel
+            :options="selectPanelOptions"
+            :value="selectPanelOptions[0]"
+            :title="`Arguments`"
+            :description="`Configure the function arguments to customize its behavior.`"
+            @update:modelValue="selectPanelUpdateModelValue"
+          >
+            <template #content>
+              <div v-show="selectPanelValue === selectPanelOptions[0]">
+                <div
+                  id="azionform"
+                  class="azion-json-form"
+                >
+                  <div
+                    v-if="schemaAzionFormString"
+                    class="flex flex-col gap-4"
+                  >
+                    <div>
+                      <div
+                        v-show="showFormBuilder && schemaAzionFormString"
+                        class="resize-y overflow-y-auto"
+                      >
+                        <CodeEditor
+                          v-model="schemaAzionFormString"
+                          runtime="json"
+                          class="overflow-clip surface-border border rounded-md"
+                          :initialValue="schemaAzionFormString"
+                          :errors="hasArgsError"
+                          :minimap="false"
+                        />
+                      </div>
+                      <div
+                        class="max-w-[320px]"
+                        v-show="!showFormBuilder"
+                      >
+                        <JsonForms
+                          :renderers="renderers"
+                          :data="azionFormData"
+                          :schema="schemaAzionForm"
+                          @change="onChangeAzionForm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-show="selectPanelValue === selectPanelOptions[1]">
+                <div class="resize-y overflow-y-auto">
+                  <CodeEditor
+                    v-model="argsValue"
+                    runtime="json"
+                    class="overflow-clip surface-border border rounded-md"
+                    :initialValue="argsValue"
+                    :readOnly="schemaAzionForm ? true : false"
+                    :errors="hasArgsError"
+                    :minimap="false"
+                  />
+                </div>
+                <small
+                  v-if="argsError"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ argsError }}
+                </small>
+                <DescriptionSmallArea
+                  description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
+                />
+              </div>
+            </template>
+          </SelectPanel>
+        </div>
+        <div
+          v-else
+          class="flex flex-col gap-4"
         >
-          {{ argsError }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Customize the arguments in JSON format. Once set, they can be called in code using
-          <code>event.args("arg_name")</code>.
-        </small>
+          <TitleDescriptionArea
+            :title="`Arguments`"
+            :description="`Configure the function arguments to customize its behavior.`"
+          />
+          <div class="resize-y overflow-y-auto">
+            <CodeEditor
+              v-model="argsValue"
+              runtime="json"
+              class="overflow-clip surface-border border rounded-md"
+              :initialValue="argsValue"
+              :readOnly="schemaAzionForm ? true : false"
+              :errors="hasArgsError"
+              :minimap="false"
+            />
+          </div>
+          <small
+            v-if="argsError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ argsError }}
+          </small>
+          <DescriptionText
+            :isHtml="true"
+            size="small"
+            description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
+          />
+        </div>
+      </div>
+
+      <div
+        class="flex justify-end mt-[-1rem]"
+        v-if="selectPanelValue === selectPanelOptions[0]"
+      >
+        <PrimeButton
+          @click="formBuilderToggle()"
+          :label="showFormBuilder ? 'Visual form' : 'Edit form'"
+          class="text-sm p-0"
+          link
+        />
       </div>
     </template>
   </FormHorizontal>
