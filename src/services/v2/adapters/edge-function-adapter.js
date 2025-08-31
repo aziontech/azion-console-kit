@@ -116,15 +116,19 @@ export const EdgeFunctionsAdapter = {
 
   transformPayloadEdgeFunctions(payload) {
     const parsedArgs = JSON.parse(payload.defaultArgs)
-
-    return {
+    const data = {
       name: payload.name,
       code: payload.code,
       runtime: CODE_LANG[payload.runtime],
       execution_environment: payload.executionEnvironment,
       default_args: parsedArgs,
-      azion_form: payload.azionForm,
       active: payload.active
     }
+
+    if(payload.azionForm) {
+      data.azion_form = payload.azionForm
+    }
+
+    return data
   }
 }
