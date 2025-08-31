@@ -125,7 +125,7 @@ export const EdgeFunctionsAdapter = {
       active: payload.active
     }
 
-    if(payload.azionForm) {
+    if (payload.azionForm) {
       data.azion_form = payload.azionForm
     }
 
