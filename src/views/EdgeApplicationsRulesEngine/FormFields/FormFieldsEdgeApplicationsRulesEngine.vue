@@ -24,7 +24,7 @@
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+      return [{ label: 'Set Connectors', value: 'set_connector', requires: false }]
     } else {
       return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
     }
@@ -879,7 +879,7 @@
                 </template>
               </FieldDropdownLazyLoader>
             </template>
-            <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
+            <template v-else-if="behaviorItem.value.name === 'set_connector'">
               <FieldDropdownLazyLoader
                 :service="getEdgeConnectors"
                 :loadService="edgeConnectorsService.loadEdgeConnectorsService"

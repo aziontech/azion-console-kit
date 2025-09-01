@@ -109,8 +109,8 @@
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
   const { value: cnameAccessOnly } = useField('cnameAccessOnly')
-  const { value: edgeApplication } = useField('edgeApplication')
-  const { value: edgeFirewall } = useField('edgeFirewall')
+  const { value: application } = useField('application')
+  const { value: firewall } = useField('firewall')
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
@@ -133,7 +133,7 @@
   }
 
   const handleEdgeFirewallClear = () => {
-    edgeFirewall.value = null
+    firewall.value = null
   }
 
   const openDrawer = () => {
@@ -149,7 +149,7 @@
   }
 
   const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
+    application.value = id
     emit('edgeApplicationCreated')
   }
 
@@ -161,7 +161,7 @@
   }
 
   const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
+    firewall.value = id
   }
 
   const handleHttps = (value) => {
@@ -484,12 +484,12 @@
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
+          name="application"
           :service="listEdgeApplicationsDecorator"
           :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
-          :value="edgeApplication"
+          :value="application"
           :disabled="disabledEdgeApplicationDropdown"
           appendTo="self"
           placeholder="Select an edge application"
@@ -520,7 +520,7 @@
           label="Edge Firewall"
           enableClearOption
           data-testid="domains-form__edge-firewall-field"
-          name="edgeFirewall"
+          name="firewall"
           @onClear="handleEdgeFirewallClear"
           :service="listEdgeFirewallService"
           :loadService="loadEdgeFirewallService"
@@ -528,7 +528,7 @@
           v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
-          :value="edgeFirewall"
+          :value="firewall"
           appendTo="self"
           placeholder="Select an edge firewall"
         >
