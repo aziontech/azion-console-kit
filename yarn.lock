@@ -2337,9 +2337,9 @@
     lodash "^4.17.21"
 
 "@mdx-js/react@^3.0.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@mdx-js/react/-/react-3.1.0.tgz#c4522e335b3897b9a845db1dbdd2f966ae8fb0ed"
-  integrity sha512-QjHtSaoameoalGnKDT3FoIl4+9RwyTmo9ZJGBdLOks/YOiWHoRDI3PUwEzOE7kEmGcV3AFcp9K6dYu9rEuKLAQ==
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@mdx-js/react/-/react-3.1.1.tgz#24bda7fffceb2fe256f954482123cda1be5f5fef"
+  integrity sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw==
   dependencies:
     "@types/mdx" "^2.0.0"
 
@@ -4063,10 +4063,10 @@ axios@^1.7.4:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-azion-theme@^1.13.2:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.0.tgz#af731e5b8d836a6097e9b903bddd8e9bf7ac12c1"
-  integrity sha512-8dejchWxcNwVxgr7WA1Uu5ygfvoVjViAOd8uBudUTlSovj3fW1DgLzQHDQT0ysE48NOmNG0ETdYYwppjP/kJIg==
+azion-theme@^1.14.0:
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.1.tgz#ff4bfb1ecf03caf176143b08a7422d56b1721ec2"
+  integrity sha512-nfWLmrBDABEhGweAqrKsUeQkaGSG2RTjxZIQer9N+KWXGBr37HtPN6RbkO3ajHCS4KJ2r2lUuEJkG7LzJucKKA==
 
 azion@^1.20.2:
   version "1.20.2"
