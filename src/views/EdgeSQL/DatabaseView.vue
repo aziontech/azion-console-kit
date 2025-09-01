@@ -11,8 +11,6 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import Menu from 'primevue/menu'
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
   import QueryEditorBlock from './FormFields/blocks/QueryEditorBlock.vue'
   import SqlDefinition from './FormFields/blocks/SqlDefinition.vue'
   import TableInfo from './FormFields/blocks/TableInfo.vue'
@@ -476,29 +474,20 @@
             <div class="flex-1 min-w-0">
               <div class="h-full flex flex-column gap-2 overflow-hidden">
                 <div class="flex-shrink-0">
-                  <Accordion :activeIndex="isEditorCollapsed ? null : 0">
-                    <AccordionTab>
-                      <template #header>
-                        <div class="flex items-center gap-2">
-                          <span class="font-semibold text-color">Query Editor</span>
-                        </div>
-                      </template>
-                      <QueryEditorBlock
-                        :sqlQuery="sqlQuery"
-                        :queryResults="queryResults"
-                        :executionTime="executionTime"
-                        :isExecutingQuery="isExecutingQuery"
-                        :monacoTheme="monacoTheme"
-                        @execute-query="setSqlQuery"
-                      />
-                    </AccordionTab>
-                  </Accordion>
+                  <QueryEditorBlock
+                    :sqlQuery="sqlQuery"
+                    :queryResults="queryResults"
+                    :executionTime="executionTime"
+                    :isExecutingQuery="isExecutingQuery"
+                    :monacoTheme="monacoTheme"
+                    @execute-query="setSqlQuery"
+                  />
                 </div>
 
                 <div>
                   <TabView
                     v-model:activeIndex="activeTabIndex"
-                    class="results-tabs"
+                    class="results-tabs mt-4"
                   >
                     <TabPanel>
                       <template #header>

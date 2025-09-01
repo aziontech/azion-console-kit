@@ -1,75 +1,74 @@
 <template>
-  <div class="p-4">
+  <div
+    class="mb-3 border-1 surface-border overflow-hidden rounded-md"
+    style="height: 250px"
+  >
     <div
-      class="mb-3 border-1 surface-border overflow-hidden"
-      style="height: 180px"
+      class="h-10 border-bottom-1 surface-border flex justify-content-between align-items-center p-2"
     >
-      <vue-monaco-editor
-        v-model:value="sqlQueryCommand"
-        language="sql"
-        :theme="monacoTheme"
-        :options="{ ...monacoOptions, readOnly: isExecutingQuery }"
-        class="w-full h-full"
-      />
+      <span class="text-color">Query Editor</span>
+      <i class="pi pi-align-left text-color"></i>
     </div>
-
-    <div class="flex justify-content-between align-items-center">
-      <div class="flex align-items-center gap-3">
-        <Button
-          :label="label"
-          :icon="icon"
-          severity="secondary"
-          :loading="isExecutingQuery"
-          @click="executeQuery"
-          :disabled="!sqlQuery.trim() || isExecutingQuery"
-          class="font-medium"
-          v-tooltip.top="'Execute Query (Ctrl+Enter)'"
-        />
-        <Button
-          label="Clear"
-          icon="pi pi-times-circle"
-          severity="secondary"
-          outlined
-          @click="sqlQueryCommand = ''"
-          :disabled="isExecutingQuery"
-        />
+    <vue-monaco-editor
+      v-model:value="sqlQueryCommand"
+      language="sql"
+      :theme="monacoTheme"
+      :options="{ ...monacoOptions, readOnly: isExecutingQuery }"
+      class="w-full h-full"
+    />
+  </div>
+  <div class="flex justify-content-between align-items-center">
+    <div class="flex align-items-center gap-3 text-sm text-color-secondary py-1">
+      <div
+        v-if="getQueryStats?.duration"
+        class="flex align-items-center gap-1"
+      >
+        <i class="pi pi-clock text-xs"></i>
+        <span>{{ getQueryStats?.duration }}ms</span>
       </div>
 
       <div
-        v-if="queryResults.length"
-        class="flex align-items-center gap-3 text-sm text-color-secondary px-3 py-1 bg-surface-100 dark:bg-surface-700 border-round"
+        v-else-if="executionTime > 0"
+        class="flex align-items-center gap-1"
       >
-        <div
-          v-if="getQueryStats?.duration"
-          class="flex align-items-center gap-1"
-        >
-          <i class="pi pi-clock text-xs"></i>
-          <span>{{ getQueryStats?.duration }}ms</span>
-        </div>
-
-        <div
-          v-else-if="executionTime > 0"
-          class="flex align-items-center gap-1"
-        >
-          <i class="pi pi-clock text-xs"></i>
-          <span>{{ executionTime }}ms</span>
-        </div>
-
-        <div
-          v-if="getQueryStats?.rowsRead !== undefined"
-          class="flex align-items-center gap-1"
-        >
-          <i class="pi pi-eye text-xs"></i>
-          <span>{{ getQueryStats?.rowsRead }} read</span>
-        </div>
-        <div
-          v-if="getQueryStats?.rowsWritten !== undefined"
-          class="flex align-items-center gap-1"
-        >
-          <i class="pi pi-pencil text-xs"></i>
-          <span>{{ getQueryStats?.rowsWritten }} written</span>
-        </div>
+        <i class="pi pi-clock text-xs"></i>
+        <span>{{ executionTime }}ms</span>
       </div>
+
+      <div
+        v-if="getQueryStats?.rowsRead !== undefined"
+        class="flex align-items-center gap-1"
+      >
+        <i class="pi pi-eye text-xs"></i>
+        <span>{{ getQueryStats?.rowsRead }} read</span>
+      </div>
+      <div
+        v-if="getQueryStats?.rowsWritten !== undefined"
+        class="flex align-items-center gap-1"
+      >
+        <i class="pi pi-pencil text-xs"></i>
+        <span>{{ getQueryStats?.rowsWritten }} written</span>
+      </div>
+    </div>
+    <div class="flex align-items-center gap-3">
+      <Button
+        label="Clear"
+        icon="pi pi-times-circle"
+        severity="secondary"
+        outlined
+        @click="sqlQueryCommand = ''"
+        :disabled="isExecutingQuery"
+      />
+      <Button
+        :label="label"
+        :icon="icon"
+        severity="secondary"
+        :loading="isExecutingQuery"
+        @click="executeQuery"
+        :disabled="!sqlQuery.trim() || isExecutingQuery"
+        class="font-medium"
+        v-tooltip.top="'Run Query (Ctrl+Enter)'"
+      />
     </div>
   </div>
 </template>
@@ -129,7 +128,7 @@
 
   const label = computed(() => {
     if (props.isExecutingQuery) return 'Executing...'
-    return 'Execute Query'
+    return 'Run Query'
   })
 
   const icon = computed(() => {
