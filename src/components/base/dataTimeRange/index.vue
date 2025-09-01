@@ -16,7 +16,7 @@
   import InputDateRange from './inputDateRange/index.vue'
   import { defineModel } from 'vue'
 
-  defineOptions({ name: 'DataTimeRange' })
+  defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
   const emit = defineEmits(['select'])
 

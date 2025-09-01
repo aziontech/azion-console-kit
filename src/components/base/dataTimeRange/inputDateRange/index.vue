@@ -1,7 +1,7 @@
 <template>
   <template v-if="!model.label">
     <div
-      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
     >
       <InputText
         class="w-min"
@@ -10,7 +10,7 @@
         @click="selectStartDate"
       />
       <div class="flex items-center text-color-secondary text-sm">
-        <i class="pi pi-arrow-right text-xs"></i>
+        <i class="pi max-md:pi-arrow-right pi-arrow-down text-xs"></i>
       </div>
       <InputText
         class="w-min"
@@ -155,23 +155,26 @@
             v-model="inputValue"
             :placeholder="editingField === 'start' ? startDateInput : endDateInput"
             class="w-full"
+            :readonly="activeTab !== 0"
             @keydown.enter="updateRange"
           />
-          <PrimeButton
-            v-if="hasChanges"
-            icon="pi pi-check"
-            size="small"
-            outlined
-            @click="updateRange"
-          />
-          <PrimeButton
-            v-else
-            label="Set today"
-            class="min-w-max"
-            size="small"
-            outlined
-            @click="setToNow"
-          />
+          <template v-if="activeTab === 0">
+            <PrimeButton
+              v-if="hasChanges"
+              icon="pi pi-check"
+              size="small"
+              outlined
+              @click="updateRange"
+            />
+            <PrimeButton
+              v-else
+              label="Set today"
+              class="min-w-max"
+              size="small"
+              outlined
+              @click="setToNow"
+            />
+          </template>
         </div>
       </div>
     </div>

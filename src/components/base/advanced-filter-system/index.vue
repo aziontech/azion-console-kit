@@ -85,7 +85,7 @@
       :class="{ 'gap-6 md:gap-4': filterData.fields.length }"
     >
       <div class="flex w-full gap-2 items-center align-items-center md:flex-row flex-col">
-        <div class="flex-1 flex gap-2 items-center">
+        <div class="flex-1 flex gap-2 items-center max-md:w-full">
           <DialogFilter
             v-model:filterAdvanced="filterData.fields"
             :fieldsInFilter="props.fieldsInFilter"
@@ -98,6 +98,7 @@
           />
         </div>
         <DataTimeRange
+          class="max-md:w-full"
           v-model="filterDataRange"
           @select="filterSearch"
         />

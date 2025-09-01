@@ -4,6 +4,9 @@
     outlined
     size="small"
     @click="toggleOverlayPanel"
+    :pt="{
+      icon: { class: 'max-md:m-0 text-white' }
+    }"
   />
 
   <OverlayPanel

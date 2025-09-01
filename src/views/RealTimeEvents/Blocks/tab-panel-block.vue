@@ -128,22 +128,8 @@
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
-    <ListTableBlock
-      lazyLoad
-      hiddenHeader
-      :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
-      isGraphql
-      frozenSize="3rem"
-      ref="listTableBlockRef"
-      :listService="listProvider"
-      :columns="props.tabSelected.columns"
-      :editInDrawer="openDetailDrawer"
-      emptyListMessage="No logs have been found for this period."
-      :csvMapper="props.tabSelected.customColumnMapper"
-      :exportFileName="`${props.tabSelected.tabRouter}-logs`"
-      data-testid="table-tab-panel-block"
-    >
-      <template #actions-header="{ exportTableCSV }">
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-2 justify-end">
         <PrimeTag
           :value="totalRecordsFound"
           severity="info"
@@ -156,15 +142,33 @@
           v-tooltip.top="{ value: 'View on GraphQL', showDelay: 200 }"
           data-testid="data-table-actions-column-header-toggle-columns"
         />
-        <PrimeButton
-          outlined
-          icon="pi pi-download"
-          class="min-w-max"
-          @click="exportTableCSV"
-          v-tooltip.top="{ value: 'Export to CSV', showDelay: 200 }"
-          data-testid="data-table-actions-column-header-toggle-columns"
-        />
-      </template>
-    </ListTableBlock>
+      </div>
+      <ListTableBlock
+        lazyLoad
+        hiddenHeader
+        :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
+        isGraphql
+        frozenSize="3rem"
+        ref="listTableBlockRef"
+        :listService="listProvider"
+        :columns="props.tabSelected.columns"
+        :editInDrawer="openDetailDrawer"
+        emptyListMessage="No logs have been found for this period."
+        :csvMapper="props.tabSelected.customColumnMapper"
+        :exportFileName="`${props.tabSelected.tabRouter}-logs`"
+        data-testid="table-tab-panel-block"
+      >
+        <template #actions-header="{ exportTableCSV }">
+          <PrimeButton
+            outlined
+            icon="pi pi-download"
+            class="min-w-max"
+            @click="exportTableCSV"
+            v-tooltip.top="{ value: 'Export to CSV', showDelay: 200 }"
+            data-testid="data-table-actions-column-header-toggle-columns"
+          />
+        </template>
+      </ListTableBlock>
+    </div>
   </data>
 </template>
