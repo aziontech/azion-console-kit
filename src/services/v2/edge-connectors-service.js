@@ -2,7 +2,7 @@ export class EdgeConnectorsService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/workspace/connectors'
+    this.baseURL = 'v4/edge_connector/connectors'
   }
 
   listEdgeConnectorsService = async (params = { pageSize: 10 }) => {
