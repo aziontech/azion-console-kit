@@ -47,7 +47,7 @@
     }
     return name || null
   })
-  const sqlQuery = ref('SELECT * FROM users')
+  const sqlQuery = ref('')
   const isExecutingQuery = ref(false)
   const isLoadingTables = ref(false)
   const queryResults = ref([])
@@ -93,6 +93,9 @@
         data: table,
         children: []
       }))
+      if (tablesTree.value.length) {
+        selectTable(tablesTree.value[0])
+      }
     } finally {
       isLoadingTables.value = false
     }
@@ -347,7 +350,7 @@
   }
 
   const openInsertRowDrawer = async () => {
-    if (queryResults.value.length === 0) return
+    if (!queryResults.value.length) return
 
     await loadTableSchema(selectedTableName.value)
     clearRowFormState()

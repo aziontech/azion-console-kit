@@ -22,6 +22,7 @@
       </div>
     </div>
     <ListTableBlock
+      :key="tableKey"
       isTabs
       ref="refListTable"
       v-if="hasContentToList && hasResults"
@@ -98,6 +99,11 @@
 
   const hasResults = computed(() => {
     return responseQuery.value?.length > 0 && responseQuery.value[0]?.rows?.length > 0
+  })
+
+  // Generate a key based on columns to force re-render when columns change
+  const tableKey = computed(() => {
+    return columns.value.map((col) => col.field).join('-')
   })
 
   const handleEditRedirect = (row) => {

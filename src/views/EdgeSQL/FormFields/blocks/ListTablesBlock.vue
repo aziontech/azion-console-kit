@@ -51,8 +51,8 @@
             <div
               v-for="table in filteredTables"
               :key="table.id"
-              class="group p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
-              :class="{ 'bg-[--table-bg-color]': selectedTableName === table.id }"
+              class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
+              :class="{ 'bg-[--table-bg-color]': selectedTableName === table.label }"
               @click="selectTable(table)"
             >
               <div class="flex items-center justify-between">
