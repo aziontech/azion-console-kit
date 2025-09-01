@@ -1,4 +1,4 @@
-import { formatBytes } from './format-bytes'
+import { formatBytes } from '@/helpers/format-bytes'
 
 export const gradeTranslate = (score) => {
   let letter = ''

@@ -1,6 +1,5 @@
 import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
-import { preventParentWindowControl } from '@/helpers/oauth-security'
 
 export class AccountHandler {
   constructor(switchAccountService, listTypeAccountService) {
@@ -85,9 +84,6 @@ export class AccountHandler {
    * @return {string | object} The URL string or object to redirect to.
    */
   async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
-    // Apply OAuth security protection first (only on auth pages)
-    preventParentWindowControl()
-
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 
