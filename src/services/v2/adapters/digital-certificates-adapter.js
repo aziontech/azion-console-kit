@@ -129,6 +129,8 @@ export const DigitalCertificatesAdapter = {
         { label: 'My certificates', items: parsedDigitalCertificates }
       ]
       count += filteredDefaultCertificates.length
+    } else {
+      bodyParser = parsedDigitalCertificates
     }
 
     return {
@@ -144,18 +146,18 @@ export const DigitalCertificatesAdapter = {
         name: item.name,
         authority: item?.authority,
         status: item?.status,
-        group: 'My certificates'
+        icon: getIconByStatus(item?.status)
       }
     })
+    let bodyParser = []
 
     if (type === 'edge_certificate') {
       const DEFAULT_CERTIFICATES = [
-        { id: 0, name: 'Azion (SAN)', status: 'active', group: 'Certificates presets' },
+        { id: 0, name: 'Azion (SAN)', status: 'active' },
         {
           id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
           name: "Let's Encrypt",
-          status: 'active',
-          group: 'Certificates presets'
+          status: 'active'
         }
       ]
       const searchLowercase = search?.toLowerCase()
@@ -165,13 +167,21 @@ export const DigitalCertificatesAdapter = {
         ? DEFAULT_CERTIFICATES.filter(matchesSearch)
         : DEFAULT_CERTIFICATES
 
-      parsedDigitalCertificates = [...filteredDefaultCertificates, ...parsedDigitalCertificates]
+      bodyParser = [
+        {
+          label: 'Certificates presets',
+          items: filteredDefaultCertificates
+        },
+        { label: 'My certificates', items: parsedDigitalCertificates }
+      ]
       count += filteredDefaultCertificates.length
+    } else {
+      bodyParser = parsedDigitalCertificates
     }
 
     return {
       count: count || 0,
-      body: parsedDigitalCertificates || []
+      body: bodyParser || []
     }
   },
 

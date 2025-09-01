@@ -20,6 +20,7 @@
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="hiddenColumns"
+        :firstLoadData="firstLoadData"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">
