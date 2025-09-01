@@ -18,9 +18,9 @@ export class WafService {
     const fieldsSplits = Array.isArray(params.fields)
       ? params.fields
       : (params.fields || '')
-        .split(',')
-        .map((field) => field.trim())
-        .filter(Boolean)
+          .split(',')
+          .map((field) => field.trim())
+          .filter(Boolean)
 
     const body = this.adapter?.transformListWafRules?.(results, fieldsSplits) ?? results
 

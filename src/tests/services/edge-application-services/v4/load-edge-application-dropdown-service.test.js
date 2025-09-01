@@ -28,7 +28,7 @@ describe('EdgeApplicationServicesV4', () => {
     await sut({ id: fixtures.edgeApplicationsMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${fixtures.edgeApplicationsMock.id}?fields=id,name`,
+      url: `${version}/workspace/applications/${fixtures.edgeApplicationsMock.id}?fields=id,name`,
       method: 'GET'
     })
   })
