@@ -1,25 +1,21 @@
 <script setup>
   import { computed, ref, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import PrimeButton from 'primevue/button'
-
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-
+  import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
-
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-
   import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
 
@@ -48,7 +44,10 @@
   const azionFormData = ref({})
   const schemaAzionFormString = ref('')
   const emptySchemaAzionForm = ref(true)
+  const selectPanelOptions = ['Raw JSON', 'Form builder']
+  const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
+
 
   const { value: name } = useField('name')
   const { value: schemaAzionForm } = useField('azionForm', null, {
@@ -66,8 +65,9 @@
     setAzionFormEmptyState(value)
   }
 
-  const formBuilderToggle = () => {
-    showFormBuilder.value = showFormBuilder.value === false ? true : false
+  const selectPanelUpdateModelValue = (value) => {
+    selectPanelValue.value = !value ? selectPanelOptions[0] : value
+    showFormBuilder.value = value === selectPanelOptions[1] ? true : false
   }
 
   const setAzionFormEmptyState = function (value) {
@@ -314,11 +314,10 @@
       </Splitter>
 
       <div class="flex justify-end mt-[1rem]">
-        <PrimeButton
-          @click="formBuilderToggle()"
-          :label="showFormBuilder ? 'Back to arguments' : 'Form builder configuration'"
-          class="text-sm p-0"
-          link
+        <SelectPanel
+            :options="selectPanelOptions"
+            :value="selectPanelOptions[0]"
+            @update:modelValue="selectPanelUpdateModelValue"
         />
       </div>
 
