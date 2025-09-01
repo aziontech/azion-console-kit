@@ -235,9 +235,9 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
       hitCount: group.hitCount,
       ipCount: group.ips.size,
       countryCount: group.countries.size,
-      topIps: getTopWithHits(group.topIps, matchingRule, "ipHitCount"),
-      topCountries: getTopWithHits(group.topCountries, matchingRule, "countryHitCount"),
-      topPaths: getTopWithHits(group.topPaths, matchingRule, "pathHitCount")
+      topIps: getTopWithHits(group.topIps, matchingRule, 'ipHitCount'),
+      topCountries: getTopWithHits(group.topCountries, matchingRule, 'countryHitCount'),
+      topPaths: getTopWithHits(group.topPaths, matchingRule, 'pathHitCount')
     }
   })
 }
