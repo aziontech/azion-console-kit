@@ -26,9 +26,9 @@
 
   const schemaAzionForm = ref(null)
   const schemaAzionFormString = ref('')
+  const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
-  const argsValue = ref('{}')
   const selectPanelOptions = ['Visual', 'Raw JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
@@ -69,7 +69,7 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
-    argsValue.value = JSON.stringify(event.data, null, 2)
+    azionFormArgsValue.value = JSON.stringify(event.data, null, 2)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -93,10 +93,6 @@
     schemaAzionFormString.value = indentJsonStringify(formSchema)
   }
 
-  const setFuntionArgs = (jsonargs) => {
-    argsValue.value = indentJsonStringify(argsJsonParser(jsonargs))
-  }
-
   const argsJsonParser = (args) => {
     try {
       return JSON.parse(args)
@@ -118,7 +114,7 @@
   })
 
   watch(args, (args) => {
-    setFuntionArgs(args)
+    azionFormArgsValue.value = args
   })
 
   watch(azionForm, (azionForm) => {
@@ -126,7 +122,8 @@
       resetFormBuilder()
       return
     }
-
+    
+    azionFormData.value = argsJsonParser(args.value)
     setAzionFormSchema(argsJsonParser(azionForm))
   })
 
@@ -218,7 +215,7 @@
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
-              <div v-show="selectPanelValue === selectPanelOptions[0]">
+              <div v-if="selectPanelValue === selectPanelOptions[0]">
                 <div
                   id="azionform"
                   class="azion-json-form"
@@ -256,14 +253,14 @@
                   </div>
                 </div>
               </div>
-              <div v-show="selectPanelValue === selectPanelOptions[1]">
+              <div v-if="selectPanelValue === selectPanelOptions[1]">
                 <div class="resize-y overflow-y-auto">
                   <CodeEditor
-                    v-model="argsValue"
+                    v-model="azionFormArgsValue"
                     runtime="json"
                     class="overflow-clip surface-border border rounded-md"
-                    :initialValue="argsValue"
                     :readOnly="schemaAzionForm ? true : false"
+                    :initialValue="azionFormArgsValue"
                     :errors="hasArgsError"
                     :minimap="false"
                   />
@@ -291,11 +288,10 @@
           />
           <div class="resize-y overflow-y-auto">
             <CodeEditor
-              v-model="argsValue"
+              v-model="args"
               runtime="json"
               class="overflow-clip surface-border border rounded-md"
-              :initialValue="argsValue"
-              :readOnly="schemaAzionForm ? true : false"
+              :initialValue="args"
               :errors="hasArgsError"
               :minimap="false"
             />
