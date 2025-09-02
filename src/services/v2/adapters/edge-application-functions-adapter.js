@@ -73,12 +73,9 @@ export const EdgeApplicationFunctionsAdapter = {
     const payloadRequest = {
       name: payload.name,
       function: payload.edgeFunctionID,
-      args: JSON.parse(payload.args)
+      args: JSON.parse(payload.args),
+      azion_form: JSON.parse(payload.azionForm)
     }
-
-    // if(payload.azionForm) {
-    //   payloadRequest.azion_form = JSON.parse(payload.azionForm)
-    // }
 
     return payloadRequest
   }

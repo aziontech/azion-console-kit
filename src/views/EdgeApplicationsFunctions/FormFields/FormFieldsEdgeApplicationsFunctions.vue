@@ -42,6 +42,8 @@
   }
 
   const changeArgs = (target) => {
+    resetFormBuilder()
+
     if (target?.defaultArgs) {
       args.value = target?.defaultArgs
     }
@@ -92,6 +94,7 @@
   const setAzionFormSchema = (formSchema) => {
     schemaAzionForm.value = formSchema
     schemaAzionFormString.value = indentJsonStringify(formSchema)
+    azionForm.value = schemaAzionFormString.value
   }
 
   const argsJsonParser = (args) => {
