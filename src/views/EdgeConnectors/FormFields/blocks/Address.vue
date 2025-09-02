@@ -5,7 +5,7 @@
     data-testid="edge-connectors-form__section__address-management"
   >
     <template #inputs>
-      <div v-if="isLoadBalancerEnabled">
+      <div v-show="isLoadBalancerEnabled">
         <Accordion v-model:activeIndex="activeAccordions">
           <AccordionTab
             v-for="(_, addressIndex) in addresses"
@@ -60,7 +60,7 @@
                     severity="primary"
                     outlined
                     :disabled="addresses.length === 1"
-                    @click.stop="removeAddressByIndex(addressIndex)"
+                    @click="removeAddressByIndex(addressIndex)"
                     :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
                   />
                 </div>
@@ -165,7 +165,7 @@
                 required
                 description="IPv4/IPv6 address or CNAME to resolve."
                 :name="`addresses[${0}].address`"
-                :value="addresses[0].value.address"
+                :value="addresses[0]?.value?.address"
                 placeholder=""
                 data-testid="edge-connectors-form__address-management__address-field"
               />
@@ -176,7 +176,7 @@
                 <FieldNumber
                   label="HTTP Port"
                   :name="`addresses[${0}].httpPort`"
-                  :value="addresses[0].value.httpPort"
+                  :value="addresses[0]?.value?.httpPort"
                   :min="0"
                   description=""
                   data-testid="edge-connectors-form__address-management__http-port-field"
@@ -187,7 +187,7 @@
                 <FieldNumber
                   label="HTTPS Port"
                   :name="`addresses[${0}].httpsPort`"
-                  :value="addresses[0].value.httpsPort"
+                  :value="addresses[0]?.value?.httpsPort"
                   :min="0"
                   description=""
                   data-testid="edge-connectors-form__address-management__https-port-field"
@@ -282,7 +282,7 @@
     return addresses.value.length === maximumAddressQuantity || !isLoadBalancerEnabled.value
   })
 
-  watch(isLoadBalancerEnabled, (newValue) => {
+  watch(loadBalancer, (newValue) => {
     if (newValue) {
       if (addresses.value.length === 0) {
         addNewAddress()
