@@ -60,7 +60,7 @@
                     severity="primary"
                     outlined
                     :disabled="addresses.length === 1"
-                    @click="removeAddressByIndex(addressIndex)"
+                    @click.stop="removeAddressByIndex(addressIndex)"
                     :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
                   />
                 </div>

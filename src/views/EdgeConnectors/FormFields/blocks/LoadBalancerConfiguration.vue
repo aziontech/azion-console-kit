@@ -67,13 +67,6 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsLoadBalancerConfiguration' })
 
-  // const props = defineProps({
-  //   setInitualValues: {
-  //     type: Boolean,
-  //     default: false
-  //   }
-  // })
-
   const { value: method } = useField('modules.loadBalancer.config.method')
   const { value: maxRetries } = useField('modules.loadBalancer.config.maxRetries')
   const { value: connectionTimeout } = useField('modules.loadBalancer.config.connectionTimeout')
