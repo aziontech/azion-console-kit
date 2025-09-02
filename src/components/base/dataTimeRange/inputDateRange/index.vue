@@ -10,7 +10,8 @@
         @click="selectStartDate"
       />
       <div class="flex items-center text-color-secondary text-sm">
-        <i class="pi max-md:pi-arrow-right pi-arrow-down text-xs"></i>
+        <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
+        <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
         class="w-min"

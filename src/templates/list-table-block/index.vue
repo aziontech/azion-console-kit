@@ -127,6 +127,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         :headerStyle="`width: ${frozenSize}`"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -143,7 +144,7 @@
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -427,6 +428,9 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({

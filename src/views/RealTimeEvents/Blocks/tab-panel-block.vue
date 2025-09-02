@@ -139,7 +139,7 @@
           icon="ai ai-graphql"
           class="min-w-max"
           @click="eventsPlaygroundOpener"
-          v-tooltip.top="{ value: 'View on GraphQL', showDelay: 200 }"
+          v-tooltip.left="{ value: 'View on GraphQL', showDelay: 200 }"
           data-testid="data-table-actions-column-header-toggle-columns"
         />
       </div>
@@ -164,7 +164,7 @@
             icon="pi pi-download"
             class="min-w-max"
             @click="exportTableCSV"
-            v-tooltip.top="{ value: 'Export to CSV', showDelay: 200 }"
+            v-tooltip.left="{ value: 'Export to CSV', showDelay: 200 }"
             data-testid="data-table-actions-column-header-toggle-columns"
           />
         </template>

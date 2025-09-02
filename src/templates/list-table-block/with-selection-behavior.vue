@@ -104,6 +104,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -354,6 +355,10 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
+
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
