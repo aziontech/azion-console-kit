@@ -44,10 +44,9 @@
   const azionFormData = ref({})
   const schemaAzionFormString = ref('')
   const emptySchemaAzionForm = ref(true)
-  const selectPanelOptions = ['Raw JSON', 'Form builder']
+  const selectPanelOptions = ['Raw JSON args', 'Form builder']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
-
 
   const { value: name } = useField('name')
   const { value: schemaAzionForm } = useField('azionForm', null, {
@@ -315,9 +314,9 @@
 
       <div class="flex justify-end mt-[1rem]">
         <SelectPanel
-            :options="selectPanelOptions"
-            :value="selectPanelOptions[0]"
-            @update:modelValue="selectPanelUpdateModelValue"
+          :options="selectPanelOptions"
+          :value="selectPanelOptions[0]"
+          @update:modelValue="selectPanelUpdateModelValue"
         />
       </div>
 

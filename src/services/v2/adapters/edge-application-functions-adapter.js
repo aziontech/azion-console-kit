@@ -39,21 +39,33 @@ export const EdgeApplicationFunctionsAdapter = {
 
   transformLoadEdgeApplicationFunction(functionData) {
     const { data } = functionData
-    return {
+    const response = {
       id: data.id,
       edgeFunctionID: data.function,
       name: data.name,
       args: JSON.stringify(data.args, null, '\t')
     }
+
+    if (data.azion_form) {
+      response.azionForm = JSON.stringify(data.azion_form, null, '\t')
+    }
+
+    return response
   },
 
   transformPayload(payload) {
-    return {
+    const payloadRequest = {
       name: payload.name,
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
       active: true
     }
+
+    if (payload.azionForm) {
+      payloadRequest.azion_form = JSON.parse(payload.azionForm)
+    }
+
+    return payloadRequest
   },
 
   transformEditPayload(payload) {
