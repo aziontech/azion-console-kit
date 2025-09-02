@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
+import { sortDate } from '@/utils/date-sort'
 
 export const listEdgeServiceServices = async ({
   orderBy = 'id',
@@ -47,7 +48,7 @@ const adapt = (httpResponse) => {
   })
 
   return {
-    body: parsedEdgeServices,
+    body: sortDate(parsedEdgeServices, 'lastModifiedDate'),
     statusCode: httpResponse.statusCode
   }
 }

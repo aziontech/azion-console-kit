@@ -65,7 +65,8 @@
     'vendor',
     'execution_environment',
     'reference_count',
-    'last_editor'
+    'last_editor',
+    'last_modified'
   ]
   const actions = [
     {
@@ -149,6 +150,7 @@
       field: 'lastEditor',
       header: 'Last Editor'
     },
+    { field: 'lastModified', header: 'Last Modified' },
     {
       field: 'status',
       header: 'Status',
