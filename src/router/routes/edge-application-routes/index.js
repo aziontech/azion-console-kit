@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
@@ -90,10 +89,7 @@ export const edgeApplicationRoutes = {
           deviceGroupsServices: {
             documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups
           },
-          errorResponsesServices: {
-            loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
-            editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
-          },
+          errorResponsesServices: {},
           rulesEngineServices: {
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService
