@@ -10,12 +10,13 @@
   import { loadProductsListService } from '@/services/contract-services'
   import { useDialog } from 'primevue/usedialog'
   import { createOriginService } from '@/services/edge-application-origins-services'
-  import { inject, ref } from 'vue'
+  import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
+  const edgeApplication = inject('edgeApplication', ref({}))
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -67,7 +68,7 @@
   const loadCreateOriginDrawer = refDebounced(showCreateOriginDrawer, debouncedDrawerAnimate)
   const loadEditOriginDrawer = refDebounced(showEditOriginDrawer, debouncedDrawerAnimate)
   const selectedOriginToEdit = ref('')
-  const originTypesOptions = ref([
+  const originTypesOptions = computed(() => [
     {
       label: 'Single Origin',
       value: 'single_origin',
@@ -76,7 +77,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: false
+      disabled: !edgeApplication.value?.loadBalancer
     },
     {
       label: 'Edge Storage',
