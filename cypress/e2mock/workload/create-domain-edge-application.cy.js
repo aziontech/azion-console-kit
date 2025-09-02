@@ -61,7 +61,7 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
       fixture: '/account/info/without_flags.json'
-  }).as('accountInfo')
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -71,11 +71,11 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/workspace/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
     cy.intercept(
       'GET',
@@ -123,8 +123,8 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
       { method: 'POST', url: '/api/v4/workspace/workloads' },
       {
         statusCode: 400,
-        body: 
-          { certificate: ["Invalid certificate status, CANNOT use pending certificate."]  }
+        body:
+          { certificate: ["Invalid certificate status, CANNOT use pending certificate."] }
       }
     ).as('createWorkload');
 
@@ -153,7 +153,7 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.domainField).should('be.visible')
     cy.get(selectors.workload.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
-   
+
     cy.get(selectors.workload.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',

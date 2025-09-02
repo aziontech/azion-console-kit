@@ -8,7 +8,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
-    edgeFirewallName  = generateUniqueName('EdgeFirewall')
+    edgeFirewallName = generateUniqueName('EdgeFirewall')
     ruleName = generateUniqueName('EdgeFirewallRule')
   })
 
@@ -39,7 +39,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleBehaviorFirstOption).click()
 
-    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
+    cy.intercept('POST', '/v4/workspace/firewalls/*/rules*').as('addEdgeFirewallRule')
 
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
 
@@ -89,7 +89,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorTagEventOption).click()
     cy.get(selectors.edgeFirewall.behaviorTagEventOption).type('Tag_Name')
 
-    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
+    cy.intercept('POST', '/v4/workspace/firewalls/*/rules*').as('addEdgeFirewallRule')
 
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
 

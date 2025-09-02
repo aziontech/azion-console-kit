@@ -2,7 +2,7 @@ export class EdgeFirewallService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_firewall/firewalls'
+    this.baseURL = 'v4/workspace/firewalls'
   }
 
   listEdgeFirewallService = async (

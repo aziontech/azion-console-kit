@@ -23,7 +23,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     await sut(fixtures.edgeApplicationId)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications/${fixtures.edgeApplicationId}`,
+      url: `v4/workspace/applications/${fixtures.edgeApplicationId}`,
       method: 'DELETE'
     })
   })

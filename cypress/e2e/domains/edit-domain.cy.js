@@ -31,7 +31,7 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
   cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
   cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
-  cy.intercept('GET', '/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
+  cy.intercept('GET', '/v4/workspace/firewalls/*').as('retrieveEdgeFirewall')
   cy.get(selectors.edgeFirewall.saveButton).click()
   cy.verifyToast('success', 'Your Edge Firewall has been created')
   cy.wait('@retrieveEdgeFirewall')
@@ -80,7 +80,7 @@ const createDigitalCertificate = () => {
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
+      fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     cy.login()
   })
@@ -91,15 +91,15 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     domainName = generateUniqueName('domain')
 
     // Arrange
-    cy.intercept('GET', '/v4/edge_firewall/firewalls*').as('getEdgeFirewalls')
+    cy.intercept('GET', '/v4/workspace/firewalls*').as('getEdgeFirewalls')
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+      `/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
     ).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -108,10 +108,10 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.edgeFirewallDropdownSearch).clear()
-    
+
     cy.intercept(
       'GET',
-      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
+      `/v4/workspace/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
     cy.get(selectors.domains.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')
@@ -176,11 +176,11 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+      `/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
     ).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)

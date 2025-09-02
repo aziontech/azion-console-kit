@@ -65,11 +65,11 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
     cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
 
-    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings?page_size=100').as(
+    cy.intercept('GET', '/v4/workspace/applications/*/cache_settings?page_size=100').as(
       'getCachePolicy'
     )
 
-    cy.intercept('POST', '/v4/edge_application/applications/*/cache_settings').as('createCache')
+    cy.intercept('POST', '/v4/workspace/applications/*/cache_settings').as('createCache')
 
     cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
       .find(selectors.form.actionsSubmitButton)

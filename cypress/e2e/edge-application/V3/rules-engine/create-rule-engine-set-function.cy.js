@@ -94,7 +94,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .click()
     cy.intercept(
       'GET',
-      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
+      'api/v4/workspace/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
     ).as('getFunctionInstance')
     cy.wait('@postFunction')
     cy.wait('@getFunctionInstance')

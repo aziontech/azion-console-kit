@@ -2,7 +2,7 @@ export class WafService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_firewall/wafs'
+    this.baseURL = 'v4/workspace/wafs'
   }
 
   listWafRules = async (
