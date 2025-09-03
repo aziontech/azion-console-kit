@@ -100,7 +100,7 @@
     }
 
     emit('update:previewData', previewValues)
-    
+
     return previewValues
   })
 

@@ -38,9 +38,7 @@
   const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
-  const {
-    value: azionForm
-  } = useField('azionForm', null, {
+  const { value: azionForm } = useField('azionForm', null, {
     initialValue: {}
   })
   const { value: isProprietaryCode } = useField('isProprietaryCode')
@@ -61,7 +59,7 @@
     initialJsonArgsValue = defaultArgs.value
 
     schemaAzionFormString.value = azionForm.value
-    
+
     let parsedValue
     try {
       parsedValue = JSON.parse(azionForm.value)

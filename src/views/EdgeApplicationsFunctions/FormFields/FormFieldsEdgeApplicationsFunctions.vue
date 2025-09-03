@@ -71,8 +71,8 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
-    azionFormArgsValue.value = indentJsonStringify(event.data, null, 2)
-    args.value = indentJsonStringify(event.data, null, 2)
+    azionFormArgsValue.value = indentJsonStringify(event.data)
+    args.value = indentJsonStringify(event.data)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -118,7 +118,7 @@
   })
 
   watch(args, (args) => {
-    azionFormArgsValue.value = args
+    azionFormArgsValue.value = indentJsonStringify(JSON.parse(args))
   })
 
   watch(azionForm, (azionForm) => {
@@ -263,7 +263,7 @@
                     v-model="azionFormArgsValue"
                     runtime="json"
                     class="overflow-clip surface-border border rounded-md"
-                    :readOnly="schemaAzionForm ? true : false"
+                    :readOnly="true"
                     :initialValue="azionFormArgsValue"
                     :errors="hasArgsError"
                     :minimap="false"
