@@ -1,5 +1,5 @@
 export default {
-  createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"] > .p-button-icon',
+  createDigitalCertificateButton: '.p-dropdown .p-dropdown-panel ul li [data-testid="domains-form__create-digital-certificate-button"] > .p-button-icon',
   digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
   breadcrumbReturnToList: '[data-testid="page-heading-block__breadcrumb__Digital Certificates"]',
   importTrustedCARadioOption:
