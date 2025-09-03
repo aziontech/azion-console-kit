@@ -64,11 +64,6 @@
       "name": "console_kit_31-07-2024_single"
     },
     {
-      "origin-id": 234047,
-      "origin-key": "65cbbdf9-59cb-47c1-913c-03342f97e4aa",
-      "name": "maintaince-origin"
-    },
-    {
       "origin-id": 154233,
       "origin-key": "8c16e835-20af-41d5-a688-cac8e6aefa94",
       "name": "origin-console-feedback"
@@ -153,11 +148,6 @@
         "phase": "request"
       },
       {
-        "id": 364147,
-        "name": "Route SIEM Azion (BB)",
-        "phase": "request"
-      },
-      {
         "id": 372222,
         "name": "API Version 4 Routing",
         "phase": "request"
@@ -165,11 +155,6 @@
       {
         "id": 381598,
         "name": "Billing PDF",
-        "phase": "request"
-      },
-      {
-        "id": 458299,
-        "name": "Maintaince Page",
         "phase": "request"
       },
       {

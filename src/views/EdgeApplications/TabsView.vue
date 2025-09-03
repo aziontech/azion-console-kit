@@ -37,17 +37,18 @@
     edgeFunctionsServices: { type: Object, required: true }
   })
 
-  const defaultTabs = {
+  const defaultTabs = ref({
     'main-settings': 0,
-    origins: 1,
-    'device-groups': 2,
-    'error-responses': 3,
-    'cache-settings': 4,
-    functions: 5,
-    'rules-engine': 6
-  }
-
-  const mapTabs = ref({ ...defaultTabs })
+    origins: !hasFlagBlockApiV4() ? null : 1,
+    'device-groups': !hasFlagBlockApiV4() ? 1 : 2,
+    'error-responses': !hasFlagBlockApiV4() ? null : 3,
+    'cache-settings': !hasFlagBlockApiV4() ? 2 : 4,
+    functions: !hasFlagBlockApiV4() ? 3 : 5,
+    'rules-engine': !hasFlagBlockApiV4() ? 4 : 6
+  })
+  const mapTabs = ref({
+    ...defaultTabs.value
+  })
 
   const toast = useToast()
   const route = useRoute()
@@ -112,7 +113,7 @@
       reindexMapTabs()
       return
     }
-    mapTabs.value = { ...defaultTabs }
+    mapTabs.value = { ...defaultTabs.value }
   }
 
   const renderTabByCurrentRouter = async () => {
