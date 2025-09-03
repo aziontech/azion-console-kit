@@ -4,7 +4,7 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
     >
       <InputText
-        class="w-min"
+        class="w-min cursor-pointer"
         :value="startDateInput"
         readonly
         @click="selectStartDate"
@@ -14,7 +14,7 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="w-min"
+        class="w-min cursor-pointer"
         :value="endDateInput"
         readonly
         @click="selectEndDate"
@@ -25,6 +25,7 @@
   <InputText
     v-else
     :value="model.label"
+    class="cursor-pointer"
     @click="selectStartDate"
     readonly
   />
@@ -33,6 +34,9 @@
     ref="overlayPanel"
     class="min-w-[200px] max-w-[400px]"
     :showCloseIcon="false"
+    :pt="{
+      content: { class: 'p-2' }
+    }"
   >
     <TabView
       v-model:activeIndex="activeTab"
@@ -208,6 +212,13 @@
 
   const emit = defineEmits(['select'])
 
+  defineProps({
+    maxDays: {
+      type: Number,
+      default: 0
+    }
+  })
+
   const model = defineModel({
     type: Object,
     default: () => ({})
@@ -256,6 +267,7 @@
   })
 
   const selectStartDate = (event) => {
+    activeTab.value = 0
     editingField.value = 'start'
     selectedTime.value = ''
     hasChanges.value = false
@@ -264,6 +276,7 @@
   }
 
   const selectEndDate = (event) => {
+    activeTab.value = 0
     editingField.value = 'end'
     selectedTime.value = ''
     hasChanges.value = false

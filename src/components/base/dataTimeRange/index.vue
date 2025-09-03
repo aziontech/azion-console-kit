@@ -20,7 +20,7 @@
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
-  const props = defineProps({
+  defineProps({
     maxDays: {
       type: Number
     }

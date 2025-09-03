@@ -5,7 +5,7 @@
     size="small"
     @click="toggleOverlayPanel"
     :pt="{
-      icon: { class: 'max-md:m-0 text-white' }
+      icon: { class: 'max-md:m-0' }
     }"
   />
 
@@ -91,7 +91,16 @@
     default: () => ({})
   })
 
-  const commonDateRanges = Object.values(COMMON_DATE_RANGES)
+  const props = defineProps({
+    maxDays: {
+      type: Number,
+      default: 0
+    }
+  })
+
+  const commonDateRanges = Object.values(COMMON_DATE_RANGES).filter(
+    (range) => range.maxDays <= props.maxDays
+  )
 
   const quickSelectDirection = ref('last')
   const quickSelectValue = ref(15)

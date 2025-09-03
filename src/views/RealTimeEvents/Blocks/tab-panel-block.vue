@@ -7,8 +7,11 @@
   import { eventsPlaygroundOpener } from '@/helpers'
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'TabPanelBlock' })
+
+  const toast = useToast()
 
   const props = defineProps({
     loadService: {
@@ -84,13 +87,27 @@
   }
 
   const listProvider = async () => {
-    const [response, total] = await Promise.all([
-      props.listService({ ...filterData.value }),
-      props.getTotalRecords({ filter: { ...filterData.value }, dataset: props.tabSelected.dataset })
-    ])
+    try {
+      const [response, total] = await Promise.all([
+        props.listService({ ...filterData.value }),
+        props.getTotalRecords({
+          filter: { ...filterData.value },
+          dataset: props.tabSelected.dataset
+        })
+      ])
 
-    recordsFound.value = total
-    return response.data
+      recordsFound.value = total
+      return response.data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error
+      })
+      recordsFound.value = 0
+      return []
+    }
   }
 
   onBeforeMount(() => {
@@ -125,7 +142,7 @@
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :maxDays="7"
+        :filterDateRangeMaxDays="7"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>

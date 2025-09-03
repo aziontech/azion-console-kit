@@ -17,7 +17,7 @@
       type: Array,
       required: true
     },
-    maxDays: {
+    filterDateRangeMaxDays: {
       type: Number
     }
   })
@@ -103,7 +103,7 @@
         <DataTimeRange
           class="max-md:w-full"
           v-model="filterDataRange"
-          :maxDays="props.maxDays"
+          :maxDays="props.filterDateRangeMaxDays"
           @select="filterSearch"
         />
         <PrimeButton
