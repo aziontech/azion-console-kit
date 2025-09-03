@@ -85,7 +85,7 @@
       description: 'Create new services to define dependencies between edge resources.'
     },
     {
-      label: 'Digital Certificates',
+      label: 'Certificate Manager',
       to: '/digital-certificates/create',
       description: 'Add a digital certificate entry to secure HTTPS applications.'
     },

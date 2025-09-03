@@ -268,9 +268,7 @@
       { label: 'Host', value: '${host}', disabled: false },
       {
         label: `${
-          hasNetworkProtectionLayerModuleEnabled
-            ? 'Network'
-            : 'Network - required Network Layer Protection'
+          hasNetworkProtectionLayerModuleEnabled ? 'Network' : 'Network - required Network Shield'
         }`,
         value: '${network}',
         disabled: !hasNetworkProtectionLayerModuleEnabled

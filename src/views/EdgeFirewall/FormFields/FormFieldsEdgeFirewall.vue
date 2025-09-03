@@ -29,7 +29,7 @@
       subtitle: 'Build ultra-low latency functions that run on the edge.'
     },
     {
-      title: 'Network Layer Protection',
+      title: 'Network Shield',
       nameField: 'networkProtectionEnabled',
       subtitle:
         'Create lists to configure a programmable security perimeter for inbound and outbound traffic at the edge.'

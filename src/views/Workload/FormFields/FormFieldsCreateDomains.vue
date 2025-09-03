@@ -652,7 +652,7 @@
           optionValue="value"
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
         />
       </div>
     </template>

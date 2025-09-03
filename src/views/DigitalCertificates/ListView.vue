@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Digital Certificates"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
