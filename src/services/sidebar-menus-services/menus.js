@@ -134,17 +134,17 @@ function createToolsItems() {
 function createEdgeLibrariesItems() {
   return [
     {
+      label: 'Certificates Manager',
+      to: '/digital-certificates',
+      icon: 'ai ai-digital-certificates',
+      id: 'digital-certificates'
+    },
+    {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'ai ai-custom-pages',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
-    },
-    {
-      label: 'Functions',
-      to: '/edge-functions',
-      icon: 'ai ai-edge-functions',
-      id: 'edge-functions'
     },
     {
       label: 'Edge Services',
@@ -153,10 +153,10 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
-      label: 'Certificates Manager',
-      to: '/digital-certificates',
-      icon: 'ai ai-digital-certificates',
-      id: 'digital-certificates'
+      label: 'Functions',
+      to: '/edge-functions',
+      icon: 'ai ai-edge-functions',
+      id: 'edge-functions'
     },
     {
       label: 'Network Lists',
