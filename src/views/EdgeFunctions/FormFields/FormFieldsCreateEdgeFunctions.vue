@@ -42,15 +42,15 @@
   const showPreview = ref(true)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
-  const schemaAzionFormString = ref('')
+  const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['Raw JSON args', 'Form builder']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
-  const { value: schemaAzionForm } = useField('azionForm', null, {
-    initialValue: null
+  const { value: azionForm } = useField('azionForm', null, {
+    initialValue: {}
   })
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs', null, {
     initialValue: ARGS_INITIAL_STATE
@@ -60,8 +60,16 @@
   })
 
   const codeEditorValueUpdate = (value) => {
-    setAzionFormSchema(value)
-    setAzionFormEmptyState(value)
+    let parsedValue
+
+    try {
+      parsedValue = JSON.parse(value)
+    } catch (error) {
+      parsedValue = {}
+    }
+
+    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -70,17 +78,11 @@
   }
 
   const setAzionFormEmptyState = function (value) {
-    emptySchemaAzionForm.value = !value ? true : false
+    emptySchemaAzionForm.value = !value || !Object.keys(value).length ? true : false
   }
 
   const setAzionFormSchema = (formSchema) => {
-    schemaAzionForm.value = formSchema
-      ? JSON.parse(formSchema)
-      : {
-          type: 'object',
-          properties: {},
-          required: []
-        }
+    azionForm.value = formSchema
   }
 
   const hasCodeError = computed(() => {
@@ -96,7 +98,9 @@
       code: code.value,
       args: defaultArgs.value
     }
+
     emit('update:previewData', previewValues)
+    
     return previewValues
   })
 
@@ -293,7 +297,7 @@
               <JsonForms
                 :data="azionFormData"
                 :renderers="renderers"
-                :schema="schemaAzionForm"
+                :schema="azionForm"
               />
             </div>
             <div

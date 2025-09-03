@@ -71,8 +71,8 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
-    azionFormArgsValue.value = JSON.stringify(event.data, null, 2)
-    args.value = JSON.stringify(event.data, null, 2)
+    azionFormArgsValue.value = indentJsonStringify(event.data, null, 2)
+    args.value = indentJsonStringify(event.data, null, 2)
   }
 
   const selectPanelUpdateModelValue = (value) => {

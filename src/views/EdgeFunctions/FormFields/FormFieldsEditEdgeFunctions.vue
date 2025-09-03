@@ -31,8 +31,7 @@
   const previewState = ref(true)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
-  const schemaAzionFormString = ref('')
-  // const schemaAzionForm = ref(null)
+  const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['Raw JSON args', 'Form builder']
   const selectPanelValue = ref(selectPanelOptions[0])
@@ -40,10 +39,9 @@
 
   const { value: name } = useField('name')
   const {
-    value: schemaAzionForm
-    // errorMessage: {}
+    value: azionForm
   } = useField('azionForm', null, {
-    initialValue: null
+    initialValue: {}
   })
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs')
@@ -62,9 +60,17 @@
     initialCodeValue = code.value
     initialJsonArgsValue = defaultArgs.value
 
-    schemaAzionFormString.value = schemaAzionForm.value
-    setAzionFormSchema(schemaAzionForm.value)
-    setAzionFormEmptyState(schemaAzionForm.value)
+    schemaAzionFormString.value = azionForm.value
+    
+    let parsedValue
+    try {
+      parsedValue = JSON.parse(azionForm.value)
+    } catch (error) {
+      parsedValue = {}
+    }
+
+    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
 
     emit('update:name', name.value)
     emit('update:run', runtime.value)
@@ -87,8 +93,10 @@
       code: code.value,
       args: defaultArgs.value
     }
+
     emit('update:previewData', previewValues)
     emit('update:run', runtime.value)
+
     return previewValues
   })
 
@@ -106,8 +114,16 @@
   ]
 
   const codeEditorValueUpdate = (value) => {
-    setAzionFormSchema(value)
-    setAzionFormEmptyState(value)
+    let parsedValue
+
+    try {
+      parsedValue = JSON.parse(value)
+    } catch (error) {
+      parsedValue = {}
+    }
+
+    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -116,17 +132,11 @@
   }
 
   const setAzionFormEmptyState = function (value) {
-    emptySchemaAzionForm.value = !value ? true : false
+    emptySchemaAzionForm.value = !value || !Object.keys(value).length ? true : false
   }
 
   const setAzionFormSchema = (formSchema) => {
-    schemaAzionForm.value = formSchema
-      ? JSON.parse(formSchema)
-      : {
-          type: 'object',
-          properties: {},
-          required: []
-        }
+    azionForm.value = formSchema
   }
 </script>
 
@@ -306,7 +316,7 @@
               <JsonForms
                 :data="azionFormData"
                 :renderers="renderers"
-                :schema="schemaAzionForm"
+                :schema="azionForm"
               />
             </div>
             <div
@@ -336,7 +346,7 @@
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
           v-model="defaultArgs"
-          :initialValue="initialJsonArgsValue"
+          :initialValue="ARGS_INITIAL_STATE"
           runtime="json"
           :errors="hasArgsError"
         />
