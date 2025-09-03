@@ -82,11 +82,11 @@ const adapt = ({ body, statusCode }) => {
 }
 
 const PRODUCT_NAMES = {
-  edge_application: 'Edge Application',
+  edge_application: 'Application',
   application_accelerator: 'Application Accelerator',
   load_balancer: 'Load Balancer',
   image_processor: 'Image Processor',
-  edge_functions: 'Edge Functions',
+  edge_functions: 'Functions',
   network_layer_protection: 'Network Layer Protection',
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',

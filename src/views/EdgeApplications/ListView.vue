@@ -40,7 +40,7 @@
     {
       type: 'delete',
       label: 'Delete',
-      title: 'edge application',
+      title: 'application',
       icon: 'pi pi-trash',
       service: edgeAppService.deleteEdgeApplicationService
     }
@@ -62,13 +62,13 @@
   }
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Edge Application'
+      productName: 'Application'
     })
   }
 
   const handleTrackEditEvent = (edgeApplication) => {
     tracker.product.clickToEdit({
-      productName: 'Edge Application'
+      productName: 'Application'
     })
 
     if (edgeApplication.isLocked) {
@@ -136,14 +136,14 @@
   <ContentBlock data-testid="edge-applications-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edge Applications"
+        pageTitle="Applications"
         data-testid="edge-applications-heading"
       />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Edge Application"
+        addButtonLabel="Application"
         createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
         :listService="edgeAppService.listEdgeApplicationsService"
@@ -152,16 +152,16 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No edge applications found."
+        emptyListMessage="No applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
-        title="No edge applications have been created"
-        description="Click the button below to create your first edge application."
-        createButtonLabel="Edge Application"
+        title="No applications have been created"
+        description="Click the button below to create your first application."
+        createButtonLabel="Application"
         createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"
         data-testid="edge-applications-empty-results-block"

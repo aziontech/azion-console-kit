@@ -365,7 +365,7 @@
       {
         value: 'run_function',
         label: `${
-          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
+          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Functions '
         }`,
         disabled: disableRunFunctionBehavior
       },

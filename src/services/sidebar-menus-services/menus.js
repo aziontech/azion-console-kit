@@ -34,7 +34,7 @@ function createDomainsItem() {
 function createBuildItems() {
   return [
     {
-      label: 'Edge Application',
+      label: 'Applications',
       icon: 'ai ai-edge-application',
       to: '/edge-applications',
       id: 'edge-application'
@@ -64,7 +64,7 @@ function createSecureItems() {
       id: 'edge-dns'
     },
     {
-      label: 'Edge Firewall',
+      label: 'Firewall',
       to: '/edge-firewall',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
@@ -141,7 +141,7 @@ function createEdgeLibrariesItems() {
       visible: !hasFlagBlockApiV4()
     },
     {
-      label: 'Edge Functions',
+      label: 'Functions',
       to: '/edge-functions',
       icon: 'ai ai-edge-functions',
       id: 'edge-functions'
@@ -153,7 +153,7 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
-      label: 'Digital Certificates',
+      label: 'Certificates Manager',
       to: '/digital-certificates',
       icon: 'ai ai-digital-certificates',
       id: 'digital-certificates'
@@ -196,7 +196,7 @@ function createMarketplaceProductsItems() {
 // function createStoreItems() {
 //   return [
 //     {
-//       label: 'Edge Storage',
+//       label: 'Object Storage',
 //       to: '/edge-storage',
 //       icon: 'ai ai-edge-storage',
 //       id: 'edge-storage',

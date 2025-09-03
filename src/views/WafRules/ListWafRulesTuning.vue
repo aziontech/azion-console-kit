@@ -552,7 +552,7 @@
   <EmptyResultsBlock
     v-if="!showListTable"
     :title="`Select a ${handleTextDomainWorkload.singularLabel} to query data`"
-    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the edge firewall that has a behavior running this WAF rule set.`"
+    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the firewall that has a behavior running this WAF rule set.`"
     :documentationService="props.documentationServiceTuning"
     noShowBorderTop
     class="!mt-0"

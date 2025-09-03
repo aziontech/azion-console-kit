@@ -156,7 +156,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a origin server configuration for the edge application. Use Rules Engine to activate origins."
+    description="Create a origin server configuration for the application. Use Rules Engine to activate origins."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

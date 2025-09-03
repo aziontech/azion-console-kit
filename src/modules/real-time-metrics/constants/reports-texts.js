@@ -152,7 +152,7 @@ const REPORTS_TEXTS = {
     invocations: {
       totalInvocations: {
         description:
-          'Quantity of times an edge function has been executed. Displays the total amount of invocations divided by Edge Firewall Invocations and Edge Application Invocations.'
+          'Quantity of times a function has been executed. Displays the total amount of invocations divided by Firewall Invocations and Application Invocations.'
       }
     }
   },

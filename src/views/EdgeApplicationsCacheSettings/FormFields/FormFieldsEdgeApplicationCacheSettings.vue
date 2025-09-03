@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a set of cache configurations to apply to the edge application. Use Rules Engine to activate cache settings."
+    description="Create a set of cache configurations to apply to the application. Use Rules Engine to activate cache settings."
     isDrawer
   >
     <template #inputs>

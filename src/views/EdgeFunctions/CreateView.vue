@@ -77,10 +77,10 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your edge function has been created',
+      feedback: 'Your function has been created',
       actions: {
         link: {
-          label: 'View Edge Function',
+          label: 'View Function',
           callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
         }
       }
@@ -92,7 +92,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Function">
+      <PageHeadingBlock pageTitle="Create Function">
         <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>

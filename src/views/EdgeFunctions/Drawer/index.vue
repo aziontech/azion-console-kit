@@ -98,7 +98,7 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your edge function has been created'
+      feedback: 'Your function has been created'
     }
     response.showToastWithActions(toast)
   }
@@ -114,7 +114,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
-    title="Create Edge Function"
+    title="Create Function"
     disableToast
   >
     <template #formFields>

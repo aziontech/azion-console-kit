@@ -86,7 +86,7 @@
       }
     },
     {
-      title: 'Edge Functions',
+      title: 'Functions',
       nameField: 'edgeFunctionsEnabled',
       subtitle: 'Build ultra-low latency functions that run on the edge.'
     },

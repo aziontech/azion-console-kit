@@ -268,7 +268,7 @@
       summary: feedback,
       action: {
         link: {
-          label: 'Go to Edge Functions',
+          label: 'Go to Functions',
           callback: () => {
             router.push({ name: 'list-edge-functions' })
           }

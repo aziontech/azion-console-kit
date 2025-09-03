@@ -47,9 +47,9 @@
       case CERTIFICATE_TYPES.TRUSTED:
         return 'Create a digital certificate that can be used for mutual Transport Layer Security (mTLS).'
       case CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST:
-        return 'Create an entry to manage a Certificate Revocation List (CRL) and ensure the security of HTTPS edge applications.'
+        return 'Create an entry to manage a Certificate Revocation List (CRL) and ensure the security of HTTPS applications.'
       default:
-        return 'Create a digital certificate entry to secure HTTPS edge applications.'
+        return 'Create a digital certificate entry to secure HTTPS applications.'
     }
   })
 

@@ -72,12 +72,12 @@
 
   const executionEnvironmentOptions = [
     {
-      title: 'Edge Application',
+      title: 'Application',
       subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
       inputValue: 'application'
     },
     {
-      title: 'Edge Firewall',
+      title: 'Firewall',
       subtitle: 'Functions are executed by a firewall to apply security policies.',
       inputValue: 'firewall'
     }
@@ -90,7 +90,7 @@
       <FormHorizontal
         class="mt-8"
         title="General"
-        description="Edit an edge function that runs closer to users to use with Edge Application or Edge Firewall."
+        description="Edit a function that runs closer to users to use with Application or Firewall."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -109,7 +109,7 @@
       <FormHorizontal
         class="mt-8"
         title="Runtime"
-        description="The execution runtime used to run your edge function"
+        description="The execution runtime used to run your function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -127,7 +127,7 @@
       <FormHorizontal
         class="mt-8"
         title="Execution Environment"
-        description="Specify the execution environment for your edge function"
+        description="Specify the execution environment for your function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
