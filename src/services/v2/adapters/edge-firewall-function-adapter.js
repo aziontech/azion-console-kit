@@ -8,6 +8,7 @@ export const EdgeFirewallFunctionAdapter = {
       name: payloadRequest.name,
       function: payloadRequest.edgeFunctionID,
       args: JSON.parse(payloadRequest.args),
+      azion_form: JSON.parse(payloadRequest.azionForm),
       ...(action === 'POST' && { active: true })
     }
   },
@@ -38,7 +39,8 @@ export const EdgeFirewallFunctionAdapter = {
       id: data.id,
       edgeFunctionID: data.function,
       name: data.name,
-      args: JSON.stringify(data.args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t'),
+      azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
   },
   transformLoadEdgeFunction({ data }) {

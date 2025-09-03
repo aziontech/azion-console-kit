@@ -173,18 +173,18 @@
         />
 
         <FieldDropdownLazyLoader
+          required
+          disableEmitFirstRender
           data-testid="edge-application-function-instance-form__edge-function"
           label="Edge Function"
-          required
           name="edgeFunctionID"
+          optionLabel="name"
+          optionValue="id"
+          inputId="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionServiceDecorator"
           :moreOptions="['defaultArgs', 'azionForm']"
-          disableEmitFirstRender
-          optionLabel="name"
-          optionValue="id"
           :value="edgeFunctionID"
-          inputId="edgeFunctionID"
           @onSelectOption="changeArgs"
         >
           <template #footer>

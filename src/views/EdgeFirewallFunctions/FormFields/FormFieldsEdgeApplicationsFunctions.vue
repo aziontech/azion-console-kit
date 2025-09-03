@@ -28,16 +28,23 @@
     edgeFunctionID.value = functionId
   }
 
-  const changeArgs = async (target) => {
+  const changeArgs = (target) => {
+    resetFormBuilder()
+
     if (target?.defaultArgs) {
-      args.value = target.defaultArgs
+      args.value = target?.defaultArgs
+    }
+
+    if (target?.azionForm) {
+      selectPanelUpdateModelValue()
+      azionForm.value = target?.azionForm
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'firewall',
-      fields: ['id', 'name', 'default_args', 'execution_environment'],
+      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment'],
       ...queryParams
     })
   }
@@ -52,29 +59,34 @@
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
-  // const { value: azionForm } = useField('azionForm')
+  const { value: azionForm } = useField('azionForm')
 
   const schemaAzionForm = ref(null)
   const schemaAzionFormString = ref('')
+  const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
-  const argsValue = ref('{}')
   const selectPanelOptions = ['Visual', 'Raw JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
-    argsValue.value = JSON.stringify(event.data, null, 2)
+    azionFormArgsValue.value = indentJsonStringify(event.data)
+    args.value = indentJsonStringify(event.data)
   }
 
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
   }
 
+  const updateLabelEditForm = () => {
+    return showFormBuilder.value ? 'Visual form' : 'Edit form'
+  }
+
   const formBuilderToggle = () => {
     showFormBuilder.value = showFormBuilder.value === false ? true : false
 
-    if (showFormBuilder.value === false) {
+    if (!showFormBuilder.value) {
       setAzionFormSchema(JSON.parse(schemaAzionFormString.value))
     }
   }
@@ -82,15 +94,7 @@
   const setAzionFormSchema = (formSchema) => {
     schemaAzionForm.value = formSchema
     schemaAzionFormString.value = indentJsonStringify(formSchema)
-  }
-
-  const setFuntionArgs = (jsonargs) => {
-    const jsonArgs = argsJsonParser(jsonargs)
-
-    delete jsonArgs.azion_form
-
-    argsValue.value = indentJsonStringify(jsonArgs)
-    azionFormData.value = jsonArgs
+    azionForm.value = schemaAzionFormString.value
   }
 
   const argsJsonParser = (args) => {
@@ -103,8 +107,10 @@
     }
   }
 
-  const getAzionFormData = (jsonArgs) => {
-    return argsJsonParser(jsonArgs).azion_form
+  const resetFormBuilder = () => {
+    schemaAzionForm.value = null
+    schemaAzionFormString.value = ''
+    azionFormData.value = {}
   }
 
   const hasArgsError = computed(() => {
@@ -112,13 +118,18 @@
   })
 
   watch(args, (args) => {
-    setAzionFormSchema(getAzionFormData(args))
-    setFuntionArgs(args)
+    azionFormArgsValue.value = indentJsonStringify(JSON.parse(args))
   })
 
-  // watch(azionForm, (azionForm) => {
-  //   console.log('WATCH azionForm', azionForm)
-  // })
+  watch(azionForm, (azionForm) => {
+    if (!Object.keys(JSON.parse(azionForm)).length) {
+      resetFormBuilder()
+      return
+    }
+
+    azionFormData.value = argsJsonParser(args.value)
+    setAzionFormSchema(argsJsonParser(azionForm))
+  })
 
   watch(
     () => drawerRef.value.showCreateDrawer,
@@ -161,19 +172,19 @@
           @onSuccess="handleDrawerSuccess"
         />
         <FieldDropdownLazyLoader
+          required
+          disableEmitFirstRender
+          data-testid="edge-firewall-functions-form__edge-function-dropdown"
           label="Edge Function"
           name="edgeFunctionID"
-          required
-          :service="listEdgeFunctionsServiceDecorator"
-          :loadService="loadEdgeFunctionServiceDecorator"
-          :value="edgeFunctionID"
-          :moreOptions="['defaultArgs']"
-          disableEmitFirstRender
-          @onSelectOption="changeArgs"
           optionLabel="name"
           optionValue="id"
           appendTo="self"
-          data-testid="edge-firewall-functions-form__edge-function-dropdown"
+          :service="listEdgeFunctionsServiceDecorator"
+          :loadService="loadEdgeFunctionServiceDecorator"
+          :moreOptions="['defaultArgs', 'azionForm']"
+          :value="edgeFunctionID"
+          @onSelectOption="changeArgs"
         >
           <template #footer>
             <ul class="p-2">
@@ -207,7 +218,7 @@
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
-              <div v-show="selectPanelValue === selectPanelOptions[0]">
+              <div v-if="selectPanelValue === selectPanelOptions[0]">
                 <div
                   id="azionform"
                   class="azion-json-form"
@@ -245,14 +256,14 @@
                   </div>
                 </div>
               </div>
-              <div v-show="selectPanelValue === selectPanelOptions[1]">
+              <div v-if="selectPanelValue === selectPanelOptions[1]">
                 <div class="resize-y overflow-y-auto">
                   <CodeEditor
-                    v-model="argsValue"
+                    v-model="azionFormArgsValue"
                     runtime="json"
                     class="overflow-clip surface-border border rounded-md"
-                    :initialValue="argsValue"
-                    :readOnly="schemaAzionForm ? true : false"
+                    :readOnly="true"
+                    :initialValue="azionFormArgsValue"
                     :errors="hasArgsError"
                     :minimap="false"
                   />
@@ -280,11 +291,10 @@
           />
           <div class="resize-y overflow-y-auto">
             <CodeEditor
-              v-model="argsValue"
+              v-model="args"
               runtime="json"
               class="overflow-clip surface-border border rounded-md"
-              :initialValue="argsValue"
-              :readOnly="schemaAzionForm ? true : false"
+              :initialValue="args"
               :errors="hasArgsError"
               :minimap="false"
             />
@@ -302,18 +312,18 @@
           />
         </div>
       </div>
+
+      <div
+        class="flex justify-end mt-[-1rem]"
+        v-if="selectPanelValue === selectPanelOptions[0] && schemaAzionFormString"
+      >
+        <PrimeButton
+          @click="formBuilderToggle()"
+          :label="updateLabelEditForm()"
+          class="text-sm p-0"
+          link
+        />
+      </div>
     </template>
   </FormHorizontal>
-
-  <div
-    class="flex justify-end mt-[-1rem]"
-    v-if="selectPanelValue === selectPanelOptions[0]"
-  >
-    <PrimeButton
-      @click="formBuilderToggle()"
-      :label="showFormBuilder ? 'Visual form' : 'Edit form'"
-      class="text-sm p-0"
-      link
-    />
-  </div>
 </template>
