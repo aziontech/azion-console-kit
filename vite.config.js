@@ -49,7 +49,8 @@ const getConfig = () => {
         '@stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
         '@assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
         '@routes': fileURLToPath(new URL('./src/router/routes', import.meta.url)),
-        '@modules': fileURLToPath(new URL('./src/modules', import.meta.url))
+        '@modules': fileURLToPath(new URL('./src/modules', import.meta.url)),
+        '@utils': fileURLToPath(new URL('./src/utils', import.meta.url))
       }
     },
     server: {
