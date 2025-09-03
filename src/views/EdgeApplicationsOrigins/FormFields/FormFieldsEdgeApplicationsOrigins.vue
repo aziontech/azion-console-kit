@@ -318,7 +318,7 @@
           required
           name="bucketName"
           :value="bucketName"
-          description="Name of the bucket created using Azion Edge Storage."
+          description="Name of the bucket created using Azion Object Storage."
         />
       </div>
       <div
