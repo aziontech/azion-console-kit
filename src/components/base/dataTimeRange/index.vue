@@ -2,10 +2,12 @@
   <div class="p-inputgroup w-fit">
     <QuickSelect
       v-model="model"
+      :maxDays="maxDays"
       @select="emit('select', $event)"
     />
     <InputDateRange
       v-model="model"
+      :maxDays="maxDays"
       @select="emit('select', $event)"
     />
   </div>
@@ -17,6 +19,12 @@
   import { defineModel } from 'vue'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
+
+  const props = defineProps({
+    maxDays: {
+      type: Number
+    }
+  })
 
   const emit = defineEmits(['select'])
 

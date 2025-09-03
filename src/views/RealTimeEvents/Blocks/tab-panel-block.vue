@@ -125,6 +125,7 @@
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
+        :maxDays="7"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
