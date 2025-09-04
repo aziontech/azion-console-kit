@@ -79,19 +79,65 @@
           size="small"
           outlined
           label="Quick Templates"
-          data-testid="table-menu-button"
+          data-testid="quick-templates-button"
+          @click="openTemplatesModal"
         />
       </div>
     </div>
+
+    <!-- Quick Templates Modal -->
+    <Dialog
+      v-model:visible="showTemplatesModal"
+      modal
+      header="SQL Quick Templates"
+      :style="{ width: '80vw', maxWidth: '1000px' }"
+      :closable="true"
+      @hide="closeTemplatesModal"
+    >
+      <div class="flex flex-col gap-4">
+        <!-- Search Field -->
+        <div class="p-input-icon-left w-1/3">
+          <i class="pi pi-search" />
+          <InputText
+            v-model="templateSearchTerm"
+            placeholder="Search templates..."
+            class="w-full"
+            @input="handleSearchTemplates"
+          />
+        </div>
+        <div class="flex w-full gap-2 flex-wrap">
+          <div
+            v-for="template in filteredTemplates"
+            :key="template.name"
+            class="cursor-pointer rounded flex-1 min-w-[300px] border surface-border h-28 p-6"
+            @click="selectTemplate(template)"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">{{ template.name }}</span>
+            </div>
+            <p class="text-sm text-color-secondary mt-2">{{ template.description }}</p>
+          </div>
+        </div>
+
+        <div
+          v-if="filteredTemplates.length === 0"
+          class="text-center py-8"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-3"></i>
+          <p class="text-color-secondary m-0">No templates found matching your search.</p>
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script setup>
   import { computed, watch } from 'vue'
-  // import { QUICK_TEMPLATES } from '../../constants'
+  import { QUICK_TEMPLATES } from '../../constants'
   import { defineProps, defineEmits, ref } from 'vue'
   import Skeleton from 'primevue/skeleton'
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
+  import Dialog from 'primevue/dialog'
 
   const emit = defineEmits(['select-table', 'show-table-menu', 'use-template', 'create-table'])
 
@@ -120,11 +166,15 @@
 
   const searchTerm = ref('')
   const isLoading = ref(false)
+  const showTemplatesModal = ref(false)
+  const templateSearchTerm = ref('')
   const filteredTables = computed(() => {
     return props.tablesTree.filter((table) => {
       return table.label.toLowerCase().includes(searchTerm.value.toLowerCase())
     })
   })
+
+  const filteredTemplates = ref(QUICK_TEMPLATES)
 
   const handleCreateQuery = () => {
     emit('create-table')
@@ -140,8 +190,38 @@
     emit('select-table', table)
   }
 
+  const handleSearchTemplates = () => {
+    const searchTermTemplate = templateSearchTerm.value || ''
+    if (!searchTermTemplate.trim()) {
+      filteredTemplates.value = QUICK_TEMPLATES
+      return
+    }
+
+    filteredTemplates.value = QUICK_TEMPLATES.filter((template) => {
+      return (
+        template.name.toLowerCase().includes(searchTermTemplate.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchTermTemplate.toLowerCase())
+      )
+    })
+  }
+
   const showTableMenu = (event, table) => {
     emit('show-table-menu', event, table)
+  }
+
+  const openTemplatesModal = () => {
+    showTemplatesModal.value = true
+    templateSearchTerm.value = ''
+  }
+
+  const closeTemplatesModal = () => {
+    showTemplatesModal.value = false
+    templateSearchTerm.value = ''
+  }
+
+  const selectTemplate = (template) => {
+    emit('use-template', template)
+    closeTemplatesModal()
   }
 
   watch(

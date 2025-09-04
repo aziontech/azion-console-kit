@@ -1,6 +1,7 @@
 export const QUICK_TEMPLATES = [
   {
     name: 'Create Table',
+    description: 'Create a basic users table with auto-increment ID and timestamp',
     query: `CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -10,20 +11,24 @@ export const QUICK_TEMPLATES = [
   },
   {
     name: 'Insert Data',
+    description: 'Insert sample user records into the users table',
     query: `INSERT INTO users (name, email) VALUES 
 ('John Doe', 'john@example.com'),
 ('Jane Smith', 'jane@example.com');`
   },
   {
     name: 'Select All',
+    description: 'Retrieve all records from users table with limit',
     query: 'SELECT * FROM users LIMIT 100;'
   },
   {
     name: 'Count Records',
+    description: 'Count total number of records in users table',
     query: 'SELECT COUNT(*) as total FROM users;'
   },
   {
     name: 'Vector Table',
+    description: 'Create a products table with vector embeddings for AI search',
     query: `CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -33,6 +38,7 @@ export const QUICK_TEMPLATES = [
   },
   {
     name: 'Insert Vectors',
+    description: 'Insert sample products with vector embeddings',
     query: `INSERT INTO products (name, description, embedding) VALUES 
 ('Laptop', 'Gaming laptop with RTX graphics', vector('[0.1, 0.2, 0.3, 0.4, 0.5]')),
 ('Mouse', 'Wireless ergonomic mouse', vector('[0.2, 0.3, 0.1, 0.6, 0.4]')),
@@ -40,6 +46,7 @@ export const QUICK_TEMPLATES = [
   },
   {
     name: 'Vector Search',
+    description: 'Search products using cosine similarity with vector embeddings',
     query: `SELECT 
   name,
   description,
@@ -50,11 +57,13 @@ LIMIT 5;`
   },
   {
     name: 'Create Vector Index',
+    description: 'Create an index to optimize vector search performance',
     query: `CREATE INDEX products_vector_idx 
 ON products (libsql_vector_idx(embedding));`
   },
   {
     name: 'Vector Top K Query',
+    description: 'Find top 3 most similar products using vector distance',
     query: `SELECT
   name,
   description,
