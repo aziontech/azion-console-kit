@@ -13,7 +13,7 @@ export const edgeSQLRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge SQL',
+            label: 'SQL Database',
             to: '/edge-sql'
           }
         ]
@@ -26,7 +26,7 @@ export const edgeSQLRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge SQL',
+            label: 'SQL Database',
             to: '/edge-sql'
           },
           {
@@ -43,7 +43,7 @@ export const edgeSQLRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge SQL',
+            label: 'SQL Database',
             to: '/edge-sql'
           },
           {

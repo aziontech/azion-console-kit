@@ -311,7 +311,7 @@
   <ContentBlock data-testid="edge-sql-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edge SQL"
+        pageTitle="SQL Database"
         data-testid="edge-sql-heading"
       >
         <template #actions>
