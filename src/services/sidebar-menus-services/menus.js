@@ -176,11 +176,11 @@ function createEdgeLibrariesItems() {
 function createStoreItems() {
   return [
     {
-      label: 'Edge SQL',
-      to: '/edge-sql',
+      label: 'SQL Database',
+      to: '/sql-database',
       icon: 'ai ai-edge-sql',
       tag: 'Preview',
-      id: 'edge-sql'
+      id: 'sql-database'
     }
   ]
 }

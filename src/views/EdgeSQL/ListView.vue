@@ -188,13 +188,13 @@
     }
 
     sqlStore.setCurrentDatabase(database)
-    router.push(`/edge-sql/database/${database.id}`)
+    router.push(`/sql-database/database/${database.id}`)
   }
 
   watch(
     () => route.path,
     (newPath, oldPath) => {
-      if (oldPath?.includes('/edge-sql/create') && newPath === '/edge-sql') {
+      if (oldPath?.includes('/sql-database/create') && newPath === '/sql-database') {
         setTimeout(reloadList, 500)
       }
     },
@@ -331,8 +331,8 @@
         v-if="hasContentToList"
         ref="fetchListRef"
         addButtonLabel="Database"
-        createPagePath="/edge-sql/create"
-        editPagePath="/edge-sql/database"
+        createPagePath="/sql-database/create"
+        editPagePath="/sql-database/database"
         :enableEditClick="false"
         :listService="edgeSQLService.listDatabases"
         :columns="getColumns"
@@ -350,7 +350,7 @@
         title="No databases have been created"
         description="Create your first SQL database to store and query your data at the edge."
         createButtonLabel="Database"
-        createPagePath="/edge-sql/create"
+        createPagePath="/sql-database/create"
         :documentationService="props.documentationService"
         data-testid="edge-sql-empty-results-block"
       >

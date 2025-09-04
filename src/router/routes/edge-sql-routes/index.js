@@ -1,11 +1,11 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeSQLRoutes = {
-  path: '/edge-sql',
-  name: 'edge-sql',
+  path: '/sql-database',
+  name: 'sql-database',
   children: [
     {
       path: '',
-      name: 'list-edge-sql-databases',
+      name: 'list-sql-databases',
       component: () => import('@views/EdgeSQL/ListView.vue'),
       props: {
         documentationService: () => 'https://www.azion.com/en/documentation/products/edge-sql/'
@@ -14,20 +14,20 @@ export const edgeSQLRoutes = {
         breadCrumbs: [
           {
             label: 'SQL Database',
-            to: '/edge-sql'
+            to: '/sql-database'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-sql-database',
+      name: 'create-sql-database',
       component: () => import('@views/EdgeSQL/CreateView.vue'),
       meta: {
         breadCrumbs: [
           {
             label: 'SQL Database',
-            to: '/edge-sql'
+            to: '/sql-database'
           },
           {
             label: 'Create Database'
@@ -37,14 +37,14 @@ export const edgeSQLRoutes = {
     },
     {
       path: 'database/:id/:tab?',
-      name: 'edge-sql-database',
+      name: 'sql-database',
       component: () => import('@views/EdgeSQL/DatabaseView.vue'),
       props: true,
       meta: {
         breadCrumbs: [
           {
             label: 'SQL Database',
-            to: '/edge-sql'
+            to: '/sql-database'
           },
           {
             label: 'Database'
