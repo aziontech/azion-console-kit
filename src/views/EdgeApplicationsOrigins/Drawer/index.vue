@@ -16,7 +16,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
-  const edgeApplication = inject('edgeApplication', ref({}))
+  const edgeApplication = inject('edgeApplication')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
