@@ -18,12 +18,10 @@ const loadFromStorage = (key, defaultValue = null) => {
     const item = localStorage.getItem(key)
     const result = item ? JSON.parse(item) : defaultValue
 
-    // Ensure result is always an array
     const arrayResult = Array.isArray(result) ? result : []
     const resultParse = adaptHistory(arrayResult)
     return resultParse
   } catch (error) {
-    // Silently handle localStorage load errors
     return Array.isArray(defaultValue) ? defaultValue : []
   }
 }
@@ -131,9 +129,7 @@ export function useEdgeSQL() {
       databaseId: currentDatabase.value?.id,
       databaseName: currentDatabase.value?.name
     }
-
     queryResults.value.unshift(enrichedResult)
-
     if (queryResults.value.length > 100) {
       queryResults.value = queryResults.value.slice(0, 100)
     }
@@ -173,6 +169,10 @@ export function useEdgeSQL() {
       exportedAt: new Date().toISOString(),
       version: '1.0'
     }
+  }
+
+  const updateListHistory = () => {
+    queryResults.value = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
   }
 
   const importHistory = (historyData) => {
@@ -227,6 +227,7 @@ export function useEdgeSQL() {
     getQueryHistoryForDatabase,
     exportHistory,
     importHistory,
+    updateListHistory,
     setLoading,
     setError,
     clearError,

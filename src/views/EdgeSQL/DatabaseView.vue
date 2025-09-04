@@ -87,7 +87,7 @@
     try {
       await edgeSQLService.getDatabase(databaseId.value)
     } catch (error) {
-      router.push('/edge-sql')
+      router.push('/sql-database')
     }
   }
 
@@ -422,7 +422,7 @@
   const handleTabChange = (index) => {
     const tabRoute = ROUTE_TABS[index]
     if (tabRoute) {
-      router.push(`/edge-sql/database/${databaseId.value}/${tabRoute}`)
+      router.push(`/sql-database/database/${databaseId.value}/${tabRoute}`)
     }
   }
 

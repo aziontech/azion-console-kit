@@ -4,6 +4,7 @@
       v-if="hasContentToList && hasResults"
       :columns="columns"
       :data="listTableService"
+      :isLoading="isExecutingQuery"
       :key="tableKey"
       @row-edit-save="handleRowSave"
       @row-edit-cancel="handleRowCancel"

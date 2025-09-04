@@ -1,6 +1,7 @@
 <template>
   <div class="max-w-full">
     <DataTable
+      v-if="!isLoading"
       ref="dataTableRef"
       v-model:editingRows="editingRowsItens"
       :value="props.data"
@@ -148,6 +149,53 @@
         </template>
       </Column>
     </DataTable>
+
+    <DataTable
+      v-else
+      :value="Array(10)"
+      :pt="{
+        header: { class: '!border-t-0' }
+      }"
+      data-testid="data-table-skeleton"
+    >
+      <template #header>
+        <slot name="header">
+          <div class="flex flex-wrap justify-between gap-2 w-full">
+            <span class="flex flex-row h-8 p-input-icon-left max-sm:w-full">
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full h-8 md:min-w-[20rem]"
+                v-model="filters.global.value"
+                placeholder="Search"
+                data-testid="data-table-skeleton-search-input"
+              />
+            </span>
+            <slot name="addButton">
+              <PrimeButton
+                class="max-sm:w-full"
+                :disabled="disabledAddButton"
+                @click="$emit('add-button-click')"
+                icon="pi pi-plus"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+                data-testid="data-table-skeleton-add-button"
+              />
+            </slot>
+          </div>
+        </slot>
+      </template>
+      <Column
+        v-for="col of props.columns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+        data-testid="data-table-skeleton-column"
+      >
+        <template #body>
+          <Skeleton />
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
 
@@ -160,6 +208,7 @@
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
+  import Skeleton from 'primevue/skeleton'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
@@ -199,6 +248,10 @@
     },
     exportFileName: {
       type: String
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   })
 

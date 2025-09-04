@@ -9,8 +9,9 @@
   defineOptions({ name: 'edge-sql-query-history' })
 
   const emit = defineEmits(['rerun-query'])
+  const tableBlock = ref(null)
 
-  const { queryResults, clearQueryResults } = useEdgeSQL()
+  const { queryResults, clearQueryResults, updateListHistory } = useEdgeSQL()
 
   const hasContentToList = ref(true)
   const toast = useToast()
@@ -22,6 +23,8 @@
 
   const clearHistory = () => {
     clearQueryResults()
+    updateListHistory()
+    tableBlock.value?.reload()
     toast.add({
       severity: 'info',
       summary: 'History Cleared',
@@ -41,7 +44,7 @@
   const actions = [
     {
       type: 'action',
-      icon: 'pi  pi-arrow-circle-right',
+      icon: 'pi pi-arrow-circle-right',
       commandAction: (item) => rerunQuery(item)
     }
   ]
@@ -87,6 +90,7 @@
   <div class="h-full mt-8">
     <TableBlock
       v-if="hasContentToList"
+      ref="tableBlock"
       :listService="getQueryHistory"
       :columns="columns"
       :hasExportToCsv="true"
