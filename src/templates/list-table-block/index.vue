@@ -56,16 +56,6 @@
               />
             </span>
 
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
-
             <slot
               name="addButton"
               data-testid="data-table-add-button"
@@ -134,6 +124,16 @@
             class="flex justify-end w-full"
             data-testid="data-table-actions-column-header"
           >
+            <slot name="actionsHeader"></slot>
+            <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full mr-2"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
             <PrimeButton
               outlined
               icon="ai ai-column"

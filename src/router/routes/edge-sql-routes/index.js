@@ -36,7 +36,7 @@ export const edgeSQLRoutes = {
       }
     },
     {
-      path: 'database/:id',
+      path: 'database/:id/:tab?',
       name: 'edge-sql-database',
       component: () => import('@views/EdgeSQL/DatabaseView.vue'),
       props: true,

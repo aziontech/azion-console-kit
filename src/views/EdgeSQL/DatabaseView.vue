@@ -1,7 +1,6 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -17,7 +16,7 @@
 
   import { useDialog } from 'primevue/usedialog'
 
-  import { useEdgeSQLStore } from '@/stores/edge-sql'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
   import { edgeSQLService } from '@/services/v2'
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
@@ -30,9 +29,8 @@
 
   const route = useRoute()
   const router = useRouter()
-  const toast = useToast()
   const dialog = useDialog()
-  const sqlStore = useEdgeSQLStore()
+  const sqlDatabase = useEdgeSQL()
   const accountStore = useAccountStore()
 
   // const documentationService = () => {
@@ -40,8 +38,19 @@
   // }
 
   const databaseId = computed(() => route.params.id)
+
+  // Tab route mapping
+  const TAB_ROUTES = {
+    results: 0,
+    history: 1
+  }
+
+  const ROUTE_TABS = {
+    0: 'results',
+    1: 'history'
+  }
   const databaseName = computed(() => {
-    const name = sqlStore.currentDatabase?.name
+    const name = sqlDatabase.currentDatabase?.name
     if (name && typeof name === 'object' && name.text !== undefined) {
       return name.text || name.content || null
     }
@@ -63,7 +72,13 @@
   const isTemplatesCollapsed = ref(true)
   const selectedTableName = ref(null)
 
-  const activeTabIndex = ref(1)
+  // Initialize activeTabIndex based on route
+  const getTabIndexFromRoute = () => {
+    const tabParam = route.params.tab
+    return TAB_ROUTES[tabParam] !== undefined ? TAB_ROUTES[tabParam] : 0
+  }
+
+  const activeTabIndex = ref(getTabIndexFromRoute())
   const tableMenuRef = ref()
   const selectedTable = ref(null)
   const selectedRows = ref([])
@@ -83,7 +98,7 @@
     try {
       const result = await edgeSQLService.getTables(databaseId.value)
 
-      sqlStore.setCurrentTables(result.body.tables)
+      sqlDatabase.setCurrentTables(result.body.tables)
 
       tablesTree.value = result.body.tables.map((table) => ({
         key: table.name,
@@ -136,7 +151,7 @@
       editingRowData.value = {}
       editingRowIndex.value = -1
 
-      sqlStore.addQueryResult({
+      sqlDatabase.addQueryResult({
         query: sqlQuery.value,
         results,
         timestamp: new Date(),
@@ -164,7 +179,7 @@
     activeTabIndex.value = 0
 
     selectedTableName.value = null
-    sqlStore.setSelectedTable(null)
+    sqlDatabase.setSelectedTable(null)
 
     if (isEditorCollapsed.value) {
       isEditorCollapsed.value = false
@@ -182,19 +197,10 @@
     await executeQuery()
   }
 
-  const clearHistory = () => {
-    toast.add({
-      severity: 'info',
-      summary: 'History Cleared',
-      detail: 'Query history has been cleared successfully',
-      life: 2000
-    })
-  }
-
   const selectTable = async (node) => {
     const tableName = node.key || node.name
     selectedTableName.value = tableName
-    sqlStore.setSelectedTable({ name: tableName })
+    sqlDatabase.setSelectedTable({ name: tableName })
     sqlQuery.value = SQLITE_QUERIES.SELECT_ALL(tableName)
 
     isLoadingSchema.value = true
@@ -291,7 +297,7 @@
 
         if (selectedTableName.value === tableName) {
           selectedTableName.value = null
-          sqlStore.setSelectedTable(null)
+          sqlDatabase.setSelectedTable(null)
           queryResults.value = []
         }
         return `Table "${tableName}" deleted successfully`
@@ -407,6 +413,14 @@
     executeQuery()
   }
 
+  // Handle tab change and update route
+  const handleTabChange = (index) => {
+    const tabRoute = ROUTE_TABS[index]
+    if (tabRoute) {
+      router.push(`/edge-sql/database/${databaseId.value}/${tabRoute}`)
+    }
+  }
+
   onMounted(async () => {
     await loadDatabaseInfo()
     await loadTables()
@@ -436,6 +450,28 @@
       setTimeout(() => {
         clearRowFormState()
       }, 300)
+    }
+  })
+
+  // Watch for route changes to update active tab
+  watch(
+    () => route.params.tab,
+    (newTab) => {
+      const newIndex = TAB_ROUTES[newTab] !== undefined ? TAB_ROUTES[newTab] : 0
+      if (activeTabIndex.value !== newIndex) {
+        activeTabIndex.value = newIndex
+      }
+    },
+    { immediate: true }
+  )
+
+  // Watch for activeTabIndex changes to update route (when tabs are clicked directly)
+  watch(activeTabIndex, (newIndex) => {
+    const currentTab = route.params.tab
+    const expectedTab = ROUTE_TABS[newIndex]
+
+    if (currentTab !== expectedTab) {
+      handleTabChange(newIndex)
     }
   })
 </script>
@@ -490,6 +526,7 @@
                 <div>
                   <TabView
                     v-model:activeIndex="activeTabIndex"
+                    @tab-change="handleTabChange"
                     class="results-tabs mt-4"
                   >
                     <TabPanel>
@@ -503,8 +540,10 @@
                         :queryResults="queryResults"
                         :isExecutingQuery="isExecutingQuery"
                         :selectedTableSchema="selectedTableSchema"
+                        :tableName="selectedTableName"
                         @open-insert-row-drawer="openInsertRowDrawer"
                         @open-edit-row-drawer="openEditRowDrawer"
+                        @execute-query="setSqlQuery"
                       />
                     </TabPanel>
 
@@ -517,8 +556,8 @@
                       </template>
 
                       <QueryHistory
+                        v-if="activeTabIndex === 1"
                         @rerun-query="rerunQuery"
-                        @clear-history="clearHistory"
                       />
                     </TabPanel>
                   </TabView>
