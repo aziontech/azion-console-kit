@@ -24,13 +24,12 @@ import DialogService from 'primevue/dialogservice'
 import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+import SentryPlugin from '@/plugins/sentry/SentryPlugin'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'
 import router from './router'
 
-// Initialize OAuth security measures early
-// Only applies to authentication pages to avoid breaking external links
 initOAuthSecurity()
 
 const app = createApp(App)
@@ -43,6 +42,10 @@ app.directive('tooltip', Tooltip)
 app.directive('prompt', customAiPrompt)
 app.use(ToastService)
 app.use(pinia)
+
+// Initialize Sentry with router for performance monitoring
+app.use(SentryPlugin, { router })
+
 app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
