@@ -54,7 +54,7 @@
   let initialCodeValue = ''
   const initialJsonArgsValue = ref('{}')
 
-  const unwatch = watch(name, () => { 
+  const unwatch = watch(name, () => {
     initialCodeValue = code.value
     initialJsonArgsValue.value = defaultArgs.value
 
@@ -125,7 +125,6 @@
   }
 
   const codeEditorArgsUpdate = (value) => {
-    
     defaultArgs.value = value ? value : '{}'
     initialJsonArgsValue.value = defaultArgs.value
   }
@@ -284,7 +283,7 @@
             v-model="defaultArgs"
             runtime="json"
             :initialValue="initialJsonArgsValue"
-            :errors="hasArgsError"  
+            :errors="hasArgsError"
             @update:modelValue="codeEditorArgsUpdate"
           />
         </SplitterPanel>

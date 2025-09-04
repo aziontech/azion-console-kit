@@ -72,11 +72,9 @@
     setAzionFormEmptyState(parsedValue)
   }
 
-   const codeEditorArgsUpdate = (value) => {
-    
+  const codeEditorArgsUpdate = (value) => {
     defaultArgs.value = value ? value : '{}'
   }
-
 
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
