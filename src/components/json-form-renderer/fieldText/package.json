@@ -1,7 +1,0 @@
-{
-  "main": "./textControlRenderer.js",
-  "types": "./textControlRenderer.d.ts",
-  "browser": {
-    "./sfc": "./textControlRenderer.vue"
-  }
-}
