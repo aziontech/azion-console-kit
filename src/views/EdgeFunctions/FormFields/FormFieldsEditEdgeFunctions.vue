@@ -52,11 +52,11 @@
   })
 
   let initialCodeValue = ''
-  let initialJsonArgsValue = ARGS_INITIAL_STATE
+  const initialJsonArgsValue = ref('{}')
 
-  const unwatch = watch(name, () => {
+  const unwatch = watch(name, () => { 
     initialCodeValue = code.value
-    initialJsonArgsValue = defaultArgs.value
+    initialJsonArgsValue.value = defaultArgs.value
 
     schemaAzionFormString.value = azionForm.value
 
@@ -111,7 +111,7 @@
     }
   ]
 
-  const codeEditorValueUpdate = (value) => {
+  const codeEditorFormBuilderUpdate = (value) => {
     let parsedValue
 
     try {
@@ -124,8 +124,14 @@
     setAzionFormEmptyState(parsedValue)
   }
 
+  const codeEditorArgsUpdate = (value) => {
+    
+    defaultArgs.value = value ? value : '{}'
+    initialJsonArgsValue.value = defaultArgs.value
+  }
+
   const selectPanelUpdateModelValue = (value) => {
-    selectPanelValue.value = !value ? selectPanelOptions[0] : value
+    selectPanelValue.value = !value ? selectPanelOptions[0] : value // TODO: use in the instasnces
     showFormBuilder.value = value === selectPanelOptions[1] ? true : false
   }
 
@@ -276,9 +282,10 @@
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
             v-model="defaultArgs"
-            :initialValue="initialJsonArgsValue"
             runtime="json"
-            :errors="hasArgsError"
+            :initialValue="initialJsonArgsValue"
+            :errors="hasArgsError"  
+            @update:modelValue="codeEditorArgsUpdate"
           />
         </SplitterPanel>
       </Splitter>
@@ -301,7 +308,7 @@
             class="overflow-clip surface-border border rounded-md"
             :initialValue="schemaAzionFormString"
             :errors="false"
-            @update:modelValue="codeEditorValueUpdate"
+            @update:modelValue="codeEditorFormBuilderUpdate"
           />
         </SplitterPanel>
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">

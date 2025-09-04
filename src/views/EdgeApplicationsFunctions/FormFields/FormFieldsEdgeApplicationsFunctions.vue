@@ -24,7 +24,6 @@
   const { value: args, errorMessage: argsError } = useField('args')
   const { value: azionForm } = useField('azionForm')
 
-
   const schemaAzionForm = ref(null)
   const schemaAzionFormString = ref('{}')
   const azionFormArgsValue = ref('{}')
@@ -251,7 +250,6 @@
                           runtime="json"
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
-                          
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />

@@ -59,7 +59,7 @@
     initialValue: HelloWorldSample
   })
 
-  const codeEditorValueUpdate = (value) => {
+  const codeEditorFormBuilderUpdate = (value) => {
     let parsedValue
 
     try {
@@ -71,6 +71,12 @@
     setAzionFormSchema(parsedValue)
     setAzionFormEmptyState(parsedValue)
   }
+
+   const codeEditorArgsUpdate = (value) => {
+    
+    defaultArgs.value = value ? value : '{}'
+  }
+
 
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
@@ -259,9 +265,10 @@
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
             v-model="defaultArgs"
-            :initialValue="ARGS_INITIAL_STATE"
+            :initialValue="defaultArgs"
             runtime="json"
             :errors="hasArgsError"
+            @update:modelValue="codeEditorArgsUpdate"
           />
         </SplitterPanel>
       </Splitter>
@@ -284,7 +291,7 @@
             class="overflow-clip surface-border border rounded-md"
             :initialValue="schemaAzionFormString"
             :errors="false"
-            @update:modelValue="codeEditorValueUpdate"
+            @update:modelValue="codeEditorFormBuilderUpdate"
           />
         </SplitterPanel>
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">

@@ -234,7 +234,7 @@
             :description="`Configure the function arguments to customize its behavior.`"
             @update:modelValue="selectPanelUpdateModelValue"
           >
-          <template #content>
+            <template #content>
               <div v-if="selectPanelValue === selectPanelOptions[0]">
                 <div
                   id="azionform"
@@ -254,7 +254,6 @@
                           runtime="json"
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
-                          
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
