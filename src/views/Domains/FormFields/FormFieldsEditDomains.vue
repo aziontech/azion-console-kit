@@ -371,8 +371,12 @@
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
+          :defaultPosition="1"
           appendTo="self"
           placeholder="Select a certificate"
+          showGroup
+          optionGroupLabel="group"
+          optionGroupChildren="items"
         >
           <template #footer>
             <ul class="p-2">

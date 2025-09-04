@@ -140,5 +140,3 @@ You can find us on:
 - [X](https://twitter.com/aziontech)
 - [LinkedIn](https://www.linkedin.com/company/aziontech)
 - [YouTube](https://www.youtube.com/aziontech)
-
-Move to the Edge! 🌎➡️🧡

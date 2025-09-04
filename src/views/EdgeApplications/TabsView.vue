@@ -37,17 +37,18 @@
     edgeFunctionsServices: { type: Object, required: true }
   })
 
-  const defaultTabs = {
+  const defaultTabs = ref({
     'main-settings': 0,
-    origins: 1,
-    'device-groups': 2,
-    'error-responses': 3,
-    'cache-settings': 4,
-    functions: 5,
-    'rules-engine': 6
-  }
-
-  const mapTabs = ref({ ...defaultTabs })
+    origins: !hasFlagBlockApiV4() ? null : 1,
+    'device-groups': !hasFlagBlockApiV4() ? 1 : 2,
+    'error-responses': !hasFlagBlockApiV4() ? null : 3,
+    'cache-settings': !hasFlagBlockApiV4() ? 2 : 4,
+    functions: !hasFlagBlockApiV4() ? 3 : 5,
+    'rules-engine': !hasFlagBlockApiV4() ? 4 : 6
+  })
+  const mapTabs = ref({
+    ...defaultTabs.value
+  })
 
   const toast = useToast()
   const route = useRoute()
@@ -102,6 +103,9 @@
 
   const reindexMapTabs = () => {
     mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+      if (!hasFlagBlockApiV4() && (key === 'origins' || key === 'error-responses')) {
+        return acc
+      }
       acc[key] = index
       return acc
     }, {})
@@ -112,7 +116,7 @@
       reindexMapTabs()
       return
     }
-    mapTabs.value = { ...defaultTabs }
+    mapTabs.value = { ...defaultTabs.value }
   }
 
   const renderTabByCurrentRouter = async () => {
@@ -238,7 +242,7 @@
     {
       header: 'Origins',
       component: EdgeApplicationsOriginsListView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
       props: () => ({
         ...props.originsServices,
@@ -260,7 +264,7 @@
     {
       header: 'Error Responses',
       component: EdgeApplicationsErrorResponseEditView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.errorResponses,
       props: () => ({
         ...props.errorResponsesServices,
@@ -303,7 +307,8 @@
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription:
-          edgeApplication.value[applicationAcceleratorEnabled.value]
+          edgeApplication.value[applicationAcceleratorEnabled.value],
+        navigateToApplicationAccelerator: navigateToApplicationAccelerator
       })
     }
   ])
@@ -313,6 +318,26 @@
   })
 
   renderTabByCurrentRouter()
+
+  const navigateToApplicationAccelerator = () => {
+    changeTab(mapTabs.value['main-settings'])
+    setTimeout(() => {
+      const element = document.querySelector('label[for="applicationAccelerator-switch-0"]')
+      if (element) {
+        const headerHeight = document.querySelector('header')?.offsetHeight || 0
+        const additionalOffset = 100
+        const totalOffset = headerHeight + additionalOffset
+
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        const offsetPosition = elementPosition - totalOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }, 50)
+  }
 
   onMounted(() => {
     checkIsLocked()

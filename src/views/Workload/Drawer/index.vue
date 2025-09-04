@@ -41,7 +41,7 @@
           return nameRegex.test(value)
         }
       ),
-    edgeApplication: yup.number().label('Edge Application'),
+    application: yup.number().label('Edge Application'),
     cnames: yup
       .string()
       .label('CNAME')
@@ -88,8 +88,8 @@
   const initialValues = {
     name: '',
     environment: '1',
-    edgeApplication: parseInt(edgeApplicationId.value),
-    edgeFirewall: null,
+    application: parseInt(edgeApplicationId.value),
+    firewall: null,
     deliveryProtocol: 'https',
     httpPort: [{ name: '80 (Default)', value: 80 }],
     httpsPort: [{ name: '443 (Default)', value: 443 }],

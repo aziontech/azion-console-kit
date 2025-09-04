@@ -32,14 +32,24 @@ export const useDeleteDialog = () => {
    * @param {Function} config.deleteService - Deletion function.
    * @param {Function} [config.closeCallback] - Callback when closing.
    * @param {Function} [config.successCallback] - Callback when deletion is successful.
+   * @param {boolean} [config.bypassConfirmation] - Bypass confirmation.
    */
-  const openDeleteDialog = ({ title, id, data, deleteService, closeCallback, successCallback }) => {
+  const openDeleteDialog = ({
+    title,
+    id,
+    data,
+    deleteService,
+    closeCallback,
+    successCallback,
+    bypassConfirmation = false
+  }) => {
     dialog.open(DeleteDialog, {
       data: {
         title,
         selectedID: id,
         selectedItemData: data,
         deleteDialogVisible: true,
+        bypassConfirmation,
         deleteService,
         rerender: Math.random(),
         deleteConfirmationText: getDeleteConfirmationText(data)
