@@ -1,7 +1,11 @@
 const conditionsMap = {
   'HEADER|NAME': 'any_http_header_name',
+  'HEADERS|NAME': 'any_http_header_name',
   HEADER: 'any_http_header_value',
+  HEADERS: 'any_http_header_value',
+  'ARG|NAME': 'any_query_string_name',
   'ARGS|NAME': 'any_query_string_name',
+  ARG: 'any_query_string_value',
   ARGS: 'any_query_string_value',
   URL: 'any_url',
   'BODY|NAME': 'body_form_field_name',
@@ -12,8 +16,12 @@ const conditionsMap = {
 
 const conditionsMapDescription = {
   'HEADER|NAME': 'specific_http_header_name',
+  'HEADERS|NAME': 'specific_http_header_name',
   HEADER: 'specific_http_header_value',
+  HEADERS: 'specific_http_header_value',
+  'ARG|NAME': 'specific_query_string_name',
   'ARGS|NAME': 'specific_query_string_name',
+  ARG: 'specific_query_string_value',
   ARGS: 'specific_query_string_value',
   URL: 'any_url',
   'BODY|NAME': 'specific_body_form_field_name',
@@ -126,7 +134,9 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
 
     entry.ruleId.split(',').forEach((ruleStr) => {
       const { ruleId, location, context } = parseRule(ruleStr)
-      const key = isDescription ? `${ruleId}|${location}|${context}` : `${ruleId}|${location}`
+      const key = isDescription
+        ? `${ruleId}|${location}|${context}`
+        : transformRuleIdToDescription(ruleId)
       const pathWithoutQueryString = entry.path.split('?')?.[0]
 
       if (!grouped[key]) {
