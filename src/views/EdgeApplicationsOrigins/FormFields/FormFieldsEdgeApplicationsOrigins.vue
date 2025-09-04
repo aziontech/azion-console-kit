@@ -7,8 +7,11 @@
   import InputNumber from 'primevue/inputnumber'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import InlineMessage from 'primevue/inlinemessage'
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, inject } from 'vue'
+
+  const edgeApplication = inject('edgeApplication')
 
   const props = defineProps({
     disabledFields: {
@@ -140,6 +143,10 @@
     return isLoadBalancerOriginType.value ? '' : 'Select an option to customize the origin.'
   })
 
+  const showLoadBalancerMessage = computed(() => {
+    return !edgeApplication.value?.loadBalancer
+  })
+
   watch(
     () => props.generatedOriginKey,
     (value) => {
@@ -213,22 +220,31 @@
     description="Customize settings related to origin servers and hosts."
   >
     <template #inputs>
-      <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
-        <FieldDropdown
-          label="Type"
-          required
-          name="originType"
-          :options="props.listOrigins"
-          :loading="!props.listOrigins"
-          @change="resetAddressesFields"
-          optionValue="value"
-          optionLabel="label"
-          :value="originType"
-          inputId="originType"
-          data-testid="origin-form__origin-type"
-          :optionDisabled="(option) => option.disabled"
-          :description="descriptionOriginType"
-        />
+      <div class="flex flex-col gap-2 sm:max-w-lg max-sm:w-full">
+        <InlineMessage
+          class="w-fit opacity-70"
+          severity="info"
+          v-if="showLoadBalancerMessage"
+        >
+          To select Load Balancer, enable it in Main Settings first.
+        </InlineMessage>
+        <div class="flex flex-col gap-2 w-80">
+          <FieldDropdown
+            label="Type"
+            required
+            name="originType"
+            :options="props.listOrigins"
+            :loading="!props.listOrigins"
+            @change="resetAddressesFields"
+            optionValue="value"
+            optionLabel="label"
+            :value="originType"
+            inputId="originType"
+            data-testid="origin-form__origin-type"
+            :optionDisabled="(option) => option.disabled"
+            :description="descriptionOriginType"
+          />
+        </div>
       </div>
       <div
         v-if="isLiveIngestOriginType"

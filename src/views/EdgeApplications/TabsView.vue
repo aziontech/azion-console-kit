@@ -185,6 +185,8 @@
     visibleOnSaved
   })
 
+  provide('edgeApplication', edgeApplication)
+
   const tagProps = {
     value: 'Locked',
     severity: 'warning',
