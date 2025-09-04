@@ -17,7 +17,7 @@ const conditionsMapDescription = {
   ARGS: 'specific_query_string_value',
   URL: 'any_url',
   'BODY|NAME': 'specific_body_form_field_name',
-  BODY: 'specific_body_form_field_value',
+  BODY: 'body_form_field_value',
   FILE_EXT: 'file_extension',
   RAW_BODY: 'raw_body'
 }
@@ -162,9 +162,13 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
   return Object.values(grouped).map((item) => {
     return {
       ...item,
-      topIps: [...item.ips].slice(0, 10),
-      topCountries: [...item.countries].slice(0, 10),
-      topPaths: [...item.paths].slice(0, 10),
+      topIps: isDescription ? [...item.ips] : [...item.ips].slice(0, 10),
+      topCountries: isDescription
+        ? [...item.countries]
+        : [...item.countries]
+            .sort((first, second) => first.localeCompare(second, 'pt-BR', { sensitivity: 'base' }))
+            .slice(0, 10),
+      topPaths: isDescription ? [...item.paths] : [...item.paths].slice(0, 10),
       ipHitCount: item.ipHitCount,
       countryHitCount: item.countryHitCount,
       pathHitCount: item.pathHitCount
@@ -188,7 +192,6 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
   const grouped = {}
 
   const rulesFiltered = rules.filter((rule) => rule.ruleId === tuningId)
-
   rulesFiltered.forEach((rule) => {
     rule.topPaths.forEach((path) => {
       const pathWithoutQueryString = path.split('?')?.[0]
@@ -196,8 +199,9 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
 
       if (!grouped[key]) {
         grouped[key] = {
+          ruleId: rule.ruleId,
           matchValue: rule.matchValue,
-          hitCount: 0,
+          hitCount: rule.hitCount,
           condition: rule.condition,
           ips: new Set(),
           countries: new Set(),
@@ -209,8 +213,6 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
           pathHitCount: rule.pathHitCount
         }
       }
-
-      grouped[key].hitCount += rule.hitCount
 
       rule.topIps.forEach((ip) => {
         grouped[key].ips.add(ip)
@@ -230,6 +232,7 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
     const matchingRule = rulesFiltered.find((rule) => rule.matchValue === group.matchValue)
 
     return {
+      ruleId: group.ruleId,
       matchValue: group.matchValue,
       condition: group.condition,
       hitCount: group.hitCount,

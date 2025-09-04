@@ -175,7 +175,11 @@
       type: 'component',
       disableSort: true,
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     },
     {
       field: 'topCountries',
@@ -183,7 +187,11 @@
       disableSort: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     }
   ])
 
