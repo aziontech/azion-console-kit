@@ -17,7 +17,7 @@ const REPORTS_TEXTS = {
     dataTransferred: {
       edgeCache: {
         description:
-          'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
+          'Sum of data transferred through Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
       },
       edgeOffload: {
         description:

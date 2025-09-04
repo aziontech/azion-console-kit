@@ -164,7 +164,7 @@
       subtitle: 'Optimize protocols and manage dynamic content delivery.'
     },
     {
-      title: 'Edge Cache',
+      title: 'Cache',
       nameField: 'caching',
       disabled: true,
       subtitle: 'Customize advanced cache settings.',
@@ -496,7 +496,7 @@
       </div>
 
       <FieldGroupRadio
-        label="Edge Cache Settings"
+        label="Cache Settings"
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('cdn')"

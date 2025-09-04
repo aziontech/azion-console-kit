@@ -17,7 +17,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'bytes',
           dataset: 'httpMetrics',
           description:
-            'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.',
+            'Sum of data transferred through Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.',
           fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
           groupBy: [],
           helpCenterPath: '/real-time-metrics/edge-applications/data-transferred/edge-cache',

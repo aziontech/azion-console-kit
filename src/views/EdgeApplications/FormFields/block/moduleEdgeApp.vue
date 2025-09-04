@@ -76,7 +76,7 @@
       subtitle: 'Optimize protocols and manage dynamic content delivery.'
     },
     {
-      title: 'Edge Cache',
+      title: 'Cache',
       nameField: 'edgeCacheEnabled',
       disabled: true,
       subtitle: 'Customize advanced cache settings.',

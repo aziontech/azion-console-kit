@@ -511,7 +511,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Edge Cache Settings</label>
+        <label class="text-color text-base font-medium">Cache Settings</label>
         <div class="flex flex-col gap-4">
           <div class="flex gap-2 items-center">
             <RadioButton
@@ -606,7 +606,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Cache</span>
+              <span class="text-base">Cache</span>
               <InputSwitch
                 v-model="caching"
                 disabled
