@@ -60,6 +60,7 @@
 
 <script setup>
   import { useField } from 'vee-validate'
+  import { watch } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
@@ -70,10 +71,24 @@
   const { value: maxRetries } = useField('modules.loadBalancer.config.maxRetries')
   const { value: connectionTimeout } = useField('modules.loadBalancer.config.connectionTimeout')
   const { value: readWriteTimeout } = useField('modules.loadBalancer.config.readWriteTimeout')
+  const { value: loadBalancerEnabled } = useField('modules.loadBalancer.enabled')
 
   const methodsList = [
     { label: 'Round Robin', value: 'round_robin' },
     { label: 'Least Connections', value: 'least_conn' },
     { label: 'IP Hash', value: 'ip_hash' }
   ]
+
+  watch(
+    () => loadBalancerEnabled.value,
+    (newValue) => {
+      if (newValue) {
+        method.value = 'round_robin'
+        maxRetries.value = 3
+        connectionTimeout.value = 30
+        readWriteTimeout.value = 60
+      }
+    },
+    { immediate: true }
+  )
 </script>
