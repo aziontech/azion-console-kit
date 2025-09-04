@@ -81,7 +81,7 @@
   }
 
   const updateLabelEditForm = () => {
-    return showFormBuilder.value ? 'Apply form' : 'Edit form'
+    return showFormBuilder.value ? 'Visual form' : 'Edit form'
   }
 
   const formBuilderToggle = () => {
