@@ -24,8 +24,9 @@
   const { value: args, errorMessage: argsError } = useField('args')
   const { value: azionForm } = useField('azionForm')
 
+
   const schemaAzionForm = ref(null)
-  const schemaAzionFormString = ref('')
+  const schemaAzionFormString = ref('{}')
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
@@ -69,6 +70,7 @@
     })
   }
 
+  // eslint-disable-next-line
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
     azionFormArgsValue.value = indentJsonStringify(event.data)
@@ -80,7 +82,7 @@
   }
 
   const updateLabelEditForm = () => {
-    return showFormBuilder.value ? 'Visual form' : 'Edit form'
+    return showFormBuilder.value ? 'Apply form' : 'Edit form'
   }
 
   const formBuilderToggle = () => {
@@ -108,9 +110,20 @@
   }
 
   const resetFormBuilder = () => {
-    schemaAzionForm.value = null
-    schemaAzionFormString.value = ''
     azionFormData.value = {}
+    schemaAzionForm.value = null
+    schemaAzionFormString.value = '{}'
+
+    azionForm.value = schemaAzionFormString.value
+  }
+
+  const codeEditorFormBuilderUpdate = (value) => {
+    try {
+      const schema = value ? JSON.parse(value) : {}
+      setAzionFormSchema(schema)
+    } catch (error) {
+      return
+    }
   }
 
   const hasArgsError = computed(() => {
@@ -238,8 +251,9 @@
                           runtime="json"
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
-                          :errors="hasArgsError"
+                          
                           :minimap="false"
+                          @update:modelValue="codeEditorFormBuilderUpdate"
                         />
                       </div>
                       <div
@@ -319,6 +333,7 @@
         v-if="selectPanelValue === selectPanelOptions[0] && schemaAzionFormString"
       >
         <PrimeButton
+          v-if="schemaAzionForm"
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
           class="text-sm p-0"

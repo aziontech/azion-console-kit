@@ -80,7 +80,7 @@
   }
 
   const updateLabelEditForm = () => {
-    return showFormBuilder.value ? 'Visual form' : 'Edit form'
+    return showFormBuilder.value ? 'Apply form' : 'Edit form'
   }
 
   const formBuilderToggle = () => {
@@ -107,10 +107,27 @@
     }
   }
 
+  // const resetFormBuilder = () => {
+  //   schemaAzionForm.value = null
+  //   schemaAzionFormString.value = ''
+  //   azionFormData.value = {}
+  //   azionForm.value = schemaAzionFormString.value
+  // }
+
   const resetFormBuilder = () => {
-    schemaAzionForm.value = null
-    schemaAzionFormString.value = ''
     azionFormData.value = {}
+    schemaAzionForm.value = null
+    schemaAzionFormString.value = '{}'
+    azionForm.value = schemaAzionFormString.value
+  }
+
+  const codeEditorFormBuilderUpdate = (value) => {
+    try {
+      const schema = value ? JSON.parse(value) : {}
+      setAzionFormSchema(schema)
+    } catch (error) {
+      return
+    }
   }
 
   const hasArgsError = computed(() => {
@@ -217,7 +234,7 @@
             :description="`Configure the function arguments to customize its behavior.`"
             @update:modelValue="selectPanelUpdateModelValue"
           >
-            <template #content>
+          <template #content>
               <div v-if="selectPanelValue === selectPanelOptions[0]">
                 <div
                   id="azionform"
@@ -237,8 +254,9 @@
                           runtime="json"
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
-                          :errors="hasArgsError"
+                          
                           :minimap="false"
+                          @update:modelValue="codeEditorFormBuilderUpdate"
                         />
                       </div>
                       <div
@@ -272,7 +290,7 @@
                   v-if="argsError"
                   class="p-error text-xs font-normal leading-tight"
                 >
-                  {{ argsError }}
+                  {{ argsEror }}
                 </small>
                 <DescriptionSmallArea
                   description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
@@ -318,6 +336,7 @@
         v-if="selectPanelValue === selectPanelOptions[0] && schemaAzionFormString"
       >
         <PrimeButton
+          v-if="schemaAzionForm"
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
           class="text-sm p-0"
