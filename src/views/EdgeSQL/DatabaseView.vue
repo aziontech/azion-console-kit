@@ -21,7 +21,7 @@
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import RowFormDrawer from './components/RowFormDrawer.vue'
-  import { SQLITE_QUERIES } from './constants'
+  import { SQLITE_QUERIES, QUICK_TEMPLATES } from './constants'
   import { TableActionManager } from './utils'
   import { useAccountStore } from '@/stores/account'
 
@@ -408,6 +408,11 @@
     }
   }
 
+  const handleCreateTable = () => {
+    sqlQuery.value = QUICK_TEMPLATES[0].query
+    activeTabIndex.value = 0
+  }
+
   const setSqlQuery = (query) => {
     sqlQuery.value = query
     executeQuery()
@@ -508,6 +513,7 @@
               @show-table-menu="showTableMenu"
               @toggle-templates="toggleTemplates"
               @use-template="useTemplate"
+              @create-table="handleCreateTable"
             />
 
             <div class="flex-1 min-w-0">
