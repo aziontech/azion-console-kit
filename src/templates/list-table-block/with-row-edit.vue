@@ -1,12 +1,15 @@
 <template>
   <div class="max-w-full">
     <DataTable
+      ref="dataTableRef"
       v-model:editingRows="editingRowsItens"
       :value="props.data"
       editMode="row"
       dataKey="id"
       scrollable
+      :rowHover="true"
       @row-edit-save="onRowEditSave"
+      @row-edit-cancel="onRowEditCancel"
       v-model:filters="filters"
       :globalFilterFields="filterBy"
       removableSort
@@ -15,6 +18,8 @@
       :rows="minimumOfItemsPerPage"
       @page="changeNumberOfLinesPerPage"
       :first="firstItemIndex"
+      :exportFilename="exportFileName"
+      :exportFunction="exportFunctionMapper"
       :pt="{
         table: { style: 'min-width: 50rem' },
         column: {
@@ -101,7 +106,7 @@
             data-testid="data-table-actions-column-header"
           >
             <PrimeButton
-              v-if="hasExportToCsv"
+              v-if="hasExportToCsvMapper"
               @click="handleExportTableDataToCSV"
               outlined
               class="max-sm:w-full ml-auto mr-2"
@@ -155,6 +160,8 @@
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
+  import { getCsvCellContentFromRowData } from '@/helpers'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'list-table-block-with-row-edit' })
 
@@ -186,17 +193,26 @@
     editingRows: {
       type: Array,
       default: () => []
+    },
+    csvMapper: {
+      type: Function
+    },
+    exportFileName: {
+      type: String
     }
   })
 
   const editingRowsItens = ref([])
   const firstItemIndex = ref(0)
-  const minimumOfItemsPerPage = ref(10)
+  const tableDefinitions = useTableDefinitionsStore()
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
   })
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
+  const dataTableRef = ref(null)
+  const hasExportToCsvMapper = ref(!!props.csvMapper)
 
   const emit = defineEmits(['row-edit-save', 'row-edit-cancel', 'add-button-click'])
 
@@ -205,7 +221,9 @@
   })
 
   const changeNumberOfLinesPerPage = (event) => {
-    minimumOfItemsPerPage.value = event.rows
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
     firstItemIndex.value = event.first
   }
 
@@ -213,19 +231,46 @@
     columnSelectorPanel.value.toggle(event)
   }
 
+  const formatSummaryToCSV = (summary) => {
+    const summaryValue = summary
+      .map((item) => `${item.key}: ${item.value.toString().replace(/"/g, '""')}`)
+      .join(' | ')
+    const csvString = `"${summaryValue}"`
+
+    return csvString
+  }
+
+  /**
+   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
+   */
+  const exportFunctionMapper = (rowData) => {
+    if (!hasExportToCsvMapper.value) {
+      return
+    }
+    const columnMapper = props.csvMapper(rowData)
+    if (rowData.field === 'summary') {
+      const values = [...columnMapper.summary]
+      columnMapper.summary = formatSummaryToCSV(values)
+    }
+    return getCsvCellContentFromRowData({ columnMapper, rowData })
+  }
+
   onMounted(() => {
     selectedColumns.value = props.columns
   })
 
   const handleExportTableDataToCSV = () => {
-    // TODO: Implementar funcionalidade de export CSV
-    // eslint-disable-next-line no-console
-    console.log('Export CSV functionality to be implemented')
+    dataTableRef.value.exportCSV()
   }
 
   const onRowEditSave = (event) => {
     const { newData, index, data } = event
     emit('row-edit-save', { newData, data, index })
+  }
+
+  const onRowEditCancel = (event) => {
+    const { data, index } = event
+    emit('row-edit-cancel', { data, index })
   }
 
   watch(

@@ -41,7 +41,7 @@
   const actions = [
     {
       type: 'action',
-      icon: 'pi  pi-play',
+      icon: 'pi  pi-arrow-circle-right',
       commandAction: (item) => rerunQuery(item)
     }
   ]

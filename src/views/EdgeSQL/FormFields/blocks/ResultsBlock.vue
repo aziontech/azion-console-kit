@@ -6,9 +6,12 @@
       :data="listTableService"
       :key="tableKey"
       @row-edit-save="handleRowSave"
+      @row-edit-cancel="handleRowCancel"
       :hasExportToCsv="true"
       :editingRows="editingRows"
       :frozenSize="'0.1rem'"
+      :csvMapper="(data) => ({ ...data })"
+      :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
     >
       <template #addButton>
         <Button
@@ -85,6 +88,13 @@
       insertRowService(row.newData)
     } else {
       editRowService(row.newData, row.data)
+    }
+  }
+
+  const handleRowCancel = (row) => {
+    if (row.data.shouldInsert) {
+      responseQuery.value[0].rows.splice(row.index, 1)
+      editingRows.value.splice(row.index, 1)
     }
   }
 

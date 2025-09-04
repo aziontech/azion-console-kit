@@ -133,7 +133,7 @@
 
   const icon = computed(() => {
     if (props.isExecutingQuery) return 'pi pi-spin pi-spinner'
-    return 'pi pi-play'
+    return 'pi pi-arrow-circle-right'
   })
 
   const getQueryStats = computed(() => {
