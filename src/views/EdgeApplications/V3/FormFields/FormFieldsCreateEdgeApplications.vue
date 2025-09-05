@@ -164,7 +164,7 @@
       subtitle: 'Optimize protocols and manage dynamic content delivery.'
     },
     {
-      title: 'Edge Cache',
+      title: 'Cache',
       nameField: 'caching',
       disabled: true,
       subtitle: 'Customize advanced cache settings.',
@@ -179,7 +179,7 @@
       subtitle: 'Activate DeviceAtlas variables to configure responsive rules.'
     },
     {
-      title: 'Edge Functions',
+      title: 'Functions',
       nameField: 'edgeFunctions',
       subtitle: 'Build ultra-low latency functions that run on the edge.'
     },
@@ -206,7 +206,7 @@
       nameField: 'websocket',
       disabled: websocketIsEnabled.value,
       subtitle:
-        'Enhance real-time data exchange between your edge application and backend services using the WebSocket protocol.'
+        'Enhance real-time data exchange between your application and backend services using the WebSocket protocol.'
     }
   ]
 </script>
@@ -215,7 +215,7 @@
   <FormHorizontal
     title="General"
     :isDrawer="isDrawer"
-    description="Create an edge application to deliver your content from the edge."
+    description="Create an application to deliver your content from the edge."
     v-if="handleBlock('general')"
     data-testid="form-horizontal-general"
   >
@@ -225,9 +225,9 @@
           label="Name"
           required
           name="name"
-          placeholder="My edge application"
+          placeholder="My application"
           :value="name"
-          description="Give a unique and descriptive name to identify the edge application."
+          description="Give a unique and descriptive name to identify the application."
           data-testid="form-horizontal-general-name"
         />
       </div>
@@ -237,7 +237,7 @@
   <FormHorizontal
     title="Delivery Settings"
     :isDrawer="isDrawer"
-    description="Choose the protocols used between the edge application and users."
+    description="Choose the protocols used between the application and users."
     v-if="handleBlock('delivery-settings')"
     data-testid="form-horizontal-delivery-settings"
   >
@@ -496,7 +496,7 @@
       </div>
 
       <FieldGroupRadio
-        label="Edge Cache Settings"
+        label="Cache Settings"
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('cdn')"

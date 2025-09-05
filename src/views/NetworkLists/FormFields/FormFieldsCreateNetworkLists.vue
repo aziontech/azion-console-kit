@@ -71,7 +71,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Edge Firewall."
+    description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Firewall."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

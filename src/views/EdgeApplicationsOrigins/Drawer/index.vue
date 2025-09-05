@@ -80,7 +80,7 @@
       disabled: !edgeApplication.value?.loadBalancer
     },
     {
-      label: 'Edge Storage',
+      label: 'Object Storage',
       value: 'object_storage',
       disabled: false
     }

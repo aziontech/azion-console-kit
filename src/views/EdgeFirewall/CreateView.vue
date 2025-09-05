@@ -42,10 +42,10 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your Edge Firewall has been created',
+      feedback: 'Your Firewall has been created',
       actions: {
         link: {
-          label: 'View Edge Firewall',
+          label: 'View Firewall',
           callback: () => response.redirectToUrl(`/edge-firewall/edit/${response.data.id}`)
         }
       }
@@ -69,7 +69,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Firewall"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

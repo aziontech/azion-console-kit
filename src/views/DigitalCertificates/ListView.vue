@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Digital Certificates"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
@@ -9,7 +9,7 @@
         :listService="listService"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
-        addButtonLabel="Digital Certificate"
+        addButtonLabel="Certificate Manager"
         createPagePath="digital-certificates/create"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -34,7 +34,7 @@
         </template>
         <template #addButton>
           <CreateMenuBlock
-            addButtonLabel="Digital Certificate"
+            addButtonLabel="Certificate Manager"
             :items="items"
           />
         </template>
@@ -48,7 +48,7 @@
       >
         <template #default>
           <CreateMenuBlock
-            addButtonLabel="Digital Certificate"
+            addButtonLabel="Certificate Manager"
             :items="items"
             severity="secondary"
           />

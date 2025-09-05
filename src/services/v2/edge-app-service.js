@@ -78,7 +78,7 @@ export class EdgeAppService {
     })
 
     return {
-      feedback: 'Your edge application has been cloned',
+      feedback: 'Your Application has been cloned',
       urlToEditView: `/edge-applications/edit/${data.data.id}`,
       applicationId: data.data.id
     }
@@ -93,7 +93,7 @@ export class EdgeAppService {
       body
     })
 
-    return 'Your edge application has been updated'
+    return 'Your application has been updated'
   }
 
   deleteEdgeApplicationService = async (edgeApplicationId) => {
