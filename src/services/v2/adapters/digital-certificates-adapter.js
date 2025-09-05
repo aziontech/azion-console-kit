@@ -225,11 +225,12 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformEditDigitalCertificate({ name, certificate, privateKey }) {
+  transformEditDigitalCertificate({ name, certificate, privateKey, type }) {
     return {
       name,
       certificate: certificate || undefined,
-      private_key: privateKey || undefined
+      private_key: privateKey || undefined,
+      type
     }
   }
 }
