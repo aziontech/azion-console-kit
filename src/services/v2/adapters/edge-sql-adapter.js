@@ -232,11 +232,34 @@ export const EdgeSQLAdapter = {
         }
       }) || []
 
+    const reorderedResults = EdgeSQLAdapter.prioritizeSelectResults(results)
+
     return {
       state: data?.state || 'executed',
-      results,
+      results: reorderedResults,
       affectedRows: EdgeSQLAdapter.affectedRows({ data })
     }
+  },
+
+  prioritizeSelectResults(results) {
+    if (!Array.isArray(results) || results.length <= 1) {
+      return results
+    }
+
+    const selectResults = []
+    const otherResults = []
+
+    results.forEach((result) => {
+      const isSelectQuery = result.rowsRead > 0 && result.rows && result.rows.length > 0
+
+      if (isSelectQuery) {
+        selectResults.push(result)
+      } else {
+        otherResults.push(result)
+      }
+    })
+
+    return [...selectResults, ...otherResults]
   },
 
   affectedRows({ data }) {

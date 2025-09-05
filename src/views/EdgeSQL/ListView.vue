@@ -11,7 +11,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { edgeSQLService } from '@/services/v2'
-  import { useEdgeSQLStore } from '@/stores/edge-sql'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useEdgeSQLStatusManager } from './hooks'
   import { getStatusContent, getDatabaseName, isPendingStatus } from './utils'
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
@@ -22,7 +22,7 @@
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
-  const sqlStore = useEdgeSQLStore()
+  const { setCurrentDatabase } = useEdgeSQL()
 
   const {
     isProcessing,
@@ -187,7 +187,7 @@
       return
     }
 
-    sqlStore.setCurrentDatabase(database)
+    setCurrentDatabase(database)
     router.push(`/sql-database/database/${database.id}`)
   }
 

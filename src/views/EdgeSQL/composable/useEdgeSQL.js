@@ -133,8 +133,9 @@ export function useEdgeSQL() {
     if (queryResults.value.length > 100) {
       queryResults.value = queryResults.value.slice(0, 100)
     }
+    const filter = queryResults.value.filter((query) => query.type.content !== 'Unknown')
 
-    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
+    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, filter)
   }
 
   const clearQueryResults = () => {
@@ -172,7 +173,9 @@ export function useEdgeSQL() {
   }
 
   const updateListHistory = () => {
-    queryResults.value = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    const loadedHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    queryResults.value = loadedHistory
+    return loadedHistory
   }
 
   const importHistory = (historyData) => {

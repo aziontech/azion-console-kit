@@ -94,7 +94,7 @@
       :closable="true"
       @hide="closeTemplatesModal"
     >
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-5">
         <!-- Search Field -->
         <div class="p-input-icon-left w-1/3">
           <i class="pi pi-search" />
@@ -105,11 +105,11 @@
             @input="handleSearchTemplates"
           />
         </div>
-        <div class="flex w-full gap-2 flex-wrap">
+        <div class="flex w-full gap-4 flex-wrap">
           <div
             v-for="template in filteredTemplates"
             :key="template.name"
-            class="cursor-pointer rounded flex-1 min-w-[300px] border surface-border h-28 p-6"
+            class="cursor-pointer rounded flex-1 min-w-[300px] border surface-border h-28 p-6 hover:border-[var(--primary-color)]"
             @click="selectTemplate(template)"
           >
             <div class="flex items-center gap-2">

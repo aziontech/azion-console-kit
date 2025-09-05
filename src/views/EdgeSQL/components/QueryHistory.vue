@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { useEdgeSQL } from '../composable/useEdgeSQL'
   import TableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
@@ -11,11 +11,10 @@
   const emit = defineEmits(['rerun-query'])
   const tableBlock = ref(null)
 
-  const { queryResults, clearQueryResults, updateListHistory } = useEdgeSQL()
+  const { clearQueryResults, updateListHistory } = useEdgeSQL()
 
   const hasContentToList = ref(true)
   const toast = useToast()
-  const queryHistory = computed(() => queryResults.value)
 
   const rerunQuery = (historyItem) => {
     emit('rerun-query', historyItem.query)
@@ -38,7 +37,9 @@
   }
 
   const getQueryHistory = () => {
-    return queryHistory.value
+    // Ensure we have the latest data from localStorage
+    const latestHistory = updateListHistory()
+    return Promise.resolve(latestHistory)
   }
 
   const actions = [
@@ -84,6 +85,15 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  onMounted(() => {
+    // Force reload history data on component mount
+    updateListHistory()
+    // Trigger table reload if it exists
+    if (tableBlock.value?.reload) {
+      tableBlock.value.reload()
+    }
+  })
 </script>
 
 <template>

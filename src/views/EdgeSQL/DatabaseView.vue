@@ -24,6 +24,7 @@
   import { SQLITE_QUERIES, QUICK_TEMPLATES } from './constants'
   import { TableActionManager } from './utils'
   import { useAccountStore } from '@/stores/account'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'edge-sql-database-view' })
 
@@ -32,6 +33,7 @@
   const dialog = useDialog()
   const sqlDatabase = useEdgeSQL()
   const accountStore = useAccountStore()
+  const toast = useToast()
 
   // const documentationService = () => {
   //   window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
@@ -127,10 +129,9 @@
 
     isExecutingQuery.value = true
     const startTime = Date.now()
+    const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
     try {
-      const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
-
       const { results, affected } = isSelectQuery
         ? await edgeSQLService.queryDatabase(databaseId.value, {
             statement: sqlQuery.value,
@@ -150,7 +151,6 @@
       isEditingRow.value = false
       editingRowData.value = {}
       editingRowIndex.value = -1
-
       sqlDatabase.addQueryResult({
         query: sqlQuery.value,
         results,
@@ -171,6 +171,14 @@
       }
     } finally {
       isExecutingQuery.value = false
+      if (!isSelectQuery) {
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Query executed successfully',
+          life: 3000
+        })
+      }
     }
   }
 
