@@ -11,7 +11,8 @@ const conditionsMap = {
   'BODY|NAME': 'body_form_field_name',
   BODY: 'body_form_field_value',
   FILE_EXT: 'file_extension',
-  RAW_BODY: 'raw_body'
+  RAW_BODY: 'raw_body',
+  PATH: 'path'
 }
 
 const conditionsMapDescription = {
@@ -27,7 +28,8 @@ const conditionsMapDescription = {
   'BODY|NAME': 'specific_body_form_field_name',
   BODY: 'body_form_field_value',
   FILE_EXT: 'file_extension',
-  RAW_BODY: 'raw_body'
+  RAW_BODY: 'raw_body',
+  PATH: 'path'
 }
 
 const wafRulesMap = {
@@ -179,6 +181,7 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
             .sort((first, second) => first.localeCompare(second, 'pt-BR', { sensitivity: 'base' }))
             .slice(0, 10),
       topPaths: isDescription ? [...item.paths] : [...item.paths].slice(0, 10),
+      paths: [],
       ipHitCount: item.ipHitCount,
       countryHitCount: item.countryHitCount,
       pathHitCount: item.pathHitCount
@@ -205,7 +208,7 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
   rulesFiltered.forEach((rule) => {
     rule.topPaths.forEach((path) => {
       const pathWithoutQueryString = path.split('?')?.[0]
-      const key = `${rule.matchValue}::${pathWithoutQueryString}`
+      const key = rule.matchValue
 
       if (!grouped[key]) {
         grouped[key] = {
@@ -250,7 +253,8 @@ const groupByMatchValueAndPath = (rules, tuningId) => {
       countryCount: group.countries.size,
       topIps: getTopWithHits(group.topIps, matchingRule, 'ipHitCount'),
       topCountries: getTopWithHits(group.topCountries, matchingRule, 'countryHitCount'),
-      topPaths: getTopWithHits(group.topPaths, matchingRule, 'pathHitCount')
+      topPaths: getTopWithHits(group.topPaths, matchingRule, 'pathHitCount'),
+      paths: [...group.topPaths]
     }
   })
 }

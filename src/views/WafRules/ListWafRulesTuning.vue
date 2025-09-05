@@ -404,22 +404,6 @@
     listServiceWafTunningRef.value.reload(queryFields)
   }
 
-  const setNetWorkListOptions = async () => {
-    try {
-      const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
-      netWorkListOptions.value.options = response
-    } catch (error) {
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        const errorMessage = error?.message || error
-        showToast(errorMessage, 'error', 'error')
-      }
-    } finally {
-      netWorkListOptions.value.done = false
-    }
-  }
-
   const listDomainsOptions = async () => {
     try {
       domainsOptions.value.done = false
@@ -433,7 +417,9 @@
   }
 
   const handleListNetworkListDropdown = async ({ id }) => {
-    return await networkListsService.listNetworkLists({ id }, true)
+    const response = await networkListsService.listNetworkLists({ id }, true)
+    netWorkListOptions.value.options = response
+    return response
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
@@ -441,7 +427,6 @@
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions()
     await listDomainsOptions()
   })
 </script>
