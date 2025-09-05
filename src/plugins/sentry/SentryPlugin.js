@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/vue'
+import './sentry-feedback.css'
 
 /**
  * Sentry Configuration
@@ -70,6 +71,8 @@ export default {
         Sentry.feedbackIntegration({
           // Additional SDK configuration goes in here, for example:
           colorScheme: 'system',
+          autoInject: false, // Disable automatic button injection
+          showBranding: false, // Remove Sentry logo
         }),
       ],
       // Enable logs to be sent to Sentry
@@ -169,6 +172,27 @@ export default {
        */
       showFeedback(options = {}) {
         Sentry.showReportDialog(options)
+      },
+
+
+      /**
+       * Create and show feedback form
+       * @param {object} options - Feedback form options
+       */
+      async createFeedbackForm(options = {}) {
+        const feedback = Sentry.getFeedback()
+        if (feedback) {
+          const form = await feedback.createForm({
+            // Default options for centered modal
+            showBranding: false,
+            ...options
+          })
+          
+          form.appendToDom()
+          form.open()
+          
+          // CSS handles all modal styling automatically
+        }
       },
 
       /**

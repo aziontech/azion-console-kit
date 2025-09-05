@@ -24,7 +24,7 @@ import DialogService from 'primevue/dialogservice'
 import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
-import SentryPlugin from '@/plugins/sentry/SentryPlugin'
+import SentryPlugin from '@/plugins/sentry'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'

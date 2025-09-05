@@ -7,7 +7,6 @@
       :listTypeAccountService="listTypeAccountService"
       :accountHandler="accountHandler"
     />
-    <PageLoadingBlock :showLoading="showLoading" />
 
     <AppSidebar />
 
@@ -32,7 +31,6 @@
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
-  import PageLoadingBlock from '@/templates/loading-block'
   import { useLayout } from '@/composables/use-layout'
 
   import { useLoadingStore } from '@/stores/loading'
