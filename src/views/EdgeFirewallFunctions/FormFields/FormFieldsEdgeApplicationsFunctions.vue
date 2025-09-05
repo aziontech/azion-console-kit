@@ -66,7 +66,7 @@
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
-  const selectPanelOptions = ['Visual', 'Raw JSON']
+  const selectPanelOptions = ['Form', 'Raw JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const onChangeAzionForm = (event) => {

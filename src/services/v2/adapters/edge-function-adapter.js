@@ -122,11 +122,8 @@ export const EdgeFunctionsAdapter = {
       runtime: CODE_LANG[payload.runtime],
       execution_environment: payload.executionEnvironment,
       default_args: parsedArgs,
+      azion_form: payload.azionForm || {},
       active: payload.active
-    }
-
-    if (payload.azionForm) {
-      data.azion_form = payload.azionForm
     }
 
     return data
