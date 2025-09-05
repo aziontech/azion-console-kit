@@ -12,7 +12,7 @@ export async function loadingGuard({ to }) {
   }
 
   if (to.name === 'login' && to.query?.next === 'cli') {
-    setupCLIConfig()
+    setupCLIConfig(2, to.query?.callback_port)
     return { name: 'login' }
   }
 }
