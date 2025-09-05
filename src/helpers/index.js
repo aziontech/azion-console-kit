@@ -11,7 +11,8 @@ import {
   openAzionGithub,
   openAzionX,
   openShowMorePlan,
-  openMarketplaceIntegrationsDocumentation
+  openMarketplaceIntegrationsDocumentation,
+  azionJsonFormWindowOpener
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
@@ -74,6 +75,7 @@ export {
   SUPPORTED_VERSIONS,
   checkIfFieldExist,
   InviteSession,
+  azionJsonFormWindowOpener,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,
   azionTermsAndServicesWindowOpener,
