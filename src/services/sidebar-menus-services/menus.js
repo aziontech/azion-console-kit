@@ -51,7 +51,7 @@ function createBuildItems() {
 function createSecureItems() {
   return [
     {
-      label: 'Edge Connectors',
+      label: 'Connectors',
       to: '/edge-connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
@@ -134,7 +134,7 @@ function createToolsItems() {
 function createEdgeLibrariesItems() {
   return [
     {
-      label: 'Certificates Manager',
+      label: 'Certificate Manager',
       to: '/digital-certificates',
       icon: 'ai ai-digital-certificates',
       id: 'digital-certificates'

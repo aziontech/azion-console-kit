@@ -11,10 +11,10 @@
         <FieldText
           label="Name"
           required
-          description="Give an unique and descriptive name to identify the edge connectors."
+          description="Give an unique and descriptive name to identify the Connectors."
           name="name"
           :value="name"
-          placeholder="My Edge Connector"
+          placeholder="My Connector"
           data-testid="edge-connectors-form__general__name-field"
         />
       </div>
