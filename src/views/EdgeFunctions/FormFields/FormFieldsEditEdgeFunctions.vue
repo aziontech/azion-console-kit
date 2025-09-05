@@ -126,7 +126,7 @@
     setAzionFormEmptyState(parsedValue)
   }
 
-  const setAzionFormData = (value={}) => {
+  const setAzionFormData = (value = {}) => {
     let parsedValue
 
     try {
@@ -134,11 +134,11 @@
     } catch (error) {
       parsedValue = {}
     }
-    
+
     azionFormData.value = parsedValue
   }
 
-  const codeEditorArgsUpdate = (value='{}') => {
+  const codeEditorArgsUpdate = (value = '{}') => {
     defaultArgs.value = value
     setAzionFormData(value)
   }
@@ -163,76 +163,68 @@
 
   const setDefaultFormBuilder = () => {
     const schema = {
-      "type": "object",
-      "properties": {
-        "cookie_name": {
-          "type": "string",
-          "title": "Cookie Name",
-          "description": "Nome do cookie usado para armazenar a variação do teste A/B",
-          "default": "azion_cookie",
-          "minLength": 1
+      type: 'object',
+      properties: {
+        cookie_name: {
+          type: 'string',
+          title: 'Cookie Name',
+          description: 'Nome do cookie usado para armazenar a variação do teste A/B',
+          default: 'azion_cookie',
+          minLength: 1
         },
-        "domain": {
-          "type": "string",
-          "title": "Domain",
-          "description": "Domínio onde o cookie será válido (use '.' no início para subdomínios)",
-          "default": ".azion.com",
-          "pattern": "^[.]?[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\\.[a-zA-Z]{2,}$"
+        domain: {
+          type: 'string',
+          title: 'Domain',
+          description: "Domínio onde o cookie será válido (use '.' no início para subdomínios)",
+          default: '.azion.com',
+          pattern: '^[.]?[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\\.[a-zA-Z]{2,}$'
         },
-        "max_age": {
-          "type": "integer",
-          "title": "Max Age (seconds)",
-          "description": "Tempo de vida do cookie em segundos",
-          "default": 180,
-          "minimum": 1,
-          "maximum": 31536000
+        max_age: {
+          type: 'integer',
+          title: 'Max Age (seconds)',
+          description: 'Tempo de vida do cookie em segundos',
+          default: 180,
+          minimum: 1,
+          maximum: 31536000
         },
-        "path": {
-          "type": "string",
-          "title": "Path",
-          "description": "Caminho onde o cookie será válido",
-          "default": "/",
-          "pattern": "^/"
+        path: {
+          type: 'string',
+          title: 'Path',
+          description: 'Caminho onde o cookie será válido',
+          default: '/',
+          pattern: '^/'
         },
-        "values": {
-          "type": "array",
-          "title": "Test Variations",
-          "description": "Lista de variações do teste A/B com seus respectivos pesos",
-          "minItems": 2,
-          "maxItems": 10,
-          "items": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "string",
-                "title": "Variation Value",
-                "description": "Identificador único da variação",
-                "minLength": 1,
-                "maxLength": 50,
-                "pattern": "^[a-zA-Z0-9_-]+$"
+        values: {
+          type: 'array',
+          title: 'Test Variations',
+          description: 'Lista de variações do teste A/B com seus respectivos pesos',
+          minItems: 2,
+          maxItems: 10,
+          items: {
+            type: 'object',
+            properties: {
+              value: {
+                type: 'string',
+                title: 'Variation Value',
+                description: 'Identificador único da variação',
+                minLength: 1,
+                maxLength: 50,
+                pattern: '^[a-zA-Z0-9_-]+$'
               },
-              "weight": {
-                "type": "integer",
-                "title": "Weight",
-                "description": "Peso da variação (maior peso = maior probabilidade)",
-                "minimum": 1,
-                "maximum": 100
+              weight: {
+                type: 'integer',
+                title: 'Weight',
+                description: 'Peso da variação (maior peso = maior probabilidade)',
+                minimum: 1,
+                maximum: 100
               }
             },
-            "required": [
-              "value",
-              "weight"
-            ],
-            "additionalProperties": false
+            required: ['value', 'weight'],
+            additionalProperties: false
           }
         }
       },
-      "required": [
-        "cookie_name",
-        "domain",
-        "max_age",
-        "values"
-      ]
+      required: ['cookie_name', 'domain', 'max_age', 'values']
     }
 
     codeEditorFormBuilderUpdate(schema)
@@ -428,7 +420,7 @@
                 @update:modelValue="codeEditorFormBuilderUpdate"
               />
             </SplitterPanel>
-            <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">            
+            <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
               <div class="overflow-y-auto h-full p-4 md:p-8">
                 <div
                   id="azionform"

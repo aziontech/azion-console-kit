@@ -29,7 +29,7 @@
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
-  const selectPanelOptions = ['Form', 'Raw JSON']
+  const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const drawerRef = ref('')
@@ -69,7 +69,6 @@
     })
   }
 
-  // eslint-disable-next-line
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
     azionFormArgsValue.value = indentJsonStringify(event.data)
@@ -81,7 +80,7 @@
   }
 
   const updateLabelEditForm = () => {
-    return showFormBuilder.value ? 'Visual form' : 'Edit form'
+    return showFormBuilder.value ? 'Visual Form' : 'Edit Form'
   }
 
   const formBuilderToggle = () => {
@@ -102,8 +101,6 @@
     try {
       return JSON.parse(args)
     } catch (error) {
-      console.error(`argsJsonParser error: `, error) // eslint-disable-line
-
       return {}
     }
   }
@@ -112,17 +109,19 @@
     azionFormData.value = {}
     schemaAzionForm.value = null
     schemaAzionFormString.value = '{}'
-
     azionForm.value = schemaAzionFormString.value
   }
 
   const codeEditorFormBuilderUpdate = (value) => {
+    let parsedValue
+
     try {
-      const schema = value ? JSON.parse(value) : {}
-      setAzionFormSchema(schema)
+      parsedValue = value ? JSON.parse(value) : {}
     } catch (error) {
-      return
+      parsedValue = {}
     }
+
+    setAzionFormSchema(parsedValue)
   }
 
   const hasArgsError = computed(() => {
@@ -238,7 +237,7 @@
                 >
                   <div
                     v-if="schemaAzionFormString"
-                    class="flex flex-col gap-4"
+                    class="flex flex-col gap-4 overflow-y-auto h-[364px]"
                   >
                     <div>
                       <div
