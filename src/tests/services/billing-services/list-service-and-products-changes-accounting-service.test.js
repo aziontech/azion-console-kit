@@ -64,7 +64,7 @@ const fixtures = {
   formattedResponse: {
     data: [
       {
-        service: 'Edge Application',
+        service: 'Application',
         value: 0,
         slug: 'edge_application',
         currency: 0,
@@ -109,7 +109,7 @@ const fixtures = {
       descriptions: mockDescription
     },
     {
-      service: 'Edge Application',
+      service: 'Application',
       slug: 'edge_application',
       descriptions: mockDescription
     },
@@ -191,7 +191,7 @@ describe('BillingServices', () => {
         descriptions: mockDescription
       },
       {
-        service: 'Edge Application',
+        service: 'Application',
         slug: 'edge_application',
         descriptions: mockDescription
       },

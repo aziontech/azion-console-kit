@@ -33,7 +33,7 @@
   <EmptyResultsBlock
     v-else
     title="No functions have been instantiated"
-    description="Click the button below to instantiate your first edge function."
+    description="Click the button below to instantiate your first function."
     createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
@@ -128,7 +128,7 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Edge Function',
+        header: 'Function',
         sortField: 'edge_function',
         disableSort: true
       },

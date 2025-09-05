@@ -91,7 +91,12 @@ const validationSchema = yup.object({
           httpPort: yup.number().min(1).max(65535).label('HTTP Port'),
           httpsPort: yup.number().min(1).max(65535).label('HTTPS Port'),
           serverRole: yup.string().label('Server Role'),
-          weight: yup.number().min(1).max(100).label('Weight'),
+          weight: yup.lazy((value, options) => {
+            const loadBalancerEnabled = options.parent?.modules?.loadBalancer?.enabled
+            return loadBalancerEnabled
+              ? yup.number().min(1).max(100).label('Weight')
+              : yup.mixed().strip()
+          }),
           active: yup.boolean().label('Active')
         })
       ),

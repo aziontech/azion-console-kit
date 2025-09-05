@@ -29,7 +29,7 @@
   const router = useRouter()
   const slots = useSlots()
   const breadcrumbs = useBreadcrumbs()
-  breadcrumbs.update(router.currentRoute.value.meta.breadCrumbs ?? [])
+  breadcrumbs.update(router.currentRoute.value.meta.breadCrumbs ?? [], router.currentRoute.value)
 
   const generateHomeBreadCrumb = computed(() => {
     return {

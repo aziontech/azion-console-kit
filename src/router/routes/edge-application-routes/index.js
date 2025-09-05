@@ -17,10 +17,10 @@ export const edgeApplicationRoutes = {
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
-        title: 'Edge Applications',
+        title: 'Applications',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
+            label: 'Applications',
             to: '/edge-applications'
           }
         ]
@@ -41,14 +41,14 @@ export const edgeApplicationRoutes = {
         }
       },
       meta: {
-        title: 'Create Edge Application',
+        title: 'Create Application',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
+            label: 'Applications',
             to: '/edge-applications'
           },
           {
-            label: 'Create Edge Application',
+            label: 'Create Application',
             to: '/edge-applications/create'
           }
         ]
@@ -102,14 +102,14 @@ export const edgeApplicationRoutes = {
         }
       },
       meta: {
-        title: 'Edit Edge Application',
+        title: 'Edit Application',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
+            label: 'Applications',
             to: '/edge-applications'
           },
           {
-            label: 'Edit Edge Application'
+            label: 'Edit Application'
           }
         ]
       }

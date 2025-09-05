@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeApplicationMock: {
-    name: 'Edge Application',
+    name: 'Application',
     deliveryProtocol: 'http',
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],

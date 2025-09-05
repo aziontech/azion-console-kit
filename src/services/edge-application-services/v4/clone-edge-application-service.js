@@ -31,7 +31,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
       return {
-        feedback: 'Your edge application has been cloned',
+        feedback: 'Your Application has been cloned',
         urlToEditView: `/edge-applications/edit/${httpResponse.body.data.id}`,
         applicationId: httpResponse.body.data.id
       }
