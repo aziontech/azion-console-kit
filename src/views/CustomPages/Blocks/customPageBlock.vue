@@ -2,7 +2,7 @@
   <FormHorizontal
     :isDrawer="props.isDrawer"
     title="Custom Page"
-    description="Create custom pages to handle errors and cache TTL based on the HTTP status code received from the edge connectors."
+    description="Create custom pages to handle errors and cache TTL based on the HTTP status code received from the Connectors."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
