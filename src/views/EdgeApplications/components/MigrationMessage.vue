@@ -20,7 +20,7 @@
       href="#"
       class="text-[var(--text-color-link)] hover:underline"
       @click="navigateToEdgeConnectors"
-      >Edge Connectors</a
+      >Connectors</a
     >, and Error Responses are now
     <a
       href="#"

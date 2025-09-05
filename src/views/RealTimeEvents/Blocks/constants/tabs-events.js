@@ -5,7 +5,7 @@ const TABS_EVENTS = {
     panel: 'httpRequests',
     index: 0,
     title: 'HTTP Requests',
-    description: 'Logs of events from requests made to your edge applications and edge firewalls.',
+    description: 'Logs of events from requests made to your applications and firewalls.',
     dataset: 'httpEvents',
     tabRouter: 'http-requests',
     columns: [
@@ -31,8 +31,8 @@ const TABS_EVENTS = {
   edgeFunctions: {
     panel: 'edgeFunctions',
     index: 1,
-    title: 'Edge Functions',
-    description: 'Logs of events from requests made to your edge functions.',
+    title: 'Functions',
+    description: 'Logs of events from requests made to your functions.',
     dataset: 'edgeFunctionsEvents',
     tabRouter: 'edge-functions',
     columns: [
@@ -58,9 +58,8 @@ const TABS_EVENTS = {
   edgeFunctionsConsole: {
     panel: 'edgeFunctionsConsole',
     index: 2,
-    title: 'Edge Functions Console',
-    description:
-      'Logs of events from edge applications using Edge Runtime returned by Cells Console.',
+    title: 'Functions Console',
+    description: 'Logs of events from applications using Edge Runtime returned by Cells Console.',
     dataset: 'cellsConsoleEvents',
     tabRouter: 'edge-functions-console',
     columns: [
@@ -88,7 +87,7 @@ const TABS_EVENTS = {
     index: 3,
     title: 'Image Processor',
     description:
-      'Logs of events from requests made to edge applications that processed images with Image Processor.',
+      'Logs of events from requests made to applications that processed images with Image Processor.',
     dataset: 'imagesProcessedEvents',
     tabRouter: 'image-processor',
     columns: [
@@ -115,7 +114,7 @@ const TABS_EVENTS = {
     panel: 'tieredCache',
     index: 4,
     title: 'Tiered Cache',
-    description: 'Logs of events from requests made to edge applications using Tiered Cache.',
+    description: 'Logs of events from requests made to applications using Tiered Cache.',
     dataset: 'l2CacheEvents',
     tabRouter: 'tiered-cache',
     columns: [

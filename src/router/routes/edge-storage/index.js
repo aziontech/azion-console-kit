@@ -13,7 +13,7 @@ export const edgeStorageRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Storage',
+            label: 'Object Storage',
             to: '/edge-storage'
           }
         ]
@@ -26,7 +26,7 @@ export const edgeStorageRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Storage',
+            label: 'Object Storage',
             to: '/edge-storage'
           },
           {
@@ -47,7 +47,7 @@ export const edgeStorageRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Storage',
+            label: 'Object Storage',
             to: '/edge-storage'
           },
           {

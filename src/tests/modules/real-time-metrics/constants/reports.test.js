@@ -17,7 +17,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'bytes',
           dataset: 'httpMetrics',
           description:
-            'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.',
+            'Sum of data transferred through Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.',
           fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
           groupBy: [],
           helpCenterPath: '/real-time-metrics/edge-applications/data-transferred/edge-cache',
@@ -698,7 +698,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'edgeFunctionsMetrics',
           description:
-            'Quantity of times an edge function has been executed. Displays the total amount of invocations divided by Edge Firewall Invocations and Edge Application Invocations.',
+            'Quantity of times a function has been executed. Displays the total amount of invocations divided by Firewall Invocations and Application Invocations.',
           fields: ['edgeApplicationInvocations', 'edgeFirewallInvocations'],
           groupBy: [],
           helpCenterPath: '/real-time-metrics/edge-functions/invocations/total-invocations',

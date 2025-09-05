@@ -42,7 +42,7 @@
   const listDataSources = ref([
     { label: 'Activity History', value: 'activity' },
     { label: 'Edge Applications', value: 'http' },
-    { label: 'Edge Functions', value: 'functions' },
+    { label: 'Functions', value: 'functions' },
     { label: 'WAF Events', value: 'waf' }
   ])
 

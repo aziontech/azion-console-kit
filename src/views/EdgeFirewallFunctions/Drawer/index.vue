@@ -86,7 +86,7 @@
       .number()
       .transform((value) => (Number.isNaN(value) ? null : value))
       .required()
-      .label('Edge Function'),
+      .label('Function'),
     args: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
@@ -113,7 +113,7 @@
   const handleTrackSuccessCreate = () => {
     tracker.product
       .productCreated({
-        productName: 'Edge Firewall Functions',
+        productName: 'Firewall Functions',
         tab: 'functions'
       })
       .track()
@@ -122,7 +122,7 @@
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
-        productName: 'Edge Firewall',
+        productName: 'Firewall',
         tab: 'functions'
       })
       .track()
@@ -132,7 +132,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Edge Firewall Functions',
+        productName: 'Firewall Functions',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -182,7 +182,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Edge Firewall',
+        productName: 'Firewall',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message

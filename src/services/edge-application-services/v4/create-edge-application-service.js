@@ -29,7 +29,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
       return {
-        feedback: 'Your edge application has been created',
+        feedback: 'Your Application has been created',
         urlToEditView: `/edge-applications/config/${httpResponse.body.data.id}`,
         applicationId: httpResponse.body.data.id
       }

@@ -2,7 +2,7 @@
   <ContentBlock data-testid="create-edge-application-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Create Edge Application"
+        pageTitle="Create Application"
         data-testid="create-edge-application-heading"
       />
     </template>
@@ -76,10 +76,10 @@
 
   const handleToast = ({ data, showToastWithActions, redirectToUrl }) => {
     const toast = {
-      feedback: 'Your edge application has been created',
+      feedback: 'Your Application has been created',
       actions: {
         link: {
-          label: 'View Edge Application',
+          label: 'View Application',
           callback: () => redirectToUrl(`/edge-applications/edit/${data.id}`)
         }
       }
@@ -90,7 +90,7 @@
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
-      productName: 'Edge Application',
+      productName: 'Application',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
@@ -100,7 +100,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Edge Application',
+        productName: 'Application',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message

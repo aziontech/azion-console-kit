@@ -4,7 +4,7 @@ import * as Errors from '@/services/axios/errors'
 const mapDataSourceName = {
   http: 'Edge Applications',
   activity: 'Activity History',
-  functions: 'Edge Functions',
+  functions: 'Functions',
   waf: 'WAF Events'
 }
 

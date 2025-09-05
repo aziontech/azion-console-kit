@@ -81,7 +81,7 @@
           return nameRegex.test(value)
         }
       ),
-    edgeApplication: yup.number().label('Edge Application'),
+    edgeApplication: yup.number().label('Application'),
     cnames: yup
       .string()
       .label('CNAME')

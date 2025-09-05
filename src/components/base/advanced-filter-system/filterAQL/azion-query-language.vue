@@ -12,22 +12,17 @@
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
+          @external-link="handleExternalLink"
+          @search="handleSearch"
           :handleQuery="handleQuery"
           ref="editable"
           data-testid="azion-query-language-input"
         />
-        <div class="h-auto w-full md:max-w-fit">
-          <PrimeButton
-            label="Search"
-            size="small"
-            class="h-auto w-full md:max-w-fit"
-            @click="executeQuery"
-            :disabled="handleErrorsQuery.length"
-            data-testid="azion-query-language-search"
-          />
-        </div>
       </div>
-      <div class="flex flex-col mt-2 gap-1">
+      <div
+        class="flex flex-col mt-2 gap-1"
+        v-if="handleErrorsQuery.length"
+      >
         <small
           v-for="(error, index) in handleErrorsQuery"
           :key="index"
@@ -68,7 +63,6 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, watch } from 'vue'
   import ContentEditable from './content-editable.vue'
-  import PrimeButton from 'primevue/button'
   import Listbox from 'primevue/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
@@ -245,6 +239,10 @@
     props.searchAdvancedFilter(filter)
   }
 
+  const handleSearch = () => {
+    executeQuery()
+  }
+
   const changeCurrentStep = (step) => {
     currentStep.value = step
   }
@@ -267,7 +265,7 @@
   }
 
   watch(
-    () => props.fieldsInFilter,
+    () => [props.fieldsInFilter, props.filterAdvanced],
     () => {
       handleInitialQuery()
     },

@@ -151,7 +151,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate an edge function within your edge firewall. Use Rules Engine to activate the function."
+    description="Instantiate a function within your firewall. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -160,8 +160,8 @@
           required
           name="name"
           v-model="name"
-          description="Give a unique and descriptive name to identify the edge firewall function instance."
-          placeholder="My edge firewalel function instance"
+          description="Give a unique and descriptive name to identify the firewall function instance."
+          placeholder="My firewall function instance"
           data-testid="edge-firewall-functions-form__name-field"
         />
       </div>
@@ -170,8 +170,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Edge Function"
-    description="Select an existing edge function and customize the arguments. Only edge functions previously created in the Edge Functions module can be instantiated."
+    title="Function"
+    description="Select an existing function and customize the arguments. Only functions previously created in the Functions module can be instantiated."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
@@ -183,7 +183,7 @@
           required
           disableEmitFirstRender
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
-          label="Edge Function"
+          label="Function"
           name="edgeFunctionID"
           optionLabel="name"
           optionValue="id"
@@ -208,7 +208,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Function"
+                  label="Create Function"
                 />
               </li>
             </ul>
