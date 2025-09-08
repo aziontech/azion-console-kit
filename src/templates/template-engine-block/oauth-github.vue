@@ -53,7 +53,7 @@
   }
 
   const emitGithubInstallation = () => {
-    emit('onCallbackUrl', callbackUrl.value)
+    emit('onCallbackUrl', callbackUrl)
   }
 
   watch(callbackUrl, () => {
