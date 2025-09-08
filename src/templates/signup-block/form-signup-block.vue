@@ -57,11 +57,12 @@
           </form>
         </div>
       </div>
-      <div class="flex flex-wrap justify-center items-center gap-3 mt-8">
+      <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
         <PrimeButton
           label="Sign In"
-          severity="secondary"
+          link
+          class="p-0"
           @click="goToLogin"
         />
       </div>
