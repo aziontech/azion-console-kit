@@ -13,7 +13,8 @@
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
   import { paymentService } from '@/services/v2'
-  import AddAddressBlock from './add-address.vue'
+  import AddAddressBlock from './add-address-block.vue'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'add-payment-method-block' })
 
@@ -67,7 +68,7 @@
     const options = {
       closable: true,
       severity: severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail: summary
     }
 
@@ -101,7 +102,7 @@
       cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
       cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
     } catch (error) {
-      showToast('Error', error)
+      showToast('error', error)
     }
   }
 
@@ -199,7 +200,7 @@
       }
       const response = await paymentService.createCreditCard(payload)
       emit('onSuccess', response)
-      showToast('Success', response.feedback)
+      showToast('success', response.feedback)
       toggleDrawerVisibility(false)
     } catch (error) {
       emit('onError', error.message)
@@ -208,7 +209,7 @@
         error.showErrors(toast)
       } else {
         const errorMessage = error.message || error
-        showToast('Error', errorMessage)
+        showToast('error', errorMessage)
       }
     } finally {
       isSubmitting.value = false

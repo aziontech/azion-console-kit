@@ -6,6 +6,7 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'form-accordion' })
 
@@ -62,7 +63,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -74,7 +75,7 @@
     if (props.disableAfterCreateToastFeedback) {
       return
     }
-    showToast('Success', feedbackMessage)
+    showToast('success', feedbackMessage)
   }
 
   const redirectToUrl = (path) => {
@@ -102,7 +103,7 @@
           emit('onError', error.message[0])
         } else {
           // Fallback for legacy errors or non-ErrorHandler errors
-          showToast('Error', error)
+          showToast('error', error)
           emit('on-response-fail', error)
         }
       }

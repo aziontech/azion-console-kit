@@ -6,6 +6,7 @@
   import { useRouter } from 'vue-router'
   import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -75,7 +76,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -86,7 +87,7 @@
     const options = {
       closable: true,
       severity: 'success',
-      summary: 'success',
+      summary: 'Success',
       detail: toastData.feedback,
       additionalDetails: toastData?.additionalFeedback,
       action: toastData?.actions
@@ -100,7 +101,7 @@
     if (props.disableAfterCreateToastFeedback) {
       return
     }
-    showToast('Success', feedbackMessage)
+    showToast('success', feedbackMessage)
   }
 
   const redirectToUrl = (path, params = {}) => {
@@ -132,7 +133,7 @@
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
-          showToast('Error', errorMessage)
+          showToast('error', errorMessage)
         }
       }
     },

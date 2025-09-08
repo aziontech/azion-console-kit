@@ -59,6 +59,8 @@
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { h, ref } from 'vue'
+  import { capitalizeFirstLetter } from '@/helpers'
+
   const emit = defineEmits([
     'update-credit-event',
     'openDrawerAddCredit',
@@ -147,7 +149,7 @@
     toast.add({
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     })
   }
@@ -157,14 +159,14 @@
       await paymentService.editCreditCard(payment.id, {
         is_default: true
       })
-      showToast('Success', 'Payment Method successfully set as default')
+      showToast('success', 'Payment Method successfully set as default')
       emit('update-credit-event')
       reloadList()
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {
-        showToast('Error', 'Error', error)
+        showToast('error', 'Error', error)
       }
     }
   }

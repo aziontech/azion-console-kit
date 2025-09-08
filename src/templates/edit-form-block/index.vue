@@ -5,6 +5,7 @@
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -99,7 +100,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -117,7 +118,7 @@
         error.showErrors(toast)
       } else {
         emit('on-load-fail', error)
-        showToast('Error', error)
+        showToast('error', error)
       }
       goBackToList()
     }
@@ -128,7 +129,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('Success', feedback || 'edited successfully')
+          showToast('success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
@@ -149,7 +150,7 @@
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
           emit('on-edit-fail', error)
-          showToast('Error', errorMessage)
+          showToast('error', errorMessage)
         }
       }
     },

@@ -8,7 +8,7 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import PrimeButton from 'primevue/button'
-
+  import { capitalizeFirstLetter } from '@/helpers'
   import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
@@ -113,7 +113,7 @@
     const options = {
       closable: true,
       severity: severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail: summary
     }
 
@@ -139,7 +139,7 @@
         const response = await props.createService(values)
         blockViewRedirection.value = false
         emit('onSuccess', { ...response, showToastWithActions })
-        if (!props.disableToast) showToast('Success', response?.feedback)
+        if (!props.disableToast) showToast('success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = true
@@ -157,7 +157,7 @@
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
-          showToast('Error', errorMessage)
+          showToast('error', errorMessage)
         }
       }
     },

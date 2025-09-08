@@ -59,6 +59,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -119,7 +120,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -141,7 +142,7 @@
       } else {
         // Fallback for legacy errors or non-ErrorHandler errors
         const errorMessage = error?.message || error
-        showToast('Error', errorMessage)
+        showToast('error', errorMessage)
       }
       isLoading.value = false
       throw error
@@ -233,7 +234,7 @@
         listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
         listPurgeRef.value.updateDataTablePagination()
         router.replace({ query: {} })
-        showToast('Success', feedbackPurge.value)
+        showToast('success', feedbackPurge.value)
       }
     } while (totalOfUserPurges !== countPurge.value)
     isLoading.value = false

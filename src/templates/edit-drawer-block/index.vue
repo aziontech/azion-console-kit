@@ -8,6 +8,7 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({
     name: 'edit-drawer-block'
@@ -105,7 +106,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -119,7 +120,7 @@
       resetForm({ values: initialValues })
     } catch (error) {
       emit('onError', error)
-      showToast('Error', error)
+      showToast('error', error)
     } finally {
       loading.value = false
     }
@@ -134,7 +135,7 @@
 
         const toastMessage =
           typeof feedback === 'object' && feedback?.feedback ? feedback.feedback : feedback
-        showToast('Success', toastMessage)
+        showToast('success', toastMessage)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = false
@@ -152,7 +153,7 @@
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
-          showToast('Error', errorMessage)
+          showToast('error', errorMessage)
         }
       }
     },

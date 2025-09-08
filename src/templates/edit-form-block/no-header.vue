@@ -29,6 +29,7 @@
 <script>
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   export default {
     name: 'edit-form-block-no-header',
@@ -80,7 +81,7 @@
         const options = {
           closable: true,
           severity,
-          summary: severity,
+          summary: capitalizeFirstLetter(severity),
           detail
         }
 
@@ -108,7 +109,7 @@
           const initialData = await this.loadService({ id })
           this.initialDataSetter(initialData)
         } catch (error) {
-          this.showToast('Error', error)
+          this.showToast('error', error)
         } finally {
           this.isLoading = false
         }
@@ -117,12 +118,12 @@
         try {
           this.isLoading = true
           await this.editService(this.formData)
-          this.showToast('Success', 'edited successfully')
+          this.showToast('success', 'edited successfully')
           this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
           this.blockViewRedirection = true
-          this.showToast('Error', error)
+          this.showToast('error', error)
         } finally {
           setTimeout(() => {
             this.isLoading = false
