@@ -73,10 +73,7 @@
             </Divider>
           </div>
 
-          <SocialIdpsBlock
-            :socialIdpsService="listSocialIdpsService"
-            v-model:showSocialIdps="showSocialIdps"
-          />
+          <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
         </div>
 
         <!-- Password step -->
@@ -203,10 +200,6 @@
     },
     accountHandler: {
       type: Object,
-      required: true
-    },
-    listSocialIdpsService: {
-      type: Function,
       required: true
     }
   })

@@ -17,7 +17,6 @@
 
             <div>
               <SocialIdpsBlock
-                :socialIdpsService="props.listSocialIdpsService"
                 @showSocialIdps="updateEmailForm"
                 v-if="showLoginFromEmail"
               />
@@ -86,7 +85,6 @@
 
   const props = defineProps({
     signupService: { required: true, type: Function },
-    listSocialIdpsService: { required: true, type: Function },
     resendEmailService: { required: true, type: Function }
   })
 

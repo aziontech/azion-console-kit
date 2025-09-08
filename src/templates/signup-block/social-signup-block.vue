@@ -1,6 +1,6 @@
 <template>
   <SocialIdpsBlock
-    :socialIdpsService="listSocialIdpsService"
+    :socialIdpsService="iamService.listSocialIdps"
     direction="bottom-to-top"
   />
   <PrimeButton
@@ -14,6 +14,7 @@
   import PrimeButton from 'primevue/button'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useAccountStore } from '@/stores/account'
+  import { iamService } from '@/services/v2'
   const emit = defineEmits(['change-signup-method'])
 
   const handleSignUpEmailClick = () => {
@@ -21,11 +22,4 @@
     accountStore.resetSsoSignUpMethod()
     emit('change-signup-method')
   }
-
-  defineProps({
-    listSocialIdpsService: {
-      type: Function,
-      required: true
-    }
-  })
 </script>

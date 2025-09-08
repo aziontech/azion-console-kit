@@ -7,7 +7,6 @@
       :verifyLoginService="props.verifyLoginService"
       :refreshLoginService="props.refreshLoginService"
       :accountHandler="props.accountHandler"
-      :listSocialIdpsService="props.listSocialIdpsService"
     />
 
     <ForgotPassword
@@ -48,10 +47,6 @@
     accountHandler: {
       required: true,
       type: Object
-    },
-    listSocialIdpsService: {
-      required: true,
-      type: Function
     }
   })
 
