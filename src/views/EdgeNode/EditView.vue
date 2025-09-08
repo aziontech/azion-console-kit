@@ -11,7 +11,8 @@
     listGroupsEdgeNodeService: { type: Function, required: true },
     loadEdgeNodeService: { type: Function, required: true },
     editEdgeNodeService: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    updatedRedirect: { type: String, required: true },
+    listEdgeServiceServices: { type: Function, required: true }
   })
 
   const validationSchema = yup.object({

@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listServiceEdgeNodeService } from '@/services/edge-node-service-services'
+import { listServiceEdgeNodeService } from '@/services/edge-node-service-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
 const localeMock = (locale = 'en') => {
@@ -11,26 +11,24 @@ const localeMock = (locale = 'en') => {
 
 const fixtures = {
   payload: {
-    edgeNodeId: 123,
-    bound: true,
-    page: 1
+    edgeNodeId: 123
   },
   mockResponse: [
     {
-      bind_id: 1,
-      name: 'test',
+      id: 1,
+      service_name: 'test',
       service_id: 1,
       last_editor: 'test',
-      updated_at: '2021-09-09T13:00:00.000Z',
-      is_active: true
+      last_modified: '2021-09-09T13:00:00.000Z',
+      active: true
     },
     {
-      bind_id: 1,
-      name: 'test',
+      id: 1,
+      service_name: 'test',
       service_id: 1,
       last_editor: 'test',
-      updated_at: '2021-09-09T13:00:00.000Z',
-      is_active: false
+      last_modified: '2021-09-09T13:00:00.000Z',
+      active: false
     }
   ]
 }
@@ -51,21 +49,21 @@ describe('EdgeNodeServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+    const version = 'v4'
     await sut(fixtures.payload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_nodes/${fixtures.payload.edgeNodeId}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
+      url: `${version}/edge_orchestrator/edge_nodes/${fixtures.payload.edgeNodeId}/services?ordering=name&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })
 
-  it('should parsed correctly all returned binded services', async () => {
+  it('should parsed correctly all binded firewalls', async () => {
     localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { services: fixtures.mockResponse }
+      body: { results: fixtures.mockResponse }
     })
     const { sut } = makeSut()
 
