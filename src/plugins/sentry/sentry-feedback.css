@@ -1,12 +1,12 @@
 /* Sentry Feedback Modal Styling */
 [data-sentry-feedback],
 .sentry-feedback,
-[data-testid="sentry-feedback"],
-div[class*="sentry"][class*="feedback"],
-div[class*="feedback"],
-div[class*="sentry"],
-div[role="dialog"],
-div[aria-modal="true"],
+[data-testid='sentry-feedback'],
+div[class*='sentry'][class*='feedback'],
+div[class*='feedback'],
+div[class*='sentry'],
+div[role='dialog'],
+div[aria-modal='true'],
 .sentry-feedback-widget,
 #sentry-feedback {
   position: fixed !important;
@@ -26,12 +26,12 @@ div[aria-modal="true"],
 /* Ensure Sentry feedback modal is always on top */
 [data-sentry-feedback] *,
 .sentry-feedback *,
-[data-testid="sentry-feedback"] *,
-div[class*="sentry"][class*="feedback"] *,
-div[class*="feedback"] *,
-div[class*="sentry"] *,
-div[role="dialog"] *,
-div[aria-modal="true"] *,
+[data-testid='sentry-feedback'] *,
+div[class*='sentry'][class*='feedback'] *,
+div[class*='feedback'] *,
+div[class*='sentry'] *,
+div[role='dialog'] *,
+div[aria-modal='true'] *,
 .sentry-feedback-widget *,
 #sentry-feedback * {
   z-index: 9999 !important;

@@ -47,12 +47,9 @@ export default {
     // Get current environment and configuration
     const currentEnv = import.meta.env.MODE || 'development'
     const config = getSentryConfig(currentEnv)
-    
+
     // Merge with any additional options passed to the plugin
-    const {
-      router = null,
-      ...sentryOptions
-    } = options
+    const { router = null, ...sentryOptions } = options
 
     // Initialize Sentry with the configuration
     Sentry.init({
@@ -72,8 +69,8 @@ export default {
           // Additional SDK configuration goes in here, for example:
           colorScheme: 'system',
           autoInject: false, // Disable automatic button injection
-          showBranding: false, // Remove Sentry logo
-        }),
+          showBranding: false // Remove Sentry logo
+        })
       ],
       // Enable logs to be sent to Sentry
       enableLogs: true,
@@ -92,7 +89,7 @@ export default {
       replaysSessionSampleRate: config.replaysSessionSampleRate,
       replaysOnErrorSampleRate: config.replaysOnErrorSampleRate,
       // Merge any additional options passed to the plugin
-      ...sentryOptions,
+      ...sentryOptions
     })
 
     // Create Sentry methods object
@@ -106,7 +103,7 @@ export default {
         Sentry.captureException(error, {
           tags: context.tags || {},
           extra: context.extra || {},
-          user: context.user || {},
+          user: context.user || {}
         })
       },
 
@@ -120,7 +117,7 @@ export default {
         Sentry.captureMessage(message, level, {
           tags: context.tags || {},
           extra: context.extra || {},
-          user: context.user || {},
+          user: context.user || {}
         })
       },
 
@@ -174,7 +171,6 @@ export default {
         Sentry.showReportDialog(options)
       },
 
-
       /**
        * Create and show feedback form
        * @param {object} options - Feedback form options
@@ -187,10 +183,10 @@ export default {
             showBranding: false,
             ...options
           })
-          
+
           form.appendToDom()
           form.open()
-          
+
           // CSS handles all modal styling automatically
         }
       },
