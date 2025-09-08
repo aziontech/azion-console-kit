@@ -2,7 +2,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edge Connectors"
+        pageTitle="Connectors"
         data-testid="edge-connectors-heading"
       />
     </template>
@@ -13,9 +13,9 @@
         :columns="getColumns"
         ref="refListTable"
         @on-load-data="handleLoadData"
-        emptyListMessage="No edge connectors found."
+        emptyListMessage="No Connectors found."
         :actions="actions"
-        addButtonLabel="Edge Connectors"
+        addButtonLabel="Connectors"
         createPagePath="/edge-connectors/create"
         editPagePath="/edge-connectors/edit"
         data-testid="edge-connectors-list-table-block"
@@ -24,9 +24,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No edge connectors have been created"
-        description="Click the button below to create your first edge connectors."
-        createButtonLabel="Edge Connectors"
+        title="No Connectors have been created"
+        description="Click the button below to create your first Connectors."
+        createButtonLabel="Connectors"
         createPagePath="edge-connectors/create"
         :documentationService="documentationService"
       >
@@ -63,7 +63,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'Edge Connectors',
+      title: 'Connectors',
       icon: 'pi pi-trash',
       service: edgeConnectorsService.deleteEdgeConnectorsService
     }

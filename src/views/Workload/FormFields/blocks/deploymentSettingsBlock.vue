@@ -84,7 +84,7 @@
 <template>
   <form-horizontal
     title="Deployment Settings"
-    description="Configure the deployment of your workload by selecting the appropriate Edge Application and Edge Firewall. The Edge Application handles traffic routing and processing at the edge, while the Edge Firewall provides security by filtering and blocking malicious traffic."
+    description="Configure the deployment of your workload by selecting the appropriate Application and Firewall. The Application handles traffic routing and processing at the edge, while the Firewall provides security by filtering and blocking malicious traffic."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -93,7 +93,7 @@
           @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
         <FieldDropdownLazyLoader
-          label="Edge Application"
+          label="Application"
           required
           data-testid="domains-form__edge-application-field"
           name="application"
@@ -103,7 +103,7 @@
           optionValue="value"
           :value="application"
           appendTo="self"
-          placeholder="Select an edge application"
+          placeholder="Select an application"
         >
           <template #footer>
             <ul class="p-2">
@@ -119,7 +119,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Application"
+                  label="Create Application"
                 />
               </li>
             </ul>
@@ -133,7 +133,7 @@
           @onSuccess="handleEdgeFirewallCreated"
         />
         <FieldDropdownLazyLoader
-          label="Edge Firewall"
+          label="Firewall"
           :enableClearOption="!!firewall"
           data-testid="domains-form__edge-firewall-field"
           name="firewall"
@@ -146,7 +146,7 @@
           optionValue="value"
           :value="firewall"
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select a firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -162,7 +162,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Firewall"
+                  label="Create Firewall"
                 />
               </li>
             </ul>

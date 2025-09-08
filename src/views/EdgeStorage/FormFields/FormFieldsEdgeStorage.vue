@@ -33,7 +33,7 @@
   <div class="flex flex-col gap-8">
     <FormHorizontal
       title="General"
-      description="Check the details of the Edge Storage Bucket."
+      description="Check the details of the Object Storage Bucket."
       :disabled="disableNameEdit"
     >
       <template #inputs>

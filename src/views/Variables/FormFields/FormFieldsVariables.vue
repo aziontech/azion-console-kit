@@ -14,7 +14,7 @@
 <template>
   <FormHorizontal
     title="Variables"
-    description="Create environment variables or secrets to use with configured edge functions."
+    description="Create environment variables or secrets to use with configured functions."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

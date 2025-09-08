@@ -114,7 +114,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Your edge application has been updated'
+      return 'Your Application has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message

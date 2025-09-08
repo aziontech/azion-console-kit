@@ -232,7 +232,7 @@
         : empty,
       https: empty,
       imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
-      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
+      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Function' : empty
     }
   })
 

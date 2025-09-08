@@ -10,7 +10,7 @@
           label="Name"
           required
           name="digitalCertificateName"
-          placeholder="My digital certificate"
+          :placeholder="tabPlaceholderByDCType"
           :value="digitalCertificateName"
           data-testid="digital-certificate__name-field"
           :description="inputDescriptionByDCType"
@@ -47,9 +47,20 @@
       case CERTIFICATE_TYPES.TRUSTED:
         return 'Create a digital certificate that can be used for mutual Transport Layer Security (mTLS).'
       case CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST:
-        return 'Create an entry to manage a Certificate Revocation List (CRL) and ensure the security of HTTPS edge applications.'
+        return 'Create an entry to manage a Certificate Revocation List (CRL) and ensure the security of HTTPS applications.'
       default:
-        return 'Create a digital certificate entry to secure HTTPS edge applications.'
+        return 'Create a digital certificate entry to secure HTTPS applications.'
+    }
+  })
+
+  const tabPlaceholderByDCType = computed(() => {
+    switch (certificateType.value) {
+      case CERTIFICATE_TYPES.TRUSTED:
+        return 'My Trusted Certificate'
+      case CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST:
+        return 'My Revocation List'
+      default:
+        return 'My Server Certificate'
     }
   })
 

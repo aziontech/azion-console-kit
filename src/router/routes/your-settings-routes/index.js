@@ -7,7 +7,7 @@ export const settingsRoutes = {
   children: [
     {
       path: '',
-      name: 'settings',
+      name: 'your-settings',
       component: () => import('@views/YourSettings/EditView.vue'),
       props: {
         listCountriesPhoneService: UsersService.listCountriesPhoneService,

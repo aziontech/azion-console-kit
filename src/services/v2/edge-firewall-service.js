@@ -75,7 +75,7 @@ export class EdgeFirewallService {
     })
 
     return {
-      feedback: 'Your Edge Firewall has been cloned',
+      feedback: 'Your firewall has been cloned',
       urlToEditView: `/edge-firewall/edit/${data.data.id}`,
       id: data.data.id
     }
@@ -90,7 +90,7 @@ export class EdgeFirewallService {
       body
     })
 
-    return 'Your edge firewall has been updated'
+    return 'Your firewall has been updated'
   }
 
   loadEdgeFirewallService = async ({ id }) => {
@@ -108,6 +108,6 @@ export class EdgeFirewallService {
       url: `${this.baseURL}/${id}`
     })
 
-    return 'Edge Firewall successfully deleted'
+    return 'Your firewall has been deleted'
   }
 }

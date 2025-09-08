@@ -63,7 +63,7 @@ describe('EdgeApplicationServices', () => {
       payload: fixtures.edgeApplicationMock
     })
 
-    expect(data.feedback).toBe('Your edge application has been cloned')
+    expect(data.feedback).toBe('Your Application has been cloned')
   })
 
   it('should throw parsing api error when request fails', async () => {

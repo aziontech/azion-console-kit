@@ -111,7 +111,7 @@
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
-              request in Edge Firewall, if necessary.`,
+              request in Firewall, if necessary.`,
       inputValue: 'permissive'
     }
   ])
@@ -156,7 +156,7 @@
 
 <template>
   <form-horizontal
-    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    description="Create a domain with Azion to launch an application and set up security with digital certificates."
   >
     <template #title> General </template>
     <template #inputs>
@@ -190,7 +190,7 @@
   </form-horizontal>
 
   <form-horizontal
-    description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #title> Settings </template>
     <template #inputs>
@@ -208,7 +208,7 @@
       />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
-          label="Edge Application"
+          label="Application"
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
@@ -218,7 +218,7 @@
           optionValue="value"
           :value="edgeApplication"
           appendTo="self"
-          placeholder="Select an edge application"
+          placeholder="Select an application"
         >
           <template #footer>
             <ul class="p-2">
@@ -234,7 +234,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Application"
+                  label="Create Application"
                 />
               </li>
             </ul>
@@ -243,7 +243,7 @@
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
-          label="Edge Firewall"
+          label="Firewall"
           enableClearOption
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
@@ -256,7 +256,7 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select an firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -272,7 +272,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Firewall"
+                  label="Create Firewall"
                 />
               </li>
             </ul>
@@ -380,7 +380,7 @@
           optionValue="value"
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
         />
       </div>
     </template>

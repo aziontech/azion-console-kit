@@ -104,7 +104,7 @@
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
-              request in Edge Firewall, if necessary.`,
+              request in Firewall, if necessary.`,
       inputValue: 'permissive'
     }
   ])
@@ -246,7 +246,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
-    description="Choose the protocols used between the edge application and users."
+    description="Choose the protocols used between the application and users."
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
@@ -477,7 +477,7 @@
 
   <form-horizontal
     title="Settings"
-    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
+    description="Determine the application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
   >
     <template #inputs>
       <DigitalCertificatesDrawer
@@ -581,7 +581,7 @@
           optionValue="value"
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
         />
       </div>
     </template>

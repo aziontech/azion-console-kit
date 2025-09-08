@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.40.1",
+  "version": "1.41.0",
   "private": false,
   "type": "module",
   "repository": {
@@ -41,7 +41,7 @@
     "analytics": "^0.8.11",
     "axios": "^1.7.4",
     "azion": "^1.20.2",
-    "azion-theme": "^1.13.2",
+    "azion-theme": "^1.14.3",
     "c3": "^0.7.20",
     "deep-chat": "^1.4.11",
     "find-cypress-specs": "^1.44.11",

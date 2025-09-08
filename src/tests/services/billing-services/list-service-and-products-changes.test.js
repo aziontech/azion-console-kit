@@ -143,7 +143,7 @@ const fixtures = {
   formattedResponse: {
     data: [
       {
-        service: 'Edge Application',
+        service: 'Application',
         value: formatCurrencyString('BRL', 6.75),
         slug: 'edge_application',
         currency: 'BRL',

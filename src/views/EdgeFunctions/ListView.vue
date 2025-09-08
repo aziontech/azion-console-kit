@@ -1,20 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Functions" />
+      <PageHeadingBlock pageTitle="Functions" />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
-        addButtonLabel="Edge Function"
+        addButtonLabel="Function"
         createPagePath="edge-functions/create?origin=list"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No edge functions found."
+        emptyListMessage="No functions found."
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
@@ -23,7 +23,7 @@
         v-else
         title="No functions have been created"
         description="Click the button below to create your first function."
-        createButtonLabel="Edge Function"
+        createButtonLabel="Function"
         createPagePath="edge-functions/create"
         @click-to-create="handleCreateTrackEvent"
         :documentationService="documentationService"
@@ -70,7 +70,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'edge function',
+      title: 'function',
       icon: 'pi pi-trash',
       service: edgeFunctionService.deleteEdgeFunctionService
     }

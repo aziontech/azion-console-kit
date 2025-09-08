@@ -45,7 +45,7 @@ describe('EdgeApplicationServicesV4', () => {
     })
   })
 
-  it('should parsed correctly edge application', async () => {
+  it('should parsed correctly Application', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: fixtures.edgeApplicationsMock }
