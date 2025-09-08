@@ -13,10 +13,11 @@
       :frozenSize="'0.1rem'"
       :csvMapper="(data) => ({ ...data })"
       :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
+      :menuItems="menuItems"
     >
       <template #addButton>
         <Button
-          label="Insert"
+          label="Row"
           icon="pi pi-plus"
           severity="primary"
           class="p-button-sm font-medium"
@@ -42,11 +43,14 @@
   import { useRoute } from 'vue-router'
   import { SQLITE_QUERIES } from '../../constants'
   import { useToast } from 'primevue/usetoast'
+  import { useEdgeSQL } from '../../composable/useEdgeSQL'
   defineOptions({ name: 'results-block' })
   const emit = defineEmits(['execute-query'])
 
   const route = useRoute()
   const toast = useToast()
+
+  const sqlDatabase = useEdgeSQL()
 
   const props = defineProps({
     queryResults: {
@@ -82,6 +86,29 @@
 
   const hasResults = computed(() => {
     return responseQuery.value?.length > 0 && responseQuery.value[0]?.rows?.length > 0
+  })
+
+  const deleteRow = async (row) => {
+    const rowWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(row, selectedTableSchema.value.rows)
+    const deleteQuery = SQLITE_QUERIES.DELETE_DATA(
+      props.tableName,
+      rowWithoutKeyDoesNotMatch,
+      selectedTableSchema.value.rows
+    )
+    await sqlDatabase.executeQuery([deleteQuery])
+    executeQuery()
+  }
+
+  const menuItems = computed(() => {
+    return [
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: (row) => {
+          deleteRow(row)
+        }
+      }
+    ]
   })
 
   const handleRowSave = (row) => {
@@ -197,7 +224,7 @@
 
   const loadTableSchema = async (tableName) => {
     const result = await edgeSQLService.queryDatabase(databaseId.value, {
-      statement: SQLITE_QUERIES.TABLE_INFO(tableName),
+      statements: SQLITE_QUERIES.TABLE_INFO(tableName),
       parameters: []
     })
     selectedTableSchema.value = {

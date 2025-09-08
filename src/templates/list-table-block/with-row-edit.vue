@@ -95,7 +95,6 @@
         </template>
       </Column>
       <Column
-        :rowEditor="true"
         :frozen="true"
         :alignFrozen="'right'"
         style="width: 1%; min-width: 1rem"
@@ -147,6 +146,47 @@
             </OverlayPanel>
           </div>
         </template>
+        <template #body="{ data, rowIndex }">
+          <!-- Show save/cancel buttons when row is in edit mode -->
+          <div
+            v-if="isRowEditing(data)"
+            class="flex gap-1 justify-end"
+          >
+            <PrimeButton
+              icon="pi pi-check"
+              size="small"
+              severity="success"
+              @click="saveRowEdit(data, rowIndex)"
+              class="w-8 h-8 p-0"
+              data-testid="row-save-button"
+              v-tooltip.top="'Save'"
+            />
+            <PrimeButton
+              icon="pi pi-times"
+              size="small"
+              severity="secondary"
+              outlined
+              @click="cancelRowEdit(data, rowIndex)"
+              class="w-8 h-8 p-0"
+              data-testid="row-cancel-button"
+              v-tooltip.top="'Cancel'"
+            />
+          </div>
+          <!-- Show menu button when row is not in edit mode -->
+          <div
+            v-else
+            class="flex justify-end"
+          >
+            <PrimeButton
+              icon="pi pi-ellipsis-v"
+              size="small"
+              outlined
+              @click="showRowMenu($event, data)"
+              class="w-8 h-8 p-0"
+              data-testid="row-actions-menu-button"
+            />
+          </div>
+        </template>
       </Column>
     </DataTable>
 
@@ -196,6 +236,14 @@
         </template>
       </Column>
     </DataTable>
+
+    <!-- Row Actions Menu -->
+    <Menu
+      ref="rowMenuRef"
+      :model="computedMenuItems"
+      :popup="true"
+      data-testid="row-actions-menu"
+    />
   </div>
 </template>
 
@@ -209,8 +257,10 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
   import Skeleton from 'primevue/skeleton'
+  import Menu from 'primevue/menu'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
 
   defineOptions({ name: 'list-table-block-with-row-edit' })
 
@@ -252,6 +302,10 @@
     isLoading: {
       type: Boolean,
       default: false
+    },
+    menuItems: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -266,8 +320,13 @@
   const columnSelectorPanel = ref(null)
   const dataTableRef = ref(null)
   const hasExportToCsvMapper = ref(!!props.csvMapper)
+  const rowMenuRef = ref(null)
+  const selectedRowData = ref(null)
+  const originalRowData = ref(new Map())
 
-  const emit = defineEmits(['row-edit-save', 'row-edit-cancel', 'add-button-click'])
+  const { openDeleteDialog } = useDeleteDialog()
+
+  const emit = defineEmits(['row-edit-save', 'row-edit-cancel', 'add-button-click', 'row-delete'])
 
   const filterBy = computed(() => {
     return props.columns.map((item) => item.field)
@@ -325,6 +384,81 @@
     const { data, index } = event
     emit('row-edit-cancel', { data, index })
   }
+
+  const showRowMenu = (event, rowData) => {
+    selectedRowData.value = rowData
+    rowMenuRef.value.show(event)
+  }
+
+  const isRowEditing = (rowData) => {
+    return editingRowsItens.value.some((editingRow) => editingRow.id === rowData.id)
+  }
+
+  const saveRowEdit = (rowData, rowIndex) => {
+    const originalData = originalRowData.value.get(rowData.id) || rowData
+
+    const event = {
+      newData: { ...rowData },
+      data: originalData,
+      index: rowIndex
+    }
+
+    editingRowsItens.value = editingRowsItens.value.filter((row) => row.id !== rowData.id)
+    originalRowData.value.delete(rowData.id)
+
+    emit('row-edit-save', event)
+  }
+
+  const cancelRowEdit = (rowData, rowIndex) => {
+    const originalData = originalRowData.value.get(rowData.id) || rowData
+
+    const event = {
+      data: originalData,
+      index: rowIndex
+    }
+
+    editingRowsItens.value = editingRowsItens.value.filter((row) => row.id !== rowData.id)
+    originalRowData.value.delete(rowData.id)
+
+    emit('row-edit-cancel', event)
+  }
+
+  const computedMenuItems = computed(() => {
+    const defaultEditAction = {
+      label: 'Edit Row',
+      icon: 'pi pi-pencil',
+      command: () => {
+        if (selectedRowData.value) {
+          originalRowData.value.set(selectedRowData.value.id, { ...selectedRowData.value })
+          editingRowsItens.value = [selectedRowData.value]
+        }
+      }
+    }
+
+    const mappedMenuItems = props.menuItems.map((item) => ({
+      ...item,
+      command: () => {
+        if (item.label === 'Delete' && selectedRowData.value) {
+          openDeleteDialog({
+            title: 'row',
+            id: selectedRowData.value.id,
+            data: selectedRowData.value,
+            deleteService: () => {
+              if (item.command) {
+                return item.command(selectedRowData.value)
+              }
+            },
+            deleteConfirmationText: undefined,
+            closeCallback: () => {}
+          })
+        } else if (item.command && selectedRowData.value) {
+          item.command(selectedRowData.value)
+        }
+      }
+    }))
+
+    return [defaultEditAction, ...mappedMenuItems]
+  })
 
   watch(
     () => props.editingRows,

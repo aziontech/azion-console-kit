@@ -63,7 +63,6 @@
   const isLoadingTables = ref(false)
   const queryResults = ref([])
   const executionTime = ref(0)
-  const affectedRows = ref(0)
 
   const tablesTree = ref([])
   const selectedTableSchema = ref(null)
@@ -128,39 +127,11 @@
     }
 
     isExecutingQuery.value = true
-    const startTime = Date.now()
     const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
     try {
-      const { results, affected } = isSelectQuery
-        ? await edgeSQLService.queryDatabase(databaseId.value, {
-            statement: sqlQuery.value,
-            parameters: []
-          })
-        : await edgeSQLService.executeDatabase(databaseId.value, {
-            statements: [sqlQuery.value]
-          })
-
-      executionTime.value = Date.now() - startTime
-
-      queryResults.value = results || []
-      affectedRows.value = affected || 0
-
-      selectedRows.value = []
-      rowFormDrawerVisible.value = false
-      isEditingRow.value = false
-      editingRowData.value = {}
-      editingRowIndex.value = -1
-      sqlDatabase.addQueryResult({
-        query: sqlQuery.value,
-        results,
-        timestamp: new Date(),
-        executionTime: executionTime.value,
-        type: isSelectQuery ? 'query' : 'execute'
-      })
-
+      queryResults.value = await sqlDatabase.executeQuery(sqlQuery.value)
       activeTabIndex.value = 0
-
       if (
         !isSelectQuery &&
         (sqlQuery.value.toLowerCase().includes('create table') ||
@@ -227,7 +198,7 @@
     isLoadingSchema.value = true
     try {
       const result = await edgeSQLService.queryDatabase(databaseId.value, {
-        statement: SQLITE_QUERIES.TABLE_INFO(tableName),
+        statements: SQLITE_QUERIES.TABLE_INFO(tableName),
         parameters: []
       })
       selectedTableSchema.value = {
@@ -245,7 +216,7 @@
     selectedTableDefinition.value = ''
     try {
       const result = await edgeSQLService.queryDatabase(databaseId.value, {
-        statement: SQLITE_QUERIES.TABLE_DEFINITION(tableName),
+        statements: SQLITE_QUERIES.TABLE_DEFINITION(tableName),
         parameters: []
       })
 

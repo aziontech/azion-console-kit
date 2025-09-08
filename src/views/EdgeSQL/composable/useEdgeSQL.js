@@ -1,5 +1,7 @@
 import { ref, computed } from 'vue'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { edgeSQLService } from '@/services/v2'
+import { useRoute } from 'vue-router'
 const STORAGE_KEYS = {
   QUERY_HISTORY: 'edge_sql_query_history',
   CURRENT_DATABASE: 'edge_sql_current_database'
@@ -70,6 +72,7 @@ const adaptHistory = (histories) => {
 }
 
 export function useEdgeSQL() {
+  const route = useRoute()
   const databases = ref([])
   const currentDatabase = ref(null)
   const currentTables = ref([])
@@ -187,6 +190,44 @@ export function useEdgeSQL() {
     return false
   }
 
+  const executeQuery = async (query) => {
+    isLoading.value = true
+    const databaseId = currentDatabase.value?.id || route.params.id
+    const isSelectQuery = Array.isArray(query)
+      ? query[0].trim().toLowerCase().startsWith('select')
+      : query.trim().toLowerCase().startsWith('select')
+    let queryResults = []
+
+    try {
+      const startTime = Date.now()
+      if (isSelectQuery) {
+        const { results } = await edgeSQLService.queryDatabase(databaseId, {
+          statements: query
+        })
+        queryResults = results
+      } else {
+        const { results } = await edgeSQLService.executeDatabase(databaseId, {
+          statements: query
+        })
+        queryResults = results
+      }
+
+      addQueryResult({
+        query,
+        results: queryResults,
+        timestamp: new Date(),
+        executionTime: Date.now() - startTime,
+        type: isSelectQuery ? 'query' : 'execute'
+      })
+
+      return queryResults
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const reset = () => {
     databases.value = []
     currentDatabase.value = null
@@ -234,6 +275,7 @@ export function useEdgeSQL() {
     setLoading,
     setError,
     clearError,
-    reset
+    reset,
+    executeQuery
   }
 }

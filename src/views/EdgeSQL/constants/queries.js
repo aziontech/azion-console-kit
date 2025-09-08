@@ -102,6 +102,36 @@ export const SQLITE_QUERIES = {
 
   DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
 
+  DELETE_DATA: (tableName, rowData, columns) => {
+    const hasIdColumn = columns.some((col) => col.name === 'id' || col.name === 'ID')
+
+    if (hasIdColumn && rowData.id !== undefined) {
+      return `DELETE FROM ${tableName} WHERE id = ${rowData.id};`
+    } else {
+      const whereConditions = columns
+        .filter((col) => rowData[col.name] !== undefined && rowData[col.name] !== null)
+        .map((col) => {
+          const value = rowData[col.name]
+          if (typeof value === 'string') {
+            return `${col.name} = '${value.replace(/'/g, "''")}'`
+          } else if (typeof value === 'number') {
+            return `${col.name} = ${value}`
+          } else if (typeof value === 'boolean') {
+            return `${col.name} = ${value ? 1 : 0}`
+          } else {
+            return `${col.name} = '${String(value).replace(/'/g, "''")}'`
+          }
+        })
+        .join(' AND ')
+
+      if (whereConditions) {
+        return `DELETE FROM ${tableName} WHERE ${whereConditions};`
+      } else {
+        throw new Error('Cannot build DELETE query: no valid columns found')
+      }
+    }
+  },
+
   TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
 
   DATABASE_SIZE: () => `SELECT 
