@@ -1,50 +1,41 @@
 <template>
   <p
-    v-if="size === 'normal' && !isHtml"
-    :class="classData.normal"
-    style="white-space: pre-line"
+    :class="currentClass"
+    :style="currentStyle"
+    v-if="!isHtml"
   >
     {{ description }}
   </p>
   <p
-    v-else-if="size === 'normal' && isHtml"
-    :class="classData.normal"
-    style="white-space: pre-line"
+    :class="currentClass"
+    :style="currentStyle"
+    v-else
     v-html="description"
-  ></p>
-
-  <p
-    v-if="size === 'small' && !isHtml"
-    :class="classData.small"
-  >
-    {{ description }}
-  </p>
-  <p
-    v-else-if="size === 'small' && isHtml"
-    v-html="description"
-    :class="classData.small"
   ></p>
 </template>
 
 <script setup>
-  defineProps({
+  import { computed } from 'vue'
+
+  const props = defineProps({
     description: {
       type: String,
       required: true
     },
-    isHtml: {
-      type: Boolean,
-      default: false
-    },
     size: {
       type: String,
-      default: 'normal',
-      options: () => ['small', 'normal']
+      validator: (value) => ['normal', 'small'].includes(value),
+      default: 'normal'
+    },
+    isHtml: {
+      type: Boolean
     }
   })
 
   const classData = {
-    small: 'text-xs text-color-secondary font-normal leading-5',
-    normal: 'text-color-secondary text-sm font-normal flex flex-col gap-2'
+    normal: 'text-color-secondary text-sm font-normal flex flex-col gap-2',
+    small: 'text-xs text-color-secondary font-normal leading-5'
   }
+  const currentClass = computed(() => classData[props.size])
+  const currentStyle = computed(() => (props.size === 'normal' ? { whiteSpace: 'pre-line' } : {}))
 </script>

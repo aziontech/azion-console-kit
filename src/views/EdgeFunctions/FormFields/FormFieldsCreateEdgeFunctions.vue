@@ -21,6 +21,7 @@
   import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import indentJsonStringify from '@/utils/indentJsonStringify'
+  import { defaultSchemaFormBuilder } from './Config'
 
   defineProps({
     isDrawer: {
@@ -92,11 +93,11 @@
 
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
-    showFormBuilder.value = value === selectPanelOptions[1] ? true : false
+    showFormBuilder.value = value === selectPanelOptions[1]
   }
 
   const setAzionFormEmptyState = function (value) {
-    emptySchemaAzionForm.value = !value || !Object.keys(value).length ? true : false
+    emptySchemaAzionForm.value = !value || !Object.keys(value).length
   }
 
   const setAzionFormSchema = (formSchema) => {
@@ -128,70 +129,7 @@
   }
 
   const setDefaultFormBuilder = () => {
-    const schema = {
-      type: 'object',
-      properties: {
-        cookie_name: {
-          type: 'string',
-          title: 'Cookie Name',
-          description: 'Nome do cookie usado para armazenar a variação do teste A/B',
-          default: 'azion_cookie',
-          minLength: 1
-        },
-        domain: {
-          type: 'string',
-          title: 'Domain',
-          description: "Domínio onde o cookie será válido (use '.' no início para subdomínios)",
-          default: '.azion.com',
-          pattern: '^[.]?[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\\.[a-zA-Z]{2,}$'
-        },
-        max_age: {
-          type: 'integer',
-          title: 'Max Age (seconds)',
-          description: 'Tempo de vida do cookie em segundos',
-          default: 180,
-          minimum: 1,
-          maximum: 31536000
-        },
-        path: {
-          type: 'string',
-          title: 'Path',
-          description: 'Caminho onde o cookie será válido',
-          default: '/',
-          pattern: '^/'
-        },
-        values: {
-          type: 'array',
-          title: 'Test Variations',
-          description: 'Lista de variações do teste A/B com seus respectivos pesos',
-          minItems: 2,
-          maxItems: 10,
-          items: {
-            type: 'object',
-            properties: {
-              value: {
-                type: 'string',
-                title: 'Variation Value',
-                description: 'Identificador único da variação',
-                minLength: 1,
-                maxLength: 50,
-                pattern: '^[a-zA-Z0-9_-]+$'
-              },
-              weight: {
-                type: 'integer',
-                title: 'Weight',
-                description: 'Peso da variação (maior peso = maior probabilidade)',
-                minimum: 1,
-                maximum: 100
-              }
-            },
-            required: ['value', 'weight'],
-            additionalProperties: false
-          }
-        }
-      },
-      required: ['cookie_name', 'domain', 'max_age', 'values']
-    }
+    const schema = defaultSchemaFormBuilder
 
     codeEditorFormBuilderUpdate(schema)
     schemaAzionFormString.value = indentJsonStringify(schema)
