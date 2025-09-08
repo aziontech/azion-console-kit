@@ -2,7 +2,6 @@ import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 const BOT_MANAGER_SLUG = 'bot_manager'
-const EDGE_STORAGE_SLUG = 'edge_storage'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -66,7 +65,7 @@ const adapt = ({ body, statusCode }) => {
   const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
 
   const filteredProducts = productsGrouped.filter(
-    (item) => ![BOT_MANAGER_SLUG, EDGE_STORAGE_SLUG].includes(item.productSlug)
+    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
   )
 
   const productsGroupedByRegion = groupBy(accountingDetail, [
@@ -200,7 +199,6 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
 export const joinEdgeApplicationWithTieredCache = (services) => {
   const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
-  const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
   const botManagerServiceIndex = services.findIndex((service) => service.slug === 'bot_manager')
 
   if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
@@ -246,11 +244,9 @@ export const joinEdgeApplicationWithTieredCache = (services) => {
     }
   })
 
-  const indicesToRemove = [
-    tieredCacheServiceIndex,
-    edgeStorageServiceIndex,
-    botManagerServiceIndex
-  ].sort((first, second) => second - first)
+  const indicesToRemove = [tieredCacheServiceIndex, botManagerServiceIndex].sort(
+    (first, second) => second - first
+  )
 
   indicesToRemove.forEach((index) => {
     if (index !== -1) {
