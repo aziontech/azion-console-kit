@@ -13,10 +13,10 @@ export const validationSchema = yup.object({
         return nameRegex.test(value)
       }
     ),
-  application: yup.number().required().label('Edge Application'),
+  application: yup.number().required().label('Application'),
   active: yup.boolean(),
   networkMap: yup.string(),
-  firewall: yup.number().label('Edge Firewall').nullable(),
+  firewall: yup.number().label('Firewall').nullable(),
   tls: yup.object({
     isEnabled: yup.boolean(),
     certificate: yup.string(),

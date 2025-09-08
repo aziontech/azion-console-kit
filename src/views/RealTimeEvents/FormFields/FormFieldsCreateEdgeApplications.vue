@@ -112,7 +112,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create an edge application to deliver your content from the edge."
+    description="Create an application to deliver your content from the edge."
     v-if="handleBlock('general')"
   >
     <template #inputs>
@@ -120,9 +120,9 @@
         <FieldText
           label="Name *"
           name="name"
-          placeholder="My edge application"
+          placeholder="My application"
           :value="name"
-          description="Give a unique and descriptive name to identify the edge application."
+          description="Give a unique and descriptive name to identify the application."
         />
       </div>
     </template>
@@ -130,7 +130,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
-    description="Choose the protocols used between the edge application and users."
+    description="Choose the protocols used between the application and users."
     v-if="handleBlock('delivery-settings')"
   >
     <template #inputs>
@@ -511,7 +511,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Edge Cache Settings</label>
+        <label class="text-color text-base font-medium">Cache Settings</label>
         <div class="flex flex-col gap-4">
           <div class="flex gap-2 items-center">
             <RadioButton
@@ -606,7 +606,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Cache</span>
+              <span class="text-base">Cache</span>
               <InputSwitch
                 v-model="caching"
                 disabled
@@ -657,7 +657,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Functions</span>
+              <span class="text-base">Functions</span>
               <InputSwitch v-model="edgeFunctions" />
             </template>
             <template #subtitle>Build ultra-low latency functions that run on the edge.</template>
@@ -749,8 +749,8 @@
               />
             </template>
             <template #subtitle
-              >Enhance real-time data exchange between your edge application and backend services
-              using the WebSocket protocol.</template
+              >Enhance real-time data exchange between your application and backend services using
+              the WebSocket protocol.</template
             >
           </Card>
         </div>

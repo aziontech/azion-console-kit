@@ -16,7 +16,7 @@ describe('RealTimeMetricsModule', () => {
           pagesDashboards: [
             {
               id: 1,
-              label: 'Edge Applications',
+              label: 'Applications',
               path: 'edge-applications',
               groupId: 1,
               dashboards: [
@@ -68,7 +68,7 @@ describe('RealTimeMetricsModule', () => {
             },
             {
               id: 3,
-              label: 'Edge Functions',
+              label: 'Functions',
               path: 'edge-functions',
               groupId: 1,
               dashboards: [

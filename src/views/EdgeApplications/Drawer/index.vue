@@ -40,7 +40,7 @@
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
-      productName: 'Edge Application',
+      productName: 'Application',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
@@ -50,7 +50,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Edge Application',
+        productName: 'Application',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -73,7 +73,7 @@
   }
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your edge application has been created'
+      feedback: 'Your Application has been created'
     }
     response.showToastWithActions(toast)
   }
@@ -93,7 +93,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
-    title="Create Edge Application"
+    title="Create Application"
     disableToast
   >
     <template #formFields>

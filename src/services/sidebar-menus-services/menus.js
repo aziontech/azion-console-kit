@@ -34,7 +34,7 @@ function createDomainsItem() {
 function createBuildItems() {
   return [
     {
-      label: 'Edge Application',
+      label: 'Applications',
       icon: 'ai ai-edge-application',
       to: '/edge-applications',
       id: 'edge-application'
@@ -51,7 +51,7 @@ function createBuildItems() {
 function createSecureItems() {
   return [
     {
-      label: 'Edge Connectors',
+      label: 'Connectors',
       to: '/edge-connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
@@ -64,7 +64,7 @@ function createSecureItems() {
       id: 'edge-dns'
     },
     {
-      label: 'Edge Firewall',
+      label: 'Firewall',
       to: '/edge-firewall',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
@@ -134,17 +134,17 @@ function createToolsItems() {
 function createEdgeLibrariesItems() {
   return [
     {
+      label: 'Certificate Manager',
+      to: '/digital-certificates',
+      icon: 'ai ai-digital-certificates',
+      id: 'digital-certificates'
+    },
+    {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'ai ai-custom-pages',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
-    },
-    {
-      label: 'Edge Functions',
-      to: '/edge-functions',
-      icon: 'ai ai-edge-functions',
-      id: 'edge-functions'
     },
     {
       label: 'Edge Services',
@@ -153,10 +153,10 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
-      label: 'Digital Certificates',
-      to: '/digital-certificates',
-      icon: 'ai ai-digital-certificates',
-      id: 'digital-certificates'
+      label: 'Functions',
+      to: '/edge-functions',
+      icon: 'ai ai-edge-functions',
+      id: 'edge-functions'
     },
     {
       label: 'Network Lists',
@@ -196,7 +196,7 @@ function createMarketplaceProductsItems() {
 // function createStoreItems() {
 //   return [
 //     {
-//       label: 'Edge Storage',
+//       label: 'Object Storage',
 //       to: '/edge-storage',
 //       icon: 'ai ai-edge-storage',
 //       id: 'edge-storage',

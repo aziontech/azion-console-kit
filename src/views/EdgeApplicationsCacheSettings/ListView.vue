@@ -93,7 +93,7 @@
       },
       {
         field: 'cdnCache',
-        header: 'Edge Cache'
+        header: 'Cache'
       }
     ]
   })

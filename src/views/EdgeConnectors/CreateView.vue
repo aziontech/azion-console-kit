@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Connectors" />
+      <PageHeadingBlock pageTitle="Create Connectors" />
     </template>
     <template #content>
       <CreateFormBlock

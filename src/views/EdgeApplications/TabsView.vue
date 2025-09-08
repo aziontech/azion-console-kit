@@ -103,6 +103,9 @@
 
   const reindexMapTabs = () => {
     mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+      if (!hasFlagBlockApiV4() && (key === 'origins' || key === 'error-responses')) {
+        return acc
+      }
       acc[key] = index
       return acc
     }, {})
@@ -181,6 +184,8 @@
     formHasUpdated,
     visibleOnSaved
   })
+
+  provide('edgeApplication', edgeApplication)
 
   const tagProps = {
     value: 'Locked',

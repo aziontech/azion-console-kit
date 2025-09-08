@@ -37,9 +37,9 @@
       subtitle: 'Connect to external origins via secure HTTP protocol for seamless data delivery.'
     },
     {
-      title: 'Edge Storage',
+      title: 'Object Storage',
       inputValue: 'storage',
-      subtitle: 'Link your Edge Storage bucket for fast, low-latency data retrieval at the edge.'
+      subtitle: 'Link your Object Storage bucket for fast, low-latency data retrieval at the edge.'
     },
     {
       title: 'Live Ingest',

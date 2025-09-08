@@ -14,19 +14,19 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
     {
       title: 'What frameworks are supported by Azion?',
       icon: 'pi pi-cog',
-      context: `I'm a developer looking for the supported frameworks for building Edge Applications on Azion. I want to understand how to start using these frameworks to streamline my development process.`
+      context: `I'm a developer looking for the supported frameworks for building Applications on Azion. I want to understand how to start using these frameworks to streamline my development process.`
     },
     {
-      title: 'How can I write an edge function?',
+      title: 'How can I write an function?',
       icon: 'pi pi-code',
-      context: `I need to create an edge function to improve my application. Explain to me how edge functions work on Azion and how can I start writing one from scratch. Give me some examples to understand better.`
+      context: `I need to create an function to improve my application. Explain to me how functions work on Azion and how can I start writing one from scratch. Give me some examples to understand better.`
     }
   ],
   'security-specialist': [
     {
       title: 'How do I configure a WAF?',
       icon: 'pi pi-shield',
-      context: `I'm a Security Specialist looking to improve the security policies for my Edge Applications. I need to use a WAF to do so. How can I set up a WAF Rule Set on Azion step-by-step, and what configurations should I take into account?`
+      context: `I'm a Security Specialist looking to improve the security policies for my Applications. I need to use a WAF to do so. How can I set up a WAF Rule Set on Azion step-by-step, and what configurations should I take into account?`
     },
     {
       title: 'How do I protect my site against bots?',
@@ -50,7 +50,7 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
     {
       title: 'How do I monitor my application activity?',
       icon: 'pi pi-chart-line',
-      context: `I've already deployed an Edge Application to the edge. Now I want to test if it's working and monitor the traffic activity. How can I do that using Azion tools and products?`
+      context: `I've already deployed an Application to the edge. Now I want to test if it's working and monitor the traffic activity. How can I do that using Azion tools and products?`
     },
     {
       title: 'How do I create a Data Stream?',
@@ -60,14 +60,14 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   ],
   other: [
     {
-      title: 'How to build an Edge Application',
+      title: 'How to build an Application',
       icon: 'pi pi-cog',
-      context: `I want to build an Edge Application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
+      context: `I want to build an Application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
     },
     {
       title: 'How to protect an application',
       icon: 'pi pi-shield',
-      context: `I've already deployed an Edge Application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
+      context: `I've already deployed an Application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
     }
   ]
 }
