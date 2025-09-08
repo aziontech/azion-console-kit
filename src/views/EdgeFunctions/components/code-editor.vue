@@ -48,7 +48,6 @@
     minimap: { enabled: props.minimap },
     tabSize: 2,
     formatOnPaste: true,
-    automaticLayout: true,
     readOnly: props.readOnly
   })
 

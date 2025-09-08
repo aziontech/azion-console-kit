@@ -21,7 +21,6 @@ const transformMap = {
   edgeFunction: (value) => value.function,
   name: (value) => parseName(value),
   jsonArgs: (value) => JSON.stringify(value.args, null, '\t'),
-  // azionForm: (value) => JSON.stringify(value.azion_form, null, '\t'),
   lastEditor: (value) => value.last_editor,
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified)
 }
@@ -40,33 +39,23 @@ export const EdgeApplicationFunctionsAdapter = {
 
   transformLoadEdgeApplicationFunction(functionData) {
     const { data } = functionData
-    const response = {
+    return {
       id: data.id,
       edgeFunctionID: data.function,
       name: data.name,
-      args: JSON.stringify(data.args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t'),
+      azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
-
-    if (data.azion_form) {
-      response.azionForm = JSON.stringify(data.azion_form, null, '\t')
-    }
-
-    return response
   },
 
   transformPayload(payload) {
-    const payloadRequest = {
+    return {
       name: payload.name,
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
-      active: true
+      active: true,
+      azion_form: JSON.parse(payload.azionForm)
     }
-
-    if (payload.azionForm) {
-      payloadRequest.azion_form = JSON.parse(payload.azionForm)
-    }
-
-    return payloadRequest
   },
 
   transformEditPayload(payload) {
