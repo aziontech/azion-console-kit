@@ -18,7 +18,7 @@ export const CacheSettingsAdapter = {
         max_age: payload.browserCacheSettingsMaximumTtl || 0
       },
       modules: {
-        edge_cache: {
+        cache: {
           behavior: payload.cdnCacheSettings || 'honor',
           max_age: payload.cdnCacheSettingsMaximumTtl || 60,
           stale_cache: {
@@ -110,12 +110,12 @@ export const CacheSettingsAdapter = {
       id: String(item.id),
       name: item.name,
       browserCache: formatCacheBehavior(item.browser_cache?.behavior || 'honor'),
-      cdnCache: formatCacheBehavior(item.modules?.edge_cache?.behavior || 'honor')
+      cdnCache: formatCacheBehavior(item.modules?.cache?.behavior || 'honor')
     }))
   },
 
   transformLoadCacheSetting({ data }) {
-    const edge = data.modules?.edge_cache || {}
+    const edge = data.modules?.cache || {}
     const tieredCache = data.modules?.tiered_cache
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
