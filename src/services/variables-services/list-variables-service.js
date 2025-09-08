@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeVariablesBaseUrl } from './make-variables-base-url'
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import { sortDate } from '@/utils/date-sort'
 
 export const listVariablesService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -37,7 +36,7 @@ const adapt = (httpResponse) => {
     : []
 
   return {
-    body: sortDate(parsedVariables, 'updatedAtDate'),
+    body: parsedVariables,
     statusCode: httpResponse.statusCode
   }
 }

@@ -124,7 +124,7 @@
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
-        defaultOrderingFieldName="last_modified"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

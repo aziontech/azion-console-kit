@@ -1,5 +1,4 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import { sortDate } from '@/utils/date-sort'
 
 export const NetworkListsAdapter = {
   transformListNetworkLists(data) {
@@ -8,17 +7,17 @@ export const NetworkListsAdapter = {
       asn: 'ASN',
       countries: 'Countries'
     }
-    const results =
+    return (
       data?.map((element) => ({
         id: element.id,
         stringId: element.id.toString(),
         name: element.name,
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
-        lastModified: formatDateToDayMonthYearHour(element.last_modified, 'full', 'short'),
+        lastModified: formatDateToDayMonthYearHour(element.last_modified),
         lastModifiedDate: element.last_modified
       })) || []
-    return sortDate(results, 'lastModifiedDate')
+    )
   },
   transformCreateNetworkList(payload) {
     return {

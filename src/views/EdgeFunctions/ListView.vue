@@ -18,6 +18,7 @@
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
+        showLastModified
       />
       <EmptyResultsBlock
         v-else
@@ -91,22 +92,24 @@
 
   const getColumns = computed(() => [
     {
-      field: 'id',
-      header: 'ID',
-      sortField: 'id',
-      filterPath: 'id'
-    },
-    {
       field: 'name',
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
+      quickActions: true,
+      showInactiveTag: true,
       component: (columnData) => {
         return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-with-tag'
+          data: { value: columnData.text, showMoreText: false },
+          columnAppearance: 'expand-text-column'
         })
       }
+    },
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
     },
     {
       field: 'version',
@@ -123,10 +126,10 @@
       component: (columnData) => {
         return columnBuilder({
           data: {
-            text: columnData || '-',
-            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
+            vendorData: columnData,
+            iconClass: 'pi pi-shopping-cart text-xl'
           },
-          columnAppearance: 'text-with-icon'
+          columnAppearance: 'icon-with-tooltip'
         })
       }
     },
@@ -135,6 +138,7 @@
       header: 'Language',
       filterPath: 'runtime.content',
       type: 'component',
+      quickActions: true,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -144,26 +148,28 @@
     },
     {
       field: 'executionEnvironment',
-      header: 'Initiator Type'
+      header: 'Initiator Type',
+      quickActions: true
     },
     {
       field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    { field: 'lastModified', header: 'Last Modified' },
-    {
-      field: 'status',
-      header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
+      header: 'Last Editor',
+      quickActions: true
     }
+    // { field: 'lastModified', header: 'Last Modified' },
+    // {
+    //   field: 'status',
+    //   header: 'Status',
+    //   sortField: 'status.content',
+    //   filterPath: 'status.content',
+    //   type: 'component',
+    //   component: (columnData) => {
+    //     return columnBuilder({
+    //       data: columnData,
+    //       columnAppearance: 'tag'
+    //     })
+    //   }
+    // }
   ])
 
   function handleLoadData(event) {

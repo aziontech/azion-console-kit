@@ -223,6 +223,80 @@ function getRemainingDays(dateStr) {
   return Math.floor(days)
 }
 
+const convertToRelativeTime = (date) => {
+  const now = new Date()
+  const targetDate = new Date(date)
+  const diffMs = now.getTime() - targetDate.getTime()
+  const diffMinutes = Math.floor(diffMs / MINUTE_IN_MILLISECONDS)
+  const diffHours = Math.floor(diffMs / HOUR_IN_MILLISECONDS)
+  const diffDays = Math.floor(diffMs / (24 * HOUR_IN_MILLISECONDS))
+
+  if (diffMinutes < 1) {
+    return 'Just now'
+  }
+
+  if (diffMinutes === 1) {
+    return '1 minute ago'
+  }
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes} minutes ago`
+  }
+
+  if (diffHours === 1) {
+    return '1 hour ago'
+  }
+
+  if (diffHours < 24) {
+    return `${diffHours} hours ago`
+  }
+
+  if (diffDays === 1) {
+    return 'Yesterday'
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays} days ago`
+  }
+
+  if (diffDays < 14) {
+    return 'Last week'
+  }
+
+  const targetMonth = targetDate.getMonth()
+  const targetYear = targetDate.getFullYear()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  if (targetYear === currentYear) {
+    if (currentMonth - targetMonth === 1) {
+      return 'Last month'
+    }
+
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+    return `On ${monthNames[targetMonth]}`
+  }
+
+  if (currentYear - targetYear === 1) {
+    return 'Last year'
+  }
+
+  return `${currentYear - targetYear} years ago`
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -235,5 +309,6 @@ export {
   convertValueToDateByUserTimezone,
   formatDateToDayMonthYearHour,
   getRemainingDays,
-  getCurrentDateTimeIntl
+  getCurrentDateTimeIntl,
+  convertToRelativeTime
 }

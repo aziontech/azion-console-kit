@@ -147,7 +147,7 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
         :apiFields="USERS_API_FIELDS"
       />
       <EmptyResultsBlock

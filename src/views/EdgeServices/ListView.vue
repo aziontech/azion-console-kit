@@ -144,6 +144,7 @@
         emptyListMessage="No services found."
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
+        :defaultOrderingFieldName="'-last_modified'"
       />
 
       <EmptyResultsBlock

@@ -1,5 +1,5 @@
-import { getCurrentTimezone } from '@/helpers'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
+import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 
 const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
   return addresses.map((address) => {
@@ -197,7 +197,10 @@ export const EdgeConnectorsAdapter = {
           active: parseStatusData(edgeConnectors.active),
           lastEditor: edgeConnectors?.last_editor,
           lastModified: edgeConnectors?.last_modified
-            ? getCurrentTimezone(edgeConnectors.last_modified)
+            ? formatDateToDayMonthYearHour(edgeConnectors.last_modified)
+            : edgeConnectors?.last_modified,
+          lastModify: edgeConnectors?.last_modified
+            ? convertToRelativeTime(edgeConnectors.last_modified)
             : edgeConnectors?.last_modified
         }
       }) || []

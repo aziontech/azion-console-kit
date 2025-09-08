@@ -25,6 +25,7 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
+        :defaultOrderingFieldName="'-last_modified'"
       >
       </ListTableBlock>
       <EmptyResultsBlock
