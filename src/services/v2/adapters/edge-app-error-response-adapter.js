@@ -4,13 +4,15 @@ export const EdgeAppErrorResponseAdapter = {
     const firstCode = response.error_responses.find((element, index) => {
       const notCodeAny = element.code !== 'any'
 
-      if (notCodeAny) return
+      if (notCodeAny) return false
 
       response.error_responses.splice(index, 1)
       return !notCodeAny
     })
 
-    response.error_responses.unshift({ ...firstCode })
+    if (firstCode) {
+      response.error_responses.unshift({ ...firstCode })
+    }
 
     return {
       id: response.id,
