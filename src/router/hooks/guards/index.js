@@ -5,7 +5,6 @@ import { themeGuard } from './themeGuard'
 import { billingGuard } from './billingGuard'
 import { redirectGuard } from './redirectGuard'
 import { ssoManagementGuard } from './SSOManagementGuard'
-import { domainsLimitGuard } from './domainsLimitGuard'
 import { flagGuard } from './flagGuard'
 export {
   logoutGuard,
@@ -15,6 +14,5 @@ export {
   billingGuard,
   redirectGuard,
   ssoManagementGuard,
-  domainsLimitGuard,
   flagGuard
 }
