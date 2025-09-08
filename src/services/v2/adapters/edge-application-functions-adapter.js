@@ -59,13 +59,11 @@ export const EdgeApplicationFunctionsAdapter = {
   },
 
   transformEditPayload(payload) {
-    const payloadRequest = {
+    return {
       name: payload.name,
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
       azion_form: JSON.parse(payload.azionForm)
     }
-
-    return payloadRequest
   }
 }
