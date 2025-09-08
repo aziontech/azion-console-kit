@@ -156,7 +156,7 @@
 
 <template>
   <form-horizontal
-    description="Create a domain with Azion to launch an application and set up security with digital certificates."
+    description="Create a domain with Azion to launch an Application and set up security with digital certificates."
   >
     <template #title> General </template>
     <template #inputs>
@@ -190,7 +190,7 @@
   </form-horizontal>
 
   <form-horizontal
-    description="Determine the application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the Application of the domain and its digital certificate. To link an existing domain to an Application, add it to the CNAME field and block access to the Application via the Azion domain."
   >
     <template #title> Settings </template>
     <template #inputs>
@@ -256,7 +256,7 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          placeholder="Select an firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -286,7 +286,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+        subtitle="Check this option to make the Application accessible only through the domains listed in the CNAME field. Attempts to access the Application through the Azion domain will be blocked."
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea

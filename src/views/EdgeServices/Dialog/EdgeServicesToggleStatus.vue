@@ -3,6 +3,7 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import { capitalizeFirstLetter } from '@/helpers'
   defineOptions({ name: 'edge-services-toggle-status' })
 
   const dialogRef = inject('dialogRef')
@@ -25,7 +26,7 @@
     toast.add({
       closable: true,
       severity: severity,
-      summary: summary
+      summary: capitalizeFirstLetter(summary)
     })
   }
 

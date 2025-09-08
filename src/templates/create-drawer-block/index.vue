@@ -8,7 +8,7 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import PrimeButton from 'primevue/button'
-
+  import { capitalizeFirstLetter } from '@/helpers'
   import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
@@ -113,7 +113,7 @@
     const options = {
       closable: true,
       severity: severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail: summary
     }
 
