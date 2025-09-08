@@ -73,7 +73,7 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
-    azionForm: null,
+    azionForm: {},
     executionEnvironment: 'application'
   }
 
