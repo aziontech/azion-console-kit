@@ -17,7 +17,7 @@ export const NetworkListsAdapter = {
         lastModified: formatDateToDayMonthYearHour(element.last_modified),
         lastModifiedDate: element.last_modified
       })) || []
-    return sortDate(results, 'lastModifiedDate')
+    )
   },
   transformCreateNetworkList(payload) {
     return {

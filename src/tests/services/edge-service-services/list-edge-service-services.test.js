@@ -102,8 +102,20 @@ describe('EdgeServiceServices', () => {
           severity: 'success'
         },
         lastEditor: fixtures.edgeServiceMock.last_editor,
-        lastModified: 'Friday, November 10, 2023',
+        lastModified: '10 hours ago',
         lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
+      },
+      {
+        id: fixtures.disabledEdgeServiceMock.id,
+        name: fixtures.disabledEdgeServiceMock.name,
+        active: false,
+        labelActive: {
+          content: 'Inactive',
+          severity: 'danger'
+        },
+        lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
+        lastModified: 'Just now',
+        lastModifiedDate: new Date('2023-11-11T00:00:00.000Z')
       }
     ])
   })

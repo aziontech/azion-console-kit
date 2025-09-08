@@ -57,8 +57,7 @@ const getPrefix = ({ match }) => {
 
 export const WafAdapter = {
   transformListWafRules(data, fields) {
-    const result = adaptServiceDataResponse(data, fields, transformMap)
-    return sortDate(result, 'lastModified')
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
   adaptWafRulePayload(payload) {
     const camelToSnakeMap = {

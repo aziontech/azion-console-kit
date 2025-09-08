@@ -36,7 +36,7 @@ const adapt = (httpResponse) => {
     : []
 
   return {
-    body: sortDate(parsedVariables, 'updatedAtDate'),
+    body: parsedVariables,
     statusCode: httpResponse.statusCode
   }
 }
