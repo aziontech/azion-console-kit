@@ -135,7 +135,7 @@
     loading.value = true
     try {
       const feedback = await data.deleteService(data.selectedID, data.selectedItemData)
-      showToast('success', 'Success', feedback ?? 'Deleted successfully!')
+      showToast('Success', 'Success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
       dialogRef.value.close({ updated: true })
@@ -146,7 +146,7 @@
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {
-        showToast('error', 'Error', error)
+        showToast('Error', 'Error', error)
       }
     } finally {
       loading.value = false

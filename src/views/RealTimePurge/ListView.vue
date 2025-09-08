@@ -141,7 +141,7 @@
       } else {
         // Fallback for legacy errors or non-ErrorHandler errors
         const errorMessage = error?.message || error
-        showToast('error', errorMessage)
+        showToast('Error', errorMessage)
       }
       isLoading.value = false
       throw error
@@ -233,7 +233,7 @@
         listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
         listPurgeRef.value.updateDataTablePagination()
         router.replace({ query: {} })
-        showToast('success', feedbackPurge.value)
+        showToast('Success', feedbackPurge.value)
       }
     } while (totalOfUserPurges !== countPurge.value)
     isLoading.value = false

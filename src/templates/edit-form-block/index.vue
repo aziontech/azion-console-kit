@@ -117,7 +117,7 @@
         error.showErrors(toast)
       } else {
         emit('on-load-fail', error)
-        showToast('error', error)
+        showToast('Error', error)
       }
       goBackToList()
     }
@@ -128,7 +128,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('success', feedback || 'edited successfully')
+          showToast('Success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
@@ -149,7 +149,7 @@
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
           emit('on-edit-fail', error)
-          showToast('error', errorMessage)
+          showToast('Error', errorMessage)
         }
       }
     },

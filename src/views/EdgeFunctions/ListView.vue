@@ -14,15 +14,15 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No functions found."
+        emptyListMessage="No Functions found."
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
-        title="No functions have been created"
-        description="Click the button below to create your first function."
+        title="No Functions have been created"
+        description="Click the button below to create your first Function."
         createButtonLabel="Function"
         createPagePath="edge-functions/create"
         @click-to-create="handleCreateTrackEvent"

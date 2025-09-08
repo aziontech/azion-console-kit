@@ -74,7 +74,7 @@
     if (props.disableAfterCreateToastFeedback) {
       return
     }
-    showToast('success', feedbackMessage)
+    showToast('Success', feedbackMessage)
   }
 
   const redirectToUrl = (path) => {
@@ -102,7 +102,7 @@
           emit('onError', error.message[0])
         } else {
           // Fallback for legacy errors or non-ErrorHandler errors
-          showToast('error', error)
+          showToast('Error', error)
           emit('on-response-fail', error)
         }
       }

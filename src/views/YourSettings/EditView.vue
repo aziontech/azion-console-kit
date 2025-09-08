@@ -143,7 +143,7 @@
     userData.value = { ...userChanges.value }
 
     if (!isEmailChanged || areOtherKeysChanged) {
-      showToast('success', 'Your user has been updated')
+      showToast('Success', 'Your user has been updated')
     }
 
     if (isEmailChanged) {

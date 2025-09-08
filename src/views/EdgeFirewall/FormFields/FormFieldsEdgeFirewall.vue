@@ -45,7 +45,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a firewall to configure security logics and protect servers and applications."
+    description="Create a Firewall to configure security logics and protect servers and applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -55,8 +55,8 @@
           name="name"
           data-testid="edge-firewall-form__name-field"
           :value="name"
-          placeholder="My firewall"
-          description="Give a unique and descriptive name to identify the firewall."
+          placeholder="My Firewall"
+          description="Give a unique and descriptive name to identify the Firewall."
         />
       </div>
     </template>

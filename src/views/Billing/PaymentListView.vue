@@ -157,14 +157,14 @@
       await paymentService.editCreditCard(payment.id, {
         is_default: true
       })
-      showToast('success', 'Payment Method successfully set as default')
+      showToast('Success', 'Payment Method successfully set as default')
       emit('update-credit-event')
       reloadList()
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {
-        showToast('error', 'Error', error)
+        showToast('Error', 'Error', error)
       }
     }
   }

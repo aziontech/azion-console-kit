@@ -34,10 +34,10 @@
     try {
       const { id, active } = params.selectRow
       const feedback = await params.service({ id, active: !active })
-      showToast('success', feedback)
+      showToast('Success', feedback)
       dialogRef.value.close({ updated: true })
     } catch (error) {
-      showToast('error', error)
+      showToast('Error', error)
       closeDialog()
     }
   }

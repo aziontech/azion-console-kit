@@ -46,7 +46,7 @@
         bound: props.bound
       })
     } catch (error) {
-      showToast('error', error)
+      showToast('Error', error)
     } finally {
       loadingOptionsServices.value = false
     }

@@ -108,7 +108,7 @@
           const initialData = await this.loadService({ id })
           this.initialDataSetter(initialData)
         } catch (error) {
-          this.showToast('error', error)
+          this.showToast('Error', error)
         } finally {
           this.isLoading = false
         }
@@ -117,12 +117,12 @@
         try {
           this.isLoading = true
           await this.editService(this.formData)
-          this.showToast('success', 'edited successfully')
+          this.showToast('Success', 'edited successfully')
           this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
           this.blockViewRedirection = true
-          this.showToast('error', error)
+          this.showToast('Error', error)
         } finally {
           setTimeout(() => {
             this.isLoading = false

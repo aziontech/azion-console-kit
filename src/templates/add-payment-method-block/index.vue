@@ -101,7 +101,7 @@
       cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
       cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
     } catch (error) {
-      showToast('error', error)
+      showToast('Error', error)
     }
   }
 
@@ -199,7 +199,7 @@
       }
       const response = await paymentService.createCreditCard(payload)
       emit('onSuccess', response)
-      showToast('success', response.feedback)
+      showToast('Success', response.feedback)
       toggleDrawerVisibility(false)
     } catch (error) {
       emit('onError', error.message)
@@ -208,7 +208,7 @@
         error.showErrors(toast)
       } else {
         const errorMessage = error.message || error
-        showToast('error', errorMessage)
+        showToast('Error', errorMessage)
       }
     } finally {
       isSubmitting.value = false

@@ -139,7 +139,7 @@
         const response = await props.createService(values)
         blockViewRedirection.value = false
         emit('onSuccess', { ...response, showToastWithActions })
-        if (!props.disableToast) showToast('success', response?.feedback)
+        if (!props.disableToast) showToast('Success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = true
@@ -157,7 +157,7 @@
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
-          showToast('error', errorMessage)
+          showToast('Error', errorMessage)
         }
       }
     },

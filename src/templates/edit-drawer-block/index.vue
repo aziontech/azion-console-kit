@@ -119,7 +119,7 @@
       resetForm({ values: initialValues })
     } catch (error) {
       emit('onError', error)
-      showToast('error', error)
+      showToast('Error', error)
     } finally {
       loading.value = false
     }
@@ -134,7 +134,7 @@
 
         const toastMessage =
           typeof feedback === 'object' && feedback?.feedback ? feedback.feedback : feedback
-        showToast('success', toastMessage)
+        showToast('Success', toastMessage)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = false
@@ -152,7 +152,7 @@
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
           emit('onError', errorMessage)
-          showToast('error', errorMessage)
+          showToast('Error', errorMessage)
         }
       }
     },
