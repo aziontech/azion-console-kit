@@ -1,6 +1,5 @@
 import {
   logoutGuard,
-  loadingGuard,
   accountGuard,
   themeGuard,
   billingGuard,
@@ -13,15 +12,7 @@ export default async function beforeEachRoute(guardDependency) {
   const router = useRouter()
   const { next } = guardDependency
 
-  const guards = [
-    logoutGuard,
-    loadingGuard,
-    accountGuard,
-    themeGuard,
-    billingGuard,
-    redirectGuard,
-    flagGuard
-  ]
+  const guards = [logoutGuard, accountGuard, themeGuard, billingGuard, redirectGuard, flagGuard]
 
   for (const executeGuard of guards) {
     const result = await executeGuard({ ...guardDependency, router })
