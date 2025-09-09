@@ -1,6 +1,6 @@
 import * as Helpers from '@/helpers'
 import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
-import { useAccountStore } from '@/stores/account-store'
+import { useAccountStore } from '@/stores/account'
 
 async function checkDomainsLimit(to, from, next) {
   const accountStore = useAccountStore()

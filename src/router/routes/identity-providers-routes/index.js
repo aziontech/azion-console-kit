@@ -1,5 +1,5 @@
 import * as idpService from '@/services/identity-providers-services'
-import { useAccountStore } from '@/stores/account-store'
+import { useAccountStore } from '@/stores/account'
 
 function checkSSOAccess(to, from, next) {
   const accountStore = useAccountStore()
