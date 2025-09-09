@@ -4,8 +4,8 @@ export class EdgeApplicationFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_application/applications'
-    this.functionListEndpoint = 'v4/edge_functions/functions'
+    this.baseURL = 'v4/workspace/applications'
+    this.functionListEndpoint = 'v4/workspace/functions'
   }
 
   #getUrl(edgeApplicationId, suffix = '') {
