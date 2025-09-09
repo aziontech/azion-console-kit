@@ -2,7 +2,7 @@ export class EdgeFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/workspace/functions'
+    this.baseURL = 'v4/edge_functions/functions'
   }
 
   #getUrl(id, suffix = '') {
