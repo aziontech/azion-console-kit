@@ -343,7 +343,7 @@
             />
           </SplitterPanel>
         </Splitter>
-        
+
         <div v-if="hasFormBuilder">
           <Splitter
             :style="{ height: SPLITTER_PROPS.height }"
