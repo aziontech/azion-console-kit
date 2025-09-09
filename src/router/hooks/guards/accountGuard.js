@@ -10,6 +10,9 @@ export async function accountGuard({ to, accountStore, tracker }) {
     if (isPrivateRoute) {
       try {
         await loadUserAndAccountInfo()
+        if (to.meta.isPublic) {
+          return '/'
+        }
       } catch {
         setRedirectRoute(to)
         await tracker.reset()

@@ -1,4 +1,4 @@
-/* Sentry Feedback Modal Styling */
+/* Sentry Feedback Modal Styling
 [data-sentry-feedback],
 .sentry-feedback,
 [data-testid='sentry-feedback'],
@@ -23,7 +23,7 @@ div[aria-modal='true'],
   display: block !important;
 }
 
-/* Ensure Sentry feedback modal is always on top */
+
 [data-sentry-feedback] *,
 .sentry-feedback *,
 [data-testid='sentry-feedback'] *,
@@ -35,4 +35,4 @@ div[aria-modal='true'] *,
 .sentry-feedback-widget *,
 #sentry-feedback * {
   z-index: 9999 !important;
-}
+} */

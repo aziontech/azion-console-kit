@@ -77,15 +77,6 @@
             v-tooltip.top="{ value: 'System status', showDelay: 200 }"
             v-if="!route.meta.hideLinksFooter"
           />
-          <!-- Feedback Button -->
-          <PrimeButton
-            icon="pi pi-comment"
-            outlined
-            size="small"
-            aria-label="Send feedback"
-            v-tooltip.top="{ value: 'Send Feedback', showDelay: 200 }"
-            @click="openFeedbackForm"
-          />
           <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
             <Dropdown
               appendTo="self"
@@ -133,7 +124,7 @@
     openDocumentation
   } from '@/helpers'
 
-  import { ref, computed, inject } from 'vue'
+  import { ref, computed } from 'vue'
   import Toolbar from 'primevue/toolbar'
   import { useAccountStore } from '@/stores/account'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
@@ -143,9 +134,6 @@
   const accountStore = useAccountStore()
   const { setTheme } = accountStore
   const route = useRoute()
-
-  // Inject Sentry methods
-  const sentry = inject('sentry')
 
   defineOptions({
     name: 'footer-block'
@@ -167,12 +155,6 @@
 
   const selectTheme = (theme) => {
     setTheme(theme)
-  }
-
-  const openFeedbackForm = async () => {
-    if (sentry && sentry.createFeedbackForm) {
-      await sentry.createFeedbackForm()
-    }
   }
 
   const toolbarClass = computed(() => ({
