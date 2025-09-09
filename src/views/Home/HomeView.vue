@@ -287,6 +287,7 @@
             class="absolute right-3 top-3 sm:right-6 sm:top-6"
             size="small"
             type="button"
+            aria-label="Close invite session"
             @click="closeInviteSession"
           />
           <div class="flex flex-col gap-2">

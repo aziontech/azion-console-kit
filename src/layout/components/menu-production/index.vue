@@ -6,6 +6,7 @@
     size="small"
     class="text-white flex-none border-header w-8 h-8"
     icon="pi pi-bars"
+    aria-label="Toggle navigation menu"
     :pt="{
       label: { class: 'text-white hover:bg-header-button-hover' },
       icon: { class: 'text-white' }

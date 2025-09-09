@@ -46,6 +46,7 @@
               icon="pi pi-github"
               outlined
               size="small"
+              aria-label="Visit Azion on GitHub"
               v-tooltip.top="{ value: 'Github', showDelay: 200 }"
               @click="openAzionGithub"
             />
@@ -53,6 +54,7 @@
               icon="pi pi-discord"
               outlined
               size="small"
+              aria-label="Join Azion Discord community"
               v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
               @click="openAzionDiscord"
             />
@@ -60,6 +62,7 @@
               icon="ai ai-x"
               outlined
               size="small"
+              aria-label="Follow Azion on X (Twitter)"
               v-tooltip.top="{ value: 'X', showDelay: 200 }"
               @click="openAzionX"
             />
@@ -79,6 +82,7 @@
             icon="pi pi-comment"
             outlined
             size="small"
+            aria-label="Send feedback"
             v-tooltip.top="{ value: 'Send Feedback', showDelay: 200 }"
             @click="openFeedbackForm"
           />
@@ -93,6 +97,7 @@
               :options="themeOptions"
               :autoOptionFocus="false"
               :pt="dropdownPt"
+              aria-label="Select theme mode"
             >
               <template #value="slotProps">
                 <div
