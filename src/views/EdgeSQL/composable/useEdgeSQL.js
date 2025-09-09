@@ -80,11 +80,40 @@ export function useEdgeSQL() {
   const isLoading = ref(false)
   const error = ref(null)
   const selectedTable = ref(null)
+  const currentQueryText = ref('')
 
   const databasesCount = computed(() => databases.value.length)
   const hasCurrentDatabase = computed(() => !!currentDatabase.value)
   const currentDatabaseName = computed(() => currentDatabase.value?.name || '')
   const tablesCount = computed(() => currentTables.value.length)
+
+  // Function to detect JOIN operations in SQL query
+  const hasJoinOperation = (query) => {
+    if (!query || typeof query !== 'string') return false
+
+    const joinKeywords = [
+      'INNER JOIN',
+      'LEFT JOIN',
+      'RIGHT JOIN',
+      'FULL JOIN',
+      'FULL OUTER JOIN',
+      'LEFT OUTER JOIN',
+      'RIGHT OUTER JOIN',
+      'CROSS JOIN',
+      'NATURAL JOIN',
+      'JOIN' // Generic JOIN
+    ]
+
+    const normalizedQuery = query.toUpperCase().replace(/\s+/g, ' ').trim()
+
+    return joinKeywords.some((keyword) => normalizedQuery.includes(keyword))
+  }
+
+  // Check if current query has JOIN operations
+  const isJoinQuery = computed(() => {
+    const result = hasJoinOperation(currentQueryText.value)
+    return result
+  })
 
   const setDatabases = (newDatabases) => {
     databases.value = newDatabases
@@ -119,6 +148,10 @@ export function useEdgeSQL() {
 
   const setSelectedTable = (table) => {
     selectedTable.value = table
+  }
+
+  const setCurrentQueryText = (query) => {
+    currentQueryText.value = query
   }
 
   const setQueryResults = (results) => {
@@ -192,6 +225,7 @@ export function useEdgeSQL() {
 
   const executeQuery = async (query) => {
     isLoading.value = true
+
     const databaseId = currentDatabase.value?.id || route.params.id
     const isSelectQuery = Array.isArray(query)
       ? query[0].trim().toLowerCase().startsWith('select')
@@ -250,12 +284,14 @@ export function useEdgeSQL() {
     isLoading,
     error,
     selectedTable,
+    currentQueryText,
 
     // Computed
     databasesCount,
     hasCurrentDatabase,
     currentDatabaseName,
     tablesCount,
+    isJoinQuery,
 
     // Actions
     setDatabases,
@@ -264,6 +300,7 @@ export function useEdgeSQL() {
     setCurrentDatabase,
     setCurrentTables,
     setSelectedTable,
+    setCurrentQueryText,
     setQueryResults,
     addQueryResult,
     clearQueryResults,
@@ -276,6 +313,7 @@ export function useEdgeSQL() {
     setError,
     clearError,
     reset,
-    executeQuery
+    executeQuery,
+    hasJoinOperation
   }
 }

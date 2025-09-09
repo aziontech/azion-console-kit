@@ -506,6 +506,7 @@
                         :isExecutingQuery="isExecutingQuery"
                         :selectedTableSchema="selectedTableSchema"
                         :tableName="selectedTableName"
+                        :currentQuery="sqlQuery"
                         @open-insert-row-drawer="openInsertRowDrawer"
                         @open-edit-row-drawer="openEditRowDrawer"
                         @execute-query="setSqlQuery"

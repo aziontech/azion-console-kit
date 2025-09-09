@@ -249,7 +249,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, computed, onMounted, watch, nextTick } from 'vue'
   import { FilterMatchMode } from 'primevue/api'
   import InputText from 'primevue/inputtext'
   import DataTable from 'primevue/datatable'
@@ -309,6 +309,10 @@
       default: () => []
     },
     cleanEditingRows: {
+      type: Boolean,
+      default: false
+    },
+    disabledRowActions: {
       type: Boolean,
       default: false
     }
@@ -392,8 +396,19 @@
   }
 
   const showRowMenu = (event, rowData) => {
+    // Close menu if it's already open
+    if (rowMenuRef.value) {
+      rowMenuRef.value.hide()
+    }
+
     selectedRowData.value = rowData
-    rowMenuRef.value.show(event)
+
+    // Use nextTick to ensure the menu is closed before opening the new one
+    nextTick(() => {
+      if (rowMenuRef.value) {
+        rowMenuRef.value.show(event)
+      }
+    })
   }
 
   const isRowEditing = (index) => {
@@ -428,6 +443,7 @@
     const defaultEditAction = {
       label: 'Edit Row',
       icon: 'pi pi-pencil',
+      disabled: props.disabledRowActions,
       command: () => {
         if (selectedRowData.value) {
           originalRowData.value.set(selectedRowData.value.id, { ...selectedRowData.value })
@@ -438,6 +454,7 @@
 
     const mappedMenuItems = props.menuItems.map((item) => ({
       ...item,
+      disabled: props.disabledRowActions,
       command: () => {
         if (item.label === 'Delete' && selectedRowData.value) {
           openDeleteDialog({

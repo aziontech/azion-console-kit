@@ -15,6 +15,7 @@
       :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
       :menuItems="menuItems"
       :cleanEditingRows="cleanEditingRows"
+      :disabledRowActions="isJoinQuery"
     >
       <template #addButton>
         <Button
@@ -67,6 +68,10 @@
     tableName: {
       type: String,
       default: () => ''
+    },
+    currentQuery: {
+      type: String,
+      default: () => ''
     }
   })
 
@@ -112,6 +117,10 @@
         }
       }
     ]
+  })
+
+  const isJoinQuery = computed(() => {
+    return sqlDatabase.hasJoinOperation(props.currentQuery)
   })
 
   const handleRowSave = (row) => {
