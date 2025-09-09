@@ -134,7 +134,7 @@ const fixtures = {
       descriptions: mockDescription
     },
     {
-      service: 'Edge Storage',
+      service: 'Object Storage',
       slug: 'edge_storage',
       descriptions: mockDescription
     },
@@ -208,6 +208,11 @@ describe('BillingServices', () => {
       {
         service: 'WAF',
         slug: 'waf',
+        descriptions: mockDescription
+      },
+      {
+        service: 'Object Storage',
+        slug: 'edge_storage',
         descriptions: mockDescription
       }
     ]
