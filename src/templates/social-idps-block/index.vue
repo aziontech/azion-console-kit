@@ -57,6 +57,7 @@
 
   const toast = useToast()
   const showIdps = ref(true)
+  
   const loadSocialIdps = async () => {
     try {
       idps.value = await iamService.listSocialIdps()
