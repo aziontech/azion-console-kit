@@ -179,12 +179,10 @@
 
   const resetFormBuilder = () => {
     hasFormBuilder.value = false
-    showFormBuilder.value = false
     azionFormData.value = setAzionFormData({})
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
-    selectPanelUpdateModelValue()
   }
 </script>
 
