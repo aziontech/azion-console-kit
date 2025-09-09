@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a set of cache configurations to apply to the edge application. Use Rules Engine to activate cache settings."
+    description="Create a set of cache configurations to apply to the application. Use Rules Engine to activate cache settings."
     isDrawer
   >
     <template #inputs>
@@ -20,9 +20,10 @@
 
   <BrowserCache />
 
-  <EdgeCache @enableSliceConfiguration="enableSliceConfiguration" />
-
-  <TieredCache v-if="showTieredCacheForm" />
+  <EdgeCache
+    :isTieredCacheEnabled="showTieredCacheForm"
+    @enableSliceConfiguration="enableSliceConfiguration"
+  />
 
   <ApplicationAccelerator v-if="isApplicationAcceleratorEnabled" />
 </template>
@@ -34,7 +35,6 @@
   // Form blocks
   import BrowserCache from './blocks/BrowserCache.vue'
   import EdgeCache from './blocks/EdgeCache.vue'
-  import TieredCache from './blocks/TieredCache.vue'
   import ApplicationAccelerator from './blocks/ApplicationAccelerator.vue'
 
   import { useField } from 'vee-validate'

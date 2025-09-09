@@ -228,11 +228,11 @@
 
     return {
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
-        ? ' - Requires Application Accelerator'
+        ? ' - Required Application Accelerator'
         : empty,
       https: empty,
-      imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
-      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
+      imageOptimization: !props.isImageOptimizationEnabled ? ' - Required Image Processor' : empty,
+      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Required Function' : empty
     }
   })
 

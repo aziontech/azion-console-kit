@@ -46,7 +46,7 @@
     {
       label: 'Delete',
       type: 'delete',
-      title: 'edge firewall',
+      title: 'Firewall',
       icon: 'pi pi-trash',
       service: edgeFirewallService.deleteEdgeFirewallService
     }
@@ -107,19 +107,19 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Firewall"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Edge Firewall"
+        addButtonLabel="Firewall"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No edge firewall found."
+        emptyListMessage="No Firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
@@ -127,9 +127,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No edge firewall has been created."
-        description="Click the button below to create your first edge firewall."
-        createButtonLabel="Edge Firewall"
+        title="No Firewall has been created."
+        description="Click the button below to create your first Firewall."
+        createButtonLabel="Firewall"
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"
         @click-to-create="handleTrackEvent"

@@ -24,12 +24,12 @@
       }
     },
     {
-      title: 'Edge Functions',
+      title: 'Functions',
       nameField: 'edgeFunctionsEnabled',
       subtitle: 'Build ultra-low latency functions that run on the edge.'
     },
     {
-      title: 'Network Layer Protection',
+      title: 'Network Shield',
       nameField: 'networkProtectionEnabled',
       subtitle:
         'Create lists to configure a programmable security perimeter for inbound and outbound traffic at the edge.'
@@ -37,7 +37,7 @@
     {
       title: 'Web Application Firewall',
       nameField: 'wafEnabled',
-      subtitle: 'Protect edge applications against threats and attacks.'
+      subtitle: 'Protect applications against threats and attacks.'
     }
   ]
 </script>
@@ -45,7 +45,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create an edge firewall to configure security logics and protect servers and applications."
+    description="Create a Firewall to configure security logics and protect servers and applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -55,8 +55,8 @@
           name="name"
           data-testid="edge-firewall-form__name-field"
           :value="name"
-          placeholder="My edge firewall"
-          description="Give a unique and descriptive name to identify the edge firewall."
+          placeholder="My Firewall"
+          description="Give a unique and descriptive name to identify the Firewall."
         />
       </div>
     </template>

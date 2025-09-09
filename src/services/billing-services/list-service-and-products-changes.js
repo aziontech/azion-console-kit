@@ -126,12 +126,12 @@ const groupBy = (firstData, secondData, groupParams) => {
 }
 
 const PRODUCT_NAMES = {
-  edge_application: 'Edge Application',
+  edge_application: 'Application',
   application_accelerator: 'Application Accelerator',
   load_balancer: 'Load Balancer',
   image_processor: 'Image Processor',
-  edge_functions: 'Edge Functions',
-  network_layer_protection: 'Network Layer Protection',
+  edge_functions: 'Functions',
+  network_layer_protection: 'Network Shield',
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',

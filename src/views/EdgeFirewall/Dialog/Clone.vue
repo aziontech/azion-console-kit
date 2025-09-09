@@ -12,7 +12,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="To confirm, type a unique and easy-to-remember name for the new Edge Firewall:"
+          label="To confirm, type a unique and easy-to-remember name for the new Firewall:"
           name="edgeFirewallName"
           :value="edgeFirewallName"
           placeholder="Name"
@@ -79,7 +79,7 @@
     edgeFirewallName: ''
   }
 
-  const showFeedback = (feedback = 'cloned successfully') => {
+  const showFeedback = (feedback = 'Cloned successfully') => {
     const feedbackMessage = feedback
     toast.add({
       closable: true,

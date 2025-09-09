@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Storage" />
+      <PageHeadingBlock pageTitle="Object Storage" />
     </template>
     <template #content>
       <div class="flex w-full gap-8">

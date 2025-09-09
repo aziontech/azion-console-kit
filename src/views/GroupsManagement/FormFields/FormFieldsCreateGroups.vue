@@ -182,6 +182,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'form-fields-create-groups' })
 
@@ -211,7 +212,7 @@
   const showToast = (summary, severity) => {
     const options = {
       severity,
-      summary,
+      summary: capitalizeFirstLetter(summary),
       closable: true
     }
 

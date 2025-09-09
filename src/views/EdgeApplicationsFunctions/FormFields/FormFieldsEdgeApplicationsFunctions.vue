@@ -62,7 +62,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate a serverless function created with Edge Functions within the edge application. Use Rules Engine to activate the function."
+    description="Instantiate a serverless function created with Functions within the Application. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -72,7 +72,7 @@
           required
           name="name"
           v-model="name"
-          placeholder="My edge application function instance"
+          placeholder="My Application function instance"
           description="Give a unique and descriptive name to identify the function instance."
         />
       </div>
@@ -81,8 +81,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Edge Function"
-    description="Select an existing edge function and customize the arguments. Only edge functions previously created in the Edge Functions module can be instantiated."
+    title="Function"
+    description="Select an existing function and customize the arguments. Only Functions previously created in the Functions module can be instantiated."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
@@ -92,7 +92,7 @@
         />
         <FieldDropdownLazyLoader
           data-testid="edge-application-function-instance-form__edge-function"
-          label="Edge Function"
+          label="Function"
           required
           name="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
@@ -119,7 +119,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Function"
+                  label="Create Function"
                 />
               </li>
             </ul>

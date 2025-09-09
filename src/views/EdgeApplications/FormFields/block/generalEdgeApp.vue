@@ -2,7 +2,7 @@
   <FormHorizontal
     title="General"
     :isDrawer="isDrawer"
-    description="Create an edge application to deliver your content from the edge."
+    description="Create an Application to deliver your content from the edge."
     data-testid="form-horizontal-general"
   >
     <template #inputs>
@@ -11,9 +11,9 @@
           label="Name"
           required
           name="name"
-          placeholder="My edge application"
+          placeholder="My Application"
           :value="name"
-          description="Give a unique and descriptive name to identify the edge application."
+          description="Give a unique and descriptive name to identify the Application."
           data-testid="form-horizontal-general-name"
         />
       </div>

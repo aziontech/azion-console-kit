@@ -26,7 +26,7 @@ const PAGES_DASHBOARDS = {
   build: [
     {
       id: 1,
-      label: 'Edge Applications',
+      label: 'Applications',
       path: 'edge-applications',
       groupId: 1,
       dashboards: [
@@ -78,7 +78,7 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 3,
-      label: 'Edge Functions',
+      label: 'Functions',
       path: 'edge-functions',
       groupId: 1,
       dashboards: [
