@@ -36,7 +36,7 @@
   const emit = defineEmits(['update:previewData'])
 
   const SPLITTER_PROPS = {
-    height: '55vh',
+    height: '50vh',
     layout: 'horizontal',
     panelsSizes: [60, 40]
   }
@@ -44,6 +44,7 @@
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
   const showPreview = ref(true)
+  const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
   const azionFormError = ref(false)
@@ -69,14 +70,12 @@
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
       azionFormError.value = false
     } catch (error) {
-      parsedValue = azionForm.value
+      parsedValue = {}
       azionFormError.value = true
     }
 
-    if (Object.keys(parsedValue).length) {
-      setAzionFormSchema(parsedValue)
-      setAzionFormEmptyState(parsedValue)
-    }
+    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
   }
 
   const setAzionFormData = (value = {}) => {
@@ -138,16 +137,15 @@
   }
 
   const setDefaultFormBuilder = () => {
-    const schema = defaultSchemaFormBuilder
-
-    codeEditorFormBuilderUpdate(schema)
-    schemaAzionFormString.value = indentJsonStringify(schema)
+    hasFormBuilder.value = true
+    codeEditorFormBuilderUpdate(defaultSchemaFormBuilder)
+    schemaAzionFormString.value = indentJsonStringify(defaultSchemaFormBuilder)
   }
 
   const resetFormBuilder = () => {
+    hasFormBuilder.value = false
     showFormBuilder.value = false
     azionFormData.value = setAzionFormData({})
-
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
@@ -326,7 +324,7 @@
             />
           </SplitterPanel>
         </Splitter>
-        <div v-if="!emptySchemaAzionForm">
+        <div v-if="hasFormBuilder">
           <Splitter
             :style="{ height: SPLITTER_PROPS.height }"
             class="mt-8 surface-border border rounded-md hidden md:flex"
@@ -390,7 +388,7 @@
         </div>
 
         <div
-          v-if="selectPanelValue === selectPanelOptions[1] && emptySchemaAzionForm"
+          v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder"
           class="mt-8"
         >
           <EmptyResultsBlock
