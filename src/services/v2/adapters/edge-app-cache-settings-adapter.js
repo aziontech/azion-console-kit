@@ -38,7 +38,7 @@ export const CacheSettingsAdapter = {
 
     // Add tiered_cache module if enabled
     if (payload.tieredCache) {
-      result.modules.tiered_cache = {
+      result.modules.edge_cache.tiered_cache = {
         behavior: 'override', // readonly according to docs
         max_age: 31536000, // readonly according to docs
         topology: payload.tieredCacheRegion || 'near-edge'
@@ -116,7 +116,7 @@ export const CacheSettingsAdapter = {
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.edge_cache || {}
-    const tieredCache = data.modules?.tiered_cache
+    const tieredCache = data.modules?.edge_cache?.tiered_cache
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
