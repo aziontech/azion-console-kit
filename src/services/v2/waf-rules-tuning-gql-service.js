@@ -14,6 +14,7 @@ export class WafRulesTuningGqlService {
     const firstPage = await wafService.listWafRulesAllowed({
       page: 1,
       pageSize,
+      fields: ['rule_id', 'conditions', 'active', 'operator', 'last_modified'],
       ...rest
     })
 
