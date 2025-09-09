@@ -59,6 +59,8 @@
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { h, ref } from 'vue'
+  import { capitalizeFirstLetter } from '@/helpers'
+
   const emit = defineEmits([
     'update-credit-event',
     'openDrawerAddCredit',
@@ -147,7 +149,7 @@
     toast.add({
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     })
   }

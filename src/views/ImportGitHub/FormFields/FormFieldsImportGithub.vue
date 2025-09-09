@@ -298,7 +298,7 @@
           required
           name="applicationName"
           :value="applicationName"
-          description="Give a unique name to the application. It’ll also be used for the bucket for storage and the function."
+          description="Give a unique name to the Application. It’ll also be used for the bucket for storage and the function."
         />
       </div>
 

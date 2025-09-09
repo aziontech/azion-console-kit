@@ -2,7 +2,7 @@
   <FormHorizontal
     :isDrawer="isDrawer"
     title="Modules"
-    description="Activate modules to extend the configuration possibilities of the application. Some modules require subscription."
+    description="Activate modules to extend the configuration possibilities of the Application. Some modules require subscription."
     data-testid="form-horizontal-modules"
   >
     <template #inputs>

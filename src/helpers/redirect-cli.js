@@ -3,16 +3,21 @@ import { useAccountStore } from '@/stores/account'
 import { convertDateToLocalTimezone } from './convert-date'
 import { setWithExpiration, getWithExpiration } from './local-storage-manager'
 import * as PersonalTokensService from '@/services/personal-tokens-services'
-const REDIRECT_TO_LOCALHOST = 'http://localhost:8080'
+const REDIRECT_TO_LOCALHOST = 'http://localhost'
 
 /**
  * Sets up CLI configuration in localStorage
  * @param {number} [expirationMinutes=2] - Expiration time in minutes
  */
-export const setupCLIConfig = (expirationMinutes = 2) => {
+export const setupCLIConfig = (expirationMinutes = 2, callbackPort = 8080) => {
   setWithExpiration({
     key: 'CLI',
     value: true,
+    expirationMinutes
+  })
+  setWithExpiration({
+    key: 'callbackPort',
+    value: callbackPort,
     expirationMinutes
   })
 }
@@ -42,8 +47,9 @@ export const handleCLIRedirect = async () => {
       description: '',
       expiresAt: expiresDate()
     }
+    const callbackPort = getWithExpiration('callbackPort')
     const { token } = await PersonalTokensService.createPersonalToken(CONFIG_TOKEN)
-    return `${REDIRECT_TO_LOCALHOST}/?c=${token}`
+    return `${REDIRECT_TO_LOCALHOST}:${callbackPort}/?c=${token}`
   }
 
   return null

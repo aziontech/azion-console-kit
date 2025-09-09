@@ -46,7 +46,7 @@
     {
       label: 'Delete',
       type: 'delete',
-      title: 'firewall',
+      title: 'Firewall',
       icon: 'pi pi-trash',
       service: edgeFirewallService.deleteEdgeFirewallService
     }
@@ -119,7 +119,7 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No firewall found."
+        emptyListMessage="No Firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
@@ -127,8 +127,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No firewall has been created."
-        description="Click the button below to create your first firewall."
+        title="No Firewall has been created."
+        description="Click the button below to create your first Firewall."
         createButtonLabel="Firewall"
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"
