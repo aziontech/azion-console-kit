@@ -97,11 +97,5 @@
     }
   ]
 
-  const subscriptionModulesSwitchOptions = [
-    {
-      title: 'Tiered Cache',
-      nameField: 'tieredCacheEnabled',
-      subtitle: 'Enable an additional cache layer at the edge.'
-    }
-  ]
+  const subscriptionModulesSwitchOptions = []
 </script>
