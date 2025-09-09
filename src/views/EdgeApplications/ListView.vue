@@ -40,7 +40,7 @@
     {
       type: 'delete',
       label: 'Delete',
-      title: 'application',
+      title: 'Application',
       icon: 'pi pi-trash',
       service: edgeAppService.deleteEdgeApplicationService
     }
@@ -160,7 +160,7 @@
       <EmptyResultsBlock
         v-else
         title="No applications have been created"
-        description="Click the button below to create your first application."
+        description="Click the button below to create your first Application."
         createButtonLabel="Application"
         createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"

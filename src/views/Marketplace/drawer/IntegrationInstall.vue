@@ -223,8 +223,8 @@
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"
-            title="Select an application"
-            description="Browse and select the desired application to install this integration."
+            title="Select an Application"
+            description="Browse and select the desired Application to install this integration."
           >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-8">
@@ -246,9 +246,9 @@
                     optionLabel="label"
                     optionValue="value"
                     class="w-full"
-                    placeholder="Select an application"
+                    placeholder="Select an Application"
                     filterIcon="pi pi-search"
-                    emptyMessage="No application found with integrations to install or update."
+                    emptyMessage="No Application found with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"
                     :loading="loadingEdges"
                   >
@@ -299,7 +299,7 @@
                   severity="info"
                   class="max-w-lg"
                 >
-                  No application has been created. Go to
+                  No Application has been created. Go to
                   <PrimeButton
                     class="p-0"
                     label="Application"

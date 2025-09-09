@@ -103,7 +103,7 @@
           optionValue="value"
           :value="application"
           appendTo="self"
-          placeholder="Select an application"
+          placeholder="Select an Application"
         >
           <template #footer>
             <ul class="p-2">
@@ -146,7 +146,7 @@
           optionValue="value"
           :value="firewall"
           appendTo="self"
-          placeholder="Select a firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">

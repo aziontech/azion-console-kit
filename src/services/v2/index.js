@@ -109,6 +109,10 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+// Edge App Error Response
+import { EdgeAppErrorResponseAdapter } from './adapters/edge-app-error-response-adapter'
+import { EdgeAppErrorResponseService } from './edge-app-error-response-service'
+
 // Activity History
 import { ActivityHistoryService } from './activity-history-service'
 import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
@@ -160,6 +164,10 @@ const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
+const edgeAppErrorResponseService = new EdgeAppErrorResponseService(
+  httpService,
+  EdgeAppErrorResponseAdapter
+)
 
 const billingGqlService = new BillingGqlService(httpService, BillingGqlAdapter)
 const workloadDeploymentService = new WorkloadDeploymentService(
@@ -205,6 +213,7 @@ export {
   edgeDNSService,
   edgeDNSRecordsService,
   paymentService,
+  edgeAppErrorResponseService,
   billingGqlService,
   workloadService,
   workloadDeploymentService,

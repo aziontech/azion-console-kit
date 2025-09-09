@@ -5,6 +5,7 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   import { useField } from 'vee-validate'
   import { computed, ref, onMounted, watch } from 'vue'
@@ -59,7 +60,7 @@
     toast.add({
       closable: true,
       severity,
-      summary
+      summary: capitalizeFirstLetter(summary)
     })
   }
 
