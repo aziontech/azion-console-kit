@@ -33,12 +33,7 @@
         class="flex flex-col gap-2"
         data-testid="form-horizontal-modules-subscription"
       >
-        <FieldGroupSwitch
-          label="Subscription modules"
-          isCard
-          :options="[]"
-          data-testid="form-horizontal-modules-subscription-switch"
-        />
+        <span class="text-color text-base font-medium leading-5">Subscription modules</span>
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
