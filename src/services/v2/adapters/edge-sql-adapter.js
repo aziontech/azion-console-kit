@@ -195,22 +195,19 @@ export const EdgeSQLAdapter = {
   },
 
   adaptSqlCommands(sql) {
-    // Handle both array and string input
     const sqlInput = Array.isArray(sql) ? sql[0] : sql
 
     if (!sqlInput || sqlInput.trim() === '') {
       return []
     }
-
-    const separator = /(?=\b(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b)/i
-
-    const formatSql = sqlInput
-      .split(separator)
+    const statements = sqlInput
+      .split(';')
       .map((statement) => statement.trim())
       .filter((statement) => statement.length > 0)
+      .map((statement) => (statement.endsWith(';') ? statement : statement + ';'))
 
     return {
-      statements: formatSql
+      statements
     }
   },
 
