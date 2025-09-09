@@ -36,7 +36,7 @@
         <FieldGroupSwitch
           label="Subscription modules"
           isCard
-          :options="subscriptionModulesSwitchOptions"
+          :options="[]"
           data-testid="form-horizontal-modules-subscription-switch"
         />
         <PrimeButton
@@ -96,6 +96,4 @@
       subtitle: 'Enable dynamic image editing options.'
     }
   ]
-
-  const subscriptionModulesSwitchOptions = []
 </script>
