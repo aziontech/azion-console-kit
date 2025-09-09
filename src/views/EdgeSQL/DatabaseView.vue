@@ -20,7 +20,7 @@
   import { edgeSQLService } from '@/services/v2'
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
-  import RowFormDrawer from './components/RowFormDrawer.vue'
+  // import RowFormDrawer from './components/RowFormDrawer.vue'
   import { SQLITE_QUERIES, QUICK_TEMPLATES } from './constants'
   import { TableActionManager } from './utils'
   import { useAccountStore } from '@/stores/account'
@@ -82,7 +82,7 @@
   const activeTabIndex = ref(getTabIndexFromRoute())
   const tableMenuRef = ref()
   const selectedTable = ref(null)
-  const selectedRows = ref([])
+  // const selectedRows = ref([])
 
   const loadDatabaseInfo = async () => {
     try {
@@ -365,19 +365,6 @@
     rowFormDrawerVisible.value = true
   }
 
-  const handleRowFormSuccess = async () => {
-    selectedRows.value = []
-    editingRowData.value = {}
-    editingRowIndex.value = -1
-    isEditingRow.value = false
-    focusedField.value = ''
-    rowFormDrawerVisible.value = false
-
-    if (selectedTableName.value && sqlQuery.value) {
-      await executeQuery(false)
-    }
-  }
-
   const handleKeyDown = (event) => {
     if (event.ctrlKey && event.key === 'Enter') {
       event.preventDefault()
@@ -397,7 +384,6 @@
     executeQuery()
   }
 
-  // Handle tab change and update route
   const handleTabChange = (index) => {
     const tabRoute = ROUTE_TABS[index]
     if (tabRoute) {
@@ -514,13 +500,7 @@
                     @tab-change="handleTabChange"
                     class="results-tabs mt-4"
                   >
-                    <TabPanel>
-                      <template #header>
-                        <div class="flex items-center gap-2">
-                          <i class="pi pi-table"></i>
-                          Results
-                        </div>
-                      </template>
+                    <TabPanel header="Results">
                       <ResultsBlock
                         :queryResults="queryResults"
                         :isExecutingQuery="isExecutingQuery"
@@ -532,14 +512,7 @@
                       />
                     </TabPanel>
 
-                    <TabPanel>
-                      <template #header>
-                        <div class="flex items-center gap-2">
-                          <i class="pi pi-history"></i>
-                          <span>History</span>
-                        </div>
-                      </template>
-
+                    <TabPanel header="History">
                       <QueryHistory
                         v-if="activeTabIndex === 1"
                         @rerun-query="rerunQuery"
@@ -567,17 +540,6 @@
       :is-loading-definition="isLoadingDefinition"
       :definition-visible="definitionDrawerVisible"
       @close="definitionDrawerVisible = false"
-    />
-
-    <RowFormDrawer
-      v-model:visible="rowFormDrawerVisible"
-      :columns="queryResults[0]?.columns || []"
-      :columnInfo="selectedTableSchema?.rows || []"
-      :tableName="selectedTableName || ''"
-      :initialData="editingRowData || {}"
-      :isEditing="isEditingRow"
-      :focusField="focusedField || ''"
-      @onSuccess="handleRowFormSuccess"
     />
 
     <Menu

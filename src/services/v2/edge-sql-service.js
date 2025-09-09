@@ -38,11 +38,12 @@ export class EdgeSQLService {
     }
   }
 
-  createDatabase = async ({ name }) => {
+  createDatabase = async ({ name, active }) => {
+    const body = this.adapter?.adaptDatabaseCreatePayload?.({ name, active })
     const { data } = await this.httpService.request({
       url: this.baseURL,
       method: 'POST',
-      body: { name }
+      body
     })
 
     const adaptedData = this.adapter?.adaptDatabaseCreate?.(data)

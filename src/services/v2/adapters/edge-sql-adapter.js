@@ -109,7 +109,8 @@ export const EdgeSQLAdapter = {
           severity: getStatusSeverity(database.status)
         },
         active: parseStatusData(database.active),
-        last_modified: formatExhibitionDate(database.last_modified, 'full', undefined),
+        lastEditor: database.last_editor,
+        lastModified: formatExhibitionDate(database.last_modified, 'full', undefined),
         lastModifyDate: database.last_modified
       }
     })
@@ -125,6 +126,13 @@ export const EdgeSQLAdapter = {
       name: database.name,
       status: database.status || 'creating',
       active: database.active
+    }
+  },
+
+  adaptDatabaseCreatePayload(payload) {
+    return {
+      name: payload.name,
+      active: payload.active
     }
   },
 
@@ -187,13 +195,16 @@ export const EdgeSQLAdapter = {
   },
 
   adaptSqlCommands(sql) {
-    if (!sql[0] || sql[0].trim() === '') {
+    // Handle both array and string input
+    const sqlInput = Array.isArray(sql) ? sql[0] : sql
+
+    if (!sqlInput || sqlInput.trim() === '') {
       return []
     }
 
     const separator = /(?=\b(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b)/i
 
-    const formatSql = sql[0]
+    const formatSql = sqlInput
       .split(separator)
       .map((statement) => statement.trim())
       .filter((statement) => statement.length > 0)

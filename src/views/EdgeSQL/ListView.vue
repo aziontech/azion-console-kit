@@ -258,8 +258,12 @@
         header: 'Name'
       },
       {
-        field: 'last_modified',
+        field: 'lastModified',
         header: 'Last Modified'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
       },
       {
         field: 'status',
@@ -304,7 +308,7 @@
     ]
   })
 
-  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified']
+  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified', 'last_editor']
 </script>
 
 <template>

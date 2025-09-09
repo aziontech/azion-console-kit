@@ -146,27 +146,28 @@
             </OverlayPanel>
           </div>
         </template>
-        <template #body="{ data, rowIndex }">
+        <template #body="{ data, index }">
           <!-- Show save/cancel buttons when row is in edit mode -->
           <div
-            v-if="isRowEditing(data)"
+            v-if="isRowEditing(index)"
             class="flex gap-1 justify-end"
           >
             <PrimeButton
-              icon="pi pi-check"
+              :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
               size="small"
               severity="success"
-              @click="saveRowEdit(data, rowIndex)"
+              @click="saveRowEdit(data, index)"
               class="w-8 h-8 p-0"
               data-testid="row-save-button"
               v-tooltip.top="'Save'"
+              :disabled="isLoadingEditRow"
             />
             <PrimeButton
               icon="pi pi-times"
               size="small"
               severity="secondary"
               outlined
-              @click="cancelRowEdit(data, rowIndex)"
+              @click="cancelRowEdit(data, index)"
               class="w-8 h-8 p-0"
               data-testid="row-cancel-button"
               v-tooltip.top="'Cancel'"
@@ -306,6 +307,10 @@
     menuItems: {
       type: Array,
       default: () => []
+    },
+    cleanEditingRows: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -323,6 +328,7 @@
   const rowMenuRef = ref(null)
   const selectedRowData = ref(null)
   const originalRowData = ref(new Map())
+  const isLoadingEditRow = ref(false)
 
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -390,35 +396,30 @@
     rowMenuRef.value.show(event)
   }
 
-  const isRowEditing = (rowData) => {
-    return editingRowsItens.value.some((editingRow) => editingRow.id === rowData.id)
+  const isRowEditing = (index) => {
+    return editingRowsItens.value.some((editingRow) => editingRow.index === index)
   }
 
   const saveRowEdit = (rowData, rowIndex) => {
+    isLoadingEditRow.value = true
     const originalData = originalRowData.value.get(rowData.id) || rowData
 
     const event = {
       newData: { ...rowData },
-      data: originalData,
+      originalData: originalData,
+      data: selectedRowData.value,
       index: rowIndex
     }
-
-    editingRowsItens.value = editingRowsItens.value.filter((row) => row.id !== rowData.id)
-    originalRowData.value.delete(rowData.id)
 
     emit('row-edit-save', event)
   }
 
   const cancelRowEdit = (rowData, rowIndex) => {
-    const originalData = originalRowData.value.get(rowData.id) || rowData
-
     const event = {
-      data: originalData,
+      data: rowData,
       index: rowIndex
     }
-
-    editingRowsItens.value = editingRowsItens.value.filter((row) => row.id !== rowData.id)
-    originalRowData.value.delete(rowData.id)
+    editingRowsItens.value = editingRowsItens.value.filter((row) => row.index !== rowIndex)
 
     emit('row-edit-cancel', event)
   }
@@ -459,6 +460,17 @@
 
     return [defaultEditAction, ...mappedMenuItems]
   })
+
+  watch(
+    () => props.cleanEditingRows,
+    (newValue) => {
+      if (newValue) {
+        editingRowsItens.value = []
+        originalRowData.value.clear()
+        isLoadingEditRow.value = false
+      }
+    }
+  )
 
   watch(
     () => props.editingRows,

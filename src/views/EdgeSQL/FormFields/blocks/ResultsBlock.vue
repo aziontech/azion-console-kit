@@ -14,6 +14,7 @@
       :csvMapper="(data) => ({ ...data })"
       :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
       :menuItems="menuItems"
+      :cleanEditingRows="cleanEditingRows"
     >
       <template #addButton>
         <Button
@@ -22,6 +23,7 @@
           severity="primary"
           class="p-button-sm font-medium"
           @click="insertRow"
+          :disabled="disabledAddNewRow"
         />
       </template>
     </ListTableBlockWithRowEdit>
@@ -51,6 +53,7 @@
   const toast = useToast()
 
   const sqlDatabase = useEdgeSQL()
+  const cleanEditingRows = ref(false)
 
   const props = defineProps({
     queryResults: {
@@ -69,7 +72,7 @@
 
   const hasContentToList = ref(false)
   const editingRows = ref([])
-
+  const disabledAddNewRow = ref(false)
   const responseQuery = ref(props.queryResults)
   const selectedTableSchema = ref(null)
   const databaseId = computed(() => route.params.id)
@@ -104,15 +107,15 @@
       {
         label: 'Delete',
         icon: 'pi pi-trash',
-        command: (row) => {
-          deleteRow(row)
+        command: async (row) => {
+          await deleteRow(row)
         }
       }
     ]
   })
 
   const handleRowSave = (row) => {
-    if (row.data.shouldInsert) {
+    if (row?.data?.shouldInsert || row?.newData?.shouldInsert) {
       insertRowService(row.newData)
     } else {
       editRowService(row.newData, row.data)
@@ -122,32 +125,14 @@
   const handleRowCancel = (row) => {
     if (row.data.shouldInsert) {
       responseQuery.value[0].rows.splice(row.index, 1)
-      editingRows.value.splice(row.index, 1)
     }
-  }
-
-  const getDefaultValueByType = (type) => {
-    const typeStr = type?.toLowerCase() || 'unknown'
-
-    if (typeStr.includes('int') || typeStr.includes('number')) {
-      return 'Value: number'
-    } else if (typeStr.includes('bool')) {
-      return `Value: boolean`
-    } else if (typeStr.includes('date') || typeStr.includes('time')) {
-      return 'Value: date'
-    } else if (
-      typeStr.includes('text') ||
-      typeStr.includes('varchar') ||
-      typeStr.includes('char')
-    ) {
-      return 'Value: string'
-    } else {
-      return 'Value: unknown'
-    }
+    editingRows.value.splice(row.index, 1)
+    disabledAddNewRow.value = false
   }
 
   const insertRow = () => {
     if (!selectedTableSchema.value?.rows) return
+    disabledAddNewRow.value = true
 
     const newRow = {
       shouldInsert: true
@@ -156,14 +141,11 @@
     const hasIdColumn = schemaColumns.some((col) => col.name === 'id')
 
     schemaColumns.forEach((col) => {
+      newRow['index'] = 0
       if (col.name === 'id' && hasIdColumn) {
         newRow[col.name] = 0
       } else {
-        if (col.dflt_value && col.dflt_value !== 'NULL') {
-          newRow[col.name] = col.dflt_value
-        } else {
-          newRow[col.name] = getDefaultValueByType(col.type)
-        }
+        newRow[col.name] = ''
       }
     })
 
@@ -204,7 +186,7 @@
     const columns = responseQuery.value?.[0]?.columns || []
 
     const result = rows.map((row, index) => {
-      const rowObject = { id: index }
+      const rowObject = { id: index, index }
       if (Array.isArray(row)) {
         columns.forEach((col, colIndex) => {
           rowObject[col] = row[colIndex]
@@ -248,6 +230,7 @@
   }
 
   const editRowService = async (newData, whereData) => {
+    cleanEditingRows.value = false
     const newDataWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(
       newData,
       selectedTableSchema.value.rows
@@ -272,10 +255,13 @@
         detail: 'The row has been updated successfully',
         life: 2000
       })
+      editingRows.value = []
+      cleanEditingRows.value = true
     }
   }
 
   const insertRowService = async (newData) => {
+    cleanEditingRows.value = false
     const newDataWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(
       newData,
       selectedTableSchema.value.rows
@@ -303,6 +289,10 @@
         detail: error.message || 'Failed to insert row',
         life: 3000
       })
+    } finally {
+      editingRows.value = []
+      cleanEditingRows.value = true
+      disabledAddNewRow.value = false
     }
   }
 

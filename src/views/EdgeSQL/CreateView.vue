@@ -61,11 +61,13 @@
       .required('Database name is required')
       .min(6, 'Database name must be at least 6 characters')
       .max(50, 'Database name must be at most 50 characters')
-      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)')
+      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)'),
+    active: yup.boolean().default(true)
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    active: true
   })
   const createDatabaseServiceWithMonitoring = async (payload) => {
     const result = await edgeSQLService.createDatabase(payload)
