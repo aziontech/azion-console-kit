@@ -73,8 +73,10 @@
       azionFormError.value = true
     }
 
-    setAzionFormSchema(parsedValue)
-    setAzionFormEmptyState(parsedValue)
+    if (Object.keys(parsedValue).length) {
+      setAzionFormSchema(parsedValue)
+      setAzionFormEmptyState(parsedValue)
+    }
   }
 
   const setAzionFormData = (value = {}) => {
@@ -118,7 +120,6 @@
   const hasAzionFormError = computed(() => {
     return !!azionFormError.value
   })
-
 
   const updateObject = computed(() => {
     const previewValues = {
