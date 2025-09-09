@@ -46,6 +46,7 @@
   const showPreview = ref(true)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
+  const azionFormError = ref(false)
   const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['JSON', 'Form Builder']
@@ -66,8 +67,10 @@
 
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
+      azionFormError.value = false
     } catch (error) {
-      parsedValue = {}
+      parsedValue = azionForm.value
+      azionFormError.value = true
     }
 
     setAzionFormSchema(parsedValue)
@@ -111,6 +114,11 @@
   const hasArgsError = computed(() => {
     return !!argsError.value
   })
+
+  const hasAzionFormError = computed(() => {
+    return !!azionFormError.value
+  })
+
 
   const updateObject = computed(() => {
     const previewValues = {
@@ -335,7 +343,7 @@
                 runtime="json"
                 class="overflow-clip surface-border border rounded-md"
                 :initialValue="schemaAzionFormString"
-                :errors="false"
+                :errors="hasAzionFormError"
                 :minimap="false"
                 @update:modelValue="codeEditorFormBuilderUpdate"
               />
