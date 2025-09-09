@@ -102,7 +102,8 @@ const PRODUCT_NAMES = {
   support_enterprise: 'Support Enterprise',
   support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
-  tiered_cache: 'Tiered Cache'
+  tiered_cache: 'Tiered Cache',
+  edge_storage: 'Object Storage'
 }
 
 const METRIC_SLUGS = {
@@ -129,7 +130,11 @@ const METRIC_SLUGS = {
   plan_missioncritical: { title: 'Plan Mission critical' },
   support_enterprise: { title: 'Total Days', unit: 'Days' },
   support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
+  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  edge_storage_class_a_operations: { title: 'Class A Operations' },
+  edge_storage_class_b_operations: { title: 'Class B Operations' },
+  edge_storage_class_c_operations: { title: 'Class C Operations' },
+  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {
