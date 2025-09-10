@@ -9,10 +9,10 @@
       <div class="min-w-[164px]">
         <div class="flex sm:flex sm:justify-end">
           <SelectButton
-            v-model="value"
+            v-model="selectPanelModelValue"
             :options="options"
             ariaLabel="Select Button"
-            @update:modelValue="emit('update:modelValue', $event)"
+            @update:modelValue="changeButtonPanel"
           />
         </div>
       </div>
@@ -53,6 +53,9 @@
     }
   })
 
-  const value = ref(props.value)
-  const options = ref(props.options)
+  const selectPanelModelValue = ref(props.value)
+
+  const changeButtonPanel = (value) => {
+    emit('update:modelValue', value)
+  }
 </script>
