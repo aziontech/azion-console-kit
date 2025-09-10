@@ -19,13 +19,33 @@ const loadFromStorage = (key, defaultValue = null) => {
   try {
     const item = localStorage.getItem(key)
     const result = item ? JSON.parse(item) : defaultValue
-
-    const arrayResult = Array.isArray(result) ? result : []
-    const resultParse = adaptHistory(arrayResult)
-    return resultParse
+    return Array.isArray(result) ? result : []
   } catch (error) {
     return Array.isArray(defaultValue) ? defaultValue : []
   }
+}
+
+const loadHistoryFromStorage = () => {
+  const rawHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+  return adaptHistory(rawHistory)
+}
+
+const detectQueryType = (query) => {
+  if (!query || typeof query !== 'string') return 'execute'
+
+  const normalizedQuery = Array.isArray(query)
+    ? query[0].trim().toUpperCase()
+    : query.trim().toUpperCase()
+
+  if (normalizedQuery.startsWith('SELECT')) return 'query'
+  if (normalizedQuery.startsWith('INSERT')) return 'insert'
+  if (normalizedQuery.startsWith('UPDATE')) return 'update'
+  if (normalizedQuery.startsWith('DELETE')) return 'delete'
+  if (normalizedQuery.startsWith('CREATE')) return 'create'
+  if (normalizedQuery.startsWith('ALTER')) return 'alter'
+  if (normalizedQuery.startsWith('DROP')) return 'drop'
+  if (normalizedQuery.startsWith('PRAGMA')) return 'pragma'
+  return 'execute'
 }
 
 const handleType = (type) => {
@@ -35,20 +55,50 @@ const handleType = (type) => {
         content: 'SELECT',
         severity: 'info'
       }
-    case 'execute':
+    case 'insert':
       return {
-        content: 'EXECUTE',
+        content: 'INSERT',
         severity: 'success'
+      }
+    case 'update':
+      return {
+        content: 'UPDATE',
+        severity: 'warn'
       }
     case 'delete':
       return {
         content: 'DELETE',
         severity: 'danger'
       }
+    case 'create':
+      return {
+        content: 'CREATE',
+        severity: 'success'
+      }
+    case 'alter':
+      return {
+        content: 'ALTER',
+        severity: 'warn'
+      }
+    case 'drop':
+      return {
+        content: 'DROP',
+        severity: 'danger'
+      }
+    case 'pragma':
+      return {
+        content: 'PRAGMA',
+        severity: 'info'
+      }
+    case 'execute':
+      return {
+        content: 'EXECUTE',
+        severity: 'success'
+      }
     default:
       return {
-        content: 'Unknown',
-        severity: 'danger'
+        content: 'UNKNOWN',
+        severity: 'secondary'
       }
   }
 }
@@ -61,14 +111,24 @@ const truncateQuery = (query, maxLength = 100) => {
 const adaptHistory = (histories) => {
   if (!Array.isArray(histories)) return []
 
-  return histories.map((history) => ({
-    executionTime: `${history.executionTime} ms`,
-    query: truncateQuery(history.query),
-    results: history.results,
-    timestamp: convertValueToDate(history.timestamp),
-    type: handleType(history.type),
-    id: history.id
-  }))
+  return histories.map((history) => {
+    // Check if already adapted to avoid reprocessing
+    const isAlreadyAdapted =
+      typeof history.executionTime === 'string' && history.executionTime.includes('ms')
+
+    if (isAlreadyAdapted) {
+      return history
+    }
+
+    return {
+      ...history,
+      executionTime: `${history.executionTime} ms`,
+      query: truncateQuery(history.originalQuery || history.query),
+      originalQuery: history.originalQuery || history.query,
+      timestamp: convertValueToDate(history.timestamp),
+      type: handleType(history.type)
+    }
+  })
 }
 
 export function useEdgeSQL() {
@@ -76,7 +136,7 @@ export function useEdgeSQL() {
   const databases = ref([])
   const currentDatabase = ref(null)
   const currentTables = ref([])
-  const queryResults = ref(loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, []))
+  const queryResults = ref(loadHistoryFromStorage())
   const isLoading = ref(false)
   const error = ref(null)
   const selectedTable = ref(null)
@@ -173,15 +233,23 @@ export function useEdgeSQL() {
       ...result,
       id: Date.now() + Math.random(),
       databaseId: currentDatabase.value?.id,
-      databaseName: currentDatabase.value?.name
+      databaseName: currentDatabase.value?.name,
+      originalQuery: result.query,
+      type: detectQueryType(result.query)
     }
-    queryResults.value.unshift(enrichedResult)
-    if (queryResults.value.length > 100) {
-      queryResults.value = queryResults.value.slice(0, 100)
-    }
-    const filter = queryResults.value.filter((query) => query.type.content !== 'Unknown')
 
-    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, filter)
+    // Save raw data to localStorage
+    const rawHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    rawHistory.unshift(enrichedResult)
+
+    if (rawHistory.length > 100) {
+      rawHistory.splice(100)
+    }
+
+    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, rawHistory)
+
+    // Update reactive state with adapted data
+    queryResults.value = adaptHistory(rawHistory)
   }
 
   const clearQueryResults = () => {
@@ -219,7 +287,7 @@ export function useEdgeSQL() {
   }
 
   const updateListHistory = () => {
-    const loadedHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    const loadedHistory = loadHistoryFromStorage()
     queryResults.value = loadedHistory
     return loadedHistory
   }
@@ -259,9 +327,8 @@ export function useEdgeSQL() {
       addQueryResult({
         query,
         results: queryResults,
-        timestamp: new Date(),
-        executionTime: Date.now() - startTime,
-        type: isSelectQuery ? 'query' : 'execute'
+        timestamp: new Date().toISOString(),
+        executionTime: Date.now() - startTime
       })
 
       return queryResults

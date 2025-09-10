@@ -34,7 +34,7 @@
   const sqlDatabase = useEdgeSQL()
   const accountStore = useAccountStore()
   const toast = useToast()
-
+  const resultQuery = ref(null)
   // const documentationService = () => {
   //   window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
   // }
@@ -61,7 +61,6 @@
   const sqlQuery = ref('')
   const isExecutingQuery = ref(false)
   const isLoadingTables = ref(false)
-  const queryResults = ref([])
   const executionTime = ref(0)
 
   const tablesTree = ref([])
@@ -130,7 +129,7 @@
     const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
     try {
-      queryResults.value = await sqlDatabase.executeQuery(sqlQuery.value)
+      resultQuery.value = await sqlDatabase.executeQuery(sqlQuery.value)
       activeTabIndex.value = 0
       if (
         !isSelectQuery &&
@@ -277,7 +276,6 @@
         if (selectedTableName.value === tableName) {
           selectedTableName.value = null
           sqlDatabase.setSelectedTable(null)
-          queryResults.value = []
         }
         return `Table "${tableName}" deleted successfully`
       } else {
@@ -335,7 +333,7 @@
   }
 
   const openInsertRowDrawer = async () => {
-    if (!queryResults.value.length) return
+    if (!sqlDatabase.queryResults.value.length) return
 
     await loadTableSchema(selectedTableName.value)
     clearRowFormState()
@@ -345,9 +343,9 @@
   const focusedField = ref('')
 
   const openEditRowDrawer = (rowData, rowIndex, fieldToFocus = '') => {
-    if (queryResults.value.length === 0) return
+    if (sqlDatabase.queryResults.value.length === 0) return
 
-    const result = queryResults.value[0]
+    const result = sqlDatabase.queryResults.value[0]
     if (!result.columns) return
 
     clearRowFormState()
@@ -486,7 +484,7 @@
                 <div class="flex-shrink-0">
                   <QueryEditorBlock
                     :sqlQuery="sqlQuery"
-                    :queryResults="queryResults"
+                    :queryResults="resultQuery"
                     :executionTime="executionTime"
                     :isExecutingQuery="isExecutingQuery"
                     :monacoTheme="monacoTheme"
@@ -502,7 +500,7 @@
                   >
                     <TabPanel header="Results">
                       <ResultsBlock
-                        :queryResults="queryResults"
+                        :queryResults="resultQuery"
                         :isExecutingQuery="isExecutingQuery"
                         :selectedTableSchema="selectedTableSchema"
                         :tableName="selectedTableName"

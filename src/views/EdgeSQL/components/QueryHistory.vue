@@ -1,28 +1,33 @@
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useEdgeSQL } from '../composable/useEdgeSQL'
   import TableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PrimeButton from 'primevue/button'
+  import ToggleButton from 'primevue/togglebutton'
   import { useToast } from 'primevue/usetoast'
   defineOptions({ name: 'edge-sql-query-history' })
 
   const emit = defineEmits(['rerun-query'])
+  const route = useRoute()
   const tableBlock = ref(null)
+  const showCurrentDatabaseOnly = ref(false)
 
-  const { clearQueryResults, updateListHistory } = useEdgeSQL()
+  const { clearQueryResults, queryResults, getQueryHistoryForDatabase } = useEdgeSQL()
+
+  const currentDatabaseId = computed(() => route.params.id)
 
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const rerunQuery = (historyItem) => {
-    emit('rerun-query', historyItem.query)
+    emit('rerun-query', historyItem.originalQuery)
   }
 
   const clearHistory = () => {
     clearQueryResults()
-    updateListHistory()
     tableBlock.value?.reload()
     toast.add({
       severity: 'info',
@@ -36,10 +41,15 @@
     window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
   }
 
+  const filteredHistory = computed(() => {
+    if (!showCurrentDatabaseOnly.value || !currentDatabaseId.value) {
+      return queryResults.value
+    }
+    return getQueryHistoryForDatabase(currentDatabaseId.value)
+  })
+
   const getQueryHistory = () => {
-    // Ensure we have the latest data from localStorage
-    const latestHistory = updateListHistory()
-    return Promise.resolve(latestHistory)
+    return Promise.resolve(filteredHistory.value)
   }
 
   const actions = [
@@ -86,9 +96,21 @@
     hasContentToList.value = event
   }
 
+  // Watch for changes in queryResults to automatically reload table
+  watch(
+    () => queryResults.value,
+    () => {
+      tableBlock.value?.reload()
+    },
+    { deep: true }
+  )
+
+  // Watch for database filter changes
+  watch(showCurrentDatabaseOnly, () => {
+    tableBlock.value?.reload()
+  })
+
   onMounted(() => {
-    // Force reload history data on component mount
-    updateListHistory()
     // Trigger table reload if it exists
     if (tableBlock.value?.reload) {
       tableBlock.value.reload()
@@ -111,14 +133,30 @@
       :exportFileName="`query-results`"
     >
       <template #actionsHeader>
-        <PrimeButton
-          @click="clearHistory"
-          icon="pi pi-times-circle"
-          outlined
-          class="max-sm:w-full ml-auto mr-2"
-          :data-testid="`clear_history_button`"
-          v-tooltip.bottom="{ value: 'Clear History', showDelay: 200 }"
-        />
+        <div class="flex gap-2 items-center">
+          <ToggleButton
+            v-model="showCurrentDatabaseOnly"
+            onLabel="Current DB"
+            offLabel="All DBs"
+            onIcon="pi pi-database"
+            offIcon="pi pi-globe"
+            class="p-button-sm"
+            v-tooltip.bottom="{
+              value: showCurrentDatabaseOnly
+                ? 'Showing current database only'
+                : 'Showing all databases',
+              showDelay: 200
+            }"
+          />
+          <PrimeButton
+            @click="clearHistory"
+            icon="pi pi-times-circle"
+            outlined
+            class="max-sm:w-full"
+            :data-testid="`clear_history_button`"
+            v-tooltip.bottom="{ value: 'Clear History', showDelay: 200 }"
+          />
+        </div>
       </template>
     </TableBlock>
 

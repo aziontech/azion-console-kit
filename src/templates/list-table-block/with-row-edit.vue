@@ -179,7 +179,7 @@
             class="flex justify-end"
           >
             <PrimeButton
-              icon="pi pi-ellipsis-v"
+              icon="pi pi-ellipsis-h"
               size="small"
               outlined
               @click="showRowMenu($event, data)"
