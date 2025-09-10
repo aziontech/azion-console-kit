@@ -248,8 +248,8 @@
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
-            :title="`Arguments`"
-            :description="`Configure the function arguments to customize its behavior.`"
+            title="Arguments"
+            description="Configure the function arguments to customize its behavior."
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
