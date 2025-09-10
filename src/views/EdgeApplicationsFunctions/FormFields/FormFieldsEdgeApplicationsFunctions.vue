@@ -12,6 +12,7 @@
   import TitleDescriptionArea from '@/components/title-description-area'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
+  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
@@ -24,10 +25,13 @@
   const { value: args, errorMessage: argsError } = useField('args')
   const { value: azionForm } = useField('azionForm')
 
-  const schemaAzionForm = ref(null)
+  const schemaAzionForm = ref({})
+  const emptySchemaAzionForm = ref(true)
   const schemaAzionFormString = ref('{}')
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
+  const azionFormError = ref(false)
+  const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
@@ -48,9 +52,13 @@
       args.value = target?.defaultArgs
     }
 
-    if (target?.azionForm) {
+    if (target?.azionForm && Object.keys(argsJsonParser(target.azionForm)).length) {
+      hasFormBuilder.value = true
+      schemaAzionFormString.value = target.azionForm
+      azionForm.value = schemaAzionFormString.value
+      showFormBuilder.value = false
+
       selectPanelUpdateModelValue()
-      azionForm.value = target?.azionForm
     }
   }
 
@@ -79,35 +87,38 @@
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
   }
 
+  const setAzionFormEmptyState = function (value) {
+    emptySchemaAzionForm.value = !value || !Object.keys(value).length
+  }
+
   const updateLabelEditForm = () => {
     return showFormBuilder.value ? 'Visual Form' : 'Edit Form'
   }
 
   const formBuilderToggle = () => {
-    showFormBuilder.value = showFormBuilder.value === false ? true : false
-
-    if (!showFormBuilder.value) {
-      setAzionFormSchema(JSON.parse(schemaAzionFormString.value))
-    }
+    showFormBuilder.value = !showFormBuilder.value
   }
 
   const setAzionFormSchema = (formSchema) => {
-    schemaAzionForm.value = formSchema
-    schemaAzionFormString.value = indentJsonStringify(formSchema)
-    azionForm.value = schemaAzionFormString.value
+    schemaAzionForm.value = argsJsonParser(formSchema)
   }
 
   const argsJsonParser = (args) => {
+    let parsedValue
+
     try {
-      return JSON.parse(args)
+      parsedValue = typeof args === 'string' ? JSON.parse(args) : args
     } catch (error) {
-      return {}
+      parsedValue = {}
     }
+
+    return parsedValue
   }
 
   const resetFormBuilder = () => {
+    hasFormBuilder.value = false
     azionFormData.value = {}
-    schemaAzionForm.value = null
+    schemaAzionForm.value = {}
     schemaAzionFormString.value = '{}'
     azionForm.value = schemaAzionFormString.value
   }
@@ -116,30 +127,44 @@
     let parsedValue
 
     try {
-      parsedValue = value ? JSON.parse(value) : {}
+      parsedValue = typeof value === 'string' ? JSON.parse(value) : value
+      schemaAzionFormString.value = value
+      azionForm.value = schemaAzionFormString.value
+      azionFormError.value = false
     } catch (error) {
       parsedValue = {}
+      azionFormError.value = true
     }
 
-    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
   }
 
   const hasArgsError = computed(() => {
     return !!argsError.value
   })
 
-  watch(args, (args) => {
-    azionFormArgsValue.value = indentJsonStringify(JSON.parse(args))
+  const hasAzionFormError = computed(() => {
+    return !!azionFormError.value
   })
 
-  watch(azionForm, (azionForm) => {
-    if (!Object.keys(JSON.parse(azionForm)).length) {
-      resetFormBuilder()
-      return
+  watch(args, (args) => {
+    try {
+      azionFormArgsValue.value = indentJsonStringify(JSON.parse(args))
+    } catch (error) {
+      console.log(error) // eslint-disable-line
     }
+  })
 
+  watch(azionForm, (azForm) => {
+    if (!Object.keys(JSON.parse(azForm)).length) return
+
+    hasFormBuilder.value = true
     azionFormData.value = argsJsonParser(args.value)
-    setAzionFormSchema(argsJsonParser(azionForm))
+    schemaAzionFormString.value = azForm
+    azionForm.value = schemaAzionFormString.value
+
+    setAzionFormSchema(argsJsonParser(azForm))
+    setAzionFormEmptyState(argsJsonParser(azForm))
   })
 
   watch(
@@ -221,7 +246,7 @@
       </div>
 
       <div class="flex flex-col gap-2 w-full">
-        <div v-if="schemaAzionForm">
+        <div v-if="hasFormBuilder">
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
@@ -235,13 +260,10 @@
                   id="azionform"
                   class="azion-json-form"
                 >
-                  <div
-                    v-if="schemaAzionFormString"
-                    class="flex flex-col gap-4 overflow-y-auto h-[364px]"
-                  >
+                  <div class="flex flex-col gap-4 overflow-y-auto h-[364px]">
                     <div>
                       <div
-                        v-show="showFormBuilder && schemaAzionFormString"
+                        v-if="showFormBuilder"
                         class="resize-y overflow-y-auto"
                       >
                         <CodeEditor
@@ -249,19 +271,32 @@
                           runtime="json"
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
+                          :errors="hasAzionFormError"
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
                       </div>
                       <div
                         class="max-w-[320px]"
-                        v-show="!showFormBuilder"
+                        v-if="!showFormBuilder && !emptySchemaAzionForm"
                       >
                         <JsonForms
-                          :renderers="renderers"
-                          :data="azionFormData"
                           :schema="schemaAzionForm"
+                          :data="azionFormData"
+                          :renderers="renderers"
                           @change="onChangeAzionForm"
+                        />
+                      </div>
+                      <div
+                        v-else
+                        class="flex flex-col items-center justify-center gap-2 h-[364px]"
+                      >
+                        <p>Configure the form builder.</p>
+                        <PrimeButton
+                          outlined
+                          @click="azionJsonFormWindowOpener()"
+                          label="Read documentation"
+                          size="small"
                         />
                       </div>
                     </div>
@@ -280,15 +315,6 @@
                     :minimap="false"
                   />
                 </div>
-                <small
-                  v-if="argsError"
-                  class="p-error text-xs font-normal leading-tight"
-                >
-                  {{ argsError }}
-                </small>
-                <DescriptionSmallArea
-                  description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
-                />
               </div>
             </template>
           </SelectPanel>
@@ -327,14 +353,13 @@
 
       <div
         class="flex justify-end mt-[-1rem]"
-        v-if="selectPanelValue === selectPanelOptions[0] && schemaAzionFormString"
+        v-if="selectPanelValue === selectPanelOptions[0] && hasFormBuilder"
       >
         <PrimeButton
-          v-if="schemaAzionForm"
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
-          class="text-sm p-0"
-          link
+          size="small"
+          text
         />
       </div>
     </template>
