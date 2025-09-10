@@ -6,7 +6,6 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PrimeButton from 'primevue/button'
-  import ToggleButton from 'primevue/togglebutton'
   import { useToast } from 'primevue/usetoast'
   defineOptions({ name: 'edge-sql-query-history' })
 
@@ -134,20 +133,6 @@
     >
       <template #actionsHeader>
         <div class="flex gap-2 items-center">
-          <ToggleButton
-            v-model="showCurrentDatabaseOnly"
-            onLabel="Current DB"
-            offLabel="All DBs"
-            onIcon="pi pi-database"
-            offIcon="pi pi-globe"
-            class="p-button-sm"
-            v-tooltip.bottom="{
-              value: showCurrentDatabaseOnly
-                ? 'Showing current database only'
-                : 'Showing all databases',
-              showDelay: 200
-            }"
-          />
           <PrimeButton
             @click="clearHistory"
             icon="pi pi-times-circle"
