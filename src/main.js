@@ -29,8 +29,6 @@ import { initOAuthSecurity } from '@/helpers/oauth-security'
 import App from './App.vue'
 import router from './router'
 
-// Initialize OAuth security measures early
-// Only applies to authentication pages to avoid breaking external links
 initOAuthSecurity()
 
 const app = createApp(App)
@@ -43,6 +41,7 @@ app.directive('tooltip', Tooltip)
 app.directive('prompt', customAiPrompt)
 app.use(ToastService)
 app.use(pinia)
+
 app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
