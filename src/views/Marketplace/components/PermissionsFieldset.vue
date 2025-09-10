@@ -62,7 +62,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Permissions"
-    description="Azion Marketplace requires the following privileges on the selected application."
+    description="Azion Marketplace requires the following privileges on the selected Application."
   >
     <template #inputs>
       <div class="text-sm text-color-secondary flex flex-col gap-4">

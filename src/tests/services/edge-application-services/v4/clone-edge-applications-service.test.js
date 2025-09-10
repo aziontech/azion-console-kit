@@ -38,7 +38,7 @@ describe('EdgeApplicationServices', () => {
     const version = 'v4'
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${fixtures.edgeApplicationMock.id}/clone`,
+      url: `${version}/workspace/applications/${fixtures.edgeApplicationMock.id}/clone`,
       method: 'POST',
       body: {
         id: fixtures.edgeApplicationMock.id,

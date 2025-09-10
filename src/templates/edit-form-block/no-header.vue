@@ -29,6 +29,7 @@
 <script>
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   export default {
     name: 'edit-form-block-no-header',
@@ -80,7 +81,7 @@
         const options = {
           closable: true,
           severity,
-          summary: severity,
+          summary: capitalizeFirstLetter(severity),
           detail
         }
 

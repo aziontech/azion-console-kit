@@ -15,5 +15,7 @@ export async function redirectGuard({ to, router }) {
     if (redirectRoute) {
       return redirectRoute
     }
+
+    return true
   }
 }

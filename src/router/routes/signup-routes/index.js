@@ -1,5 +1,4 @@
 import * as SignupService from '@/services/signup-services'
-import { listSocialIdpsService } from '@/services/social-idps-services'
 import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
@@ -15,7 +14,6 @@ export const signupRoutes = {
       component: SignupView,
       props: {
         signupService: SignupService.signupService,
-        listSocialIdpsService: listSocialIdpsService,
         resendEmailService: SignupService.resendEmailService
       },
       meta: {

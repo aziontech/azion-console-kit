@@ -178,7 +178,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate a function wqithin your firewall. Use Rules Engine to activate the function."
+    description="Instantiate a function within your Firewall. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -187,8 +187,8 @@
           required
           name="name"
           v-model="name"
-          description="Give a unique and descriptive name to identify the firewall function instance."
-          placeholder="My firewall function instance"
+          description="Give a unique and descriptive name to identify the Firewall function instance."
+          placeholder="My Firewall function instance"
           data-testid="edge-firewall-functions-form__name-field"
         />
       </div>
@@ -198,7 +198,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Function"
-    description="Select an existing function and customize the arguments. Only functions previously created in the Functions module can be instantiated."
+    description="Select an existing Function and customize the arguments. Only Functions previously created in the Functions module can be instantiated."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">

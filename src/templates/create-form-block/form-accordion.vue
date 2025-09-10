@@ -6,6 +6,7 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'form-accordion' })
 
@@ -62,7 +63,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 

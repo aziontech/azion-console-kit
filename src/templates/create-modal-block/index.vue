@@ -40,7 +40,7 @@
     {
       label: 'Variables',
       to: '/variables/create',
-      description: 'Create environment variables or secrets to use with configured functions.'
+      description: 'Create environment variables or secrets to use with configured Functions.'
     },
     {
       label: 'Edge DNS',
@@ -77,7 +77,7 @@
     {
       label: 'Functions',
       to: '/edge-functions/create?origin=create',
-      description: 'Create functions to use with Application or Firewall.'
+      description: 'Create Functions to use with Application or Firewall.'
     },
     {
       label: 'Edge Services',

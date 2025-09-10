@@ -201,14 +201,14 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'success',
+        summary: 'Success',
         detail: 'Reorder saved'
       })
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Error',
         detail: error
       })
     } finally {

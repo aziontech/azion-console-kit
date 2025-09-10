@@ -121,7 +121,7 @@ const adaptPaymentHistoryForNotRegularAccounts = (results) => {
 }
 
 const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
-  const parseBilling = httpResponse.body.data.accountingDetail?.map((card) => {
+  const parseBilling = httpResponse?.body?.data?.accountingDetail?.map((card) => {
     const disabledOpenInvoice = true
 
     return {

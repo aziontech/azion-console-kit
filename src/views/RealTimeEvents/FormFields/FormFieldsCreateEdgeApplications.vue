@@ -112,7 +112,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create an application to deliver your content from the edge."
+    description="Create an Application to deliver your content from the edge."
     v-if="handleBlock('general')"
   >
     <template #inputs>
@@ -120,9 +120,9 @@
         <FieldText
           label="Name *"
           name="name"
-          placeholder="My application"
+          placeholder="My Application"
           :value="name"
-          description="Give a unique and descriptive name to identify the application."
+          description="Give a unique and descriptive name to identify the Application."
         />
       </div>
     </template>
@@ -130,7 +130,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
-    description="Choose the protocols used between the application and users."
+    description="Choose the protocols used between the Application and users."
     v-if="handleBlock('delivery-settings')"
   >
     <template #inputs>
@@ -749,7 +749,7 @@
               />
             </template>
             <template #subtitle
-              >Enhance real-time data exchange between your application and backend services using
+              >Enhance real-time data exchange between your Application and backend services using
               the WebSocket protocol.</template
             >
           </Card>
