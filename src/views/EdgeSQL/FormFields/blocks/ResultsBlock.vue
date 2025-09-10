@@ -15,7 +15,7 @@
       :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
       :menuItems="menuItems"
       :cleanEditingRows="cleanEditingRows"
-      :disabledRowActions="isJoinQuery"
+      :disabledRowActions="disableActions"
     >
       <template #addButton>
         <Button
@@ -119,8 +119,8 @@
     ]
   })
 
-  const isJoinQuery = computed(() => {
-    return sqlDatabase.hasJoinOperation(props.currentQuery)
+  const disableActions = computed(() => {
+    return sqlDatabase.isNonEditableQuery(props.currentQuery)
   })
 
   const handleRowSave = (row) => {

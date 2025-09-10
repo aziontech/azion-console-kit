@@ -87,8 +87,8 @@ export function useEdgeSQL() {
   const currentDatabaseName = computed(() => currentDatabase.value?.name || '')
   const tablesCount = computed(() => currentTables.value.length)
 
-  // Function to detect JOIN operations in SQL query
-  const hasJoinOperation = (query) => {
+  // Function to detect non-editable queries (JOIN operations, PRAGMA, COUNT, etc.)
+  const isNonEditableQuery = (query) => {
     if (!query || typeof query !== 'string') return false
 
     const joinKeywords = [
@@ -104,14 +104,24 @@ export function useEdgeSQL() {
       'JOIN' // Generic JOIN
     ]
 
+    const nonEditableKeywords = ['PRAGMA', 'COUNT(', 'ROUND(']
+
     const normalizedQuery = query.toUpperCase().replace(/\s+/g, ' ').trim()
 
-    return joinKeywords.some((keyword) => normalizedQuery.includes(keyword))
+    // Check for JOIN operations
+    const hasJoin = joinKeywords.some((keyword) => normalizedQuery.includes(keyword))
+
+    // Check for non-editable query types
+    const hasNonEditableQuery = nonEditableKeywords.some((keyword) =>
+      normalizedQuery.includes(keyword)
+    )
+
+    return hasJoin || hasNonEditableQuery
   }
 
-  // Check if current query has JOIN operations
-  const isJoinQuery = computed(() => {
-    const result = hasJoinOperation(currentQueryText.value)
+  // Check if current query is non-editable
+  const isNonEditableQueryResult = computed(() => {
+    const result = isNonEditableQuery(currentQueryText.value)
     return result
   })
 
@@ -291,7 +301,7 @@ export function useEdgeSQL() {
     hasCurrentDatabase,
     currentDatabaseName,
     tablesCount,
-    isJoinQuery,
+    isNonEditableQueryResult,
 
     // Actions
     setDatabases,
@@ -314,6 +324,6 @@ export function useEdgeSQL() {
     clearError,
     reset,
     executeQuery,
-    hasJoinOperation
+    isNonEditableQuery
   }
 }
