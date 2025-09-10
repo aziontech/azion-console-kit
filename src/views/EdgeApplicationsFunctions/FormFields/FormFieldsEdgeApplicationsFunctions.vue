@@ -139,6 +139,10 @@
     setAzionFormEmptyState(parsedValue)
   }
 
+  const isFirstSelectPanelValue = computed(() => {
+    return selectPanelValue.value === selectPanelOptions[0]
+  })
+
   const hasArgsError = computed(() => {
     return !!argsError.value
   })
@@ -255,7 +259,7 @@
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
-              <div v-if="selectPanelValue === selectPanelOptions[0]">
+              <div v-if="isFirstSelectPanelValue">
                 <div
                   id="azionform"
                   class="azion-json-form"
@@ -343,11 +347,10 @@
           >
             {{ argsError }}
           </small>
-          <DescriptionText
-            size="small"
-          >
+          <DescriptionText size="small">
             <template #rawHtml>
-              Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>.
+              Customize the arguments in JSON format. Once set, they can be called in code using
+              <code>event.args('arg_name')</code>.
             </template>
           </DescriptionText>
         </div>
@@ -355,7 +358,7 @@
 
       <div
         class="flex justify-end mt-[-1rem]"
-        v-if="selectPanelValue === selectPanelOptions[0] && hasFormBuilder"
+        v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
         <PrimeButton
           @click="formBuilderToggle()"

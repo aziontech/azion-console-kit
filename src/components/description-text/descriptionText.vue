@@ -4,7 +4,7 @@
     :style="currentStyle"
     v-if="$slots.rawHtml"
   >
-    <slot name="rawHtml"/>
+    <slot name="rawHtml" />
   </p>
   <p
     :class="currentClass"

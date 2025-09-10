@@ -138,6 +138,10 @@
     setAzionFormEmptyState(parsedValue)
   }
 
+  const isFirstSelectPanelValue = computed(() => {
+    return selectPanelValue.value === selectPanelOptions[0]
+  })
+
   const hasArgsError = computed(() => {
     return !!argsError.value
   })
@@ -253,7 +257,7 @@
             @update:modelValue="selectPanelUpdateModelValue"
           >
             <template #content>
-              <div v-if="selectPanelValue === selectPanelOptions[0]">
+              <div v-if="isFirstSelectPanelValue">
                 <div
                   id="azionform"
                   class="azion-json-form"
@@ -351,7 +355,7 @@
 
       <div
         class="flex justify-end mt-[-1rem]"
-        v-if="selectPanelValue === selectPanelOptions[0] && hasFormBuilder"
+        v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
         <PrimeButton
           @click="formBuilderToggle()"
