@@ -344,10 +344,12 @@
             {{ argsError }}
           </small>
           <DescriptionText
-            :isHtml="true"
             size="small"
-            description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
-          />
+          >
+            <template #rawHtml>
+              Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>.
+            </template>
+          </DescriptionText>
         </div>
       </div>
 

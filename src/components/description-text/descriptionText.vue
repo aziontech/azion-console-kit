@@ -2,16 +2,17 @@
   <p
     :class="currentClass"
     :style="currentStyle"
-    v-if="!isHtml"
+    v-if="$slots.rawHtml"
   >
-    {{ description }}
+    <slot name="rawHtml"/>
   </p>
   <p
     :class="currentClass"
     :style="currentStyle"
     v-else
-    v-html="description"
-  ></p>
+  >
+    {{ description }}
+  </p>
 </template>
 
 <script setup>
@@ -26,10 +27,6 @@
       type: String,
       validator: (value) => ['normal', 'small'].includes(value),
       default: 'normal'
-    },
-    isHtml: {
-      type: Boolean,
-      default: false
     }
   })
 
