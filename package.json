@@ -101,5 +101,23 @@
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^0.33.0",
     "vitest-sonar-reporter": "^1.0.0"
+  },
+  "resolutions": {
+    "ansi-regex": "5.0.1",
+    "ansi-styles": "4.3.0",
+    "backslash": "0.2.0",
+    "chalk": "4.1.2",
+    "color": "3.2.1",
+    "color-convert": "2.0.1",
+    "color-name": "1.1.4",
+    "debug": "4.3.4",
+    "has-ansi": "2.0.0",
+    "has-flag": "4.0.0",
+    "ms": "2.1.2",
+    "simple-swizzle": "0.2.2",
+    "slice-ansi": "4.0.0",
+    "strip-ansi": "6.0.1",
+    "supports-color": "7.2.0",
+    "supports-hyperlinks": "2.3.0"
   }
 }
