@@ -130,8 +130,8 @@ export const WafAdapter = {
     if (attack.matchValue === '-') {
       attack.matchValue = null
     }
-    const hasSpecificMatch = attack.condition.startsWith('specific_')
-    const suffix = attack.condition.includes('_value') ? 'value' : 'name'
+    const hasSpecificMatch = attack.condition?.startsWith('specific_')
+    const suffix = attack.condition?.includes('_value') ? 'value' : 'name'
     const hasMatchValue = !!attack.matchValue
     const hasValue = hasSpecificMatch && hasMatchValue
     return {
