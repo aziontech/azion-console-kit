@@ -119,6 +119,10 @@ import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
 import graphQLApi from '@/services/axios/makeEventsApi'
 const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
 
+// IAM
+import { IAMAdapter } from './adapters/iam-adapter'
+import { IAMService } from './iam-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -188,6 +192,8 @@ const activityHistoryService = new ActivityHistoryService(
   graphQLApiInstance
 )
 
+const iamService = new IAMService(httpService, IAMAdapter)
+
 export {
   vcsService,
   cacheSettingsService,
@@ -218,5 +224,6 @@ export {
   workloadService,
   workloadDeploymentService,
   activityHistoryService,
-  edgeStorageService
+  edgeStorageService,
+  iamService
 }

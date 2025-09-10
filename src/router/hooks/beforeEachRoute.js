@@ -1,31 +1,23 @@
 import {
   logoutGuard,
-  loadingGuard,
   accountGuard,
   themeGuard,
   billingGuard,
   redirectGuard,
-  ssoManagementGuard,
-  domainsLimitGuard,
   flagGuard
 } from '@/router/hooks/guards'
 import { useRouter } from 'vue-router'
+import { useLoadingStore } from '@/stores/loading'
 
 export default async function beforeEachRoute(guardDependency) {
   const router = useRouter()
   const { next } = guardDependency
+  const loadingStore = useLoadingStore()
 
-  const guards = [
-    logoutGuard,
-    loadingGuard,
-    accountGuard,
-    themeGuard,
-    billingGuard,
-    redirectGuard,
-    ssoManagementGuard,
-    domainsLimitGuard,
-    flagGuard
-  ]
+  // Inicia o loading quando a navegação começa
+  loadingStore.startLoading()
+
+  const guards = [logoutGuard, themeGuard, accountGuard, billingGuard, redirectGuard, flagGuard]
 
   for (const executeGuard of guards) {
     const result = await executeGuard({ ...guardDependency, router })

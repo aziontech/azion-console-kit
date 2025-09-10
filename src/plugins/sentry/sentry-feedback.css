@@ -1,0 +1,38 @@
+/* Sentry Feedback Modal Styling
+[data-sentry-feedback],
+.sentry-feedback,
+[data-testid='sentry-feedback'],
+div[class*='sentry'][class*='feedback'],
+div[class*='feedback'],
+div[class*='sentry'],
+div[role='dialog'],
+div[aria-modal='true'],
+.sentry-feedback-widget,
+#sentry-feedback {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  max-width: 90vw !important;
+  max-height: 70vh !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+
+[data-sentry-feedback] *,
+.sentry-feedback *,
+[data-testid='sentry-feedback'] *,
+div[class*='sentry'][class*='feedback'] *,
+div[class*='feedback'] *,
+div[class*='sentry'] *,
+div[role='dialog'] *,
+div[aria-modal='true'] *,
+.sentry-feedback-widget *,
+#sentry-feedback * {
+  z-index: 9999 !important;
+} */
