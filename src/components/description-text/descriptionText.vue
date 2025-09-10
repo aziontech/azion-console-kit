@@ -28,7 +28,8 @@
       default: 'normal'
     },
     isHtml: {
-      type: Boolean
+      type: Boolean,
+      default: false
     }
   })
 
