@@ -122,11 +122,11 @@ export class EdgeSQLService {
 
   executeDatabase = async (databaseId, { statements }) => {
     const body = this.adapter?.adaptSqlCommands?.(statements)
+
     const { data } = await this.httpService.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
-      body,
-      processError: false
+      body
     })
 
     return this.adapter?.adaptExecuteResult?.(data)
@@ -138,8 +138,7 @@ export class EdgeSQLService {
     const { data } = await this.httpService.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
-      body,
-      processError: false
+      body
     })
 
     return this.adapter?.adaptExecuteResult?.(data)

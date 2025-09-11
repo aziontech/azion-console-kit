@@ -13,56 +13,36 @@
   import QueryEditorBlock from './FormFields/blocks/QueryEditorBlock.vue'
   import SqlDefinition from './FormFields/blocks/SqlDefinition.vue'
   import TableInfo from './FormFields/blocks/TableInfo.vue'
-
-  import { useDialog } from 'primevue/usedialog'
-
-  import { useEdgeSQL } from './composable/useEdgeSQL'
-  import { edgeSQLService } from '@/services/v2'
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
-  // import RowFormDrawer from './components/RowFormDrawer.vue'
+
+  import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
+  import { useAccountStore } from '@/stores/account'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
+  import { edgeSQLService } from '@/services/v2'
   import { SQLITE_QUERIES, QUICK_TEMPLATES } from './constants'
   import { TableActionManager } from './utils'
-  import { useAccountStore } from '@/stores/account'
-  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'edge-sql-database-view' })
 
   const route = useRoute()
   const router = useRouter()
   const dialog = useDialog()
-  const sqlDatabase = useEdgeSQL()
-  const accountStore = useAccountStore()
   const toast = useToast()
-  const resultQuery = ref(null)
-  // const documentationService = () => {
-  //   window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
-  // }
+  const accountStore = useAccountStore()
+  const sqlDatabase = useEdgeSQL()
 
   const databaseId = computed(() => route.params.id)
+  const resultQuery = ref(null)
 
-  // Tab route mapping
-  const TAB_ROUTES = {
-    results: 0,
-    history: 1
-  }
+  const TAB_ROUTES = { results: 0, history: 1 }
+  const ROUTE_TABS = { 0: 'results', 1: 'history' }
 
-  const ROUTE_TABS = {
-    0: 'results',
-    1: 'history'
-  }
-  const databaseName = computed(() => {
-    const name = sqlDatabase.currentDatabase?.name
-    if (name && typeof name === 'object' && name.text !== undefined) {
-      return name.text || name.content || null
-    }
-    return name || null
-  })
   const sqlQuery = ref('')
   const isExecutingQuery = ref(false)
   const isLoadingTables = ref(false)
   const executionTime = ref(0)
-
   const tablesTree = ref([])
   const selectedTableSchema = ref(null)
   const selectedTableDefinition = ref('')
@@ -71,17 +51,28 @@
   const isEditorCollapsed = ref(true)
   const isTemplatesCollapsed = ref(true)
   const selectedTableName = ref(null)
-
-  // Initialize activeTabIndex based on route
-  const getTabIndexFromRoute = () => {
-    const tabParam = route.params.tab
-    return TAB_ROUTES[tabParam] !== undefined ? TAB_ROUTES[tabParam] : 0
-  }
-
   const activeTabIndex = ref(getTabIndexFromRoute())
   const tableMenuRef = ref()
   const selectedTable = ref(null)
-  // const selectedRows = ref([])
+  const drawerVisible = ref(false)
+  const definitionDrawerVisible = ref(false)
+
+  const databaseName = computed(() => {
+    const name = sqlDatabase.currentDatabase?.name
+    if (name && typeof name === 'object' && name.text !== undefined) {
+      return name.text || name.content || null
+    }
+    return name || null
+  })
+
+  const monacoTheme = computed(() => {
+    return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
+
+  function getTabIndexFromRoute() {
+    const tabParam = route.params.tab
+    return TAB_ROUTES[tabParam] !== undefined ? TAB_ROUTES[tabParam] : 0
+  }
 
   const loadDatabaseInfo = async () => {
     try {
@@ -117,13 +108,7 @@
   }
 
   const executeQuery = async () => {
-    if (!sqlQuery.value.trim()) {
-      return
-    }
-
-    if (!databaseId.value) {
-      return
-    }
+    if (!sqlQuery.value.trim() || !databaseId.value) return
 
     isExecutingQuery.value = true
     const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
@@ -131,6 +116,7 @@
     try {
       resultQuery.value = await sqlDatabase.executeQuery(sqlQuery.value)
       activeTabIndex.value = 0
+
       if (
         !isSelectQuery &&
         (sqlQuery.value.toLowerCase().includes('create table') ||
@@ -155,7 +141,6 @@
   const useTemplate = (template) => {
     sqlQuery.value = template.query
     activeTabIndex.value = 0
-
     selectedTableName.value = null
     sqlDatabase.setSelectedTable(null)
 
@@ -182,11 +167,10 @@
     sqlQuery.value = SQLITE_QUERIES.SELECT_ALL(tableName)
 
     isLoadingSchema.value = true
-
     await loadTableSchema(tableName)
 
     activeTabIndex.value = 0
-    await executeQuery(false)
+    await executeQuery()
   }
 
   const toggleTemplates = () => {
@@ -219,13 +203,9 @@
         parameters: []
       })
 
-      if (
-        result.statusCode === 200 &&
-        result.body.results?.length > 0 &&
-        result.body.results[0].rows?.length > 0
-      ) {
+      if (result.results?.length > 0 && result.results[0].rows?.length > 0) {
         selectedTableDefinition.value =
-          result.body.results[0].rows[0][0] || 'Table definition not found'
+          result.results[0].rows[0].sql || 'Table definition not found'
       } else {
         selectedTableDefinition.value = 'Table definition not found'
       }
@@ -235,10 +215,6 @@
       isLoadingDefinition.value = false
     }
   }
-
-  const monacoTheme = computed(() => {
-    return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
-  })
 
   const showTableMenu = (event, table) => {
     if (selectedTable.value?.key === table.key) {
@@ -257,33 +233,12 @@
     })
   }
 
-  const drawerVisible = ref(false)
-  const definitionDrawerVisible = ref(false)
-  const rowFormDrawerVisible = ref(false)
-  const isEditingRow = ref(false)
-  const editingRowData = ref({})
-  const editingRowIndex = ref(-1)
-
   const deleteTableService = async (tableName) => {
-    try {
-      const result = await edgeSQLService.executeDatabase(databaseId.value, {
-        statements: [`DROP TABLE ${tableName};`]
-      })
+    await edgeSQLService.executeDatabase(databaseId.value, {
+      statements: [`DROP TABLE ${tableName};`]
+    })
 
-      if (result.statusCode === 200) {
-        await loadTables()
-
-        if (selectedTableName.value === tableName) {
-          selectedTableName.value = null
-          sqlDatabase.setSelectedTable(null)
-        }
-        return `Table "${tableName}" deleted successfully`
-      } else {
-        throw new Error(result.error || 'Failed to delete table')
-      }
-    } catch (error) {
-      throw new Error(`Delete failed: ${error.message}`)
-    }
+    return `Table "${tableName}" deleted successfully`
   }
 
   const openDeleteTableDialog = (tableName) => {
@@ -295,7 +250,13 @@
         deleteService: () => deleteTableService(tableName),
         deleteConfirmationText: tableName,
         entityDeleteMessage: `The table "${tableName}" will be permanently deleted along with all its data. This action cannot be undone.`,
-        onSuccess: () => {}
+        onSuccess: async () => {
+          await loadTables()
+          if (selectedTableName.value === tableName) {
+            selectedTableName.value = null
+            sqlDatabase.setSelectedTable(null)
+          }
+        }
       }
     })
   }
@@ -324,44 +285,6 @@
     if (!selectedTable.value) return []
     return tableActionManager.generateMenuItems(selectedTable.value.key)
   })
-
-  const clearRowFormState = () => {
-    editingRowData.value = {}
-    editingRowIndex.value = -1
-    isEditingRow.value = false
-    focusedField.value = ''
-  }
-
-  const openInsertRowDrawer = async () => {
-    if (!sqlDatabase.queryResults.value.length) return
-
-    await loadTableSchema(selectedTableName.value)
-    clearRowFormState()
-    rowFormDrawerVisible.value = true
-  }
-
-  const focusedField = ref('')
-
-  const openEditRowDrawer = (rowData, rowIndex, fieldToFocus = '') => {
-    if (sqlDatabase.queryResults.value.length === 0) return
-
-    const result = sqlDatabase.queryResults.value[0]
-    if (!result.columns) return
-
-    clearRowFormState()
-
-    isEditingRow.value = true
-    editingRowData.value = {}
-
-    result.columns.forEach((col) => {
-      editingRowData.value[col] = rowData[col] || ''
-    })
-
-    focusedField.value = fieldToFocus
-
-    editingRowIndex.value = rowIndex
-    rowFormDrawerVisible.value = true
-  }
 
   const handleKeyDown = (event) => {
     if (event.ctrlKey && event.key === 'Enter') {
@@ -407,21 +330,6 @@
     }
   })
 
-  watch(databaseId, async (newId) => {
-    if (newId) {
-      await loadTables()
-    }
-  })
-
-  watch(rowFormDrawerVisible, (newVisible) => {
-    if (!newVisible) {
-      setTimeout(() => {
-        clearRowFormState()
-      }, 300)
-    }
-  })
-
-  // Watch for route changes to update active tab
   watch(
     () => route.params.tab,
     (newTab) => {
@@ -433,7 +341,6 @@
     { immediate: true }
   )
 
-  // Watch for activeTabIndex changes to update route (when tabs are clicked directly)
   watch(activeTabIndex, (newIndex) => {
     const currentTab = route.params.tab
     const expectedTab = ROUTE_TABS[newIndex]
@@ -457,7 +364,7 @@
               <Button
                 label="Back to Databases"
                 icon="pi pi-arrow-left"
-                class="p-button-outlined"
+                outlined
                 @click="router.push('/edge-sql')"
               />
             </div>
@@ -503,11 +410,8 @@
                       <ResultsBlock
                         :queryResults="resultQuery"
                         :isExecutingQuery="isExecutingQuery"
-                        :selectedTableSchema="selectedTableSchema"
                         :tableName="selectedTableName"
                         :currentQuery="sqlQuery"
-                        @open-insert-row-drawer="openInsertRowDrawer"
-                        @open-edit-row-drawer="openEditRowDrawer"
                         @execute-query="setSqlQuery"
                       />
                     </TabPanel>
