@@ -62,7 +62,8 @@ export const documentationGuideProducts = {
   paymentHistory: () =>
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
   customPages: () => openDocumentationProducts('guides/customizing-error-response-page'),
-  edgeStorage: () => openDocumentationProducts('store/edge-storage')
+  edgeStorage: () => openDocumentationProducts('store/edge-storage'),
+  edgeSQL: () => openDocumentationProducts('store/edge-sql')
 }
 
 export const documentationStoreProducts = {

@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { edgeSQLService } from '@/services/v2'
 import { useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
 
 // Global state to share between components
 let globalState = null
@@ -142,6 +143,7 @@ export function useEdgeSQL() {
   }
 
   const route = useRoute()
+  const toast = useToast()
   const databases = ref([])
   const currentDatabase = ref(null)
   const databaseCreated = ref(null)
@@ -345,9 +347,22 @@ export function useEdgeSQL() {
         executionTime: Date.now() - startTime
       })
 
+      if (!isSelectQuery) {
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Query executed successfully',
+          life: 3000
+        })
+      }
+
       return queryResults
     } catch (error) {
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      }
       setError(error.message)
+      throw error
     } finally {
       isLoading.value = false
     }

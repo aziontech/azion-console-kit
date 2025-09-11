@@ -1,4 +1,6 @@
 /** @type {import('vue-router').RouteRecordRaw} */
+import * as Helpers from '@/helpers'
+
 export const edgeSQLRoutes = {
   path: '/sql-database',
   name: 'sql-database',
@@ -8,7 +10,7 @@ export const edgeSQLRoutes = {
       name: 'list-sql-databases',
       component: () => import('@views/EdgeSQL/ListView.vue'),
       props: {
-        documentationService: () => 'https://www.azion.com/en/documentation/products/edge-sql/'
+        documentationService: Helpers.documentationGuideProducts.edgeSQL
       },
       meta: {
         breadCrumbs: [

@@ -201,15 +201,15 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No databases found."
+        emptyListMessage="No Databases found."
         data-testid="edge-sql-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
-        title="No databases have been created"
-        description="Create your first SQL database to store and query your data at the edge."
+        title="No Databases have been created"
+        description="Create your first SQL Database to store and query your data at the edge."
         createButtonLabel="Database"
         createPagePath="/sql-database/create"
         :documentationService="props.documentationService"

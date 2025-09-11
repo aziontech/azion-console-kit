@@ -59,14 +59,7 @@
                     severity="info"
                   />
                 </div>
-                <Button
-                  icon="pi pi-copy"
-                  label="Copy Statement"
-                  severity="secondary"
-                  outlined
-                  size="small"
-                  @click="copyDefinition"
-                />
+                <copyBlock :value="selectedTableDefinition" />
               </div>
             </template>
           </InfoSection>
@@ -84,12 +77,7 @@
                   class="sql-definition-header p-2 border-bottom-1 surface-border bg-surface-50 dark:bg-surface-800 flex justify-content-between align-items-center"
                 >
                   <span class="text-xs text-color-secondary font-mono">SQLite</span>
-                  <Button
-                    icon="pi pi-copy"
-                    class="p-button-text p-button-sm text-color-secondary hover:text-primary"
-                    @click="copyDefinition"
-                    v-tooltip.top="'Copy SQL'"
-                  />
+                  <copyBlock :value="selectedTableDefinition" />
                 </div>
                 <div
                   class="sql-monaco-container border-round-lg overflow-hidden"
@@ -134,9 +122,9 @@
 <script setup>
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import Button from 'primevue/button'
   import Tag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
   import { ref, watch } from 'vue'
   import { computed } from 'vue'
 
@@ -203,10 +191,6 @@
   const monacoTheme = computed(() => {
     return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
-
-  const copyDefinition = () => {
-    navigator.clipboard.writeText(props.selectedTableDefinition.value)
-  }
 
   const definitionDrawerVisible = ref(false)
 

@@ -17,7 +17,6 @@
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
 
   import { useDialog } from 'primevue/usedialog'
-  import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { edgeSQLService } from '@/services/v2'
@@ -29,7 +28,6 @@
   const route = useRoute()
   const router = useRouter()
   const dialog = useDialog()
-  const toast = useToast()
   const accountStore = useAccountStore()
   const sqlDatabase = useEdgeSQL()
 
@@ -127,14 +125,6 @@
       }
     } finally {
       isExecutingQuery.value = false
-      if (!isSelectQuery) {
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Query executed successfully',
-          life: 3000
-        })
-      }
     }
   }
 
