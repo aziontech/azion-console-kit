@@ -21,6 +21,7 @@
       :loading="isLoading"
       data-testid="data-table"
       rowHover
+      :rowClass="stateClassRules"
     >
       <template
         #header
@@ -563,6 +564,13 @@
     }
   }
 
+  const stateClassRules = (row) => {
+    if (selectedItems.value.find((item) => item.id === row.id)) {
+      return 'bg-altered'
+    }
+    return ''
+  }
+
   defineExpose({ reload, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
@@ -595,3 +603,29 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style lang="scss">
+  .p-datatable {
+    .p-datatable-tbody {
+      > tr {
+        &.p-datatable-dragpoint-top > td {
+          box-shadow: inset 0 2px 0 0 var(--text-color);
+        }
+
+        &.p-datatable-dragpoint-bottom > td {
+          box-shadow: inset 0 -2px 0 0 var(--text-color);
+        }
+
+        &.bg-altered,
+        &.p-frozen.bg-altered {
+          @media (prefers-color-scheme: dark) {
+            background-color: var(--surface-500);
+          }
+          @media (prefers-color-scheme: light) {
+            background-color: var(--surface-50);
+          }
+        }
+      }
+    }
+  }
+</style>
