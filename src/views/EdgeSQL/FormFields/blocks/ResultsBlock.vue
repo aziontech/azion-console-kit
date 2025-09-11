@@ -24,7 +24,7 @@
           severity="primary"
           class="p-button-sm font-medium"
           @click="insertRow"
-          :disabled="disabledAddNewRow"
+          :disabled="disabledAddNewRow || disableActions"
         />
       </template>
     </ListTableBlockWithRowEdit>
@@ -309,6 +309,7 @@
     () => props.queryResults,
     (newResults) => {
       responseQuery.value = newResults
+      disabledAddNewRow.value = false
       if (newResults?.length > 0) {
         hasContentToList.value = true
       }

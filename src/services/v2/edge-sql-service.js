@@ -108,12 +108,12 @@ export class EdgeSQLService {
   }
 
   queryDatabase = async (databaseId, { statements }) => {
+    const body = this.adapter?.adaptSqlCommands?.(statements)
+
     const { data } = await this.httpService.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
-      body: {
-        statements: [statements]
-      },
+      body,
       processError: false
     })
 
