@@ -1,6 +1,6 @@
 <template>
   <EmptyResultsBlock
-    v-if="!buckets.length && !isLoading"
+    v-if="showEmptyResults"
     title="No buckets created"
     description="Create your first bucket here"
     createButtonLabel="Bucket"
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-  import { inject, ref } from 'vue'
+  import { inject, ref, computed } from 'vue'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeStorageService } from '@/services/v2'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
@@ -43,10 +43,6 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const { buckets, bucketTableNeedRefresh } = useEdgeStorage()
-
-  const listServiceRef = ref(null)
-
-  const isLoading = ref(true)
   const fields = ['name', 'size', 'last_editor', 'last_modified']
   const columns = [
     {
@@ -70,6 +66,14 @@
       sortable: true
     }
   ]
+
+  const listServiceRef = ref(null)
+
+  const isLoading = ref(true)
+
+  const showEmptyResults = computed(() => {
+    return !buckets.value.length && !isLoading.value
+  })
 
   const handleEdit = (bucket) => {
     router.push(`/object-storage/edit/${bucket.name}`)
@@ -96,11 +100,13 @@
   ]
 
   const loadBuckets = async () => {
+    isLoading.value = true
     if (!buckets.value.length || bucketTableNeedRefresh.value) {
       const response = await edgeStorageService.listEdgeStorageBuckets()
       buckets.value = response.body
       bucketTableNeedRefresh.value = false
     }
+    isLoading.value = false
     return {
       body: buckets.value,
       count: buckets.value.length
