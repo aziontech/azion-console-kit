@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-8">
+  <div class="mt-6">
     <ListTableBlockWithRowEdit
       v-if="hasContentToList && hasResults"
       :columns="columns"

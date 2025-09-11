@@ -362,7 +362,7 @@
         </PageHeadingBlock>
       </template>
       <template #content>
-        <div class="h-full overflow-hidden">
+        <div class="h-full">
           <div class="flex flex-col sm:flex-row h-full gap-3">
             <ListTablesBlock
               :tablesTree="tablesTree"

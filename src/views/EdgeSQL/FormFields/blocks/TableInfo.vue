@@ -68,13 +68,9 @@
                     severity="info"
                   />
                 </div>
-                <Button
-                  icon="pi pi-copy"
+                <copyBlock
+                  :value="copyDefinition"
                   label="Copy Definition"
-                  severity="secondary"
-                  outlined
-                  size="small"
-                  @click="copyTableDefinition"
                 />
               </div>
             </template>
@@ -152,7 +148,7 @@
 <script setup>
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import Button from 'primevue/button'
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
   import Tag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
   import { computed, ref, watch } from 'vue'
@@ -180,6 +176,8 @@
     get: () => props.schemaVisible,
     set: (value) => emit('close', value)
   })
+
+  const copyDefinition = computed(() => JSON.stringify(props.selectedTableSchema, null, 2))
 
   watch(
     () => props.selectedTableSchema,

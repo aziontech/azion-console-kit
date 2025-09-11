@@ -207,9 +207,11 @@ export const EdgeSQLAdapter = {
         const trimmedLine = line.trim()
         if (!trimmedLine) return
 
-        const startsWithKeyword = sqlKeywords.some((keyword) =>
-          trimmedLine.toUpperCase().startsWith(keyword.toUpperCase())
-        )
+        const startsWithKeyword = sqlKeywords.some((keyword) => {
+          const upperLine = trimmedLine.toUpperCase()
+          const upperKeyword = keyword.toUpperCase()
+          return upperLine === upperKeyword || upperLine.startsWith(upperKeyword + ' ')
+        })
 
         if (startsWithKeyword && currentStatement.trim() && index > 0) {
           processedStatements.push(currentStatement.trim())

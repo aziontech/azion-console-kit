@@ -59,7 +59,10 @@
                     severity="info"
                   />
                 </div>
-                <copyBlock :value="selectedTableDefinition" />
+                <copyBlock
+                  :value="selectedTableDefinition"
+                  label="Copy Definition"
+                />
               </div>
             </template>
           </InfoSection>

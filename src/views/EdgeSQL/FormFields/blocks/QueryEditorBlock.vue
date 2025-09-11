@@ -6,8 +6,7 @@
     <div
       class="h-10 border-bottom-1 surface-border flex justify-content-between align-items-center p-2"
     >
-      <span class="text-color">Query Editor</span>
-      <i class="pi pi-align-left text-color"></i>
+      <span class="text-color text-sm p-2">Query Editor</span>
     </div>
     <vue-monaco-editor
       v-model:value="sqlQueryCommand"
@@ -17,7 +16,9 @@
       class="w-full h-full"
     />
   </div>
-  <div class="flex justify-content-between align-items-center">
+  <div
+    class="flex flex-col sm:flex-row justify-content-between sm:align-items-center align-items-start flex-wrap gap-2"
+  >
     <div class="flex align-items-center gap-3 text-sm text-color-secondary py-1">
       <div
         v-if="getQueryStats?.duration"
@@ -50,7 +51,7 @@
         <span>{{ getQueryStats?.rowsWritten }} written</span>
       </div>
     </div>
-    <div class="flex align-items-center gap-3">
+    <div class="flex align-items-center gap-3 justify-end">
       <Button
         label="Clear"
         icon="pi pi-times-circle"
