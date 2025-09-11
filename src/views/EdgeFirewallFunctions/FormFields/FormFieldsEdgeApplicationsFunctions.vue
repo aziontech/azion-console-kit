@@ -12,7 +12,7 @@
   import TitleDescriptionArea from '@/components/title-description-area'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
-  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
+  // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
@@ -294,12 +294,14 @@
                         class="flex flex-col items-center justify-center gap-2 h-[364px]"
                       >
                         <p>Configure the form builder.</p>
+                        <!--
                         <PrimeButton
                           outlined
                           @click="azionJsonFormWindowOpener()"
                           label="Read documentation"
                           size="small"
                         />
+                        -->
                       </div>
                     </div>
                   </div>
