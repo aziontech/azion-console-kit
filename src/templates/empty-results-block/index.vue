@@ -21,10 +21,6 @@
     noShowBorderTop: { type: Boolean, required: false, default: false }
   })
   function openDocumentation() {
-    if (!props.documentationService || typeof props.documentationService !== 'function') {
-      return
-    }
-
     props.documentationService()
   }
   function navigateToCreatePage() {
