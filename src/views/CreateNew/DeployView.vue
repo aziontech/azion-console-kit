@@ -173,7 +173,7 @@
   const failMessage =
     'There was an issue during the deployment. Check the Deploy Log for more details.'
   const successMessage =
-    'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
+    'The Application is being propagated through the edge nodes. This process will take a few minutes.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',

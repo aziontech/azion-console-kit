@@ -16,7 +16,7 @@ export class WorkloadService {
   }
 
   #ensureCertificate = async (payload) => {
-    if (payload.tls.certificate !== 1) return
+    if (payload.tls.certificate !== 1 && payload.tls.certificate !== 2) return
     const shouldCreate =
       this._certificateId == null ||
       hasAnyFieldChanged(this.digitalCertificateAdapter, this._objLetEncrypt, payload, keysToCheck)

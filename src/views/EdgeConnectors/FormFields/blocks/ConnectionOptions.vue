@@ -132,7 +132,7 @@
                       label: { class: 'w-full text-left' },
                       root: { class: 'p-2' }
                     }"
-                    label="Create Edge Storage"
+                    label="Create Object Storage"
                   />
                 </li>
               </ul>
@@ -236,7 +236,7 @@
       case 'http':
         return 'Customize settings related to origin servers and hosts.'
       case 'storage':
-        return 'Configure the connection to your Edge Storage bucket to enable seamless data access and retrieval at the edge.'
+        return 'Configure the connection to your Object Storage bucket to enable seamless data access and retrieval at the edge.'
       case 'live_ingest':
         return 'Set up the connection for live media stream ingestion to ensure real-time processing and delivery through the edge network.'
       default:

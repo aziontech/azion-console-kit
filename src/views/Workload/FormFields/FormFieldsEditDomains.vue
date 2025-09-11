@@ -104,7 +104,7 @@
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
-              request in Edge Firewall, if necessary.`,
+              request in Firewall, if necessary.`,
       inputValue: 'permissive'
     }
   ])
@@ -246,7 +246,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
-    description="Choose the protocols used between the edge application and users."
+    description="Choose the protocols used between the Application and users."
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
@@ -477,7 +477,7 @@
 
   <form-horizontal
     title="Settings"
-    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
+    description="Determine the Application of the workload and its digital certificate. To link an existing workload to an Application, add it to the CNAME field and block access to the Application via the Azion workload."
   >
     <template #inputs>
       <DigitalCertificatesDrawer
@@ -490,7 +490,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
+        subtitle="Check this option to make the Application accessible only through the domains listed in the CNAME field. Attempts to access the Application through the Azion workload will be blocked."
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -581,7 +581,7 @@
           optionValue="value"
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
         />
       </div>
     </template>

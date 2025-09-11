@@ -30,7 +30,7 @@ describe('EdgeApplicationServicesV4', () => {
     await sut(fixtures.edgeApplication)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications`,
+      url: `v4/workspace/applications`,
       method: 'POST',
       body: {
         name: fixtures.edgeApplication.name
@@ -38,7 +38,7 @@ describe('EdgeApplicationServicesV4', () => {
     })
   })
 
-  it('should return a feedback when successfully create an edge application', async () => {
+  it('should return a feedback when successfully create an Application', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,
       body: {
@@ -52,7 +52,7 @@ describe('EdgeApplicationServicesV4', () => {
     const result = await sut(fixtures.edgeApplication)
 
     expect(result).toEqual({
-      feedback: 'Your edge application has been created',
+      feedback: 'Your Application has been created',
       urlToEditView: `/edge-applications/config/${fixtures.edgeApplicationId}`,
       applicationId: fixtures.edgeApplicationId
     })

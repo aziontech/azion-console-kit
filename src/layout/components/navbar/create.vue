@@ -60,6 +60,7 @@
             size="small"
             class="flex-none surface-border text-sm w-8 h-8"
             text
+            aria-label="Close create modal"
           />
         </div>
       </div>

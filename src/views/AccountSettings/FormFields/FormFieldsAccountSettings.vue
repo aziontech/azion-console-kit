@@ -14,6 +14,7 @@
   import PrimeButton from 'primevue/button'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   const props = defineProps({
     listCountriesService: {
@@ -56,7 +57,7 @@
   const showToast = (summary, severity) => {
     const options = {
       severity,
-      summary,
+      summary: capitalizeFirstLetter(summary),
       closable: true
     }
 

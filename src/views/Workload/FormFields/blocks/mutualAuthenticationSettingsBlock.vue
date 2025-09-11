@@ -34,7 +34,7 @@
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
                 the Trusted CA can't be validated. Check which client certificate attempted the
-                request in Edge Firewall, if necessary.`,
+                request in Firewall, if necessary.`,
       inputValue: 'permissive'
     }
   ])

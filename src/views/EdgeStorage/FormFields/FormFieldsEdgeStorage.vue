@@ -33,7 +33,7 @@
   <div class="flex flex-col gap-8">
     <FormHorizontal
       title="General"
-      description="Check the details of the Edge Storage Bucket."
+      description="Check the details of the Object Storage Bucket."
       :disabled="disableNameEdit"
     >
       <template #inputs>
@@ -65,7 +65,7 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Select a Edge Access level"
-            description="Select the appropriate access level for your bucket based on your application's requirements."
+            description="Select the appropriate access level for your bucket based on your Application's requirements."
             data-testid="edge-storage-form__edge-access-field"
           />
         </div>

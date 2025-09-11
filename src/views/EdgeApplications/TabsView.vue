@@ -31,7 +31,6 @@
     originsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
     edgeFunctionsServices: { type: Object, required: true }
@@ -185,6 +184,8 @@
     visibleOnSaved
   })
 
+  provide('edgeApplication', edgeApplication)
+
   const tagProps = {
     value: 'Locked',
     severity: 'warning',
@@ -267,7 +268,6 @@
       condition: hasFlagBlockApiV4(),
       show: showTabs.errorResponses,
       props: () => ({
-        ...props.errorResponsesServices,
         edgeApplicationId: edgeApplicationId.value,
         listOriginsService: props.originsServices.listOriginsService
       })

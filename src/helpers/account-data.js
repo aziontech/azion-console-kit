@@ -7,12 +7,7 @@ import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo, accountJobRole, creditAndExpirationDate] = await Promise.all([
-    getAccountInfoService(),
-    getUserInfoService(),
-    loadAccountJobRoleService(),
-    billingGqlService.getCreditAndExpirationDate()
-  ])
+  const [accountInfo, userInfo] = await Promise.all([getAccountInfoService(), getUserInfoService()])
 
   accountInfo.is_account_owner = userInfo.results.is_account_owner
   accountInfo.client_id = userInfo.results.client_id
@@ -23,21 +18,43 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.permissions = userInfo.results.permissions
   accountInfo.email = userInfo.results.email
   accountInfo.user_id = userInfo.results.id
-  accountInfo.colorTheme = accountStore.theme
-  accountInfo.jobRole = accountJobRole.jobRole
+  accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
-  accountInfo.credit = creditAndExpirationDate.credit
-  accountInfo.formatCredit = creditAndExpirationDate.formatCredit
-  accountInfo.days = creditAndExpirationDate.days
-
-  if (accountInfo.client_id) {
-    const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
-      clientId: accountInfo.client_id
-    })
-    accountInfo.isDeveloperSupportPlan = isDeveloperSupportPlan
-    accountInfo.yourServicePlan = yourServicePlan
-  }
 
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
+}
+
+export const loadProfileAndAccountInfo = async () => {
+  const accountStore = useAccountStore()
+  const accountInfo = accountStore.account
+
+  const promises = [
+    loadAccountJobRoleService().then(({ jobRole }) => {
+      accountStore.setAccountData({
+        jobRole
+      })
+    }),
+
+    billingGqlService.getCreditAndExpirationDate().then(({ credit, formatCredit, days }) => {
+      accountStore.setAccountData({
+        credit,
+        formatCredit,
+        days
+      })
+    }),
+
+    accountInfo.client_id
+      ? loadContractServicePlan({
+          clientId: accountInfo.client_id
+        }).then(({ isDeveloperSupportPlan, yourServicePlan }) => {
+          accountStore.setAccountData({
+            isDeveloperSupportPlan,
+            yourServicePlan
+          })
+        })
+      : Promise.resolve()
+  ]
+
+  await Promise.all(promises)
 }

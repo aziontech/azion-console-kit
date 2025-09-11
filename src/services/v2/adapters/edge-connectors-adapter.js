@@ -81,12 +81,9 @@ const typeBuilders = {
       }
     }
 
-    if (!payload.modules.originShield.config.hmac.enabled && modules.origin_shield.config) {
-      delete modules.origin_shield.config.hmac
+    if (modules.origin_shield.config && !payload.modules.originShield.config.hmac.enabled) {
+      modules.origin_shield.config.hmac.config = null
     }
-
-    const shouldSendModules =
-      payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
 
     const result = {
       addresses: extractAddressesPostRequest(
@@ -104,9 +101,7 @@ const typeBuilders = {
       }
     }
 
-    if (shouldSendModules) {
-      result.modules = modules
-    }
+    result.modules = modules
 
     return result
   }

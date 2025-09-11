@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Digital Certificates"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
@@ -9,7 +9,7 @@
         :listService="listService"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
-        addButtonLabel="Digital Certificate"
+        addButtonLabel="Certificate Manager"
         createPagePath="digital-certificates/create"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -19,6 +19,7 @@
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="hiddenColumns"
         :firstLoadData="firstLoadData"
       >
         <template #select-buttons>
@@ -33,7 +34,7 @@
         </template>
         <template #addButton>
           <CreateMenuBlock
-            addButtonLabel="Digital Certificate"
+            addButtonLabel="Certificate Manager"
             :items="items"
           />
         </template>
@@ -47,7 +48,7 @@
       >
         <template #default>
           <CreateMenuBlock
-            addButtonLabel="Digital Certificate"
+            addButtonLabel="Certificate Manager"
             :items="items"
             severity="secondary"
           />
@@ -99,7 +100,13 @@
     'status',
     'status_detail',
     'validity',
-    'type'
+    'type',
+    'challenge',
+    'authority',
+    'key_algorithm',
+    'last_editor',
+    'last_modified',
+    'managed'
   ]
   const digitalCertificateTypeSelected = ref('Certificates')
   const optionsSelectButton = ref(['Certificates', 'CRL'])
@@ -156,6 +163,13 @@
     })
   }
 
+  const hiddenColumns = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return []
+    }
+    return ['managed', 'challenge', 'authority', 'keyAlgorithm']
+  })
+
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
@@ -177,6 +191,22 @@
           field: 'issuer',
           header: 'Issuer',
           sortField: 'issuer'
+        },
+        {
+          field: 'lastEditor',
+          header: 'Last Editor',
+          sortField: 'last_editor',
+          type: 'component',
+          component: (columnData) =>
+            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+        },
+        {
+          field: 'lastModified',
+          header: 'Last Modified',
+          sortField: 'last_modified',
+          type: 'component',
+          component: (columnData) =>
+            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
         },
         {
           field: 'status',
@@ -227,7 +257,26 @@
       {
         field: 'validity',
         header: 'Expiration Date',
-        sortField: 'validity'
+        sortField: 'validity',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'status',
@@ -239,6 +288,32 @@
             data: { ...columnData.status, tooltipText: columnData.statusDetail },
             columnAppearance: 'tag-with-tooltip'
           })
+      },
+      {
+        field: 'managed',
+        header: 'Managed',
+        sortField: 'managed',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: { content: columnData, severity: columnData ? 'success' : 'danger' },
+            columnAppearance: 'tag'
+          })
+      },
+      {
+        field: 'challenge',
+        header: 'Challenge',
+        sortField: 'challenge'
+      },
+      {
+        field: 'authority',
+        header: 'Authority',
+        sortField: 'authority'
+      },
+      {
+        field: 'keyAlgorithm',
+        header: 'Key Algorithm',
+        sortField: 'key_algorithm'
       }
     ]
   })
