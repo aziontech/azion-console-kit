@@ -193,17 +193,17 @@ function createMarketplaceProductsItems() {
 }
 
 //  Uncoment this when store is ready
-function createStoreItems() {
-  return [
-    {
-      label: 'Object Storage',
-      to: '/object-storage',
-      icon: 'ai ai-edge-storage',
-      id: 'object-storage',
-      tag: 'Preview'
-    }
-  ]
-}
+// function createStoreItems() {
+//   return [
+//     {
+//       label: 'Object Storage',
+//       to: '/object-storage',
+//       icon: 'ai ai-edge-storage',
+//       id: 'object-storage',
+//       tag: 'Preview'
+//     }
+//   ]
+// }
 
 export function getMenuItens(showMarketplaceProductsItens) {
   const menus = [
@@ -219,10 +219,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
       items: createSecureItems()
     },
     // Uncomment this when store is ready
-    {
-      label: 'Store',
-      items: createStoreItems()
-    },
+    // {
+    //   label: 'Store',
+    //   items: createStoreItems()
+    // },
     {
       label: 'Deploy',
       items: createDeployItems()
