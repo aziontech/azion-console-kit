@@ -123,8 +123,7 @@ export const EdgeSQLAdapter = {
 
   adaptDatabaseCreatePayload(payload) {
     return {
-      name: payload.name,
-      active: payload.active
+      name: payload.name
     }
   },
 

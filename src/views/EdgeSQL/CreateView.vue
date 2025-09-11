@@ -59,13 +59,11 @@
       .required('Database name is required')
       .min(6, 'Database name must be at least 6 characters')
       .max(50, 'Database name must be at most 50 characters')
-      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)'),
-    active: yup.boolean().default(true)
+      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)')
   })
 
   const initialValues = ref({
-    name: '',
-    active: true
+    name: ''
   })
 
   const handleResponse = (response) => {

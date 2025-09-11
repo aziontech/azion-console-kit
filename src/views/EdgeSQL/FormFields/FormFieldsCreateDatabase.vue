@@ -19,31 +19,12 @@
         </div>
       </template>
     </FormHorizontal>
-    <FormHorizontal
-      title="Status"
-      description=""
-    >
-      <template #inputs>
-        <div class="flex flex-col gap-2">
-          <FieldSwitchBlock
-            nameField="active"
-            name="active"
-            auto
-            :isCard="false"
-            title="Active"
-            subtitle=""
-            data-testid="form-horizontal-active-switch"
-          />
-        </div>
-      </template>
-    </FormHorizontal>
   </div>
 </template>
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   import { useField } from 'vee-validate'
 
