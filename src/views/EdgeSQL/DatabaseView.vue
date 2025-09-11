@@ -488,6 +488,7 @@
                     :executionTime="executionTime"
                     :isExecutingQuery="isExecutingQuery"
                     :monacoTheme="monacoTheme"
+                    :tablesTree="tablesTree"
                     @execute-query="setSqlQuery"
                   />
                 </div>

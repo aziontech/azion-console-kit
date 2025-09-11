@@ -2,6 +2,10 @@ import { ref, computed } from 'vue'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { edgeSQLService } from '@/services/v2'
 import { useRoute } from 'vue-router'
+
+// Global state to share between components
+let globalState = null
+
 const STORAGE_KEYS = {
   QUERY_HISTORY: 'edge_sql_query_history',
   CURRENT_DATABASE: 'edge_sql_current_database'
@@ -132,9 +136,15 @@ const adaptHistory = (histories) => {
 }
 
 export function useEdgeSQL() {
+  // Return existing global state if it exists
+  if (globalState) {
+    return globalState
+  }
+
   const route = useRoute()
   const databases = ref([])
   const currentDatabase = ref(null)
+  const databaseCreated = ref(null)
   const currentTables = ref([])
   const queryResults = ref(loadHistoryFromStorage())
   const isLoading = ref(false)
@@ -214,6 +224,10 @@ export function useEdgeSQL() {
 
   const setCurrentTables = (tables) => {
     currentTables.value = tables
+  }
+
+  const setDatabaseCreated = (database) => {
+    databaseCreated.value = database
   }
 
   const setSelectedTable = (table) => {
@@ -352,10 +366,12 @@ export function useEdgeSQL() {
     localStorage.removeItem(STORAGE_KEYS.CURRENT_DATABASE)
   }
 
-  return {
+  // Create the composable object
+  const composable = {
     // State
     databases,
     currentDatabase,
+    databaseCreated,
     currentTables,
     queryResults,
     isLoading,
@@ -391,6 +407,12 @@ export function useEdgeSQL() {
     clearError,
     reset,
     executeQuery,
-    isNonEditableQuery
+    isNonEditableQuery,
+    setDatabaseCreated
   }
+
+  // Store as global state
+  globalState = composable
+
+  return composable
 }

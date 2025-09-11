@@ -3,7 +3,7 @@
     <div class="sm:w-80">
       <div class="flex flex-col w-80 gap-4">
         <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium text-color-primary">Tables</h3>
+          <h3 class="text-lg font-medium text-color-primary">Database Tables</h3>
           <PrimeButton
             icon="pi pi-plus"
             size="small"
@@ -75,13 +75,16 @@
         </div>
 
         <PrimeButton
-          icon="pi pi-bolt"
-          size="small"
           outlined
-          label="Quick Templates"
+          class="w-full"
           data-testid="quick-templates-button"
           @click="openTemplatesModal"
-        />
+        >
+          <span class="flex items-center gap-2 justify-center w-full">
+            <i class="pi pi-bolt" />
+            Quick Templates
+          </span>
+        </PrimeButton>
       </div>
     </div>
 

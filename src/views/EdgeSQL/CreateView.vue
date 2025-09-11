@@ -10,7 +10,7 @@
       <CreateFormBlock
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
-        :createService="createDatabaseServiceWithMonitoring"
+        :createService="edgeSQLService.createDatabase"
         :schema="validationSchema"
         :initialValues="initialValues"
         disableToast
@@ -44,16 +44,14 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeSQLService } from '@/services/v2'
-  import { useEdgeSQLStatusManager } from './hooks'
-  import { useToast } from 'primevue/usetoast'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
 
   defineOptions({ name: 'create-edge-sql-database' })
 
   const tracker = inject('tracker')
-  const toast = useToast()
   const route = useRoute()
 
-  const { addCreateOperation } = useEdgeSQLStatusManager()
+  const { setDatabaseCreated } = useEdgeSQL()
 
   const validationSchema = yup.object({
     name: yup
@@ -69,39 +67,10 @@
     name: '',
     active: true
   })
-  const createDatabaseServiceWithMonitoring = async (payload) => {
-    const result = await edgeSQLService.createDatabase(payload)
-
-    if (result.shouldMonitor && result.databaseId) {
-      addCreateOperation(result.databaseId, result.databaseName, (status, operation) => {
-        if (status === 'failed') {
-          toast.add({
-            severity: 'error',
-            summary: 'Creation Failed',
-            detail: `Failed to create database "${result.databaseName}". ${
-              operation.error || 'Please try again.'
-            }`,
-            life: 6000
-          })
-        }
-      })
-    }
-
-    return result
-  }
 
   const handleResponse = (response) => {
+    setDatabaseCreated(response.body)
     handleTrackCreation()
-
-    if (response?.data?.id) {
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Your Edge SQL database has been created',
-        life: 4000,
-        closable: true
-      })
-    }
   }
 
   const handleTrackCreation = () => {

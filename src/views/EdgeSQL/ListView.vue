@@ -1,38 +1,18 @@
 <script setup>
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-
+  import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
   import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQL } from './composable/useEdgeSQL'
-  import { useEdgeSQLStatusManager } from './hooks'
-  import { getStatusContent, getDatabaseName, isPendingStatus } from './utils'
-  import OperationQueueStatus from './components/OperationQueueStatus.vue'
 
   defineOptions({ name: 'list-edge-sql-databases' })
-
-  const tracker = inject('tracker')
-  const router = useRouter()
-  const route = useRoute()
-  const toast = useToast()
-  const { setCurrentDatabase } = useEdgeSQL()
-
-  const {
-    isProcessing,
-    isEmpty,
-    stats,
-    addCreateOperation,
-    addDeleteOperation,
-    isDatabasePending,
-    onGlobalEvent
-  } = useEdgeSQLStatusManager()
 
   const props = defineProps({
     documentationService: {
@@ -41,48 +21,111 @@
     }
   })
 
+  const tracker = inject('tracker')
+  const router = useRouter()
+  const { databaseCreated, setCurrentDatabase, setDatabaseCreated } = useEdgeSQL()
+
   const hasContentToList = ref(true)
   const fetchListRef = ref(null)
+  const pollingInterval = ref(null)
+  const deletePollingInterval = ref(null)
+  const isLoading = ref(false)
+  const isDeleting = ref(false)
+  const databaseDeleted = ref(null)
+
+  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified', 'last_editor']
 
   const reloadList = () => {
-    if (fetchListRef.value?.reload) {
-      fetchListRef.value.reload()
-    }
+    fetchListRef.value?.reload?.()
   }
 
-  const removeGlobalListener = onGlobalEvent('operationCompleted', () => {
-    setTimeout(reloadList, 200)
-  })
-
-  const deleteDatabaseService = async (databaseId, databaseData) => {
-    const result = await edgeSQLService.deleteDatabase(databaseId)
-    const databaseName = databaseData.name?.text || databaseData.name
-    const isAsyncOperation = typeof result === 'string' && result.includes('initiated')
-
-    if (isAsyncOperation) {
-      addDeleteOperation(databaseId, databaseName, (status, operation) => {
-        if (status === 'failed') {
-          toast.add({
-            severity: 'error',
-            summary: 'Delete Failed',
-            detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
-            life: 5000
-          })
-          reloadList()
-        } else if (status === 'deleted') {
-          toast.add({
-            severity: 'success',
-            summary: 'Delete Completed',
-            detail: `Database "${databaseName}" has been successfully deleted.`,
-            life: 4000
-          })
-          reloadList()
-        }
-      })
-    }
-
-    return result
+  const checkDatabaseStatus = async (databaseId) => {
+    const result = await edgeSQLService.checkDatabaseStatus(databaseId, 'id,name,status')
+    return result.body.status
   }
+
+  const startPolling = (databaseId) => {
+    if (pollingInterval.value) clearInterval(pollingInterval.value)
+
+    pollingInterval.value = setInterval(async () => {
+      const status = await checkDatabaseStatus(databaseId)
+
+      if (status === 'created' || status === 'ready') {
+        stopPolling()
+        setDatabaseCreated(null)
+        reloadList()
+      } else if (status === 'failed' || status === 'error') {
+        stopPolling()
+        setDatabaseCreated(null)
+      }
+    }, 3000)
+  }
+
+  const startDeletePolling = (databaseId) => {
+    if (deletePollingInterval.value) clearInterval(deletePollingInterval.value)
+
+    deletePollingInterval.value = setInterval(async () => {
+      try {
+        await checkDatabaseStatus(databaseId)
+      } catch (error) {
+        stopDeletePolling()
+        databaseDeleted.value = null
+        reloadList()
+      }
+    }, 3000)
+  }
+
+  const stopPolling = () => {
+    if (pollingInterval.value) {
+      clearInterval(pollingInterval.value)
+      pollingInterval.value = null
+    }
+    isLoading.value = false
+  }
+
+  const stopDeletePolling = () => {
+    if (deletePollingInterval.value) {
+      clearInterval(deletePollingInterval.value)
+      deletePollingInterval.value = null
+    }
+    isDeleting.value = false
+  }
+
+  const deleteDatabase = async (databaseId) => {
+    const response = await edgeSQLService.deleteDatabase(databaseId)
+    databaseDeleted.value = databaseId
+    return response
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const handleTrackEvent = () => {
+    tracker.product?.clickToCreate({ productName: 'Edge SQL Database' })
+  }
+
+  const handleTrackEditEvent = (database) => {
+    tracker.product?.clickToEdit({ productName: 'Edge SQL Database' })
+    setCurrentDatabase(database)
+    router.push(`/sql-database/database/${database.id}`)
+  }
+
+  const getColumns = computed(() => [
+    { field: 'name', header: 'Name' },
+    { field: 'lastEditor', header: 'Last Editor' },
+    { field: 'lastModified', header: 'Last Modified' },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+    }
+  ])
 
   const actions = [
     {
@@ -90,225 +133,40 @@
       label: 'Delete',
       title: 'database',
       icon: 'pi pi-trash',
-      service: deleteDatabaseService
+      service: deleteDatabase
     }
   ]
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-
-    if (event && fetchListRef.value?.data?.value && Array.isArray(fetchListRef.value.data.value)) {
-      processLoadedData(fetchListRef.value.data.value)
-    }
-  }
-
-  const shouldMonitorDatabase = (db) => {
-    const statusContent = getStatusContent(db)
-    const isPending = isPendingStatus(statusContent)
-    const isAlreadyMonitored = isDatabasePending(db.id)
-    return isPending && !isAlreadyMonitored
-  }
-
-  const createOperationCallback = (databaseName) => (status, operation) => {
-    if (status === 'failed') {
-      toast.add({
-        severity: 'error',
-        summary: 'Creation Failed',
-        detail: `Failed to create database "${databaseName}". ${operation.error || ''}`,
-        life: 5000
-      })
-      reloadList()
-    }
-  }
-
-  const deleteOperationCallback = (databaseName) => (status, operation) => {
-    if (status === 'failed') {
-      toast.add({
-        severity: 'error',
-        summary: 'Delete Failed',
-        detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
-        life: 5000
-      })
-      reloadList()
-    }
-  }
-
-  const addDatabaseOperation = (db) => {
-    const statusContent = getStatusContent(db)
-    const databaseName = getDatabaseName(db)
-
-    if (statusContent === 'creating') {
-      addCreateOperation(db.id, databaseName, createOperationCallback(databaseName))
-    } else if (statusContent === 'deleting') {
-      addDeleteOperation(db.id, databaseName, deleteOperationCallback(databaseName))
-    }
-  }
-
-  const processLoadedData = (databases) => {
-    if (!Array.isArray(databases)) return
-
-    databases.forEach((db) => {
-      if (shouldMonitorDatabase(db)) {
-        addDatabaseOperation(db)
-      }
-    })
-  }
-
-  const handleTrackEvent = () => {
-    tracker.product?.clickToCreate({
-      productName: 'Edge SQL Database'
-    })
-  }
-
-  const handleTrackEditEvent = (database) => {
-    tracker.product?.clickToEdit({
-      productName: 'Edge SQL Database'
-    })
-
-    const statusContent = database.status?.content || database.status
-
-    if (statusContent === 'creating') {
-      toast.add({
-        severity: 'warn',
-        summary: 'Database not ready',
-        detail: 'Please wait for the database creation to complete before accessing it.',
-        life: 4000
-      })
-      return
-    }
-
-    if (statusContent !== 'created' && statusContent !== 'ready') {
-      toast.add({
-        severity: 'error',
-        summary: 'Database unavailable',
-        detail: 'This database is not available for queries at the moment.',
-        life: 4000
-      })
-      return
-    }
-
-    setCurrentDatabase(database)
-    router.push(`/sql-database/database/${database.id}`)
-  }
-
   watch(
-    () => route.path,
-    (newPath, oldPath) => {
-      if (oldPath?.includes('/sql-database/create') && newPath === '/sql-database') {
-        setTimeout(reloadList, 500)
+    databaseCreated,
+    (newDatabase) => {
+      if (newDatabase?.id) {
+        isLoading.value = true
+        startPolling(newDatabase.id)
+      } else {
+        stopPolling()
       }
     },
     { immediate: true }
   )
 
   watch(
-    () => fetchListRef.value?.data?.value,
-    (newData, oldData) => {
-      if (newData && Array.isArray(newData) && newData !== oldData) {
-        processLoadedData(newData)
+    databaseDeleted,
+    (deletedDatabase) => {
+      if (deletedDatabase) {
+        isDeleting.value = true
+        startDeletePolling(deletedDatabase)
+      } else {
+        stopDeletePolling()
       }
     },
-    { deep: true, immediate: true }
+    { immediate: true }
   )
 
   onUnmounted(() => {
-    if (removeGlobalListener) {
-      removeGlobalListener()
-    }
+    stopPolling()
+    stopDeletePolling()
   })
-
-  const getQueueSummary = () => {
-    const creating = stats.value.creating
-    const deleting = stats.value.deleting
-    const total = creating + deleting
-
-    if (total === 0) {
-      return {
-        status: 'idle',
-        icon: 'pi pi-check-circle',
-        text: 'All operations complete',
-        color: 'text-green-600',
-        severity: 'success'
-      }
-    }
-
-    if (isProcessing.value) {
-      return {
-        status: 'processing',
-        icon: 'pi pi-spin pi-spinner',
-        text: `Processing ${total} operation${total > 1 ? 's' : ''}...`,
-        color: 'text-blue-600',
-        severity: 'info'
-      }
-    }
-
-    return {
-      status: 'pending',
-      icon: 'pi pi-clock',
-      text: `${creating} creating, ${deleting} deleting`,
-      color: 'text-yellow-600',
-      severity: 'warning'
-    }
-  }
-
-  const getColumns = computed(() => {
-    return [
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'status',
-        header: 'Status',
-        type: 'component',
-        component: (columnData) => {
-          const statusContent = columnData?.content || columnData
-          let tagData = columnData
-
-          if (statusContent === 'creating') {
-            tagData = {
-              content: 'Creating',
-              severity: 'warning',
-              icon: 'pi pi-spin pi-spinner'
-            }
-          } else if (statusContent === 'created' || statusContent === 'ready') {
-            tagData = {
-              content: 'Ready',
-              severity: 'success',
-              icon: 'pi pi-check'
-            }
-          } else if (statusContent === 'deleting') {
-            tagData = {
-              content: 'Deleting',
-              severity: 'danger',
-              icon: 'pi pi-spin pi-spinner'
-            }
-          } else {
-            tagData = {
-              content: statusContent || 'Unknown',
-              severity: 'secondary',
-              icon: 'pi pi-exclamation-triangle'
-            }
-          }
-
-          return columnBuilder({
-            data: tagData,
-            columnAppearance: 'tag'
-          })
-        }
-      }
-    ]
-  })
-
-  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified', 'last_editor']
 </script>
 
 <template>
@@ -318,19 +176,18 @@
         pageTitle="SQL Database"
         data-testid="edge-sql-heading"
       >
-        <template #actions>
-          <div class="flex items-center gap-3">
-            <OperationQueueStatus
-              :stats="stats"
-              :isProcessing="isProcessing"
-              :isEmpty="isEmpty"
-              :queueSummary="getQueueSummary()"
-            />
-          </div>
-        </template>
       </PageHeadingBlock>
     </template>
     <template #content>
+      <InlineMessage
+        class="w-fit mb-8"
+        severity="info"
+        icon="pi pi-spin pi-spinner"
+        v-if="isLoading || isDeleting"
+      >
+        Database requests are queued. The table will update automatically once processing is
+        complete.
+      </InlineMessage>
       <FetchListTableBlock
         v-if="hasContentToList"
         ref="fetchListRef"

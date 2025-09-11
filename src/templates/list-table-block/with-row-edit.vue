@@ -90,6 +90,7 @@
             <InputText
               v-model="data[field]"
               class="w-full"
+              placeholder="Value"
             />
           </slot>
         </template>
@@ -155,7 +156,6 @@
             <PrimeButton
               :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
               size="small"
-              severity="success"
               @click="saveRowEdit(data, index)"
               class="w-8 h-8 p-0"
               data-testid="row-save-button"

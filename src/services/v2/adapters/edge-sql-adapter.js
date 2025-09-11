@@ -84,19 +84,11 @@ const getStatusSeverity = (status) => {
 }
 
 export const EdgeSQLAdapter = {
-  adaptDatabaseStatus(database) {
+  adaptDatabaseStatus({ data }) {
     return {
-      id: database.id,
-      name: database.name,
-      clientId: database.client_id,
-      status: database.status,
-      createdAt: database.created_at || database.last_modified,
-      updatedAt: database.updated_at || database.last_modified,
-      lastModified: database.last_modified,
-      deletedAt: database.deleted_at,
-      isActive: database.active !== undefined ? database.active : database.is_active,
-      productVersion: database.product_version,
-      lastEditor: database.last_editor
+      id: data.id,
+      name: data.name,
+      status: data.status
     }
   },
   adaptDatabaseList(data) {
