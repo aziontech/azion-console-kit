@@ -55,19 +55,17 @@
 </template>
 
 <script setup>
+  import { computed, ref, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
-  import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2'
-
-  import { computed, ref } from 'vue'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
-
-  const hasContentToList = ref(true)
-
+  
   const props = defineProps({
     edgeFirewallID: {
       required: true,
@@ -103,6 +101,9 @@
     }
   })
 
+  const router = useRouter()
+  const route = useRoute()
+  const hasContentToList = ref(true)
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
   const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
@@ -164,11 +165,24 @@
     hasContentToList.value = event
   }
 
+  
+
   const openCreateFunctionDrawer = () => {
     drawerFunctionRef.value.openDrawerCreate()
   }
 
   const openEditFunctionDrawer = (data) => {
+    openDrawer({ id: data.id })
+    router.push({ query: {
+      id: data.id
+    }})
+  }
+
+    const openDrawerById = (data) => {
+    openDrawer({ id: data.id })
+  }
+
+  const openDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
@@ -188,4 +202,8 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  onMounted(() => {
+    openDrawerById({ id: route.query.id })
+  })
 </script>

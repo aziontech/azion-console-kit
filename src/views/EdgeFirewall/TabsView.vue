@@ -122,7 +122,8 @@
     }
     router.push({
       name: 'edit-edge-firewall',
-      params
+      params,
+      query: route.query 
     })
   }
 
