@@ -292,6 +292,7 @@
   }
 
   const extractTableNameFromSelect = (selectQuery) => {
+    if (!selectQuery) return null
     const cleanQuery = selectQuery.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
 
     const fromRegex = /\bFROM\s+(?:`([^`]+)`|"([^"]+)"|(\w+))/i
