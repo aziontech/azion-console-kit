@@ -280,6 +280,13 @@
       domainsOptions.value.options
         .filter((item) => selectedDomainIds.value.includes(item.id))
         .map((domain) => domain.domain) || []
+
+    const cnames =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .flatMap((domain) => domain.cnames) || []
+
+    selectedFilter.value.domains = [...selectedFilter.value.domains, ...cnames]
     filterTuning()
   }
 
@@ -409,7 +416,6 @@
       domainsOptions.value.done = false
 
       const domains = await props.listDomainsService({ wafId: wafRuleId.value })
-
       domainsOptions.value.options = domains
     } finally {
       domainsOptions.value.done = true
@@ -446,6 +452,7 @@
           @change="filterTuning"
           class="w-full sm:max-w-xs"
         />
+        <!-- cnames -->
         <MultiSelect
           data-testid="waf-tuning-list__domains-field"
           appendTo="body"
