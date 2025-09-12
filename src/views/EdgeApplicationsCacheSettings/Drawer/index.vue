@@ -75,7 +75,7 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: true,
+    tieredCache: props.showTieredCache ?? true,
     tieredCacheRegion: 'near-edge',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
@@ -119,7 +119,7 @@
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    cdnCacheSettings: yup.string().required().label('Edge cache Behavior'),
+    cdnCacheSettings: yup.string().required().label('Cache Behavior'),
     cdnCacheSettingsMaximumTtl: yup
       .number()
       .label('Edge Maximum TTL')

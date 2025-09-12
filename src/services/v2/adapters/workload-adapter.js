@@ -3,7 +3,6 @@ import {
   HTTPS_PORT_LIST_OPTIONS,
   HTTP3_PORT_LIST_OPTIONS,
   SUPPORTED_VERSIONS,
-  TLS_VERSIONS_OPTIONS,
   SUPPORTED_CIPHERS_LIST_OPTIONS
 } from '@/helpers'
 import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
@@ -147,8 +146,8 @@ export const WorkloadAdapter = {
       active: workload.active,
       workloadHostname: workload.workload_domain?.replace(/\.azion\.app$/, ''),
       workloadDeploymentId: workloadDeployment?.id,
-      edgeFirewall: workloadDeployment?.edgeFirewall,
-      edgeApplication: workloadDeployment?.edgeApplication,
+      application: workloadDeployment?.application,
+      firewall: workloadDeployment?.firewall,
       customPage: workloadDeployment?.customPage,
       domains: cleanDomains,
       customDomain: azionAppSubdomains,
@@ -156,7 +155,7 @@ export const WorkloadAdapter = {
       infrastructure: String(workload.infrastructure),
       workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {
-        minimumVersion: workload.tls.minimum_version || TLS_VERSIONS_OPTIONS[1].value,
+        minimumVersion: workload.tls.minimum_version,
         ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
         certificate: workload.tls.certificate || 0
       },

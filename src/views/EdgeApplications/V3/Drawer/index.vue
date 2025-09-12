@@ -99,7 +99,7 @@
   }
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your edge application has been created'
+      feedback: 'Your Application has been created'
     }
     response.showToastWithActions(toast)
   }
@@ -119,7 +119,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
-    title="Create Edge Application"
+    title="Create Application"
     disableToast
   >
     <template #formFields>

@@ -17,7 +17,7 @@ const REPORTS_TEXTS = {
     dataTransferred: {
       edgeCache: {
         description:
-          'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
+          'Sum of data transferred through Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
       },
       edgeOffload: {
         description:
@@ -152,7 +152,7 @@ const REPORTS_TEXTS = {
     invocations: {
       totalInvocations: {
         description:
-          'Quantity of times an edge function has been executed. Displays the total amount of invocations divided by Edge Firewall Invocations and Edge Application Invocations.'
+          'Quantity of times a function has been executed. Displays the total amount of invocations divided by Firewall Invocations and Application Invocations.'
       }
     }
   },

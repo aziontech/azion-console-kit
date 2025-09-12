@@ -40,12 +40,12 @@ describe('EdgeApplicationServicesV4', () => {
     await sut({ id: fixtures.edgeApplicationsMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${fixtures.edgeApplicationsMock.id}`,
+      url: `${version}/workspace/applications/${fixtures.edgeApplicationsMock.id}`,
       method: 'GET'
     })
   })
 
-  it('should parsed correctly edge application', async () => {
+  it('should parsed correctly Application', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: fixtures.edgeApplicationsMock }

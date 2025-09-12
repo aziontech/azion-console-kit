@@ -56,6 +56,20 @@
               />
             </span>
 
+<<<<<<< HEAD
+=======
+            <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full ml-auto"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              aria-label="Export to CSV"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
+
+>>>>>>> dev
             <slot
               name="addButton"
               data-testid="data-table-add-button"
@@ -117,6 +131,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         :headerStyle="`width: ${frozenSize}`"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -124,6 +139,7 @@
             class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+<<<<<<< HEAD
             <slot name="actionsHeader"></slot>
             <PrimeButton
               v-if="hasExportToCsvMapper"
@@ -133,13 +149,18 @@
               icon="pi pi-download"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+=======
+            <slot
+              name="actions-header"
+              :exportTableCSV="handleExportTableDataToCSV"
+>>>>>>> dev
             />
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -427,6 +448,9 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({

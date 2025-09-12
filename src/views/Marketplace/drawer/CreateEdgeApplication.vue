@@ -31,7 +31,7 @@
     }"
   >
     <template #header>
-      <div>Create Edge Application</div>
+      <div>Create Application</div>
       <ConsoleFeedback />
     </template>
     <template #default>

@@ -20,6 +20,7 @@
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
+      @row-click="({ data }) => editItemSelected(data)"
     >
       <template
         #header
@@ -85,14 +86,12 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
-              @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
           <template v-else>
             <component
-              @click="editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -104,6 +103,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -354,6 +354,10 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
+
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
@@ -446,7 +450,7 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
+    if (props.listService && !isLoading.value) {
       try {
         isLoading.value = true
         const response = props.isGraphql
@@ -459,7 +463,7 @@
         toast.add({
           closable: true,
           severity: 'error',
-          summary: 'error',
+          summary: 'Error',
           detail: errorMessage
         })
       } finally {

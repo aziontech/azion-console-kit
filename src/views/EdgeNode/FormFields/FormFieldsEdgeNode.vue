@@ -48,7 +48,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Running Settings"
-    description="Each node must run the Edge Orchestrator agent, which establishes a communication between your private node and Azion."
+    description="Each node must run the Orchestrator agent, which establishes a communication between your private node and Azion."
   >
     <template #inputs>
       <div class="flex flex-col gap-5 mb-6">

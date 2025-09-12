@@ -4,8 +4,8 @@ export class EdgeApplicationFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_application/applications'
-    this.functionListEndpoint = 'v4/edge_functions/functions'
+    this.baseURL = 'v4/workspace/applications'
+    this.functionListEndpoint = 'v4/workspace/functions'
   }
 
   #getUrl(edgeApplicationId, suffix = '') {
@@ -48,14 +48,14 @@ export class EdgeApplicationFunctionService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [] }
   ) => {
-    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'edge_function']
+    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
     const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
     if (!count) return []
 
     const enrichedFunctions = await enrichByMatchingReference({
       items: functionInstances,
       fetchReferencePage: this.#listFunctionNames,
-      getReferenceId: (item) => item.edgeFunction,
+      getReferenceId: (item) => item.function,
       merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name

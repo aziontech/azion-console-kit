@@ -109,14 +109,29 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+<<<<<<< HEAD
 // Edge SQL
 import { EdgeSQLService } from './edge-sql-service'
 import { EdgeSQLAdapter } from './adapters/edge-sql-adapter'
+=======
+// Edge App Error Response
+import { EdgeAppErrorResponseAdapter } from './adapters/edge-app-error-response-adapter'
+import { EdgeAppErrorResponseService } from './edge-app-error-response-service'
+
+>>>>>>> dev
 // Activity History
 import { ActivityHistoryService } from './activity-history-service'
 import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
 import graphQLApi from '@/services/axios/makeEventsApi'
 const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+
+// Waf Rules Tuning GQL
+import { WafRulesTuningGqlService } from './waf-rules-tuning-gql-service'
+import { WafRulesTuningGqlAdapter } from './adapters/waf-rules-tuning-gql-adapter'
+
+// IAM
+import { IAMAdapter } from './adapters/iam-adapter'
+import { IAMService } from './iam-service'
 
 const httpService = createHttpService()
 
@@ -163,6 +178,10 @@ const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
+const edgeAppErrorResponseService = new EdgeAppErrorResponseService(
+  httpService,
+  EdgeAppErrorResponseAdapter
+)
 
 const billingGqlService = new BillingGqlService(httpService, BillingGqlAdapter)
 const workloadDeploymentService = new WorkloadDeploymentService(
@@ -176,13 +195,19 @@ const workloadService = new WorkloadService(
   digitalCertificatesService,
   DigitalCertificatesAdapter
 )
+<<<<<<< HEAD
 const edgeSQLService = new EdgeSQLService(httpService, EdgeSQLAdapter)
+=======
+const wafRulesTuningGqlService = new WafRulesTuningGqlService(httpService, WafRulesTuningGqlAdapter)
+>>>>>>> dev
 
 const activityHistoryService = new ActivityHistoryService(
   httpService,
   ActivityHistoryAdapter,
   graphQLApiInstance
 )
+
+const iamService = new IAMService(httpService, IAMAdapter)
 
 export {
   vcsService,
@@ -209,10 +234,17 @@ export {
   edgeDNSService,
   edgeDNSRecordsService,
   paymentService,
+  edgeAppErrorResponseService,
   billingGqlService,
   workloadService,
   workloadDeploymentService,
   edgeStorageService,
+<<<<<<< HEAD
   edgeSQLService,
   activityHistoryService
+=======
+  wafRulesTuningGqlService,
+  activityHistoryService,
+  iamService
+>>>>>>> dev
 }

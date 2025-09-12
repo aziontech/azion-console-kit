@@ -21,7 +21,7 @@
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
     title="General"
-    description="Create a workload with Azion to launch an edge application and set up security with digital certificates."
+    description="Create a workload with Azion to launch an Application and set up security with digital certificates."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

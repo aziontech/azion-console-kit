@@ -60,6 +60,7 @@ const transformMap = {
   executionEnvironment: (value) => value.execution_environment,
   lastEditor: (value) => value.last_editor,
   referenceCount: (value) => value.reference_count,
+  azionForm: (value) => JSON.stringify(value.azion_form, null, 2),
   defaultArgs: (value) => JSON.stringify(value.default_args, null, 2),
   name: (value) => value.name,
   code: (value) => value.code,
@@ -83,6 +84,7 @@ export const EdgeFunctionsAdapter = {
   transformLoadEdgeFunction({ data }, fields) {
     const adapt = adaptServiceDataResponseToLoad(data, fields, transformMap)
     adapt.runtimeFormat = LANGUAGE_WITH_ICON[adapt.runtime]
+
     return adapt
   },
 
@@ -120,6 +122,7 @@ export const EdgeFunctionsAdapter = {
       runtime: CODE_LANG[payload.runtime],
       execution_environment: payload.executionEnvironment,
       default_args: parsedArgs,
+      azion_form: payload.azionForm,
       active: payload.active
     }
   }

@@ -138,7 +138,7 @@
       .number()
       .transform((value) => (Number.isNaN(value) ? null : value))
       .required()
-      .label('Edge Function'),
+      .label('Function'),
     args: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {

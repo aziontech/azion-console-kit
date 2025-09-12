@@ -16,7 +16,7 @@ export class WorkloadService {
   }
 
   #ensureCertificate = async (payload) => {
-    if (payload.tls.certificate !== 1) return
+    if (payload.tls.certificate !== 1 && payload.tls.certificate !== 2) return
     const shouldCreate =
       this._certificateId == null ||
       hasAnyFieldChanged(this.digitalCertificateAdapter, this._objLetEncrypt, payload, keysToCheck)
@@ -64,8 +64,8 @@ export class WorkloadService {
     const deployPayload = {
       id: workloadId,
       name: 'workload-deployment',
-      edgeApplication: payload.edgeApplication,
-      edgeFirewall: payload.edgeFirewall,
+      application: payload.application,
+      firewall: payload.firewall,
       customPage: payload.customPage
     }
 
@@ -200,8 +200,8 @@ export class WorkloadService {
   #updateDeployment = async (payload) => {
     const deployPayload = {
       id: payload.workloadDeploymentId,
-      edgeApplication: payload.edgeApplication,
-      edgeFirewall: payload.edgeFirewall,
+      application: payload.application,
+      firewall: payload.firewall,
       customPage: payload.customPage
     }
     await this.workloadDeployment.updateWorkloadDeployment(payload.id, deployPayload)

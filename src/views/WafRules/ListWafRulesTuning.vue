@@ -18,7 +18,8 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import { networkListsService, wafService } from '@/services/v2'
+  import { networkListsService, wafService, wafRulesTuningGqlService } from '@/services/v2'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
@@ -169,24 +170,28 @@
       header: 'Hits'
     },
     {
-      field: 'pathCount',
-      header: 'Paths'
-    },
-    {
-      field: 'ipCount',
-      header: 'IPs'
-    },
-    {
-      field: 'countryCount',
-      header: 'Countries'
-    },
-    {
       field: 'topIps',
-      header: 'Top 10 IP Addresses'
+      header: 'Top 10 IP Addresses',
+      type: 'component',
+      disableSort: true,
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     },
     {
       field: 'topCountries',
-      header: 'Top 10 Countries'
+      header: 'Top 10 Countries',
+      disableSort: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     }
   ])
 
@@ -195,7 +200,7 @@
   })
 
   const listService = async (params) => {
-    const response = await props.listWafRulesTuningService(params)
+    const response = await wafRulesTuningGqlService.listWafRulesTuning(params)
     totalRecordsFound.value = response.recordsFound
     return response.data
   }
@@ -270,7 +275,11 @@
     selectedDomainsNames.value = domainsOptions.value.options
       .filter((item) => selectedDomainIds.value.includes(item.id))
       .map((domain) => domain.name)
-    selectedFilter.value.domains = selectedDomainIds.value || []
+
+    selectedFilter.value.domains =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .map((domain) => domain.domain) || []
     filterTuning()
   }
 
@@ -395,22 +404,6 @@
     listServiceWafTunningRef.value.reload(queryFields)
   }
 
-  const setNetWorkListOptions = async () => {
-    try {
-      const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
-      netWorkListOptions.value.options = response
-    } catch (error) {
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        const errorMessage = error?.message || error
-        showToast(errorMessage, 'error', 'error')
-      }
-    } finally {
-      netWorkListOptions.value.done = false
-    }
-  }
-
   const listDomainsOptions = async () => {
     try {
       domainsOptions.value.done = false
@@ -424,7 +417,9 @@
   }
 
   const handleListNetworkListDropdown = async ({ id }) => {
-    return await networkListsService.listNetworkLists({ id }, true)
+    const response = await networkListsService.listNetworkLists({ id }, true)
+    netWorkListOptions.value.options = response
+    return response
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
@@ -432,7 +427,6 @@
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions()
     await listDomainsOptions()
   })
 </script>
@@ -552,7 +546,7 @@
   <EmptyResultsBlock
     v-if="!showListTable"
     :title="`Select a ${handleTextDomainWorkload.singularLabel} to query data`"
-    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the edge firewall that has a behavior running this WAF rule set.`"
+    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the Firewall that has a behavior running this WAF rule set.`"
     :documentationService="props.documentationServiceTuning"
     noShowBorderTop
     class="!mt-0"

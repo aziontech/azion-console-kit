@@ -2,7 +2,6 @@ import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 const BOT_MANAGER_SLUG = 'bot_manager'
-const EDGE_STORAGE_SLUG = 'edge_storage'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -126,12 +125,12 @@ const groupBy = (firstData, secondData, groupParams) => {
 }
 
 const PRODUCT_NAMES = {
-  edge_application: 'Edge Application',
+  edge_application: 'Application',
   application_accelerator: 'Application Accelerator',
   load_balancer: 'Load Balancer',
   image_processor: 'Image Processor',
-  edge_functions: 'Edge Functions',
-  network_layer_protection: 'Network Layer Protection',
+  edge_functions: 'Functions',
+  network_layer_protection: 'Network Shield',
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',
@@ -147,7 +146,8 @@ const PRODUCT_NAMES = {
   support_enterprise: 'Support Enterprise',
   support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
-  tiered_cache: 'Tiered Cache'
+  tiered_cache: 'Tiered Cache',
+  edge_storage: 'Object Storage'
 }
 
 const METRIC_SLUGS = {
@@ -174,7 +174,11 @@ const METRIC_SLUGS = {
   plan_missioncritical: { title: 'Plan Mission critical' },
   support_enterprise: { title: 'Total Days', unit: 'Days' },
   support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
+  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  edge_storage_class_a_operations: { title: 'Class A Operations' },
+  edge_storage_class_b_operations: { title: 'Class B Operations' },
+  edge_storage_class_c_operations: { title: 'Class C Operations' },
+  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
 }
 
 const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
@@ -235,9 +239,7 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  const filteredProducts = products.filter(
-    (item) => ![BOT_MANAGER_SLUG, EDGE_STORAGE_SLUG].includes(item.productSlug)
-  )
+  const filteredProducts = products.filter((item) => ![BOT_MANAGER_SLUG].includes(item.productSlug))
 
   if (!filteredProducts.length) {
     return { body: filteredProducts, statusCode }

@@ -2,6 +2,7 @@
 import { useLoadingStore } from '@/stores/loading'
 import { useAccountStore } from '@/stores/account'
 import { inject } from 'vue'
+import { loadProfileAndAccountInfo } from '@/helpers/account-data'
 
 /** @type {import('vue-router').NavigationHookAfter} */
 export default function afterEachRoute(to, from, failure) {
@@ -18,4 +19,6 @@ export default function afterEachRoute(to, from, failure) {
     })
     .track()
   tracker.identify(userId)
+
+  loadProfileAndAccountInfo()
 }

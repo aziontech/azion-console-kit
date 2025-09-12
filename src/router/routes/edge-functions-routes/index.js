@@ -13,10 +13,10 @@ export const edgeFunctionsRoutes = {
         documentationService: Helpers.documentationCatalog.edgeFunctions
       },
       meta: {
-        title: 'Edge Functions',
+        title: 'Functions',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
+            label: 'Functions',
             to: '/edge-functions'
           }
         ]
@@ -27,14 +27,14 @@ export const edgeFunctionsRoutes = {
       name: 'create-edge-functions',
       component: () => import('@views/EdgeFunctions/CreateView.vue'),
       meta: {
-        title: 'Create Edge Function',
+        title: 'Create Function',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
+            label: 'Functions',
             to: '/edge-functions'
           },
           {
-            label: 'Create Edge Function',
+            label: 'Create Function',
             to: '/edge-functions/create'
           }
         ]
@@ -48,14 +48,14 @@ export const edgeFunctionsRoutes = {
         updatedRedirect: 'list-edge-functions'
       },
       meta: {
-        title: 'Edit Edge Function',
+        title: 'Edit Function',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
+            label: 'Functions',
             to: '/edge-functions'
           },
           {
-            label: 'Edit Edge Function'
+            label: 'Edit Function'
           }
         ]
       }

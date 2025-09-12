@@ -21,4 +21,10 @@ function PreviewProvider(args) {
 
   return handleRequest(request);
 }
+
+// For Edge Firewall functions, use 'firewall' instead of 'fetch' in the addEventListener.
+
+addEventListener("fetch", event => {
+  return event.respondWith(handleRequest(event.args))
+});
 `

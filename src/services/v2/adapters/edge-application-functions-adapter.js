@@ -18,7 +18,7 @@ const parseName = (data) => {
 
 const transformMap = {
   id: (value) => value.id.toString(),
-  edgeFunction: (value) => value.edge_function,
+  edgeFunction: (value) => value.function,
   name: (value) => parseName(value),
   jsonArgs: (value) => JSON.stringify(value.args, null, '\t'),
   lastEditor: (value) => value.last_editor,
@@ -41,26 +41,29 @@ export const EdgeApplicationFunctionsAdapter = {
     const { data } = functionData
     return {
       id: data.id,
-      edgeFunctionID: data.edge_function,
+      edgeFunctionID: data.function,
       name: data.name,
-      args: JSON.stringify(data.args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t'),
+      azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
   },
 
   transformPayload(payload) {
     return {
       name: payload.name,
-      edge_function: payload.edgeFunctionID,
+      function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
-      active: true
+      active: true,
+      azion_form: JSON.parse(payload.azionForm)
     }
   },
 
   transformEditPayload(payload) {
     return {
       name: payload.name,
-      edge_function: payload.edgeFunctionID,
-      args: JSON.parse(payload.args)
+      function: payload.edgeFunctionID,
+      args: JSON.parse(payload.args),
+      azion_form: JSON.parse(payload.azionForm)
     }
   }
 }

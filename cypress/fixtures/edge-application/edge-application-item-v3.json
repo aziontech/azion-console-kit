@@ -1,0 +1,26 @@
+{
+  "results": {
+    "id": 1755712388,
+    "name": "teste",
+    "delivery_protocol": "http",
+    "http_port": [80],
+    "https_port": [443],
+    "minimum_tls_version": "",
+    "active": true,
+    "debug_rules": false,
+    "http3": false,
+    "websocket": false,
+    "supported_ciphers": "all",
+    "application_acceleration": true,
+    "caching": true,
+    "device_detection": true,
+    "edge_firewall": false,
+    "edge_functions": true,
+    "image_optimization": true,
+    "l2_caching": true,
+    "load_balancer": true,
+    "raw_logs": false,
+    "web_application_firewall": false
+  },
+  "schema_version": 3
+}

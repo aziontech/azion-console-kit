@@ -24,7 +24,7 @@
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+      return [{ label: 'Set Connector', value: 'set_connector', requires: false }]
     } else {
       return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
     }
@@ -228,11 +228,11 @@
 
     return {
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
-        ? ' - Requires Application Accelerator'
+        ? ' - Required Application Accelerator'
         : empty,
       https: empty,
-      imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
-      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
+      imageOptimization: !props.isImageOptimizationEnabled ? ' - Required Image Processor' : empty,
+      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Required Function' : empty
     }
   })
 
@@ -879,7 +879,7 @@
                 </template>
               </FieldDropdownLazyLoader>
             </template>
-            <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
+            <template v-else-if="behaviorItem.value.name === 'set_connector'">
               <FieldDropdownLazyLoader
                 :service="getEdgeConnectors"
                 :loadService="edgeConnectorsService.loadEdgeConnectorsService"

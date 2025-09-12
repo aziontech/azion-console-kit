@@ -51,6 +51,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
+    azionForm: yup.object(),
     defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
@@ -72,15 +73,16 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
+    azionForm: {},
     executionEnvironment: 'application'
   }
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your edge function has been created',
+      feedback: 'Your function has been created',
       actions: {
         link: {
-          label: 'View Edge Function',
+          label: 'View Function',
           callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
         }
       }
@@ -92,7 +94,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Function">
+      <PageHeadingBlock pageTitle="Create Function">
         <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>

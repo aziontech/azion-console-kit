@@ -1,12 +1,12 @@
 <template>
   <FormHorizontal
-    title="Edge Cache"
+    title="Cache"
     description="Manage caching at the edge to improve performance and reduce latency for end users."
     isDrawer
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Edge Cache Behavior"
+        label="Cache Behavior"
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="getEdgeCacheRadioOptions()"
@@ -94,6 +94,33 @@
           {{ largeFileCacheOffsetError }}
         </small>
       </div>
+      <template v-if="isTieredCacheEnabled">
+        <FieldSwitchBlock
+          nameField="tieredCache"
+          name="tieredCache"
+          description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
+          auto
+          :isCard="false"
+          title="Enable Tiered Cache"
+          data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
+        />
+
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <FieldDropdown
+            label="Tiered Cache Region"
+            name="tieredCacheRegion"
+            :options="TIERED_CACHE_REGION"
+            optionLabel="label"
+            optionValue="value"
+            :value="tieredCacheRegion"
+            :disabled="!tieredCache"
+            inputId="tieredCacheRegion"
+            placeholder="Select an Tiered Cache Region"
+            description="Choose an Tiered Cache Region suitable for your application."
+            data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+          />
+        </div>
+      </template>
     </template>
   </FormHorizontal>
 </template>
@@ -111,15 +138,34 @@
   import LabelBlock from '@/templates/label-block'
   import InputNumber from 'primevue/inputnumber'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   const emit = defineEmits(['enableSliceConfiguration'])
 
   const props = defineProps({
     isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
+    },
+    isTieredCacheEnabled: {
+      type: Boolean,
+      required: true
     }
   })
+
+  const TIERED_CACHE_REGION = [
+    {
+      label: 'near-edge',
+      value: 'near-edge'
+    },
+    {
+      label: 'br-east-1',
+      value: 'br-east-1'
+    },
+    {
+      label: 'us-east-1',
+      value: 'us-east-1'
+    }
+  ]
 
   const getEdgeCacheRadioOptions = () => {
     return [
@@ -131,7 +177,7 @@
       },
       {
         title: 'Override cache behavior',
-        subtitle: `Customize the edge cache behavior by overriding the origin server's cache policies.`,
+        subtitle: `Customize the cache behavior by overriding the origin server's cache policies.`,
         inputValue: 'override'
       }
     ]
@@ -143,7 +189,8 @@
     useField('largeFileCacheOffset')
   const { value: enableLargeFileCache } = useField('enableLargeFileCache')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-
+  const { value: tieredCacheRegion } = useField('tieredCacheRegion')
+  const { value: tieredCache } = useField('tieredCache')
   const showSliceConfigurationRange = computed(() => {
     return !!enableLargeFileCache.value
   })

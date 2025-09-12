@@ -36,7 +36,7 @@ export const DigitalCertificatesAdapter = {
       certificate: null,
       private_key: null,
       type: 'edge_certificate',
-      challenge: 'dns',
+      challenge: payload.tls.certificate === 1 ? 'dns' : 'http',
       authority: 'lets_encrypt',
       key_algorithm: 'rsa_2048',
       active: true,
@@ -71,9 +71,15 @@ export const DigitalCertificatesAdapter = {
         id: checkIfFieldExist(item?.id, null),
         name: checkIfFieldExist(item?.name),
         issuer: checkIfFieldExist(item?.issuer),
-        subjectName,
+        subjectName: subjectName.length ? subjectName : '-',
         type: checkIfFieldExist(typeMap[item?.type]),
         validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
+        challenge: checkIfFieldExist(item?.challenge),
+        authority: checkIfFieldExist(item?.authority),
+        keyAlgorithm: checkIfFieldExist(item?.key_algorithm),
+        lastEditor: checkIfFieldExist(item?.last_editor),
+        lastModified: item?.last_modified ? getCurrentTimezone(item.last_modified) : '-',
+        managed: item?.managed,
         status: {
           status: parseStatusString(item.status),
           statusDetail: item?.status_detail
@@ -104,7 +110,12 @@ export const DigitalCertificatesAdapter = {
         { id: 0, name: 'Azion (SAN)', status: 'active' },
         {
           id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
-          name: "Let's Encrypt",
+          name: "New Let's Encrypt Certificate (DNS-01)",
+          status: 'active'
+        },
+        {
+          id: !hasFlagBlockApiV4() ? 2 : 'lets_encrypt_http',
+          name: "New Let's Encrypt Certificate (HTTP-01)",
           status: 'active'
         }
       ]
@@ -123,6 +134,8 @@ export const DigitalCertificatesAdapter = {
         { label: 'My certificates', items: parsedDigitalCertificates }
       ]
       count += filteredDefaultCertificates.length
+    } else {
+      bodyParser = parsedDigitalCertificates
     }
 
     return {
@@ -167,6 +180,8 @@ export const DigitalCertificatesAdapter = {
         { label: 'My certificates', items: parsedDigitalCertificates }
       ]
       count += filteredDefaultCertificates.length
+    } else {
+      bodyParser = parsedDigitalCertificates
     }
 
     return {
@@ -210,11 +225,12 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformEditDigitalCertificate({ name, certificate, privateKey }) {
+  transformEditDigitalCertificate({ name, certificate, privateKey, type }) {
     return {
       name,
       certificate: certificate || undefined,
-      private_key: privateKey || undefined
+      private_key: privateKey || undefined,
+      type
     }
   }
 }

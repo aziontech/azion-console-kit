@@ -10,7 +10,7 @@ const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
   const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
-  const DEBUG_PROXY = env.VITE_DEBUG_PROXY
+  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && env.VITE_ENVIRONMENT !== 'production'
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -49,7 +49,8 @@ const getConfig = () => {
         '@stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
         '@assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
         '@routes': fileURLToPath(new URL('./src/router/routes', import.meta.url)),
-        '@modules': fileURLToPath(new URL('./src/modules', import.meta.url))
+        '@modules': fileURLToPath(new URL('./src/modules', import.meta.url)),
+        '@utils': fileURLToPath(new URL('./src/utils', import.meta.url))
       }
     },
     server: {
