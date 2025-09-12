@@ -57,7 +57,8 @@
     'teams',
     'two_factor_enabled',
     'is_active',
-    'is_account_owner'
+    'is_account_owner',
+    'last_modified'
   ]
 
   const getColumns = computed(() => [
@@ -93,11 +94,11 @@
       }
     },
     {
-      field: 'status',
-      header: 'Status',
-      disableSort: true,
-      filterPath: 'status.content',
+      field: 'owner',
+      header: 'Account Owner',
+      filterPath: 'owner.content',
       type: 'component',
+      disableSort: true,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -106,11 +107,11 @@
       }
     },
     {
-      field: 'owner',
-      header: 'Account Owner',
-      filterPath: 'owner.content',
-      type: 'component',
+      field: 'status',
+      header: 'Status',
       disableSort: true,
+      filterPath: 'status.content',
+      type: 'component',
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -146,7 +147,7 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
         :apiFields="USERS_API_FIELDS"
       />
       <EmptyResultsBlock
