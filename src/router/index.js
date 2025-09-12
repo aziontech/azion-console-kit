@@ -51,6 +51,7 @@ import { clientManagementRoutes } from '@routes/clients-management-routes'
 import { customPagesRoutes } from '@routes/custom-pages-routes'
 import { mfaManagementRoutes } from '@routes/mfa-management-routes'
 import { edgeConnectorsRoutes } from '@routes/edge-connectors-routes'
+import { edgeSQLRoutes } from '@routes/edge-sql-routes'
 import { edgeStorageRoutes } from '@routes/edge-storage'
 
 const router = createRouter({
@@ -101,6 +102,7 @@ const router = createRouter({
     customPagesRoutes,
     mfaManagementRoutes,
     edgeConnectorsRoutes,
+    edgeSQLRoutes,
     edgeStorageRoutes
   ].concat(errorRoutes)
 })
