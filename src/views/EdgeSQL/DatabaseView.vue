@@ -1,6 +1,7 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { adaptSqlQuery } from '@/services/v2/utils/adapter/handleSqlCommand'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -290,8 +291,39 @@
     activeTabIndex.value = 0
   }
 
+  const extractTableNameFromSelect = (selectQuery) => {
+    const cleanQuery = selectQuery.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
+
+    const fromRegex = /\bFROM\s+(?:`([^`]+)`|"([^"]+)"|(\w+))/i
+    const match = cleanQuery.match(fromRegex)
+
+    if (match) {
+      return match[1] || match[2] || match[3]
+    }
+
+    return null
+  }
+
+  const findFirstSelectQuery = (queries) => {
+    if (!Array.isArray(queries)) return null
+
+    for (const query of queries) {
+      const trimmedQuery = query.trim().toUpperCase()
+      if (trimmedQuery.startsWith('SELECT')) {
+        return query
+      }
+    }
+
+    return null
+  }
+
   const setSqlQuery = (query) => {
     sqlQuery.value = query
+    const adaptedQuery = adaptSqlQuery(query)
+    const firstSelectQuery = findFirstSelectQuery(adaptedQuery)
+    const tableName = extractTableNameFromSelect(firstSelectQuery)
+    sqlDatabase.setSelectedTable({ name: tableName })
+    selectedTableName.value = tableName
     executeQuery()
   }
 
