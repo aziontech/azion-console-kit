@@ -1,38 +1,61 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { adaptSqlQuery } from '../utils/adapter/handleSqlCommand'
-const truncate = (str, len) => (str.length > len ? `${str.substring(0, len - 3)}...` : str)
+
+const truncateString = (str, maxLength) => {
+  return str.length > maxLength ? `${str.substring(0, maxLength - 3)}...` : str
+}
+
+const getDatabaseStatusSeverity = (status) => {
+  const statusMap = {
+    created: 'success',
+    creating: 'info',
+    deletion_failed: 'danger',
+    deleting: 'warning',
+    unknown: 'warning',
+    pending: 'info'
+  }
+  return statusMap[status] || 'info'
+}
 
 const formatSqlValue = (value, fieldName, schema) => {
-  const column = schema.find((column) => column.name === fieldName)
-  const type = column ? column.type.toUpperCase() : 'TEXT'
+  const column = schema.find((col) => col.name === fieldName)
+  const columnType = column ? column.type.toUpperCase() : 'TEXT'
 
   if (value === null || String(value).toUpperCase() === 'NULL') {
     return 'NULL'
   }
 
-  if (['INTEGER', 'REAL', 'NUMERIC'].includes(type)) {
-    const num = Number(value)
-    return isNaN(num) ? 'NULL' : num
+  const numericTypes = ['INTEGER', 'REAL', 'NUMERIC']
+  if (numericTypes.includes(columnType)) {
+    const numericValue = Number(value)
+    return isNaN(numericValue) ? 'NULL' : numericValue
   }
 
   const stringValue = String(value)
   return `'${stringValue.replace(/'/g, "''")}'`
 }
 
-const formatters = {
-  Array: (arr) => {
-    if (arr.length <= 5) return `[${arr.join(', ')}]`
-    return `Array[${arr.length}] [${arr.slice(0, 3).join(', ')}, ...]`
+const cellValueFormatters = {
+  formatArray: (array) => {
+    if (array.length <= 5) {
+      return `[${array.join(', ')}]`
+    }
+    return `Array[${array.length}] [${array.slice(0, 3).join(', ')}, ...]`
   },
-  Blob: (blob) => `BLOB(${blob.byteLength || blob.length} bytes)`,
-  Object: (obj) => {
+
+  formatBlob: (blob) => {
+    const size = blob.byteLength || blob.length
+    return `BLOB(${size} bytes)`
+  },
+
+  formatObject: (obj) => {
     if (obj.type && obj.data) {
       return `${obj.type}(${obj.data.length || 'unknown size'})`
     }
     try {
-      const jsonStr = JSON.stringify(obj)
-      return truncate(jsonStr, 100)
+      const jsonString = JSON.stringify(obj)
+      return truncateString(jsonString, 100)
     } catch {
       return `Object{${Object.keys(obj).length} keys}`
     }
@@ -40,47 +63,32 @@ const formatters = {
 }
 
 const formatCellValue = (value) => {
-  const simpleValues = {
+  const nullValues = {
     null: 'NULL',
     undefined: 'UNDEFINED',
     '': '(empty)'
   }
-  if (value in simpleValues) return simpleValues[value]
+
+  if (value in nullValues) return nullValues[value]
   if (value == null) return String(value).toUpperCase()
 
-  if (Array.isArray(value)) return formatters.Array(value)
-  if (value instanceof Uint8Array || value instanceof ArrayBuffer) return formatters.Blob(value)
-  if (typeof value === 'object') return formatters.Object(value)
+  if (Array.isArray(value)) return cellValueFormatters.formatArray(value)
+  if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+    return cellValueFormatters.formatBlob(value)
+  }
+  if (typeof value === 'object') return cellValueFormatters.formatObject(value)
+
   return value
 }
 
-function mapRowsToObjects(columns, rows) {
+const mapRowsToObjects = (columns, rows) => {
   return rows.map((row) => {
-    const obj = {}
-    columns.forEach((column, index) => {
-      obj[column] = row[index]
+    const rowObject = {}
+    columns.forEach((columnName, index) => {
+      rowObject[columnName] = row[index]
     })
-    return obj
+    return rowObject
   })
-}
-
-const getStatusSeverity = (status) => {
-  switch (status) {
-    case 'created':
-      return 'success'
-    case 'creating':
-      return 'info'
-    case 'deletion_failed':
-      return 'danger'
-    case 'deleting':
-      return 'warning'
-    case 'unknown':
-      return 'warning'
-    case 'pending':
-      return 'info'
-    default:
-      return 'info'
-  }
 }
 
 export const EdgeSQLAdapter = {
@@ -91,28 +99,26 @@ export const EdgeSQLAdapter = {
       status: data.status
     }
   },
-  adaptDatabaseList(data) {
-    const parsedDatabases = data.map((database) => {
-      return {
-        id: database.id,
-        name: database.name,
-        status: {
-          content: database.status,
-          severity: getStatusSeverity(database.status)
-        },
-        active: parseStatusData(database.active),
-        lastEditor: database.last_editor,
-        lastModified: formatExhibitionDate(database.last_modified, 'full', undefined),
-        lastModifyDate: database.last_modified
-      }
-    })
 
-    return parsedDatabases
+  adaptDatabaseList(databases) {
+    return databases.map((database) => ({
+      id: database.id,
+      name: database.name,
+      status: {
+        content: database.status,
+        severity: getDatabaseStatusSeverity(database.status)
+      },
+      active: parseStatusData(database.active),
+      lastEditor: database.last_editor,
+      lastModified: formatExhibitionDate(database.last_modified, 'full', undefined),
+      lastModifyDate: database.last_modified
+    }))
   },
 
   adaptDatabaseCreate(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    const database = data.data || data
+    const responseData = httpResponse.data || httpResponse.body
+    const database = responseData.data || responseData
+
     return {
       id: database.id,
       name: database.name,
@@ -136,6 +142,16 @@ export const EdgeSQLAdapter = {
       active: data.active
     }
   },
+
+  adaptDatabaseDelete(httpResponse) {
+    const responseData = httpResponse.data || httpResponse.body
+
+    if (responseData?.state === 'pending') {
+      return 'Database deletion initiated. This may take a few moments.'
+    }
+
+    return 'Database successfully deleted'
+  },
   adaptTables(data) {
     return data.results.map((table) => ({
       name: table.name,
@@ -145,8 +161,10 @@ export const EdgeSQLAdapter = {
   },
 
   adaptTablesFromQuery({ data }) {
-    if (!data[0].results.rows.length) return []
-    return data[0].results.rows.map((row) => ({
+    const queryResult = data[0]
+    if (!queryResult?.results?.rows?.length) return []
+
+    return queryResult.results.rows.map((row) => ({
       name: row[0],
       type: row[1] || 'table',
       sql: row[2] || ''
@@ -154,79 +172,82 @@ export const EdgeSQLAdapter = {
   },
 
   adaptTablesFromExecute({ data }) {
-    return data[0].rows.map((row) => ({
+    const executeResult = data[0]
+    if (!executeResult?.rows?.length) return []
+
+    return executeResult.rows.map((row) => ({
       name: row[0],
       type: row[1] || 'table',
       sql: row[2] || ''
     }))
   },
 
-  adaptQueryResult({ data }) {
-    const formatRows = (rows) => rows.map((row) => row.map(formatCellValue))
-    const results = data.map((item) => {
-      return {
-        columns: item.results?.columns || [],
-        rows: formatRows(item.results?.rows) || [],
-        statement: item.results?.statement,
-        queryDurationMs: item.results?.query_duration_ms,
-        rowsRead: item.results?.rows_read,
-        rowsWritten: item.results?.rows_written
-      }
-    })
+  adaptSqlCommands(sql) {
+    const processedStatements = adaptSqlQuery(sql)
+    return {
+      statements: processedStatements
+    }
+  },
 
-    results.forEach((result) => {
+  adaptQueryResult({ data }) {
+    const formatRowsForDisplay = (rows) => {
+      return rows.map((row) => row.map(formatCellValue))
+    }
+
+    const processedResults = data.map((item) => ({
+      columns: item.results?.columns || [],
+      rows: formatRowsForDisplay(item.results?.rows || []),
+      statement: item.results?.statement,
+      queryDurationMs: item.results?.query_duration_ms,
+      rowsRead: item.results?.rows_read,
+      rowsWritten: item.results?.rows_written
+    }))
+
+    processedResults.forEach((result) => {
       result.rows = mapRowsToObjects(result.columns, result.rows)
     })
 
     return {
       state: data?.state || 'executed',
-      results,
-      affected: EdgeSQLAdapter.affectedRows({ data })
-    }
-  },
-
-  adaptSqlCommands(sql) {
-    const finalStatements = adaptSqlQuery(sql)
-    return {
-      statements: finalStatements
-    }
-  },
-
-  adaptQueryFromExecute({ data }) {
-    const result = data[0]
-    return {
-      state: data?.state || 'executed',
-      results: [
-        {
-          rows: result.rows || [],
-          columns: result.columns || [],
-          rowsAffected: result.rowsAffected || result.rows_affected || 0,
-          executionTime: result.executionTime || result.execution_time || 0,
-          success: true
-        }
-      ]
+      results: processedResults,
+      affected: this.calculateAffectedRows({ data })
     }
   },
 
   adaptExecuteResult({ data }) {
-    const results =
-      data?.map((item) => {
-        return {
-          columns: item.results?.columns || [],
-          rows: item.results?.rows || [],
-          statement: item.results?.statement,
-          queryDurationMs: item.results?.query_duration_ms,
-          rowsRead: item.results?.rows_read,
-          rowsWritten: item.results?.rows_written
-        }
-      }) || []
+    const processedResults =
+      data?.map((item) => ({
+        columns: item.results?.columns || [],
+        rows: item.results?.rows || [],
+        statement: item.results?.statement,
+        queryDurationMs: item.results?.query_duration_ms,
+        rowsRead: item.results?.rows_read,
+        rowsWritten: item.results?.rows_written
+      })) || []
 
-    const reorderedResults = EdgeSQLAdapter.prioritizeSelectResults(results)
+    const prioritizedResults = this.prioritizeSelectResults(processedResults)
 
     return {
       state: data?.state || 'executed',
-      results: reorderedResults,
-      affectedRows: EdgeSQLAdapter.affectedRows({ data })
+      results: prioritizedResults,
+      affectedRows: this.calculateAffectedRows({ data })
+    }
+  },
+
+  adaptQueryFromExecute({ data }) {
+    const firstResult = data[0]
+
+    return {
+      state: data?.state || 'executed',
+      results: [
+        {
+          rows: firstResult.rows || [],
+          columns: firstResult.columns || [],
+          rowsAffected: firstResult.rowsAffected || firstResult.rows_affected || 0,
+          executionTime: firstResult.executionTime || firstResult.execution_time || 0,
+          success: true
+        }
+      ]
     }
   },
 
@@ -235,78 +256,78 @@ export const EdgeSQLAdapter = {
       return results
     }
 
-    const selectResults = []
-    const otherResults = []
+    const selectQueries = []
+    const otherQueries = []
 
     results.forEach((result) => {
-      const isSelectQuery = result.rowsRead > 0 && result.rows && result.rows.length > 0
+      const hasReadData = result.rowsRead > 0 && result.rows?.length > 0
 
-      if (isSelectQuery) {
-        selectResults.push(result)
+      if (hasReadData) {
+        selectQueries.push(result)
       } else {
-        otherResults.push(result)
+        otherQueries.push(result)
       }
     })
 
-    return [...selectResults, ...otherResults]
+    return [...selectQueries, ...otherQueries]
   },
 
-  affectedRows({ data }) {
-    return (
-      data.reduce((total, result) => {
-        return total + (result.rows?.length || 0)
-      }, 0) || 0
-    )
+  calculateAffectedRows({ data }) {
+    return data.reduce((total, result) => {
+      return total + (result.rows?.length || 0)
+    }, 0)
   },
 
   adaptUpdateRow({ tableName, newData, whereData, tableSchema }) {
-    const setClause = Object.keys(newData)
-      .map((key) => {
-        const formattedValue = formatSqlValue(newData[key], key, tableSchema)
-        return `"${key}" = ${formattedValue}`
-      })
-      .join(', ')
+    const buildSetClause = () => {
+      return Object.keys(newData)
+        .map((columnName) => {
+          const formattedValue = formatSqlValue(newData[columnName], columnName, tableSchema)
+          return `"${columnName}" = ${formattedValue}`
+        })
+        .join(', ')
+    }
 
-    const whereClause = Object.keys(whereData)
-      .map((key) => {
-        const originalValue = whereData[key]
-        if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
-          return `"${key}" IS NULL`
-        }
-        const formattedValue = formatSqlValue(originalValue, key, tableSchema)
-        return `"${key}" = ${formattedValue}`
-      })
-      .join(' AND ')
+    const buildWhereClause = () => {
+      return Object.keys(whereData)
+        .map((columnName) => {
+          const originalValue = whereData[columnName]
 
-    const query = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause};`
+          if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+            return `"${columnName}" IS NULL`
+          }
+
+          const formattedValue = formatSqlValue(originalValue, columnName, tableSchema)
+          return `"${columnName}" = ${formattedValue}`
+        })
+        .join(' AND ')
+    }
+
+    const setClause = buildSetClause()
+    const whereClause = buildWhereClause()
+    const updateQuery = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause};`
 
     return {
-      statements: [query]
+      statements: [updateQuery]
     }
   },
 
   adaptInsertRow({ tableName, dataToInsert, tableSchema }) {
-    const columns = Object.keys(dataToInsert)
+    const columnNames = Object.keys(dataToInsert)
 
-    const columnsPart = columns.map((col) => `"${col}"`).join(', ')
+    const columnsClause = columnNames.map((columnName) => `"${columnName}"`).join(', ')
 
-    const valuesPart = columns
-      .map((col) => {
-        const value = dataToInsert[col]
-        return formatSqlValue(value, col, tableSchema)
+    const valuesClause = columnNames
+      .map((columnName) => {
+        const value = dataToInsert[columnName]
+        return formatSqlValue(value, columnName, tableSchema)
       })
       .join(', ')
 
-    return { statements: [`INSERT INTO "${tableName}" (${columnsPart}) VALUES (${valuesPart});`] }
-  },
+    const insertQuery = `INSERT INTO "${tableName}" (${columnsClause}) VALUES (${valuesClause});`
 
-  adaptDatabaseDelete(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-
-    if (data?.state === 'pending') {
-      return 'Database deletion initiated. This may take a few moments.'
+    return {
+      statements: [insertQuery]
     }
-
-    return 'Database successfully deleted'
   }
 }
