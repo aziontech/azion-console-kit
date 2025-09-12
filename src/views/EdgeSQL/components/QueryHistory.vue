@@ -128,7 +128,7 @@
       :csvMapper="(data) => ({ ...data })"
       :exportFileName="`query-results`"
     >
-      <template #actionsHeader>
+      <template #actions-header>
         <PrimeButton
           @click="clearHistory"
           icon="pi pi-times-circle"

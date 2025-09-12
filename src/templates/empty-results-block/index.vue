@@ -76,7 +76,6 @@
           icon="pi pi-external-link"
           label="Learn more"
           link
-          v-if="showLearnMoreButton"
           @click="openDocumentation"
         />
       </div>
