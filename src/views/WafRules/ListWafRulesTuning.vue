@@ -280,6 +280,13 @@
       domainsOptions.value.options
         .filter((item) => selectedDomainIds.value.includes(item.id))
         .map((domain) => domain.domain) || []
+
+    const cnames =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .flatMap((domain) => domain.cnames) || []
+
+    selectedFilter.value.domains = [...selectedFilter.value.domains, ...cnames]
     filterTuning()
   }
 
