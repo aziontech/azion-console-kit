@@ -689,3 +689,13 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style scoped>
+/* Style for row hover */
+:deep(.p-datatable-tbody > tr:hover) {
+  /* Target the frozen column cell on row hover */
+  .p-frozen-column {
+    background: var(--surface-section) !important;
+  }
+}
+</style>
