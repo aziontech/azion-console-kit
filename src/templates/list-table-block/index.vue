@@ -121,7 +121,7 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
             <slot name="actionsHeader"></slot>
@@ -129,7 +129,7 @@
               v-if="hasExportToCsvMapper"
               @click="handleExportTableDataToCSV"
               outlined
-              class="max-sm:w-full mr-2"
+              class="max-sm:w-full"
               icon="pi pi-download"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"

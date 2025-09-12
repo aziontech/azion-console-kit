@@ -55,6 +55,7 @@
     {
       type: 'action',
       icon: 'pi pi-arrow-circle-right',
+      tooltip: 'Run Again',
       commandAction: (item) => rerunQuery(item)
     }
   ]
@@ -94,8 +95,6 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
-
-  // Watch for changes in queryResults to automatically reload table
   watch(
     () => queryResults.value,
     () => {
@@ -104,13 +103,11 @@
     { deep: true }
   )
 
-  // Watch for database filter changes
   watch(showCurrentDatabaseOnly, () => {
     tableBlock.value?.reload()
   })
 
   onMounted(() => {
-    // Trigger table reload if it exists
     if (tableBlock.value?.reload) {
       tableBlock.value.reload()
     }
@@ -132,16 +129,14 @@
       :exportFileName="`query-results`"
     >
       <template #actionsHeader>
-        <div class="flex gap-2 items-center">
-          <PrimeButton
-            @click="clearHistory"
-            icon="pi pi-times-circle"
-            outlined
-            class="max-sm:w-full"
-            :data-testid="`clear_history_button`"
-            v-tooltip.bottom="{ value: 'Clear History', showDelay: 200 }"
-          />
-        </div>
+        <PrimeButton
+          @click="clearHistory"
+          icon="pi pi-times-circle"
+          outlined
+          class="max-sm:w-full"
+          :data-testid="`clear_history_button`"
+          v-tooltip.bottom="{ value: 'Clear History', showDelay: 200 }"
+        />
       </template>
     </TableBlock>
 
