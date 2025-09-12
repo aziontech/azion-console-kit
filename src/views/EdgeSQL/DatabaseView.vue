@@ -7,7 +7,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ResultsBlock from './FormFields/blocks/ResultsBlock.vue'
   import ListTablesBlock from './FormFields/blocks/ListTablesBlock.vue'
-  import Button from 'primevue/button'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import Menu from 'primevue/menu'
@@ -55,14 +54,7 @@
   const selectedTable = ref(null)
   const drawerVisible = ref(false)
   const definitionDrawerVisible = ref(false)
-
-  const databaseName = computed(() => {
-    const name = sqlDatabase.currentDatabase?.name
-    if (name && typeof name === 'object' && name.text !== undefined) {
-      return name.text || name.content || null
-    }
-    return name || null
-  })
+  const databaseName = ref('')
 
   const monacoTheme = computed(() => {
     return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
@@ -75,7 +67,9 @@
 
   const loadDatabaseInfo = async () => {
     try {
-      await edgeSQLService.getDatabase(databaseId.value)
+      const database = await edgeSQLService.getDatabase(databaseId.value)
+      databaseName.value = database.name
+      sqlDatabase.setCurrentDatabase(database)
     } catch (error) {
       router.push('/sql-database')
     }
@@ -381,18 +375,7 @@
         <PageHeadingBlock
           :pageTitle="databaseName"
           data-testid="edge-sql-database-heading"
-        >
-          <template #actions>
-            <div class="flex gap-2">
-              <Button
-                label="Back to Databases"
-                icon="pi pi-arrow-left"
-                outlined
-                @click="router.push('/edge-sql')"
-              />
-            </div>
-          </template>
-        </PageHeadingBlock>
+        />
       </template>
       <template #content>
         <div class="h-full">

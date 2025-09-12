@@ -49,7 +49,7 @@ export const edgeSQLRoutes = {
             to: '/sql-database'
           },
           {
-            label: 'Database'
+            label: 'Edit Database'
           }
         ]
       }
