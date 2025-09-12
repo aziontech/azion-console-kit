@@ -173,19 +173,6 @@ function createEdgeLibrariesItems() {
   ]
 }
 
-// TODO: Uncoment this when database is ready
-// function createStoreItems() {
-//   return [
-// {
-//   label: 'SQL Database',
-//   to: '/sql-database',
-//   icon: 'ai ai-edge-sql',
-//   tag: 'Preview',
-//   id: 'sql-database'
-// }
-//   ]
-// }
-
 function createMarketplaceProductsItems() {
   return [
     {
@@ -214,7 +201,14 @@ function createMarketplaceProductsItems() {
 //       icon: 'ai ai-edge-storage',
 //       id: 'edge-storage',
 //       tag: 'Preview'
-//     }
+//     },
+//        {
+//         label: 'SQL Database',
+//         to: '/sql-database',
+//         icon: 'ai ai-edge-sql',
+//         tag: 'Preview',
+//         id: 'sql-database'
+//        }
 //   ]
 // }
 
@@ -252,10 +246,6 @@ export function getMenuItens(showMarketplaceProductsItens) {
       label: 'Edge Libraries',
       items: createEdgeLibrariesItems()
     },
-    // {
-    //   label: 'Store',
-    //   items: createStoreItems()
-    // },
     {
       label: 'Marketplace Products',
       visible: showMarketplaceProductsItens,
