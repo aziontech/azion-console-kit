@@ -12,7 +12,7 @@
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    documentationService: { type: Function, required: false },
+    documentationService: { type: Function, required: true },
     createPagePath: { type: String, required: false },
     disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
@@ -69,7 +69,6 @@
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
-          v-if="props.documentationService"
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
