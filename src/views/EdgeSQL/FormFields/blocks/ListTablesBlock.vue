@@ -90,13 +90,13 @@
     v-model:visible="showTemplatesModal"
     modal
     header="SQL Quick Templates"
-    :style="{ width: '80vw', maxWidth: '1000px' }"
+    :style="{ width: 'w-full sm:80vw', maxWidth: 'sm:1000px' }"
     :closable="true"
     @hide="closeTemplatesModal"
   >
     <div class="flex flex-col gap-5">
       <!-- Search Field -->
-      <div class="p-input-icon-left w-1/3">
+      <div class="p-input-icon-left sm:w-1/3 w-full">
         <i class="pi pi-search" />
         <InputText
           v-model="templateSearchTerm"
