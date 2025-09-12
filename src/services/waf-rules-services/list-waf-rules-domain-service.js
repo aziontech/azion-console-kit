@@ -24,11 +24,11 @@ const adapt = (httpResponse) => {
 
   const parsedWafRulesDomain = isArray
     ? httpResponse.body.results.map((domain) => ({
-      domain: domain.domain,
-      id: domain.id,
-      name: domain.name,
-      cnames: domain.cnames
-    }))
+        domain: domain.domain,
+        id: domain.id,
+        name: domain.name,
+        cnames: domain.cnames
+      }))
     : []
 
   return {
