@@ -1,21 +1,21 @@
 <template>
   <div class="mt-6">
     <ListTableBlockWithRowEdit
-      v-if="hasContentToList && hasResults"
-      :columns="columns"
-      :data="listTableService"
+      v-if="shouldShowTable"
+      :columns="tableColumns"
+      :data="formattedTableData"
       :isLoading="isExecutingQuery"
       :key="tableKey"
-      @row-edit-save="handleRowSave"
-      @row-edit-cancel="handleRowCancel"
       :hasExportToCsv="true"
       :editingRows="editingRows"
       :frozenSize="'0.1rem'"
-      :csvMapper="(data) => ({ ...data })"
-      :exportFileName="`results-${new Date().toISOString().split('T')[0]}`"
-      :menuItems="menuItems"
-      :cleanEditingRows="cleanEditingRows"
-      :disabledRowActions="disableActions"
+      :csvMapper="csvDataMapper"
+      :exportFileName="csvFileName"
+      :menuItems="rowMenuItems"
+      :cleanEditingRows="shouldCleanEditingRows"
+      :disabledRowActions="areActionsDisabled"
+      @row-edit-save="handleRowSave"
+      @row-edit-cancel="handleRowCancel"
     >
       <template #addButton>
         <Button
@@ -23,8 +23,8 @@
           icon="pi pi-plus"
           severity="primary"
           class="p-button-sm font-medium"
-          @click="insertRow"
-          :disabled="disabledAddNewRow || disableActions"
+          :disabled="isAddRowDisabled"
+          @click="handleAddRow"
         />
       </template>
     </ListTableBlockWithRowEdit>
@@ -34,28 +34,34 @@
       title="Ready to execute"
       description="Execute a query to see the results here"
       :showLearnMoreButton="false"
-    ></EmptyResultsBlock>
+    />
   </div>
 </template>
 <script setup>
   import { ref, watch, computed } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  
+  // Components
   import ListTableBlockWithRowEdit from '@/templates/list-table-block/with-row-edit'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Button from 'primevue/button'
+  
+  // Services and composables
   import { edgeSQLService } from '@/services/v2'
-  import { useRoute } from 'vue-router'
-  import { SQLITE_QUERIES } from '../../constants'
-  import { useToast } from 'primevue/usetoast'
   import { useEdgeSQL } from '../../composable/useEdgeSQL'
-  defineOptions({ name: 'results-block' })
+  import { SQLITE_QUERIES } from '../../constants'
+  
+  defineOptions({ name: 'ResultsBlock' })
   const emit = defineEmits(['execute-query'])
 
   const route = useRoute()
   const toast = useToast()
 
-  const sqlDatabase = useEdgeSQL()
-  const cleanEditingRows = ref(false)
-
+  // Composables
+  const edgeSQL = useEdgeSQL()
+  
+  // Props
   const props = defineProps({
     queryResults: {
       type: Array,
@@ -75,52 +81,68 @@
     }
   })
 
-  const hasContentToList = ref(false)
+  // Reactive state
+  const shouldCleanEditingRows = ref(false)
   const editingRows = ref([])
-  const disabledAddNewRow = ref(false)
-  const responseQuery = ref(props.queryResults)
-  const selectedTableSchema = ref(null)
+  const isAddNewRowDisabled = ref(false)
+  const queryResults = ref(props.queryResults)
+  const tableSchema = ref(null)
+  
+  // Computed properties
   const databaseId = computed(() => route.params.id)
 
-  const columns = computed(() => {
-    const firstResult = responseQuery.value?.[0]
+  const tableColumns = computed(() => {
+    const firstResult = queryResults.value?.[0]
     if (!firstResult?.columns?.length) return []
 
-    return firstResult.columns.map((col) => ({
-      field: col,
-      header: col
+    return firstResult.columns.map((column) => ({
+      field: column,
+      header: column
     }))
   })
 
-  const hasResults = computed(() => {
-    return responseQuery.value?.length > 0 && responseQuery.value[0]?.rows?.length > 0
+  const hasQueryResults = computed(() => {
+    return queryResults.value?.length > 0 && queryResults.value[0]?.rows?.length > 0
   })
 
-  const deleteRow = async (row) => {
-    const rowWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(row, selectedTableSchema.value.rows)
+  const shouldShowTable = computed(() => {
+    return hasQueryResults.value
+  })
+
+  const handleDeleteRow = async (row) => {
+    const filteredRowData = filterValidSchemaKeys(row, tableSchema.value.rows)
     const deleteQuery = SQLITE_QUERIES.DELETE_DATA(
       props.tableName,
-      rowWithoutKeyDoesNotMatch,
-      selectedTableSchema.value.rows
+      filteredRowData,
+      tableSchema.value.rows
     )
-    await sqlDatabase.executeQuery([deleteQuery])
-    executeQuery()
+    await edgeSQL.executeQuery([deleteQuery])
+    refreshQueryResults()
   }
 
-  const menuItems = computed(() => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: async (row) => {
-          await deleteRow(row)
-        }
+  const rowMenuItems = computed(() => [
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: async (row) => {
+        await handleDeleteRow(row)
       }
-    ]
+    }
+  ])
+
+  const areActionsDisabled = computed(() => {
+    return edgeSQL.isNonEditableQuery(props.currentQuery)
   })
 
-  const disableActions = computed(() => {
-    return sqlDatabase.isNonEditableQuery(props.currentQuery)
+  const isAddRowDisabled = computed(() => {
+    return isAddNewRowDisabled.value || areActionsDisabled.value
+  })
+
+  const csvDataMapper = computed(() => (data) => ({ ...data }))
+  
+  const csvFileName = computed(() => {
+    const today = new Date().toISOString().split('T')[0]
+    return `results-${today}`
   })
 
   const handleRowSave = (row) => {
@@ -133,24 +155,27 @@
 
   const handleRowCancel = (row) => {
     if (row.data.shouldInsert) {
-      responseQuery.value[0].rows.splice(row.index, 1)
+      queryResults.value[0].rows.splice(row.index, 1)
     }
     editingRows.value.splice(row.index, 1)
-    disabledAddNewRow.value = false
+    isAddNewRowDisabled.value = false
   }
 
-  const insertRow = () => {
-    if (!selectedTableSchema.value?.rows) return
-    disabledAddNewRow.value = true
+  const handleAddRow = () => {
+    if (!tableSchema.value?.rows) return
+    
+    isAddNewRowDisabled.value = true
+    const newRow = createNewRowObject()
+    addRowToEditingState(newRow)
+    addRowToQueryResults(newRow)
+  }
 
-    const newRow = {
-      shouldInsert: true
-    }
-    const schemaColumns = selectedTableSchema.value.rows
+  const createNewRowObject = () => {
+    const newRow = { shouldInsert: true, index: 0 }
+    const schemaColumns = tableSchema.value.rows
     const hasIdColumn = schemaColumns.some((col) => col.name === 'id')
 
     schemaColumns.forEach((col) => {
-      newRow['index'] = 0
       if (col.name === 'id' && hasIdColumn) {
         newRow[col.name] = 0
       } else {
@@ -158,44 +183,47 @@
       }
     })
 
-    const currentEditingRows = [...editingRows.value]
-
     if (!hasIdColumn) {
       newRow.id = 0
     }
-    currentEditingRows.push(newRow)
-    editingRows.value = currentEditingRows
 
-    if (responseQuery.value?.[0]) {
-      const currentRows = [...(responseQuery.value[0].rows || [])]
-      const currentColumns = responseQuery.value[0].columns || []
+    return newRow
+  }
 
-      if (currentRows.length > 0 && Array.isArray(currentRows[0])) {
-        const newRowArray = currentColumns.map((col) => newRow[col] || '')
-        currentRows.unshift(newRowArray)
-      } else {
-        currentRows.unshift(newRow)
-      }
+  const addRowToEditingState = (newRow) => {
+    editingRows.value = [...editingRows.value, newRow]
+  }
 
-      responseQuery.value = [
-        {
-          ...responseQuery.value[0],
-          rows: currentRows
-        }
-      ]
+  const addRowToQueryResults = (newRow) => {
+    if (!queryResults.value?.[0]) return
+
+    const currentRows = [...(queryResults.value[0].rows || [])]
+    const currentColumns = queryResults.value[0].columns || []
+
+    if (currentRows.length > 0 && Array.isArray(currentRows[0])) {
+      const newRowArray = currentColumns.map((col) => newRow[col] || '')
+      currentRows.unshift(newRowArray)
+    } else {
+      currentRows.unshift(newRow)
     }
+
+    queryResults.value = [{
+      ...queryResults.value[0],
+      rows: currentRows
+    }]
   }
 
   const tableKey = computed(() => {
-    return columns.value.map((col) => col.field).join('-')
+    return tableColumns.value.map((col) => col.field).join('-')
   })
 
-  const listTableService = computed(() => {
-    const rows = responseQuery.value?.[0]?.rows || []
-    const columns = responseQuery.value?.[0]?.columns || []
+  const formattedTableData = computed(() => {
+    const rows = queryResults.value?.[0]?.rows || []
+    const columns = queryResults.value?.[0]?.columns || []
 
-    const result = rows.map((row, index) => {
+    return rows.map((row, index) => {
       const rowObject = { id: index, index }
+      
       if (Array.isArray(row)) {
         columns.forEach((col, colIndex) => {
           rowObject[col] = row[colIndex]
@@ -203,84 +231,84 @@
       } else {
         Object.assign(rowObject, row)
       }
+      
       return rowObject
     })
-    return result
   })
 
-  const executeQuery = () => {
+  const refreshQueryResults = () => {
     const query = SQLITE_QUERIES.SELECT_ALL(props.tableName)
     emit('execute-query', query)
   }
 
   const loadTableSchema = async (tableName) => {
-    const result = await edgeSQLService.queryDatabase(databaseId.value, {
-      statements: SQLITE_QUERIES.TABLE_INFO(tableName),
-      parameters: []
-    })
-    selectedTableSchema.value = {
-      name: tableName,
-      columns: result.results[0].columns || [],
-      rows: result.results[0].rows || []
+    try {
+      const result = await edgeSQLService.queryDatabase(databaseId.value, {
+        statements: SQLITE_QUERIES.TABLE_INFO(tableName),
+        parameters: []
+      })
+      
+      tableSchema.value = {
+        name: tableName,
+        columns: result.results[0].columns || [],
+        rows: result.results[0].rows || []
+      }
+    } catch (error) {
+      // Log error for debugging
+      // eslint-disable-next-line no-console
+      console.error('Failed to load table schema:', error)
     }
   }
 
-  const removeKeyDoesNotMatch = (obj, keys) => {
-    const newObj = {}
-    const allowedKeys = keys.map((key) => key.name)
+  const filterValidSchemaKeys = (obj, schemaKeys) => {
+    const allowedKeys = schemaKeys.map((key) => key.name)
+    const filteredObj = {}
 
-    Object.keys(obj).forEach((objKey) => {
-      if (allowedKeys.includes(objKey)) {
-        newObj[objKey] = obj[objKey]
+    Object.keys(obj).forEach((key) => {
+      if (allowedKeys.includes(key)) {
+        filteredObj[key] = obj[key]
       }
     })
 
-    return newObj
+    return filteredObj
   }
 
   const editRowService = async (newData, whereData) => {
-    cleanEditingRows.value = false
-    const newDataWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(
-      newData,
-      selectedTableSchema.value.rows
-    )
-    const whereDataWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(
-      whereData,
-      selectedTableSchema.value.rows
-    )
+    shouldCleanEditingRows.value = false
+    const filteredNewData = filterValidSchemaKeys(newData, tableSchema.value.rows)
+    const filteredWhereData = filterValidSchemaKeys(whereData, tableSchema.value.rows)
+    
     try {
       await edgeSQLService.updatedRow(databaseId.value, {
         tableName: props.tableName,
-        newData: newDataWithoutKeyDoesNotMatch,
-        whereData: whereDataWithoutKeyDoesNotMatch,
-        tableSchema: selectedTableSchema.value.rows
+        newData: filteredNewData,
+        whereData: filteredWhereData,
+        tableSchema: tableSchema.value.rows
       })
 
-      executeQuery()
-    } finally {
       toast.add({
         severity: 'success',
         summary: 'Row Updated',
         detail: 'The row has been updated successfully',
         life: 2000
       })
+
+      refreshQueryResults()
+    } finally {
       editingRows.value = []
-      cleanEditingRows.value = true
+      shouldCleanEditingRows.value = true
     }
   }
 
   const insertRowService = async (newData) => {
-    cleanEditingRows.value = false
-    const newDataWithoutKeyDoesNotMatch = removeKeyDoesNotMatch(
-      newData,
-      selectedTableSchema.value.rows
-    )
+    shouldCleanEditingRows.value = false
+    const filteredData = filterValidSchemaKeys(newData, tableSchema.value.rows)
 
     try {
       await edgeSQLService.insertRow(databaseId.value, {
         tableName: props.tableName,
-        dataToInsert: newDataWithoutKeyDoesNotMatch,
-        tableSchema: selectedTableSchema.value.rows
+        dataToInsert: filteredData,
+        tableSchema: tableSchema.value.rows
       })
 
       toast.add({
@@ -290,36 +318,31 @@
         life: 2000
       })
 
-      executeQuery()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Insert Failed',
-        detail: error.message || 'Failed to insert row',
-        life: 3000
-      })
+      refreshQueryResults()
     } finally {
       editingRows.value = []
-      cleanEditingRows.value = true
-      disabledAddNewRow.value = false
+      shouldCleanEditingRows.value = true
+      isAddNewRowDisabled.value = false
     }
   }
 
+  // Watchers
   watch(
     () => props.queryResults,
     (newResults) => {
-      responseQuery.value = newResults
-      disabledAddNewRow.value = false
-      if (newResults?.length > 0) {
-        hasContentToList.value = true
-      }
-    }
+      queryResults.value = newResults
+      isAddNewRowDisabled.value = false
+    },
+    { immediate: true }
   )
 
   watch(
     () => props.tableName,
     (tableName) => {
-      loadTableSchema(tableName)
-    }
+      if (tableName) {
+        loadTableSchema(tableName)
+      }
+    },
+    { immediate: true }
   )
 </script>
