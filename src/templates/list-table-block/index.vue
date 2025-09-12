@@ -7,6 +7,7 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
+      :class="{ 'disabled-list': disabledList }"
       v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
@@ -691,11 +692,10 @@
 </script>
 
 <style scoped>
-/* Style for row hover */
-:deep(.p-datatable-tbody > tr:hover) {
-  /* Target the frozen column cell on row hover */
-  .p-frozen-column {
-    background: var(--surface-section) !important;
+  /* Style for row hover when disabledList is true */
+  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
+    .p-frozen-column {
+      background: var(--surface-section) !important;
+    }
   }
-}
 </style>

@@ -3650,10 +3650,10 @@ axios@^1.7.4:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-azion-theme@^1.14.3:
-  version "1.14.3"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.3.tgz#c78b075145aa60d4eb0567e2e7b6042e95e277f5"
-  integrity sha512-satP2PYuzY92cZfEg1tzsI6Kp438rwduHHOTEmGtUef5ePWvF+1k86ek0KlRbI0BflHbG5HnmSRWVuykA4ZFUw==
+azion-theme@^1.14.4:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.4.tgz#5aad69dcbedbd769a06e01bcb711e469afbbf49e"
+  integrity sha512-cuOyA56bRwhncxq8VBq39thtFbuJN776f74dXEPld0jLPopvPeu3TnEsJPlDkK+DeSjB79/wvN5W1pP5AgfzlA==
 
 azion@^1.20.2:
   version "1.20.2"
