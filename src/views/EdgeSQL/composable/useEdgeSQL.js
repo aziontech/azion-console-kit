@@ -12,6 +12,10 @@ const STORAGE_KEYS = {
   CURRENT_DATABASE: 'edge_sql_current_database'
 }
 
+const getDatabaseSpecificKey = (baseKey, databaseName) => {
+  return databaseName ? `${baseKey}_${databaseName}` : baseKey
+}
+
 const saveToStorage = (key, data) => {
   try {
     localStorage.setItem(key, JSON.stringify(data))
@@ -30,8 +34,9 @@ const loadFromStorage = (key, defaultValue = null) => {
   }
 }
 
-const loadHistoryFromStorage = () => {
-  const rawHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+const loadHistoryFromStorage = (databaseName = null) => {
+  const key = getDatabaseSpecificKey(STORAGE_KEYS.QUERY_HISTORY, databaseName)
+  const rawHistory = loadFromStorage(key, [])
   return adaptHistory(rawHistory)
 }
 
@@ -148,7 +153,7 @@ export function useEdgeSQL() {
   const currentDatabase = ref(null)
   const databaseCreated = ref(null)
   const currentTables = ref([])
-  const queryResults = ref(loadHistoryFromStorage())
+  const queryResults = ref([])
   const isLoading = ref(false)
   const error = ref(null)
   const selectedTable = ref(null)
@@ -221,6 +226,8 @@ export function useEdgeSQL() {
 
     if (database) {
       saveToStorage(STORAGE_KEYS.CURRENT_DATABASE, database)
+      // Load history specific to this database
+      queryResults.value = loadHistoryFromStorage(database.name)
     }
   }
 
@@ -254,15 +261,17 @@ export function useEdgeSQL() {
       type: detectQueryType(result.query)
     }
 
-    // Save raw data to localStorage
-    const rawHistory = loadFromStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    // Save raw data to localStorage with database-specific key
+    const databaseName = currentDatabase.value?.name
+    const key = getDatabaseSpecificKey(STORAGE_KEYS.QUERY_HISTORY, databaseName)
+    const rawHistory = loadFromStorage(key, [])
     rawHistory.unshift(enrichedResult)
 
     if (rawHistory.length > 100) {
       rawHistory.splice(100)
     }
 
-    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, rawHistory)
+    saveToStorage(key, rawHistory)
 
     // Update reactive state with adapted data
     queryResults.value = adaptHistory(rawHistory)
@@ -270,7 +279,9 @@ export function useEdgeSQL() {
 
   const clearQueryResults = () => {
     queryResults.value = []
-    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, [])
+    const databaseName = currentDatabase.value?.name
+    const key = getDatabaseSpecificKey(STORAGE_KEYS.QUERY_HISTORY, databaseName)
+    saveToStorage(key, [])
   }
 
   const setLoading = (loading) => {
@@ -287,7 +298,9 @@ export function useEdgeSQL() {
 
   const removeQueryFromHistory = (queryId) => {
     queryResults.value = queryResults.value.filter((query) => query.id !== queryId)
-    saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
+    const databaseName = currentDatabase.value?.name
+    const key = getDatabaseSpecificKey(STORAGE_KEYS.QUERY_HISTORY, databaseName)
+    saveToStorage(key, queryResults.value)
   }
 
   const getQueryHistoryForDatabase = (databaseId) => {
@@ -303,7 +316,8 @@ export function useEdgeSQL() {
   }
 
   const updateListHistory = () => {
-    const loadedHistory = loadHistoryFromStorage()
+    const databaseName = currentDatabase.value?.name
+    const loadedHistory = loadHistoryFromStorage(databaseName)
     queryResults.value = loadedHistory
     return loadedHistory
   }
@@ -311,7 +325,9 @@ export function useEdgeSQL() {
   const importHistory = (historyData) => {
     if (historyData?.queries && Array.isArray(historyData.queries)) {
       queryResults.value = historyData.queries
-      saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
+      const databaseName = currentDatabase.value?.name
+      const key = getDatabaseSpecificKey(STORAGE_KEYS.QUERY_HISTORY, databaseName)
+      saveToStorage(key, queryResults.value)
       return true
     }
     return false

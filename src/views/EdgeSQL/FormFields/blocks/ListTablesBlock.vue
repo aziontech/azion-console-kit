@@ -90,7 +90,7 @@
     v-model:visible="showTemplatesModal"
     modal
     header="SQL Quick Templates"
-    :style="{ width: 'w-full sm:80vw', maxWidth: 'sm:1000px' }"
+    :style="{ width: 'w-full sm:80vw', maxWidth: '62.5rem' }"
     :closable="true"
     @hide="closeTemplatesModal"
   >
