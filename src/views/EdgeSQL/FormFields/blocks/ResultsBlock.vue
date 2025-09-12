@@ -1,5 +1,15 @@
 <template>
   <div class="mt-6">
+    <InlineMessage
+      class="w-full mb-6"
+      severity="info"
+      icon="pi pi-info"
+      v-if="areActionsDisabled"
+    >
+      Searches across multiple database tables are read-only. For security reasons, editing or
+      deleting rows is not permitted in this context.
+    </InlineMessage>
+
     <ListTableBlockWithRowEdit
       v-if="shouldShowTable"
       :columns="tableColumns"
@@ -41,17 +51,18 @@
   import { ref, watch, computed } from 'vue'
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  
+
   // Components
   import ListTableBlockWithRowEdit from '@/templates/list-table-block/with-row-edit'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Button from 'primevue/button'
-  
+  import InlineMessage from 'primevue/inlinemessage'
+
   // Services and composables
   import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQL } from '../../composable/useEdgeSQL'
   import { SQLITE_QUERIES } from '../../constants'
-  
+
   defineOptions({ name: 'ResultsBlock' })
   const emit = defineEmits(['execute-query'])
 
@@ -60,7 +71,7 @@
 
   // Composables
   const edgeSQL = useEdgeSQL()
-  
+
   // Props
   const props = defineProps({
     queryResults: {
@@ -87,7 +98,7 @@
   const isAddNewRowDisabled = ref(false)
   const queryResults = ref(props.queryResults)
   const tableSchema = ref(null)
-  
+
   // Computed properties
   const databaseId = computed(() => route.params.id)
 
@@ -139,7 +150,7 @@
   })
 
   const csvDataMapper = computed(() => (data) => ({ ...data }))
-  
+
   const csvFileName = computed(() => {
     const today = new Date().toISOString().split('T')[0]
     return `results-${today}`
@@ -163,7 +174,7 @@
 
   const handleAddRow = () => {
     if (!tableSchema.value?.rows) return
-    
+
     isAddNewRowDisabled.value = true
     const newRow = createNewRowObject()
     addRowToEditingState(newRow)
@@ -207,10 +218,12 @@
       currentRows.unshift(newRow)
     }
 
-    queryResults.value = [{
-      ...queryResults.value[0],
-      rows: currentRows
-    }]
+    queryResults.value = [
+      {
+        ...queryResults.value[0],
+        rows: currentRows
+      }
+    ]
   }
 
   const tableKey = computed(() => {
@@ -223,7 +236,7 @@
 
     return rows.map((row, index) => {
       const rowObject = { id: index, index }
-      
+
       if (Array.isArray(row)) {
         columns.forEach((col, colIndex) => {
           rowObject[col] = row[colIndex]
@@ -231,7 +244,7 @@
       } else {
         Object.assign(rowObject, row)
       }
-      
+
       return rowObject
     })
   })
@@ -247,7 +260,7 @@
         statements: SQLITE_QUERIES.TABLE_INFO(tableName),
         parameters: []
       })
-      
+
       tableSchema.value = {
         name: tableName,
         columns: result.results[0].columns || [],
@@ -277,7 +290,7 @@
     shouldCleanEditingRows.value = false
     const filteredNewData = filterValidSchemaKeys(newData, tableSchema.value.rows)
     const filteredWhereData = filterValidSchemaKeys(whereData, tableSchema.value.rows)
-    
+
     try {
       await edgeSQLService.updatedRow(databaseId.value, {
         tableName: props.tableName,
