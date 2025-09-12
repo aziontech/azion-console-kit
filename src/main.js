@@ -1,6 +1,3 @@
-/**
- * ==== styles block ====
- */
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/main.css'
@@ -8,9 +5,6 @@ import 'azion-theme'
 import '@assets/icons/azionicons.scss'
 import '@assets/c3.scss'
 import '@assets/flags.css'
-/**
- * ==== End of styles block ====
- */
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
