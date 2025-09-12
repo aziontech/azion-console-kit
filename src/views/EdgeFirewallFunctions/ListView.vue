@@ -65,7 +65,7 @@
   import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
-  
+
   const props = defineProps({
     edgeFirewallID: {
       required: true,
@@ -165,20 +165,20 @@
     hasContentToList.value = event
   }
 
-  
-
   const openCreateFunctionDrawer = () => {
     drawerFunctionRef.value.openDrawerCreate()
   }
 
   const openEditFunctionDrawer = (data) => {
     openDrawer({ id: data.id })
-    router.push({ query: {
-      id: data.id
-    }})
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
   }
 
-    const openDrawerById = (data) => {
+  const openDrawerById = (data) => {
     openDrawer({ id: data.id })
   }
 

@@ -61,10 +61,10 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeApplicationFunctionService } from '@/services/v2'
   import DrawerFunction from './Drawer'
-  
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  
+
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
   const props = defineProps({
@@ -155,11 +155,13 @@
 
   const openEditFunctionDrawer = (data) => {
     openDrawer({ id: data.id })
-    router.push({ query: {
-      id: data.id
-    }})
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
   }
-  
+
   const openDrawerById = (data) => {
     openDrawer({ id: data.id })
   }

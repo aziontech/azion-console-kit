@@ -164,7 +164,7 @@
     router.push({
       name: 'edit-edge-application',
       params,
-      query: route.query 
+      query: route.query
     })
   }
   const changeTab = (index) => {
