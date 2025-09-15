@@ -113,8 +113,8 @@
       <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Firewall"
-        createPagePath="/edge-firewall/create"
-        editPagePath="/edge-firewall/edit"
+        createPagePath="/firewall/create"
+        editPagePath="/firewall/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
@@ -130,7 +130,7 @@
         title="No Firewall has been created."
         description="Click the button below to create your first Firewall."
         createButtonLabel="Firewall"
-        createPagePath="/edge-firewall/create"
+        createPagePath="/firewall/create"
         :documentationService="props.documentationService"
         @click-to-create="handleTrackEvent"
       >

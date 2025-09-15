@@ -65,7 +65,7 @@ function createSecureItems() {
     },
     {
       label: 'Firewall',
-      to: '/edge-firewall',
+      to: '/firewall',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
     }

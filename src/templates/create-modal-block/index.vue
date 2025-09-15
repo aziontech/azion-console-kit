@@ -49,7 +49,7 @@
     },
     {
       label: 'Firewall',
-      to: '/edge-firewall/create',
+      to: '/firewall/create',
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
