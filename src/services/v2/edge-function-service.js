@@ -124,7 +124,7 @@ export class EdgeFunctionService {
     })
 
     return {
-      feedback: 'Your function has been created',
+      feedback: 'Your Function has been created',
       urlToEditView: `/edge-functions/edit/${data.data.id}`,
       functionId: data.data.id
     }
@@ -139,7 +139,7 @@ export class EdgeFunctionService {
       body
     })
 
-    return 'Your function has been updated'
+    return 'Your Function has been updated'
   }
 
   deleteEdgeFunctionService = async (id) => {

@@ -45,7 +45,7 @@
       title: 'Live Ingest',
       inputValue: 'live_ingest',
       subtitle:
-        'Enable real-time ingestion of live streams directly into your workloads for immediate processing and delivery.'
+        'Enable real-time ingestion of live streams directly into your Workloads for immediate processing and delivery.'
     }
   ]
 

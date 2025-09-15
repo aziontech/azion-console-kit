@@ -70,7 +70,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'function',
+      title: 'Function',
       icon: 'pi pi-trash',
       service: edgeFunctionService.deleteEdgeFunctionService
     }
