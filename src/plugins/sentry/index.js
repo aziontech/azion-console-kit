@@ -4,34 +4,27 @@
  */
 
 import * as Sentry from '@sentry/vue'
-import { shouldEnableSentry, getSentryDSN, getSentryConfig } from './config.js'
+import { getSentryConfig } from './config.js'
 import { setUserContext } from './methods.js'
 
-/**
- * Default Sentry plugin for Vue 3
- */
 export default {
   install(app, options = {}) {
-    if (!shouldEnableSentry()) return
+    
+    const { router = null } = options
 
-    const dsn = getSentryDSN()
-    if (!dsn) return
-
-    // Get environment-specific configuration
-    const config = getSentryConfig(dsn, {
+    const config = getSentryConfig({
       app,
+      sendDefaultPii: true,
+      enableLogs: true,
       integrations: [
-        Sentry.browserTracingIntegration({
-          router: options.router
-        }),
+        ...(router ? [Sentry.browserTracingIntegration({ router })] : []),
+        // Session replay
         Sentry.replayIntegration()
       ]
     })
 
-    // Initialize Sentry with environment-specific configuration
     Sentry.init(config)
 
-    // Expose methods globally
     app.config.globalProperties.$sentry = {
       captureException: Sentry.captureException,
       captureMessage: Sentry.captureMessage,
