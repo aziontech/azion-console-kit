@@ -102,8 +102,15 @@
   const loadBuckets = async () => {
     isLoading.value = true
     if (!buckets.value.length || bucketTableNeedRefresh.value) {
-      const response = await edgeStorageService.listEdgeStorageBuckets()
-      buckets.value = response.body
+      const [listBucketsResponse, metricsResponse] = await Promise.all([
+        edgeStorageService.listEdgeStorageBuckets(),
+        edgeStorageService.getEdgeStorageMetrics()
+      ])
+      buckets.value = listBucketsResponse.body
+      buckets.value.forEach((bucket) => {
+        const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
+        bucket.size = size ? `${size} GB` : '-'
+      })
       bucketTableNeedRefresh.value = false
     }
     isLoading.value = false

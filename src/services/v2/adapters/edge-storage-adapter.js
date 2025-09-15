@@ -8,8 +8,8 @@ const transformMap = {
   name: (value) => value.name || value.key,
   active: (value) => parseStatusData(value.active),
   edgeAccess: (value) => value.edge_access,
-  lastEditor: (value) => value.last_editor,
-  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
+  lastEditor: (value) => value.last_editor || '-',
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified) || '-',
   productVersion: (value) => value.product_version,
   size: (value) => value.size || '-'
 }
@@ -29,8 +29,8 @@ export const EdgeStorageAdapter = {
     return data.results.map((file) => ({
       id: file.key,
       name: file.key,
-      last_modified: formatDateToDayMonthYearHour(file.last_modified),
-      size: formatBytes(file.size)
+      last_modified: formatDateToDayMonthYearHour(file.last_modified) || '-',
+      size: formatBytes(file.size) || '-'
     }))
   }
 }
