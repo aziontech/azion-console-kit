@@ -68,7 +68,8 @@
     id: props.edgeApplicationId,
     name: undefined,
     edgeFunctionID: undefined,
-    args: '{}'
+    args: '{}',
+    azionForm: '{}'
   })
 
   const handleSuccessEdit = () => {

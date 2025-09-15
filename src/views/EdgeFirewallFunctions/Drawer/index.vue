@@ -77,7 +77,8 @@
     id: props.edgeFirewallID,
     name: undefined,
     edgeFunctionID: undefined,
-    args: '{}'
+    args: '{}',
+    azionForm: '{}'
   })
 
   const validationSchema = yup.object({
