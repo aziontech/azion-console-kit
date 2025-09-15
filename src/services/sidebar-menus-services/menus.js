@@ -52,7 +52,7 @@ function createSecureItems() {
   return [
     {
       label: 'Connectors',
-      to: '/edge-connectors',
+      to: '/connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
       visible: !hasFlagBlockApiV4()

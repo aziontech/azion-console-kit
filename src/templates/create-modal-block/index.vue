@@ -54,7 +54,7 @@
     },
     {
       label: 'Edge Connector',
-      to: '/edge-connectors/create',
+      to: '/connectors/create',
       description:
         'Edge Connector centralizes connections and how to connect to machines and applications.'
     },
