@@ -9,7 +9,6 @@ import { setUserContext } from './methods.js'
 
 export default {
   install(app, options = {}) {
-    
     const { router = null } = options
 
     const config = getSentryConfig({

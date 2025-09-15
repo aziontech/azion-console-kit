@@ -8,7 +8,7 @@
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
-  const instance = getCurrentInstance();
+  const instance = getCurrentInstance()
 
   const DEFAULT_TITLE = 'Azion Console'
 
