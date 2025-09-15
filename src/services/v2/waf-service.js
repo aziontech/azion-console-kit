@@ -111,12 +111,12 @@ export class WafService {
 
   createWafRulesAllowedTuning = async ({ attackEvents, wafId, name }) => {
     const requests = attackEvents.flatMap((attack) => {
-      if (!attack?.paths?.length) {
+      if (!attack?.top10Paths) {
         const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name)
         return [this._createTuningRequest({ wafId, payload })]
       }
 
-      return attack.paths.map((path) => {
+      return attack.top10Paths.map(({ path }) => {
         const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name, path)
         return this._createTuningRequest({ wafId, payload })
       })
