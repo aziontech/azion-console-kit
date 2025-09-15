@@ -690,11 +690,4 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
-
-  watch(
-    () => props.isLoading,
-    (newValue) => {
-      isLoading.value = newValue
-    }
-  )
 </script>

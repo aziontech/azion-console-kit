@@ -1,5 +1,4 @@
 /** @type {import('vue-router').RouteRecordRaw} */
-import * as Helpers from '@/helpers'
 
 export const edgeSQLRoutes = {
   path: '/sql-database',
@@ -9,9 +8,6 @@ export const edgeSQLRoutes = {
       path: '',
       name: 'list-sql-databases',
       component: () => import('@views/EdgeSQL/ListView.vue'),
-      props: {
-        documentationService: Helpers.documentationGuideProducts.edgeSQL
-      },
       meta: {
         breadCrumbs: [
           {
@@ -41,7 +37,6 @@ export const edgeSQLRoutes = {
       path: 'database/:id/:tab?',
       name: 'sql-database',
       component: () => import('@views/EdgeSQL/DatabaseView.vue'),
-      props: true,
       meta: {
         breadCrumbs: [
           {

@@ -11,15 +11,9 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQL } from './composable/useEdgeSQL'
+  import * as Helpers from '@/helpers'
 
   defineOptions({ name: 'list-edge-sql-databases' })
-
-  const props = defineProps({
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const tracker = inject('tracker')
   const router = useRouter()
@@ -212,7 +206,7 @@
         description="Create your first SQL Database to store and query your data at the edge."
         createButtonLabel="Database"
         createPagePath="/sql-database/create"
-        :documentationService="props.documentationService"
+        :documentationService="Helpers.documentationGuideProducts.edgeSQL"
         data-testid="edge-sql-empty-results-block"
       >
         <template #illustration>
