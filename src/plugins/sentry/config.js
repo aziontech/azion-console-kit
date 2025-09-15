@@ -3,16 +3,21 @@
  * @module sentry/config
  */
 
+const dsn =
+  import.meta.env.VITE_ENVIRONMENT === 'production'
+    ? import.meta.env.VITE_PROD_SENTRY
+    : import.meta.env.VITE_STAGE_SENTRY
+
 const environmentConfigs = {
   production: {
-    dsn: () => import.meta.env.PROD_SENTRY,
+    dsn,
     tracesSampleRate: 0.1, // 10% - conservative sampling for production
     tracePropagationTargets: ['console.azion.com'],
     replaysSessionSampleRate: 0.01, // 1% - minimal session replay
     replaysOnErrorSampleRate: 1.0 // 100% of sessions with errors
   },
   stage: {
-    dsn: () => import.meta.env.STAGE_SENTRY,
+    dsn,
     tracesSampleRate: 0.5, // 50% - more data for staging analysis
     tracePropagationTargets: ['stage-console.azion.com', 'localhost'],
     replaysSessionSampleRate: 0.1, // 10% - moderate session replay
@@ -20,26 +25,22 @@ const environmentConfigs = {
   }
 }
 
-export function getSentryConfig(config, options = {}) {
+export function getSentryConfig(options = {}) {
   const environment = import.meta.env.VITE_ENVIRONMENT
 
   if (!environment) return null
 
   const {
     dsn,
-    enableLogs,
     tracesSampleRate,
     tracePropagationTargets,
     replaysSessionSampleRate,
     replaysOnErrorSampleRate
   } = environmentConfigs[environment === 'development' ? 'stage' : environment]
 
-  if (!config) return {}
-
   return {
     dsn,
     environment,
-    enableLogs,
     tracesSampleRate,
     tracePropagationTargets,
     replaysSessionSampleRate,

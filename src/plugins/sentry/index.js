@@ -5,7 +5,6 @@
 
 import * as Sentry from '@sentry/vue'
 import { getSentryConfig } from './config.js'
-import { setUserContext } from './methods.js'
 
 export default {
   install(app, options = {}) {
@@ -27,13 +26,9 @@ export default {
     app.config.globalProperties.$sentry = {
       captureException: Sentry.captureException,
       captureMessage: Sentry.captureMessage,
-      setUser: setUserContext,
+      setUser: Sentry.setUser,
       setTag: Sentry.setTag,
       setContext: Sentry.setContext
     }
   }
 }
-
-// Export utility methods
-export * from './methods.js'
-export * from './config.js'

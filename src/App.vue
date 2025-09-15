@@ -1,6 +1,6 @@
 <script setup>
   import DynamicDialog from 'primevue/dynamicdialog'
-  import { computed, inject, watch, getCurrentInstance } from 'vue'
+  import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -8,7 +8,6 @@
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
-  const instance = getCurrentInstance()
 
   const DEFAULT_TITLE = 'Azion Console'
 
@@ -52,18 +51,6 @@
 
     tracker.assignGroupTraits(defaultTraits)
     tracker.identify(userID)
-
-    if (instance.appContext.config.globalProperties.$sentry) {
-      instance.appContext.config.globalProperties.$sentry.setUser({
-        id: userID,
-        email,
-        account_id: accountId,
-        account_name: name,
-        account_type: accountType,
-        account_status: status,
-        client_id: clientId
-      })
-    }
   }
 
   const isLogged = computed(() => {
