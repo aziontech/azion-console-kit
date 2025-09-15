@@ -20,10 +20,11 @@ const failedFiles = ref([])
 const currentFileProgress = ref(0)
 const totalBytesUploaded = ref(0)
 const totalBytesToUpload = ref(0)
-const createdBucket = ref('')
-const needRefresh = ref(false)
+const bucketTableNeedRefresh = ref(true)
+const filesTableNeedRefresh = ref(false)
 const selectedFiles = ref([])
 const isDownloading = ref(false)
+const showDragAndDrop = ref(false)
 
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
@@ -68,17 +69,16 @@ const validationSchema = yup.object({
     .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
 })
 
-const handleToast = (severity, summary, message) => {
-  const toast = useToast()
-  toast.add({
-    severity: severity,
-    summary: summary,
-    detail: message,
-    life: 5000
-  })
-}
-
 export const useEdgeStorage = () => {
+  const toast = useToast()
+  const handleToast = (severity, summary, message) => {
+    toast.add({
+      severity: severity,
+      summary: summary,
+      detail: message,
+      life: 5000
+    })
+  }
   /**
    * Finds a bucket by its ID.
    * @param {number|string} id - The ID of the bucket to find.
@@ -94,7 +94,6 @@ export const useEdgeStorage = () => {
    */
   const uploadFiles = async (fileList) => {
     if (selectedBucket.value) {
-      needRefresh.value = true
       const filesArray = Array.from(fileList)
       const maxFileSize = 300 * 1024 * 1024 // 300MB in bytes
 
@@ -163,6 +162,8 @@ export const useEdgeStorage = () => {
         const failureCount = failedFiles.value.length
 
         if (successCount) {
+          filesTableNeedRefresh.value = true
+          showDragAndDrop.value = false
           handleToast(
             failureCount > 0 ? 'warn' : 'success',
             failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
@@ -220,7 +221,7 @@ export const useEdgeStorage = () => {
   const removeFiles = async (fileIds) => {
     for (const fileId of fileIds) {
       await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, fileId)
-      needRefresh.value = true
+      filesTableNeedRefresh.value = true
     }
   }
 
@@ -292,12 +293,13 @@ export const useEdgeStorage = () => {
     uploadFiles,
     createFolder,
     removeFiles,
-    createdBucket,
+    bucketTableNeedRefresh,
     validationSchema,
     handleFileChange,
-    needRefresh,
+    filesTableNeedRefresh,
     handleDownload,
     selectedFiles,
-    isDownloading
+    isDownloading,
+    showDragAndDrop
   }
 }
