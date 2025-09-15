@@ -14,6 +14,7 @@
   import * as yup from 'yup'
   import { paymentService } from '@/services/v2'
   import AddAddressBlock from './add-address.vue'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'add-payment-method-block' })
 
@@ -67,7 +68,7 @@
     const options = {
       closable: true,
       severity: severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail: summary
     }
 

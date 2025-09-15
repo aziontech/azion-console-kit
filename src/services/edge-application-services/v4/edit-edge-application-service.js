@@ -37,7 +37,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Your edge application has been updated'
+      return 'Your Application has been updated'
     case 500:
       throw new Errors.InternalServerError().message
     default:

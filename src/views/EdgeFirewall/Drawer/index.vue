@@ -68,7 +68,7 @@
   }
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Your Edge Firewall has been created'
+      feedback: 'Your Firewall has been created'
     }
     response.showToastWithActions(toast)
   }
@@ -89,7 +89,7 @@
     drawerId="edge-firewall-drawer"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
-    title="Create Edge Firewall"
+    title="Create Firewall"
     disableToast
   >
     <template #formFields>

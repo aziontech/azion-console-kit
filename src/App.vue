@@ -15,7 +15,6 @@
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()
-
   const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
 
   const route = useRoute()

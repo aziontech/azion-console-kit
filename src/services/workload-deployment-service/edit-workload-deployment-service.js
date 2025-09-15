@@ -15,8 +15,8 @@ export const editWorkloadDeploymentService = async ({ domainId, payload }) => {
 const adapt = (payload) => {
   return {
     binds: {
-      edge_application: payload.edgeApplication,
-      edge_firewall: payload?.edgeFirewall,
+      application: payload.application,
+      firewall: payload?.firewall,
       custom_page: payload?.customPage
     }
   }

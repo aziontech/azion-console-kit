@@ -101,10 +101,9 @@
   const statusCodeColumns = [
     {
       field: 'code',
-      header: 'Page Code',
+      header: 'Page Status Code',
       type: 'component',
       filterPath: 'code.value',
-      sortField: 'code.value',
       component: (columnData) => {
         return columnBuilder({
           data: {
@@ -130,7 +129,7 @@
     },
     {
       field: 'customStatusCode',
-      header: 'Custom Status',
+      header: 'Custom Status Code',
       type: 'component',
       filterPath: 'customStatusCode',
       sortField: 'customStatusCode',
@@ -197,7 +196,14 @@
     if (hasPages) {
       const pagesCodes = new Set(pagesValue.value.map((page) => page.code.value))
       const filteredPages = STATUS_CODE_OPTIONS.filter((page) => !pagesCodes.has(page.code.value))
-      return [...pagesValue.value, ...filteredPages]
+      const pages = pagesValue.value.sort((pageA, pageB) => pageA?.code?.value - pageB?.code?.value)
+      const defaultPage = pages.find((page) => page.code.value === 'default')
+
+      if (defaultPage) {
+        const pagesWithoutDefault = pages.filter((page) => page.code.value !== 'default')
+        return [...pagesWithoutDefault, ...filteredPages, defaultPage]
+      }
+      return [...pages, ...filteredPages]
     }
 
     return STATUS_CODE_OPTIONS

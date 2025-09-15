@@ -49,6 +49,10 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    navigateToApplicationAccelerator: {
+      type: Function,
+      required: false
     }
   })
 
@@ -197,14 +201,14 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'success',
+        summary: 'Success',
         detail: 'Reorder saved'
       })
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Error',
         detail: error
       })
     } finally {
@@ -237,6 +241,10 @@
       return 'p-badge-lg !text-white bg-black !border-surface h-5 min-w-[20px] !text-xl'
     }
   })
+
+  const handleNavigateToMainSettings = () => {
+    props.navigateToApplicationAccelerator()
+  }
 </script>
 
 <template>
@@ -253,6 +261,7 @@
     :currentPhase="currentPhase"
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
+    @navigate-to-main-settings="handleNavigateToMainSettings"
   />
 
   <TableBlock

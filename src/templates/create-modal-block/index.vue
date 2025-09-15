@@ -30,17 +30,17 @@
     {
       label: `${handleTextDomainWorkload.pluralTitle}`,
       to: `/${handleTextDomainWorkload.pluralLabel}/create?origin=create`,
-      description: 'Launch an edge application and set up security with digital certificates.'
+      description: 'Launch an application and set up security with digital certificates.'
     },
     {
-      label: 'Edge Application',
+      label: 'Application',
       to: '/edge-applications/create?origin=create',
-      description: 'Deploy an edge application to deliver content from the edge.'
+      description: 'Deploy an application to deliver content from the edge.'
     },
     {
       label: 'Variables',
       to: '/variables/create',
-      description: 'Create environment variables or secrets to use with configured edge functions.'
+      description: 'Create environment variables or secrets to use with configured Functions.'
     },
     {
       label: 'Edge DNS',
@@ -48,7 +48,7 @@
       description: 'Use an authoritative DNS server to host a domain.'
     },
     {
-      label: 'Edge Firewall',
+      label: 'Firewall',
       to: '/edge-firewall/create',
       description: 'Create security settings to protect applications against threats and attacks.'
     },
@@ -75,9 +75,9 @@
       description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
-      label: 'Edge Functions',
+      label: 'Functions',
       to: '/edge-functions/create?origin=create',
-      description: 'Create edge functions to use with Edge Application or Edge Firewall.'
+      description: 'Create Functions to use with Application or Firewall.'
     },
     {
       label: 'Edge Services',
@@ -85,15 +85,15 @@
       description: 'Create new services to define dependencies between edge resources.'
     },
     {
-      label: 'Digital Certificates',
+      label: 'Certificate Manager',
       to: '/digital-certificates/create',
-      description: 'Add a digital certificate entry to secure HTTPS edge applications.'
+      description: 'Add a digital certificate entry to secure HTTPS applications.'
     },
     {
       label: 'Network Lists',
       to: '/network-lists/create',
       description:
-        'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
+        'Add allowlists, blocklists, and greylists to use with Rules Engine for Firewall.'
     }
   ]
 

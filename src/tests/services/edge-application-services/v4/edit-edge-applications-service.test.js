@@ -37,7 +37,7 @@ describe('EdgeApplicationServicesV4', () => {
     await sut(fixtures.edgeApplication)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications/${fixtures.edgeApplication.id}`,
+      url: `v4/workspace/applications/${fixtures.edgeApplication.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.edgeApplication.name,
@@ -54,7 +54,7 @@ describe('EdgeApplicationServicesV4', () => {
     })
   })
 
-  it('should return a feedback when successfully edit edge application', async () => {
+  it('should return a feedback when successfully edit Application', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,
       body: {
@@ -67,7 +67,7 @@ describe('EdgeApplicationServicesV4', () => {
 
     const result = await sut(fixtures.edgeApplication)
 
-    expect(result).toEqual('Your edge application has been updated')
+    expect(result).toEqual('Your Application has been updated')
   })
 
   it('should throw parsing api error when request fails', async () => {

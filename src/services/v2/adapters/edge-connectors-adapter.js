@@ -38,7 +38,7 @@ const typeBuilders = {
     region: payload.connectionOptions.region
   }),
 
-  edge_storage: (payload) => ({
+  storage: (payload) => ({
     bucket: payload.connectionOptions.bucket,
     prefix: payload.connectionOptions.prefix
   }),
@@ -81,12 +81,9 @@ const typeBuilders = {
       }
     }
 
-    if (!payload.modules.originShield.config.hmac.enabled && modules.origin_shield.config) {
-      delete modules.origin_shield.config.hmac
+    if (modules.origin_shield.config && !payload.modules.originShield.config.hmac.enabled) {
+      modules.origin_shield.config.hmac.config = null
     }
-
-    const shouldSendModules =
-      payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
 
     const result = {
       addresses: extractAddressesPostRequest(
@@ -104,9 +101,7 @@ const typeBuilders = {
       }
     }
 
-    if (shouldSendModules) {
-      result.modules = modules
-    }
+    result.modules = modules
 
     return result
   }
@@ -119,7 +114,7 @@ const typeBuildersLoadRequest = {
     }
   }),
 
-  edge_storage: (data) => ({
+  storage: (data) => ({
     connectionOptions: {
       bucket: data.attributes.bucket,
       prefix: data.attributes.prefix
@@ -179,7 +174,7 @@ const typeBuildersLoadRequest = {
 
 const edgeConnectorsTypes = {
   http: 'HTTP',
-  edge_storage: 'Edge Storage',
+  storage: 'Edge Storage',
   live_ingest: 'Live Ingest'
 }
 

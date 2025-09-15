@@ -5,6 +5,10 @@
     data-testid="edge-connectors-form__section__connection-options"
   >
     <template #inputs>
+      <DrawerEdgeStorage
+        ref="drawerEdgeStorageRef"
+        @onSuccess="handleEdgeStorageCreated"
+      />
       <div
         v-if="type === 'http'"
         class="flex flex-col gap-8"
@@ -94,11 +98,12 @@
         </div>
       </div>
       <div
-        v-if="type === 'edge_storage'"
+        v-if="type === 'storage'"
         class="flex flex-col gap-8"
       >
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldDropdownLazyLoader
+            ref="bucketDropdownRef"
             data-testid="edge-connectors-form__connection-options__bucket-name-field"
             label="Bucket"
             description="Enter the name of the bucket to connect to."
@@ -112,19 +117,25 @@
             optionValue="name"
             :value="bucket"
             inputId="bucket"
-            @onSelectOption="changeBucketName"
           >
-            <template #description>
-              <p>
-                Bucket creation is not available in the graphical interface at the moment. Use
-                Azion's API to create buckets. Learn more:
-                <a
-                  @click="openDocsCreateBucket"
-                  class="text-[var(--text-color-link)] font-medium cursor-pointer"
-                  >documentation <i class="pi pi-external-link text-xs"></i
-                ></a>
-                .
-              </p>
+            <template #footer>
+              <ul class="p-2">
+                <li>
+                  <PrimeButton
+                    @click="openDrawerEdgeStorage"
+                    class="w-full whitespace-nowrap flex"
+                    data-testid="domains-form__create-edge-storage-button"
+                    text
+                    size="small"
+                    icon="pi pi-plus-circle"
+                    :pt="{
+                      label: { class: 'w-full text-left' },
+                      root: { class: 'p-2' }
+                    }"
+                    label="Create Object Storage"
+                  />
+                </li>
+              </ul>
             </template>
           </FieldDropdownLazyLoader>
         </div>
@@ -163,7 +174,7 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { ref, computed } from 'vue'
   import { useField } from 'vee-validate'
   import { edgeStorageService } from '@/services/v2'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -171,7 +182,8 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import { documentationStoreProducts } from '@/helpers/azion-documentation-catalog'
+  import PrimeButton from 'primevue/button'
+  import DrawerEdgeStorage from '@/views/EdgeStorage/Drawer/index.vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
 
@@ -207,16 +219,24 @@
     { label: 'br-east-3', value: 'br-east-3' }
   ]
 
-  const openDocsCreateBucket = () => {
-    documentationStoreProducts.bucket()
+  const drawerEdgeStorageRef = ref(null)
+  const bucketDropdownRef = ref(null)
+
+  const openDrawerEdgeStorage = () => {
+    drawerEdgeStorageRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeStorageCreated = async (newBucket) => {
+    await bucketDropdownRef.value?.refreshData()
+    bucket.value = newBucket
   }
 
   const getDescriptionByType = computed(() => {
     switch (type.value) {
       case 'http':
         return 'Customize settings related to origin servers and hosts.'
-      case 'edge_storage':
-        return 'Configure the connection to your Edge Storage bucket to enable seamless data access and retrieval at the edge.'
+      case 'storage':
+        return 'Configure the connection to your Object Storage bucket to enable seamless data access and retrieval at the edge.'
       case 'live_ingest':
         return 'Set up the connection for live media stream ingestion to ensure real-time processing and delivery through the edge network.'
       default:

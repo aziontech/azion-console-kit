@@ -1,0 +1,42 @@
+{
+  "data": {
+    "id": 1727808946,
+    "name": "foo1",
+    "last_editor": "foo1@foo.com",
+    "last_modified": "2025-08-29T15:58:32.195505Z",
+    "modules": {
+      "edge_cache": {
+        "enabled": true
+      },
+      "edge_functions": {
+        "enabled": true
+      },
+      "application_accelerator": {
+        "enabled": true
+      },
+      "image_processor": {
+        "enabled": true
+      },
+      "tiered_cache": {
+        "enabled": true
+      }
+    },
+    "application_acceleration": true,
+    "caching": true,
+    "debug_rules": true,
+    "delivery_protocol": "http",
+    "device_detection": true,
+    "edge_firewall": true,
+    "edgeFunctions": true,
+    "http3": true,
+    "http_port": [80],
+    "https_port": [443],
+    "image_optimization": true,
+    "l2_caching": true,
+    "load_balancer": true,
+    "active": true,
+    "debug": true,
+    "product_version": "3.0"
+  },
+  "schema_version": 3
+}

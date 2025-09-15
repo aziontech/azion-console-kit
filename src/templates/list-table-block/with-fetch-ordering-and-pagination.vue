@@ -137,6 +137,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -149,7 +150,7 @@
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -163,7 +164,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: columns }]"
+                :options="[{ label: 'Available Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -445,6 +446,9 @@
   const itemsByPage = ref(getSpecificPageCount.value)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
 

@@ -2,7 +2,7 @@
   <FormHorizontal
     :isDrawer="isDrawer"
     title="Modules"
-    description="Activate modules to extend the configuration possibilities of the application. Some modules require subscription."
+    description="Activate modules to extend the configuration possibilities of the Application. Some modules require subscription."
     data-testid="form-horizontal-modules"
   >
     <template #inputs>
@@ -76,7 +76,7 @@
       subtitle: 'Optimize protocols and manage dynamic content delivery.'
     },
     {
-      title: 'Edge Cache',
+      title: 'Cache',
       nameField: 'edgeCacheEnabled',
       disabled: true,
       subtitle: 'Customize advanced cache settings.',
@@ -86,7 +86,7 @@
       }
     },
     {
-      title: 'Edge Functions',
+      title: 'Functions',
       nameField: 'edgeFunctionsEnabled',
       subtitle: 'Build ultra-low latency functions that run on the edge.'
     },

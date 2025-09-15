@@ -233,13 +233,13 @@ footer {
 
 export const STATUS_CODE_OPTIONS = [
   {
-    id: 0,
-    code: { value: 'default', origin: 'Azion' },
+    id: 404,
+    code: { value: '404', origin: 'Azion' },
     ...defaultValue
   },
   {
-    id: 404,
-    code: { value: '404', origin: 'Azion' },
+    id: 0,
+    code: { value: 'default', origin: 'Azion' },
     ...defaultValue
   }
 ]

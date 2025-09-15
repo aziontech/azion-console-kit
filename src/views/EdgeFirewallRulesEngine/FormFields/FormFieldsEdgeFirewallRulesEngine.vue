@@ -210,7 +210,7 @@
     const criteriaVariableOptions = [
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - required WAF'
         }`,
         value: '${header_accept}',
         disabled: !hasWebApplicationFirewallModuleEnabled
@@ -219,7 +219,7 @@
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Accept Encoding'
-            : 'Header Accept Encoding - requires WAF'
+            : 'Header Accept Encoding - required WAF'
         }`,
         value: '${header_accept_encoding}',
         disabled: !hasWebApplicationFirewallModuleEnabled
@@ -228,21 +228,21 @@
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Accept Language'
-            : 'Header Accept Language - requires WAF'
+            : 'Header Accept Language - required WAF'
         }`,
         value: '${header_accept_language}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - required WAF'
         }`,
         value: '${header_cookie}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - required WAF'
         }`,
         value: '${header_origin}',
         disabled: !hasWebApplicationFirewallModuleEnabled
@@ -251,7 +251,7 @@
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Referer'
-            : 'Header Referer - requires WAF'
+            : 'Header Referer - required WAF'
         }`,
         value: '${header_referer}',
         disabled: !hasWebApplicationFirewallModuleEnabled
@@ -260,7 +260,7 @@
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header User Agent'
-            : 'Header User Agent - requires WAF'
+            : 'Header User Agent - required WAF'
         }`,
         value: '${header_user_agent}',
         disabled: !hasWebApplicationFirewallModuleEnabled
@@ -268,9 +268,7 @@
       { label: 'Host', value: '${host}', disabled: false },
       {
         label: `${
-          hasNetworkProtectionLayerModuleEnabled
-            ? 'Network'
-            : 'Network - required Network Layer Protection'
+          hasNetworkProtectionLayerModuleEnabled ? 'Network' : 'Network - required Network Shield'
         }`,
         value: '${network}',
         disabled: !hasNetworkProtectionLayerModuleEnabled
@@ -359,13 +357,13 @@
       { value: 'set_rate_limit', label: 'Set Rate Limit' },
       {
         value: 'set_waf',
-        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
+        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - required WAF'}`,
         disabled: disableWafBehavior
       },
       {
         value: 'run_function',
         label: `${
-          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
+          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Functions '
         }`,
         disabled: disableRunFunctionBehavior
       },

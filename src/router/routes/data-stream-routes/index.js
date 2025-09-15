@@ -1,4 +1,33 @@
 import * as Helpers from '@/helpers'
+import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
+import { useAccountStore } from '@/stores/account'
+
+async function checkDomainsLimit(to, from, next) {
+  const accountStore = useAccountStore()
+  const { hasActiveUserId } = accountStore
+
+  if (!hasActiveUserId) {
+    return next()
+  }
+
+  try {
+    const workloads = await listWorkloadsDynamicFieldsService({
+      fields: 'id',
+      ordering: 'id',
+      page: 1,
+      pageSize: 1
+    })
+
+    const isMaxDomainsReached = workloads.count >= 3000
+    if (isMaxDomainsReached) {
+      return next('/')
+    }
+
+    return next()
+  } catch (error) {
+    return next()
+  }
+}
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
@@ -26,6 +55,7 @@ export const dataStreamRoutes = {
       path: 'create',
       name: 'create-data-stream',
       component: () => import('@views/DataStream/CreateView.vue'),
+      beforeEnter: checkDomainsLimit,
       meta: {
         title: 'Create Data Stream',
         breadCrumbs: [
@@ -44,6 +74,7 @@ export const dataStreamRoutes = {
       path: 'edit/:id',
       name: 'edit-data-stream',
       component: () => import('@views/DataStream/EditView.vue'),
+      beforeEnter: checkDomainsLimit,
       props: {
         updatedRedirect: 'list-data-stream'
       },

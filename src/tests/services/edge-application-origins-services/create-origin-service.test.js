@@ -148,7 +148,7 @@ describe('EdgeApplicationOriginsServices', () => {
     })
   })
 
-  it('Should return an API array error to an invalid edge application', async () => {
+  it('Should return an API array error to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -164,7 +164,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error to an invalid edge application ', async () => {
+  it('Should return an API error to an invalid Application ', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -180,7 +180,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error with object to an invalid edge application', async () => {
+  it('Should return an API error with object to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,

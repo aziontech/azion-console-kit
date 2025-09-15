@@ -18,7 +18,7 @@ describe('AzionDocumentation', () => {
     vi.unstubAllGlobals()
   })
 
-  it('should open edge application guide with correct link', () => {
+  it('should open Application guide with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 

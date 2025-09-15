@@ -38,7 +38,7 @@ describe('EdgeApplicationServices', () => {
     const version = 'v4'
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${fixtures.edgeApplicationMock.id}/clone`,
+      url: `${version}/workspace/applications/${fixtures.edgeApplicationMock.id}/clone`,
       method: 'POST',
       body: {
         id: fixtures.edgeApplicationMock.id,
@@ -63,7 +63,7 @@ describe('EdgeApplicationServices', () => {
       payload: fixtures.edgeApplicationMock
     })
 
-    expect(data.feedback).toBe('Your edge application has been cloned')
+    expect(data.feedback).toBe('Your Application has been cloned')
   })
 
   it('should throw parsing api error when request fails', async () => {

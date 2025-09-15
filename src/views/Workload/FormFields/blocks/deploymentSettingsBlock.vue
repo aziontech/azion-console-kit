@@ -10,8 +10,8 @@
   import { edgeAppService, edgeFirewallService, customPageService } from '@/services/v2'
   import { ref } from 'vue'
 
-  const { value: edgeApplication } = useField('edgeApplication')
-  const { value: edgeFirewall } = useField('edgeFirewall')
+  const { value: application } = useField('application')
+  const { value: firewall } = useField('firewall')
   const { value: customPage } = useField('customPage')
 
   const drawerRef = ref('')
@@ -21,7 +21,7 @@
   const hasEdgeFirewallAccess = ref(true)
 
   const handleEdgeFirewallClear = () => {
-    edgeFirewall.value = null
+    firewall.value = null
   }
 
   const handleCustomPageClear = () => {
@@ -45,7 +45,7 @@
   }
 
   const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
+    application.value = id
   }
 
   const handleCustomPagesCreated = (id) => {
@@ -78,13 +78,13 @@
   }
 
   const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
+    firewall.value = id
   }
 </script>
 <template>
   <form-horizontal
     title="Deployment Settings"
-    description="Configure the deployment of your workload by selecting the appropriate Edge Application and Edge Firewall. The Edge Application handles traffic routing and processing at the edge, while the Edge Firewall provides security by filtering and blocking malicious traffic."
+    description="Configure the deployment of your workload by selecting the appropriate Application and Firewall. The Application handles traffic routing and processing at the edge, while the Firewall provides security by filtering and blocking malicious traffic."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -93,17 +93,17 @@
           @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
         <FieldDropdownLazyLoader
-          label="Edge Application"
+          label="Application"
           required
           data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
+          name="application"
           :service="listEdgeApplicationsDecorator"
           :loadService="edgeAppService.loadEdgeApplicationService"
           optionLabel="name"
           optionValue="value"
-          :value="edgeApplication"
+          :value="application"
           appendTo="self"
-          placeholder="Select an edge application"
+          placeholder="Select an Application"
         >
           <template #footer>
             <ul class="p-2">
@@ -119,7 +119,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Application"
+                  label="Create Application"
                 />
               </li>
             </ul>
@@ -133,10 +133,10 @@
           @onSuccess="handleEdgeFirewallCreated"
         />
         <FieldDropdownLazyLoader
-          label="Edge Firewall"
-          :enableClearOption="!!edgeFirewall"
+          label="Firewall"
+          :enableClearOption="!!firewall"
           data-testid="domains-form__edge-firewall-field"
-          name="edgeFirewall"
+          name="firewall"
           @onClear="handleEdgeFirewallClear"
           :service="listEdgeFirewallDropdown"
           :loadService="edgeFirewallService.loadEdgeFirewallService"
@@ -144,9 +144,9 @@
           v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
-          :value="edgeFirewall"
+          :value="firewall"
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -162,7 +162,7 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Firewall"
+                  label="Create Firewall"
                 />
               </li>
             </ul>

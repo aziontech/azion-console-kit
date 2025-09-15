@@ -32,8 +32,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No functions have been instantiated"
-    description="Click the button below to instantiate your first edge function."
+    title="No Functions have been instantiated"
+    description="Click the button below to instantiate your first Function."
     createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
@@ -55,18 +55,16 @@
 </template>
 
 <script setup>
+  import { computed, ref, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
-  import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2'
-
-  import { computed, ref } from 'vue'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
-
-  const hasContentToList = ref(true)
 
   const props = defineProps({
     edgeFirewallID: {
@@ -103,6 +101,9 @@
     }
   })
 
+  const router = useRouter()
+  const route = useRoute()
+  const hasContentToList = ref(true)
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
   const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
@@ -111,7 +112,7 @@
     'last_editor',
     'last_modified',
     'version',
-    'edge_function'
+    'function'
   ]
 
   const getColumns = computed(() => {
@@ -128,7 +129,7 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Edge Function',
+        header: 'Function',
         sortField: 'edge_function',
         disableSort: true
       },
@@ -146,10 +147,11 @@
   })
 
   const listFunctionsInstance = async (query) => {
-    return await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
+    const data = await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
       props.edgeFirewallID,
       query
     )
+    return data
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
@@ -168,6 +170,19 @@
   }
 
   const openEditFunctionDrawer = (data) => {
+    openDrawer({ id: data.id })
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
+  }
+
+  const openDrawerById = (data) => {
+    openDrawer({ id: data.id })
+  }
+
+  const openDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
@@ -187,4 +202,8 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  onMounted(() => {
+    openDrawerById({ id: route.query.id })
+  })
 </script>

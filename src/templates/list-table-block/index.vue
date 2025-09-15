@@ -63,6 +63,7 @@
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
               :data-testid="`export_button`"
+              aria-label="Export to CSV"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
 
@@ -127,19 +128,24 @@
         :frozen="true"
         :alignFrozen="'right'"
         :headerStyle="`width: ${frozenSize}`"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+            <slot
+              name="actions-header"
+              :exportTableCSV="handleExportTableDataToCSV"
+            />
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -153,7 +159,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: columns }]"
+                :options="[{ label: 'Available Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -423,6 +429,9 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({

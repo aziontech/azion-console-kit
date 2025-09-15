@@ -176,7 +176,7 @@
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -190,7 +190,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: optionsColumns }]"
+                :options="[{ label: 'Available Columns', items: optionsColumns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -712,7 +712,7 @@
         toast.add({
           closable: true,
           severity: 'error',
-          summary: 'error',
+          summary: 'Error',
           detail: errorMessage
         })
       } finally {

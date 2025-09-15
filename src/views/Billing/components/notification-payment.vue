@@ -227,7 +227,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Error',
         detail:
           'An error occurred while updating account status. Please refresh the page to see the latest changes.'
       })

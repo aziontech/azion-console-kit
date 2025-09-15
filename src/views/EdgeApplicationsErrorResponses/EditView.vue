@@ -7,6 +7,7 @@
   import { useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import { edgeAppErrorResponseService } from '@/services/v2'
   import customPagesGif from '@/assets/images/customPages.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -20,26 +21,18 @@
     listOriginsService: {
       type: Function,
       required: true
-    },
-    editErrorResponsesService: {
-      type: Function,
-      required: true
-    },
-    loadErrorResponsesService: {
-      type: Function,
-      required: true
     }
   })
 
   const editService = async (payload) => {
-    return await props.editErrorResponsesService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    return await edgeAppErrorResponseService.editEdgeApplicationErrorResponseService(
+      payload,
+      props.edgeApplicationId
+    )
   }
 
   const loadService = async (payload) => {
-    return await props.loadErrorResponsesService({
+    return await edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })

@@ -14,10 +14,10 @@ export const edgeConnectorsRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
-        title: 'Edge Connectors',
+        title: 'Connectors',
         breadCrumbs: [
           {
-            label: 'Edge Connectors',
+            label: 'Connectors',
             to: '/edge-connectors'
           }
         ],
@@ -29,14 +29,14 @@ export const edgeConnectorsRoutes = {
       name: 'create-edge-connectors',
       component: () => import('@views/EdgeConnectors/CreateView.vue'),
       meta: {
-        title: 'Create Edge Connector',
+        title: 'Create Connector',
         breadCrumbs: [
           {
-            label: 'Edge Connectors',
+            label: 'Connectors',
             to: '/edge-connectors'
           },
           {
-            label: 'Create Edge Connectors',
+            label: 'Create Connectors',
             to: '/edge-connectors/create'
           }
         ],
@@ -48,14 +48,14 @@ export const edgeConnectorsRoutes = {
       name: 'edit-edge-connectors',
       component: () => import('@views/EdgeConnectors/EditView.vue'),
       meta: {
-        title: 'Edit Edge Connector',
+        title: 'Edit Connector',
         breadCrumbs: [
           {
-            label: 'Edge Connectors',
+            label: 'Connectors',
             to: '/edge-connectors'
           },
           {
-            label: 'Edit Edge Connectors'
+            label: 'Edit Connector'
           }
         ],
         flag: 'checkout_access_without_flag'

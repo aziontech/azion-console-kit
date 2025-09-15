@@ -6,8 +6,9 @@ export const EdgeFirewallFunctionAdapter = {
 
     return {
       name: payloadRequest.name,
-      edge_function: payloadRequest.edgeFunctionID,
+      function: payloadRequest.edgeFunctionID,
       args: JSON.parse(payloadRequest.args),
+      azion_form: JSON.parse(payloadRequest.azionForm),
       ...(action === 'POST' && { active: true })
     }
   },
@@ -16,7 +17,7 @@ export const EdgeFirewallFunctionAdapter = {
       data?.map((edgeFirewall) => {
         return {
           id: edgeFirewall.id,
-          edgeFunctionId: edgeFirewall.edge_function,
+          edgeFunctionId: edgeFirewall.function,
           name: edgeFirewall.name,
           lastEditor: edgeFirewall.last_editor,
           lastModified: edgeFirewall.last_modified,
@@ -36,9 +37,10 @@ export const EdgeFirewallFunctionAdapter = {
   transformLoadEdgeFirewallFunction(data) {
     return {
       id: data.id,
-      edgeFunctionID: data.edge_function,
+      edgeFunctionID: data.function,
       name: data.name,
-      args: JSON.stringify(data.args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t'),
+      azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
   },
   transformLoadEdgeFunction({ data }) {
