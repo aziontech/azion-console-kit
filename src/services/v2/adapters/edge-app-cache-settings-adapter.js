@@ -41,7 +41,7 @@ export const CacheSettingsAdapter = {
       result.modules.edge_cache.tiered_cache = {
         behavior: 'override', // readonly according to docs
         max_age: 31536000, // readonly according to docs
-        topology: payload.tieredCacheRegion || 'near-edge'
+        topology: 'global'
       }
     }
 
@@ -153,7 +153,7 @@ export const CacheSettingsAdapter = {
       enableLargeFileCache: edge.large_file_cache?.enabled || false,
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
       tieredCache: !!tieredCache,
-      tieredCacheRegion: tieredCache?.topology || 'near-edge',
+      tieredCacheRegion: tieredCache?.topology || 'global',
       cacheByQueryString,
       queryStringFields,
       enableQueryStringSort,
