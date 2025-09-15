@@ -1,21 +1,34 @@
 /**
- * Sentry Plugin Export
- * Centralized export for Sentry configuration and feedback functionality
+ * Default Sentry plugin for Vue 3
+ * @module sentry
  */
 
-import SentryPlugin from './SentryPlugin.js'
+import * as Sentry from '@sentry/vue'
+import { getSentryConfig } from './config.js'
 
-export default SentryPlugin
+export default {
+  install(app, options = {}) {
+    const { router = null } = options
 
-// Export individual methods for direct usage if needed
-export const createFeedbackForm = (sentryInstance, options = {}) => {
-  return sentryInstance.createFeedbackForm(options)
-}
+    const config = getSentryConfig({
+      app,
+      sendDefaultPii: true,
+      enableLogs: true,
+      integrations: [
+        ...(router ? [Sentry.browserTracingIntegration({ router })] : []),
+        // Session replay
+        Sentry.replayIntegration()
+      ]
+    })
 
-export const applyModalStyles = (sentryInstance, element) => {
-  return sentryInstance.applyModalStyles(element)
-}
+    Sentry.init(config)
 
-export const findAndStyleFeedbackModal = (sentryInstance) => {
-  return sentryInstance.findAndStyleFeedbackModal()
+    app.config.globalProperties.$sentry = {
+      captureException: Sentry.captureException,
+      captureMessage: Sentry.captureMessage,
+      setUser: Sentry.setUser,
+      setTag: Sentry.setTag,
+      setContext: Sentry.setContext
+    }
+  }
 }
