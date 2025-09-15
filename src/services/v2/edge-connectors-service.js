@@ -57,7 +57,7 @@ export class EdgeConnectorsService {
       body
     })
 
-    return 'Edge Connector has been updated'
+    return 'Connector has been updated'
   }
 
   loadEdgeConnectorsService = async ({ id }) => {

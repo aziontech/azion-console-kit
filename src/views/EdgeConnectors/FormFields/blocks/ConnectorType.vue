@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="Connector Type"
-    description="Select the type of origin to connect to your edge connector."
+    description="Select the type of origin to connect to your Connector."
     data-testid="edge-connectors-form__section__connector-type"
   >
     <template #inputs>
