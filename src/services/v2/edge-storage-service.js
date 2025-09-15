@@ -108,4 +108,36 @@ export class EdgeStorageService {
 
     return response.data
   }
+
+  getEdgeStorageMetrics = async () => {
+    const now = new Date()
+    const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000)
+
+    const tsLt = now.toISOString()
+    const tsGte = twoDaysAgo.toISOString()
+
+    const query = `
+      query {
+        edgeStorageMetrics(
+          filter: {
+            tsGte: "${tsGte}"
+            tsLt: "${tsLt}"
+          }
+        ) {
+          bucketName
+          storedGb
+        }
+      }
+    `
+
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: 'v4/metrics/graphql',
+      body: {
+        query
+      }
+    })
+
+    return data.data.edgeStorageMetrics
+  }
 }
