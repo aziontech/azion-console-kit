@@ -34,7 +34,7 @@
     },
     {
       label: 'Application',
-      to: '/edge-applications/create?origin=create',
+      to: '/applications/create?origin=create',
       description: 'Deploy an application to deliver content from the edge.'
     },
     {

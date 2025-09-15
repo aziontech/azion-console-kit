@@ -5,12 +5,12 @@ import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
-  path: '/edge-applications',
-  name: 'edge-applications',
+  path: '/applications',
+  name: 'applications',
   children: [
     {
       path: '',
-      name: 'list-edge-applications',
+      name: 'list-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         documentationService: Helpers.documentationCatalog.edgeApplication
@@ -20,14 +20,14 @@ export const edgeApplicationRoutes = {
         breadCrumbs: [
           {
             label: 'Applications',
-            to: '/edge-applications'
+            to: '/applications'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-application',
+      name: 'create-application',
       component: () =>
         hasFlagBlockApiV4()
           ? import('@views/EdgeApplications/V3/CreateView.vue')
@@ -44,18 +44,18 @@ export const edgeApplicationRoutes = {
         breadCrumbs: [
           {
             label: 'Applications',
-            to: '/edge-applications'
+            to: '/applications'
           },
           {
             label: 'Create Application',
-            to: '/edge-applications/create'
+            to: '/applications/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
-      name: 'edit-edge-application',
+      name: 'edit-application',
       component: () => import('@views/EdgeApplications/TabsView.vue'),
       props: () => {
         const EdgeApplicationServices = useEdgeApplicationServices()
@@ -66,7 +66,7 @@ export const edgeApplicationRoutes = {
               EdgeApplicationServices?.checkgeApplicationsLockedService,
             editEdgeApplication: EdgeApplicationServices?.editEdgeApplicationService,
             loadEdgeApplication: EdgeApplicationServices?.loadEdgeApplicationService,
-            updatedRedirect: 'list-edge-applications',
+            updatedRedirect: 'list-applications',
             contactSalesEdgeApplicationService:
               EdgeApplicationServices?.contactSalesEdgeApplicationService
           },
@@ -100,7 +100,7 @@ export const edgeApplicationRoutes = {
         breadCrumbs: [
           {
             label: 'Applications',
-            to: '/edge-applications'
+            to: '/applications'
           },
           {
             label: 'Edit Application'

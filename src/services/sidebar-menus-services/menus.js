@@ -36,7 +36,7 @@ function createBuildItems() {
     {
       label: 'Applications',
       icon: 'ai ai-edge-application',
-      to: '/edge-applications',
+      to: '/applications',
       id: 'edge-application'
     },
     {
