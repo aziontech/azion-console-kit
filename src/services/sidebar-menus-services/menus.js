@@ -154,7 +154,7 @@ function createEdgeLibrariesItems() {
     },
     {
       label: 'Functions',
-      to: '/edge-functions',
+      to: '/functions',
       icon: 'ai ai-edge-functions',
       id: 'edge-functions'
     },

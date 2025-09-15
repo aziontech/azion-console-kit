@@ -76,7 +76,7 @@
     },
     {
       label: 'Functions',
-      to: '/edge-functions/create?origin=create',
+      to: '/functions/create?origin=create',
       description: 'Create Functions to use with Application or Firewall.'
     },
     {
