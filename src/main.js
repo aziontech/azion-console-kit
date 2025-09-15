@@ -49,8 +49,7 @@ app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
 app.use(SentryPlugin, {
-  router,
-  dsn: import.meta.env.VITE_SENTRY_DSN
+  router
 })
 app.use(VueMonacoEditorPlugin, {
   paths: {

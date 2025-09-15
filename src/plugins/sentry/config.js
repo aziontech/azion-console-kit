@@ -1,153 +1,85 @@
 /**
- * Sentry configurations for different environments
+ * Sentry configuration for different environments
  * @module sentry/config
  */
 
 /**
- * Domain configurations for Sentry
- * @type {Object}
+ * Environment-specific configurations following industry best practices
  */
-export const domainConfig = {
-  /**
-   * Allowed domains for tracing and monitoring
-   * Includes subdomains for azionedge.net and azion.com
-   * @type {string[]}
-   */
-  tracingOrigins: ['*.azionedge.net', '*.azion.com', 'azionedge.net', 'azion.com']
-}
-
-/**
- * Environment-specific configurations
- * @type {Object.<string, Object>}
- */
-export const environmentConfigs = {
-  development: {
-    enabled: false,
+const environmentConfigs = {
+  production: {
+    dsn: () => import.meta.env.PROD_SENTRY,
+    enableLogs: false, // Disable logs in production for performance
+    tracesSampleRate: 0.1, // 10% - conservative sampling for production
+    tracePropagationTargets: ['console.azion.com'],
+    replaysSessionSampleRate: 0.01, // 1% - minimal session replay
+    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
     debug: false,
-    tracesSampleRate: 0,
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 0,
-    enablePerformance: false,
-    enableSessionReplay: false,
-    enableAutoMonitoring: false
+    silent: true
   },
   stage: {
-    enabled: true,
-    debug: true,
-    tracesSampleRate: 0, // Disable performance monitoring
-    replaysSessionSampleRate: 0, // Disable session replay
-    replaysOnErrorSampleRate: 0, // Disable session replay
-    enablePerformance: false, // Disable performance monitoring
-    enableSessionReplay: false, // Disable session replay
-    enableAutoMonitoring: true, // Only JavaScript errors
-    enableNetworkMonitoring: false // Disable network monitoring
-  },
-  production: {
-    enabled: true,
+    dsn: () =>
+      import.meta.env.STAGE_SENTRY ||
+      'https://8480d3940a656261bf3813bb5c9fdaf5@o4505035032952832.ingest.us.sentry.io/4510024014561280',
+    enableLogs: true, // Enable logs in staging for debugging
+    tracesSampleRate: 0.5, // 50% - more data for staging analysis
+    tracePropagationTargets: ['stage-console.azion.com'],
+    replaysSessionSampleRate: 0.1, // 10% - moderate session replay
+    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
     debug: false,
-    tracesSampleRate: 0.1, // 10% performance sampling
-    replaysSessionSampleRate: 0, // No regular session replay
-    replaysOnErrorSampleRate: 0.1, // 10% session replay only on new errors
-    enablePerformance: true, // Enable performance monitoring
-    enableSessionReplay: true, // Enable session replay
-    enableAutoMonitoring: true, // Enable automatic monitoring
-    enableNetworkMonitoring: false, // Disable network monitoring
-    silent: true // Don't display errors in console
+    silent: false
   }
 }
 
 /**
- * Security and filter configurations
- * @type {Object}
+ * Gets DSN based on environment flags
+ * @returns {string|null} Sentry DSN or null if not configured
  */
-export const securityConfig = {
-  /**
-   * Sensitive URLs that should be filtered from breadcrumbs
-   * @type {string[]}
-   */
-  sensitiveUrls: ['/api/auth', '/api/token', '/api/password', '/api/totp'],
+export function getSentryDSN() {
+  const environment = import.meta.env.VITE_ENVIRONMENT
 
-  /**
-   * Error types that should be ignored
-   * @type {string[]}
-   */
-  ignoredErrors: ['NetworkError', 'Failed to fetch', 'Network request failed', 'AbortError'],
+  if (!environment) return null
 
-  /**
-   * Allowed domains for tracing
-   * @type {string[]}
-   */
-  tracingOrigins: domainConfig.tracingOrigins
+  const config = environmentConfigs[environment]
+  if (!config) return null
+
+  return config.dsn() || null
 }
 
 /**
- * Default Sentry configurations
- * @type {Object}
- */
-export const defaultConfig = {
-  /**
-   * Integration configurations
-   */
-  integrations: [],
-
-  /**
-   * Breadcrumb configurations
-   */
-  beforeBreadcrumb: null,
-
-  /**
-   * Filter configurations
-   */
-  beforeSend: null,
-
-  /**
-   * Context configurations
-   */
-  defaultTags: {},
-
-  /**
-   * Debug configurations
-   */
-  debug: false
-}
-
-/**
- * Gets configuration for the current environment
- * @param {string} environment - Application environment
- * @returns {Object} Environment configuration
- */
-export function getEnvironmentConfig(environment) {
-  return environmentConfigs[environment] || environmentConfigs.development
-}
-
-/**
- * Checks if Sentry should be enabled for the environment
- * @param {string} environment - Application environment
+ * Checks if Sentry should be enabled
  * @returns {boolean} True if Sentry should be enabled
  */
-export function shouldEnableSentry(environment) {
-  const config = getEnvironmentConfig(environment)
-  return config.enabled
+export function shouldEnableSentry() {
+  const dsn = getSentryDSN()
+
+  return !!dsn
 }
 
 /**
- * Gets complete Sentry configuration
- * @param {string} environment - Application environment
+ * Gets Sentry configuration for the current environment
  * @param {string} dsn - Sentry DSN
  * @param {Object} options - Additional options
- * @returns {Object} Complete Sentry configuration
+ * @returns {Object} Sentry configuration
  */
-export function getSentryConfig(environment, dsn, options = {}) {
-  const envConfig = getEnvironmentConfig(environment)
+export function getSentryConfig(dsn, options = {}) {
+  const environment = import.meta.env.VITE_ENVIRONMENT
+
+  if (!environment) return {}
+
+  const config = environmentConfigs[environment]
+  if (!config) return {}
 
   return {
     dsn,
     environment,
-    debug: envConfig.debug,
-    tracesSampleRate: envConfig.tracesSampleRate,
-    replaysSessionSampleRate: envConfig.replaysSessionSampleRate,
-    replaysOnErrorSampleRate: envConfig.replaysOnErrorSampleRate,
-    silent: envConfig.silent || false,
+    enableLogs: config.enableLogs,
+    tracesSampleRate: config.tracesSampleRate,
+    tracePropagationTargets: config.tracePropagationTargets,
+    replaysSessionSampleRate: config.replaysSessionSampleRate,
+    replaysOnErrorSampleRate: config.replaysOnErrorSampleRate,
+    debug: config.debug,
+    silent: config.silent,
     ...options
   }
 }

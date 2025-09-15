@@ -52,6 +52,19 @@
 
     tracker.assignGroupTraits(defaultTraits)
     tracker.identify(userID)
+
+    // Update Sentry user context (same as Segment)
+    if (window.$sentry) {
+      window.$sentry.setUser({
+        id: userID,
+        email,
+        account_id: accountId,
+        account_name: name,
+        account_type: accountType,
+        account_status: status,
+        client_id: clientId
+      })
+    }
   }
 
   const isLogged = computed(() => {

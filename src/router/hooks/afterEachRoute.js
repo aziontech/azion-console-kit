@@ -18,4 +18,11 @@ export default function afterEachRoute(to, from, failure) {
     })
     .track()
   tracker.identify(userId)
+
+  // Update Sentry user context on route change (same as Segment)
+  if (window.$sentry && userId) {
+    window.$sentry.setUser({
+      id: userId
+    })
+  }
 }
