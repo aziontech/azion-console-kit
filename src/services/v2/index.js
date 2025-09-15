@@ -119,10 +119,6 @@ import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
 import graphQLApi from '@/services/axios/makeEventsApi'
 const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
 
-// Waf Rules Tuning GQL
-import { WafRulesTuningGqlService } from './waf-rules-tuning-gql-service'
-import { WafRulesTuningGqlAdapter } from './adapters/waf-rules-tuning-gql-adapter'
-
 // IAM
 import { IAMAdapter } from './adapters/iam-adapter'
 import { IAMService } from './iam-service'
@@ -189,7 +185,6 @@ const workloadService = new WorkloadService(
   digitalCertificatesService,
   DigitalCertificatesAdapter
 )
-const wafRulesTuningGqlService = new WafRulesTuningGqlService(httpService, WafRulesTuningGqlAdapter)
 
 const activityHistoryService = new ActivityHistoryService(
   httpService,
@@ -228,8 +223,7 @@ export {
   billingGqlService,
   workloadService,
   workloadDeploymentService,
-  edgeStorageService,
-  wafRulesTuningGqlService,
   activityHistoryService,
+  edgeStorageService,
   iamService
 }

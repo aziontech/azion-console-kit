@@ -14,14 +14,12 @@
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-  import { wafRulesTuningGqlService } from '@/services/v2'
 
   defineOptions({
     name: 'more-details'
   })
 
   const emit = defineEmits(['update:visible', 'attack-on'])
-
   const props = defineProps({
     visible: {
       type: Boolean,
@@ -235,16 +233,14 @@
     } else {
       query = params.filters
     }
-
     query.domains = props.domains.join(',')
-
-    const response = await wafRulesTuningGqlService.listWafRulesTuningAttacks({
+    const response = await props.listService({
       wafId: props.wafRuleId,
       tuningId: props.tuningObject.ruleId,
       query: query
     })
-    totalRecordsFound.value = response.recordsFound
-    return response?.data
+    totalRecordsFound.value = response.length
+    return response
   }
 
   const filterTuning = async () => {
