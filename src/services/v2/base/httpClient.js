@@ -1,8 +1,6 @@
-export class HttpClient {
-  constructor(api) {
-    this.api = api
-  }
+import axios from 'axios'
 
+export class HttpClient {
   async send(config) {
     const headers = config.headers || {}
     const baseURL = config.baseURL ?? '/'
@@ -17,6 +15,6 @@ export class HttpClient {
       baseURL
     }
 
-    return this.api(requestConfig)
+    return axios(requestConfig)
   }
 }
