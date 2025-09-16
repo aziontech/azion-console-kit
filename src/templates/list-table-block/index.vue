@@ -429,9 +429,11 @@
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderOneOption = props.actions?.length === 1
   const shouldShowActions = ref(false)
-  const classActions = shouldShowActions.value
-    ? ''
-    : 'background-color: transparent !important; cursor: pointer !important;'
+  const classActions = computed(() => {
+    return shouldShowActions.value
+      ? ''
+      : 'background-color: transparent !important; cursor: pointer !important;'
+  })
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
