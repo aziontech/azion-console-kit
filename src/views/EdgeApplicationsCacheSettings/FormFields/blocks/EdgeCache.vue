@@ -61,7 +61,7 @@
       />
 
       <div
-        v-if="showSliceConfigurationRange"
+        v-if="showOffsetRange"
         class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
       >
         <label
@@ -192,6 +192,9 @@
   const { value: tieredCacheRegion } = useField('tieredCacheRegion')
   const { value: tieredCache } = useField('tieredCache')
   const showSliceConfigurationRange = computed(() => {
+    return !!enableLargeFileCache.value || !!tieredCache.value
+  })
+  const showOffsetRange = computed(() => {
     return !!enableLargeFileCache.value
   })
 
@@ -201,6 +204,9 @@
 
   watch(enableLargeFileCache, (value) => {
     emit('enableSliceConfiguration', value)
+  })
+  watch(tieredCache, (value) => {
+    checkLargeFileCache(value)
   })
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
