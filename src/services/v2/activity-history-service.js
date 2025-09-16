@@ -1,9 +1,8 @@
 export class ActivityHistoryService {
-  constructor(http, adapter, apiClient) {
+  constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
     this.baseURL = 'v4/events/graphql'
-    this.apiClient = apiClient
   }
 
   #getOffsetDate = () => {
@@ -55,14 +54,11 @@ export class ActivityHistoryService {
       }
     }
 
-    let httpResponse = await this.http.request(
-      {
-        url: `${this.baseURL}`,
-        method: 'POST',
-        body: payload
-      },
-      this.apiClient
-    )
+    let httpResponse = await this.http.request({
+      url: `${this.baseURL}`,
+      method: 'POST',
+      body: payload
+    })
 
     const parsedEvents = this.adapter.transformListActivityHistoryEvents(httpResponse.data)
 
@@ -102,14 +98,11 @@ export class ActivityHistoryService {
       }
     }
 
-    let { data: httpResponse } = await this.http.request(
-      {
-        url: `${this.baseURL}`,
-        method: 'POST',
-        body: payload
-      },
-      this.apiClient
-    )
+    let { data: httpResponse } = await this.http.request({
+      url: `${this.baseURL}`,
+      method: 'POST',
+      body: payload
+    })
 
     const totalRecords = httpResponse.data.activityHistoryEvents[0].count
 

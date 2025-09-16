@@ -116,8 +116,6 @@ import { EdgeAppErrorResponseService } from './edge-app-error-response-service'
 // Activity History
 import { ActivityHistoryService } from './activity-history-service'
 import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
-import graphQLApi from '@/services/axios/makeEventsApi'
-const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
 
 // IAM
 import { IAMAdapter } from './adapters/iam-adapter'
@@ -186,11 +184,7 @@ const workloadService = new WorkloadService(
   DigitalCertificatesAdapter
 )
 
-const activityHistoryService = new ActivityHistoryService(
-  httpService,
-  ActivityHistoryAdapter,
-  graphQLApiInstance
-)
+const activityHistoryService = new ActivityHistoryService(httpService, ActivityHistoryAdapter)
 
 const iamService = new IAMService(httpService, IAMAdapter)
 
