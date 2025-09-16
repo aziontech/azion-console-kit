@@ -20,7 +20,8 @@
       <div
         class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-6 md:gap-4"
       >
-        <IntervalFilterBlock
+        <!-- {{ groupData }} -->
+        <!-- <IntervalFilterBlock
           :key="filterData.current?.id"
           :moduleActions="metricsModule.actions"
           :moduleGetters="metricsModule.getters"
@@ -28,8 +29,8 @@
           :userUTC="userUTC"
           @applyTSRange="load"
           :groupData="groupData"
-        />
-        <ContentFilterBlock
+        /> -->
+        <!-- <ContentFilterBlock
           :key="filterData.current?.id"
           :playgroundOpener="playgroundOpener"
           :moduleActions="metricsModule.actions"
@@ -39,8 +40,16 @@
           :userUTC="userUTC"
           :filterHash="filterHash"
           @clearHash="clearFilterHash"
+        /> -->
+        <AdvancedFilterSystem
+          v-model:filterData="filterData"
+          :fieldsInFilter="filterFields"
+          :filterDateRangeMaxDays="7"
+          @updatedFilter="load"
         />
+        <!-- @updatedFilter="reloadListTableWithHash" -->
       </div>
+      <!-- -- {{ reportData }} -->
       <DashboardPanelBlock
         v-if="reportData"
         :key="groupData.currentDashboard?.id"
@@ -66,6 +75,7 @@
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
+  import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -83,11 +93,18 @@
 
   const route = useRoute()
   const filterHash = ref(null)
+  const filterData = ref(null)
+  const filterFields = ref([])
 
-  onMounted(() => {
-    loadPageInfo()
-    setFilterHash()
-  })
+  const defaultFilter = {
+    tsRange: {
+      tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
+      tsRangeEnd: new Date(),
+      label: 'Last 5 minutes'
+    },
+    fields: [],
+    dataset: ''
+  }
 
   const setFilterHash = () => {
     filterHash.value = route?.query?.filters || ''
@@ -108,7 +125,10 @@
       setInfoAvailableFilters,
       setInitialCurrentsByIds,
       setDatasetAvailableFilters,
-      loadCurrentReports
+      loadCurrentReports,
+      setTimeRange, // ADICIONE
+      filterDatasetUpdate, // ADICIONE
+      setFilters // ADICIONE
     },
     groupObservable,
     filterObservable,
@@ -118,8 +138,30 @@
   /* Module state */
 
   const groupData = ref(null)
-  const filterData = ref(null)
+  // const filterData = ref(null)
   const reportData = ref(null)
+
+  onMounted(async () => {
+    filterData.value = defaultFilter
+
+    // setFilters({
+    //   tsRange: {
+    //     begin: new Date(defaultFilter.tsRange.tsRangeBegin).getTime(),
+    //     end: new Date(defaultFilter.tsRange.tsRangeEnd).getTime(),
+    //     meta: { label: defaultFilter.tsRange.label }
+    //   },
+    //   datasets: [], // sem campos inicialmente
+    //   and: undefined
+    // })
+
+    await loadPageInfo()
+    setFilterHash()
+  })
+
+  // const onUpdatedFilter = () => {
+  //   filterFields.value = groupData.value.currentDashboard.datasetAvailable || []
+  //   console.log('teste---- ', filterData.value)
+  // }
 
   const updateGroupData = (data) => {
     groupData.value = { ...data }
@@ -127,7 +169,11 @@
   groupObservable.subscribe(updateGroupData)
 
   const updateFilterData = (data) => {
-    filterData.value = { ...data }
+    // console.log('data ', { ...data })
+    // filterData.value = { ...data }
+    console.log('aquiiiii *******')
+    filterFields.value = data.datasetAvailable || []
+    // reportData.value = { ...data }
   }
   filterObservable.subscribe(updateFilterData)
 
@@ -152,6 +198,9 @@
   }
 
   const load = async () => {
+    console.log('___ filtro ', filterData.value.fields?.length)
+    console.log('loader filter ', filterData.value)
+    setTimeRange(defaultFilter.tsRange)
     await loadCurrentReports(userUTC)
   }
 

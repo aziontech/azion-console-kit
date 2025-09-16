@@ -45,7 +45,7 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
       ...(filters.datasets ? { datasets: filters.datasets } : {})
     }
   }
-
+  console.log('filters ', filters)
   const filterLastRegisterFail = {
     filterEndDatetime: filters.tsRange.end,
     currentEndDatetime: new Date().toBeholderFormat()

@@ -59,8 +59,8 @@ const filters = {
  */
 const setInitialPageAndDashboardCurrent = () => {
   ;[group.current] = group.all
-  ;[group.currentPage] = group.current.pagesDashboards
-  ;[group.currentDashboard] = group.currentPage.dashboards
+    ;[group.currentPage] = group.current.pagesDashboards
+    ;[group.currentDashboard] = group.currentPage.dashboards
 
   notify(groupObservers, group)
 }
@@ -86,7 +86,7 @@ const setCurrentGroupPage = (groupPage) => {
 const setCurrentPage = (page) => {
   resetReports()
   group.currentPage = page
-  ;[group.currentDashboard] = group.currentPage.dashboards
+    ;[group.currentDashboard] = group.currentPage.dashboards
   notify(groupObservers, group)
 }
 
@@ -136,7 +136,7 @@ const setCurrentGroupPageByLabels = (labelGroup) => {
   group.currentPage = { ...page }
   const { dashboards } = page
 
-  ;[group.currentDashboard] = dashboards
+    ;[group.currentDashboard] = dashboards
 
   notify(groupObservers, group)
 }
@@ -264,7 +264,7 @@ const loadCurrentReports = async (userUTC) => {
   const availableReports = LoadReportsDataBySelectedDashboard(reports.all, group.currentDashboard)
 
   setCurrentReports(availableReports)
-
+  console.log('Filters arquivo index module ', filters.selected)
   availableReports.forEach(async (report) => {
     const reportInfo = await ResolveReport(
       report,
