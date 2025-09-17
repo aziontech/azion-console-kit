@@ -100,6 +100,14 @@
         header: 'Address'
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
+      },
+      {
         field: 'active',
         header: 'Status',
         type: 'component',
@@ -109,14 +117,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified'
       }
     ]
   })

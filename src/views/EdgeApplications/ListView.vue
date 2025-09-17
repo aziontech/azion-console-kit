@@ -11,7 +11,6 @@
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2'
-
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -79,44 +78,29 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name',
+        filterPath: 'name.text',
+        type: 'component',
+        quickActions: true,
+        showInactiveTag: true,
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData.text, showMoreText: false },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
       },
       {
-        field: 'name',
-        header: 'Name',
-        filterPath: 'name.text',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
-          })
-        }
-      },
-      {
         field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        sortField: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'active',
-        header: 'Status',
-        sortField: 'active',
-        filterPath: 'active',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        }
+        header: 'Last Editor',
+        quickActions: true
       }
     ]
   })
@@ -156,6 +140,7 @@
         data-testid="edge-applications-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
+        showLastModified
       />
       <EmptyResultsBlock
         v-else

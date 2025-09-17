@@ -1,4 +1,4 @@
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
@@ -7,7 +7,7 @@ const transformMap = {
   name: (value) => value.name,
   debugRules: (value) => value.debug_rules,
   lastEditor: (value) => value.last_editor,
-  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => value.last_modified,
   active: (value) => parseStatusData(value.active)
 }
