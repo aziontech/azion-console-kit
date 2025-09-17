@@ -233,7 +233,7 @@
       query = params.filters
     }
 
-    query.domains = props.domains.join(',')
+    query.domains = props.domains
 
     const response = await wafRulesTuningGqlService.listWafRulesTuningAttacks({
       wafId: props.wafRuleId,
