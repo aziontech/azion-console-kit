@@ -1,18 +1,35 @@
 import { QueryClient } from '@tanstack/vue-query'
 
+// Time constants (in milliseconds)
+const STALE_TIME_MS = 300000 // 5 minutes
+const CACHE_TIME_MS = 600000 // 10 minutes
+const RETRY_DELAY_BASE_MS = 1000 // 1 second
+const MAX_RETRY_DELAY_MS = 30000 // 30 seconds
+
+// Retry constants
+const QUERY_RETRY_COUNT = 2
+const MUTATION_RETRY_COUNT = 1
+
+// Retry delay calculation function
+const calculateRetryDelay = (attempt) => {
+  const RETRY_EXPONENTIAL_BASE = 2
+  const exponentialDelay = RETRY_DELAY_BASE_MS * Math.pow(RETRY_EXPONENTIAL_BASE, attempt)
+  return Math.min(exponentialDelay, MAX_RETRY_DELAY_MS)
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
-      cacheTime: 1000 * 60 * 10,
+      staleTime: STALE_TIME_MS,
+      gcTime: CACHE_TIME_MS,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      retry: 2,
-      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
-      keepPreviousData: true
+      retry: QUERY_RETRY_COUNT,
+      retryDelay: calculateRetryDelay,
+      placeholderData: (previousData) => previousData
     },
     mutations: {
-      retry: 1,
+      retry: MUTATION_RETRY_COUNT,
       // eslint-disable-next-line no-console
       onError: (err) => console.error('Mutation Error:', err)
     }

@@ -1,6 +1,6 @@
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { loadAccountJobRoleService } from '@/services/account-settings-services'
-import { billingGqlService } from '@/services/v2'
+import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'

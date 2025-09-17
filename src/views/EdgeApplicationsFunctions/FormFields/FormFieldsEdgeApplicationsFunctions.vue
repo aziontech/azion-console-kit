@@ -14,7 +14,7 @@
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
-  import { edgeFunctionService } from '@/services/v2'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   const emit = defineEmits(['toggleDrawer'])
 

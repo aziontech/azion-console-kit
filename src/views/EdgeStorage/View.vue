@@ -10,7 +10,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
 
   defineOptions({
     name: 'edge-storage-view'

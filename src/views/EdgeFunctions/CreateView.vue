@@ -11,7 +11,7 @@
   import { ref, onMounted, inject } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
   import { useRoute } from 'vue-router'
-  import { edgeFunctionService } from '@/services/v2'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   const route = useRoute()
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

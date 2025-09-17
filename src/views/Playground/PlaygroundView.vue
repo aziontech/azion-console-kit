@@ -17,7 +17,7 @@
 
 <script setup>
   import { watch } from 'vue'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import FieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import { useField } from 'vee-validate'
 

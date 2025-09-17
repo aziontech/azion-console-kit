@@ -56,7 +56,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
 
   import { useRouter } from 'vue-router'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   import * as yup from 'yup'
 

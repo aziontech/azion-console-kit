@@ -38,7 +38,7 @@
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
-  import { iamService } from '@/services/v2'
+  import { iamService } from '@/services/v2/iam/iam-service'
 
   defineOptions({ name: 'social-idps-block' })
   const emit = defineEmits(['showSocialIdps'])

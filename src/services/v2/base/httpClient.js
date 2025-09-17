@@ -18,3 +18,5 @@ export class HttpClient {
     return axios(requestConfig)
   }
 }
+
+export const httpClient = new HttpClient()

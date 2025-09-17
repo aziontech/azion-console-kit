@@ -9,7 +9,7 @@ export class QueryService {
   }
 
   buildKey(key) {
-    const { client_id: accountId } = useAccountStore().accountData
+    const { user_id: accountId } = useAccountStore().accountData
 
     const id = accountId || 'default'
     // eslint-disable-next-line no-console

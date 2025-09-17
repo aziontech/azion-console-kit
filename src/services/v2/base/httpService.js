@@ -1,8 +1,12 @@
+import { HttpClient } from './httpClient'
+import { AbortManager } from './abortManager'
+import { buildQueryParams, errorHandler } from '../utils'
+
 export class HttpService {
-  constructor({ httpClient, abortManager, buildQueryParams, errorHandler }) {
-    this.httpClient = httpClient
-    this.abortManager = abortManager
-    this.errorHandler = errorHandler
+  constructor() {
+    this.httpClient = new HttpClient()
+    this.abortManager = new AbortManager()
+    this.errorHandler = new errorHandler()
     this.buildQueryParams = buildQueryParams
   }
 
@@ -60,3 +64,5 @@ export class HttpService {
     this.abortManager.abortGroup(groupName)
   }
 }
+
+export const httpService = new HttpService()

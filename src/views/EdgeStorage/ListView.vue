@@ -288,7 +288,7 @@
   import { useResize } from '@/composables/useResize'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import UploadCard from './components/UploadCard.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
 

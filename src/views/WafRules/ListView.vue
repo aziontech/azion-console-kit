@@ -7,7 +7,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CloneDialog from './Dialog/Clone.vue'
-  import { wafService } from '@/services/v2'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

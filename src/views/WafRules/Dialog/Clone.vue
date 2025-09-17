@@ -7,7 +7,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import * as yup from 'yup'
   import { useField, useForm } from 'vee-validate'
-  import { wafService } from '@/services/v2'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   defineOptions({ name: 'Clone-Dialog' })
 

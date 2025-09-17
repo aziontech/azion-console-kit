@@ -56,7 +56,7 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { useRouter } from 'vue-router'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import * as yup from 'yup'
   import { useField, useForm } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'

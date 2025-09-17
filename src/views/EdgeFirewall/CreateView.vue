@@ -5,7 +5,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { inject } from 'vue'
 
   defineOptions({ name: 'create-edge-firewall' })
