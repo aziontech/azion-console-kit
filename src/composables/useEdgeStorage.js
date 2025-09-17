@@ -25,6 +25,7 @@ const filesTableNeedRefresh = ref(false)
 const selectedFiles = ref([])
 const isDownloading = ref(false)
 const showDragAndDrop = ref(false)
+const folderPath = ref('')
 
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
@@ -144,7 +145,8 @@ export const useEdgeStorage = () => {
             await edgeStorageService.addEdgeStorageBucketFiles(
               file,
               selectedBucket.value.name,
-              onProgress
+              onProgress,
+              folderPath.value
             )
             uploadedFiles.value.push(file)
             totalBytesUploaded.value += file.size
@@ -300,6 +302,7 @@ export const useEdgeStorage = () => {
     handleDownload,
     selectedFiles,
     isDownloading,
-    showDragAndDrop
+    showDragAndDrop,
+    folderPath
   }
 }
