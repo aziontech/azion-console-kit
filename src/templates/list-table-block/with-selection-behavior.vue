@@ -20,6 +20,7 @@
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
+      @row-click="({ data }) => editItemSelected(data)"
     >
       <template
         #header
@@ -85,14 +86,12 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
-              @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
           <template v-else>
             <component
-              @click="editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -451,7 +450,7 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
+    if (props.listService && !isLoading.value) {
       try {
         isLoading.value = true
         const response = props.isGraphql
