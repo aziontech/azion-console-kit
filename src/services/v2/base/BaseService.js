@@ -1,4 +1,5 @@
 import { httpService } from './httpService'
+import { QueryService } from './queryService'
 
 export class BaseService {
   constructor() {
@@ -7,7 +8,7 @@ export class BaseService {
     }
 
     this.http = httpService
-
+    this.query = new QueryService()
     this.constructor.instance = this
   }
 }

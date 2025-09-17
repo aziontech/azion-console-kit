@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/vue-query'
+import { errorHandler } from '@/services/v2/utils'
 
 // Time constants (in milliseconds)
 const STALE_TIME_MS = 300000 // 5 minutes
@@ -30,8 +31,8 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: MUTATION_RETRY_COUNT,
-      // eslint-disable-next-line no-console
-      onError: (err) => console.error('Mutation Error:', err)
-    }
+      onError: (err) => errorHandler(err)
+    },
+    onError: (err) => errorHandler(err)
   }
 })
