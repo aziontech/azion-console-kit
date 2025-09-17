@@ -98,8 +98,8 @@
       return
     }
 
-    isLoading.value = false
     await onSubmit()
+    isLoading.value = false
   }
 
   const handleSuccessEdit = () => {

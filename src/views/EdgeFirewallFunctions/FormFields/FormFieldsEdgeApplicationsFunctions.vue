@@ -125,6 +125,7 @@
     schemaAzionFormString.value = '{}'
     azionFormValidationErrors.value = []
     azionForm.value = schemaAzionFormString.value
+    emit('additionalErrors', [])
   }
 
   const codeEditorFormBuilderUpdate = (value) => {
