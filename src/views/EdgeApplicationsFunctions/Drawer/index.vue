@@ -12,7 +12,10 @@
     title="Create Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction @toggleDrawer="handleToggleDrawer" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        @additionalErrors="handleAdditionalErrors"
+      />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -28,18 +31,32 @@
     title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction @toggleDrawer="handleToggleDrawer" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        @additionalErrors="handleAdditionalErrors"
+      />
+    </template>
+    <template #action-bar="{ onSubmit, onCancel, loading }">
+      <ActionBarBlock
+        @onSubmit="formSubmit(onSubmit)"
+        @onCancel="onCancel"
+        :loading="isLoading || loading"
+      />
     </template>
   </EditDrawerBlock>
 </template>
 
 <script setup>
   import { ref, inject } from 'vue'
-  import * as yup from 'yup'
-  import CreateDrawerBlock from '@templates/create-drawer-block'
-  import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
-  import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
+  import * as yup from 'yup'
+
+  import CreateDrawerBlock from '@templates/create-drawer-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
+  import ActionBarBlock from '@/templates/action-bar-block'
+
+  import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -63,6 +80,8 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const isOverlapped = ref(false)
+  const isLoading = ref(false)
+  const additionalErrors = ref([])
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -70,6 +89,18 @@
     edgeFunctionID: undefined,
     args: '{}'
   })
+
+  const formSubmit = async (onSubmit) => {
+    isLoading.value = true
+
+    if (hasAdditionalErrors()) {
+      isLoading.value = false
+      return
+    }
+
+    isLoading.value = false
+    await onSubmit()
+  }
 
   const handleSuccessEdit = () => {
     handleTrackSuccessEdit()
@@ -130,6 +161,14 @@
       .track()
 
     closeDrawerEdit()
+  }
+
+  const handleAdditionalErrors = (errors) => {
+    additionalErrors.value = errors
+  }
+
+  const hasAdditionalErrors = () => {
+    return additionalErrors.value.length
   }
 
   const validationSchema = yup.object({
