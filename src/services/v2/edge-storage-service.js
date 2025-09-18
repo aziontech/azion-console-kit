@@ -35,7 +35,11 @@ export class EdgeStorageService {
   listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects?all_levels=${all_levels}&prefix=${prefix}&max_object_count=100`
+      url: `${
+        this.baseURL
+      }/${bucketName}/objects?all_levels=${all_levels}&prefix=${encodeURIComponent(
+        prefix
+      )}&max_object_count=100`
     })
 
     return this.adapter?.transformListEdgeStorageFiles?.(data)
@@ -85,7 +89,7 @@ export class EdgeStorageService {
 
     await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${bucketName}/objects/${prefix}${
+      url: `${this.baseURL}/${bucketName}/objects/${encodeURIComponent(prefix)}${
         file.webkitRelativePath ? file.webkitRelativePath : file.name
       }`,
       body: file,

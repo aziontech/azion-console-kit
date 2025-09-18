@@ -73,7 +73,7 @@
           <Checkbox
             :model-value="isAllSelected"
             @update:model-value="toggleSelectAll"
-            :binary="true"
+            binary
           />
         </template>
         <template #body="{ data: rowData }">
@@ -84,10 +84,10 @@
           >
             <Checkbox
               v-if="selectedItems.includes(rowData)"
-              :model-value="true"
+              :model-value="selectedItems.includes(rowData)"
               @update:model-value="toggleRowSelection(rowData)"
               @click.stop="toggleRowSelection(rowData)"
-              :binary="true"
+              binary
             />
             <i
               v-else
