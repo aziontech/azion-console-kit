@@ -19,7 +19,15 @@
         :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
       />
     </template>
+    <template #actionBar="{ onSubmit, onCancel, loading }">
+      <ActionBarBlock
+        @onSubmit="formSubmit(onSubmit)"
+        @onCancel="onCancel"
+        :loading="isLoading || loading"
+      />
+    </template>
   </CreateDrawerBlock>
+
   <EditDrawerBlock
     v-if="loadEditFunctionDrawer"
     :id="selectedFunctionToEdit"
