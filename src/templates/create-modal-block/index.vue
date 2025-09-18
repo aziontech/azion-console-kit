@@ -255,6 +255,14 @@
     return filterBySearchField(search.value)
   })
 
+  const hasInitialData = computed(() => {
+    return templatesData.value[selectedTab.value].length > 0
+  })
+
+  const isEmptyDueToNoData = computed(() => {
+    return !hasInitialData.value && filteredTemplates.value.length === 0
+  })
+
   const resetFilters = () => {
     search.value = ''
   }
@@ -321,11 +329,14 @@
           class="flex flex-col gap-3"
           data-testid="integrations-list-content-header"
         >
-          <div class="text-base font-medium">
+          <div
+            v-if="hasInitialData"
+            class="text-base font-medium"
+          >
             {{ tabInfo[selectedTab].title }}
           </div>
           <span
-            v-if="!tabInfo.githubImport.show"
+            v-if="!tabInfo.githubImport.show && hasInitialData"
             class="p-input-icon-left"
             data-testid="integrations-list-content-search"
           >
@@ -365,143 +376,187 @@
         v-if="tabInfo.recommended.show"
         data-testid="integrations-list-content-recommended"
       >
-        <PrimeButton
-          v-for="template in filteredTemplates"
-          :key="template.id"
-          @click="redirectToSolution(template, 'recommended')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-recommended-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
-              >
-                <div class="bg-white flex h-full w-full rounded">
-                  <img
-                    class="object-contain"
-                    :src="template.vendor.icon"
-                    :alt="template.vendor.name"
-                  />
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="template in filteredTemplates"
+            :key="template.id"
+            @click="redirectToSolution(template, 'recommended')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-recommended-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+                >
+                  <div class="bg-white flex h-full w-full rounded">
+                    <img
+                      class="object-contain"
+                      :src="template.vendor.icon"
+                      :alt="template.vendor.name"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ template.headline }}
+                  </span>
                 </div>
               </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ template.headline }}
-                </span>
-              </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-recommended-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No recommended templates found</h3>
+          <p class="text-color-secondary">Check back later for new recommendations.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.templates.show"
         data-testid="integrations-list-content-templates"
       >
-        <PrimeButton
-          v-for="template in filteredTemplates"
-          :key="template.id"
-          @click="redirectToSolution(template, 'templates')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-templates-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
-              >
-                <div class="bg-white flex h-full w-full rounded">
-                  <img
-                    class="object-contain"
-                    :src="template.vendor.icon"
-                    :alt="template.name"
-                  />
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="template in filteredTemplates"
+            :key="template.id"
+            @click="redirectToSolution(template, 'templates')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-templates-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+                >
+                  <div class="bg-white flex h-full w-full rounded">
+                    <img
+                      class="object-contain"
+                      :src="template.vendor.icon"
+                      :alt="template.name"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ template.headline }}
+                  </span>
                 </div>
               </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ template.headline }}
-                </span>
-              </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-templates-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No templates found</h3>
+          <p class="text-color-secondary">Check back later for new templates.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.newResource.show"
         data-testid="integrations-list-content-new-resources"
       >
-        <PrimeButton
-          v-for="resource in filteredTemplates"
-          :key="resource.to"
-          @click="redirect(resource.to, resource.label)"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-new-resources-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ resource.label }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ resource.description }}
-                </span>
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="resource in filteredTemplates"
+            :key="resource.to"
+            @click="redirect(resource.to, resource.label)"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-new-resources-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ resource.label }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ resource.description }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-new-resources-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No resources found</h3>
+          <p class="text-color-secondary">No resources are currently available.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.githubImport.show"
         data-testid="integrations-list-content-github-import"
       >
-        <PrimeButton
-          v-for="(template, index) in filteredTemplates"
-          :key="index"
-          @click="redirectGithubImport(template, 'githubImport')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-github-import-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
-              >
-                <i class="pi pi-github text-white text-2xl"></i>
-              </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="(template, index) in filteredTemplates"
+            :key="index"
+            @click="redirectGithubImport(template, 'githubImport')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-github-import-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
                 >
-                  Import an existing project to deploy it on Azion's edge.
-                </span>
+                  <i class="pi pi-github text-white text-2xl"></i>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    Import an existing project to deploy it on Azion's edge.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-github-import-empty"
+        >
+          <i class="pi pi-github text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No GitHub repositories found</h3>
+          <p class="text-color-secondary">No repositories are currently available for import.</p>
+        </div>
       </div>
     </div>
   </div>

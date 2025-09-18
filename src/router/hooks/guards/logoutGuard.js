@@ -9,7 +9,7 @@ export async function logoutGuard({ to, accountStore, tracker }) {
   if (to.meta?.hideLoading) {
     loadingStore.finishLoading()
   }
-  
+
   if (to.path === '/logout') {
     tracker.reset()
     await logoutService()

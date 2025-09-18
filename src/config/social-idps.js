@@ -13,6 +13,11 @@ const SSO_PROVIDERS = [
     name: 'Microsoft Azure',
     slug: 'azure',
     envVar: 'VITE_SSO_AZURE'
+  },
+  {
+    name: 'IDP SCIM e2e',
+    slug: '',
+    envVar: 'VITE_SSO_IDP_SCIM_E2E'
   }
 ]
 

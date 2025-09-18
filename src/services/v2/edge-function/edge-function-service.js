@@ -1,10 +1,10 @@
 import { BaseService } from '@/services/v2/base/BaseService'
-import { EdgeFunctionAdapter } from './edge-function-adapter'
+import { EdgeFunctionsAdapter } from './edge-function-adapter'
 
 export class EdgeFunctionService extends BaseService {
   constructor() {
     super()
-    this.adapter = EdgeFunctionAdapter
+    this.adapter = EdgeFunctionsAdapter
     this.baseURL = 'v4/workspace/functions'
   }
 

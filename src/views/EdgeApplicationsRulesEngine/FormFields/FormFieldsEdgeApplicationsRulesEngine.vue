@@ -19,7 +19,7 @@
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService } from '@/services/v2/edge-app/edge-app-edge-connectors-service'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
 

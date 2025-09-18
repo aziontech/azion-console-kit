@@ -11,8 +11,6 @@ export class QueryService {
     const { user_id: accountId } = useAccountStore().accountData
 
     const id = accountId || 'default'
-    // eslint-disable-next-line no-console
-    console.log('🚀 ~ QueryService ~ buildKey ~ accountId:', id)
     return Array.isArray(key) ? [id, ...key] : [id, key]
   }
 

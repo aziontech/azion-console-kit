@@ -14,11 +14,11 @@ const isGlobalData = (queryKey) => {
 // Helper function to serialize queryKey properly
 const serializeQueryKey = (queryKey) => {
   if (Array.isArray(queryKey)) {
-    return queryKey.map(item => 
-      typeof item === 'object' && item !== null 
-        ? JSON.stringify(item) 
-        : String(item)
-    ).join('_')
+    return queryKey
+      .map((item) =>
+        typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item)
+      )
+      .join('_')
   }
   return String(queryKey)
 }
@@ -29,13 +29,13 @@ const saveToCache = (queryKey, data) => {
     const key = serializeQueryKey(queryKey)
     const cacheKey = `${CACHE_PREFIX}${key}`
     const isGlobal = isGlobalData(queryKey)
-    
+
     const cacheData = {
       data,
       timestamp: Date.now(),
       isGlobal
     }
-    
+
     localStorage.setItem(cacheKey, JSON.stringify(cacheData))
   } catch (error) {
     // Silent fail - cache is optional
@@ -47,17 +47,17 @@ const loadFromCache = (queryKey) => {
     const key = serializeQueryKey(queryKey)
     const cacheKey = `${CACHE_PREFIX}${key}`
     const cached = localStorage.getItem(cacheKey)
-    
+
     if (!cached) return null
-    
+
     const { data, timestamp } = JSON.parse(cached)
-    
+
     // Cache expires after 24 hours
     if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
       localStorage.removeItem(cacheKey)
       return null
     }
-    
+
     return data
   } catch (error) {
     return null

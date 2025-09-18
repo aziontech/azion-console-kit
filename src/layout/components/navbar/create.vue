@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
@@ -104,32 +104,39 @@
 
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
+  const recommendedQuery = ref(null)
+  const templatesQuery = ref(null)
+  const githubImportQuery = ref(null)
 
-  const recommendedQuery = solutionService.useListSolutions({
-    group: 'recommended',
-    type: hasFlagBlockApiV4() ? accountData.value.jobRole : `${accountData.value.jobRole}-v4`
-  })
+  const loadQueries = () => {
+    if (accountData.value.kind !== 'client') return
 
-  const templatesQuery = solutionService.useListSolutions({
-    group: 'templates',
-    type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
-  })
+    recommendedQuery.value = solutionService.useListSolutions({
+      group: 'recommended',
+      type: hasFlagBlockApiV4() ? accountData.value.jobRole : `${accountData.value.jobRole}-v4`
+    })
 
-  const githubImportQuery = solutionService.useListSolutions({
-    group: 'githubImport',
-    type: 'import-from-github'
-  })
+    templatesQuery.value = solutionService.useListSolutions({
+      group: 'templates',
+      type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
+    })
+
+    githubImportQuery.value = solutionService.useListSolutions({
+      group: 'githubImport',
+      type: 'import-from-github'
+    })
+  }
 
   const solutions = computed(() => ({
-    recommended: recommendedQuery.data.value || [],
-    templates: templatesQuery.data.value || [],
-    githubImport: githubImportQuery.data.value || []
+    recommended: recommendedQuery.value.data || [],
+    templates: templatesQuery.value.data || [],
+    githubImport: githubImportQuery.value.data || []
   }))
 
   const loading = computed(() => ({
-    recommended: !accountData.value.jobRole || recommendedQuery.isLoading.value,
-    templates: templatesQuery.isLoading.value,
-    githubImport: githubImportQuery.isLoading.value
+    recommended: !accountData.value.jobRole || recommendedQuery.value.isLoading,
+    templates: templatesQuery.value.isLoading,
+    githubImport: githubImportQuery.value.isLoading
   }))
 
   const openCreateModalToggle = () => {
@@ -155,4 +162,6 @@
   const createModalIsOpen = computed(() => {
     return createModalStore.isOpen
   })
+
+  loadQueries()
 </script>

@@ -25,10 +25,11 @@ export class SolutionService extends BaseService {
   useListSolutions({ group, type }, options = {}) {
     return this.useGlobalQuery(
       ['solutions', 'list', { group, type }],
-      () => this.getListSolutions({ 
-        group: group, 
-        type: type 
-      }),
+      () =>
+        this.getListSolutions({
+          group: group,
+          type: type
+        }),
       options
     )
   }

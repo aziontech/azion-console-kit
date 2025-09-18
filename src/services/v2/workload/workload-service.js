@@ -2,7 +2,7 @@ import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/BaseService'
 import { WorkloadAdapter } from './workload-adapter'
-import { WorkloadDeploymentService } from '../workload-deployment/workload-deployment-service'
+import { WorkloadDeploymentService } from './workload-deployments-service'
 import { DigitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 
@@ -223,3 +223,5 @@ export class WorkloadService extends BaseService {
     return `Workload successfully deleted.`
   }
 }
+
+export const workloadService = new WorkloadService()
