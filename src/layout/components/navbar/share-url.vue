@@ -44,7 +44,7 @@
   import Button from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import OverlayPanel from 'primevue/overlaypanel'
-  
+
   const overlayPanel = ref()
   const copyButton = ref()
   const tooltipMessage = ref('')
