@@ -1,6 +1,7 @@
 /* eslint id-length: "off" */
 
 export const getFileIcon = (data) => {
+  if (!data) return 'mdi mdi-file-document text-gray-500'
   // Check for special cases first
   if (data.isParentNav) {
     return 'mdi mdi-folder-open text-grey-500'
