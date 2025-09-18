@@ -170,7 +170,7 @@
 <template>
   <form-horizontal
     title="General"
-    description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
+    description="Check the details of the Azion domain, including the domain address to access the Application, and modify digital certificate options."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -246,7 +246,7 @@
 
   <form-horizontal
     title="Settings"
-    description="Determine the application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the Application of the domain and its digital certificate. To link an existing domain to an Application, add it to the CNAME field and block access to the Application via the Azion domain."
   >
     <template #inputs>
       <Drawer
@@ -274,7 +274,7 @@
           optionValue="value"
           :value="edgeApplication"
           appendTo="self"
-          placeholder="Select an application"
+          placeholder="Select an Application"
         >
           <template #footer>
             <ul class="p-2">
@@ -317,7 +317,7 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          placeholder="Select a firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -346,7 +346,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+        subtitle="Check this option to make the Application accessible only through the domains listed in the CNAME field. Attempts to access the Application through the Azion domain will be blocked."
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

@@ -4,8 +4,8 @@ export class EdgeFirewallFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_firewall/firewalls'
-    this.functionListEndpoint = 'v4/edge_functions/functions'
+    this.baseURL = 'v4/workspace/firewalls'
+    this.functionListEndpoint = 'v4/workspace/functions'
     this.countFunctions = 0
   }
 

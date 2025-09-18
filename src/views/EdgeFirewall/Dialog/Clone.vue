@@ -79,7 +79,7 @@
     edgeFirewallName: ''
   }
 
-  const showFeedback = (feedback = 'cloned successfully') => {
+  const showFeedback = (feedback = 'Cloned successfully') => {
     const feedbackMessage = feedback
     toast.add({
       closable: true,

@@ -42,3 +42,4 @@ jobs:
           CROSS_EDGE_SECRET: ${{ secrets.STAGE_CROSS_EDGE_SECRET}}
           NODE_ENV: stage
           VITE_ENVIRONMENT: stage
+          VITE_STAGE_SENTRY: ${{ secrets.STAGE_SENTRY }}

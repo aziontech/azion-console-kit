@@ -29,8 +29,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No functions have been instantiated"
-    description="Click the button below to instantiate your first function."
+    title="No Functions have been instantiated"
+    description="Click the button below to instantiate your first Function."
     createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
@@ -52,29 +52,20 @@
 </template>
 
 <script setup>
+  import { onMounted, computed, ref, inject } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeApplicationFunctionService } from '@/services/v2'
-
-  import PrimeButton from 'primevue/button'
-  import { computed, ref, inject } from 'vue'
   import DrawerFunction from './Drawer'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
-
-  const hasContentToList = ref(true)
-  const FUNCTIONS_API_FIELDS = [
-    'id',
-    'name',
-    'edge_function',
-    'args',
-    'last_modified',
-    'last_editor'
-  ]
 
   const props = defineProps({
     edgeApplicationId: {
@@ -87,6 +78,17 @@
     }
   })
 
+  const router = useRouter()
+  const route = useRoute()
+  const hasContentToList = ref(true)
+  const FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'edge_function',
+    'args',
+    'last_modified',
+    'last_editor'
+  ]
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeApplicationsRef = ref('')
 
@@ -152,6 +154,19 @@
   }
 
   const openEditFunctionDrawer = (data) => {
+    openDrawer({ id: data.id })
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
+  }
+
+  const openDrawerById = (data) => {
+    openDrawer({ id: data.id })
+  }
+
+  const openDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
@@ -186,4 +201,8 @@
       })
       .track()
   }
+
+  onMounted(() => {
+    openDrawerById({ id: route.query.id })
+  })
 </script>

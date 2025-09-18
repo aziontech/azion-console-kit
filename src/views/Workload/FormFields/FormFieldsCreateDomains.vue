@@ -232,7 +232,7 @@
 
 <template>
   <form-horizontal
-    description="Create a workload with Azion to launch an application and set up security with digital certificates."
+    description="Create a workload with Azion to launch an Application and set up security with digital certificates."
     :isDrawer="isDrawer"
     :noBorder="noBorder"
   >
@@ -273,7 +273,7 @@
     :isDrawer="isDrawer"
     title="Delivery Settings"
     :noBorder="noBorder"
-    description="Choose the protocols used between the application and users."
+    description="Choose the protocols used between the Application and users."
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
@@ -463,7 +463,7 @@
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"
-    description="Determine the application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
+    description="Determine the Application of the workload and its digital certificate. To link an existing workload to an Application, add it to the CNAME field and block access to the Application via the Azion workload."
   >
     <template #title> Settings </template>
     <template #inputs>
@@ -492,7 +492,7 @@
           :value="application"
           :disabled="disabledEdgeApplicationDropdown"
           appendTo="self"
-          placeholder="Select an application"
+          placeholder="Select an Application"
         >
           <template #footer>
             <ul class="p-2">
@@ -530,7 +530,7 @@
           optionValue="value"
           :value="firewall"
           appendTo="self"
-          placeholder="Select an firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">

@@ -2,7 +2,7 @@ export class EdgeFirewallService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_firewall/firewalls'
+    this.baseURL = 'v4/workspace/firewalls'
   }
 
   listEdgeFirewallService = async (
@@ -75,7 +75,7 @@ export class EdgeFirewallService {
     })
 
     return {
-      feedback: 'Your firewall has been cloned',
+      feedback: 'Your Firewall has been cloned',
       urlToEditView: `/edge-firewall/edit/${data.data.id}`,
       id: data.data.id
     }
@@ -90,7 +90,7 @@ export class EdgeFirewallService {
       body
     })
 
-    return 'Your firewall has been updated'
+    return 'Your Firewall has been updated'
   }
 
   loadEdgeFirewallService = async ({ id }) => {
@@ -108,6 +108,6 @@ export class EdgeFirewallService {
       url: `${this.baseURL}/${id}`
     })
 
-    return 'Your firewall has been deleted'
+    return 'Your Firewall has been deleted'
   }
 }

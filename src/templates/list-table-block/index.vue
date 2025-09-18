@@ -63,6 +63,7 @@
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
               :data-testid="`export_button`"
+              aria-label="Export to CSV"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
 

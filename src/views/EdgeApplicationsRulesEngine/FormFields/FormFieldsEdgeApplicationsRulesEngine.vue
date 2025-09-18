@@ -24,7 +24,7 @@
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Connectors', value: 'set_connector', requires: false }]
+      return [{ label: 'Set Connector', value: 'set_connector', requires: false }]
     } else {
       return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
     }
@@ -228,11 +228,11 @@
 
     return {
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
-        ? ' - Requires Application Accelerator'
+        ? ' - Required Application Accelerator'
         : empty,
       https: empty,
-      imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
-      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Function' : empty
+      imageOptimization: !props.isImageOptimizationEnabled ? ' - Required Image Processor' : empty,
+      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Required Function' : empty
     }
   })
 

@@ -59,6 +59,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -119,7 +120,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 

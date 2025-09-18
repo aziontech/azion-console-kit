@@ -15,7 +15,7 @@
             class="text-color text-base font-semibold truncate"
             :data-testid="handleDataTestIdInItem(message, 'title')"
           >
-            {{ parseText(message.summary, CHAR_LIMITS.SUMMARY) }}
+            {{ toUpperCaseTitleCase(parseText(message.summary, CHAR_LIMITS.SUMMARY)) }}
           </h5>
         </header>
         <div :class="{ 'max-h-32 overflow-y-auto': message.additionalDetails }">
@@ -111,6 +111,10 @@
   }
 
   const isString = (str) => typeof str === 'string'
+
+  const toUpperCaseTitleCase = (text) => {
+    return text?.charAt(0).toUpperCase() + text.slice(1)
+  }
 
   const parseText = (text, charLimit, isSummary = true) => {
     const existsAndIsString = text && isString(text)
