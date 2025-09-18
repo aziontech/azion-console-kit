@@ -67,42 +67,35 @@
     overlayPanel.value.toggle(event)
   }
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(url.value)
-      tooltipMessage.value = 'Copied'
-      showTooltip.value = true
-      
-      await nextTick()
-      
-      const buttonEl = copyButton.value?.$el || copyButton.value
-      if (buttonEl) {
-        const mouseEnterEvent = new MouseEvent('mouseenter', { bubbles: true })
-        buttonEl.dispatchEvent(mouseEnterEvent)
-        
-        setTimeout(() => {
-          const mouseLeaveEvent = new MouseEvent('mouseleave', { bubbles: true })
-          buttonEl.dispatchEvent(mouseLeaveEvent)
-          showTooltip.value = false
-        }, 2000)
-      }
-    } catch (err) {
-      tooltipMessage.value = 'Failed to copy'
-      showTooltip.value = true
-      
-      await nextTick()
-      
-      const buttonEl = copyButton.value?.$el || copyButton.value
-      if (buttonEl) {
-        const mouseEnterEvent = new MouseEvent('mouseenter', { bubbles: true })
-        buttonEl.dispatchEvent(mouseEnterEvent)
-        
-        setTimeout(() => {
-          const mouseLeaveEvent = new MouseEvent('mouseleave', { bubbles: true })
-          buttonEl.dispatchEvent(mouseLeaveEvent)
-          showTooltip.value = false
-        }, 2000)
-      }
-    }
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(url.value)
+    tooltipMessage.value = 'Copied'
+    showTooltip.value = true
+    
+    await showTooltipOnButton()
+  } catch (err) {
+    tooltipMessage.value = 'Failed to copy'
+    showTooltip.value = true
+    
+    await showTooltipOnButton()
+  }
+}
+
+const showTooltipOnButton = async () => {
+  await nextTick()
+  
+  const buttonEl = copyButton.value?.$el || copyButton.value
+  if (buttonEl) {
+    const mouseEnterEvent = new MouseEvent('mouseenter', { bubbles: true })
+    buttonEl.dispatchEvent(mouseEnterEvent)
+    
+    setTimeout(() => {
+      const mouseLeaveEvent = new MouseEvent('mouseleave', { bubbles: true })
+      buttonEl.dispatchEvent(mouseLeaveEvent)
+      showTooltip.value = false
+    }, 2000)
+  }
+}
   }
 </script>
