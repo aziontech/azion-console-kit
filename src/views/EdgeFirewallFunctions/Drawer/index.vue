@@ -27,8 +27,9 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="handleSuccessEdit"
     :showBarGoBack="true"
+    :showShareUrl="true"
+    @onSuccess="handleSuccessEdit"
     @onError="handleFailedToEdit"
     title="Edit Instance"
   >
