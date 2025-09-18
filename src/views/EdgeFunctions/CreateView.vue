@@ -7,22 +7,24 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  
+
   import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
-  
+
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  
+
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  
+
   import { useLoadingStore } from '@/stores/loading'
   import { edgeFunctionService } from '@/services/v2'
 
-  
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const route = useRoute()
   const ARGS_INITIAL_STATE = '{}'
+
+  const isLoading = ref(false)
+  const additionalErrors = ref([])
 
   const handleTrackCreation = (response) => {
     tracker.product.productCreated({
@@ -94,6 +96,26 @@
     }
     response.showToastWithActions(toast)
   }
+
+  const hasAdditionalErrors = () => {
+    return additionalErrors.value.length
+  }
+
+  const handleAdditionalErrors = (errors) => {
+    additionalErrors.value = errors
+  }
+
+  const formSubmit = async (onSubmit) => {
+    isLoading.value = true
+
+    if (hasAdditionalErrors()) {
+      isLoading.value = false
+      return
+    }
+
+    await onSubmit()
+    isLoading.value = false
+  }
 </script>
 
 <template>
@@ -113,14 +135,17 @@
         disableToast
       >
         <template #form>
-          <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />
+          <FormFieldsCreateEdgeFunctions
+            v-model:preview-data="updateObject"
+            @additionalErrors="handleAdditionalErrors"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            @onSubmit="formSubmit(onSubmit)"
             @onCancel="onCancel"
-            :loading="loading"
+            :loading="isLoading || loading"
           />
         </template>
       </CreateFormBlock>

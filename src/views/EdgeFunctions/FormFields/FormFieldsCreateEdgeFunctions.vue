@@ -33,7 +33,7 @@
     }
   })
 
-  const emit = defineEmits(['update:previewData'])
+  const emit = defineEmits(['update:previewData', 'additionalErrors'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -48,6 +48,7 @@
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['JSON', 'Form Builder']
@@ -132,8 +133,12 @@
   })
 
   const onChangeAzionForm = (event) => {
+    azionFormValidationErrors.value = event.errors || []
+    
     codeEditorArgsUpdate(indentJsonStringify(event.data))
     setAzionFormData(event.data)
+    
+    emit('additionalErrors', event.errors || [])
   }
 
   const setDefaultFormBuilder = () => {
@@ -148,6 +153,9 @@
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
+
+    azionFormValidationErrors.value = []
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const executionEnvironmentOptions = [
