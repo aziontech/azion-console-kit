@@ -44,11 +44,12 @@
   import Button from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import OverlayPanel from 'primevue/overlaypanel'
-
+  
   const overlayPanel = ref()
   const copyButton = ref()
   const tooltipMessage = ref('')
   const showTooltip = ref(false)
+  const delay = 2000
   const url = computed(() => window.location.href)
 
   const tooltipConfig = computed(() => {
@@ -58,7 +59,7 @@
     return {
       value: tooltipMessage.value,
       showDelay: 0,
-      hideDelay: 2000,
+      hideDelay: delay,
       disabled: false
     }
   })
@@ -96,7 +97,7 @@
         const mouseLeaveEvent = new MouseEvent('mouseleave', { bubbles: true })
         buttonEl.dispatchEvent(mouseLeaveEvent)
         showTooltip.value = false
-      }, 2000)
+      }, delay)
     }
   }
 </script>
