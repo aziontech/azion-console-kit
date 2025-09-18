@@ -3,9 +3,8 @@ import { queryClient } from './queryClient'
 import { useAccountStore } from '@/stores/account'
 
 export class QueryService {
-  constructor(defaultOptions = {}) {
+  constructor() {
     this.queryClient = queryClient
-    this.defaultOptions = defaultOptions
   }
 
   buildKey(key) {
@@ -18,11 +17,11 @@ export class QueryService {
   }
 
   useQuery(key, queryFn, options = {}) {
-    return useQuery(this.buildKey(key), queryFn, { ...this.defaultOptions, ...options })
+    return useQuery({ queryKey: this.buildKey(key), queryFn, ...options })
   }
 
   useMutation(mutationFn, options = {}) {
-    return useMutation(mutationFn, { ...this.defaultOptions, ...options })
+    return useMutation(mutationFn, { ...options })
   }
 
   setDefaultOptions(options = {}) {

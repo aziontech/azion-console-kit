@@ -3,27 +3,33 @@ import { BaseService } from '../base/BaseService'
 export class SolutionService extends BaseService {
   constructor() {
     super()
-    this.baseURL = 'marketplace/solution'
+    this.baseURL = 'marketplace/solution/'
   }
 
-  useListSolutions({ group, type = 'onboarding' }) {
-    const queryKey = ['solutions', 'list', { group, type }]
-
-    return this.query.useQuery(queryKey, async () => {
-      const response = await this.http.request({
-        method: 'GET',
-        url: this.baseURL,
-        config: {
-          headers: {
-            'Mktp-Api-Context': type
-          }
-        },
-        params: { group }
-      })
-
-      return this.#adaptResponse(response)
+  getListSolutions = async ({ group, type = 'onboarding' }) => {
+    const response = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      config: {
+        baseURL: '/api',
+        headers: {
+          'Mktp-Api-Context': type
+        }
+      },
+      params: { group }
     })
+
+    return this.#adaptResponse(response)
   }
+
+  // Simple method - automatically cached and persisted
+  useListSolutions({ group, type = 'onboarding' }) {
+    return this.useGlobalQuery(
+      ['solutions', 'list', { group, type }], 
+      () => this.getListSolutions({ group, type })
+    )
+  }
+
   #adaptResponse(response) {
     const isArray = Array.isArray(response.data)
     const parsedSolutions =

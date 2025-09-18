@@ -4,10 +4,12 @@ export class HttpClient {
   async send(config) {
     const headers = config.headers || {}
     const baseURL = config.baseURL ?? '/'
-
-    headers['Accept'] = config.accept ?? 'application/json; version=3'
-    headers['Content-Type'] = config.contentType ?? 'application/json; version=3'
-    headers['withCredentials'] = config.withCredentials ?? true
+    
+    delete axios.defaults.headers.common['Authorization']
+    axios.defaults.headers.common['Accept'] = config.accept ?? 'application/json; version=3'
+    axios.defaults.headers.common['Content-Type'] = config.contentType ?? 'application/json; version=3'
+    axios.defaults.headers.common['withCredentials'] = config.withCredentials ?? true
+    
 
     const requestConfig = {
       ...config,

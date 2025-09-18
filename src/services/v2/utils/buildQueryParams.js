@@ -27,7 +27,8 @@ export const buildQueryParams = ({
   search,
   type,
   active,
-  isDefault
+  isDefault,
+  group
 }) => {
   const params = new URLSearchParams()
   const paramsMap = {
@@ -38,7 +39,8 @@ export const buildQueryParams = ({
     ...(type && { type }),
     ...(active && { active }),
     ...(isDefault && { is_default: isDefault }),
-    ...(fields && { fields })
+    ...(fields && { fields }),
+    ...(group && { group })
   }
 
   Object.entries(paramsMap)
