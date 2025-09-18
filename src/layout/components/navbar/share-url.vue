@@ -75,6 +75,8 @@ const copyToClipboard = async () => {
     
     await showTooltipOnButton()
   } catch (err) {
+    console.error('Failed to copy to clipboard:', err) // eslint-disable-line
+
     tooltipMessage.value = 'Failed to copy'
     showTooltip.value = true
     
@@ -97,5 +99,4 @@ const showTooltipOnButton = async () => {
     }, 2000)
   }
 }
-  }
 </script>
