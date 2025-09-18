@@ -134,10 +134,10 @@
 
   const onChangeAzionForm = (event) => {
     azionFormValidationErrors.value = event.errors || []
-    
+
     codeEditorArgsUpdate(indentJsonStringify(event.data))
     setAzionFormData(event.data)
-    
+
     emit('additionalErrors', azionFormValidationErrors.value)
   }
 
