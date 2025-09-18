@@ -23,7 +23,7 @@
   import { defaultSchemaFormBuilder } from './Config'
 
   defineProps(['previewData', 'run'])
-  const emit = defineEmits(['update:previewData', 'update:run', 'update:name'])
+  const emit = defineEmits(['update:previewData', 'update:run', 'update:name', 'additionalErrors'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -37,6 +37,7 @@
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['JSON', 'Form Builder']
@@ -167,8 +168,12 @@
   }
 
   const onChangeAzionForm = (event) => {
+    azionFormValidationErrors.value = event.errors || []
+
     codeEditorArgsUpdate(indentJsonStringify(event.data))
     setAzionFormData(event.data)
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const setDefaultFormBuilder = () => {
@@ -183,6 +188,9 @@
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
+    azionFormValidationErrors.value = []
+    
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 </script>
 

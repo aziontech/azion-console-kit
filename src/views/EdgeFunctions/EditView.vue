@@ -6,13 +6,13 @@
   import EditFormBlock from '@/templates/edit-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  
+
   import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  
+
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFunctionService } from '@/services/v2'
-  
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -22,6 +22,9 @@
       required: true
     }
   })
+
+  const isLoading = ref(false)
+  const additionalErrors = ref([])
   const updateObject = ref({})
   const runtime = ref(null)
   const name = ref('')
@@ -61,6 +64,26 @@
     active: yup.boolean(),
     runtime: yup.string()
   })
+
+  const hasAdditionalErrors = () => {
+    return additionalErrors.value.length
+  }
+
+  const handleAdditionalErrors = (errors) => {
+    additionalErrors.value = errors
+  }
+
+  const formSubmit = async (onSubmit) => {
+    isLoading.value = true
+
+    if (hasAdditionalErrors()) {
+      isLoading.value = false
+      return
+    }
+
+    await onSubmit()
+    isLoading.value = false
+  }
 </script>
 
 <template>
@@ -87,13 +110,14 @@
             v-model:preview-data="updateObject"
             v-model:run="runtime"
             v-model:name="name"
+            @additionalErrors="handleAdditionalErrors"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            @onSubmit="formSubmit(onSubmit)"
             @onCancel="onCancel"
-            :loading="loading"
+            :loading="isLoading || loading"
           />
         </template>
       </EditFormBlock>

@@ -138,7 +138,7 @@
     codeEditorArgsUpdate(indentJsonStringify(event.data))
     setAzionFormData(event.data)
     
-    emit('additionalErrors', event.errors || [])
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const setDefaultFormBuilder = () => {
@@ -153,7 +153,6 @@
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
-
     azionFormValidationErrors.value = []
     emit('additionalErrors', azionFormValidationErrors.value)
   }
