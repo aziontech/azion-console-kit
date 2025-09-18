@@ -17,19 +17,18 @@ export class BaseService {
   buildQueryKey(key, isGlobal = false) {
     const accountStore = useAccountStore()
     const { user_id: accountId } = accountStore.accountData
-    
+
     if (isGlobal) {
       return Array.isArray(key) ? ['global', ...key] : ['global', key]
     }
-    
+
     const id = accountId || 'default'
     return Array.isArray(key) ? [id, ...key] : [id, key]
   }
 
-  // Simple query hook with auto-cache
   useQuery(key, queryFn, options = {}) {
     const queryKey = this.buildQueryKey(key, options.global)
-    
+
     return enhancedQueryClient.useQuery({
       queryKey,
       queryFn,
@@ -44,7 +43,6 @@ export class BaseService {
     })
   }
 
-  // Convenience methods
   useGlobalQuery(key, queryFn, options = {}) {
     return this.useQuery(key, queryFn, { ...options, global: true })
   }

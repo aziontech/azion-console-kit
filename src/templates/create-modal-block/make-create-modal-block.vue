@@ -4,8 +4,22 @@
   defineOptions({
     name: 'make-create-modal-block'
   })
+
+  defineProps({
+    solutions: {
+      type: Object,
+      required: true
+    },
+    loading: {
+      type: Object,
+      required: true
+    }
+  })
 </script>
 
 <template>
-  <CreateModalBlock />
+  <CreateModalBlock
+    :solutions="solutions"
+    :loading="loading"
+  />
 </template>

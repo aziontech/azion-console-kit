@@ -6,7 +6,7 @@ export class SolutionService extends BaseService {
     this.baseURL = 'marketplace/solution/'
   }
 
-  getListSolutions = async ({ group, type = 'onboarding' }) => {
+  getListSolutions = async ({ group, type }) => {
     const response = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -22,11 +22,14 @@ export class SolutionService extends BaseService {
     return this.#adaptResponse(response)
   }
 
-  // Simple method - automatically cached and persisted
-  useListSolutions({ group, type = 'onboarding' }) {
+  useListSolutions({ group, type }, options = {}) {
     return this.useGlobalQuery(
-      ['solutions', 'list', { group, type }], 
-      () => this.getListSolutions({ group, type })
+      ['solutions', 'list', { group, type }],
+      () => this.getListSolutions({ 
+        group: group, 
+        type: type 
+      }),
+      options
     )
   }
 

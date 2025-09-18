@@ -7,7 +7,15 @@ import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo] = await Promise.all([getAccountInfoService(), getUserInfoService()])
+  const [accountInfo, userInfo] = await Promise.all([
+    getAccountInfoService(),
+    getUserInfoService(),
+    loadAccountJobRoleService().then(({ jobRole }) => {
+      accountStore.setAccountData({
+        jobRole
+      })
+    })
+  ])
 
   accountInfo.is_account_owner = userInfo.results.is_account_owner
   accountInfo.client_id = userInfo.results.client_id
@@ -30,12 +38,6 @@ export const loadProfileAndAccountInfo = async () => {
   const accountInfo = accountStore.account
 
   const promises = [
-    loadAccountJobRoleService().then(({ jobRole }) => {
-      accountStore.setAccountData({
-        jobRole
-      })
-    }),
-
     billingGqlService.getCreditAndExpirationDate().then(({ credit, formatCredit, days }) => {
       accountStore.setAccountData({
         credit,
