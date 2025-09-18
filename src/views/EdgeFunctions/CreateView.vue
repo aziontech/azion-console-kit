@@ -1,22 +1,27 @@
 <script setup>
+  import { ref, onMounted, inject } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import HelloWorldSample from '@/helpers/edge-function-hello-world'
-  import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
+
   import ContentBlock from '@/templates/content-block'
   import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  
+  import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
+  
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref, onMounted, inject } from 'vue'
+  
+  import HelloWorldSample from '@/helpers/edge-function-hello-world'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  
   import { useLoadingStore } from '@/stores/loading'
-  import { useRoute } from 'vue-router'
   import { edgeFunctionService } from '@/services/v2'
 
-  const route = useRoute()
+  
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
+  const route = useRoute()
   const ARGS_INITIAL_STATE = '{}'
 
   const handleTrackCreation = (response) => {

@@ -1,16 +1,20 @@
 <script setup>
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+
   import ContentBlock from '@/templates/content-block'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  
+  import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref, inject } from 'vue'
+  
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFunctionService } from '@/services/v2'
+  
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  import { edgeFunctionService } from '@/services/v2'
 
   const props = defineProps({
     updatedRedirect: {
