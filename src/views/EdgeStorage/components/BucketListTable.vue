@@ -100,23 +100,26 @@
   ]
 
   const loadBuckets = async () => {
-    isLoading.value = true
-    if (!buckets.value.length || bucketTableNeedRefresh.value) {
-      const [listBucketsResponse, metricsResponse] = await Promise.all([
-        edgeStorageService.listEdgeStorageBuckets(),
-        edgeStorageService.getEdgeStorageMetrics()
-      ])
-      buckets.value = listBucketsResponse.body
-      buckets.value.forEach((bucket) => {
-        const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
-        bucket.size = size ? `${size} GB` : '-'
-      })
-      bucketTableNeedRefresh.value = false
-    }
-    isLoading.value = false
-    return {
-      body: buckets.value,
-      count: buckets.value.length
+    try {
+      isLoading.value = true
+      if (!buckets.value.length || bucketTableNeedRefresh.value) {
+        const [listBucketsResponse, metricsResponse] = await Promise.all([
+          edgeStorageService.listEdgeStorageBuckets(),
+          edgeStorageService.getEdgeStorageMetrics()
+        ])
+        buckets.value = listBucketsResponse.body
+        buckets.value.forEach((bucket) => {
+          const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
+          bucket.size = size ? `${size} GB` : '-'
+        })
+        bucketTableNeedRefresh.value = false
+      }
+      return {
+        body: buckets.value,
+        count: buckets.value.length
+      }
+    } finally {
+      isLoading.value = false
     }
   }
 
