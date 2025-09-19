@@ -27,5 +27,5 @@ export async function billingGuard({ to, accountStore }) {
     return BILLING_REDIRECT_OPTIONS
   }
 
-  return true
+  return
 }
