@@ -6,6 +6,7 @@
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
   import Layout from '@/layout'
+  import UsabilityTestPopup from '@/components/UsabilityTestPopup.vue'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
 
@@ -68,4 +69,5 @@
 <template>
   <DynamicDialog />
   <Layout :isLogged="isLogged" />
+  <UsabilityTestPopup />
 </template>

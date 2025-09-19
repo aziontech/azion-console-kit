@@ -10,6 +10,8 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import PrimeVue from 'primevue/config'
+import Checkbox from 'primevue/checkbox'
+import ProgressBar from 'primevue/progressbar'
 import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
@@ -33,6 +35,8 @@ pinia.use(piniaPluginPersistedstate)
 
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(PrimeVue)
+app.component('BaseCheckbox', Checkbox)
+app.component('BaseProgressBar', ProgressBar)
 app.directive('tooltip', Tooltip)
 app.directive('prompt', customAiPrompt)
 app.use(ToastService)

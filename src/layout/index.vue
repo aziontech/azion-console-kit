@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col h-full">
     <ToastBlock />
+    <UsabilityTestPopup />
 
     <AppNavbar
       :showNavItems="showNavItems"
@@ -27,6 +28,7 @@
   import AppNavbar from './app-navbar.vue'
   import ToastBlock from '@/templates/toast-block'
   import AppSidebar from './app-sidebar.vue'
+  import UsabilityTestPopup from '@/components/UsabilityTestPopup.vue'
 
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'

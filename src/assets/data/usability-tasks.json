@@ -1,0 +1,26 @@
+{
+  "survey_question": "Como você classificaria a facilidade de uso da nossa plataforma?",
+  "survey_options": [
+    "Muito fácil",
+    "Fácil",
+    "Neutro",
+    "Difícil",
+    "Muito difícil"
+  ],
+  "tasks": [
+    {
+      "id": "access-project-page",
+      "description": "Acessar página de projetos",
+      "category": "Navegação",
+      "type": "route",
+      "trigger": "/workloads"
+    },
+    {
+      "id": "access-home-page",
+      "description": "Home",
+      "category": "Navegação",
+      "type": "route",
+      "trigger": "/"
+    }
+  ]
+}
