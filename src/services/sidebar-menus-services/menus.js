@@ -36,7 +36,7 @@ function createBuildItems() {
     {
       label: 'Applications',
       icon: 'ai ai-edge-application',
-      to: '/edge-applications',
+      to: '/applications',
       id: 'edge-application'
     },
     {
@@ -52,7 +52,7 @@ function createSecureItems() {
   return [
     {
       label: 'Connectors',
-      to: '/edge-connectors',
+      to: '/connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
       visible: !hasFlagBlockApiV4()
@@ -65,7 +65,7 @@ function createSecureItems() {
     },
     {
       label: 'Firewall',
-      to: '/edge-firewall',
+      to: '/firewall',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
     }
@@ -154,7 +154,7 @@ function createEdgeLibrariesItems() {
     },
     {
       label: 'Functions',
-      to: '/edge-functions',
+      to: '/functions',
       icon: 'ai ai-edge-functions',
       id: 'edge-functions'
     },

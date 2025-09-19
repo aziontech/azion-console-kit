@@ -53,7 +53,7 @@ describe('EdgeApplicationServicesV4', () => {
 
     expect(result).toEqual({
       feedback: 'Your Application has been created',
-      urlToEditView: `/edge-applications/config/${fixtures.edgeApplicationId}`,
+      urlToEditView: `/applications/config/${fixtures.edgeApplicationId}`,
       applicationId: fixtures.edgeApplicationId
     })
   })

@@ -3,12 +3,12 @@ import * as DomainServices from '@/services/domains-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
-  path: '/edge-firewall',
-  name: 'edge-firewall',
+  path: '/firewall',
+  name: 'firewall',
   children: [
     {
       path: '',
-      name: 'list-edge-firewall',
+      name: 'list-firewall',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         documentationService: Helpers.documentationCatalog.edgeFirewall
@@ -18,14 +18,14 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/edge-firewall'
+            to: '/firewall'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-firewall',
+      name: 'create-firewall',
       component: () => import('@views/EdgeFirewall/CreateView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService
@@ -35,24 +35,24 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/edge-firewall'
+            to: '/firewall'
           },
           {
             label: 'Create Firewall',
-            to: '/edge-firewall/create'
+            to: '/firewall/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
-      name: 'edit-edge-firewall',
+      name: 'edit-firewall',
       component: () => import('@/views/EdgeFirewall/TabsView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
         edgeFirewallServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewall,
-          updatedRedirect: 'list-edge-firewall'
+          updatedRedirect: 'list-firewall'
         },
         rulesEngineServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine
@@ -63,7 +63,7 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/edge-firewall'
+            to: '/firewall'
           },
           {
             label: 'Edit Firewall'

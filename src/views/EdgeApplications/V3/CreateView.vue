@@ -130,7 +130,7 @@
       actions: {
         link: {
           label: 'View Application',
-          callback: () => data.redirectToUrl(`/edge-applications/edit/${data.id}`)
+          callback: () => data.redirectToUrl(`/applications/edit/${data.id}`)
         }
       }
     }
