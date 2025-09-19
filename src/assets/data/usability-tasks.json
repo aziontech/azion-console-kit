@@ -10,11 +10,11 @@
       "trigger": "/workloads"
     },
     {
-      "id": "access-home-page",
-      "description": "Home",
-      "category": "Navegação",
-      "type": "route",
-      "trigger": "/"
+      "id": "workload-created",
+      "description": "Workload criado com sucesso",
+      "category": "Eventos",
+      "type": "toast",
+      "trigger": "Your workload has been created"
     }
   ]
 }

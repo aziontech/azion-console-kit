@@ -162,7 +162,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import Button from 'primevue/button'
@@ -353,8 +353,38 @@
     }
   }
 
+  let originalToastAdd
+
+  const checkToast = (toastMessage) => {
+    try {
+      const message = toastMessage.detail || toastMessage.feedback
+      if (!message) return
+
+      tasks.value.forEach((task) => {
+        if (task.completed || task.type !== 'toast') return
+
+        const trigger = task.trigger
+        if (!trigger) return
+
+        if (message.includes(trigger)) {
+          markTaskAsCompleted(task.id)
+        }
+      })
+    } catch (error) {
+      // Handle error silently in production
+    }
+  }
+
   // Lifecycle hooks
   onMounted(async () => {
+    originalToastAdd = toast.add
+    toast.add = (message) => {
+      checkToast(message)
+      originalToastAdd(message)
+    }
+
+
+
     try {
       // Initial load of tasks
       loadTasks()
@@ -437,36 +467,7 @@
     }
   )
 
-  // Watch for API calls to mark tasks as completed
-  const originalFetch = window.fetch
-  window.fetch = async function (...args) {
-    const response = await originalFetch.apply(this, args)
-
-    // Clone the response so we can read it multiple times
-    const responseClone = response.clone()
-
-    // Only process successful responses
-    if (response.ok) {
-      try {
-        // Parse the response but don't store it since we don't use it
-        await responseClone.json()
-        const url = args[0]?.url || ''
-        const method = (args[1]?.method || 'GET').toUpperCase()
-
-        tasks.value.forEach((task) => {
-          if (
-            task.trigger?.url &&
-            url.includes(task.trigger.url) &&
-            (!task.trigger.method || task.trigger.method.toUpperCase() === method)
-          ) {
-            markTaskAsCompleted(task.id)
-          }
-        })
-      } catch (error) {
-        // Handle error silently in production
-      }
-    }
-
-    return response
-  }
+  onUnmounted(() => {
+    toast.add = originalToastAdd
+  })
 </script>
