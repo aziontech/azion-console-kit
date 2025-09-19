@@ -2,10 +2,11 @@
   import { computed, onBeforeMount, ref, provide } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
+  import Sidebar from 'primevue/sidebar'
+  import ShareUrl from '@/layout/components/navbar/share-url'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
-  import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -49,6 +50,10 @@
       default: false
     },
     showBarGoBack: {
+      type: Boolean,
+      default: false
+    },
+    showShareUrl: {
       type: Boolean,
       default: false
     }
@@ -195,7 +200,10 @@
     >
       <template #header>
         <h2>{{ title }}</h2>
-        <ConsoleFeedback />
+        <div class="flex gap-2">
+          <ConsoleFeedback />
+          <ShareUrl v-if="showShareUrl" />
+        </div>
       </template>
       <div class="pb-16 w-full space-y-8">
         <form

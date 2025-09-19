@@ -1,0 +1,22 @@
+{
+  "syntaxError": {
+    "error": "SQL syntax error near 'INVALID': syntax error",
+    "details": "Invalid SQL syntax at line 1, column 1",
+    "statusCode": 400
+  },
+  "permissionError": {
+    "error": "Permission denied: insufficient privileges",
+    "details": "User does not have permission to perform this operation",
+    "statusCode": 403
+  },
+  "tableNotFound": {
+    "error": "Table 'unknown_table' does not exist",
+    "details": "Referenced table does not exist in the database",
+    "statusCode": 404
+  },
+  "connectionTimeout": {
+    "error": "Database connection timeout",
+    "details": "Query execution exceeded maximum timeout limit",
+    "statusCode": 408
+  }
+}

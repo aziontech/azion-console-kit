@@ -201,7 +201,14 @@ function createMarketplaceProductsItems() {
 //       icon: 'ai ai-edge-storage',
 //       id: 'object-storage',
 //       tag: 'Preview'
-//     }
+//     },
+//        {
+//         label: 'SQL Database',
+//         to: '/sql-database',
+//         icon: 'ai ai-edge-sql',
+//         tag: 'Preview',
+//         id: 'sql-database'
+//        }
 //   ]
 // }
 

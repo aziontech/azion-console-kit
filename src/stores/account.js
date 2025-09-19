@@ -22,7 +22,8 @@ export const useAccountStore = defineStore({
       DATA_STREAM_SAMPLING: 'data_streaming_sampling',
       MARKETPLACE_PRODUCTS: 'marketplace_products',
       HIDE_CREATE_OPTIONS: 'hide_create_options',
-      FORCE_REDIRECT_TO_CONSOLE: 'force_redirect_to_console'
+      FORCE_REDIRECT_TO_CONSOLE: 'force_redirect_to_console',
+      ENABLE_WAF_TUNING: 'enable_waf_tuning_details_save'
     }
   }),
   getters: {
@@ -31,6 +32,9 @@ export const useAccountStore = defineStore({
     },
     clientFlags(state) {
       return state.account?.client_flags
+    },
+    hasEnableWafTuning(state) {
+      return state.account?.client_flags?.includes(state.flags.ENABLE_WAF_TUNING)
     },
     hasActiveUserId(state) {
       return !!state.account?.id

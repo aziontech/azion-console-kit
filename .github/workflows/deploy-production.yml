@@ -39,3 +39,4 @@ jobs:
           CROSS_EDGE_SECRET: ${{ secrets.PROD_CROSS_EDGE_SECRET}}
           NODE_ENV: production
           VITE_ENVIRONMENT: production
+          VITE_PROD_SENTRY: ${{ secrets.PROD_SENTRY }}
