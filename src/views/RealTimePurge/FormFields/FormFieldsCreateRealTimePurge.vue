@@ -28,7 +28,7 @@
   const layerRadioOptions = [
     {
       title: 'Cache',
-      inputValue: 'edge_cache',
+      inputValue: 'cache',
       subtitle: `Purge content from Azion's cache layer.`
     },
     {
