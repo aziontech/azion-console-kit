@@ -130,10 +130,32 @@ export const WafAdapter = {
     if (attack.matchValue === '-') {
       attack.matchValue = null
     }
-    const hasSpecificMatch = attack.condition?.startsWith('specific_')
-    const suffix = attack.condition?.includes('_value') ? 'value' : 'name'
     const hasMatchValue = !!attack.matchValue
-    const hasValue = hasSpecificMatch && hasMatchValue
+    const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
+
+    const MAP_ZONES = {
+      query_string: hasMatchValue ? 'specific_query_string' : 'any_query_string',
+      request_body: hasMatchValue ? 'specific_body_form_field' : 'body_form_field',
+      request_header: hasMatchValue ? 'specific_http_header' : 'any_http_header',
+      body: hasMatchValue ? 'specific_body_form_field' : 'body_form_field',
+      file_name: 'file_extension',
+      raw_body: 'raw_body',
+      path: 'any_url',
+      cookie: hasMatchValue ? 'specific_http_header' : 'any_http_header'
+    }
+
+    const skipSuffix = ['any_url', 'raw_body', 'file_extension']
+
+    const match =
+      attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY
+        ? 'body_form_field'
+        : MAP_ZONES[attack.matchZone] || 'specific_http_header'
+
+    const hasSpecificMatch = match.startsWith('specific_')
+    const suffix = skipSuffix.includes(match) ? '' : `_${attack.matchesOn}`
+
+    const matchFormat = `${match}${suffix}`
+
     return {
       rule_id: attack.ruleId,
       ...(path && { path }),
@@ -144,10 +166,12 @@ export const WafAdapter = {
         .trim(),
       conditions: [
         {
-          match: attack.condition,
-          ...(hasValue && {
-            [suffix]: attack.matchValue
-          })
+          match: matchFormat,
+          ...(hasSpecificMatch &&
+            hasMatchValue && {
+              [attack.matchesOn]:
+                attack.matchZone === 'cookie' ? attack.matchZone : attack.matchValue
+            })
         }
       ]
     }
