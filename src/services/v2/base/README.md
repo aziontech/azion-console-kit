@@ -1,163 +1,228 @@
-# Sistema de Cache Avançado para @base/
+# Sistema Base v2 - TanStack Query + Cache Persistente
 
-## Visão Geral
+Sistema de serviços com cache inteligente usando TanStack Query integrado com IndexedDB/localStorage.
 
-Este documento descreve a implementação de um sistema de cache avançado que utiliza **IndexedDB como padrão** com **fallback para localStorage**, integrado com TanStack Query para diferentes cenários de persistência de dados.
+## 🏗️ Arquitetura
 
-## Objetivos
+```
+src/services/v2/base/
+├── BaseService.js        # Classe base para todos os serviços
+├── queryClient.js        # TanStack Query + cache persistente
+├── httpService.js        # Cliente HTTP com AbortController
+├── httpClient.js         # Wrapper do Axios
+├── abortManager.js       # Gerenciamento de cancelamento
+├── cache/
+│   ├── CacheManager.js   # IndexedDB + localStorage fallback
+│   ├── VersionManager.js # Limpeza automática por versão
+│   └── CacheConfig.js    # Configurações de cache
+└── index.js             # Exports + inicialização automática
+```
 
-- Utilizar IndexedDB por padrão com fallback automático para localStorage
-- Integração completa com TanStack Query para invalidações automáticas
-- Suporte a múltiplos cenários de cache com diferentes níveis de persistência
-- Invalidação automática do cache em novas versões do sistema
-- API simples e abstrata para uso nos serviços
-- Possibilidade de usar tambem metodos para cache de dados globais e dados do usuario sem o uso do tanstack query
+## 🚀 Uso Básico
 
-## Cenários de Cache
-
-### 1. Global Persistente
-- **Descrição**: Cache mantido mesmo após reload/restart do browser
-- **Uso**: Dados globais como configurações de sistema
-- **Duração**: Persistente até invalidação manual ou nova versão ou expiracao definida no tanstack query
-- **Exemplo**: `global.persistent`
-
-### 2. Global Não Persistente  
-- **Descrição**: Cache mantido apenas durante a sessão do browser
-- **Uso**: Dados temporários globais que não precisam persistir
-- **Duração**: Até fechar o browser ou trocar de aba ou expiracao definida no tanstack query
-- **Exemplo**: `global.session`
-
-### 3. User Persistente
-- **Descrição**: Cache por usuário mantido mesmo após reload
-- **Uso**: Configurações específicas do usuário, preferências
-- **Duração**: Persistente até logout ou nova versão ou expiracao definida no tanstack query
-- **Exemplo**: `user.persistent`
-
-### 4. User Não Persistente
-- **Descrição**: Cache por usuário apenas durante a sessão
-- **Uso**: Dados temporários do usuário
-- **Duração**: Até logout ou reload ou expiracao definida no tanstack query
-- **Exemplo**: `user.session`
-
-## API de Uso
-
-### Configuração Simples
+### 1. Criar um Serviço
 
 ```javascript
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService, CACHE_TYPES } from '@/services/v2/base'
 
-class MyService extends BaseService {
-  // Método 1: Usando enum de configuração pré-definida
-  async getData() {
-    return this.useQuery(
-      ['my-data'], 
-      fetchData,
-      { cacheType: 'user.persistent' }
-    )
+export class UserService extends BaseService {
+  // Cache nativo TanStack Query (apenas memória)
+  getUsers() {
+    return this.useQuery(['users'], () => this.http.get('/users'))
   }
 
-  // Método 2: Configuração customizada
-  async getGlobalData() {
-    return this.useQuery(
-      ['global-data'], 
-      fetchGlobalData,
-      { 
-        cacheConfig: {
-          type: 'global',
-          persistent: true,
-          ttl: 60 * 60 * 1000, // 1 hora
-        }
-      }
+  // Cache persistente do usuário (12h, IndexedDB)
+  getUserProfile() {
+    return this.useUserQuery(['profile'], () => this.http.get('/profile'))
+  }
+
+  // Cache persistente global (24h, IndexedDB)
+  getSystemConfig() {
+    return this.useGlobalQuery(['config'], () => this.http.get('/config'))
+  }
+
+  // Mutation com invalidação automática
+  updateProfile(data) {
+    return this.useMutation(
+      () => this.http.put('/profile', data),
+      { invalidateQueries: [['profile'], ['users']] }
     )
   }
 }
 ```
 
-### Configurações Pré-definidas
+### 2. Usar no Componente
 
 ```javascript
-const cacheTypes = {
-  'global.persistent': {
-    type: 'global',
-    persistent: true,
-    storage: 'auto',
-    ttl: 24 * 60 * 60 * 1000 // 24 horas
-  },
-  'global.session': {
-    type: 'global', 
-    persistent: false,
-    storage: 'session',
-    ttl: 1 * 60 * 60 * 1000 // 12 hora
-  },
-  'user.persistent': {
-    type: 'user',
-    persistent: true,
-    storage: 'auto',
-    ttl: 12 * 60 * 60 * 1000 // 12 horas
-  },
-  'user.session': {
-    type: 'user',
-    persistent: false,
-    storage: 'session',
-    ttl: 30 * 60 * 1000 // 10 minutos
+import { userService } from '@/services/user-service'
+
+export default {
+  setup() {
+    // Dados ficam em cache automaticamente
+    const { data: users, isLoading } = userService.getUsers()
+    const { data: profile } = userService.getUserProfile()
+    
+    const updateProfileMutation = userService.updateProfile()
+    
+    return { users, profile, isLoading, updateProfileMutation }
   }
 }
 ```
 
-## Integração com TanStack Query
+## 📦 Tipos de Cache
 
-### Invalidações Automáticas
+| Método | TTL | Persistente | Escopo | Uso |
+|--------|-----|-------------|---------|-----|
+| `useQuery()` | 5min | ❌ | Memória | Cache padrão TanStack Query |
+| `useUserQuery()` | 12h | ✅ | Por usuário | Dados específicos do usuário |
+| `useGlobalQuery()` | 24h | ✅ | Global | Configurações, dados compartilhados |
+
+## 🔧 Métodos Disponíveis
+
+### BaseService
 
 ```javascript
-// Quando TanStack Query invalida uma query
-queryClient.invalidateQueries(['user-data'])
+// Queries
+this.useQuery(key, fn, options)           // Cache nativo TanStack Query
+this.useUserQuery(key, fn, options)       // Cache persistente usuário  
+this.useGlobalQuery(key, fn, options)     // Cache persistente global
+this.useQueryWithCache(key, fn, options)  // Pré-carrega cache
 
-// O sistema de cache automaticamente:
-// 1. Remove do cache local (IndexedDB/localStorage)
-// 2. Força refetch dos dados
-// 3. Atualiza o cache com novos dados
+// Mutations  
+this.useMutation(fn, { invalidateQueries: [...] })
+
+// Gerenciamento
+this.invalidateQueries(pattern)
+this.clearCache()
+
+// HTTP
+this.http.request({ method, url, body, params })
 ```
 
-### Mutations e Cache
+### Configuração Avançada
 
 ```javascript
-// Após uma mutation bem-sucedida
-const mutation = useMutation({
-  mutationFn: updateUserData,
-  onSuccess: (data, variables) => {
-    // Automaticamente invalida cache relacionado
-    queryClient.invalidateQueries(['user-data', variables.userId])
-  }
+// Cache personalizado
+this.useQuery(['data'], fetchData, {
+  persistent: {
+    type: CACHE_TYPES.USER_PERSISTENT,
+    ttl: 2 * 60 * 60 * 1000  // 2 horas
+  },
+  staleTime: 10 * 60 * 1000    // 10 min fresh
 })
+
+// Query keys com objetos (suportado)
+this.useGlobalQuery(['solutions', { group: 'web', type: 'all' }], fetchSolutions)
 ```
 
-## Versionamento e Limpeza
+## ⚙️ Configurações TanStack Query
 
-### Sistema de Versões
+- **staleTime**: 5 minutos (dados considerados fresh)
+- **gcTime**: 10 minutos (tempo em memória após unused)
+- **retry**: 2 tentativas em caso de erro
+- **refetchOnWindowFocus**: false
+- **refetchOnReconnect**: true
 
+## 🗄️ Sistema de Cache
+
+### Cache Persistente
+
+- **IndexedDB** como storage principal
+- **localStorage** como fallback automático
+- **TTL** (Time To Live) respeitado automaticamente
+- **Versionamento** - limpa cache em atualizações da app
+
+### Fluxo de Cache
+
+1. **Query executada** → Verifica cache TanStack Query
+2. **Se não existe** → Verifica cache persistente (IndexedDB/localStorage)
+3. **Se existe e válido** → Retorna dados do cache (sem request)
+4. **Se inválido/inexistente** → Executa request + salva no cache
+
+### Serialização de Keys
+
+Query keys com objetos são serializadas automaticamente:
 ```javascript
-// versionManager.js detecta mudanças de versão
-const CURRENT_VERSION = '1.2.0'
-
-// Em nova versão:
-// 1. Limpa todo cache existente
-// 2. Reinicia com cache limpo
-// 3. Permite migração de dados se necessário
+['solutions', { group: 'web', type: 'all' }]
+// Vira: "solutions_{"group":"web","type":"all"}"
 ```
 
-### Estratégias de Limpeza
+## 🚨 Invalidação de Cache
 
-- **Automática**: Em novas versões do sistema
-- **Manual**: Via API de limpeza
-- **Por TTL**: Baseado no tempo de vida configurado
-- **Por Espaço**: Quando IndexedDB atinge limite
+### Automática
+- **Nova versão** da aplicação limpa todo cache
+- **TTL expirado** remove entrada automaticamente
+- **Mutations** invalidam queries relacionadas
 
-## Próximos Passos
+### Manual
+```javascript
+// Invalidar queries específicas
+this.invalidateQueries(['users'])
+this.invalidateQueries([['users'], ['profile']])
 
-1. Implementar storage adapters (IndexedDB, localStorage, sessionStorage)
-2. Criar cache manager com configurações pré-definidas
-3. Implementar version manager para limpeza automática
-4. Integrar com TanStack Query para invalidações
-5. Atualizar BaseService com nova API
+// Limpar todo cache
+this.clearCache()
+```
 
-**Nota**: Este sistema manterá compatibilidade com o sistema atual durante a migração, permitindo adoção gradual nos serviços existentes.
+## 🔄 Migração de Serviços Existentes
+
+### Passo 1: Herdar de BaseService
+```javascript
+// Antes
+class MyService {
+  async getData() {
+    return axios.get('/data')
+  }
+}
+
+// Depois
+class MyService extends BaseService {
+  async getData() {
+    return this.useQuery(['data'], () => this.http.get('/data'))
+  }
+}
+```
+
+### Passo 2: Adicionar Cache Conforme Necessário
+```javascript
+// Cache básico (memória)
+getUsers() {
+  return this.useQuery(['users'], () => this.http.get('/users'))
+}
+
+// Cache persistente usuário
+getUserProfile() {
+  return this.useUserQuery(['profile'], () => this.http.get('/profile'))
+}
+
+// Cache persistente global
+getSystemConfig() {
+  return this.useGlobalQuery(['config'], () => this.http.get('/config'))
+}
+```
+
+## 📊 Monitoramento
+
+### DevTools TanStack Query
+```javascript
+import { ReactQueryDevtools } from '@tanstack/vue-query-devtools'
+// Adicione no seu App.vue para debug
+```
+
+### Cache no DevTools
+- **Application → IndexedDB → azion_cache_db** - Cache persistente
+- **Application → Local Storage** - Fallback cache
+- **Console** - Logs de inicialização do cache
+
+## 🎯 Resumo dos Benefícios
+
+- ✅ **Cache automático** - TanStack Query + IndexedDB
+- ✅ **Zero configuração** - Funciona out-of-the-box  
+- ✅ **Evita requests** desnecessárias
+- ✅ **Offline-first** - Dados persistem entre sessões
+- ✅ **Versionamento** automático
+- ✅ **API simples** - Apenas 3 métodos principais
+- ✅ **Migração fácil** - Compatible com código existente
+- ✅ **Performance** - Dados carregam instantaneamente do cache
+
+**Sistema pronto para produção com cache inteligente e performance otimizada!**

@@ -1,141 +1,169 @@
 import { QueryClient, useQuery } from '@tanstack/vue-query'
+import { cacheManager } from './cache/CacheManager'
+import { VersionManager } from './cache/VersionManager'
+import { getCacheConfig } from './cache/CacheConfig'
 
-// ============================================================================
-// SIMPLE PERSISTENCE SYSTEM
-// ============================================================================
-const CACHE_PREFIX = 'azion_cache_'
-
-// Auto-detect if data should be global (persist across users)
-const isGlobalData = (queryKey) => {
-  const key = Array.isArray(queryKey) ? queryKey[1] : queryKey
-  return key === 'global' || key === 'solutions' || key === 'marketplace'
-}
-
-// Helper function to serialize queryKey properly
-const serializeQueryKey = (queryKey) => {
-  if (Array.isArray(queryKey)) {
-    return queryKey
-      .map((item) =>
-        typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item)
-      )
-      .join('_')
+class EnhancedQueryClient {
+  constructor() {
+    this.cacheManager = cacheManager
+    this.versionManager = new VersionManager(this.cacheManager)
+    this.queryClient = this._createQueryClient()
+    this.isInitialized = false
+    this.initializationPromise = null
   }
-  return String(queryKey)
-}
 
-// Simple cache operations
-const saveToCache = (queryKey, data) => {
-  try {
-    const key = serializeQueryKey(queryKey)
-    const cacheKey = `${CACHE_PREFIX}${key}`
-    const isGlobal = isGlobalData(queryKey)
+  async initialize() {
+    if (this.isInitialized) return
 
-    const cacheData = {
-      data,
-      timestamp: Date.now(),
-      isGlobal
+    if (this.initializationPromise) {
+      return this.initializationPromise
     }
 
-    localStorage.setItem(cacheKey, JSON.stringify(cacheData))
-  } catch (error) {
-    // Silent fail - cache is optional
+    this.initializationPromise = this._doInitialize()
+    return this.initializationPromise
   }
-}
 
-const loadFromCache = (queryKey) => {
-  try {
-    const key = serializeQueryKey(queryKey)
-    const cacheKey = `${CACHE_PREFIX}${key}`
-    const cached = localStorage.getItem(cacheKey)
+  async _doInitialize() {
+    await this.cacheManager.initialize()
+    await this.versionManager.initialize()
+    this._setupCacheSubscription()
+    
+    this.isInitialized = true
+  }
 
-    if (!cached) return null
+  async initializeEarly() {
+    await this.initialize()
+    return this.isInitialized
+  }
 
-    const { data, timestamp } = JSON.parse(cached)
+  _createQueryClient() {
+    return new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          gcTime: 10 * 60 * 1000, // 10 minutes
+          retry: 2,
+          refetchOnWindowFocus: false,
+          refetchOnReconnect: true
+        },
+        mutations: {
+          retry: 1
+        }
+      }
+    })
+  }
 
-    // Cache expires after 24 hours
-    if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem(cacheKey)
-      return null
+  _setupCacheSubscription() {
+    this.queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'updated' && event.query.state.status === 'success') {
+        this._handleQuerySuccess(event)
+      }
+    })
+  }
+
+  async _handleQuerySuccess(event) {
+    const { queryKey, state, meta } = event.query
+    
+    if (!state.data || !meta?.persistent) return
+
+    try {
+      const cacheKey = this._serializeQueryKey(queryKey)
+      const config = meta.persistent.type ? getCacheConfig(meta.persistent.type) : meta.persistent
+      
+      await this.cacheManager.set(cacheKey, state.data, {
+        ttl: config.ttl,
+        type: config.type,
+        userScope: meta.persistent.userScope
+      })
+    } catch (error) {
+      // Silent fail
     }
-
-    return data
-  } catch (error) {
-    return null
   }
-}
 
-// ============================================================================
-// QUERY CLIENT WITH AUTO-PERSISTENCE
-// ============================================================================
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: 2,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: true
-    },
-    mutations: {
-      retry: 1
+  _serializeQueryKey(queryKey) {
+    if (!Array.isArray(queryKey)) {
+      return String(queryKey)
     }
+    
+    return queryKey.map(item => {
+      if (item === null || item === undefined) {
+        return 'null'
+      }
+      if (typeof item === 'object') {
+        try {
+          const sortedKeys = Object.keys(item).sort()
+          const sortedObj = {}
+          sortedKeys.forEach(key => {
+            sortedObj[key] = item[key]
+          })
+          return JSON.stringify(sortedObj)
+        } catch (error) {
+          return 'invalid_object'
+        }
+      }
+      return String(item)
+    }).join('_')
   }
-})
 
-// Auto-save successful queries to cache
-queryClient.getQueryCache().subscribe((event) => {
-  if (event.type === 'updated' && event.query.state.status === 'success') {
-    const { queryKey, state } = event.query
-    if (state.data) {
-      saveToCache(queryKey, state.data)
-    }
-  }
-})
+  useQuery(options) {
+    const { queryKey, queryFn, persistent, ...restOptions } = options
 
-// ============================================================================
-// ENHANCED QUERY CLIENT WITH AUTO-CACHE
-// ============================================================================
-export const enhancedQueryClient = {
-  ...queryClient,
-
-  useQuery: (options) => {
-    const { queryKey, queryFn, ...restOptions } = options
-
-    const cached = loadFromCache(queryKey)
+    const enhancedQueryFn = persistent ? async () => {
+      const cachedData = await this._getCachedDataIfValid(queryKey)
+      if (cachedData) {
+        return cachedData
+      }
+      return queryFn()
+    } : queryFn
 
     return useQuery({
       queryKey,
-      queryFn,
-      ...(cached && { initialData: cached }),
+      queryFn: enhancedQueryFn,
+      meta: { persistent },
       ...restOptions
     })
   }
-}
 
-// ============================================================================
-// SIMPLE CACHE UTILITIES
-// ============================================================================
-export const cacheUtils = {
-  clear: () => {
-    const keys = Object.keys(localStorage)
-    keys
-      .filter((key) => key.startsWith(CACHE_PREFIX))
-      .forEach((key) => localStorage.removeItem(key))
-  },
-
-  clearGlobal: () => {
-    const keys = Object.keys(localStorage)
-    keys
-      .filter((key) => key.startsWith(CACHE_PREFIX))
-      .forEach((key) => {
-        try {
-          const cached = localStorage.getItem(key)
-          const { isGlobal } = JSON.parse(cached)
-          if (isGlobal) localStorage.removeItem(key)
-        } catch {
-          // Remove corrupted cache
-          localStorage.removeItem(key)
-        }
-      })
+  async _getCachedDataIfValid(queryKey) {
+    try {
+      await this.initialize()
+      const cacheKey = this._serializeQueryKey(queryKey)
+      return await this.cacheManager.get(cacheKey)
+    } catch (error) {
+      return null
+    }
   }
+
+  invalidateQueries(...args) {
+    return this.queryClient.invalidateQueries(...args)
+  }
+
+  setQueryData(...args) {
+    return this.queryClient.setQueryData(...args)
+  }
+
+  getQueryData(...args) {
+    return this.queryClient.getQueryData(...args)
+  }
+
+  async clearCache() {
+    await this.cacheManager.clear()
+  }
+
+  async preloadCache(queryKey) {
+    await this.initialize()
+    const existingData = this.queryClient.getQueryData(queryKey)
+    if (!existingData) {
+      const cachedData = await this._getCachedDataIfValid(queryKey)
+      if (cachedData) {
+        this.queryClient.setQueryData(queryKey, cachedData)
+        return cachedData
+      }
+    }
+    return existingData
+  }
+
 }
+
+export const enhancedQueryClient = new EnhancedQueryClient()
+export const queryClient = enhancedQueryClient.queryClient

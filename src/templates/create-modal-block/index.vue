@@ -260,7 +260,7 @@
   })
 
   const isEmptyDueToNoData = computed(() => {
-    return !hasInitialData.value && filteredTemplates.value.length === 0
+    return !hasInitialData.value && filteredTemplates.value.length === 0 && !isLoading.value
   })
 
   const resetFilters = () => {

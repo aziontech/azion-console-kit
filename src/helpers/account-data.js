@@ -1,31 +1,28 @@
-import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
-import { loadAccountJobRoleService } from '@/services/account-settings-services'
+import { accountService, userService, accountSettingsService, contractService } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
-import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo] = await Promise.all([
-    getAccountInfoService(),
-    getUserInfoService(),
-    loadAccountJobRoleService().then(({ jobRole }) => {
-      accountStore.setAccountData({
-        jobRole
-      })
-    })
+  const [accountInfo, userInfo, accountJobRole] = await Promise.all([
+    accountService.getAccountInfo({ prefetch: true }),
+    userService.getUserInfo({ prefetch: true }),
+    accountSettingsService.getAccountJobRole({ prefetch: true })
   ])
 
-  accountInfo.is_account_owner = userInfo.results.is_account_owner
-  accountInfo.client_id = userInfo.results.client_id
-  accountInfo.timezone = userInfo.results.timezone
-  accountInfo.utc_offset = userInfo.results.utc_offset
-  accountInfo.first_name = userInfo.results.first_name
-  accountInfo.last_name = userInfo.results.last_name
-  accountInfo.permissions = userInfo.results.permissions
-  accountInfo.email = userInfo.results.email
-  accountInfo.user_id = userInfo.results.id
+
+  accountInfo.jobRole = accountJobRole.jobRole
+  const userResults = userInfo.results || userInfo
+  accountInfo.is_account_owner = userResults.is_account_owner
+  accountInfo.client_id = userResults.client_id
+  accountInfo.timezone = userResults.timezone
+  accountInfo.utc_offset = userResults.utc_offset
+  accountInfo.first_name = userResults.first_name
+  accountInfo.last_name = userResults.last_name
+  accountInfo.permissions = userResults.permissions
+  accountInfo.email = userResults.email
+  accountInfo.user_id = userResults.id
   accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
 
@@ -47,9 +44,7 @@ export const loadProfileAndAccountInfo = async () => {
     }),
 
     accountInfo.client_id
-      ? loadContractServicePlan({
-          clientId: accountInfo.client_id
-        }).then(({ isDeveloperSupportPlan, yourServicePlan }) => {
+      ? contractService.getContractServicePlan(accountInfo.client_id, { prefetch: true }).then(({ isDeveloperSupportPlan, yourServicePlan }) => {
           accountStore.setAccountData({
             isDeveloperSupportPlan,
             yourServicePlan
