@@ -1,0 +1,76 @@
+{
+  "simpleSelect": {
+    "results": [
+      {
+        "columns": ["id", "name", "email", "created_at"],
+        "rows": [
+          [1, "John Doe", "john@example.com", "2024-01-01T10:00:00Z"],
+          [2, "Jane Smith", "jane@example.com", "2024-01-02T11:30:00Z"],
+          [3, "Bob Wilson", "bob@example.com", "2024-01-03T14:15:00Z"]
+        ],
+        "query_duration_ms": 15,
+        "rows_read": 3,
+        "rows_written": 0
+      }
+    ]
+  },
+  "emptyResult": {
+    "results": [
+      {
+        "columns": ["id", "name", "email"],
+        "rows": [],
+        "query_duration_ms": 5,
+        "rows_read": 0,
+        "rows_written": 0
+      }
+    ]
+  },
+  "insertResult": {
+    "results": [
+      {
+        "columns": [],
+        "rows": [],
+        "query_duration_ms": 8,
+        "rows_read": 0,
+        "rows_written": 1,
+        "changes": 1,
+        "last_insert_rowid": 4
+      }
+    ]
+  },
+  "aggregateResult": {
+    "results": [
+      {
+        "columns": ["total_users", "avg_age", "max_created"],
+        "rows": [
+          [150, 28.5, "2024-12-15T10:30:00Z"]
+        ],
+        "query_duration_ms": 42,
+        "rows_read": 150,
+        "rows_written": 0
+      }
+    ]
+  },
+  "largeDataset": {
+    "results": [
+      {
+        "columns": ["id", "product_name", "price", "category"],
+        "rows": [
+          [1, "MacBook Pro", 2499.99, "Electronics"],
+          [2, "iPhone 15", 999.99, "Electronics"],
+          [3, "AirPods Pro", 249.99, "Electronics"],
+          [4, "Magic Mouse", 99.99, "Accessories"],
+          [5, "Keyboard", 179.99, "Accessories"],
+          [6, "Monitor", 599.99, "Electronics"],
+          [7, "USB Cable", 29.99, "Accessories"],
+          [8, "SSD Drive", 199.99, "Storage"],
+          [9, "RAM Module", 149.99, "Components"],
+          [10, "Graphics Card", 799.99, "Components"]
+        ],
+        "query_duration_ms": 125,
+        "rows_read": 10,
+        "rows_written": 0
+      }
+    ]
+  }
+}

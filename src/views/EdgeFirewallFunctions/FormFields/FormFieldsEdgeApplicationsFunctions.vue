@@ -16,6 +16,8 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
+  const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
+
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
@@ -27,13 +29,12 @@
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
-
-  const emit = defineEmits(['toggleDrawer'])
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -78,8 +79,11 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
+    azionFormValidationErrors.value = event.errors || []
     azionFormArgsValue.value = indentJsonStringify(event.data)
     args.value = indentJsonStringify(event.data)
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -119,7 +123,9 @@
     azionFormData.value = {}
     schemaAzionForm.value = {}
     schemaAzionFormString.value = '{}'
+    azionFormValidationErrors.value = []
     azionForm.value = schemaAzionFormString.value
+    emit('additionalErrors', [])
   }
 
   const codeEditorFormBuilderUpdate = (value) => {
@@ -165,6 +171,7 @@
     azionFormData.value = argsJsonParser(args.value)
     schemaAzionFormString.value = azForm
     azionForm.value = schemaAzionFormString.value
+    azionFormValidationErrors.value = []
 
     setAzionFormSchema(argsJsonParser(azForm))
     setAzionFormEmptyState(argsJsonParser(azForm))

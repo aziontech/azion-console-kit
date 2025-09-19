@@ -206,6 +206,12 @@ export const WafAdapter = {
       body: parsedWafRulesAllowed
     }
   },
+  transformCloneWafRule(payload) {
+    return {
+      id: payload.id,
+      name: payload.cloneName
+    }
+  },
   transformLoadWafRuleAllowed({ data: waf }) {
     const formatConditions = waf.conditions.map((condition) => {
       const { suffix } = getPrefix(condition)

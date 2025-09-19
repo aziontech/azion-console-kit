@@ -3691,10 +3691,10 @@ axios@^1.7.4:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-azion-theme@^1.14.3:
-  version "1.14.3"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.3.tgz#c78b075145aa60d4eb0567e2e7b6042e95e277f5"
-  integrity sha512-satP2PYuzY92cZfEg1tzsI6Kp438rwduHHOTEmGtUef5ePWvF+1k86ek0KlRbI0BflHbG5HnmSRWVuykA4ZFUw==
+azion-theme@^1.14.5:
+  version "1.14.5"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.5.tgz#41b4fdf933bcbf97648b82cb98b0a933e54bc3f6"
+  integrity sha512-q1cXFy0pfWpgNZ4pIY7/lV4T7yfThLhEs1YChwJaWAVUutDUGKAv5Qcdmj6ECCmf6I5NI3rTcR8K1bmLwQtbWA==
 
 azion@^1.20.2:
   version "1.20.2"
@@ -5000,7 +5000,7 @@ define-lazy-prop@^3.0.0:
 
 define-properties@^1.1.3, define-properties@^1.2.1:
   version "1.2.1"
-  resolved "https://registry.npmjs.org/define-properties/-/define-properties-1.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/define-properties/-/define-properties-1.2.1.tgz#10781cc616eb951a80a034bafcaa7377f6af2b6c"
   integrity sha512-8QmQKqEASLd5nx0U1B1okLElbUuuttJ/AnYmRXbbbGDWh6uS208EjD4Xqq/I9wK7u0v6O08XhTWnt5XtEbR6Dg==
   dependencies:
     define-data-property "^1.0.1"
@@ -7981,7 +7981,7 @@ object-inspect@^1.9.0:
 
 object-is@^1.0.1, object-is@^1.1.5:
   version "1.1.6"
-  resolved "https://registry.npmjs.org/object-is/-/object-is-1.1.6.tgz"
+  resolved "https://registry.yarnpkg.com/object-is/-/object-is-1.1.6.tgz#1a6a53aed2dd8f7e6775ff870bea58545956ab07"
   integrity sha512-F8cZ+KfGlSGi09lJT7/Nd6KJZ9ygtvYC0/UYYLI9nmQKLMnydpB9yvbv9K1uSkEu7FU9vYPmVwLg328tX+ot3Q==
   dependencies:
     call-bind "^1.0.7"
