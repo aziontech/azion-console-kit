@@ -6,11 +6,11 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import CloneDialog from './Dialog/Clone.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2'
+  import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -31,9 +31,14 @@
       label: 'Clone',
       icon: 'pi pi-fw pi-clone',
       dialog: {
-        component: CloneDialog,
+        component: CloneBlock,
         body: (item) => ({
-          data: item
+          data: {
+            ...item,
+            service: edgeAppService.cloneEdgeApplicationService,
+            itemType: 'Application',
+            name: item.name.text
+          }
         })
       }
     },

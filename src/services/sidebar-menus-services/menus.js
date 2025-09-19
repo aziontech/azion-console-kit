@@ -201,6 +201,14 @@ function createStoreItems() {
       id: 'object-storage',
       tag: 'Preview'
     }
+    //  Uncoment this when database is ready
+    //  {
+    //   label: 'SQL Database',
+    //   to: '/sql-database',
+    //   icon: 'ai ai-edge-sql',
+    //   tag: 'Preview',
+    //   id: 'sql-database'
+    //  }
   ]
 }
 

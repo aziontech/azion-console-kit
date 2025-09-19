@@ -16,7 +16,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { edgeFunctionService } from '@/services/v2'
 
-  const emit = defineEmits(['toggleDrawer'])
+  const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
   const renderers = markRaw([...vanillaRenderers])
 
@@ -31,6 +31,7 @@
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const selectPanelOptions = ['Form', 'JSON']
@@ -79,8 +80,11 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
+    azionFormValidationErrors.value = event.errors || []
     azionFormArgsValue.value = indentJsonStringify(event.data)
     args.value = indentJsonStringify(event.data)
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -121,6 +125,8 @@
     schemaAzionForm.value = {}
     schemaAzionFormString.value = '{}'
     azionForm.value = schemaAzionFormString.value
+    azionFormValidationErrors.value = []
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const codeEditorFormBuilderUpdate = (value) => {
@@ -166,6 +172,7 @@
     azionFormData.value = argsJsonParser(args.value)
     schemaAzionFormString.value = azForm
     azionForm.value = schemaAzionFormString.value
+    azionFormValidationErrors.value = []
 
     setAzionFormSchema(argsJsonParser(azForm))
     setAzionFormEmptyState(argsJsonParser(azForm))
@@ -330,8 +337,8 @@
           class="flex flex-col gap-4"
         >
           <TitleDescriptionArea
-            :title="`Arguments`"
-            :description="`Configure the function arguments to customize its behavior.`"
+            title="Arguments"
+            description="Configure the function arguments to customize its behavior."
           />
           <div class="resize-y overflow-y-auto">
             <CodeEditor

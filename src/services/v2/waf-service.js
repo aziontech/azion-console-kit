@@ -70,14 +70,13 @@ export class WafService {
     return this.adapter?.transformLoadWafRule?.(response) ?? response
   }
 
-  cloneWafRule = async ({ wafRulesName, payload }) => {
+  cloneWafRule = async (payload) => {
+    const body = this.adapter?.transformCloneWafRule?.(payload) ?? payload
+
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/${payload.id}/clone`,
-      body: {
-        id: payload.id,
-        name: wafRulesName
-      }
+      body
     })
 
     return {
@@ -111,12 +110,12 @@ export class WafService {
 
   createWafRulesAllowedTuning = async ({ attackEvents, wafId, name }) => {
     const requests = attackEvents.flatMap((attack) => {
-      if (!attack?.paths?.length) {
+      if (!attack?.top10Paths) {
         const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name)
         return [this._createTuningRequest({ wafId, payload })]
       }
 
-      return attack.paths.map((path) => {
+      return attack.top10Paths.map(({ path }) => {
         const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name, path)
         return this._createTuningRequest({ wafId, payload })
       })

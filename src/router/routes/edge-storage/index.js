@@ -39,7 +39,8 @@ export const edgeStorageRoutes = {
             routeParam: 'id'
           }
         ]
-      }
+      },
+      alias: '/object-storage/:id'
     },
     {
       path: 'create',
