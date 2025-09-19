@@ -65,7 +65,7 @@ function formatC3DataProp(chartData, resultChart) {
   data.type = type
 
   if (isDate(resultChart[0][1], isTimeseries)) {
-    data.xFormat = '%Y-%m-%dT%H:%M:%S.%LZ'
+    data.xFormat = '%Y-%m-%dT%H:%M:%SZ'
   }
 
   return data
