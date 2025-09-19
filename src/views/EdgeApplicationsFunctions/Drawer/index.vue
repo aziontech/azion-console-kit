@@ -34,6 +34,7 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
+    :showShareUrl="true"
     @onSuccess="handleSuccessEdit"
     @onError="handleFailedToEdit"
     title="Edit Instance"
