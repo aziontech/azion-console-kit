@@ -197,9 +197,9 @@ function createMarketplaceProductsItems() {
 //   return [
 //     {
 //       label: 'Object Storage',
-//       to: '/edge-storage',
+//       to: '/object-storage',
 //       icon: 'ai ai-edge-storage',
-//       id: 'edge-storage',
+//       id: 'object-storage',
 //       tag: 'Preview'
 //     },
 //        {

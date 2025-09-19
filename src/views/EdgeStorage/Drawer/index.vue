@@ -8,7 +8,7 @@
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
   defineOptions({
-    name: 'edge-storage-drawer'
+    name: 'object-storage-drawer'
   })
 
   const emit = defineEmits(['onSuccess'])

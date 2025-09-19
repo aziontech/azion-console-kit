@@ -21,6 +21,7 @@
       :loading="isLoading"
       data-testid="data-table"
       rowHover
+      :rowClass="stateClassRules"
     >
       <template
         #header
@@ -561,6 +562,13 @@
       icon: firstAction?.icon,
       disabled: firstAction?.disabled
     }
+  }
+
+  const stateClassRules = (row) => {
+    if (selectedItems.value.find((item) => item.id === row.id)) {
+      return 'bg-[var(--table-body-row-hover-bg)] bg-altered'
+    }
+    return ''
   }
 
   defineExpose({ reload, data, handleExportTableDataToCSV })
