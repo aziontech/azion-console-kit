@@ -109,7 +109,7 @@
 <template>
   <form-horizontal
     title="Protocol Settings"
-    description="Configure the communication protocols used between the workload and its users. This section allows you to define security, compatibility, and performance settings to optimize how your workload operates at the edge."
+    description="Configure the communication protocols used between the Workload and its users. This section allows you to define security, compatibility, and performance settings to optimize how your Workload operates at the edge."
     data-testid="form-horizontal-protocol-settings"
   >
     <template #inputs>

@@ -127,7 +127,7 @@
 <template>
   <form-horizontal
     title="Domains"
-    description="Manage the domains linked to your application. Ensure proper DNS configuration by mapping CNAME records to the workload domain. You can also use Edge DNS to simplify domain management and seamlessly link your domains to Azion."
+    description="Manage the domains linked to your application. Ensure proper DNS configuration by mapping CNAME records to the Workload domain. You can also use Edge DNS to simplify domain management and seamlessly link your domains to Azion."
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
   >
@@ -151,7 +151,7 @@
             />
           </span>
           <small class="text-xs text-color-secondary font-normal leading-5">
-            The default domain used to route traffic to your workload.
+            The default domain used to route traffic to your Workload.
           </small>
         </div>
         <copyBlock :value="workloadHostname" />
@@ -296,7 +296,7 @@
           auto
           :isCard="false"
           title="Workload Domain Allow Access"
-          subtitle="Allow direct access to the default workload domain generated after workload creation (e.g id.map.azionedge.net)."
+          subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
         />
       </div>
     </template>

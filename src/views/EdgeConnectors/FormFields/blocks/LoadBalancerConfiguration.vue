@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="Load Balancer Configuration"
-    description="Configure load balancing settings to define how the Edge Connector distributes traffic and manages connections with origins."
+    description="Configure load balancing settings to define how the Connectors distributes traffic and manages connections with origins."
     data-testid="edge-connectors-form__section__load-balancer-configuration"
   >
     <template #inputs>
@@ -38,7 +38,7 @@
           :value="connectionTimeout"
           :min="1"
           :max="300"
-          description="Maximum time (in seconds) the Edge Connector will wait to establish a connection with the origin. Valid range: 1-300."
+          description="Maximum time (in seconds) the Connector will wait to establish a connection with the origin. Valid range: 1-300."
           data-testid="edge-connectors-form__load-balancer-configuration__connection-timeout-field"
         />
       </div>
@@ -50,7 +50,7 @@
           :value="readWriteTimeout"
           :min="1"
           :max="600"
-          description="Maximum time (in seconds) the Edge Connector will wait for data to be read from or written to the origin. Valid range: 1-600."
+          description="Maximum time (in seconds) the Connector will wait for data to be read from or written to the origin. Valid range: 1-600."
           data-testid="edge-connectors-form__load-balancer-configuration__read-write-timeout-field"
         />
       </div>

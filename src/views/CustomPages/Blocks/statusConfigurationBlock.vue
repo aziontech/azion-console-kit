@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="Status Configuration"
-    description="Configure the settings for the selected HTTP status code. Define how the custom page will behave, including its type, associated Edge Connector, and response details."
+    description="Configure the settings for the selected HTTP status code. Define how the custom page will behave, including its type, associated Connectors, and response details."
     :isDrawer="props.isDrawer"
   >
     <template #inputs>

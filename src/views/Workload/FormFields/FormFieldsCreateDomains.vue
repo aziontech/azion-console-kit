@@ -232,7 +232,7 @@
 
 <template>
   <form-horizontal
-    description="Create a workload with Azion to launch an Application and set up security with digital certificates."
+    description="Create a Workload with Azion to launch an Application and set up security with digital certificates."
     :isDrawer="isDrawer"
     :noBorder="noBorder"
   >
@@ -243,10 +243,10 @@
           label="Name"
           required
           name="name"
-          placeholder="My workload"
+          placeholder="My Workload"
           data-testid="domains-form__name-field"
           :value="name"
-          description="This is an identification name for the workload. Once you save the configuration, the URL will be automatically generated."
+          description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
         />
       </div>
     </template>
@@ -255,7 +255,7 @@
     :isDrawer="isDrawer"
     :noBorder="noBorder"
     title="Environment Type"
-    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment"
+    description="Select Global Edge Network to set this as a production Workload or select Staging Network for a testing Workload that won’t affect your production environment"
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
@@ -463,7 +463,7 @@
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"
-    description="Determine the Application of the workload and its digital certificate. To link an existing workload to an Application, add it to the CNAME field and block access to the Application via the Azion workload."
+    description="Determine the Application of the Workload and its digital certificate. To link an existing Workload to an Application, add it to the CNAME field and block access to the Application via the Azion Workload."
   >
     <template #title> Settings </template>
     <template #inputs>

@@ -212,7 +212,7 @@ describe('DomainsServicesV4', () => {
 
     const data = await sut(fixtures.domainMock)
 
-    expect(data.feedback).toBe('Your workload has been created')
+    expect(data.feedback).toBe('Your Workload has been created')
   })
 
   it('Should return an API error for an 400 response status', async () => {

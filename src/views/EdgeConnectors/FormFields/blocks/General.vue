@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create an edge connector to securely and efficiently connect your origins to Azion's Edge Network."
+    description="Create a Connector to securely and efficiently connect your origins to Azion's Edge Network."
     data-testid="edge-connectors-form__section__general"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"

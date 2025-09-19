@@ -98,10 +98,10 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Edge Connector successfully created',
+      feedback: 'Connector successfully created',
       actions: {
         link: {
-          label: 'View Edge Connector',
+          label: 'View Connector',
           callback: () => response.redirectToUrl(`/edge-connectors/edit/${response.data.id}`)
         }
       }
