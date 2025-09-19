@@ -192,25 +192,25 @@ function createMarketplaceProductsItems() {
   ]
 }
 
-//  Uncoment this when store is ready
-// function createStoreItems() {
-//   return [
-//     {
-//       label: 'Object Storage',
-//       to: '/object-storage',
-//       icon: 'ai ai-edge-storage',
-//       id: 'object-storage',
-//       tag: 'Preview'
-//     },
-//        {
-//         label: 'SQL Database',
-//         to: '/sql-database',
-//         icon: 'ai ai-edge-sql',
-//         tag: 'Preview',
-//         id: 'sql-database'
-//        }
-//   ]
-// }
+function createStoreItems() {
+  return [
+    {
+      label: 'Object Storage',
+      to: '/object-storage',
+      icon: 'ai ai-edge-storage',
+      id: 'object-storage',
+      tag: 'Preview'
+    }
+    //  Uncoment this when database is ready
+    //  {
+    //   label: 'SQL Database',
+    //   to: '/sql-database',
+    //   icon: 'ai ai-edge-sql',
+    //   tag: 'Preview',
+    //   id: 'sql-database'
+    //  }
+  ]
+}
 
 export function getMenuItens(showMarketplaceProductsItens) {
   const menus = [
@@ -225,11 +225,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
       label: 'Secure',
       items: createSecureItems()
     },
-    // Uncomment this when store is ready
-    // {
-    //   label: 'Store',
-    //   items: createStoreItems()
-    // },
+    {
+      label: 'Store',
+      items: createStoreItems()
+    },
     {
       label: 'Deploy',
       items: createDeployItems()
