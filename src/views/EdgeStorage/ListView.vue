@@ -216,6 +216,11 @@
       }
     ]
   })
+
+  const needFetchToAPI = computed(() => {
+    return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
+  })
+
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
     selectedBucket.value = bucket
@@ -294,7 +299,7 @@
   }
 
   const listEdgeStorageBucketFiles = async () => {
-    if (selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)) {
+    if (needFetchToAPI.value) {
       selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
         selectedBucket.value.name
       )
