@@ -175,7 +175,7 @@
         </template>
         <template
           #body="{ data: rowData }"
-          v-if="isRenderActions"
+          v-if="shouldShowActions"
         >
           <div
             class="flex justify-end"
@@ -427,11 +427,13 @@
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
-  const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
-  const classActions = isRenderActions
-    ? ''
-    : 'background-color: transparent !important; cursor: pointer !important;'
+  const shouldShowActions = ref(false)
+  const classActions = computed(() => {
+    return shouldShowActions.value
+      ? ''
+      : 'background-color: transparent !important; cursor: pointer !important;'
+  })
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
@@ -563,6 +565,7 @@
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
 
+    shouldShowActions.value = !!actions.length
     return actions
   }
 
