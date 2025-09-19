@@ -137,6 +137,7 @@ export const WafAdapter = {
     return {
       rule_id: attack.ruleId,
       ...(path && { path }),
+      operator: path ? 'regex' : 'contains',
       name: name
         .split('\n')
         .filter((line) => line.trim() !== '')

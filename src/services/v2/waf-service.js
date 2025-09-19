@@ -109,15 +109,24 @@ export class WafService {
     return { feedback: 'Your waf rule allowed has been created' }
   }
 
-  createWafRulesAllowedTuning = async ({ attackEvents, wafId, name }) => {
+  createWafRulesAllowedTuning = async ({ attackEvents, wafId, name, pathRegex }) => {
+    const pathToPayload = pathRegex ?? null
     const requests = attackEvents.flatMap((attack) => {
       if (!attack?.paths?.length) {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name)
+        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
+          attack,
+          name,
+          pathToPayload
+        )
         return [this._createTuningRequest({ wafId, payload })]
       }
 
-      return attack.paths.map((path) => {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name, path)
+      return attack.paths.map(() => {
+        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
+          attack,
+          name,
+          pathToPayload
+        )
         return this._createTuningRequest({ wafId, payload })
       })
     })

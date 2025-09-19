@@ -2,7 +2,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import DialogAllowRule from './Dialog'
+  import DrawerAllowRule from './Drawer/allowedRules.vue'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
 
@@ -73,7 +73,7 @@
   const totalRecordsFound = ref(0)
   const selectedDomainsNames = ref([])
   const isLoadingAllowed = ref(null)
-  const showDialogAllowRule = ref(false)
+  const showDrawerAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
@@ -304,7 +304,7 @@
   }
 
   const openDialog = (origin = 'page') => {
-    showDialogAllowRule.value = true
+    showDrawerAllowRule.value = true
     allowRuleOrigin.value = origin
     tracker.wafRules.clickedToAllowRules({ origin }).track()
   }
@@ -315,7 +315,7 @@
 
   const closeDialog = () => {
     isLoadingAllowed.value = null
-    showDialogAllowRule.value = false
+    showDrawerAllowRule.value = false
     allowedByAttacks.value = []
   }
 
@@ -328,7 +328,8 @@
     router.push({ name: `list-${handleTextDomainWorkload.pluralLabel}` })
   }
 
-  const handleSubmitAllowRules = async (nameAttack) => {
+  const handleSubmitAllowRules = async (data) => {
+    const { name, pathRegex } = data
     let attackEvents = []
     if (allowedByAttacks.value.length) {
       attackEvents = [...allowedByAttacks.value]
@@ -340,20 +341,21 @@
       const [{ status, reason, value }] = await wafService.createWafRulesAllowedTuning({
         attackEvents,
         wafId: wafRuleId.value,
-        name: nameAttack
+        name,
+        pathRegex
       })
 
       if (status === 'rejected') {
         throw new Error(reason.message || reason)
       }
 
-      showToast(value.feedback, 'Success', 'success')
       filterSearch()
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
       showDetailsOfAttack.value = false
       handleTrackAllowRule()
+      return value
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
@@ -597,11 +599,13 @@
   >
   </MoreDetailsDrawer>
 
-  <DialogAllowRule
-    v-model:visible="showDialogAllowRule"
+  <DrawerAllowRule
+    v-model:visible="showDrawerAllowRule"
     :isLoading="isLoadingAllowed"
-    @closeDialog="closeDialog"
+    :allowedByAttacks="allowedByAttacks"
+    :handleSubmitAllowRules="handleSubmitAllowRules"
+    @closeDrawer="closeDialog"
     @handleDescriptionOfAttack="handleSubmitAllowRules"
   >
-  </DialogAllowRule>
+  </DrawerAllowRule>
 </template>
