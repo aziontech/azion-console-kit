@@ -63,7 +63,6 @@
     edgeCacheEnabled: true,
     edgeFunctionsEnabled: true,
     imageProcessorEnabled: false,
-    tieredCacheEnabled: false,
     isActive: true
   })
 
