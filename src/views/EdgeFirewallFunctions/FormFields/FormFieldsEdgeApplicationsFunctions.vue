@@ -295,7 +295,7 @@
                       </div>
                       <div
                         class="max-w-[320px]"
-                        v-if="!showFormBuilder && !emptySchemaAzionForm"
+                        v-if="!showFormBuilder && (!emptySchemaAzionForm || !azionFormError)"
                       >
                         <JsonForms
                           :schema="schemaAzionForm"
@@ -305,7 +305,7 @@
                         />
                       </div>
                       <div
-                        v-else
+                        v-if="!showFormBuilder && (emptySchemaAzionForm || azionFormError)"
                         class="flex flex-col items-center justify-center gap-2 h-[364px]"
                       >
                         <p>Configure the form builder.</p>
