@@ -330,7 +330,7 @@
 
     <TabPanel header="Arguments">
       <div class="relative z-8 w-full">
-        <div class="absolute top-0 right-4 z-10 flex mt-[1rem]">
+        <div class="absolute top-0 right-8 z-10 flex mt-[1rem]">
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
