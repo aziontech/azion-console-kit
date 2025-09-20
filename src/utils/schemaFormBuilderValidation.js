@@ -97,7 +97,7 @@ const schemaRef = {
   }
 }
 
-const isValidSchema = (json, schema = schemaRef) => {
+const isValidFormBuilderSchema = (json, schema = schemaRef) => {
   let isValid = { valid: false, errors: null }
   const validate = ajv.compile(schema)
 
@@ -111,4 +111,4 @@ const isValidSchema = (json, schema = schemaRef) => {
   return isValid
 }
 
-export { isValidSchema }
+export { isValidFormBuilderSchema }
