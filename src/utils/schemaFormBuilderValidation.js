@@ -105,7 +105,7 @@ const isValidFormBuilderSchema = (json, schema = schemaRef) => {
     const valid = validate(json)
     isValid = { valid, errors: validate.errors }
   } catch (error) {
-    isValid.errors = [error.message]
+    isValid.errors = [{ message: error.message, type: error.name }]
   }
 
   return isValid
