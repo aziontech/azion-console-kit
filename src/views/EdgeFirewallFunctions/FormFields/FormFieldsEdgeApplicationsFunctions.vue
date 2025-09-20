@@ -135,7 +135,7 @@
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
       const isSchemaValid = isValidFormBuilderSchema(parsedValue)
-      
+
       if (isSchemaValid.valid) {
         azionFormError.value = false
         schemaAzionFormString.value = value
@@ -144,7 +144,6 @@
         azionFormError.value = true
         parsedValue = {}
       }
-
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
