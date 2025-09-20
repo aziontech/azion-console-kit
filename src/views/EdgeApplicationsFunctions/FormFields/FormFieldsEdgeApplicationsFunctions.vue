@@ -279,7 +279,7 @@
                   id="azionform"
                   class="azion-json-form"
                 >
-                  <div class="flex flex-col gap-4 overflow-y-auto h-[364px]">
+                  <div class="flex flex-col gap-4 overflow-y-auto h-[400px]">
                     <div>
                       <div
                         v-if="showFormBuilder"
@@ -295,30 +295,32 @@
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
                       </div>
-                      <div
-                        class="max-w-[320px]"
-                        v-if="!showFormBuilder && (!emptySchemaAzionForm || !azionFormError)"
-                      >
-                        <JsonForms
-                          :schema="schemaAzionForm"
-                          :data="azionFormData"
-                          :renderers="renderers"
-                          @change="onChangeAzionForm"
-                        />
-                      </div>
-                      <div
-                        v-if="!showFormBuilder && (emptySchemaAzionForm || azionFormError)"
-                        class="flex flex-col items-center justify-center gap-2 h-[364px]"
-                      >
-                        <p>Configure the form builder.</p>
-                        <!--
-                        <PrimeButton
-                          outlined
-                          @click="azionJsonFormWindowOpener()"
-                          label="Read documentation"
-                          size="small"
-                        />
-                        -->
+                      <div v-else>
+                        <div
+                          class="max-w-[320px]"
+                          v-if="!emptySchemaAzionForm || !azionFormError"
+                        >
+                          <JsonForms
+                            :schema="schemaAzionForm"
+                            :data="azionFormData"
+                            :renderers="renderers"
+                            @change="onChangeAzionForm"
+                          />
+                        </div>
+                        <div
+                          v-else
+                          class="flex flex-col items-center justify-center gap-2 h-[400px]"
+                        >
+                          <p>Configure the form builder.</p>
+                          <!--
+                          <PrimeButton
+                            outlined
+                            @click="azionJsonFormWindowOpener()"
+                            label="Read documentation"
+                            size="small"
+                          />
+                          -->
+                        </div>
                       </div>
                     </div>
                   </div>
