@@ -2,7 +2,6 @@ import Ajv from 'ajv'
 
 const ajv = new Ajv({ allErrors: true })
 const schemaRef = {
-  title: 'AzionFormSchema',
   type: 'object',
   properties: {
     type: {
