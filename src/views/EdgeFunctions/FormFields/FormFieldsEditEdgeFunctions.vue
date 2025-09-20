@@ -20,6 +20,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
+  import { isValidSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
 
   defineProps(['previewData', 'run'])
@@ -127,7 +128,14 @@
 
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-      azionFormError.value = false
+      const isSchemaValid = isValidSchema(parsedValue)
+
+      if (isSchemaValid.valid) {
+        azionFormError.value = false
+      } else {
+        azionFormError.value = true
+        parsedValue = {}
+      }
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
