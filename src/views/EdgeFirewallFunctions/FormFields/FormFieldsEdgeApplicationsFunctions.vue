@@ -14,6 +14,7 @@
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
+  import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
@@ -133,9 +134,17 @@
 
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-      schemaAzionFormString.value = value
-      azionForm.value = schemaAzionFormString.value
-      azionFormError.value = false
+      const isSchemaValid = isValidFormBuilderSchema(parsedValue)
+      
+      if (isSchemaValid.valid) {
+        azionFormError.value = false
+        schemaAzionFormString.value = value
+        azionForm.value = schemaAzionFormString.value
+      } else {
+        azionFormError.value = true
+        parsedValue = {}
+      }
+
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
