@@ -141,13 +141,16 @@
         azionFormError.value = false
         schemaAzionFormString.value = value
         azionForm.value = schemaAzionFormString.value
+        emit('additionalErrors', [])
       } else {
-        azionFormError.value = true
         parsedValue = {}
+        azionFormError.value = true
+        emit('additionalErrors', isSchemaValid.errors)
       }
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
+      emit('additionalErrors', [error])
     }
 
     setAzionFormEmptyState(parsedValue)
