@@ -75,6 +75,7 @@
       if (isSchemaValid.valid) {
         azionFormError.value = false
         setAzionFormSchema(parsedValue)
+        emit('additionalErrors', [])
       } else {
         parsedValue = {}
         azionFormError.value = true
