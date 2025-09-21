@@ -113,7 +113,7 @@
   }
 
   const setAzionFormEmptyState = function (value) {
-    emptySchemaAzionForm.value = !Object.keys(value).length
+    emptySchemaAzionForm.value = !value || !Object.keys(value).length
   }
 
   const setAzionFormSchema = (formSchema) => {
