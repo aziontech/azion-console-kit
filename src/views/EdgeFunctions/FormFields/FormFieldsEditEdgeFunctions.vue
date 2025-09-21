@@ -132,16 +132,18 @@
 
       if (isSchemaValid.valid) {
         azionFormError.value = false
+        setAzionFormSchema(parsedValue)
       } else {
-        azionFormError.value = true
         parsedValue = {}
+        azionFormError.value = true
+        emit('additionalErrors', isSchemaValid.errors)
       }
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
+      emit('additionalErrors', [error])
     }
 
-    setAzionFormSchema(parsedValue)
     setAzionFormEmptyState(parsedValue)
   }
 
@@ -167,8 +169,8 @@
     showFormBuilder.value = value === selectPanelOptions[1]
   }
 
-  const setAzionFormEmptyState = function (value) {
-    emptySchemaAzionForm.value = !value || !Object.keys(value).length
+  const setAzionFormEmptyState = function (value = {}) {
+    emptySchemaAzionForm.value = !Object.keys(value).length
   }
 
   const setAzionFormSchema = (formSchema) => {
