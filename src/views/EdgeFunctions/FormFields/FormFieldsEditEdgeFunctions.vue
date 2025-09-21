@@ -284,6 +284,10 @@
         @resizestart="previewState = false"
         @resizeend="previewState = true"
         :layout="SPLITTER_PROPS.layout"
+        :pt="{
+          gutter: { style: { backgroundColor: 'transparent' } },
+          gutterHandle: { style: { backgroundColor: 'transparent' } }
+        }"
       >
         <SplitterPanel
           :size="SPLITTER_PROPS.panelsSizes[0]"
@@ -344,6 +348,10 @@
           @resizestart="showPreview = false"
           @resizeend="showPreview = true"
           :layout="SPLITTER_PROPS.layout"
+          :pt="{
+            gutter: { style: { backgroundColor: 'transparent' } },
+            gutterHandle: { style: { backgroundColor: 'transparent' } }
+          }"
           v-if="!showFormBuilder"
         >
           <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
@@ -365,6 +373,10 @@
             @resizestart="showPreview = false"
             @resizeend="showPreview = true"
             :layout="SPLITTER_PROPS.layout"
+            :pt="{
+              gutter: { style: { backgroundColor: 'transparent' } },
+              gutterHandle: { style: { backgroundColor: 'transparent' } }
+            }"
             v-if="showFormBuilder"
           >
             <SplitterPanel
