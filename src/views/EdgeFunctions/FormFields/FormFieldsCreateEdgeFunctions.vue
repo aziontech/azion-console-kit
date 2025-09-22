@@ -183,16 +183,21 @@
   ]
 
   const setViewport = (innerWidth = '') => {
-    if(innerWidth < 640) return ''
-    if(innerWidth >= 640 && innerWidth < 768) return'sm'
-    if(innerWidth >= 768 && innerWidth < 1024) return 'md'
-    if(innerWidth >= 1024 && innerWidth < 1280) return 'lg'
-    if(innerWidth >= 1280 && innerWidth < 1536) return 'xl'
-    if(innerWidth >= 1536) return '2xl'
+    if (innerWidth < 640) return ''
+    if (innerWidth >= 640 && innerWidth < 768) return 'sm'
+    if (innerWidth >= 768 && innerWidth < 1024) return 'md'
+    if (innerWidth >= 1024 && innerWidth < 1280) return 'lg'
+    if (innerWidth >= 1280 && innerWidth < 1536) return 'xl'
+    if (innerWidth >= 1536) return '2xl'
   }
 
   const setSplitterDirection = () => {
-    if(viewPort.value === '' || viewPort.value === 'sm' || viewPort.value === 'md' || viewPort.value === 'lg') {
+    if (
+      viewPort.value === '' ||
+      viewPort.value === 'sm' ||
+      viewPort.value === 'md' ||
+      viewPort.value === 'lg'
+    ) {
       SPLITTER_PROPS.value = {
         height: '',
         layout: 'vertical',
@@ -352,23 +357,25 @@
 
     <TabPanel header="Arguments">
       <div class="w-full mt-4">
-        <div class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 mb-[-3px]">
+        <div
+          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 mb-[-3px]"
+        >
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
-            :pt="() => ({
-              root: {
-                class: 'p-0'
-              }
-            })"
+            :pt="
+              () => ({
+                root: {
+                  class: 'p-0'
+                }
+              })
+            "
             @update:modelValue="selectPanelUpdateModelValue"
           />
         </div>
 
         <Splitter
           :style="{ height: SPLITTER_PROPS.height }"
-          @resizestart="showPreview = false"
-          @resizeend="showPreview = true"
           :layout="SPLITTER_PROPS.layout"
           :pt="{
             root: {
@@ -393,8 +400,6 @@
         <div v-if="hasFormBuilder">
           <Splitter
             :style="{ height: SPLITTER_PROPS.height }"
-            @resizestart="showPreview = false"
-            @resizeend="showPreview = true"
             :layout="SPLITTER_PROPS.layout"
             :pt="{
               root: {
