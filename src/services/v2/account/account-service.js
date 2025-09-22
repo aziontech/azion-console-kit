@@ -20,15 +20,17 @@ export class AccountService extends BaseService {
     const { prefetch = false } = options
     
     if (prefetch) {
-      return this.fetchUserQuery(
+      return this.prefetchQuery(
         ['account', 'info'],
-        () => this.fetchAccountInfo()
+        () => this.fetchAccountInfo(),
+        { persistent: 'user.persistent', isUser: true }
       )
     }
     
-    return this.useUserQuery(
+    return this.useQuery(
       ['account', 'info'],
-      () => this.fetchAccountInfo()
+      () => this.fetchAccountInfo(),
+      { persistent: 'user.persistent', isUser: true, ...options }
     )
   }
 

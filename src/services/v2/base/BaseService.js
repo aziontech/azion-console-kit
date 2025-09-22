@@ -17,41 +17,33 @@ export class BaseService {
 
   buildQueryKey(key, { isGlobal = false, isUser = true } = {}) {
     const keys = Array.isArray(key) ? key : [key]
-    const keyCondition = []
+    const prefix = []
 
     if (isGlobal) {
-      keyCondition.push('global')
-    }
-    if (isUser) {
+      prefix.push('global')
+    } else if (isUser) {
       const accountStore = useAccountStore()
       const { user_id: accountId } = accountStore.accountData
-      const id = accountId || 'default'
-      keyCondition.push(id)
+      prefix.push(accountId || 'sensitive')
     }
 
-    return [...keyCondition, ...keys]
+    return [...prefix, ...keys]
   }
 
   _buildPersistentConfig(persistent, isUser, isGlobal) {
     if (!persistent) return null
 
-    let persistentConfig = null
-    if (typeof persistent === 'string') {
-      persistentConfig = {
-        type: persistent,
-        ...getCacheConfig(persistent)
-      }
-    } else {
-      persistentConfig = persistent
-    }
+    const config = typeof persistent === 'string' 
+      ? { type: persistent, ...getCacheConfig(persistent) }
+      : persistent
 
     if (isUser && !isGlobal) {
       const accountStore = useAccountStore()
       const { user_id: accountId } = accountStore.accountData
-      persistentConfig.userScope = accountId || 'default'
+      config.userScope = accountId || 'sensitive'
     }
 
-    return persistentConfig
+    return config
   }
 
   useQuery(key, queryFn, options = {}) {
@@ -159,15 +151,16 @@ export class BaseService {
     await this.queryClient.clearCache()
   }
 
-  async useQueryWithCache(key, queryFn, options = {}) {
-    const { persistent, isGlobal, isUser } = options
-    const queryKey = this.buildQueryKey(key, { isGlobal, isUser })
-
-    if (persistent) {
-      await this.queryClient.preloadCache(queryKey)
+  async clearUserCache() {
+    const accountStore = useAccountStore()
+    const { user_id: accountId } = accountStore.accountData || {}
+    
+    if (accountId) {
+      // Limpar queries do TanStack Query
+      await this.queryClient.invalidateQueries({ queryKey: [accountId] })
+      
+      // Limpar cache persistente do usuário
+      await this.queryClient.clearUserPersistentCache(accountId)
     }
-
-    return this.useQuery(key, queryFn, options)
   }
-
 }

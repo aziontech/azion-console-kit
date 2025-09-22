@@ -6,7 +6,7 @@ export class HttpService {
   constructor() {
     this.httpClient = new HttpClient()
     this.abortManager = new AbortManager()
-    this.errorHandler = new errorHandler()
+    this.errorHandler = errorHandler
     this.buildQueryParams = buildQueryParams
   }
 

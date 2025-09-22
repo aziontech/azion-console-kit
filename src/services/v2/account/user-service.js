@@ -19,15 +19,17 @@ export class UserService extends BaseService {
     const { prefetch = false } = options
     
     if (prefetch) {
-      return this.fetchUserQuery(
+      return this.prefetchQuery(
         ['user', 'info'],
-        () => this.fetchUserInfo()
+        () => this.fetchUserInfo(),
+        { persistent: 'user.persistent', isUser: true }
       )
     }
     
-    return this.useUserQuery(
+    return this.useQuery(
       ['user', 'info'],
-      () => this.fetchUserInfo()
+      () => this.fetchUserInfo(),
+      { persistent: 'user.persistent', isUser: true, ...options }
     )
   }
 

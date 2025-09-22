@@ -19,10 +19,10 @@ export class CacheManager {
   async _openDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1)
-      
+
       request.onerror = () => reject(request.error)
       request.onsuccess = () => resolve(request.result)
-      
+
       request.onupgradeneeded = (event) => {
         const db = event.target.result
         if (!db.objectStoreNames.contains(this.storeName)) {
@@ -52,22 +52,25 @@ export class CacheManager {
     }
   }
 
-  async get(key) {
+  async _getEntry(key) {
     await this.initialize()
 
-    let entry
     if (this.useLocalStorage) {
       const stored = localStorage.getItem(`azion_cache_${key}`)
-      entry = stored ? JSON.parse(stored) : null
+      return stored ? JSON.parse(stored) : null
     } else {
       const tx = this.db.transaction([this.storeName], 'readonly')
-      entry = await new Promise((resolve) => {
+      return new Promise((resolve) => {
         const request = tx.objectStore(this.storeName).get(key)
         request.onsuccess = () => resolve(request.result)
         request.onerror = () => resolve(null)
       })
     }
+  }
 
+  async get(key) {
+    const entry = await this._getEntry(key)
+    
     if (!entry) return null
 
     if (entry.ttl && Date.now() - entry.timestamp > entry.ttl) {
@@ -94,7 +97,7 @@ export class CacheManager {
 
     if (this.useLocalStorage) {
       const keys = Object.keys(localStorage)
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key.startsWith('azion_cache_')) {
           const entry = JSON.parse(localStorage.getItem(key) || '{}')
           if (this._matchesCriteria(entry, criteria)) {
@@ -106,7 +109,7 @@ export class CacheManager {
       const tx = this.db.transaction([this.storeName], 'readwrite')
       const store = tx.objectStore(this.storeName)
       const request = store.openCursor()
-      
+
       request.onsuccess = (event) => {
         const cursor = event.target.result
         if (cursor) {

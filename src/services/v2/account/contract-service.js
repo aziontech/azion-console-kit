@@ -19,15 +19,17 @@ export class ContractService extends BaseService {
     const { prefetch = false } = options
     
     if (prefetch) {
-      return this.fetchUserQuery(
+      return this.prefetchQuery(
         ['contract', 'service-plan', clientId],
-        () => this.fetchContractServicePlan(clientId)
+        () => this.fetchContractServicePlan(clientId),
+        { persistent: 'user.persistent', isUser: true }
       )
     }
     
-    return this.useUserQuery(
+    return this.useQuery(
       ['contract', 'service-plan', clientId],
-      () => this.fetchContractServicePlan(clientId)
+      () => this.fetchContractServicePlan(clientId),
+      { persistent: 'user.persistent', isUser: true, ...options }
     )
   }
 

@@ -19,15 +19,17 @@ export class AccountSettingsService extends BaseService {
     const { prefetch = false } = options
     
     if (prefetch) {
-      return this.fetchUserQuery(
+      return this.prefetchQuery(
         ['account', 'job-role'],
-        () => this.fetchAccountJobRole()
+        () => this.fetchAccountJobRole(),
+        { persistent: 'user.persistent', isUser: true }
       )
     }
     
-    return this.useUserQuery(
+    return this.useQuery(
       ['account', 'job-role'],
-      () => this.fetchAccountJobRole()
+      () => this.fetchAccountJobRole(),
+      { persistent: 'user.persistent', isUser: true, ...options }
     )
   }
 

@@ -38,7 +38,7 @@
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
-  import socialIdpsData from '@/config/social-idps'
+  import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
 
