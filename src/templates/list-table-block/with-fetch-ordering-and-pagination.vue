@@ -373,16 +373,13 @@
       }"
     >
       <button
-        @click="copyToClipboard"
-        title="Copiar texto"
+        v-for="item in quickActions"
+        :key="item"
+        @click="item.action"
+        :title="item.title"
+        class="px-2"
       >
-        <i class="pi pi-copy text-sm"></i>
-      </button>
-      <button
-        @click="searchText"
-        title="Pesquisar texto"
-      >
-        <i class="pi pi-search text-sm"></i>
+        <i :class="item.icon"></i>
       </button>
     </div>
   </div>
@@ -521,6 +518,10 @@
     showLastModified: {
       type: Boolean,
       default: false
+    },
+    showContrastInactiveLine: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -594,7 +595,9 @@
 
   const getRowClass = computed(() => {
     return (rowData) => {
-      return rowData?.active?.content === 'Inactive' ? 'opacity-50' : ''
+      return props.showContrastInactiveLine && rowData?.active?.content === 'Inactive'
+        ? 'opacity-50'
+        : ''
     }
   })
   /**
@@ -1084,6 +1087,18 @@
 
     fetchOnSearch()
   }
+  const quickActions = [
+    {
+      title: 'Copy to clipboard',
+      icon: 'pi pi-copy',
+      action: copyToClipboard
+    },
+    {
+      title: 'Search text',
+      icon: 'pi pi-search',
+      action: searchText
+    }
+  ]
 
   defineExpose({ reload, handleExportTableDataToCSV })
 </script>
@@ -1098,12 +1113,13 @@
     outline: 2px dashed #f97316 !important;
     outline-offset: -2px;
     transition-delay: 0.3s;
+    border-radius: 0 6px 6px 6px;
   }
   .popup-container {
     background-color: #f97316;
     color: white;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: 6px 6px 0 0;
     display: flex;
     align-items: center;
     gap: 2px;

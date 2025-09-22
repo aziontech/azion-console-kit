@@ -88,8 +88,6 @@
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
-        quickActions: true,
-        showInactiveTag: true,
         component: (columnData) => {
           return columnBuilder({
             data: { value: columnData.text, showMoreText: false },
@@ -105,8 +103,11 @@
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor',
-        quickActions: true
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })
@@ -146,7 +147,6 @@
         data-testid="edge-applications-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        showLastModified
       />
       <EmptyResultsBlock
         v-else
