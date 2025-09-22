@@ -115,6 +115,7 @@
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
+          :class="{ 'opacity-60': item.disabled }"
           @onRadioChange="emit('onRadioChange', item.inputValue)"
           :data-testid="radioTestId(item.name, props.nameField, index)"
         >
