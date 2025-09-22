@@ -13,6 +13,7 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { wafRulesTuningGqlService } from '@/services/v2'
 

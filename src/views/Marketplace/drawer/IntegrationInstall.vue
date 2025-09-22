@@ -159,7 +159,7 @@
   }
 
   const handleCreateNew = () => {
-    router.push('/edge-applications/create?origin=marketplace')
+    router.push('/applications/create?origin=marketplace')
   }
 
   const handleLoading = () => {

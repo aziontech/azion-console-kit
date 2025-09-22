@@ -30,7 +30,7 @@ const parseHttpResponse = (httpResponse) => {
     case 202:
       return {
         feedback: 'Your Application has been created',
-        urlToEditView: `/edge-applications/config/${httpResponse.body.data.id}`,
+        urlToEditView: `/applications/config/${httpResponse.body.data.id}`,
         applicationId: httpResponse.body.data.id
       }
     case 500:

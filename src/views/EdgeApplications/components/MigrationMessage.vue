@@ -50,7 +50,7 @@
   const router = useRouter()
 
   const navigateToEdgeConnectors = () => {
-    router.push('/edge-connectors')
+    router.push('/connectors')
   }
 
   const navigateToCustomPages = () => {

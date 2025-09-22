@@ -109,6 +109,10 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+// Edge SQL
+import { EdgeSQLService } from './edge-sql-service'
+import { EdgeSQLAdapter } from './adapters/edge-sql-adapter'
+
 // Edge App Error Response
 import { EdgeAppErrorResponseAdapter } from './adapters/edge-app-error-response-adapter'
 import { EdgeAppErrorResponseService } from './edge-app-error-response-service'
@@ -189,7 +193,10 @@ const workloadService = new WorkloadService(
   digitalCertificatesService,
   DigitalCertificatesAdapter
 )
+
 const wafRulesTuningGqlService = new WafRulesTuningGqlService(httpService, WafRulesTuningGqlAdapter)
+
+const edgeSQLService = new EdgeSQLService(httpService, EdgeSQLAdapter)
 
 const activityHistoryService = new ActivityHistoryService(
   httpService,
@@ -229,7 +236,8 @@ export {
   workloadService,
   workloadDeploymentService,
   edgeStorageService,
-  wafRulesTuningGqlService,
+  edgeSQLService,
   activityHistoryService,
-  iamService
+  iamService,
+  wafRulesTuningGqlService
 }
