@@ -160,7 +160,6 @@
         data-testid="edge-applications-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        showLastModified
       />
       <EmptyResultsBlock
         v-else
