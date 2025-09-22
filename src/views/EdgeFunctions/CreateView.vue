@@ -76,7 +76,7 @@
       actions: {
         link: {
           label: 'View Function',
-          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
+          callback: () => response.redirectToUrl(`/functions/edit/${response.functionId}`)
         }
       }
     }

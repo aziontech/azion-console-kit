@@ -149,8 +149,8 @@
       <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Application"
-        createPagePath="/edge-applications/create?origin=list"
-        editPagePath="/edge-applications/edit"
+        createPagePath="/applications/create?origin=list"
+        editPagePath="/applications/edit"
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :apiFields="EDGE_APPLICATION_API_FIELDS"
@@ -167,7 +167,7 @@
         title="No applications have been created"
         description="Click the button below to create your first Application."
         createButtonLabel="Application"
-        createPagePath="/edge-applications/create?origin=list"
+        createPagePath="/applications/create?origin=list"
         :documentationService="props.documentationService"
         data-testid="edge-applications-empty-results-block"
       >
