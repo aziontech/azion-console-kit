@@ -20,10 +20,11 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
+  import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
 
   defineProps(['previewData', 'run'])
-  const emit = defineEmits(['update:previewData', 'update:run', 'update:name'])
+  const emit = defineEmits(['update:previewData', 'update:run', 'update:name', 'additionalErrors'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -37,6 +38,7 @@
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
   const selectPanelOptions = ['JSON', 'Form Builder']
@@ -126,13 +128,23 @@
 
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-      azionFormError.value = false
+      const isSchemaValid = isValidFormBuilderSchema(parsedValue)
+
+      if (isSchemaValid.valid) {
+        azionFormError.value = false
+        setAzionFormSchema(parsedValue)
+        emit('additionalErrors', [])
+      } else {
+        parsedValue = {}
+        azionFormError.value = true
+        emit('additionalErrors', isSchemaValid.errors)
+      }
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
+      emit('additionalErrors', [error])
     }
 
-    setAzionFormSchema(parsedValue)
     setAzionFormEmptyState(parsedValue)
   }
 
@@ -158,7 +170,7 @@
     showFormBuilder.value = value === selectPanelOptions[1]
   }
 
-  const setAzionFormEmptyState = function (value) {
+  const setAzionFormEmptyState = function (value = {}) {
     emptySchemaAzionForm.value = !value || !Object.keys(value).length
   }
 
@@ -167,8 +179,12 @@
   }
 
   const onChangeAzionForm = (event) => {
+    azionFormValidationErrors.value = event.errors || []
+
     codeEditorArgsUpdate(indentJsonStringify(event.data))
     setAzionFormData(event.data)
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const setDefaultFormBuilder = () => {
@@ -183,6 +199,9 @@
     schemaAzionFormString.value = '{}'
     azionForm.value = {}
     emptySchemaAzionForm.value = true
+    azionFormValidationErrors.value = []
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 </script>
 
@@ -268,6 +287,10 @@
         @resizestart="previewState = false"
         @resizeend="previewState = true"
         :layout="SPLITTER_PROPS.layout"
+        :pt="{
+          gutter: { style: { backgroundColor: 'transparent' } },
+          gutterHandle: { style: { backgroundColor: 'transparent' } }
+        }"
       >
         <SplitterPanel
           :size="SPLITTER_PROPS.panelsSizes[0]"
@@ -314,7 +337,7 @@
 
     <TabPanel header="Arguments">
       <div class="relative z-8 w-full">
-        <div class="absolute top-0 right-4 z-10 flex mt-[1rem]">
+        <div class="absolute top-0 right-8 z-10 flex mt-[1rem]">
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
@@ -328,6 +351,10 @@
           @resizestart="showPreview = false"
           @resizeend="showPreview = true"
           :layout="SPLITTER_PROPS.layout"
+          :pt="{
+            gutter: { style: { backgroundColor: 'transparent' } },
+            gutterHandle: { style: { backgroundColor: 'transparent' } }
+          }"
           v-if="!showFormBuilder"
         >
           <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
@@ -349,6 +376,10 @@
             @resizestart="showPreview = false"
             @resizeend="showPreview = true"
             :layout="SPLITTER_PROPS.layout"
+            :pt="{
+              gutter: { style: { backgroundColor: 'transparent' } },
+              gutterHandle: { style: { backgroundColor: 'transparent' } }
+            }"
             v-if="showFormBuilder"
           >
             <SplitterPanel
