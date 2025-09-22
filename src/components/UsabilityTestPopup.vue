@@ -12,12 +12,12 @@
     <transition name="fade">
       <div
         v-if="isVisible"
-        class="surface-card border-round-md overflow-hidden w-30rem border surface-border"
+        class="surface-200 border-round-md overflow-hidden w-30rem border border-[var(--surface-400)]"
         style="position: fixed; bottom: 4.25rem; left: 1.5rem; z-index: 1100"
       >
-        <div class="surface-section p-4 border-bottom-1 surface-border">
-          <div class="flex justify-content-between align-items-center mb-3">
-            <h3 class="text-xl font-medium text-color m-0">Teste de Usabilidade</h3>
+        <div class="surface-200 p-3 border-bottom-1 border-[var(--surface-400)]">
+          <div class="flex justify-content-between align-items-center">
+            <h3 class="text-lg font-medium text-color m-0">Teste de Usabilidade</h3>
           </div>
         </div>
 
@@ -28,7 +28,7 @@
           <div
             v-for="task in tasks"
             :key="task.id"
-            class="p-3 border-bottom-1 surface-border flex align-items-center justify-content-between"
+            class="p-4 border-bottom-1 border-[var(--surface-500)] flex align-items-center justify-content-between"
             :class="{ 'bg-green-500/10 dark:bg-green-900/20': task.completed }"
           >
             <div class="flex align-items-center gap-3">
@@ -40,7 +40,7 @@
                 }"
               />
               <div>
-                <p class="text-color font-medium m-0">{{ task.description }}</p>
+                <p class="text-color font-medium m-0 leading-none">{{ task.description }}</p>
                 <span class="text-color-secondary text-sm">{{ task.category }}</span>
               </div>
             </div>
@@ -60,14 +60,14 @@
               {{ completedTasks }}/{{ tasks.length }} tarefas concluídas
             </span>
             <div class="flex align-items-center gap-2">
-              <Button
+              <!-- <Button
                 v-if="allTasksCompleted && !hasCompletedSurvey"
                 icon="pi pi-star"
                 label="Avaliar"
                 size="small"
                 @click="showSurvey = true"
                 severity="secondary"
-              />
+              /> -->
               <Button
                 icon="pi pi-replay"
                 size="small"
@@ -109,13 +109,14 @@
             :cancel="false"
             class="mb-2"
             :pt="{
-              onIcon: { class: 'text-yellow-400' },
-              offIcon: { class: 'text-color-secondary' }
+              root: { class: 'w-full justify-around flex' },
+              onIcon: { class: 'text-color' },
+              offIcon: { class: 'text-color-secondary hover:text-color' }
             }"
           />
           <div class="flex justify-content-between text-color-secondary text-sm">
-            <span>Não gostei</span>
-            <span>Muito bom</span>
+            <span>Muito difícil</span>
+            <span>Muito fácil</span>
           </div>
         </div>
 
@@ -245,8 +246,8 @@
     // Show success message
     toast.add({
       severity: 'success',
-      summary: 'Sucesso',
-      detail: 'O teste de usabilidade foi reiniciado com sucesso!',
+      summary: 'Success',
+      detail: 'The usability test has been reset successfully!',
       life: 3000
     })
   }
@@ -301,8 +302,8 @@
 
       toast.add({
         severity: 'success',
-        summary: 'Obrigado!',
-        detail: 'Sua avaliação foi enviada com sucesso!',
+        summary: 'Success',
+        detail: 'Your survey has been submitted successfully!',
         life: 3000
       })
     } catch (error) {
@@ -382,8 +383,6 @@
       checkToast(message)
       originalToastAdd(message)
     }
-
-
 
     try {
       // Initial load of tasks

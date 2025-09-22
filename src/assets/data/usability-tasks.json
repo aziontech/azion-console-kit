@@ -11,7 +11,7 @@
     },
     {
       "id": "workload-created",
-      "description": "Workload criado com sucesso",
+      "description": "Criar um projeto com sucesso",
       "category": "Eventos",
       "type": "toast",
       "trigger": "Your workload has been created"

@@ -51,3 +51,7 @@ src/views/Playground/PlaygroundView.vue
 .edge/
 .vulcan
 specs.json
+#Paths added by Azion CLI
+.edge/
+.vulcan
+.open-next
