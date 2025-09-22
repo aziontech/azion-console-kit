@@ -409,6 +409,7 @@
       folderPath.value = `${pathToFolder}/`
     }
 
+    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
@@ -452,6 +453,7 @@
       goBackToBucket()
     } else if (item.isFolder) {
       folderPath.value += item.name
+      router.replace({ query: { folderPath: folderPath.value } })
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
@@ -461,6 +463,7 @@
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
@@ -541,11 +544,14 @@
     listServiceFilesRef.value?.reload()
   }
 
-  watch(route, () => {
-    const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
-    selectBucket(bucket)
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
-  })
+  watch(
+    () => route.params.id,
+    () => {
+      const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
+      selectBucket(bucket)
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+    }
+  )
 
   watch(
     breadcrumbItems,
@@ -560,8 +566,8 @@
   })
 
   onMounted(async () => {
-    if (route.params.id) {
-      router.replace('/object-storage')
+    if (route.params?.id && route.query?.folderPath) {
+      folderPath.value = route.query.folderPath
     }
 
     setTimeout(updateContainerWidth, 100)
