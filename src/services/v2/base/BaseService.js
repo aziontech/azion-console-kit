@@ -1,6 +1,5 @@
 import { httpService } from './httpService'
 import { useMutation } from '@tanstack/vue-query'
-import { useAccountStore } from '@/stores/account'
 import { enhancedQueryClient } from './queryClient'
 import { CACHE_TYPES, getCacheConfig } from './cache/CacheConfig'
 
@@ -22,9 +21,7 @@ export class BaseService {
     if (isGlobal) {
       prefix.push('global')
     } else if (isUser) {
-      const accountStore = useAccountStore()
-      const { user_id: accountId } = accountStore.accountData
-      prefix.push(accountId || 'sensitive')
+      prefix.push('sensitive')
     }
 
     return [...prefix, ...keys]
@@ -33,14 +30,13 @@ export class BaseService {
   _buildPersistentConfig(persistent, isUser, isGlobal) {
     if (!persistent) return null
 
-    const config = typeof persistent === 'string' 
-      ? { type: persistent, ...getCacheConfig(persistent) }
-      : persistent
+    const config =
+      typeof persistent === 'string'
+        ? { type: persistent, ...getCacheConfig(persistent) }
+        : persistent
 
     if (isUser && !isGlobal) {
-      const accountStore = useAccountStore()
-      const { user_id: accountId } = accountStore.accountData
-      config.userScope = accountId || 'sensitive'
+      config.userScope = 'sensitive'
     }
 
     return config
@@ -64,16 +60,18 @@ export class BaseService {
     const queryKey = this.buildQueryKey(key, { isGlobal, isUser })
     const persistentConfig = this._buildPersistentConfig(persistent, isUser, isGlobal)
 
-    const enhancedQueryFn = persistentConfig ? async () => {
-      const cachedData = await this.queryClient._getCachedDataIfValid(queryKey)
-      if (cachedData) {
-        return cachedData
-      }
-      return queryFn()
-    } : queryFn
+    const enhancedQueryFn = persistentConfig
+      ? async () => {
+          const cachedData = await this.queryClient._getCachedDataIfValid(queryKey)
+          if (cachedData) {
+            return cachedData
+          }
+          return queryFn()
+        }
+      : queryFn
 
     await this.queryClient.initialize()
-    
+
     // Use fetchQuery instead of prefetchQuery to get the data back
     return this.queryClient.queryClient.fetchQuery({
       queryKey,
@@ -90,11 +88,11 @@ export class BaseService {
       mutationFn,
       onSuccess: (data, variables, context) => {
         if (invalidateQueries) {
-          const patterns = Array.isArray(invalidateQueries) 
-            ? invalidateQueries 
+          const patterns = Array.isArray(invalidateQueries)
+            ? invalidateQueries
             : [invalidateQueries]
-          
-          patterns.forEach(pattern => {
+
+          patterns.forEach((pattern) => {
             this.queryClient.invalidateQueries(pattern)
           })
         }
@@ -108,17 +106,17 @@ export class BaseService {
   }
 
   useGlobalQuery(key, queryFn, options = {}) {
-    return this.useQuery(key, queryFn, { 
-      ...options, 
+    return this.useQuery(key, queryFn, {
+      ...options,
       persistent: CACHE_TYPES.GLOBAL_PERSISTENT,
-      isGlobal: true, 
-      isUser: false 
+      isGlobal: true,
+      isUser: false
     })
   }
 
   useUserQuery(key, queryFn, options = {}) {
-    return this.useQuery(key, queryFn, { 
-      ...options, 
+    return this.useQuery(key, queryFn, {
+      ...options,
       persistent: CACHE_TYPES.USER_PERSISTENT,
       isUser: true,
       isGlobal: false
@@ -126,8 +124,8 @@ export class BaseService {
   }
 
   async fetchUserQuery(key, queryFn, options = {}) {
-    return this.prefetchQuery(key, queryFn, { 
-      ...options, 
+    return this.prefetchQuery(key, queryFn, {
+      ...options,
       persistent: CACHE_TYPES.USER_PERSISTENT,
       isUser: true,
       isGlobal: false
@@ -135,8 +133,8 @@ export class BaseService {
   }
 
   async fetchGlobalQuery(key, queryFn, options = {}) {
-    return this.prefetchQuery(key, queryFn, { 
-      ...options, 
+    return this.prefetchQuery(key, queryFn, {
+      ...options,
       persistent: CACHE_TYPES.GLOBAL_PERSISTENT,
       isGlobal: true,
       isUser: false
@@ -152,15 +150,7 @@ export class BaseService {
   }
 
   async clearUserCache() {
-    const accountStore = useAccountStore()
-    const { user_id: accountId } = accountStore.accountData || {}
-    
-    if (accountId) {
-      // Limpar queries do TanStack Query
-      await this.queryClient.invalidateQueries({ queryKey: [accountId] })
-      
-      // Limpar cache persistente do usuário
-      await this.queryClient.clearUserPersistentCache(accountId)
-    }
+    await this.queryClient.invalidateQueries({ queryKey: ['sensitive'] })
+    await this.queryClient.clearUserPersistentCache('sensitive')
   }
 }

@@ -17,7 +17,9 @@ export const TIME = {
   CACHE_1_HOUR: 1 * 60 * 60 * 1000, // 1 hour
   CACHE_6_HOURS: 6 * 60 * 60 * 1000, // 6 hours
   CACHE_12_HOURS: 12 * 60 * 60 * 1000, // 12 hours
-  CACHE_24_HOURS: 24 * 60 * 60 * 1000 // 24 hours
+  CACHE_24_HOURS: 24 * 60 * 60 * 1000, // 24 hours
+  CACHE_48_HOURS: 48 * 60 * 60 * 1000, // 48 hours
+  CACHE_72_HOURS: 72 * 60 * 60 * 1000 // 72 hours
 }
 
 // Retry constants

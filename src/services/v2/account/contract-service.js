@@ -1,4 +1,4 @@
-import { BaseService } from '../base'
+import { BaseService } from '../base/BaseService'
 
 export class ContractService extends BaseService {
   constructor() {

@@ -1,4 +1,4 @@
-import { BaseService } from '../base'
+import { BaseService } from '../base/BaseService'
 
 export class UserService extends BaseService {
   constructor() {
@@ -17,20 +17,19 @@ export class UserService extends BaseService {
 
   getUserInfo(options = {}) {
     const { prefetch = false } = options
-    
+
     if (prefetch) {
-      return this.prefetchQuery(
-        ['user', 'info'],
-        () => this.fetchUserInfo(),
-        { persistent: 'user.persistent', isUser: true }
-      )
+      return this.prefetchQuery(['user', 'info'], () => this.fetchUserInfo(), {
+        persistent: 'user.persistent',
+        isUser: true
+      })
     }
-    
-    return this.useQuery(
-      ['user', 'info'],
-      () => this.fetchUserInfo(),
-      { persistent: 'user.persistent', isUser: true, ...options }
-    )
+
+    return this.useQuery(['user', 'info'], () => this.fetchUserInfo(), {
+      persistent: 'user.persistent',
+      isUser: true,
+      ...options
+    })
   }
 
   getCurrentUser() {

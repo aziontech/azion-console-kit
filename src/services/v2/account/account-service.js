@@ -1,4 +1,4 @@
-import { BaseService } from '../base'
+import { BaseService } from '../base/BaseService'
 import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
 
 export class AccountService extends BaseService {

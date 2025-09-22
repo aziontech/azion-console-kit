@@ -1,4 +1,4 @@
-import { BaseService } from '../base'
+import { BaseService } from '../base/BaseService'
 
 export class AccountSettingsService extends BaseService {
   constructor() {
