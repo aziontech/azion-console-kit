@@ -110,13 +110,6 @@
               </div>
             </div>
             <UploadCard />
-            <input
-              ref="dragDropFileInput"
-              type="file"
-              multiple
-              style="display: none"
-              @change="handleDragDropUpload"
-            />
 
             <DragAndDrop
               v-if="showDragAndDrop"
@@ -126,7 +119,7 @@
             <div
               v-else
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
-              :class="{ 'border-dashed !border-[#f3652b]': isDragOver }"
+              :class="{ 'border-dashed border-[#f3652b] rounded-md pb-4': isDragOver }"
             >
               <ListTableBlock
                 pageTitleDelete="Files"
@@ -245,7 +238,7 @@
   ]
   const uploadMenuItems = [
     {
-      label: 'Create folder',
+      label: 'Upload folder',
       icon: 'pi pi-folder',
       command: () => openFileSelector('folder')
     },
@@ -467,13 +460,12 @@
 
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
-      title:
-        selectedFiles.value.length > 1 ? `${selectedFiles.value.length} selected files` : 'File',
+      title: selectedFiles.value.length > 1 ? `${selectedFiles.value.length} files` : 'File',
       message: 'Are you sure you want to delete the selected files?',
       data: {
-        deleteConfirmationText: selectedFiles.value[0].name
+        deleteConfirmationText:
+          selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
       },
-      bypassConfirmation: selectedFiles.value.length > 1,
       deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
       successCallback: () => {
         listServiceFilesRef.value?.reload()
@@ -559,6 +551,41 @@
     setTimeout(updateContainerWidth, 50)
   })
 
+  const handleDocumentDragOver = (event) => {
+    event.preventDefault()
+    handleDrag(true)
+  }
+
+  const handleDocumentDragEnter = (event) => {
+    event.preventDefault()
+    handleDrag(true)
+  }
+
+  const handleDocumentDrop = (event) => {
+    event.preventDefault()
+    handleDragDropUpload(event)
+  }
+
+  const handleDocumentDragLeave = (event) => {
+    if (!event.relatedTarget || !document.contains(event.relatedTarget)) {
+      handleDrag(false)
+    }
+  }
+
+  const setupDocumentDragEvents = () => {
+    document.addEventListener('dragover', handleDocumentDragOver)
+    document.addEventListener('dragenter', handleDocumentDragEnter)
+    document.addEventListener('drop', handleDocumentDrop)
+    document.addEventListener('dragleave', handleDocumentDragLeave)
+  }
+
+  const removeDocumentDragEvents = () => {
+    document.removeEventListener('dragover', handleDocumentDragOver)
+    document.removeEventListener('dragenter', handleDocumentDragEnter)
+    document.removeEventListener('drop', handleDocumentDrop)
+    document.removeEventListener('dragleave', handleDocumentDragLeave)
+  }
+
   onMounted(async () => {
     if (route.params.id) {
       router.replace('/object-storage')
@@ -567,9 +594,11 @@
     setTimeout(updateContainerWidth, 100)
 
     window.addEventListener('resize', updateContainerWidth)
+    setupDocumentDragEvents()
   })
 
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
+    removeDocumentDragEvents()
   })
 </script>
