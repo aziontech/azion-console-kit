@@ -48,7 +48,12 @@ export class CacheManager {
       localStorage.setItem(`azion_cache_${key}`, JSON.stringify(entry))
     } else {
       const tx = this.db.transaction([this.storeName], 'readwrite')
-      await tx.objectStore(this.storeName).put(entry)
+      const store = tx.objectStore(this.storeName)
+      await new Promise((resolve, reject) => {
+        const request = store.put(entry)
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
     }
   }
 
@@ -88,7 +93,12 @@ export class CacheManager {
       localStorage.removeItem(`azion_cache_${key}`)
     } else {
       const tx = this.db.transaction([this.storeName], 'readwrite')
-      await tx.objectStore(this.storeName).delete(key)
+      const store = tx.objectStore(this.storeName)
+      await new Promise((resolve, reject) => {
+        const request = store.delete(key)
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
     }
   }
 
@@ -108,17 +118,22 @@ export class CacheManager {
     } else {
       const tx = this.db.transaction([this.storeName], 'readwrite')
       const store = tx.objectStore(this.storeName)
-      const request = store.openCursor()
-
-      request.onsuccess = (event) => {
-        const cursor = event.target.result
-        if (cursor) {
-          if (this._matchesCriteria(cursor.value, criteria)) {
-            cursor.delete()
+      
+      await new Promise((resolve, reject) => {
+        const request = store.openCursor()
+        request.onsuccess = (event) => {
+          const cursor = event.target.result
+          if (cursor) {
+            if (this._matchesCriteria(cursor.value, criteria)) {
+              cursor.delete()
+            }
+            cursor.continue()
+          } else {
+            resolve()
           }
-          cursor.continue()
         }
-      }
+        request.onerror = () => reject(request.error)
+      })
     }
   }
 

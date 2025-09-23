@@ -1,6 +1,6 @@
 import { HttpClient } from './httpClient'
 import { AbortManager } from './abortManager'
-import { buildQueryParams, errorHandler } from '../utils'
+import { buildQueryParams, errorHandler } from '../../utils'
 
 export class HttpService {
   constructor() {

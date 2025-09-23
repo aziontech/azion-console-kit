@@ -16,20 +16,10 @@ export class ContractService extends BaseService {
   }
 
   getContractServicePlan(clientId, options = {}) {
-    const { prefetch = false } = options
-    
-    if (prefetch) {
-      return this.prefetchQuery(
-        ['contract', 'service-plan', clientId],
-        () => this.fetchContractServicePlan(clientId),
-        { persistent: 'user.persistent', isUser: true }
-      )
-    }
-    
-    return this.useQuery(
+    return this.syncGlobalQuery(
       ['contract', 'service-plan', clientId],
       () => this.fetchContractServicePlan(clientId),
-      { persistent: 'user.persistent', isUser: true, ...options }
+      options
     )
   }
 

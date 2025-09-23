@@ -15,21 +15,8 @@ export class UserService extends BaseService {
     return response.data
   }
 
-  getUserInfo(options = {}) {
-    const { prefetch = false } = options
-
-    if (prefetch) {
-      return this.prefetchQuery(['user', 'info'], () => this.fetchUserInfo(), {
-        persistent: 'user.persistent',
-        isUser: true
-      })
-    }
-
-    return this.useQuery(['user', 'info'], () => this.fetchUserInfo(), {
-      persistent: 'user.persistent',
-      isUser: true,
-      ...options
-    })
+  async getUserInfo(options = {}) {
+    return await this.syncSensitiveQuery(['user', 'info'], () => this.fetchUserInfo(), options)
   }
 
   getCurrentUser() {

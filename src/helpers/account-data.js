@@ -1,4 +1,9 @@
-import { accountService, userService, accountSettingsService, contractService } from '@/services/v2/account'
+import {
+  accountService,
+  userService,
+  accountSettingsService,
+  contractService
+} from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
@@ -6,12 +11,10 @@ import { setFeatureFlags } from '@/composables/user-flag'
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
   const [accountInfo, userInfo, accountJobRole] = await Promise.all([
-    accountService.getAccountInfo({ prefetch: true }),
-    userService.getUserInfo({ prefetch: true }),
-    accountSettingsService.getAccountJobRole({ prefetch: true })
+    accountService.getAccountInfo(),
+    userService.getUserInfo(),
+    accountSettingsService.getAccountJobRole()
   ])
-
-
   accountInfo.jobRole = accountJobRole.jobRole
   const userResults = userInfo.results || userInfo
   accountInfo.is_account_owner = userResults.is_account_owner
@@ -44,12 +47,14 @@ export const loadProfileAndAccountInfo = async () => {
     }),
 
     accountInfo.client_id
-      ? contractService.getContractServicePlan(accountInfo.client_id, { prefetch: true }).then(({ isDeveloperSupportPlan, yourServicePlan }) => {
-          accountStore.setAccountData({
-            isDeveloperSupportPlan,
-            yourServicePlan
+      ? contractService
+          .getContractServicePlan(accountInfo.client_id, { prefetch: true })
+          .then(({ isDeveloperSupportPlan, yourServicePlan }) => {
+            accountStore.setAccountData({
+              isDeveloperSupportPlan,
+              yourServicePlan
+            })
           })
-        })
       : Promise.resolve()
   ]
 

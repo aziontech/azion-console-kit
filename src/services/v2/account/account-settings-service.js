@@ -15,22 +15,8 @@ export class AccountSettingsService extends BaseService {
     return this._adaptJobRole(response.data)
   }
 
-  getAccountJobRole(options = {}) {
-    const { prefetch = false } = options
-    
-    if (prefetch) {
-      return this.prefetchQuery(
-        ['account', 'job-role'],
-        () => this.fetchAccountJobRole(),
-        { persistent: 'user.persistent', isUser: true }
-      )
-    }
-    
-    return this.useQuery(
-      ['account', 'job-role'],
-      () => this.fetchAccountJobRole(),
-      { persistent: 'user.persistent', isUser: true, ...options }
-    )
+  async getAccountJobRole(options = {}) {
+    return await this.syncGlobalQuery(['account', 'job-role'], () => this.fetchAccountJobRole(), options)
   }
 
   _adaptJobRole(response) {
@@ -46,7 +32,7 @@ export class AccountSettingsService extends BaseService {
     const defaultJobRole = 'other'
     const validJobRoles = [
       'software-developer',
-      'devops-engineer', 
+      'devops-engineer',
       'infrastructure-analyst',
       'network-engineer',
       'security-specialist',

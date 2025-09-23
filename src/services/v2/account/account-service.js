@@ -16,22 +16,8 @@ export class AccountService extends BaseService {
     return this._adaptAccountInfo(response.data)
   }
 
-  getAccountInfo(options = {}) {
-    const { prefetch = false } = options
-    
-    if (prefetch) {
-      return this.prefetchQuery(
-        ['account', 'info'],
-        () => this.fetchAccountInfo(),
-        { persistent: 'user.persistent', isUser: true }
-      )
-    }
-    
-    return this.useQuery(
-      ['account', 'info'],
-      () => this.fetchAccountInfo(),
-      { persistent: 'user.persistent', isUser: true, ...options }
-    )
+  async getAccountInfo(options = {}) {
+    return await this.syncSensitiveQuery(['account', 'info'], () => this.fetchAccountInfo(), options)
   }
 
   _adaptAccountInfo(response) {

@@ -1,7 +1,5 @@
-import { httpService } from './httpService'
-import { useMutation } from '@tanstack/vue-query'
-import { enhancedQueryClient } from './queryClient'
-import { CACHE_TYPES, getCacheConfig } from './cache/CacheConfig'
+import { httpService } from './http/httpService'
+import { simpleQueryClient } from './queryClient'
 
 export class BaseService {
   constructor() {
@@ -10,81 +8,46 @@ export class BaseService {
     }
 
     this.http = httpService
-    this.queryClient = enhancedQueryClient
+    this.queryClient = simpleQueryClient
     this.constructor.instance = this
   }
 
-  buildQueryKey(key, { isGlobal = false, isUser = true } = {}) {
-    const keys = Array.isArray(key) ? key : [key]
-    const prefix = []
-
-    if (isGlobal) {
-      prefix.push('global')
-    } else if (isUser) {
-      prefix.push('sensitive')
-    }
-
-    return [...prefix, ...keys]
-  }
-
-  _buildPersistentConfig(persistent, isUser, isGlobal) {
-    if (!persistent) return null
-
-    const config =
-      typeof persistent === 'string'
-        ? { type: persistent, ...getCacheConfig(persistent) }
-        : persistent
-
-    if (isUser && !isGlobal) {
-      config.userScope = 'sensitive'
-    }
-
-    return config
-  }
-
   useQuery(key, queryFn, options = {}) {
-    const { persistent, isGlobal, isUser, ...restOptions } = options
-    const queryKey = this.buildQueryKey(key, { isGlobal, isUser })
-    const persistentConfig = this._buildPersistentConfig(persistent, isUser, isGlobal)
-
     return this.queryClient.useQuery({
-      queryKey,
+      queryKey: key,
       queryFn,
-      persistent: persistentConfig,
-      ...restOptions
+      ...options
     })
   }
 
-  async prefetchQuery(key, queryFn, options = {}) {
-    const { persistent, isGlobal, isUser, ...restOptions } = options
-    const queryKey = this.buildQueryKey(key, { isGlobal, isUser })
-    const persistentConfig = this._buildPersistentConfig(persistent, isUser, isGlobal)
+  useGlobalQuery(key, queryFn, options = {}) {
+    return this.useQuery(key, queryFn, { ...options, global: true })
+  }
 
-    const enhancedQueryFn = persistentConfig
-      ? async () => {
-          const cachedData = await this.queryClient._getCachedDataIfValid(queryKey)
-          if (cachedData) {
-            return cachedData
-          }
-          return queryFn()
-        }
-      : queryFn
+  useSensitiveQuery(key, queryFn, options = {}) {
+    return this.useQuery(key, queryFn, { ...options, sensitive: true })
+  }
 
-    await this.queryClient.initialize()
-
-    // Use fetchQuery instead of prefetchQuery to get the data back
-    return this.queryClient.queryClient.fetchQuery({
-      queryKey,
-      queryFn: enhancedQueryFn,
-      meta: { persistent: persistentConfig },
-      ...restOptions
+  async syncQuery(key, queryFn, options = {}) {
+    return await this.queryClient.fetchQuery({
+      queryKey: key,
+      queryFn,
+      ...options
     })
+  }
+
+  async syncGlobalQuery(key, queryFn, options = {}) {
+    return await this.syncQuery(key, queryFn, { ...options, global: true })
+  }
+
+  async syncSensitiveQuery(key, queryFn, options = {}) {
+    return await this.syncQuery(key, queryFn, { ...options, sensitive: true })
   }
 
   useMutation(mutationFn, options = {}) {
     const { invalidateQueries, ...restOptions } = options
 
-    return useMutation({
+    return this.queryClient.useMutation({
       mutationFn,
       onSuccess: (data, variables, context) => {
         if (invalidateQueries) {
@@ -101,56 +64,20 @@ export class BaseService {
           restOptions.onSuccess(data, variables, context)
         }
       },
+      onError: (error, variables, context) => {
+        if (restOptions.onError) {
+          restOptions.onError(error, variables, context)
+        }
+      },
       ...restOptions
     })
-  }
-
-  useGlobalQuery(key, queryFn, options = {}) {
-    return this.useQuery(key, queryFn, {
-      ...options,
-      persistent: CACHE_TYPES.GLOBAL_PERSISTENT,
-      isGlobal: true,
-      isUser: false
-    })
-  }
-
-  useUserQuery(key, queryFn, options = {}) {
-    return this.useQuery(key, queryFn, {
-      ...options,
-      persistent: CACHE_TYPES.USER_PERSISTENT,
-      isUser: true,
-      isGlobal: false
-    })
-  }
-
-  async fetchUserQuery(key, queryFn, options = {}) {
-    return this.prefetchQuery(key, queryFn, {
-      ...options,
-      persistent: CACHE_TYPES.USER_PERSISTENT,
-      isUser: true,
-      isGlobal: false
-    })
-  }
-
-  async fetchGlobalQuery(key, queryFn, options = {}) {
-    return this.prefetchQuery(key, queryFn, {
-      ...options,
-      persistent: CACHE_TYPES.GLOBAL_PERSISTENT,
-      isGlobal: true,
-      isUser: false
-    })
-  }
-
-  invalidateQueries(pattern) {
-    return this.queryClient.invalidateQueries(pattern)
   }
 
   async clearCache() {
     await this.queryClient.clearCache()
   }
 
-  async clearUserCache() {
-    await this.queryClient.invalidateQueries({ queryKey: ['sensitive'] })
-    await this.queryClient.clearUserPersistentCache('sensitive')
+  async clearSensitiveData() {
+    await this.queryClient.clearSensitiveData()
   }
 }

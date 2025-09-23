@@ -30,9 +30,7 @@ initOAuthSecurity()
 
 const app = createApp(App)
 
-app.use(VueQueryPlugin, {
-  queryClient
-})
+app.use(VueQueryPlugin, queryClient)
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

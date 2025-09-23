@@ -23,14 +23,14 @@ export class SolutionService extends BaseService {
   }
 
   useListSolutions({ group, type }, options = {}) {
-    return this.useQuery(
+    return this.useGlobalQuery(
       ['solutions', 'list', { group, type }],
       () =>
         this.getListSolutions({
           group: group,
           type: type
         }),
-      { persistent: 'global.persistent', isGlobal: true, isUser: false, ...options }
+      options
     )
   }
 
