@@ -165,13 +165,13 @@
       disableSort: true
     },
     {
-      field: 'lastModified',
-      header: 'Last Modified',
+      field: 'lastEditor',
+      header: 'Last Editor',
       disableSort: true
     },
     {
-      field: 'lastEditor',
-      header: 'Last Editor',
+      field: 'lastModified',
+      header: 'Last Modified',
       disableSort: true
     },
     {
@@ -259,7 +259,6 @@
     :actions="actions"
     isTabs
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
-    :defaultOrderingFieldName="''"
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div

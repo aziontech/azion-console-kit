@@ -6,6 +6,7 @@ import {
   SUPPORTED_CIPHERS_LIST_OPTIONS
 } from '@/helpers'
 import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
+import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 
 const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
@@ -119,10 +120,9 @@ export const WorkloadAdapter = {
         name: parseName(workload),
         isLocked: locked,
         disableEditClick: locked,
+        lastModify: convertToRelativeTime(workload.last_modified),
         lastModified: workload.last_modified
-          ? new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-              new Date(workload.last_modified)
-            )
+          ? formatDateToDayMonthYearHour(workload.last_modified)
           : '-',
         lastEditor: workload.last_editor,
         productVersion: workload.product_version,

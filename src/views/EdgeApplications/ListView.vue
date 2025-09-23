@@ -84,44 +84,30 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'id',
-        header: 'ID',
-        sortField: 'id',
-        filterPath: 'id'
-      },
-      {
         field: 'name',
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
+            data: { value: columnData.text, showMoreText: false },
+            columnAppearance: 'expand-text-column'
           })
         }
+      },
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
       },
       {
         field: 'lastEditor',
         header: 'Last Editor'
       },
       {
-        field: 'lastModify',
-        sortField: 'lastModified',
+        field: 'lastModified',
         header: 'Last Modified'
-      },
-      {
-        field: 'active',
-        header: 'Status',
-        sortField: 'active',
-        filterPath: 'active',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        }
       }
     ]
   })

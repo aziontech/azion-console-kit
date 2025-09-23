@@ -88,6 +88,14 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
+      },
+      {
         field: 'active',
         header: 'Status',
         type: 'component',
@@ -120,7 +128,7 @@
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
