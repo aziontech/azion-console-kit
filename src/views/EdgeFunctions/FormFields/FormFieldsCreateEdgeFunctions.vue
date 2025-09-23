@@ -24,7 +24,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
-  
+
   defineProps({
     isDrawer: {
       type: Boolean,
