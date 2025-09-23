@@ -358,7 +358,7 @@
     <TabPanel header="Arguments">
       <div class="w-full mt-4">
         <div
-          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 mb-[-3px]"
+          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 top-[3px]"
         >
           <SelectPanel
             :options="selectPanelOptions"
@@ -368,11 +368,12 @@
         </div>
 
         <Splitter
+          class="!z-20 relative"
           :style="{ height: SPLITTER_PROPS.height }"
           :layout="SPLITTER_PROPS.layout"
           :pt="{
             root: {
-              class: 'mt-0 surface-border border rounded-md'
+              class: 'mt-0'
             },
             gutter: { style: { backgroundColor: 'transparent' } },
             gutterHandle: { style: { backgroundColor: 'transparent' } }
@@ -392,11 +393,12 @@
         </Splitter>
         <div v-if="hasFormBuilder">
           <Splitter
+            class="!z-20 relative"
             :style="{ height: SPLITTER_PROPS.height }"
             :layout="SPLITTER_PROPS.layout"
             :pt="{
               root: {
-                class: 'mt-0 surface-border border rounded-md'
+                class: 'mt-0'
               },
               gutter: { style: { backgroundColor: 'transparent' } },
               gutterHandle: { style: { backgroundColor: 'transparent' } }
@@ -410,7 +412,6 @@
               <CodeEditor
                 v-model="schemaAzionFormString"
                 runtime="json"
-                class="overflow-clip surface-border border rounded-md"
                 :initialValue="schemaAzionFormString"
                 :errors="hasAzionFormError"
                 :minimap="false"
