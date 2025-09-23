@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, ref, markRaw } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, markRaw } from 'vue'
   import { useField } from 'vee-validate'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
@@ -204,11 +204,19 @@
     }
   }
 
+  const handleResize = () => {
+    breakpoint.value = getBreakpoint(window.innerWidth)
+    setSplitterDirection()
+  }
+
   onMounted(() => {
     window.addEventListener('resize', () => {
-      breakpoint.value = getBreakpoint(window.innerWidth)
-      setSplitterDirection()
+      handleResize()
     })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize)
   })
 </script>
 
