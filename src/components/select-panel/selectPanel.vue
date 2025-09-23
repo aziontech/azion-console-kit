@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="flex flex-col gap-4 sm:flex-row md:gap-0 justify-between w-full">
+    <div class="flex flex-col justify-between w-full">
       <TitleDescriptionArea
         :title="title"
         :description="description"
@@ -10,9 +10,10 @@
         <div class="flex sm:flex sm:justify-end">
           <SelectButton
             v-model="selectPanelModelValue"
-            :options="options"
-            ariaLabel="Select Button"
             @update:modelValue="changeButtonPanel"
+            :options="options"
+            :pt="pt()"
+            ariaLabel="Select Button"
           />
         </div>
       </div>
@@ -50,6 +51,10 @@
     description: {
       type: String,
       default: ''
+    },
+    pt: {
+      type: Function,
+      default: () => {}
     }
   })
 
