@@ -20,10 +20,10 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
-  import { getBreakpoint } from '@/utils/getBreakpoint'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
+  import { useResize } from '@/composables/useResize'
 
   defineProps({
     isDrawer: {
@@ -36,13 +36,13 @@
   })
 
   const emit = defineEmits(['update:previewData', 'additionalErrors'])
-
-  const breakpoint = ref('')
   let SPLITTER_PROPS = ref({
     height: '50vh',
     layout: 'horizontal',
-    panelsSizes: [50, 50]
+    panelsSizes: [60, 40]
   })
+
+  const { isGreaterThanLG } = useResize()
 
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
@@ -184,39 +184,29 @@
   ]
 
   const setSplitterDirection = () => {
-    if (
-      breakpoint.value === '' ||
-      breakpoint.value === 'sm' ||
-      breakpoint.value === 'md' ||
-      breakpoint.value === 'lg'
-    ) {
+    if (isGreaterThanLG.value) {
+      SPLITTER_PROPS.value = {
+        height: '50vh',
+        layout: 'horizontal',
+        panelsSizes: [60, 40]
+      }
+    } else {
       SPLITTER_PROPS.value = {
         height: '',
         layout: 'vertical',
         panelsSizes: []
       }
-    } else {
-      SPLITTER_PROPS.value = {
-        height: '50vh',
-        layout: 'horizontal',
-        panelsSizes: [50, 50]
-      }
     }
-  }
-
-  const handleResize = () => {
-    breakpoint.value = getBreakpoint(window.innerWidth)
-    setSplitterDirection()
   }
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      handleResize()
+      setSplitterDirection()
     })
   })
 
   onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
+    window.removeEventListener('resize', setSplitterDirection)
   })
 </script>
 
