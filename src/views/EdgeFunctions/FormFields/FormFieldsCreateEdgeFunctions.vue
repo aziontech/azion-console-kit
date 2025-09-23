@@ -8,6 +8,7 @@
   import PrimeButton from 'primevue/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
+  import { useResize } from '@/composables/useResize'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
@@ -23,8 +24,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
-  import { useResize } from '@/composables/useResize'
-
+  
   defineProps({
     isDrawer: {
       type: Boolean,
