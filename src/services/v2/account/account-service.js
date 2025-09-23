@@ -16,8 +16,8 @@ export class AccountService extends BaseService {
     return this._adaptAccountInfo(response.data)
   }
 
-  async getAccountInfo(options = {}) {
-    return await this.syncSensitiveQuery(['account', 'info'], () => this.fetchAccountInfo(), options)
+  getAccountInfo(options = {}) {
+    return this.syncSensitiveQuery(['account', 'info'], () => this.fetchAccountInfo(), options)
   }
 
   _adaptAccountInfo(response) {

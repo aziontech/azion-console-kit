@@ -12,6 +12,7 @@ export const TIME = {
 
   // Cache TTL - Generic durations
   CACHE_1_MINUTE: 1 * 60 * 1000, // 1 minute
+  CACHE_3_MINUTES: 3 * 60 * 1000, // 3 minutes
   CACHE_5_MINUTES: 5 * 60 * 1000, // 5 minutes
   CACHE_30_MINUTES: 30 * 60 * 1000, // 30 minutes
   CACHE_1_HOUR: 1 * 60 * 60 * 1000, // 1 hour
@@ -30,4 +31,10 @@ export const RETRY = {
   RETRY_2_TIMES: 2,
   RETRY_3_TIMES: 3,
   RETRY_5_TIMES: 5
+}
+
+// Cache type constants
+export const CACHE_TYPE = {
+  GLOBAL: 'global',
+  SENSITIVE: 'sensitive'
 }

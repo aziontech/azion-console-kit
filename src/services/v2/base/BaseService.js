@@ -28,20 +28,20 @@ export class BaseService {
     return this.useQuery(key, queryFn, { ...options, sensitive: true })
   }
 
-  async syncQuery(key, queryFn, options = {}) {
-    return await this.queryClient.fetchQuery({
+  syncQuery(key, queryFn, options = {}) {
+    return this.queryClient.fetchQuery({
       queryKey: key,
       queryFn,
       ...options
     })
   }
 
-  async syncGlobalQuery(key, queryFn, options = {}) {
-    return await this.syncQuery(key, queryFn, { ...options, global: true })
+  syncGlobalQuery(key, queryFn, options = {}) {
+    return this.syncQuery(key, queryFn, { ...options, global: true })
   }
 
-  async syncSensitiveQuery(key, queryFn, options = {}) {
-    return await this.syncQuery(key, queryFn, { ...options, sensitive: true })
+  syncSensitiveQuery(key, queryFn, options = {}) {
+    return this.syncQuery(key, queryFn, { ...options, sensitive: true })
   }
 
   useMutation(mutationFn, options = {}) {

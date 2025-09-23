@@ -40,8 +40,7 @@ export class CacheManager {
       data,
       timestamp: Date.now(),
       ttl: options.ttl,
-      type: options.type || 'default',
-      userScope: options.userScope
+      type: options.type || 'default'
     }
 
     if (this.useLocalStorage) {
@@ -75,7 +74,7 @@ export class CacheManager {
 
   async get(key) {
     const entry = await this._getEntry(key)
-    
+
     if (!entry) return null
 
     if (entry.ttl && Date.now() - entry.timestamp > entry.ttl) {
@@ -118,7 +117,7 @@ export class CacheManager {
     } else {
       const tx = this.db.transaction([this.storeName], 'readwrite')
       const store = tx.objectStore(this.storeName)
-      
+
       await new Promise((resolve, reject) => {
         const request = store.openCursor()
         request.onsuccess = (event) => {
@@ -139,7 +138,6 @@ export class CacheManager {
 
   _matchesCriteria(entry, criteria) {
     if (criteria.type && entry.type !== criteria.type) return false
-    if (criteria.userScope && entry.userScope !== criteria.userScope) return false
     return true
   }
 }
