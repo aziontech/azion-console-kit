@@ -38,10 +38,10 @@ export const CacheSettingsAdapter = {
 
     // Add tiered_cache module if enabled
     if (payload.tieredCache) {
-      result.modules.tiered_cache = {
+      result.modules.edge_cache.tiered_cache = {
         behavior: 'override', // readonly according to docs
         max_age: 31536000, // readonly according to docs
-        topology: payload.tieredCacheRegion || 'near-edge'
+        topology: 'global'
       }
     }
 
@@ -115,8 +115,8 @@ export const CacheSettingsAdapter = {
   },
 
   transformLoadCacheSetting({ data }) {
-    const edge = data.modules?.cache || {}
-    const tieredCache = data.modules?.tiered_cache
+    const edge = data.modules?.edge_cache || {}
+    const tieredCache = data.modules?.edge_cache?.tiered_cache
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
@@ -153,7 +153,7 @@ export const CacheSettingsAdapter = {
       enableLargeFileCache: edge.large_file_cache?.enabled || false,
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
       tieredCache: !!tieredCache,
-      tieredCacheRegion: tieredCache?.topology || 'near-edge',
+      tieredCacheRegion: tieredCache?.topology || 'global',
       cacheByQueryString,
       queryStringFields,
       enableQueryStringSort,
