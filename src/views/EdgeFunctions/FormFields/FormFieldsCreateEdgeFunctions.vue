@@ -20,6 +20,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
+  import { getBreakpoint } from '@/utils/getBreakpoint'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
@@ -182,15 +183,6 @@
     }
   ]
 
-  const getViewport = (innerWidth = '') => {
-    if (innerWidth < 640) return ''
-    if (innerWidth >= 640 && innerWidth < 768) return 'sm'
-    if (innerWidth >= 768 && innerWidth < 1024) return 'md'
-    if (innerWidth >= 1024 && innerWidth < 1280) return 'lg'
-    if (innerWidth >= 1280 && innerWidth < 1536) return 'xl'
-    if (innerWidth >= 1536) return '2xl'
-  }
-
   const setSplitterDirection = () => {
     if (
       viewPort.value === '' ||
@@ -214,7 +206,7 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      let viewport = getViewport(window.innerWidth)
+      let viewport = getBreakpoint(window.innerWidth)
       viewPort.value = viewport
 
       setSplitterDirection()

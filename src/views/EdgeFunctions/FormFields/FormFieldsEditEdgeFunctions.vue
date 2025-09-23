@@ -19,7 +19,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
-  import { getViewport } from '@/utils/getViewport'
+  import { getBreakpoint } from '@/utils/getBreakpoint'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
@@ -228,7 +228,7 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      let viewport = getViewport(window.innerWidth)
+      let viewport = getBreakpoint(window.innerWidth)
       viewPort.value = viewport
 
       setSplitterDirection()
