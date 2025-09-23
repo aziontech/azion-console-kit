@@ -5,6 +5,8 @@ import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-util
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
+const statusExpired = { content: 'Expired', severity: 'danger' }
+
 const getIconByStatus = (status) => {
   if (status === 'pending') {
     return 'pi-exclamation-triangle'
@@ -13,6 +15,19 @@ const getIconByStatus = (status) => {
   }
 
   return ''
+}
+
+const isValidityDateExpired = (validityDate) => {
+  if (!validityDate) return false
+
+  try {
+    const expirationDate = new Date(validityDate)
+    const currentDate = new Date()
+
+    return !isNaN(expirationDate.getTime()) && expirationDate < currentDate
+  } catch (error) {
+    return false
+  }
 }
 
 export const DigitalCertificatesAdapter = {
@@ -67,6 +82,10 @@ export const DigitalCertificatesAdapter = {
         }
       }
 
+      const isExpired = isValidityDateExpired(item?.validity)
+      const originalStatus = parseStatusString(item.status)
+      const finalStatus = isExpired ? statusExpired : originalStatus
+
       return {
         id: checkIfFieldExist(item?.id, null),
         name: checkIfFieldExist(item?.name),
@@ -81,7 +100,7 @@ export const DigitalCertificatesAdapter = {
         lastModified: item?.last_modified ? getCurrentTimezone(item.last_modified) : '-',
         managed: item?.managed,
         status: {
-          status: parseStatusString(item.status),
+          status: finalStatus,
           statusDetail: item?.status_detail
         }
       }
