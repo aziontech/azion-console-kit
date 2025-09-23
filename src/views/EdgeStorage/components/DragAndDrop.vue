@@ -58,10 +58,6 @@
     event.preventDefault()
   }
 
-  const handleDocumentDragEnter = (event) => {
-    event.preventDefault()
-  }
-
   const handleDocumentDrop = (event) => {
     event.preventDefault()
     handleFileChangeDragDrop(event)
@@ -73,14 +69,14 @@
 
   const setupDocumentDragEvents = () => {
     document.addEventListener('dragover', handleDocumentDragOver)
-    document.addEventListener('dragenter', handleDocumentDragEnter)
+    document.addEventListener('dragenter', handleDocumentDragOver)
     document.addEventListener('drop', handleDocumentDrop)
     document.addEventListener('dragleave', handleDocumentDragLeave)
   }
 
   const removeDocumentDragEvents = () => {
     document.removeEventListener('dragover', handleDocumentDragOver)
-    document.removeEventListener('dragenter', handleDocumentDragEnter)
+    document.removeEventListener('dragenter', handleDocumentDragOver)
     document.removeEventListener('drop', handleDocumentDrop)
     document.removeEventListener('dragleave', handleDocumentDragLeave)
   }
