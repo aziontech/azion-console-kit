@@ -207,7 +207,8 @@ const sidebarProducts = [
   'Network Lists',
   'WAF Rules',
   'Custom Pages',
-  'Edge Connectors'
+  'Edge Connectors',
+  'Edge SQL'
 ]
 const accountProducts = [
   'Account Settings',

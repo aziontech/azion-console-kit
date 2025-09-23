@@ -65,18 +65,18 @@ export class EdgeFirewallService {
     return data
   }
 
-  cloneEdgeFirewallService = async (name, id) => {
-    const body = { name, id }
+  cloneEdgeFirewallService = async (payload) => {
+    const body = this.adapter?.transformCloneEdgeFirewall?.(payload) ?? payload
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${id}/clone`,
+      url: `${this.baseURL}/${payload.id}/clone`,
       body
     })
 
     return {
       feedback: 'Your Firewall has been cloned',
-      urlToEditView: `/edge-firewall/edit/${data.data.id}`,
+      urlToEditView: `/firewall/edit/${data.data.id}`,
       id: data.data.id
     }
   }

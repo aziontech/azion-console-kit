@@ -35,7 +35,7 @@
       type="file"
       multiple
       class="hidden"
-      @change="handleFileChange"
+      @change="handleFileChangeDragDrop"
     />
   </div>
 </template>
@@ -46,8 +46,13 @@
 
   const { handleFileChange } = useEdgeStorage()
   const fileInput = ref(null)
-
+  const emit = defineEmits(['reload'])
   const openFileSelector = () => {
     fileInput.value?.click()
+  }
+
+  const handleFileChangeDragDrop = async (event) => {
+    await handleFileChange(event)
+    emit('reload')
   }
 </script>

@@ -48,7 +48,7 @@
   })
   const updateObject = ref({})
 
-  const executionEnvironment = router.currentRoute.value.path.startsWith('/edge-firewall')
+  const executionEnvironment = router.currentRoute.value.path.startsWith('/firewall')
     ? 'firewall'
     : 'application'
 
@@ -58,6 +58,7 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
+    azionForm: {},
     executionEnvironment: executionEnvironment
   }
   const handleTrackCreation = () => {

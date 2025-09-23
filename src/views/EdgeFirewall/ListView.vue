@@ -3,10 +3,10 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import CloneEdgeFirewall from './Dialog/Clone.vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
   import { edgeFirewallService } from '@/services/v2'
+  import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'edge-firewall-view' })
 
@@ -37,9 +37,13 @@
       label: 'Clone',
       icon: 'pi pi-fw pi-copy',
       dialog: {
-        component: CloneEdgeFirewall,
+        component: CloneBlock,
         body: (item) => ({
-          data: item
+          data: {
+            service: edgeFirewallService.cloneEdgeFirewallService,
+            itemType: 'Firewall',
+            ...item
+          }
         })
       }
     },
@@ -113,8 +117,8 @@
       <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Firewall"
-        createPagePath="/edge-firewall/create"
-        editPagePath="/edge-firewall/edit"
+        createPagePath="/firewall/create"
+        editPagePath="/firewall/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
@@ -130,7 +134,7 @@
         title="No Firewall has been created."
         description="Click the button below to create your first Firewall."
         createButtonLabel="Firewall"
-        createPagePath="/edge-firewall/create"
+        createPagePath="/firewall/create"
         :documentationService="props.documentationService"
         @click-to-create="handleTrackEvent"
       >

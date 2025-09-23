@@ -5,6 +5,7 @@ import 'azion-theme'
 import '@assets/icons/azionicons.scss'
 import '@assets/c3.scss'
 import '@assets/flags.css'
+import '@mdi/font/css/materialdesignicons.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -18,6 +19,7 @@ import DialogService from 'primevue/dialogservice'
 import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+import SentryPlugin from '@/plugins/sentry'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'
@@ -26,6 +28,7 @@ import router from './router'
 initOAuthSecurity()
 
 const app = createApp(App)
+
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
@@ -39,6 +42,9 @@ app.use(pinia)
 app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
+app.use(SentryPlugin, {
+  router
+})
 app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'
