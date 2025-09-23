@@ -182,7 +182,7 @@
     }
   ]
 
-  const setViewport = (innerWidth = '') => {
+  const getViewport = (innerWidth = '') => {
     if (innerWidth < 640) return ''
     if (innerWidth >= 640 && innerWidth < 768) return 'sm'
     if (innerWidth >= 768 && innerWidth < 1024) return 'md'
@@ -214,7 +214,7 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      let viewport = setViewport(window.innerWidth)
+      let viewport = getViewport(window.innerWidth)
       viewPort.value = viewport
 
       setSplitterDirection()

@@ -19,6 +19,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
+  import { getViewport } from '@/utils/getViewport'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
@@ -204,15 +205,6 @@
     emit('additionalErrors', azionFormValidationErrors.value)
   }
 
-  const setViewport = (innerWidth = '') => {
-    if (innerWidth < 640) return ''
-    if (innerWidth >= 640 && innerWidth < 768) return 'sm'
-    if (innerWidth >= 768 && innerWidth < 1024) return 'md'
-    if (innerWidth >= 1024 && innerWidth < 1280) return 'lg'
-    if (innerWidth >= 1280 && innerWidth < 1536) return 'xl'
-    if (innerWidth >= 1536) return '2xl'
-  }
-
   const setSplitterDirection = () => {
     if (
       viewPort.value === '' ||
@@ -236,7 +228,7 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      let viewport = setViewport(window.innerWidth)
+      let viewport = getViewport(window.innerWidth)
       viewPort.value = viewport
 
       setSplitterDirection()
@@ -376,9 +368,7 @@
 
     <TabPanel header="Arguments">
       <div class="w-full mt-4">
-        <div
-          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10"
-        >
+        <div class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10">
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
