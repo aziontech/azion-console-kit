@@ -1,4 +1,5 @@
-const getBreakpoint = (innerWidth = '') => {
+const getBreakpoint = (innerWidth = window.innerWidth) => {
+  if (!innerWidth || typeof innerWidth !== 'number') return ''
   if (innerWidth < 640) return ''
   if (innerWidth >= 640 && innerWidth < 768) return 'sm'
   if (innerWidth >= 768 && innerWidth < 1024) return 'md'
