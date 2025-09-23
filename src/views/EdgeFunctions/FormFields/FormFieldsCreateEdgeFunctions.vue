@@ -37,7 +37,7 @@
 
   const emit = defineEmits(['update:previewData', 'additionalErrors'])
 
-  const viewPort = ref('')
+  const breakpoint = ref('')
   let SPLITTER_PROPS = ref({
     height: '50vh',
     layout: 'horizontal',
@@ -185,10 +185,10 @@
 
   const setSplitterDirection = () => {
     if (
-      viewPort.value === '' ||
-      viewPort.value === 'sm' ||
-      viewPort.value === 'md' ||
-      viewPort.value === 'lg'
+      breakpoint.value === '' ||
+      breakpoint.value === 'sm' ||
+      breakpoint.value === 'md' ||
+      breakpoint.value === 'lg'
     ) {
       SPLITTER_PROPS.value = {
         height: '',
@@ -206,9 +206,7 @@
 
   onMounted(() => {
     window.addEventListener('resize', () => {
-      let viewport = getBreakpoint(window.innerWidth)
-      viewPort.value = viewport
-
+      breakpoint.value = getBreakpoint(window.innerWidth)
       setSplitterDirection()
     })
   })
@@ -454,6 +452,7 @@
 
         <div v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder">
           <EmptyResultsBlock
+            class="!min-h-[496px]"
             title="No form have been created"
             description="Click the button below to create configure your form."
             createButtonLabel="Form Builder"
