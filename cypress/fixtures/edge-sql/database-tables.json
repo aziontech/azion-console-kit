@@ -1,0 +1,16 @@
+{
+  "tables": [
+    {
+      "name": "users",
+      "type": "table"
+    },
+    {
+      "name": "products", 
+      "type": "table"
+    },
+    {
+      "name": "orders",
+      "type": "table"
+    }
+  ]
+}

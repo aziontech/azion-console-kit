@@ -1,23 +1,24 @@
 <script setup>
+  import { ref, onMounted, inject } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import HelloWorldSample from '@/helpers/edge-function-hello-world'
-  import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
   import ContentBlock from '@/templates/content-block'
   import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref, onMounted, inject } from 'vue'
+  import HelloWorldSample from '@/helpers/edge-function-hello-world'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useLoadingStore } from '@/stores/loading'
-  import { useRoute } from 'vue-router'
   import { edgeFunctionService } from '@/services/v2'
 
-  const route = useRoute()
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
+  const route = useRoute()
   const ARGS_INITIAL_STATE = '{}'
+  const isLoading = ref(false)
+  const additionalErrors = ref([])
 
   const handleTrackCreation = (response) => {
     tracker.product.productCreated({
@@ -40,17 +41,10 @@
       .track()
   }
 
-  onMounted(() => {
-    const store = useLoadingStore()
-    store.startLoading()
-    if (document.readyState == 'complete') {
-      store.finishLoading()
-    }
-  })
-
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
+    azionForm: yup.object(),
     defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
@@ -72,6 +66,7 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
+    azionForm: {},
     executionEnvironment: 'application'
   }
 
@@ -81,12 +76,40 @@
       actions: {
         link: {
           label: 'View Function',
-          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
+          callback: () => response.redirectToUrl(`/functions/edit/${response.functionId}`)
         }
       }
     }
     response.showToastWithActions(toast)
   }
+
+  const hasAdditionalErrors = () => {
+    return additionalErrors.value.length
+  }
+
+  const handleAdditionalErrors = (errors) => {
+    additionalErrors.value = errors
+  }
+
+  const formSubmit = async (onSubmit) => {
+    isLoading.value = true
+
+    if (hasAdditionalErrors()) {
+      isLoading.value = false
+      return
+    }
+
+    await onSubmit()
+    isLoading.value = false
+  }
+
+  onMounted(() => {
+    const store = useLoadingStore()
+    store.startLoading()
+    if (document.readyState == 'complete') {
+      store.finishLoading()
+    }
+  })
 </script>
 
 <template>
@@ -106,14 +129,17 @@
         disableToast
       >
         <template #form>
-          <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />
+          <FormFieldsCreateEdgeFunctions
+            v-model:preview-data="updateObject"
+            @additionalErrors="handleAdditionalErrors"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            @onSubmit="formSubmit(onSubmit)"
             @onCancel="onCancel"
-            :loading="loading"
+            :loading="isLoading || loading"
           />
         </template>
       </CreateFormBlock>

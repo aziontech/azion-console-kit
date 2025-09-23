@@ -1,8 +1,5 @@
 <template>
-  <SocialIdpsBlock
-    :socialIdpsService="listSocialIdpsService"
-    direction="bottom-to-top"
-  />
+  <SocialIdpsBlock direction="bottom-to-top" />
   <PrimeButton
     label="Sign Up with Email"
     outlined
@@ -21,11 +18,4 @@
     accountStore.resetSsoSignUpMethod()
     emit('change-signup-method')
   }
-
-  defineProps({
-    listSocialIdpsService: {
-      type: Function,
-      required: true
-    }
-  })
 </script>

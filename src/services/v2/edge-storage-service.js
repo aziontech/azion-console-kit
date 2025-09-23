@@ -32,10 +32,14 @@ export class EdgeStorageService {
     return data
   }
 
-  listEdgeStorageBucketFiles = async (bucketName = '') => {
+  listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects`
+      url: `${
+        this.baseURL
+      }/${bucketName}/objects?all_levels=${all_levels}&prefix=${encodeURIComponent(
+        prefix
+      )}&max_object_count=100`
     })
 
     return this.adapter?.transformListEdgeStorageFiles?.(data)
@@ -60,7 +64,12 @@ export class EdgeStorageService {
     return `Bucket "${bucketName}" has been deleted successfully`
   }
 
-  addEdgeStorageBucketFiles = async (file = {}, bucketName = '', onProgress = null) => {
+  addEdgeStorageBucketFiles = async (
+    file = {},
+    bucketName = '',
+    onProgress = null,
+    prefix = ''
+  ) => {
     const config = {}
 
     if (onProgress && typeof onProgress === 'function') {
@@ -80,7 +89,7 @@ export class EdgeStorageService {
 
     await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${bucketName}/objects/${
+      url: `${this.baseURL}/${bucketName}/objects/${encodeURIComponent(prefix)}${
         file.webkitRelativePath ? file.webkitRelativePath : file.name
       }`,
       body: file,
@@ -107,5 +116,37 @@ export class EdgeStorageService {
     })
 
     return response.data
+  }
+
+  getEdgeStorageMetrics = async () => {
+    const now = new Date()
+    const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000)
+
+    const tsLt = now.toISOString()
+    const tsGte = twoDaysAgo.toISOString()
+
+    const query = `
+      query {
+        edgeStorageMetrics(
+          filter: {
+            tsGte: "${tsGte}"
+            tsLt: "${tsLt}"
+          }
+        ) {
+          bucketName
+          storedGb
+        }
+      }
+    `
+
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: 'v4/metrics/graphql',
+      body: {
+        query
+      }
+    })
+
+    return data.data.edgeStorageMetrics
   }
 }

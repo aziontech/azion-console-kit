@@ -2,12 +2,12 @@ import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFunctionsRoutes = {
-  path: '/edge-functions',
-  name: 'edge-functions',
+  path: '/functions',
+  name: 'functions',
   children: [
     {
       path: '',
-      name: 'list-edge-functions',
+      name: 'list-functions',
       component: () => import('@views/EdgeFunctions/ListView.vue'),
       props: {
         documentationService: Helpers.documentationCatalog.edgeFunctions
@@ -17,42 +17,42 @@ export const edgeFunctionsRoutes = {
         breadCrumbs: [
           {
             label: 'Functions',
-            to: '/edge-functions'
+            to: '/functions'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-functions',
+      name: 'create-functions',
       component: () => import('@views/EdgeFunctions/CreateView.vue'),
       meta: {
         title: 'Create Function',
         breadCrumbs: [
           {
             label: 'Functions',
-            to: '/edge-functions'
+            to: '/functions'
           },
           {
             label: 'Create Function',
-            to: '/edge-functions/create'
+            to: '/functions/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edit-edge-functions',
+      name: 'edit-functions',
       component: () => import('@views/EdgeFunctions/EditView.vue'),
       props: {
-        updatedRedirect: 'list-edge-functions'
+        updatedRedirect: 'list-functions'
       },
       meta: {
         title: 'Edit Function',
         breadCrumbs: [
           {
             label: 'Functions',
-            to: '/edge-functions'
+            to: '/functions'
           },
           {
             label: 'Edit Function'

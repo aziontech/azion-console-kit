@@ -13,6 +13,9 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+
+  const accountStore = useAccountStore()
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   defineOptions({
@@ -72,7 +75,6 @@
       required: true
     }
   })
-
   const showGoBack = ref(false)
   const selectedAttack = ref([])
   const selectedFilter = ref({
@@ -89,6 +91,8 @@
       emit('update:visible', value)
     }
   })
+
+  const hasEnableWafTuning = computed(() => accountStore.hasEnableWafTuning)
 
   const recordsFoundLabel = computed(() => {
     return `${totalRecordsFound.value} records found`
@@ -211,6 +215,20 @@
     listTableRef.value?.reload({ filters: query })
   }
 
+  const toggleDrawerVisibility = (isVisible) => {
+    visibleDrawer.value = isVisible
+  }
+  const closeDrawer = () => {
+    toggleDrawerVisibility(false)
+  }
+  const handleGoBack = () => {
+    showGoBack.value = false
+    toggleDrawerVisibility(false)
+  }
+  const createAllowed = () => {
+    emit('attack-on', selectedAttack.value)
+  }
+
   const listAttacks = async (params) => {
     let query
 
@@ -245,23 +263,6 @@
 
   const filterTuning = async () => {
     filterSearch(selectedFilterAdvanced.value)
-  }
-
-  const toggleDrawerVisibility = (isVisible) => {
-    visibleDrawer.value = isVisible
-  }
-
-  const closeDrawer = () => {
-    toggleDrawerVisibility(false)
-  }
-
-  const handleGoBack = () => {
-    showGoBack.value = false
-    toggleDrawerVisibility(false)
-  }
-
-  const createAllowed = () => {
-    emit('attack-on', selectedAttack.value)
   }
 
   const tableColumns = [
@@ -452,8 +453,10 @@
         </div>
       </div>
     </template>
-
-    <template #footer>
+    <template
+      #footer
+      v-if="hasEnableWafTuning"
+    >
       <div class="sticky bottom-0">
         <GoBack
           :goBack="handleGoBack"

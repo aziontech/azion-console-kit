@@ -142,6 +142,7 @@
             @change="updateRelativeRange"
             optionLabel="label"
             optionValue="value"
+            disabled
           />
         </div>
       </TabPanel>

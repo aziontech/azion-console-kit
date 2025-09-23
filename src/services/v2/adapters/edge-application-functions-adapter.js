@@ -43,7 +43,8 @@ export const EdgeApplicationFunctionsAdapter = {
       id: data.id,
       edgeFunctionID: data.function,
       name: data.name,
-      args: JSON.stringify(data.args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t'),
+      azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
   },
 
@@ -52,7 +53,8 @@ export const EdgeApplicationFunctionsAdapter = {
       name: payload.name,
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
-      active: true
+      active: true,
+      azion_form: JSON.parse(payload.azionForm)
     }
   },
 
@@ -60,7 +62,8 @@ export const EdgeApplicationFunctionsAdapter = {
     return {
       name: payload.name,
       function: payload.edgeFunctionID,
-      args: JSON.parse(payload.args)
+      args: JSON.parse(payload.args),
+      azion_form: JSON.parse(payload.azionForm)
     }
   }
 }

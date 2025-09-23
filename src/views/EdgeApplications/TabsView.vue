@@ -162,8 +162,9 @@
       tab
     }
     router.push({
-      name: 'edit-edge-application',
-      params
+      name: 'edit-application',
+      params,
+      query: route.query
     })
   }
   const changeTab = (index) => {
@@ -208,7 +209,7 @@
   })
 
   const tieredCacheEnabled = computed(() => {
-    return hasFlagBlockApiV4() ? 'l2Caching' : 'tieredCacheEnabled'
+    return hasFlagBlockApiV4() ? isModuleEnabled('l2Caching').value : true
   })
 
   const imageProcessorEnabled = computed(() => {
@@ -279,7 +280,7 @@
       show: showTabs.cacheSettings,
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
-        isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
+        isTieredCacheEnabled: tieredCacheEnabled.value,
         edgeApplicationId: edgeApplicationId.value
       })
     },

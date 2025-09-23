@@ -121,8 +121,9 @@
       tab
     }
     router.push({
-      name: 'edit-edge-firewall',
-      params
+      name: 'edit-firewall',
+      params,
+      query: route.query
     })
   }
 

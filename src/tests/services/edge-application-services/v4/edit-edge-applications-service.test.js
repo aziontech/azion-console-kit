@@ -37,12 +37,12 @@ describe('EdgeApplicationServicesV4', () => {
     await sut(fixtures.edgeApplication)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications/${fixtures.edgeApplication.id}`,
+      url: `v4/workspace/applications/${fixtures.edgeApplication.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.edgeApplication.name,
         modules: {
-          edge_cache_enabled: fixtures.edgeApplication.edgeCacheEnabled,
+          cache_enabled: fixtures.edgeApplication.edgeCacheEnabled,
           edge_functions_enabled: fixtures.edgeApplication.edgeFunctionsEnabled,
           application_accelerator_enabled: fixtures.edgeApplication.applicationAcceleratorEnabled,
           image_processor_enabled: fixtures.edgeApplication.imageProcessorEnabled,

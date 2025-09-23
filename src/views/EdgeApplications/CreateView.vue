@@ -63,7 +63,6 @@
     edgeCacheEnabled: true,
     edgeFunctionsEnabled: true,
     imageProcessorEnabled: false,
-    tieredCacheEnabled: false,
     isActive: true
   })
 
@@ -80,7 +79,7 @@
       actions: {
         link: {
           label: 'View Application',
-          callback: () => redirectToUrl(`/edge-applications/edit/${data.id}`)
+          callback: () => redirectToUrl(`/applications/edit/${data.id}`)
         }
       }
     }

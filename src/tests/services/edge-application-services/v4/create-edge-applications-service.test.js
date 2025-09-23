@@ -30,7 +30,7 @@ describe('EdgeApplicationServicesV4', () => {
     await sut(fixtures.edgeApplication)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications`,
+      url: `v4/workspace/applications`,
       method: 'POST',
       body: {
         name: fixtures.edgeApplication.name
@@ -53,7 +53,7 @@ describe('EdgeApplicationServicesV4', () => {
 
     expect(result).toEqual({
       feedback: 'Your Application has been created',
-      urlToEditView: `/edge-applications/config/${fixtures.edgeApplicationId}`,
+      urlToEditView: `/applications/config/${fixtures.edgeApplicationId}`,
       applicationId: fixtures.edgeApplicationId
     })
   })

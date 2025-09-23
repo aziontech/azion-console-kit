@@ -109,6 +109,10 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+// Edge SQL
+import { EdgeSQLService } from './edge-sql-service'
+import { EdgeSQLAdapter } from './adapters/edge-sql-adapter'
+
 // Edge App Error Response
 import { EdgeAppErrorResponseAdapter } from './adapters/edge-app-error-response-adapter'
 import { EdgeAppErrorResponseService } from './edge-app-error-response-service'
@@ -118,6 +122,10 @@ import { ActivityHistoryService } from './activity-history-service'
 import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
 import graphQLApi from '@/services/axios/makeEventsApi'
 const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+
+// IAM
+import { IAMAdapter } from './adapters/iam-adapter'
+import { IAMService } from './iam-service'
 
 const httpService = createHttpService()
 
@@ -181,12 +189,15 @@ const workloadService = new WorkloadService(
   digitalCertificatesService,
   DigitalCertificatesAdapter
 )
+const edgeSQLService = new EdgeSQLService(httpService, EdgeSQLAdapter)
 
 const activityHistoryService = new ActivityHistoryService(
   httpService,
   ActivityHistoryAdapter,
   graphQLApiInstance
 )
+
+const iamService = new IAMService(httpService, IAMAdapter)
 
 export {
   vcsService,
@@ -217,6 +228,8 @@ export {
   billingGqlService,
   workloadService,
   workloadDeploymentService,
+  edgeStorageService,
+  edgeSQLService,
   activityHistoryService,
-  edgeStorageService
+  iamService
 }

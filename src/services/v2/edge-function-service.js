@@ -2,7 +2,7 @@ export class EdgeFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_functions/functions'
+    this.baseURL = 'v4/workspace/functions'
   }
 
   #getUrl(id, suffix = '') {
@@ -125,7 +125,7 @@ export class EdgeFunctionService {
 
     return {
       feedback: 'Your function has been created',
-      urlToEditView: `/edge-functions/edit/${data.data.id}`,
+      urlToEditView: `/functions/edit/${data.data.id}`,
       functionId: data.data.id
     }
   }

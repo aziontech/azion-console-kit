@@ -12,13 +12,14 @@
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    documentationService: { type: Function, required: true },
+    documentationService: { type: Function, required: false },
     createPagePath: { type: String, required: false },
     disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
     noBorder: { type: Boolean, required: false },
-    noShowBorderTop: { type: Boolean, required: false, default: false }
+    noShowBorderTop: { type: Boolean, required: false, default: false },
+    showLearnMoreButton: { type: Boolean, required: false, default: true }
   })
   function openDocumentation() {
     props.documentationService()
@@ -37,7 +38,7 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
+      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3 min-h-[300px]"
       :class="{ 'border surface-border': !noBorder, 'rounded-t-none': noShowBorderTop }"
     >
       <slot name="illustration">
@@ -69,6 +70,7 @@
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
+          v-if="props.documentationService"
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
