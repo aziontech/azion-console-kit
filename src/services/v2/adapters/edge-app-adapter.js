@@ -49,7 +49,7 @@ export const EdgeAppAdapter = {
       edgeFunctionsEnabled: data?.modules?.functions.enabled,
       applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
       imageProcessorEnabled: data?.modules?.image_processor.enabled,
-      tieredCacheEnabled: data?.modules?.tiered_cache.enabled,
+      tieredCacheEnabled: data?.modules?.tiered_cache?.enabled,
       isActive: data?.active,
       debug: data?.debug,
       productVersion: data?.product_version

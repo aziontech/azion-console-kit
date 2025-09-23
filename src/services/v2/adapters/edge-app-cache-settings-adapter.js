@@ -31,18 +31,17 @@ export const CacheSettingsAdapter = {
         }
       }
     }
+    if (payload.tieredCache) {
+      result.modules.cache.tiered_cache = {
+        enabled: payload.tieredCache,
+        topology: payload.tieredCacheRegion
+      }
+    } else {
+      delete result.modules.cache.tiered_cache
+    }
 
     if (result.browser_cache.behavior === 'honor') {
       result.browser_cache.max_age = 0
-    }
-
-    // Add tiered_cache module if enabled
-    if (payload.tieredCache) {
-      result.modules.edge_cache.tiered_cache = {
-        behavior: 'override', // readonly according to docs
-        max_age: 31536000, // readonly according to docs
-        topology: 'global'
-      }
     }
 
     // Add application_accelerator module if any of its features are used
@@ -116,7 +115,7 @@ export const CacheSettingsAdapter = {
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.edge_cache || {}
-    const tieredCache = data.modules?.edge_cache?.tiered_cache
+    const tieredCache = data.modules?.cache?.tiered_cache
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
