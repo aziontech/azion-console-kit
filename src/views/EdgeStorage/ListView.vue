@@ -1,7 +1,9 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Object Storage" />
+      <PageHeadingBlock
+        :pageTitle="selectedBucket?.name ? selectedBucket.name : 'Object Storage'"
+      />
     </template>
     <template #content>
       <BucketListTable v-if="!selectedBucket" />
@@ -14,14 +16,55 @@
             v-if="selectedBucket"
             class="flex flex-col"
           >
-            <div class="flex justify-between items-center mb-4 pt-1">
-              <h2
+            <div
+              class="flex justify-between items-start mb-4 pt-1 relative"
+              ref="headerContainer"
+            >
+              <div
                 v-if="isGreaterThanMD"
-                class="text-xl font-semibold text-color-primary truncate"
+                class="flex-shrink min-w-0 overflow-hidden"
               >
-                {{ selectedBucket.name }}
-              </h2>
-              <div class="flex w-full md:w-auto items-center gap-2.5">
+                <Breadcrumb
+                  :model="displayedBreadcrumbItems"
+                  class="text-color-primary overflow-hidden"
+                  :pt="{
+                    root: { class: 'overflow-hidden' },
+                    menu: { class: 'flex flex-nowrap overflow-hidden max-w-full' }
+                  }"
+                >
+                  <template #item="{ item }">
+                    <a
+                      class="cursor-pointer whitespace-nowrap"
+                      @click="item.label === '...' ? null : handleBreadcrumbClick(item)"
+                      @mouseenter.stop="item.label === '...' && setEllipsisPopup(true)"
+                      @mouseleave.stop="item.label === '...' && scheduleHidePopup()"
+                    >
+                      {{ item.label }}
+                    </a>
+                  </template>
+                </Breadcrumb>
+                <div
+                  class="absolute top-full left-20 mt-1 bg-[var(--menu-bg)] rounded-md z-[-50] opacity-0"
+                  @mouseleave="scheduleHidePopup()"
+                  @mouseenter="cancelHidePopup()"
+                  :class="{
+                    'opacity-100 transition-opacity duration-300 z-[50]': showEllipsisPopup
+                  }"
+                >
+                  <div
+                    v-for="hiddenItem in hiddenBreadcrumbItems"
+                    :key="hiddenItem.index"
+                    class="px-3 py-2 hover:bg-[var(--surface-hover)] rounded-md cursor-pointer text-sm whitespace-nowrap"
+                    @click="handleBreadcrumbClick(hiddenItem)"
+                  >
+                    {{ hiddenItem.label }}
+                  </div>
+                </div>
+              </div>
+              <div
+                class="flex w-full md:w-auto items-center gap-2.5"
+                ref="buttonsContainer"
+              >
                 <div class="p-input-icon-left w-full md:w-64">
                   <i class="pi pi-search" />
                   <InputText
@@ -134,17 +177,20 @@
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
+  import Breadcrumb from 'primevue/breadcrumb'
   import DragAndDrop from './components/DragAndDrop.vue'
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import UploadCard from './components/UploadCard.vue'
 
   const router = useRouter()
   const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
   const {
     buckets,
     selectedBucket,
@@ -154,7 +200,8 @@
     handleDownload,
     selectedFiles,
     isDownloading,
-    showDragAndDrop
+    showDragAndDrop,
+    folderPath
   } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
@@ -165,24 +212,6 @@
       type: Function
     }
   })
-
-  const fileSearchTerm = ref('')
-  const selectedFolder = ref(null)
-  const listServiceFilesRef = ref(null)
-  const isDragOver = ref(false)
-
-  const uploadMenuItems = [
-    {
-      label: 'Create folder',
-      icon: 'pi pi-folder',
-      command: () => openFileSelector('folder')
-    },
-    {
-      label: 'Upload files',
-      icon: 'pi pi-upload',
-      command: () => openFileSelector('files')
-    }
-  ]
 
   const fileActions = [
     {
@@ -200,23 +229,165 @@
     }
   ]
 
-  const getColumns = computed(() => {
-    return [
+  const getColumns = [
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'size',
+      header: 'Size'
+    },
+    {
+      field: 'last_modified',
+      header: 'Last Modified'
+    }
+  ]
+  const uploadMenuItems = [
+    {
+      label: 'Create folder',
+      icon: 'pi pi-folder',
+      command: () => openFileSelector('folder')
+    },
+    {
+      label: 'Upload files',
+      icon: 'pi pi-upload',
+      command: () => openFileSelector('files')
+    }
+  ]
+  const fileSearchTerm = ref('')
+  const listServiceFilesRef = ref(null)
+  const isDragOver = ref(false)
+  const headerContainer = ref(null)
+  const buttonsContainer = ref(null)
+  const containerWidth = ref(0)
+  const showEllipsisPopup = ref(false)
+  const hidePopupTimeout = ref(null)
+
+  const breadcrumbItems = computed(() => {
+    if (!selectedBucket.value) return []
+
+    const items = [
       {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'size',
-        header: 'Size'
-      },
-      {
-        field: 'last_modified',
-        header: 'Last Modified'
+        label: selectedBucket.value.name,
+        index: 0
       }
     ]
+
+    if (folderPath.value) {
+      const folders = folderPath.value.split('/').filter((folder) => folder.trim() !== '')
+      folders.forEach((folder, index) => {
+        items.push({
+          label: folder,
+          index: index + 1
+        })
+      })
+    }
+
+    return items
   })
 
+  const availableWidth = computed(() => {
+    if (!isGreaterThanMD.value || containerWidth.value === 0) {
+      return 1000
+    }
+
+    const buttonsWidth = buttonsContainer.value ? buttonsContainer.value.offsetWidth : 400
+    const gap = 16
+    return Math.max(200, containerWidth.value - buttonsWidth - gap)
+  })
+
+  const displayedBreadcrumbItems = computed(() => {
+    const items = breadcrumbItems.value
+    const width = availableWidth.value
+
+    if (items.length <= 1) {
+      return items
+    }
+
+    const estimatedItemWidth = 120
+    const separatorWidth = 32
+    const ellipsisWidth = 40
+
+    const calculateBreadcrumbWidth = (itemsToShow) => {
+      const totalItems = itemsToShow.length
+      const hasEllipsis = itemsToShow.some((item) => item.label === '...')
+
+      let totalWidth = totalItems * estimatedItemWidth + (totalItems - 1) * separatorWidth
+      if (hasEllipsis) {
+        totalWidth = totalWidth - estimatedItemWidth + ellipsisWidth
+      }
+
+      return totalWidth
+    }
+
+    if (calculateBreadcrumbWidth(items) <= width) {
+      return items
+    }
+
+    if (items.length === 2) {
+      return items
+    }
+
+    let currentItems = [...items]
+
+    while (currentItems.length > 2) {
+      const testItems = [currentItems[0], { label: '...' }, ...currentItems.slice(2)]
+
+      if (calculateBreadcrumbWidth(testItems) <= width) {
+        return testItems
+      }
+
+      currentItems.splice(1, 1)
+    }
+
+    return [items[0], { label: '...', disabled: true }, items[items.length - 1]]
+  })
+
+  const hiddenBreadcrumbItems = computed(() => {
+    const items = breadcrumbItems.value
+    const displayed = displayedBreadcrumbItems.value
+
+    const hasEllipsis = displayed.some((item) => item.label === '...')
+    if (!hasEllipsis) {
+      return []
+    }
+
+    const firstDisplayedIndex = displayed[0].index
+    const lastDisplayedItems = displayed.slice(-2)
+    const lastDisplayedIndex = lastDisplayedItems[0].index
+
+    return items.filter(
+      (item) => item.index > firstDisplayedIndex && item.index < lastDisplayedIndex
+    )
+  })
+
+  const setEllipsisPopup = (value) => {
+    if (!value) {
+      setTimeout(() => {
+        showEllipsisPopup.value = value
+      }, 500)
+    } else {
+      showEllipsisPopup.value = value
+    }
+  }
+
+  const scheduleHidePopup = () => {
+    if (hidePopupTimeout.value) {
+      clearTimeout(hidePopupTimeout.value)
+    }
+    hidePopupTimeout.value = setTimeout(() => {
+      showEllipsisPopup.value = false
+    }, 200)
+  }
+
+  const cancelHidePopup = () => {
+    if (hidePopupTimeout.value) {
+      clearTimeout(hidePopupTimeout.value)
+      hidePopupTimeout.value = null
+    }
+    showEllipsisPopup.value = true
+  }
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
   })
@@ -224,11 +395,23 @@
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
     selectedBucket.value = bucket
-    selectedFolder.value = null
+    folderPath.value = ''
     selectedFiles.value = []
     listServiceFilesRef.value?.reload()
   }
 
+  const handleBreadcrumbClick = (item) => {
+    if (item.index === 0) {
+      folderPath.value = ''
+    } else {
+      const folders = folderPath.value.split('/').filter((folder) => folder.trim() !== '')
+      const pathToFolder = folders.slice(0, item.index).join('/')
+      folderPath.value = `${pathToFolder}/`
+    }
+
+    filesTableNeedRefresh.value = true
+    listServiceFilesRef.value?.reload()
+  }
   const handleSettingsTrackEvent = () => {
     router.push(`/object-storage/edit/${selectedBucket.value.id}`)
   }
@@ -268,13 +451,17 @@
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
-      selectedFolder.value = item
+      folderPath.value += item.name
+      filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
   }
 
   const goBackToBucket = () => {
-    selectedFolder.value = null
+    const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
+    pathSegments.pop()
+    folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
 
@@ -301,8 +488,22 @@
   const listEdgeStorageBucketFiles = async () => {
     if (needFetchToAPI.value) {
       selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
-        selectedBucket.value.name
+        selectedBucket.value.name,
+        false,
+        folderPath.value
       )
+      selectedBucket.value.files = selectedBucket.value.files.map((file) => ({
+        ...file,
+        name: file.name.replace(folderPath.value, '')
+      }))
+      if (folderPath.value) {
+        selectedBucket.value.files.unshift({
+          id: '..',
+          name: '..',
+          isParentNav: true,
+          isFolder: true
+        })
+      }
       filesTableNeedRefresh.value = false
     }
     showDragAndDrop.value = !selectedBucket.value?.files?.length
@@ -323,6 +524,12 @@
     }
   }
 
+  const updateContainerWidth = () => {
+    if (headerContainer.value) {
+      containerWidth.value = headerContainer.value.offsetWidth
+    }
+  }
+
   const handleRefresh = () => {
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
@@ -337,10 +544,32 @@
   watch(route, () => {
     const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
     selectBucket(bucket)
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
   })
+
+  watch(
+    breadcrumbItems,
+    () => {
+      setTimeout(updateContainerWidth, 50)
+    },
+    { deep: true }
+  )
+
+  watch(isGreaterThanMD, () => {
+    setTimeout(updateContainerWidth, 50)
+  })
+
   onMounted(async () => {
     if (route.params.id) {
       router.replace('/object-storage')
     }
+
+    setTimeout(updateContainerWidth, 100)
+
+    window.addEventListener('resize', updateContainerWidth)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateContainerWidth)
   })
 </script>

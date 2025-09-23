@@ -27,7 +27,7 @@
         title="No Connectors have been created"
         description="Click the button below to create your first Connectors."
         createButtonLabel="Connectors"
-        createPagePath="edge-connectors/create"
+        createPagePath="connectors/create"
         :documentationService="documentationService"
       >
         <template #illustration>

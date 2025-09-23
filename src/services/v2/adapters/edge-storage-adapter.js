@@ -30,7 +30,8 @@ export const EdgeStorageAdapter = {
       id: file.key,
       name: file.key,
       last_modified: formatDateToDayMonthYearHour(file.last_modified) || '-',
-      size: formatBytes(file.size) || '-'
+      size: file.is_folder ? '-' : formatBytes(file.size),
+      isFolder: file.is_folder
     }))
   }
 }

@@ -3,6 +3,7 @@ export const edgeStorageRoutes = {
   path: '/object-storage',
   name: 'object-storage',
   meta: {
+    title: 'Object Storage',
     flag: 'checkout_access_without_flag'
   },
   children: [
@@ -15,6 +16,27 @@ export const edgeStorageRoutes = {
           {
             label: 'Object Storage',
             to: '/object-storage'
+          }
+        ]
+      }
+    },
+    {
+      path: ':id',
+      name: 'object-storage-view',
+      component: () => import('@/views/EdgeStorage/ListView.vue'),
+      props: {
+        mode: 'view'
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Object Storage',
+            to: '/object-storage'
+          },
+          {
+            label: 'Edit Bucket',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       },

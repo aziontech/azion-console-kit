@@ -192,7 +192,6 @@ function createMarketplaceProductsItems() {
   ]
 }
 
-//  Uncoment this when store is ready
 // function createStoreItems() {
 //   return [
 //     {
@@ -201,14 +200,15 @@ function createMarketplaceProductsItems() {
 //       icon: 'ai ai-edge-storage',
 //       id: 'object-storage',
 //       tag: 'Preview'
-//     },
-//        {
-//         label: 'SQL Database',
-//         to: '/sql-database',
-//         icon: 'ai ai-edge-sql',
-//         tag: 'Preview',
-//         id: 'sql-database'
-//        }
+//     }
+//     //  Uncoment this when database is ready
+//     //  {
+//     //   label: 'SQL Database',
+//     //   to: '/sql-database',
+//     //   icon: 'ai ai-edge-sql',
+//     //   tag: 'Preview',
+//     //   id: 'sql-database'
+//     //  }
 //   ]
 // }
 
@@ -225,7 +225,6 @@ export function getMenuItens(showMarketplaceProductsItens) {
       label: 'Secure',
       items: createSecureItems()
     },
-    // Uncomment this when store is ready
     // {
     //   label: 'Store',
     //   items: createStoreItems()
