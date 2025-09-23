@@ -41,7 +41,7 @@
   const azionFormValidationErrors = ref([])
   const schemaAzionFormString = ref('{}')
   const emptySchemaAzionForm = ref(true)
-  const selectPanelOptions = ['{ } args.json', '{ } form.json']
+  const selectPanelOptions = ['JSON', 'Form Builder']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
 
@@ -382,21 +382,12 @@
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
-            :pt="
-              () => ({
-                root: {
-                  class: 'p-0'
-                }
-              })
-            "
             @update:modelValue="selectPanelUpdateModelValue"
           />
         </div>
 
         <Splitter
           :style="{ height: SPLITTER_PROPS.height }"
-          @resizestart="showPreview = false"
-          @resizeend="showPreview = true"
           :layout="SPLITTER_PROPS.layout"
           :pt="{
             root: {
