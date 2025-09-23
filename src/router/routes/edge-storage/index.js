@@ -4,7 +4,7 @@ export const edgeStorageRoutes = {
   name: 'object-storage',
   meta: {
     title: 'Object Storage',
-    flag: 'checkout_access_without_flag'
+    flag: 'only_azon_email'
   },
   children: [
     {
