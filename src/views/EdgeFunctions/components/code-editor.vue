@@ -3,9 +3,9 @@
     v-model:value="code"
     :language="runtime"
     :theme="theme"
-    class="w-full min-h-[400px] h-full surface-border border-r"
+    class="w-full min-h-[400px] h-full border border-transparent surface-border border-r rounded-md"
     :class="{
-      'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors,
+      '!border-red-500 border h-[calc(100%-1.5rem)]': errors,
       'cursor-not-allowed': EDITOR_OPTIONS.readOnly
     }"
     :options="EDITOR_OPTIONS"
