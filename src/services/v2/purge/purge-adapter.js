@@ -1,5 +1,6 @@
 const MAPLAYER = {
   Cache: 'edge_cache',
+
   'Tiered Cache': 'tiered_cache'
 }
 

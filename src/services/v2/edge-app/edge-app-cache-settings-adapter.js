@@ -110,12 +110,14 @@ export const CacheSettingsAdapter = {
       name: item.name,
       browserCache: formatCacheBehavior(item.browser_cache?.behavior || 'honor'),
       cdnCache: formatCacheBehavior(item.modules?.cache?.behavior || 'honor')
+
     }))
   },
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.edge_cache || {}
     const tieredCache = data.modules?.cache?.tiered_cache
+
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
@@ -153,6 +155,7 @@ export const CacheSettingsAdapter = {
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
       tieredCache: !!tieredCache,
       tieredCacheRegion: tieredCache?.topology || 'global',
+
       cacheByQueryString,
       queryStringFields,
       enableQueryStringSort,

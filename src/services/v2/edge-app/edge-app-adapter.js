@@ -50,6 +50,7 @@ export const EdgeAppAdapter = {
       applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
       imageProcessorEnabled: data?.modules?.image_processor.enabled,
       tieredCacheEnabled: data?.modules?.tiered_cache?.enabled,
+
       isActive: data?.active,
       debug: data?.debug,
       productVersion: data?.product_version
@@ -61,6 +62,7 @@ export const EdgeAppAdapter = {
       name: payload.name,
       modules: {
         cache: { enabled: payload.edgeCacheEnabled },
+
         functions: { enabled: payload.edgeFunctionsEnabled },
         application_accelerator: { enabled: payload.applicationAcceleratorEnabled },
         image_processor: { enabled: payload.imageProcessorEnabled },
