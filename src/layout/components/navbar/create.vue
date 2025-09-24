@@ -85,6 +85,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import { useToast } from 'primevue/usetoast'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
@@ -107,6 +108,7 @@
   const recommendedQuery = ref(null)
   const templatesQuery = ref(null)
   const githubImportQuery = ref(null)
+  const toast = useToast()
 
   const loadQueries = () => {
     if (accountData.value.kind !== 'client') return
@@ -141,6 +143,15 @@
 
   const openCreateModalToggle = () => {
     tracker.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
+    if (accountData.value.kind !== 'client') {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Only client accounts have access to the create system',
+        life: 3000
+      })
+      return
+    }
     createModalStore.toggle()
   }
 
