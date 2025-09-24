@@ -4,7 +4,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
-  import { edgeDNSService } from '@/services/v2'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import LabelBlock from '@/templates/label-block'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
   import { useField } from 'vee-validate'

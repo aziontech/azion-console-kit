@@ -11,7 +11,8 @@
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useLoadingStore } from '@/stores/loading'
-  import { edgeFunctionService } from '@/services/v2'
+
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

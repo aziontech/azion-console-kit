@@ -8,7 +8,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { useRouter } from 'vue-router'
-  import { edgeFunctionService } from '@/services/v2'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   defineOptions({
     name: 'edge-functions-drawer'
