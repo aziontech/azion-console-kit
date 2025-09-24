@@ -19,7 +19,7 @@ export class AccountSettingsService extends BaseService {
     return await this.queryAsync({
       key: ['account', 'job-role'],
       queryFn: () => this.fetchAccountJobRole(),
-      cache: this.cacheType.GLOBAL,
+      cache: this.cacheType.SENSITIVE,
       overrides: { refetchInterval: this.cacheTime.FIVE_MINUTES, ...options }
     })
   }
