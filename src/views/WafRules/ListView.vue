@@ -6,7 +6,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import CloneDialog from './Dialog/Clone.vue'
+  import CloneBlock from '@/templates/clone-block'
   import { wafService } from '@/services/v2/waf/waf-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -26,9 +26,13 @@
       label: 'Clone',
       icon: 'pi pi-fw pi-clone',
       dialog: {
-        component: CloneDialog,
+        component: CloneBlock,
         body: (item) => ({
-          data: item
+          data: {
+            service: wafService.cloneWafRule,
+            itemType: 'WAF Rule',
+            ...item
+          }
         })
       }
     },

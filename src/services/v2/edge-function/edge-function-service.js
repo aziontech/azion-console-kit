@@ -128,7 +128,7 @@ export class EdgeFunctionService extends BaseService {
 
     return {
       feedback: 'Your function has been created',
-      urlToEditView: `/edge-functions/edit/${data.data.id}`,
+      urlToEditView: `/functions/edit/${data.data.id}`,
       functionId: data.data.id
     }
   }

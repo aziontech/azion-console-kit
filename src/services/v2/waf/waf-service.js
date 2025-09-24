@@ -72,14 +72,13 @@ export class WafService extends BaseService {
     return this.adapter?.transformLoadWafRule?.(response) ?? response
   }
 
-  cloneWafRule = async ({ wafRulesName, payload }) => {
+  cloneWafRule = async (payload) => {
+    const body = this.adapter?.transformCloneWafRule?.(payload) ?? payload
+
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/${payload.id}/clone`,
-      body: {
-        id: payload.id,
-        name: wafRulesName
-      }
+      body
     })
 
     return {

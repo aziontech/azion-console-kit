@@ -35,6 +35,12 @@ export const EdgeFirewallAdapter = {
       ddosProtectionUnmetered: data.modules.ddos_protection.enabled
     }
   },
+  transformCloneEdgeFirewall(payload) {
+    return {
+      name: payload.cloneName,
+      id: payload.id
+    }
+  },
   transformPayload(payload) {
     return {
       name: payload.name,

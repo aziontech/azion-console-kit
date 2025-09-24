@@ -35,7 +35,8 @@
   import FormFieldsEditEdgeApplications from './FormFields/FormFieldsEditEdgeApplications.vue'
   import { inject } from 'vue'
 
-  defineOptions({ name: 'edit-edge-application' })
+  defineOptions({ name: 'edit-application' })
+
   const emit = defineEmits(['updatedApplication'])
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'

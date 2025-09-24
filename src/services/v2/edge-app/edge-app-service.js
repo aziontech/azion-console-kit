@@ -82,7 +82,7 @@ export class EdgeAppService extends BaseService {
 
     return {
       feedback: 'Your Application has been cloned',
-      urlToEditView: `/edge-applications/edit/${data.data.id}`,
+      urlToEditView: `/applications/edit/${data.data.id}`,
       applicationId: data.data.id
     }
   }

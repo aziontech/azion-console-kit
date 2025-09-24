@@ -14,7 +14,10 @@
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
+  import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+
+  const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
@@ -27,13 +30,12 @@
   const azionFormArgsValue = ref('{}')
   const azionFormData = ref({})
   const azionFormError = ref(false)
+  const azionFormValidationErrors = ref([])
   const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
-
-  const emit = defineEmits(['toggleDrawer'])
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -78,8 +80,11 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
+    azionFormValidationErrors.value = event.errors || []
     azionFormArgsValue.value = indentJsonStringify(event.data)
     args.value = indentJsonStringify(event.data)
+
+    emit('additionalErrors', azionFormValidationErrors.value)
   }
 
   const selectPanelUpdateModelValue = (value) => {
@@ -119,7 +124,9 @@
     azionFormData.value = {}
     schemaAzionForm.value = {}
     schemaAzionFormString.value = '{}'
+    azionFormValidationErrors.value = []
     azionForm.value = schemaAzionFormString.value
+    emit('additionalErrors', [])
   }
 
   const codeEditorFormBuilderUpdate = (value) => {
@@ -127,12 +134,22 @@
 
     try {
       parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-      schemaAzionFormString.value = value
-      azionForm.value = schemaAzionFormString.value
-      azionFormError.value = false
+      const isSchemaValid = isValidFormBuilderSchema(parsedValue)
+
+      if (isSchemaValid.valid) {
+        azionFormError.value = false
+        schemaAzionFormString.value = value
+        azionForm.value = schemaAzionFormString.value
+        emit('additionalErrors', [])
+      } else {
+        parsedValue = {}
+        azionFormError.value = true
+        emit('additionalErrors', isSchemaValid.errors)
+      }
     } catch (error) {
       parsedValue = {}
       azionFormError.value = true
+      emit('additionalErrors', [error])
     }
 
     setAzionFormEmptyState(parsedValue)
@@ -165,6 +182,7 @@
     azionFormData.value = argsJsonParser(args.value)
     schemaAzionFormString.value = azForm
     azionForm.value = schemaAzionFormString.value
+    azionFormValidationErrors.value = []
 
     setAzionFormSchema(argsJsonParser(azForm))
     setAzionFormEmptyState(argsJsonParser(azForm))
@@ -262,7 +280,7 @@
                   id="azionform"
                   class="azion-json-form"
                 >
-                  <div class="flex flex-col gap-4 overflow-y-auto h-[364px]">
+                  <div class="flex flex-col gap-4 overflow-y-auto h-[400px]">
                     <div>
                       <div
                         v-if="showFormBuilder"
@@ -278,30 +296,32 @@
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
                       </div>
-                      <div
-                        class="max-w-[320px]"
-                        v-if="!showFormBuilder && !emptySchemaAzionForm"
-                      >
-                        <JsonForms
-                          :schema="schemaAzionForm"
-                          :data="azionFormData"
-                          :renderers="renderers"
-                          @change="onChangeAzionForm"
-                        />
-                      </div>
-                      <div
-                        v-else
-                        class="flex flex-col items-center justify-center gap-2 h-[364px]"
-                      >
-                        <p>Configure the form builder.</p>
-                        <!--
-                        <PrimeButton
-                          outlined
-                          @click="azionJsonFormWindowOpener()"
-                          label="Read documentation"
-                          size="small"
-                        />
-                        -->
+                      <div v-else>
+                        <div
+                          class="max-w-[320px]"
+                          v-if="!emptySchemaAzionForm || !azionFormError"
+                        >
+                          <JsonForms
+                            :schema="schemaAzionForm"
+                            :data="azionFormData"
+                            :renderers="renderers"
+                            @change="onChangeAzionForm"
+                          />
+                        </div>
+                        <div
+                          v-else
+                          class="flex flex-col items-center justify-center gap-2 h-[400px]"
+                        >
+                          <p>Configure the form builder.</p>
+                          <!--
+                          <PrimeButton
+                            outlined
+                            @click="azionJsonFormWindowOpener()"
+                            label="Read documentation"
+                            size="small"
+                          />
+                          -->
+                        </div>
                       </div>
                     </div>
                   </div>

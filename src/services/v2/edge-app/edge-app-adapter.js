@@ -74,7 +74,7 @@ export const EdgeAppAdapter = {
   transformPayloadClone(payload) {
     return {
       id: payload.id,
-      name: payload.edgeApplicationName
+      name: payload.cloneName
     }
   }
 }

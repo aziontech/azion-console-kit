@@ -2,12 +2,12 @@ import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeConnectorsRoutes = {
-  path: '/edge-connectors',
-  name: 'edge-connectors',
+  path: '/connectors',
+  name: 'connectors',
   children: [
     {
       path: '',
-      name: 'list-edge-connectors',
+      name: 'list-connectors',
       component: () => import('@views/EdgeConnectors/ListView.vue'),
       props: {
         documentationService: Helpers.documentationCatalog.edgeConnectors,
@@ -18,7 +18,7 @@ export const edgeConnectorsRoutes = {
         breadCrumbs: [
           {
             label: 'Connectors',
-            to: '/edge-connectors'
+            to: '/connectors'
           }
         ],
         flag: 'checkout_access_without_flag'
@@ -26,18 +26,18 @@ export const edgeConnectorsRoutes = {
     },
     {
       path: 'create',
-      name: 'create-edge-connectors',
+      name: 'create-connectors',
       component: () => import('@views/EdgeConnectors/CreateView.vue'),
       meta: {
         title: 'Create Connector',
         breadCrumbs: [
           {
             label: 'Connectors',
-            to: '/edge-connectors'
+            to: '/connectors'
           },
           {
             label: 'Create Connectors',
-            to: '/edge-connectors/create'
+            to: '/connectors/create'
           }
         ],
         flag: 'checkout_access_without_flag'
@@ -45,14 +45,14 @@ export const edgeConnectorsRoutes = {
     },
     {
       path: 'edit/:id',
-      name: 'edit-edge-connectors',
+      name: 'edit-connectors',
       component: () => import('@views/EdgeConnectors/EditView.vue'),
       meta: {
         title: 'Edit Connector',
         breadCrumbs: [
           {
             label: 'Connectors',
-            to: '/edge-connectors'
+            to: '/connectors'
           },
           {
             label: 'Edit Connector'

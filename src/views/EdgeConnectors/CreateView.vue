@@ -102,7 +102,7 @@
       actions: {
         link: {
           label: 'View Edge Connector',
-          callback: () => response.redirectToUrl(`/edge-connectors/edit/${response.data.id}`)
+          callback: () => response.redirectToUrl(`/connectors/edit/${response.data.id}`)
         }
       }
     }

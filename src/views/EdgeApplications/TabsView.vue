@@ -162,7 +162,7 @@
       tab
     }
     router.push({
-      name: 'edit-edge-application',
+      name: 'edit-application',
       params,
       query: route.query
     })

@@ -5,6 +5,7 @@ import 'azion-theme'
 import '@assets/icons/azionicons.scss'
 import '@assets/c3.scss'
 import '@assets/flags.css'
+import '@mdi/font/css/materialdesignicons.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -27,7 +28,6 @@ import router from './router'
 initOAuthSecurity()
 
 const app = createApp(App)
-
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

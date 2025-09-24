@@ -313,7 +313,7 @@
   }
 
   const goToEdgeApplicationEditView = () => {
-    router.push(`/edge-applications/edit/${results.value.edgeApplication.id}`)
+    router.push(`/applications/edit/${results.value.edgeApplication.id}`)
   }
 
   const goToDomainEditView = () => {

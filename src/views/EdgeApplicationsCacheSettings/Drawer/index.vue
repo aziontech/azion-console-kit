@@ -61,7 +61,7 @@
     name: '',
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: 0,
-    cdnCacheSettings: 'honor',
+    cdnCacheSettings: props.showTieredCache ? 'override' : 'honor',
     cdnCacheSettingsMaximumTtl: 60,
     enableLargeFileCache: false,
     sliceConfigurationRange: MAX_SLICE_RANGE_IN_KBYTES,

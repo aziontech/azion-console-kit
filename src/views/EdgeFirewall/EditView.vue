@@ -11,7 +11,7 @@
 
   const tracker = inject('tracker')
 
-  defineOptions({ name: 'edit-edge-firewall' })
+  defineOptions({ name: 'edit-firewall' })
   const emit = defineEmits(['updatedFirewall'])
 
   const props = defineProps({

@@ -45,7 +45,7 @@
     }
   })
 
-  const emit = defineEmits(['on-response', 'on-response-fail'])
+  const emit = defineEmits(['on-response', 'on-response-fail', 'onError'])
   const attrs = useAttrs()
   const { scrollToError } = useScrollToError()
 

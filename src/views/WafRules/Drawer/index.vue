@@ -1,6 +1,8 @@
 <script setup>
   import { computed, onBeforeMount, ref, nextTick } from 'vue'
+  import ActionBarBlock from '@/templates/action-bar-block'
   import Divider from 'primevue/divider'
+  import GoBack from '@/templates/action-bar-block/go-back'
   import EmptyDrawer from '@/templates/empty-drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import WithSelectionBehavior from '@/templates/list-table-block/with-selection-behavior.vue'
@@ -11,6 +13,9 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+
+  const accountStore = useAccountStore()
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   defineOptions({
@@ -70,7 +75,7 @@
       required: true
     }
   })
-
+  const showGoBack = ref(false)
   const selectedAttack = ref([])
   const selectedFilter = ref({
     hourRange: '1'
@@ -86,6 +91,8 @@
       emit('update:visible', value)
     }
   })
+
+  const hasEnableWafTuning = computed(() => accountStore.hasEnableWafTuning)
 
   const recordsFoundLabel = computed(() => {
     return `${totalRecordsFound.value} records found`
@@ -206,6 +213,20 @@
       pathsList: filter.filter((item) => item.valueField === 'pathsList')[0]?.value
     }
     listTableRef.value?.reload({ filters: query })
+  }
+
+  const toggleDrawerVisibility = (isVisible) => {
+    visibleDrawer.value = isVisible
+  }
+  const closeDrawer = () => {
+    toggleDrawerVisibility(false)
+  }
+  const handleGoBack = () => {
+    showGoBack.value = false
+    toggleDrawerVisibility(false)
+  }
+  const createAllowed = () => {
+    emit('attack-on', selectedAttack.value)
   }
 
   const listAttacks = async (params) => {
@@ -430,6 +451,26 @@
             </div>
           </div>
         </div>
+      </div>
+    </template>
+    <template
+      #footer
+      v-if="hasEnableWafTuning"
+    >
+      <div class="sticky bottom-0">
+        <GoBack
+          :goBack="handleGoBack"
+          v-if="showGoBack"
+          :inDrawer="true"
+        />
+        <ActionBarBlock
+          v-else
+          @onCancel="closeDrawer"
+          @onSubmit="createAllowed"
+          :inDrawer="true"
+          primaryActionLabel="Allow Rules"
+          :submitDisabled="!selectedAttack.length"
+        />
       </div>
     </template>
   </EmptyDrawer>

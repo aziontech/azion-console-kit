@@ -45,7 +45,7 @@
     },
     {
       label: 'Application',
-      to: '/edge-applications/create?origin=create',
+      to: '/applications/create?origin=create',
       description: 'Deploy an application to deliver content from the edge.'
     },
     {
@@ -60,12 +60,12 @@
     },
     {
       label: 'Firewall',
-      to: '/edge-firewall/create',
+      to: '/firewall/create',
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
       label: 'Edge Connector',
-      to: '/edge-connectors/create',
+      to: '/connectors/create',
       description:
         'Edge Connector centralizes connections and how to connect to machines and applications.'
     },
@@ -87,7 +87,7 @@
     },
     {
       label: 'Functions',
-      to: '/edge-functions/create?origin=create',
+      to: '/functions/create?origin=create',
       description: 'Create Functions to use with Application or Firewall.'
     },
     {

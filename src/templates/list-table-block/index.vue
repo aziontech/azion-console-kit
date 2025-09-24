@@ -7,6 +7,7 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
+      :class="{ 'disabled-list': disabledList }"
       v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
@@ -55,17 +56,6 @@
                 placeholder="Search"
               />
             </span>
-
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              aria-label="Export to CSV"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
 
             <slot
               name="addButton"
@@ -141,6 +131,15 @@
               :exportTableCSV="handleExportTableDataToCSV"
             />
             <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
+            <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
@@ -175,7 +174,7 @@
         </template>
         <template
           #body="{ data: rowData }"
-          v-if="isRenderActions"
+          v-if="shouldShowActions"
         >
           <div
             class="flex justify-end"
@@ -421,23 +420,29 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    isLoading: {
+      type: Boolean,
+      default: () => false
     }
   })
   const firstItemIndex = ref(0)
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
-  const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
-  const classActions = isRenderActions
-    ? ''
-    : 'background-color: transparent !important; cursor: pointer !important;'
+  const shouldShowActions = ref(false)
+  const classActions = computed(() => {
+    return shouldShowActions.value
+      ? ''
+      : 'background-color: transparent !important; cursor: pointer !important;'
+  })
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-  const isLoading = ref(false)
+  const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
@@ -563,6 +568,7 @@
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
 
+    shouldShowActions.value = !!actions.length
     return actions
   }
 
@@ -689,3 +695,12 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style scoped>
+  /* Style for row hover when disabledList is true */
+  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
+    .p-frozen-column {
+      background: var(--surface-section) !important;
+    }
+  }
+</style>
