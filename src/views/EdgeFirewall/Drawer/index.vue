@@ -5,7 +5,7 @@
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import FormCreateEdgeFirewall from '../FormFields/FormFieldsEdgeFirewall'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   defineOptions({
     name: 'edge-firewall-drawer'

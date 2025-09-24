@@ -8,7 +8,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { validationSchema } from './FormFields/composables/validation'
 
   const validation = validationSchema(false)
