@@ -1,10 +1,8 @@
 import { ref, computed, readonly } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  digitalCertificatesService,
-  digitalCertificatesCSRService,
-  digitalCertificatesCRLService
-} from '@/services/v2'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+import { digitalCertificatesCSRService } from '@/services/v2/digital-certificates/digital-certificates-csr-service'
+import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
 
 export const CERTIFICATE_TYPES = {
   EDGE_CERTIFICATE: 'edge_certificate',

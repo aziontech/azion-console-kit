@@ -7,7 +7,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
-  import { networkListsService } from '@/services/v2'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

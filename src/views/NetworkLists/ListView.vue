@@ -4,7 +4,7 @@
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { networkListsService } from '@/services/v2'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
 

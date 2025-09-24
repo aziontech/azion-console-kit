@@ -9,7 +9,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { edgeSQLService } from '@/services/v2'
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import * as Helpers from '@/helpers'
 

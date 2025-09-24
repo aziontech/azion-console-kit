@@ -16,10 +16,7 @@
             </div>
 
             <div>
-              <SocialIdpsBlock
-                @showSocialIdps="updateEmailForm"
-                v-if="showLoginFromEmail"
-              />
+              <SocialIdpsBlock v-model:showSocialIdps="showLoginFromEmail" />
 
               <PrimeDivider
                 class="my-3"
@@ -92,10 +89,6 @@
   const router = useRouter()
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
-
-  const updateEmailForm = (value) => {
-    showLoginFromEmail.value = value
-  }
 
   const showActivationEmail = () => {
     showActivation.value = false

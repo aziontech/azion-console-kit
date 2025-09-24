@@ -18,7 +18,8 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import { networkListsService, wafService } from '@/services/v2'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
