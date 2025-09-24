@@ -1,7 +1,10 @@
-export class EdgeSQLService {
-  constructor(httpService, adapter) {
-    this.httpService = httpService
-    this.adapter = adapter
+import { BaseService } from '@/services/v2/base/query/baseService'
+import { EdgeSQLAdapter } from './edge-sql-adapter'
+
+export class EdgeSQLService extends BaseService {
+  constructor() {
+    super()
+    this.adapter = EdgeSQLAdapter
     this.baseURL = 'v4/edge_sql/databases'
   }
 
@@ -22,7 +25,7 @@ export class EdgeSQLService {
       search: ''
     }
   ) => {
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: this.baseURL,
       method: 'GET',
       params
@@ -41,7 +44,7 @@ export class EdgeSQLService {
   createDatabase = async ({ name }) => {
     const body = this.adapter?.adaptDatabaseCreatePayload?.({ name })
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: this.baseURL,
       method: 'POST',
       body
@@ -59,7 +62,7 @@ export class EdgeSQLService {
   }
 
   deleteDatabase = async (id) => {
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${id}`,
       method: 'DELETE'
     })
@@ -69,7 +72,7 @@ export class EdgeSQLService {
   }
 
   getDatabase = async (id) => {
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${id}`,
       method: 'GET'
     })
@@ -80,7 +83,7 @@ export class EdgeSQLService {
   checkDatabaseStatus = async (id, fields = null) => {
     const url = fields ? `${this.baseURL}/${id}?fields=${fields}` : `${this.baseURL}/${id}`
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url,
       method: 'GET'
     })
@@ -90,7 +93,7 @@ export class EdgeSQLService {
   }
 
   getTables = async (databaseId) => {
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body: {
@@ -111,7 +114,7 @@ export class EdgeSQLService {
   queryDatabase = async (databaseId, { statements }) => {
     const body = this.adapter?.adaptSqlCommands?.(statements)
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body
@@ -123,7 +126,7 @@ export class EdgeSQLService {
   executeDatabase = async (databaseId, { statements }) => {
     const body = this.adapter?.adaptSqlCommands?.(statements)
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body
@@ -135,7 +138,7 @@ export class EdgeSQLService {
   updatedRow = async (databaseId, { tableName, newData, whereData, tableSchema }) => {
     const body = this.adapter?.adaptUpdateRow?.({ tableName, newData, whereData, tableSchema })
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body
@@ -147,7 +150,7 @@ export class EdgeSQLService {
   insertRow = async (databaseId, { tableName, dataToInsert, tableSchema }) => {
     const body = this.adapter?.adaptInsertRow?.({ tableName, dataToInsert, tableSchema })
 
-    const { data } = await this.httpService.request({
+    const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body
@@ -156,3 +159,5 @@ export class EdgeSQLService {
     return this.adapter?.adaptExecuteResult?.(data)
   }
 }
+
+export const edgeSQLService = new EdgeSQLService()
