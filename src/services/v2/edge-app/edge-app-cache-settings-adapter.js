@@ -110,7 +110,6 @@ export const CacheSettingsAdapter = {
       name: item.name,
       browserCache: formatCacheBehavior(item.browser_cache?.behavior || 'honor'),
       cdnCache: formatCacheBehavior(item.modules?.cache?.behavior || 'honor')
-
     }))
   },
 
