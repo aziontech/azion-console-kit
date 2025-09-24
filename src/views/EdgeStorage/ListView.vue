@@ -182,7 +182,7 @@
   import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useResize } from '@/composables/useResize'
-  import { useBreadcrumbs } from '@/composables/useBreadcrumbs'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
