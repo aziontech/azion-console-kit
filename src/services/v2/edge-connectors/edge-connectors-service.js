@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeConnectorsAdapter } from './edge-connectors-adapter'
 export class EdgeConnectorsService extends BaseService {
   constructor() {

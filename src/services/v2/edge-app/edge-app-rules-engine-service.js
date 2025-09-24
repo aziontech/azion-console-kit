@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
 export class RulesEngineService extends BaseService {
   constructor() {

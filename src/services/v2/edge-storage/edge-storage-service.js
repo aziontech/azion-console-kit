@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
 
 export class EdgeStorageService extends BaseService {

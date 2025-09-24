@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class SolutionService extends BaseService {
   constructor() {
@@ -23,15 +23,12 @@ export class SolutionService extends BaseService {
   }
 
   useListSolutions({ group, type }, options = {}) {
-    return this.useGlobalQuery(
-      ['solutions', 'list', { group, type }],
-      () =>
-        this.getListSolutions({
-          group: group,
-          type: type
-        }),
-      options
-    )
+    return this.query({
+      key: ['solutions', 'list', group, type],
+      queryFn: () => this.getListSolutions({ group, type }),
+      cache: this.cacheType.GLOBAL,
+      overrides: { refetchInterval: this.cacheTime.TWENTY_FOUR_HOURS, ...options }
+    })
   }
 
   #adaptResponse(response) {
@@ -63,5 +60,4 @@ export class SolutionService extends BaseService {
   }
 }
 
-// Export singleton instance
 export const solutionService = new SolutionService()

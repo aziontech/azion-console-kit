@@ -1,5 +1,5 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallFunctionAdapter } from './edge-firewall-function-adapter'
 
 export class EdgeFirewallFunctionService extends BaseService {

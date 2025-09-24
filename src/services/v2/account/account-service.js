@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
 
 export class AccountService extends BaseService {
@@ -12,12 +12,17 @@ export class AccountService extends BaseService {
       method: 'GET',
       url: this.baseURL,
       config: { baseURL: '/api' }
-    })
+    })	
     return this._adaptAccountInfo(response.data)
   }
 
   getAccountInfo(options = {}) {
-    return this.syncSensitiveQuery(['account', 'info'], () => this.fetchAccountInfo(), options)
+    return this.queryAsync({
+      key: ['account', 'info'],
+      queryFn: () => this.fetchAccountInfo(),
+      cache: this.cacheType.SENSITIVE,
+      overrides: { staleTime: this.cacheTime.ONE_MINUTE, ...options }
+    })
   }
 
   _adaptAccountInfo(response) {

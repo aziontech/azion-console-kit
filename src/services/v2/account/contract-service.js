@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class ContractService extends BaseService {
   constructor() {
@@ -16,11 +16,12 @@ export class ContractService extends BaseService {
   }
 
   getContractServicePlan(clientId, options = {}) {
-    return this.syncGlobalQuery(
-      ['contract', 'service-plan', clientId],
-      () => this.fetchContractServicePlan(clientId),
-      options
-    )
+    return this.queryAsync({
+      key: ['contract', 'service-plan', clientId],
+      queryFn: () => this.fetchContractServicePlan(clientId),
+      cache: this.cacheType.GLOBAL,
+      overrides: { refetchInterval: this.cacheTime.ONE_MINUTE, ...options }
+    })
   }
 
   _adaptContractPlan(response) {

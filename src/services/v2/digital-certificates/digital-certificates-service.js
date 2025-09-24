@@ -1,5 +1,5 @@
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { DigitalCertificatesAdapter } from './digital-certificates-adapter'
 
 export class DigitalCertificatesService extends BaseService {

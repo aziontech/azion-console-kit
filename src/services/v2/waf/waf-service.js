@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { WafAdapter } from './waf-adapter'
 export class WafService extends BaseService {
   constructor() {

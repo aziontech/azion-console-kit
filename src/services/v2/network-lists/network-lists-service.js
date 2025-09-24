@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { NetworkListsAdapter } from './network-lists-adapter'
 export class NetworkListsService extends BaseService {
   constructor() {

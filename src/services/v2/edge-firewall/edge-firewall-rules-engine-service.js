@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallRulesEngineAdapter } from './edge-firewall-rules-engine-adapter'
 export class EdgeFirewallRulesEngineService extends BaseService {
   constructor() {

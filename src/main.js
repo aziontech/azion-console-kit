@@ -21,7 +21,7 @@ import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import { queryClient } from '@/services/v2/base/queryClient'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 
 import App from './App.vue'
 import router from './router'

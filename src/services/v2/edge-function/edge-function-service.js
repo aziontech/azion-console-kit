@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFunctionsAdapter } from './edge-function-adapter'
 
 export class EdgeFunctionService extends BaseService {

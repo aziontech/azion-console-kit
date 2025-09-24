@@ -1,5 +1,5 @@
 import { ActivityHistoryAdapter } from './activity-history-adapter'
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class ActivityHistoryService extends BaseService {
   constructor() {

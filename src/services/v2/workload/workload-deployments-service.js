@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadDeploymentAdapter } from './workload-deployments-adapter'
 export class WorkloadDeploymentService extends BaseService {
   constructor() {

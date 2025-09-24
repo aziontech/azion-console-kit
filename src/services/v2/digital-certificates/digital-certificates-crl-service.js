@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { DigitalCertificatesCRLAdapter } from './digital-certificates-crl-adapter'
 export class DigitalCertificatesCRLService extends BaseService {
   constructor() {

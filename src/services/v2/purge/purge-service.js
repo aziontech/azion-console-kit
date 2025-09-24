@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { PurgeAdapter } from './purge-adapter'
 
 export class PurgeService extends BaseService {

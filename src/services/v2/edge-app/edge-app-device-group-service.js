@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
 
 export class DeviceGroupService extends BaseService {

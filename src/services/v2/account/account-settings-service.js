@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class AccountSettingsService extends BaseService {
   constructor() {
@@ -15,12 +15,13 @@ export class AccountSettingsService extends BaseService {
     return this._adaptJobRole(response.data)
   }
 
-  async getAccountJobRole(options = {}) {
-    return await this.syncGlobalQuery(
-      ['account', 'job-role'],
-      () => this.fetchAccountJobRole(),
-      options
-    )
+  getAccountJobRole(options = {}) {
+    return this.queryAsync({
+      key: ['account', 'job-role'],
+      queryFn: () => this.fetchAccountJobRole(),
+      cache: this.cacheType.GLOBAL,
+      overrides: { refetchInterval: this.cacheTime.ONE_MINUTE, ...options }
+    })
   }
 
   _adaptJobRole(response) {

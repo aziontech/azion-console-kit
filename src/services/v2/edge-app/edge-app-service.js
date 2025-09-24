@@ -1,5 +1,5 @@
 import { EdgeAppAdapter } from './edge-app-adapter'
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class EdgeAppService extends BaseService {
   constructor() {

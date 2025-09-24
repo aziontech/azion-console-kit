@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeDNSRecordsAdapter } from './edge-dns-records-adapter'
 export class EdgeDNSRecordsService extends BaseService {
   constructor() {

@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 
 export class EdgeAppErrorResponseService extends BaseService {

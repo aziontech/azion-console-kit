@@ -1,6 +1,6 @@
 import { getCurrentMonthStartEnd } from '@/helpers/get-current-month-start-end'
 import { BillingGqlAdapter } from './billing-gql-adapter'
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class BillingGqlService extends BaseService {
   constructor() {

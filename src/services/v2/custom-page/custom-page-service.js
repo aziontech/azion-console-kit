@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { CustomPageAdapter } from './custom-page-adapter'
 
 export class CustomPageService extends BaseService {

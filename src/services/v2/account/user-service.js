@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class UserService extends BaseService {
   constructor() {
@@ -15,8 +15,13 @@ export class UserService extends BaseService {
     return response.data
   }
 
-  async getUserInfo(options = {}) {
-    return await this.syncSensitiveQuery(['user', 'info'], () => this.fetchUserInfo(), options)
+  getUserInfo(options = {}) {
+    return this.queryAsync({
+      key: ['user', 'info'],
+      queryFn: () => this.fetchUserInfo(),
+      cache: this.cacheType.SENSITIVE,
+      overrides: { refetchInterval: this.cacheTime.ONE_MINUTE, ...options }
+    })
   }
 
   getCurrentUser() {

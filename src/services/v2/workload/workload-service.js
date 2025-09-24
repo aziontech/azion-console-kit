@@ -1,6 +1,6 @@
 import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadAdapter } from './workload-adapter'
 import { WorkloadDeploymentService } from './workload-deployments-service'
 import { DigitalCertificatesService } from '../digital-certificates/digital-certificates-service'

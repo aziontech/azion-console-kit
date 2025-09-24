@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { MFAAdapter } from './mfa-adapter'
 export class MFAService extends BaseService {
   constructor() {

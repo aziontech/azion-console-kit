@@ -1,4 +1,4 @@
-import { BaseService } from '@/services/v2/base/BaseService'
+import { BaseService } from '@/services/v2/base/query/baseService'
 import { CacheSettingsAdapter } from './edge-app-cache-settings-adapter'
 export class CacheSettingsService extends BaseService {
   constructor() {
