@@ -36,7 +36,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref } from 'vue'
-  import { mafService } from '@/services/v2'
+  import { mfaService } from '@/services/v2/mfa/mfa-service'
   defineProps({
     documentationService: {
       type: Function,
@@ -53,7 +53,7 @@
       type: 'delete',
       title: 'MFA',
       icon: 'pi pi-trash',
-      service: mafService.deleteMfaService
+      service: mfaService.deleteMfaService
     }
   ]
 

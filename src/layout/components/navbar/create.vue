@@ -33,6 +33,8 @@
     <div>
       <MakeCreateModalBlock
         v-if="!isMobile"
+        :solutions="solutions"
+        :loading="loading"
         @closeModal="closeCreateModalStore()"
       />
     </div>
@@ -67,21 +69,28 @@
     </template>
     <MakeCreateModalBlock
       v-if="isMobile"
+      :solutions="solutions"
+      :loading="loading"
       @closeModal="closeCreateModalStore()"
     />
   </Sidebar>
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
   import { useRoute } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import { solutionService } from '@/services/v2/marketplace/solution-service'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
   import MakeCreateModalBlock from '@/templates/create-modal-block/make-create-modal-block.vue'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -92,6 +101,43 @@
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
   const SCREEN_BREAKPOINT_SM = 640
+
+  const accountStore = useAccountStore()
+  const { accountData } = storeToRefs(accountStore)
+  const recommendedQuery = ref(null)
+  const templatesQuery = ref(null)
+  const githubImportQuery = ref(null)
+
+  const loadQueries = () => {
+    if (accountData.value.kind !== 'client') return
+
+    recommendedQuery.value = solutionService.useListSolutions({
+      group: 'recommended',
+      type: hasFlagBlockApiV4() ? accountData.value.jobRole : `${accountData.value.jobRole}-v4`
+    })
+
+    templatesQuery.value = solutionService.useListSolutions({
+      group: 'templates',
+      type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
+    })
+
+    githubImportQuery.value = solutionService.useListSolutions({
+      group: 'githubImport',
+      type: 'import-from-github'
+    })
+  }
+
+  const solutions = computed(() => ({
+    recommended: recommendedQuery.value.data || [],
+    templates: templatesQuery.value.data || [],
+    githubImport: githubImportQuery.value.data || []
+  }))
+
+  const loading = computed(() => ({
+    recommended: !accountData.value.jobRole || recommendedQuery.value.isLoading,
+    templates: templatesQuery.value.isLoading,
+    githubImport: githubImportQuery.value.isLoading
+  }))
 
   const openCreateModalToggle = () => {
     tracker.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
@@ -116,4 +162,6 @@
   const createModalIsOpen = computed(() => {
     return createModalStore.isOpen
   })
+
+  loadQueries()
 </script>

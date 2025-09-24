@@ -13,7 +13,7 @@
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   const props = defineProps({

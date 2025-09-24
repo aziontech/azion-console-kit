@@ -20,7 +20,7 @@
   import MigrationMessage from './components/MigrationMessage.vue'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 

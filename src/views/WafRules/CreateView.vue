@@ -7,7 +7,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import { inject } from 'vue'
-  import { wafService } from '@/services/v2'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

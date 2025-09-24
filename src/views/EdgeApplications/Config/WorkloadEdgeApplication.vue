@@ -34,7 +34,7 @@
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import * as yup from 'yup'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   const emit = defineEmits(['createdDomain'])
 
