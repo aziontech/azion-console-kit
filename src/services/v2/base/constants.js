@@ -1,4 +1,3 @@
-// Time constants in milliseconds
 export const TIME = {
   // Basic units
   SECOND: 1000,
@@ -23,9 +22,7 @@ export const TIME = {
   CACHE_72_HOURS: 72 * 60 * 60 * 1000 // 72 hours
 }
 
-// Retry constants
 export const RETRY = {
-  // Generic retry counts
   RETRY_0_TIMES: 0,
   RETRY_1_TIME: 1,
   RETRY_2_TIMES: 2,
@@ -33,8 +30,8 @@ export const RETRY = {
   RETRY_5_TIMES: 5
 }
 
-// Cache type constants
 export const CACHE_TYPE = {
   GLOBAL: 'global',
-  SENSITIVE: 'sensitive'
+  SENSITIVE: 'sensitive',
+  DEFAULT: 'default'
 }

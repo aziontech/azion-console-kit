@@ -26,7 +26,7 @@ export class ContractService extends BaseService {
   _adaptContractPlan(response) {
     const products = response || []
     const slugs = products?.map((product) => product.slug)
-    
+
     const KEYWORDS = {
       CONTRACT: 'contract_',
       SUPPORT: 'support_',
@@ -46,7 +46,7 @@ export class ContractService extends BaseService {
           product.slug.includes(KEYWORDS.SUPPORT) ||
           product.slug.includes(KEYWORDS.PLAN)
       )
-      
+
       contractProduct.forEach((product) => {
         const planType = this._extractWordFromSlug(product.slug)
         yourServicePlan = this._getPlanName(planType) || 'Developer'

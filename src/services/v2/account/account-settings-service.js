@@ -16,7 +16,11 @@ export class AccountSettingsService extends BaseService {
   }
 
   async getAccountJobRole(options = {}) {
-    return await this.syncGlobalQuery(['account', 'job-role'], () => this.fetchAccountJobRole(), options)
+    return await this.syncGlobalQuery(
+      ['account', 'job-role'],
+      () => this.fetchAccountJobRole(),
+      options
+    )
   }
 
   _adaptJobRole(response) {

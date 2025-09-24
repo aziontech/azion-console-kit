@@ -23,41 +23,6 @@ const config = {
   }
 }
 
-const encrypt = (data) => {
-  try {
-    return btoa(JSON.stringify(data))
-  } catch {
-    return btoa(String(data))
-  }
-}
-
-const decrypt = (encryptedData) => {
-  try {
-    return JSON.parse(atob(encryptedData))
-  } catch {
-    return atob(encryptedData)
-  }
-}
-
-const serializeQueryKey = (queryKey) => {
-  if (!Array.isArray(queryKey)) {
-    return String(queryKey)
-  }
-  return queryKey
-    .map((item) => {
-      if (item === null || item === undefined) return 'null'
-      if (typeof item === 'object') {
-        try {
-          return JSON.stringify(item)
-        } catch {
-          return 'invalid_object'
-        }
-      }
-      return String(item)
-    })
-    .join('_')
-}
-
 class SimpleQueryClient {
   constructor() {
     this.queryClient = new QueryClient({
@@ -95,75 +60,19 @@ class SimpleQueryClient {
         (event.type === 'added' && event.query.state.status === 'success') ||
         (event.type === 'observerAdded' && event.query.state.status === 'success')
       ) {
-        this._saveToCache(event.query)
+        cacheManager.saveToCache(event.query)
       }
     })
   }
 
-  async _saveToCache(query) {
-    const { queryKey, state, meta } = query
-    if (!state.data || !meta || (!meta.global && !meta.sensitive)) return
-
-    try {
-      const cacheKey = serializeQueryKey(queryKey)
-      const dataToSave = meta.sensitive ? encrypt(state.data) : state.data
-      await cacheManager.set(cacheKey, dataToSave, {
-        ttl: config.cache.ttl,
-        type: meta.global ? config.cache.types.GLOBAL : config.cache.types.SENSITIVE
-      })
-    } catch (error) {
-      // Silent fail
-    }
-  }
-
-  async _saveToCacheDirect(queryKey, data, global, sensitive) {
-    if (!data || (!global && !sensitive)) return
-
-    try {
-      const cacheKey = serializeQueryKey(queryKey)
-      const dataToSave = sensitive ? encrypt(data) : data
-      await cacheManager.set(cacheKey, dataToSave, {
-        ttl: config.cache.ttl,
-        type: global ? config.cache.types.GLOBAL : config.cache.types.SENSITIVE
-      })
-    } catch (error) {
-      // Silent fail
-    }
-  }
-
-  async _getFromCache(queryKey, isSensitive = false) {
-    try {
-      const cacheKey = serializeQueryKey(queryKey)
-      const data = await cacheManager.get(cacheKey)
-      return isSensitive && data ? decrypt(data) : data
-    } catch (error) {
-      return null
-    }
-  }
-
-  async _getInitialData(queryKey, global, sensitive) {
-    const data = this._getFromCache(queryKey, sensitive)
-    return global || sensitive ? data : undefined
-  }
-
-  _createCacheFirstQueryFn(queryKey, queryFn, global, sensitive) {
-    return async () => {
-      if (global || sensitive) {
-        const cachedData = await this._getFromCache(queryKey, sensitive)
-        if (cachedData) return cachedData
-      }
-
-      const result = await queryFn()
-      if (result && (global || sensitive)) {
-        await this._saveToCacheDirect(queryKey, result, global, sensitive)
-      }
-      return result
-    }
-  }
-
   useQuery(options) {
     const { queryKey, queryFn, global, sensitive, ...restOptions } = options
-    const wrappedQueryFn = this._createCacheFirstQueryFn(queryKey, queryFn, global, sensitive)
+    const wrappedQueryFn = cacheManager.createCacheFirstQueryFn(
+      queryKey,
+      queryFn,
+      global,
+      sensitive
+    )
 
     return useQuery({
       queryKey,
@@ -175,7 +84,7 @@ class SimpleQueryClient {
 
   async fetchQuery(options) {
     const { queryKey, queryFn, global, sensitive, ...restOptions } = options
-    const initialData = await this._getInitialData(queryKey, global, sensitive)
+    const initialData = await cacheManager.getInitialData(queryKey, global, sensitive)
 
     return await this.queryClient.fetchQuery({
       queryKey,
@@ -199,7 +108,7 @@ class SimpleQueryClient {
   }
 
   async clearSensitiveData() {
-    await cacheManager.clear({ type: 'sensitive' })
+    await cacheManager.clearSensitiveData()
     this.queryClient.invalidateQueries({
       predicate: (query) => query.meta?.sensitive === true
     })

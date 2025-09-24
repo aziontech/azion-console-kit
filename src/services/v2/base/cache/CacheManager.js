@@ -1,9 +1,55 @@
+import { TIME, RETRY, CACHE_TYPE } from '../constants'
+
+// Cryptography methods
+const encrypt = (data) => {
+  try {
+    return btoa(JSON.stringify(data))
+  } catch {
+    return btoa(String(data))
+  }
+}
+
+const decrypt = (encryptedData) => {
+  try {
+    return JSON.parse(atob(encryptedData))
+  } catch {
+    return atob(encryptedData)
+  }
+}
+
+const serializeQueryKey = (queryKey) => {
+  if (!Array.isArray(queryKey)) {
+    return String(queryKey)
+  }
+  return queryKey
+    .map((item) => {
+      if (item === null || item === undefined) return 'null'
+      if (typeof item === 'object') {
+        try {
+          return JSON.stringify(item)
+        } catch {
+          return 'invalid_object'
+        }
+      }
+      return String(item)
+    })
+    .join('_')
+}
+
 export class CacheManager {
   constructor() {
     this.dbName = 'azion_cache_db'
     this.storeName = 'cache_store'
     this.db = null
     this.useLocalStorage = false
+
+    // Cache configuration
+    this.config = {
+      cache: {
+        ttl: TIME.CACHE_3_MINUTES,
+        types: CACHE_TYPE
+      }
+    }
   }
 
   async initialize() {
@@ -40,7 +86,7 @@ export class CacheManager {
       data,
       timestamp: Date.now(),
       ttl: options.ttl,
-      type: options.type || 'default'
+      type: options.type
     }
 
     if (this.useLocalStorage) {
@@ -140,6 +186,84 @@ export class CacheManager {
     if (criteria.type && entry.type !== criteria.type) return false
     return true
   }
+
+  // Query cache methods
+  async saveToCache(queryOrData, options = {}) {
+    const { queryKey, data, global, sensitive } = options
+
+    // Handle both query object and direct data
+    let finalQueryKey, finalData, finalGlobal, finalSensitive
+
+    if (queryOrData.queryKey) {
+      // Called with query object
+      const { queryKey: qKey, state, meta: qMeta } = queryOrData
+      if (!state.data || !qMeta || (!qMeta.global && !qMeta.sensitive)) return
+
+      finalQueryKey = qKey
+      finalData = state.data
+      finalGlobal = qMeta.global
+      finalSensitive = qMeta.sensitive
+    } else {
+      // Called with direct data
+      if (!data || (!global && !sensitive)) return
+
+      finalQueryKey = queryKey
+      finalData = data
+      finalGlobal = global
+      finalSensitive = sensitive
+    }
+
+    try {
+      const cacheKey = serializeQueryKey(finalQueryKey)
+      const dataToSave = finalSensitive ? encrypt(finalData) : finalData
+      await this.set(cacheKey, dataToSave, {
+        ttl: this.config.cache.ttl,
+        type: finalGlobal ? this.config.cache.types.GLOBAL : this.config.cache.types.SENSITIVE
+      })
+    } catch (error) {
+      return error
+    }
+  }
+
+  async getFromCache(queryKey, isSensitive = false) {
+    try {
+      const cacheKey = serializeQueryKey(queryKey)
+      const data = await this.get(cacheKey)
+      return isSensitive && data ? decrypt(data) : data
+    } catch (error) {
+      return null
+    }
+  }
+
+  async getInitialData(queryKey, global, sensitive) {
+    const data = await this.getFromCache(queryKey, sensitive)
+    return global || sensitive ? data : undefined
+  }
+
+  createCacheFirstQueryFn(queryKey, queryFn, global, sensitive) {
+    return async () => {
+      if (global || sensitive) {
+        const cachedData = await this.getFromCache(queryKey, sensitive)
+        if (cachedData) return cachedData
+      }
+
+      const result = await queryFn()
+      if (result && (global || sensitive)) {
+        await this.saveToCache(result, { queryKey, data: result, global, sensitive })
+      }
+      return result
+    }
+  }
+
+  async clearSensitiveData() {
+    await this.clear({ type: 'sensitive' })
+  }
 }
 
 export const cacheManager = new CacheManager()
+
+// Export cryptography and utility methods
+export { encrypt, decrypt, serializeQueryKey }
+
+// Export constants for use by other modules
+export { TIME, RETRY, CACHE_TYPE }
