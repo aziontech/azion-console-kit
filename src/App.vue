@@ -8,7 +8,6 @@
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
-  import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
   const DEFAULT_TITLE = 'Azion Console'
 
@@ -69,5 +68,4 @@
 <template>
   <DynamicDialog />
   <Layout :isLogged="isLogged" />
-  <VueQueryDevtools />
 </template>

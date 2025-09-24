@@ -12,16 +12,16 @@ export class AccountService extends BaseService {
       method: 'GET',
       url: this.baseURL,
       config: { baseURL: '/api' }
-    })	
+    })
     return this._adaptAccountInfo(response.data)
   }
 
-  getAccountInfo(options = {}) {
-    return this.queryAsync({
+  async getAccountInfo(options = {}) {
+    return await this.queryAsync({
       key: ['account', 'info'],
       queryFn: () => this.fetchAccountInfo(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { staleTime: this.cacheTime.ONE_MINUTE, ...options }
+      overrides: { staleTime: this.cacheTime.FIVE_MINUTES, ...options }
     })
   }
 

@@ -20,8 +20,6 @@ import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prom
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
-import { VueQueryPlugin } from '@tanstack/vue-query'
-import { queryClient } from '@/services/v2/base/query/queryClient'
 
 import App from './App.vue'
 import router from './router'
@@ -30,7 +28,6 @@ initOAuthSecurity()
 
 const app = createApp(App)
 
-app.use(VueQueryPlugin, queryClient)
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

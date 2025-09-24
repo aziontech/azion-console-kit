@@ -15,12 +15,12 @@ export class UserService extends BaseService {
     return response.data
   }
 
-  getUserInfo(options = {}) {
-    return this.queryAsync({
+  async getUserInfo(options = {}) {
+    return await this.queryAsync({
       key: ['user', 'info'],
       queryFn: () => this.fetchUserInfo(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { refetchInterval: this.cacheTime.ONE_MINUTE, ...options }
+      overrides: { refetchInterval: this.cacheTime.FIVE_MINUTES, ...options }
     })
   }
 

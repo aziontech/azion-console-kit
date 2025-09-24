@@ -15,12 +15,12 @@ export class ContractService extends BaseService {
     return this._adaptContractPlan(response.data)
   }
 
-  getContractServicePlan(clientId, options = {}) {
-    return this.queryAsync({
+  async getContractServicePlan(clientId, options = {}) {
+    return await this.queryAsync({
       key: ['contract', 'service-plan', clientId],
       queryFn: () => this.fetchContractServicePlan(clientId),
       cache: this.cacheType.GLOBAL,
-      overrides: { refetchInterval: this.cacheTime.ONE_MINUTE, ...options }
+      overrides: { refetchInterval: this.cacheTime.FIVE_MINUTES, ...options }
     })
   }
 
