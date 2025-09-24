@@ -18,7 +18,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
         setRedirectRoute(to)
         await tracker.reset()
         queryClient.clearSensitive()
-        return '/logout'
+        return '/login'
       }
     }
   }
