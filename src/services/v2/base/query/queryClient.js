@@ -56,6 +56,7 @@ export class QueryClient {
   async clearSensitive() {
     await this.#clearScope(CACHE_TYPE.SENSITIVE)
   }
+
   async clearGlobal() {
     await this.#clearScope(CACHE_TYPE.GLOBAL)
   }
@@ -63,6 +64,16 @@ export class QueryClient {
   async clearAll() {
     await this.#clearScope(CACHE_TYPE.SENSITIVE)
     await this.#clearScope(CACHE_TYPE.GLOBAL)
+  }
+
+  async unregister(queryKey, state) {
+    const set = this.subscribers.get(queryKey)
+    if (!set) return
+    set.delete(state)
+    if (set.size === 0) {
+      this.subscribers.delete(queryKey)
+      this.#clearRefetch(queryKey)
+    }
   }
 
   async #resolveQuery({ queryKey, queryFn, state, staleTime, gcTime, refetchInterval, encrypted }) {

@@ -16,6 +16,6 @@ export async function logoutGuard({ to, accountStore, tracker }) {
     await logoutService()
     queryClient.clearAll()
     accountStore.setAccountData({})
-    return true
+    return { name: 'login' }
   }
 }
