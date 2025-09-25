@@ -34,14 +34,16 @@
 
 <template>
   <div
-    class="flex flex-col min-h-[300px] justify-center"
+    class="flex flex-col justify-center"
     :class="{
       'mt-4 pb-8': inTabs,
       'border surface-border': !noBorder,
       'rounded-t-none': noShowBorderTop
     }"
   >
-    <div class="flex flex-col gap-5 items-center rounded-md p-8 max-md:p-3">
+    <div
+      class="min-h-[300px] flex flex-col justify-center gap-5 items-center rounded-md p-8 max-md:p-3"
+    >
       <slot name="illustration">
         <Illustration />
       </slot>
