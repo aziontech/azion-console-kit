@@ -4,7 +4,7 @@
   import FormFieldsCustomPages from '@/views/CustomPages/FormFields/CustomPages'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { customPageService } from '@/services/v2'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 
   import { validationSchema, defaultValues } from '../Config/validationSchema'
 

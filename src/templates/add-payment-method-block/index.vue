@@ -12,7 +12,7 @@
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
-  import { paymentService } from '@/services/v2'
+  import { paymentService } from '@/services/v2/payment/payment-service'
   import AddAddressBlock from './add-address.vue'
   import { capitalizeFirstLetter } from '@/helpers'
 

@@ -55,7 +55,7 @@
   import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
-  import { purgeService } from '@/services/v2'
+  import { purgeService } from '@/services/v2/purge/purge-service'
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'

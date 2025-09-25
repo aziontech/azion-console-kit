@@ -9,7 +9,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS } from '@/helpers'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'list-edge-applications' })

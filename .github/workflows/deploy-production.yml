@@ -40,3 +40,5 @@ jobs:
           NODE_ENV: production
           VITE_ENVIRONMENT: production
           VITE_PROD_SENTRY: ${{ secrets.PROD_SENTRY }}
+          VITE_SSO_GITHUB:  ${{ secrets.PROD_SSO_GITHUB }}
+          VITE_SSO_GOOGLE:  ${{ secrets.PROD_SSO_GOOGLE }}

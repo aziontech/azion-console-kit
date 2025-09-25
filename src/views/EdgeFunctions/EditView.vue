@@ -11,10 +11,10 @@
   import MobileCodePreview from './components/mobile-code-preview.vue'
 
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFunctionService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   const props = defineProps({
     updatedRedirect: {

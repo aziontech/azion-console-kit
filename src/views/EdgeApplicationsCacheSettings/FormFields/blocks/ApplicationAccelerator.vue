@@ -254,7 +254,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import PrimeButton from 'primevue/button'
-  import { deviceGroupService } from '@/services/v2'
+  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { useRoute } from 'vue-router'
 
   import { computed, ref } from 'vue'

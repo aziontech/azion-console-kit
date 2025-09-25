@@ -32,7 +32,7 @@
 <script setup>
   import { inject, ref, computed } from 'vue'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
