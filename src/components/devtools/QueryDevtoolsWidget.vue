@@ -83,6 +83,7 @@
                     <th scope="col" class="px-4 py-3 font-medium">Query</th>
                     <th scope="col" class="px-4 py-3 font-medium">Status</th>
                     <th scope="col" class="px-4 py-3 font-medium">Última atualização</th>
+                    <th scope="col" class="px-4 py-3 font-medium">Cache</th>
                     <th scope="col" class="px-4 py-3 font-medium">Auto refresh</th>
                     <th scope="col" class="px-4 py-3 font-medium">Ações</th>
                   </tr>
@@ -130,15 +131,50 @@
                         <span v-if="query.nextAutoRefreshAt" class="text-[10px] text-slate-500">
                           Próximo refresh em {{ formatDuration(query.nextAutoRefreshIn) }}
                         </span>
+                        <span v-if="query.lastDuration != null" class="text-[9px] text-slate-500">
+                          Última duração: {{ formatDuration(query.lastDuration) }}
+                        </span>
                       </div>
                     </td>
                     <td class="px-4 py-3 text-[10px] text-slate-300">
-                      <div class="flex flex-col gap-2">
-                        <span>
-                          {{ query.isAutoRefreshing
-                            ? `Intervalo de ${formatDuration(query.refetchInterval)}`
-                            : 'Auto refresh inativo' }}
-                        </span>
+                      <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-1">
+                          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                            Stale
+                          </span>
+                          <span class="text-slate-200">{{ describeStaleStatus(query) }}</span>
+                          <span class="text-[9px] text-slate-500">
+                            Limite: {{ formatDurationOrPlaceholder(query.staleTime) }}
+                            <template v-if="query.staleAt"> · {{ formatTimestamp(query.staleAt) }}</template>
+                          </span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-400">GC</span>
+                          <span class="text-slate-200">{{ describeGcStatus(query) }}</span>
+                          <span class="text-[9px] text-slate-500">
+                            Limite: {{ formatDurationOrPlaceholder(query.gcTime) }}
+                            <template v-if="query.gcScheduledAt">
+                              · Previsto para {{ formatTimestamp(query.gcScheduledAt) }}
+                            </template>
+                          </span>
+                        </div>
+                        <div class="text-[9px] uppercase tracking-[0.18em] text-slate-500">
+                          Observadores ativos: <span class="text-slate-300">{{ query.observerCount }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-[10px] text-slate-300">
+                      <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-1">
+                          <span>
+                            {{ query.isAutoRefreshing
+                              ? `Intervalo de ${formatDuration(query.refetchInterval)}`
+                              : 'Auto refresh inativo' }}
+                          </span>
+                          <span class="text-[9px] text-slate-500">
+                            Configuração atual: {{ formatDurationOrPlaceholder(query.refetchInterval) }}
+                          </span>
+                        </div>
                         <div class="flex flex-wrap items-center gap-2">
                           <label :for="`interval-${query.key}`" class="text-[9px] uppercase tracking-[0.2em] text-slate-500">
                             Intervalo
@@ -209,10 +245,10 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { queryDevtools } from '@/services/v2/base/query/queryDevtools'
+import { isQueryDevtoolsEnabled, queryDevtools } from '@/services/v2/base/query/queryDevtools'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 
-const isDevtoolsEnabled = import.meta.env.DEV
+const isDevtoolsEnabled = isQueryDevtoolsEnabled
 const isOpen = ref(false)
 const now = ref(Date.now())
 let intervalId = null
@@ -234,6 +270,7 @@ const toggle = () => {
 }
 
 onMounted(() => {
+  if (!isDevtoolsEnabled) return
   if (typeof window !== 'undefined') {
     intervalId = window.setInterval(() => {
       now.value = Date.now()
@@ -250,10 +287,28 @@ onBeforeUnmount(() => {
 
 const queries = computed(() => queryDevtools.queries.value)
 
-const rows = computed(() =>
-  queries.value.map((query) => {
+const rows = computed(() => {
+  if (!isDevtoolsEnabled) return []
+  const current = now.value
+  return queries.value.map((query) => {
     const nextAutoRefreshIn =
-      query.nextAutoRefreshAt != null ? Math.max(0, query.nextAutoRefreshAt - now.value) : null
+      query.nextAutoRefreshAt != null ? Math.max(0, query.nextAutoRefreshAt - current) : null
+    const staleAt =
+      query.staleAt ??
+      (query.staleTime != null && query.lastUpdatedAt != null
+        ? query.lastUpdatedAt + query.staleTime
+        : null)
+    const staleIn = staleAt != null ? Math.max(0, staleAt - current) : null
+    const isStale = staleAt != null ? current >= staleAt : false
+    const gcExpiresAt =
+      query.gcExpiresAt ??
+      (query.gcTime != null && query.lastUpdatedAt != null
+        ? query.lastUpdatedAt + query.gcTime
+        : null)
+    const gcExpiresIn = gcExpiresAt != null ? Math.max(0, gcExpiresAt - current) : null
+    const gcScheduledAt = query.gcScheduledAt ?? null
+    const gcScheduledIn = gcScheduledAt != null ? Math.max(0, gcScheduledAt - current) : null
+    const observerCount = query.observerCount ?? 0
 
     return {
       key: query.queryKey,
@@ -266,10 +321,22 @@ const rows = computed(() =>
       isAutoRefreshing: query.isAutoRefreshing,
       nextAutoRefreshAt: query.nextAutoRefreshAt,
       nextAutoRefreshIn,
-      error: query.error
+      error: query.error,
+      staleTime: query.staleTime,
+      staleAt,
+      staleIn,
+      isStale,
+      gcTime: query.gcTime,
+      gcExpiresAt,
+      gcExpiresIn,
+      gcScheduledAt,
+      gcScheduledIn,
+      isGcScheduled: gcScheduledAt != null,
+      garbageCollectedAt: query.garbageCollectedAt ?? null,
+      observerCount
     }
   })
-)
+})
 
 const totalQueries = computed(() => rows.value.length)
 const fetchingCount = computed(() => rows.value.filter((row) => row.isFetching).length)
@@ -280,6 +347,7 @@ const successCount = computed(() => rows.value.filter((row) => row.status === 's
 watch(
   rows,
   (newRows) => {
+    if (!isDevtoolsEnabled) return
     newRows.forEach((row) => {
       if (selectedIntervals[row.key] == null) {
         selectedIntervals[row.key] = row.refetchInterval ?? DEFAULT_INTERVAL
@@ -377,6 +445,46 @@ function formatDuration(duration) {
     return `${minutes.toFixed(minutes < 10 ? 1 : 0)} min`
   }
   return `${seconds.toFixed(seconds < 10 ? 2 : 1)} s`
+}
+
+function formatDurationOrPlaceholder(duration) {
+  if (duration == null || duration <= 0) return '—'
+  return formatDuration(duration)
+}
+
+function describeStaleStatus(row) {
+  if (row.staleTime == null || row.staleTime <= 0) {
+    return 'Sem stale time configurado'
+  }
+  if (row.lastUpdatedAt == null) {
+    return `Aguardando primeira resposta (limite ${formatDuration(row.staleTime)})`
+  }
+  if (row.isStale) {
+    return `Stale desde ${formatTimestamp(row.staleAt)}`
+  }
+  if (row.staleIn != null) {
+    return `Fica stale em ${formatDuration(row.staleIn)}`
+  }
+  return `Limite de ${formatDuration(row.staleTime)}`
+}
+
+function describeGcStatus(row) {
+  if (row.gcTime == null || row.gcTime <= 0) {
+    return 'GC desativado'
+  }
+  if (row.garbageCollectedAt != null) {
+    return `Coleta concluída em ${formatTimestamp(row.garbageCollectedAt)}`
+  }
+  if (row.isGcScheduled && row.gcScheduledIn != null) {
+    return `Agendado para ${formatDuration(row.gcScheduledIn)}`
+  }
+  if (row.observerCount > 0) {
+    return 'Observadores ativos — aguardando ficar inativa'
+  }
+  if (row.gcExpiresIn != null) {
+    return `Elegível para GC em ${formatDuration(row.gcExpiresIn)}`
+  }
+  return `Limite de ${formatDuration(row.gcTime)}`
 }
 </script>
 

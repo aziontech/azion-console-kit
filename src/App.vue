@@ -9,6 +9,7 @@
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
   import QueryDevtoolsWidget from '@/components/devtools/QueryDevtoolsWidget.vue'
+  import { isQueryDevtoolsEnabled } from '@/services/v2/base/query/queryDevtools'
 
   const DEFAULT_TITLE = 'Azion Console'
 
@@ -19,6 +20,7 @@
   const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
 
   const route = useRoute()
+  const isDevtoolsEnabled = isQueryDevtoolsEnabled
 
   watch(
     () => route,
@@ -69,5 +71,5 @@
 <template>
   <DynamicDialog />
   <Layout :isLogged="isLogged" />
-  <QueryDevtoolsWidget />
+  <QueryDevtoolsWidget v-if="isDevtoolsEnabled" />
 </template>
