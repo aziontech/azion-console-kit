@@ -11,12 +11,12 @@ export class WorkloadDeploymentService extends BaseService {
     return `${this.baseURL}/${workloadId}/deployments${suffix}`
   }
 
-  createWorkloadDeployment = async (workloadId, payload) => {
+  createWorkloadDeployment = async (payload) => {
     const body = this.adapter?.transformCreateWorkloadDeployment?.(payload)
 
     const { data: response } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(workloadId),
+      url: this.#getUrl(payload.id),
       body
     })
 

@@ -76,7 +76,7 @@ export class WorkloadService extends BaseService {
       customPage: payload.customPage
     }
 
-    await this.workloadDeployment.createWorkloadDeployment(workloadId, deployPayload)
+    await this.workloadDeployment.createWorkloadDeployment(deployPayload)
 
     payload._deploymentCreated = true
     this._workloadData = null
