@@ -9,6 +9,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
+  const IS_SENTRY_UPLOAD = env.VITE_SENTRY_UPLOAD === 'true'
   const IS_PROD = env.VITE_ENVIRONMENT === 'production'
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'com' : 'net'
@@ -35,7 +36,7 @@ const getConfig = () => {
 
   return {
     build: {
-      sourcemap: env.VITE_SENTRY_AUTH_TOKEN?.length ? 'hidden' : true
+      sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
     },
     plugins: [
       vue(),
@@ -44,7 +45,7 @@ const getConfig = () => {
         nycrcPath: '.nycrc'
       }),
       ...(
-        env.VITE_SENTRY_AUTH_TOKEN?.length
+        IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
             sentryVitePlugin({
               org: 'azion-technologies',
