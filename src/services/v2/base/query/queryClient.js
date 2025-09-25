@@ -9,6 +9,7 @@ export class QueryClient {
   constructor() {
     this.timers = new Map()
     this.subscribers = new Map()
+    this.queryConfigs = new Map()
   }
 
   query({
@@ -21,6 +22,7 @@ export class QueryClient {
   }) {
     const state = this.#createReactiveState()
     queryDevtools.register(queryKey, { refetchInterval })
+    this.#storeConfig(queryKey, { queryFn, staleTime, gcTime, refetchInterval, encrypted })
     this.#registerSubscriber(queryKey, state)
     this.#resolveQuery({ queryKey, queryFn, state, staleTime, gcTime, refetchInterval, encrypted })
     return state
@@ -35,6 +37,7 @@ export class QueryClient {
     encrypted = false
   }) {
     queryDevtools.register(queryKey, { refetchInterval })
+    this.#storeConfig(queryKey, { queryFn, staleTime, gcTime, refetchInterval, encrypted })
     const cached = await cacheStore.get(queryKey, encrypted)
 
     if (cached && cached.data != null) {
@@ -62,6 +65,52 @@ export class QueryClient {
     queryDevtools.invalidate(queryKey)
   }
 
+  async refetch(queryKey) {
+    const config = this.queryConfigs.get(queryKey)
+    if (!config?.queryFn) return undefined
+
+    const { queryFn, gcTime, encrypted, refetchInterval } = config
+
+    queryDevtools.start(queryKey)
+
+    try {
+      const fresh = await queryFn()
+      await cacheStore.set(
+        queryKey,
+        { data: fresh, timestamp: Date.now(), gcTime },
+        encrypted
+      )
+      this.#updateSubscribers(queryKey, (state) => this.#setSuccessState(state, fresh))
+      queryDevtools.resolveSuccess(queryKey, { refetchInterval })
+      return fresh
+    } catch (err) {
+      this.#updateSubscribers(queryKey, (state) => this.#setErrorState(state, err))
+      queryDevtools.resolveError(queryKey, err)
+      throw err
+    }
+  }
+
+  async setAutoRefresh(queryKey, refetchInterval) {
+    const config = this.queryConfigs.get(queryKey)
+    if (!config) return
+
+    this.#clearRefetch(queryKey)
+
+    if (!refetchInterval || refetchInterval <= 0) {
+      this.#updateConfig(queryKey, { refetchInterval: null })
+      return
+    }
+
+    this.#updateConfig(queryKey, { refetchInterval })
+    this.#setupRefetch({
+      queryKey,
+      queryFn: config.queryFn,
+      refetchInterval,
+      gcTime: config.gcTime,
+      encrypted: config.encrypted
+    })
+  }
+
   async clearSensitive() {
     await this.#clearScope(CACHE_TYPE.SENSITIVE)
   }
@@ -83,6 +132,7 @@ export class QueryClient {
       this.subscribers.delete(queryKey)
       this.#clearRefetch(queryKey)
       queryDevtools.unregister(queryKey)
+      this.queryConfigs.delete(queryKey)
     }
   }
 
@@ -104,6 +154,7 @@ export class QueryClient {
       this.#setSuccessState(state, fresh)
       this.#setupRefetch({ queryKey, queryFn, refetchInterval, gcTime, encrypted })
       queryDevtools.resolveSuccess(queryKey, { refetchInterval })
+      this.#updateConfig(queryKey, { queryFn, staleTime, gcTime, refetchInterval, encrypted })
     } catch (err) {
       this.#setErrorState(state, err)
       queryDevtools.resolveError(queryKey, err)
@@ -152,6 +203,7 @@ export class QueryClient {
       this.timers.delete(queryKey)
     }
     queryDevtools.setAutoRefresh(queryKey, null)
+    this.#updateConfig(queryKey, { refetchInterval: null })
   }
 
   #registerSubscriber(queryKey, state) {
@@ -173,6 +225,19 @@ export class QueryClient {
       isError: false,
       isSuccess: false
     })
+  }
+
+  #storeConfig(queryKey, config) {
+    const existing = this.queryConfigs.get(queryKey)
+    this.queryConfigs.set(queryKey, {
+      ...(existing ?? {}),
+      ...config
+    })
+  }
+
+  #updateConfig(queryKey, config) {
+    if (!this.queryConfigs.has(queryKey)) return
+    Object.assign(this.queryConfigs.get(queryKey), config)
   }
 
   #setSuccessState(state, data) {

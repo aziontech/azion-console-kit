@@ -128,4 +128,51 @@ describe('QueryClient devtools integration', () => {
       globalThis.document = originalDocument
     }
   })
+
+  it('supports manual actions triggered via devtools widget', async () => {
+    const queryFn = vi
+      .fn()
+      .mockResolvedValueOnce('primeira carga')
+      .mockResolvedValueOnce('refetch manual')
+      .mockResolvedValueOnce('auto refresh')
+    const client = new QueryClient()
+
+    const state = client.query({
+      queryKey: 'GLOBAL:manual',
+      queryFn,
+      refetchInterval: null
+    })
+
+    await flushPromises()
+    await waitForExpectation(() => {
+      expect(queryDevtools.getQuery('GLOBAL:manual')?.status).toBe('success')
+    })
+
+    await client.refetch('GLOBAL:manual')
+    await flushPromises()
+
+    let tracked = queryDevtools.getQuery('GLOBAL:manual')
+    expect(tracked?.fetchCount).toBe(2)
+    expect(state.data).toBe('refetch manual')
+    expect(queryFn).toHaveBeenCalledTimes(2)
+
+    await client.setAutoRefresh('GLOBAL:manual', 10000)
+
+    tracked = queryDevtools.getQuery('GLOBAL:manual')
+    expect(tracked?.isAutoRefreshing).toBe(true)
+    expect(tracked?.refetchInterval).toBe(10000)
+    expect(tracked?.nextAutoRefreshAt).toBeDefined()
+
+    await vi.advanceTimersByTimeAsync(10000)
+    await flushPromises()
+    await waitForExpectation(() => {
+      expect(queryDevtools.getQuery('GLOBAL:manual')?.fetchCount).toBe(3)
+    })
+    expect(queryFn).toHaveBeenCalledTimes(3)
+
+    await client.setAutoRefresh('GLOBAL:manual', null)
+    tracked = queryDevtools.getQuery('GLOBAL:manual')
+    expect(tracked?.isAutoRefreshing).toBe(false)
+    expect(tracked?.refetchInterval).toBeNull()
+  })
 })
