@@ -2,7 +2,7 @@ import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadAdapter } from './workload-adapter'
-import { WorkloadDeploymentService } from './workload-deployments-service'
+import { workloadDeploymentService } from './workload-deployments-service'
 import { DigitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 
@@ -12,7 +12,7 @@ export class WorkloadService extends BaseService {
     this.adapter = WorkloadAdapter
     this.baseURL = 'v4/workspace/workloads'
 
-    this.workloadDeployment = WorkloadDeploymentService
+    this.workloadDeployment = workloadDeploymentService
     this.digitalCertificate = DigitalCertificatesService
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
 
