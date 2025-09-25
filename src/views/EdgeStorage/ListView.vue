@@ -453,7 +453,7 @@
       goBackToBucket()
     } else if (item.isFolder) {
       folderPath.value += item.name
-      router.replace({ query: { folderPath: folderPath.value } })
+      router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
