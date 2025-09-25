@@ -28,7 +28,6 @@ import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
 import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
-import { queryDevtoolsRoutes } from '@routes/query-devtools-routes'
 import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
 import { switchAccountRoutes } from '@routes/switch-account-routes'
@@ -79,7 +78,6 @@ const router = createRouter({
     usersListsRoutes,
     passwordRoutes,
     playgroundRoutes,
-    queryDevtoolsRoutes,
     createNewRoutes,
     mfaRoutes,
     activityHistoryRoutes,

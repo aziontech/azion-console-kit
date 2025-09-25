@@ -8,6 +8,7 @@
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+  import QueryDevtoolsWidget from '@/components/devtools/QueryDevtoolsWidget.vue'
 
   const DEFAULT_TITLE = 'Azion Console'
 
@@ -68,4 +69,5 @@
 <template>
   <DynamicDialog />
   <Layout :isLogged="isLogged" />
+  <QueryDevtoolsWidget />
 </template>
