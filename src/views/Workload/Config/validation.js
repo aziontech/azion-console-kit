@@ -68,6 +68,8 @@ export const validationSchema = yup.object({
           .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
             if (!value) return true
 
+            if (value === '*') return true
+
             if (value.endsWith('.')) return false
 
             const dotCount = (value.match(/\./g) || []).length
