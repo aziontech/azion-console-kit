@@ -120,6 +120,7 @@
               inputId="tieredCacheRegion"
               placeholder="Global"
               data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+              description="Currently, the region is fixed to Global"
             />
           </div>
         </div>
