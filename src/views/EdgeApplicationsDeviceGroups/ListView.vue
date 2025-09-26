@@ -3,7 +3,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
-  import { deviceGroupService } from '@/services/v2'
+  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import PrimeButton from 'primevue/button'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'

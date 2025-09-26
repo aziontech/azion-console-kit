@@ -7,7 +7,10 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import DrawerCustomPages from '@/views/CustomPages/Drawer'
   import DrawerEdgeApplication from '@/views/EdgeApplications/Drawer'
-  import { edgeAppService, edgeFirewallService, customPageService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+
   import { ref } from 'vue'
 
   const { value: application } = useField('application')

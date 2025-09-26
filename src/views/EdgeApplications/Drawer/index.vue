@@ -5,7 +5,7 @@
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsCreateEdgeApplications'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
   import { useRoute } from 'vue-router'
 

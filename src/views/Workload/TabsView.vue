@@ -8,7 +8,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import EditView from './EditView.vue'
-  import { workloadService } from '@/services/v2'
+  import { workloadService } from '@/services/v2/workload/workload-service'
 
   defineOptions({ name: 'tabs-workloads' })
 

@@ -176,7 +176,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useField } from 'vee-validate'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'

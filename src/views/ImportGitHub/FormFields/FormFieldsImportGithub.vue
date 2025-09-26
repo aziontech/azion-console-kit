@@ -12,7 +12,7 @@
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
   import LabelBlock from '@/templates/label-block'
-  import { vcsService } from '@/services/v2'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
 
   const toast = useToast()
   const router = useRouter()

@@ -10,7 +10,7 @@
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
   import { ref, computed } from 'vue'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   import {
     HTTP_PORT_LIST_OPTIONS,

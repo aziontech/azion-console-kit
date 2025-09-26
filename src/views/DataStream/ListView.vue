@@ -70,7 +70,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   defineOptions({ name: 'data-stream-view' })
 
   defineProps({

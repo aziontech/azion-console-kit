@@ -54,7 +54,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { edgeDNSService } from '@/services/v2'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

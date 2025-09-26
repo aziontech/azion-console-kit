@@ -1,12 +1,25 @@
 <script setup>
   import CreateModalBlock from './index.vue'
-  import * as SolutionsService from '@/services/solutions-services'
 
   defineOptions({
     name: 'make-create-modal-block'
   })
+
+  defineProps({
+    solutions: {
+      type: Object,
+      required: true
+    },
+    loading: {
+      type: Object,
+      required: true
+    }
+  })
 </script>
 
 <template>
-  <CreateModalBlock :listSolutionsService="SolutionsService.listSolutionsService" />
+  <CreateModalBlock
+    :solutions="solutions"
+    :loading="loading"
+  />
 </template>

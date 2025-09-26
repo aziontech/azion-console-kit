@@ -42,7 +42,7 @@
   import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { activityHistoryService } from '@/services/v2'
+  import { activityHistoryService } from '@/services/v2/activity-history/activity-history-service'
 
   defineProps({
     documentationService: {

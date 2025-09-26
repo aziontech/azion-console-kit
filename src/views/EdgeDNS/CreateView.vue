@@ -37,7 +37,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeDNSService } from '@/services/v2'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

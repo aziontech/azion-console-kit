@@ -7,7 +7,7 @@
   import { useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-  import { edgeAppErrorResponseService } from '@/services/v2'
+  import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
   import customPagesGif from '@/assets/images/customPages.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

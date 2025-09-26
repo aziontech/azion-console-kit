@@ -43,7 +43,7 @@
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeSQLService } from '@/services/v2'
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from './composable/useEdgeSQL'
 
   defineOptions({ name: 'create-edge-sql-database' })

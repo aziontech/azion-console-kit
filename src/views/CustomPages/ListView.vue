@@ -6,7 +6,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { customPageService } from '@/services/v2'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

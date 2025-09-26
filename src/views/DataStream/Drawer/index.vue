@@ -42,7 +42,7 @@
   import * as yup from 'yup'
   import { ref } from 'vue'
   import { refDebounced } from '@vueuse/core'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 
   defineOptions({
     name: 'drawer-template'

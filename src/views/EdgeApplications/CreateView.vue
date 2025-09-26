@@ -47,7 +47,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'

@@ -37,7 +37,7 @@
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { validationSchema } from './Config/validation'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 
   const initialValues = {
     name: '',

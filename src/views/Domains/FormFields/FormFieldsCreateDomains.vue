@@ -11,7 +11,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
   import { ref, watch } from 'vue'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   const props = defineProps({
     digitalCertificates: {

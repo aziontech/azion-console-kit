@@ -100,7 +100,7 @@
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { useAccountStore } from '@/stores/account'
   import DrawerTemplate from '@/views/DataStream/Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'

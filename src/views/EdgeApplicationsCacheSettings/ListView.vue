@@ -4,7 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
-  import { cacheSettingsService } from '@/services/v2'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

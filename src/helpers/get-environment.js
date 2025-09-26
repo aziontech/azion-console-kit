@@ -6,3 +6,10 @@ export const getEnvironment = () => {
 
   return environment.VITE_ENVIRONMENT || environment.MODE
 }
+
+/**
+ * @returns {boolean}
+ */
+export const isProduction = () => {
+  return getEnvironment() === 'production'
+}

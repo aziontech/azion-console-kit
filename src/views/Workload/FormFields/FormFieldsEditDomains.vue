@@ -16,7 +16,7 @@
   import { computed, ref, watch } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import { INFORMATION_TEXTS } from '@/helpers'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   const props = defineProps({
     digitalCertificates: {

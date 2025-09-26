@@ -19,7 +19,7 @@
   import { useDialog } from 'primevue/usedialog'
   import { useAccountStore } from '@/stores/account'
   import { useEdgeSQL } from './composable/useEdgeSQL'
-  import { edgeSQLService } from '@/services/v2'
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { SQLITE_QUERIES, QUICK_TEMPLATES } from './constants'
   import { TableActionManager } from './utils'
 

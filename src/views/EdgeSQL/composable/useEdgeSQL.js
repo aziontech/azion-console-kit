@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { convertValueToDate } from '@/helpers/convert-date'
-import { edgeSQLService } from '@/services/v2'
+import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 import { useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 

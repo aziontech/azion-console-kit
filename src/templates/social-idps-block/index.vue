@@ -37,11 +37,10 @@
   import PrimeButton from 'primevue/button'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
-  import { iamService } from '@/services/v2'
+  import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
+  import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
-  const emit = defineEmits(['showSocialIdps'])
 
   const tracker = inject('tracker')
 
@@ -56,21 +55,11 @@
   })
 
   const toast = useToast()
-  const showIdps = ref(true)
+  const showIdps = defineModel('showSocialIdps')
 
-  const loadSocialIdps = async () => {
-    try {
-      idps.value = await iamService.listSocialIdps()
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      showIdps.value = idps.value.length > 0
-      emit('showSocialIdps', showIdps.value)
-    }
+  const loadSocialIdps = () => {
+    idps.value = socialIdpsData
+    showIdps.value = idps.value.length > 0
   }
 
   const formatName = (name) => {

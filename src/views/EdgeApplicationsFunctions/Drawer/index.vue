@@ -69,7 +69,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeApplicationFunctionService } from '@/services/v2'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
 
   defineOptions({ name: 'drawer-origin' })
 

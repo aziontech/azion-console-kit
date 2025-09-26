@@ -47,7 +47,7 @@
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-  import { workloadService } from '@/services/v2'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
   import * as Helpers from '@/helpers'
 

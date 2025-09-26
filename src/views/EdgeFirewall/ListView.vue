@@ -5,7 +5,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'edge-firewall-view' })

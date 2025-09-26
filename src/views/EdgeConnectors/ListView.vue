@@ -46,7 +46,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 
   defineOptions({ name: 'edge-connectors-view' })
 

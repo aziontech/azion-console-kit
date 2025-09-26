@@ -11,7 +11,7 @@
   import PrimeButton from 'primevue/button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
-  import { edgeDNSService } from '@/services/v2'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
 
   const props = defineProps({
     isDrawer: {

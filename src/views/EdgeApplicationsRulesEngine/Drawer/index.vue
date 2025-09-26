@@ -7,7 +7,8 @@
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { cacheSettingsService, rulesEngineService } from '@/services/v2'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
 
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })

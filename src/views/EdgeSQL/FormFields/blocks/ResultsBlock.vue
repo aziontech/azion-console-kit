@@ -59,7 +59,7 @@
   import InlineMessage from 'primevue/inlinemessage'
 
   // Services and composables
-  import { edgeSQLService } from '@/services/v2'
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from '../../composable/useEdgeSQL'
   import { SQLITE_QUERIES } from '../../constants'
 

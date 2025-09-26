@@ -34,7 +34,7 @@
   import RenderTemplateSection from './blocks/RenderTemplateSection.vue'
   import StatusSection from './blocks/StatusSection.vue'
 
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 
   const props = defineProps({
     resetForm: {

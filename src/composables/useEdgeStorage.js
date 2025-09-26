@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { edgeStorageService } from '@/services/v2'
+import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
 import { useToast } from 'primevue/usetoast'
 import * as yup from 'yup'
 import { formatBytes } from '@/helpers/format-bytes'

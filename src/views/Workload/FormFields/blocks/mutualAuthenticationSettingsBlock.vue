@@ -7,7 +7,8 @@
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import fieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import PrimeButton from 'primevue/button'
-  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
   import { ref, watch } from 'vue'
   import { useField } from 'vee-validate'
 

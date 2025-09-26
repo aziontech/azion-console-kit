@@ -55,7 +55,7 @@
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
-  import { paymentService } from '@/services/v2'
+  import { paymentService } from '@/services/v2/payment/payment-service'
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { h, ref } from 'vue'

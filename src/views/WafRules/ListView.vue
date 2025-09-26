@@ -6,8 +6,8 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { wafService } from '@/services/v2'
   import CloneBlock from '@/templates/clone-block'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

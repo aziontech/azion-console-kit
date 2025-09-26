@@ -36,7 +36,7 @@
   import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { workloadService } from '@/services/v2'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { validationSchema } from './Config/validation'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
