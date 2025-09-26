@@ -1,3 +1,4 @@
+<!-- eslint-disable no-useless-escape -->
 <template>
   <CreateDrawerBlock
     data-testid="allow-rules-drawer"
@@ -9,6 +10,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Allowing Rules"
+    v-if="visible"
   >
     <template #formFields>
       <div class="flex flex-col gap-6">
@@ -37,34 +39,32 @@
                 </template>
               </FieldGroupRadio>
             </div>
-            <Message
-              severity="warn"
-              :closable="false"
-              :pt="{ wrapper: { class: 'px-4 py-2' }, icon: { class: 'w-4 h-4' } }"
-              v-if="showPathRegexField"
-            >
-              <p class="text-xs">
-                This is a sensitive field essential for secure and effective WAF configuration.
-                Ensure the path regex is correct.
-                <PrimeButton
-                  link
-                  label="Learn more about Regex in WAF Rules."
-                  class="w-fit p-0 text-xs"
-                  @click="clickOnLearnMore"
-                />
-              </p>
-            </Message>
             <div
-              class="flex flex-col sm:max-w-sm gap-4"
+              class="flex flex-col md:flex-row justify-between gap-8"
               v-if="showPathRegexField"
             >
-              <FieldText
-                data-testid="allow-rules-drawer__path-regex"
-                label="Path Regex"
-                required
-                name="pathRegex"
-                placeholder="/user/\d+/details"
-                description=""
+              <div class="flex flex-col gap-5 w-full">
+                <div class="flex flex-col sm:max-w-sm gap-2">
+                  <FieldText
+                    data-testid="allow-rules-drawer__path-regex"
+                    label="Path Regex"
+                    required
+                    name="pathRegex"
+                    @input="handlePathRegexInput"
+                    placeholder="/user/\d+/details"
+                    :description="getRegexDescription()"
+                  />
+                </div>
+                <RegexExamples class="hidden md:block" />
+                <TopPaths
+                  :topPaths="topPaths"
+                  class="block md:hidden"
+                />
+              </div>
+              <RegexExamples class="block md:hidden" />
+              <TopPaths
+                :topPaths="topPaths"
+                class="hidden md:block"
               />
             </div>
           </template>
@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import * as yup from 'yup'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -101,8 +101,9 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeTag from 'primevue/tag'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import PrimeButton from 'primevue/button'
-  import Message from 'primevue/message'
+  import { pathRegexSchema } from '@/views/WafRules/Config/regexValidator'
+  import TopPaths from './components/topPaths.vue'
+  import RegexExamples from './components/regexExamples.vue'
 
   defineOptions({
     name: 'allowed-rules-details'
@@ -130,7 +131,7 @@
     name: yup.string().required('Description is required'),
     pathRegex: yup.string().when('typeOption', {
       is: 'path_regex',
-      then: (schema) => schema.required('Path regex is required when using Path Regex option'),
+      then: () => pathRegexSchema.required('Path regex is required'),
       otherwise: (schema) => schema.notRequired()
     })
   })
@@ -142,6 +143,8 @@
   })
 
   const currentTypeOption = ref('fields')
+  const pathMatches = ref({})
+  const pathRegexValue = ref('')
 
   const closeDrawer = () => {
     currentTypeOption.value = 'fields'
@@ -160,7 +163,25 @@
     return `e.g., False positive for query parameter 'item_value' affecting multiple paths.`
   }
 
-  const clickOnLearnMore = () => {}
+  const handlePathRegexInput = (event) => {
+    pathRegexValue.value = event.target.value
+    updatePathMatches(event.target.value)
+  }
+
+  const getRegexDescription = () => {
+    if (!pathRegexValue.value) {
+      return 'Enter a regex pattern to see matching paths.'
+    }
+
+    const matchedCount = Object.values(pathMatches.value).filter((result) => result?.isMatch).length
+    const totalCount = Object.keys(pathMatches.value).length
+
+    if (totalCount === 0) {
+      return 'No paths to match against.'
+    }
+
+    return `${matchedCount} of ${totalCount} paths match your regex pattern.`
+  }
 
   const moreThanOneItemWasSelected = computed(() => props.allowedByAttacks.length > 1)
 
@@ -183,11 +204,76 @@
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
+      closeDrawer()
       emit('update:visible', value)
     }
   })
 
   const showPathRegexField = computed(() => {
     return currentTypeOption.value === 'path_regex'
+  })
+
+  const topPaths = computed(() => {
+    return props.allowedByAttacks.flatMap((attack) => {
+      return attack.topPaths.map((topPath) => {
+        const [path, hits, rest] = topPath.split(' ')
+        const matchResult = pathMatches.value[path]
+        return {
+          path: path,
+          hits: `${hits} ${rest}`,
+          isMatched: matchResult?.isMatch || false,
+          matchInfo: matchResult?.matchInfo || null
+        }
+      })
+    })
+  })
+
+  const validatePathAgainstRegex = (path, regex) => {
+    if (!regex || !path) return { isMatch: false, matchInfo: null }
+
+    try {
+      const regexObj = new RegExp(regex)
+      const match = path.match(regexObj)
+
+      if (match) {
+        return {
+          isMatch: true,
+          matchInfo: {
+            fullMatch: match[0],
+            startIndex: match.index,
+            endIndex: match.index + match[0].length,
+            matchedPart: match[0],
+            beforeMatch: path.substring(0, match.index),
+            afterMatch: path.substring(match.index + match[0].length)
+          }
+        }
+      }
+
+      return { isMatch: false, matchInfo: null }
+    } catch (error) {
+      return { isMatch: false, matchInfo: null }
+    }
+  }
+
+  const updatePathMatches = (regex) => {
+    const matches = {}
+    const allPaths = props.allowedByAttacks.flatMap((attack) =>
+      attack.topPaths.map((topPath) => topPath.split(' ')[0])
+    )
+
+    allPaths.forEach((path) => {
+      const result = validatePathAgainstRegex(path, regex)
+      matches[path] = result
+    })
+
+    pathMatches.value = matches
+  }
+
+  watch(currentTypeOption, (newType) => {
+    if (newType === 'path_regex' && pathRegexValue.value) {
+      updatePathMatches(pathRegexValue.value)
+    } else {
+      pathMatches.value = {}
+    }
   })
 </script>

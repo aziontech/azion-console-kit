@@ -443,7 +443,6 @@
                   @click="downloadCSV"
                 />
               </div>
-
               <WithSelectionBehavior
                 ref="listTableRef"
                 v-model:selectedItensData="selectedAttack"
