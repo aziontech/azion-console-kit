@@ -81,12 +81,13 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Knowledge Base Item" />
+      <PageHeadingBlock pageTitle="Create Knowledge Base" />
     </template>
     <template #content>
       <CreateFormBlock
         :createService="debugCreateKnowledgeBaseService"
         :schema="validationSchema"
+        :initialValues="{ embedding_model: 'Qwen/Qwen3-Embedding-4B' }"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         disableToast

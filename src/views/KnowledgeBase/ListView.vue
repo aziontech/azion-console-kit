@@ -39,7 +39,6 @@
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
 
@@ -97,26 +96,6 @@
       header: 'Name',
       filterPath: 'name',
       sortField: 'name'
-    },
-    {
-      field: 'description',
-      header: 'Description',
-      filterPath: 'description'
-    },
-    {
-      field: 'embeddingModel',
-      header: 'Embedding Model',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-with-icon'
-        })
-      }
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
     },
     {
       field: 'updatedAt',

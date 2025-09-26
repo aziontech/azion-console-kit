@@ -3,22 +3,25 @@ import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import * as Errors from '@/services/axios/errors'
 
 export const editKnowledgeBaseService = async (payload) => {
+  console.log('🔄 editKnowledgeBaseService called with payload:', payload)
+
   const parsedPayload = adapt(payload)
+  console.log('🔄 Adapted payload for edit:', parsedPayload)
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeKnowledgeBaseBaseUrl()}/${payload.id}`,
-    method: 'PUT',
+    method: 'PATCH',
     body: parsedPayload
   })
 
+  console.log('🔄 Edit response:', httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (payload) => {
+  // In edit mode, only send description since name and embedding_model are read-only
   return {
-    name: payload.name,
-    description: payload.description,
-    category: payload.category,
-    content: payload.content
+    description: payload.description
   }
 }
 
@@ -32,6 +35,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
+    case 204:
       return 'Your knowledge base item has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
@@ -64,12 +68,7 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const nameError = extractErrorKey(httpResponse.body, 'name')
   const descriptionError = extractErrorKey(httpResponse.body, 'description')
-  const categoryError = extractErrorKey(httpResponse.body, 'category')
-  const contentError = extractErrorKey(httpResponse.body, 'content')
 
-  const errorMessages = [nameError, descriptionError, categoryError, contentError]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage || 'An error occurred while updating the knowledge base item'
+  return descriptionError || 'An error occurred while updating the knowledge base'
 }

@@ -48,7 +48,7 @@ export const azionAiRoutes = [
       createKnowledgeBaseService: KnowledgeBaseService.createKnowledgeBaseService
     },
     meta: {
-      title: 'Create Knowledge Base Item',
+      title: 'Create Knowledge Base',
       breadCrumbs: [
         {
           label: 'AI',
@@ -75,7 +75,7 @@ export const azionAiRoutes = [
       updatedRedirect: 'knowledge-base'
     },
     meta: {
-      title: 'Edit Knowledge Base Item',
+      title: 'Edit Knowledge Base',
       breadCrumbs: [
         {
           label: 'AI',
