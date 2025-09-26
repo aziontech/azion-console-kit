@@ -66,8 +66,8 @@ export class BaseService {
         return {
           queryKey: globalKey(key),
           baseOptions: {
-            staleTime: this.cacheTime.TWENTY_FOUR_HOURS,
-            gcTime: this.cacheTime.TWENTY_FOUR_HOURS,
+            staleTime: this.cacheTime.FIVE_MINUTES,
+            gcTime: this.cacheTime.FIVE_MINUTES,
             encrypted: false
           }
         }
