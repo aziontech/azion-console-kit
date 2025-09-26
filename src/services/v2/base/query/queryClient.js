@@ -1,11 +1,13 @@
 import { reactive } from 'vue'
 import { cacheStore } from '@/services/v2/base/query/cacheStore'
-import { DEFAULT_OPTIONS, CACHE_TYPE } from '@/services/v2/base/query/config'
+import { DEFAULT_OPTIONS, CACHE_TYPE, GC_OPTIONS } from '@/services/v2/base/query/config'
 
 export class QueryClient {
   constructor() {
     this.timers = new Map()
     this.subscribers = new Map()
+    this.gcTimer = null
+    this.#startGarbageCollection()
   }
 
   query({
@@ -31,7 +33,6 @@ export class QueryClient {
     encrypted = false
   }) {
     const cached = await cacheStore.get(queryKey, encrypted)
-
     if (cached && cached.data != null) {
       const isStale = Date.now() - cached.timestamp > staleTime
       this.#setupRefetch({ queryKey, queryFn, refetchInterval, gcTime, encrypted })
@@ -64,6 +65,43 @@ export class QueryClient {
   async clearAll() {
     await this.#clearScope(CACHE_TYPE.SENSITIVE)
     await this.#clearScope(CACHE_TYPE.GLOBAL)
+  }
+
+  async runGarbageCollection() {
+    try {
+      const removedCount = await cacheStore.clearExpired()
+      return removedCount
+    } catch (error) {
+      return 0
+    }
+  }
+
+  #startGarbageCollection() {
+    if (!GC_OPTIONS.ENABLED) return
+
+    this.gcTimer = setInterval(async () => {
+      await this.runGarbageCollection()
+    }, GC_OPTIONS.INTERVAL)
+  }
+
+  #stopGarbageCollection() {
+    if (this.gcTimer) {
+      clearInterval(this.gcTimer)
+      this.gcTimer = null
+    }
+  }
+
+  stopGarbageCollection() {
+    this.#stopGarbageCollection()
+  }
+
+  destroy() {
+    this.timers.forEach((timer) => clearInterval(timer))
+    this.timers.clear()
+
+    this.#stopGarbageCollection()
+
+    this.subscribers.clear()
   }
 
   async unregister(queryKey, state) {

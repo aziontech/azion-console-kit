@@ -20,7 +20,7 @@ export class ContractService extends BaseService {
       key: ['contract', 'service-plan', clientId],
       queryFn: () => this.fetchContractServicePlan(clientId),
       cache: this.cacheType.SENSITIVE,
-      overrides: { refetchInterval: this.cacheTime.FIVE_MINUTES, ...options }
+      overrides: { ...options }
     })
   }
 
