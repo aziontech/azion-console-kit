@@ -62,7 +62,7 @@
 
       <div
         v-if="showOffsetRange"
-        class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
+        class="flex flex-col sm:max-w-xs w-full gap-2"
       >
         <label
           for="largeFileCacheOffset"
@@ -95,30 +95,34 @@
         </small>
       </div>
       <template v-if="isTieredCacheEnabled">
-        <FieldSwitchBlock
-          nameField="tieredCache"
-          name="tieredCache"
-          description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
-          auto
-          :isCard="false"
-          title="Enable Tiered Cache"
-          data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
-        />
-
-        <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdown
-            label="Tiered Cache Region"
-            name="tieredCacheRegion"
-            :options="TIERED_CACHE_REGION"
-            optionLabel="label"
-            optionValue="value"
-            :value="tieredCacheRegion"
-            :disabled="!tieredCache"
-            inputId="tieredCacheRegion"
-            placeholder="Select an Tiered Cache Region"
-            description="Choose an Tiered Cache Region suitable for your application."
-            data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+        <div class="flex flex-col gap-2">
+          <FieldSwitchBlock
+            nameField="tieredCache"
+            name="tieredCache"
+            description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
+            auto
+            :isCard="false"
+            title="Tiered Cache"
+            data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
           />
+
+          <div
+            class="flex flex-col w-full sm:max-w-xs gap-1 pl-14"
+            v-if="tieredCache"
+          >
+            <FieldDropdown
+              label="Tiered Cache Region"
+              name="tieredCacheRegion"
+              optionLabel="label"
+              optionValue="value"
+              :value="'global'"
+              disabled
+              inputId="tieredCacheRegion"
+              placeholder="Global"
+              data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+              description="Currently, the region is fixed to Global"
+            />
+          </div>
         </div>
       </template>
     </template>
@@ -152,21 +156,6 @@
     }
   })
 
-  const TIERED_CACHE_REGION = [
-    {
-      label: 'near-edge',
-      value: 'near-edge'
-    },
-    {
-      label: 'br-east-1',
-      value: 'br-east-1'
-    },
-    {
-      label: 'us-east-1',
-      value: 'us-east-1'
-    }
-  ]
-
   const getEdgeCacheRadioOptions = () => {
     return [
       {
@@ -189,7 +178,6 @@
     useField('largeFileCacheOffset')
   const { value: enableLargeFileCache } = useField('enableLargeFileCache')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-  const { value: tieredCacheRegion } = useField('tieredCacheRegion')
   const { value: tieredCache } = useField('tieredCache')
   const showSliceConfigurationRange = computed(() => {
     return !!enableLargeFileCache.value || !!tieredCache.value

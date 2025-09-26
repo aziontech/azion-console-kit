@@ -41,14 +41,14 @@ describe('extractApiError', () => {
     const httpResponse = {
       body: {
         modules: {
-          edge_cache_enabled: ['Must be a valid boolean.']
+          cache_enabled: ['Must be a valid boolean.']
         }
       }
     }
 
     const result = sut(httpResponse)
 
-    expect(result).toBe('edge_cache_enabled: Must be a valid boolean.')
+    expect(result).toBe('cache_enabled: Must be a valid boolean.')
   })
 
   it('should return unknown error when no error message is found', () => {

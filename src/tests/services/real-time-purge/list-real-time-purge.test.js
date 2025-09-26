@@ -12,7 +12,7 @@ const purge = [
     title: 'Purge:url  was created',
     comment: '-',
     type: 'created',
-    requestData: '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}',
+    requestData: '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"cache\\"}',
     authorName: 'Paulo Sobrinho Ferreira',
     authorEmail: 'azion+teste1@azion.com',
     accountId: '2515'
@@ -23,7 +23,7 @@ const fixtures = {
   realTimePurgeMock: {
     arguments: ['www.vicva.com'],
     disabled: false,
-    layer: 'edge_cache',
+    layer: 'cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
     user: 'azion+teste1@azion.com',
@@ -102,7 +102,7 @@ describe('ListRealTimePurgeService', () => {
         type: 'URL',
         arguments: fixtures.realTimePurgeMock.arguments,
         disabled: false,
-        layer: 'Edge Cache',
+        layer: 'Cache',
         user: fixtures.realTimePurgeMock.user,
         time: fixtures.realTimePurgeMock.time,
         ts: fixtures.realTimePurgeMock.ts
@@ -113,7 +113,7 @@ describe('ListRealTimePurgeService', () => {
   it('should correctly parse double-escaped requestData', async () => {
     localeMock()
     const doubleEscapedRequestData =
-      '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}'
+      '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"cache\\"}'
     const mockResponse = {
       statusCode: 200,
       body: {
@@ -144,7 +144,7 @@ describe('ListRealTimePurgeService', () => {
       id: '2023-12-13T18:02:49Z-0',
       type: 'URL',
       arguments: ['www.vicva.com'],
-      layer: 'Edge Cache',
+      layer: 'Cache',
       user: 'azion+teste1@azion.com',
       disabled: false,
       time: 'Wednesday, December 13, 2023 at 6:02 PM',
