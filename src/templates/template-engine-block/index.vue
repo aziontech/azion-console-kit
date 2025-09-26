@@ -202,7 +202,7 @@
   import { useDeploy } from '@/stores/deploy'
   import { useScrollToError } from '@/composables/useScrollToError'
   import LabelBlock from '@/templates/label-block'
-  import { vcsService } from '@/services/v2'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
   defineOptions({ name: 'templateEngineBlock' })
 
   const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])

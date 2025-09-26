@@ -11,7 +11,7 @@
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
-  import { wafService } from '@/services/v2'
+  import { wafService } from '@/services/v2/waf/waf-service'
   import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

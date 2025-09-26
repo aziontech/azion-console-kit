@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, markRaw } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, markRaw } from 'vue'
   import { useField } from 'vee-validate'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
@@ -8,6 +8,7 @@
   import PrimeButton from 'primevue/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
+  import { useResize } from '@/composables/useResize'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
@@ -35,12 +36,13 @@
   })
 
   const emit = defineEmits(['update:previewData', 'additionalErrors'])
-
-  const SPLITTER_PROPS = {
+  let SPLITTER_PROPS = ref({
     height: '50vh',
     layout: 'horizontal',
     panelsSizes: [60, 40]
-  }
+  })
+
+  const { isGreaterThanLG } = useResize()
 
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
@@ -180,6 +182,32 @@
       inputValue: 'firewall'
     }
   ]
+
+  const setSplitterDirection = () => {
+    if (isGreaterThanLG.value) {
+      SPLITTER_PROPS.value = {
+        height: '50vh',
+        layout: 'horizontal',
+        panelsSizes: [60, 40]
+      }
+    } else {
+      SPLITTER_PROPS.value = {
+        height: '',
+        layout: 'vertical',
+        panelsSizes: []
+      }
+    }
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', () => {
+      setSplitterDirection()
+    })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', setSplitterDirection)
+  })
 </script>
 
 <template>
@@ -299,7 +327,7 @@
           />
         </SplitterPanel>
       </Splitter>
-      <div class="flex flex-col mt-8 surface-border border rounded-md gap-2 md:hidden h-[50vh]">
+      <div class="flex flex-col mt-0 surface-border border rounded-md gap-2 md:hidden h-[50vh]">
         <CodeEditor
           v-model="code"
           :initialValue="HelloWorldSample"
@@ -316,8 +344,10 @@
     </TabPanel>
 
     <TabPanel header="Arguments">
-      <div class="relative z-8 w-full">
-        <div class="absolute top-0 right-8 z-10 flex mt-[1rem]">
+      <div class="w-full mt-4">
+        <div
+          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 top-[3px]"
+        >
           <SelectPanel
             :options="selectPanelOptions"
             :value="selectPanelOptions[0]"
@@ -326,12 +356,13 @@
         </div>
 
         <Splitter
+          class="!z-20 relative"
           :style="{ height: SPLITTER_PROPS.height }"
-          class="mt-8 surface-border border rounded-md hidden md:flex"
-          @resizestart="showPreview = false"
-          @resizeend="showPreview = true"
           :layout="SPLITTER_PROPS.layout"
           :pt="{
+            root: {
+              class: 'mt-0'
+            },
             gutter: { style: { backgroundColor: 'transparent' } },
             gutterHandle: { style: { backgroundColor: 'transparent' } }
           }"
@@ -350,12 +381,13 @@
         </Splitter>
         <div v-if="hasFormBuilder">
           <Splitter
+            class="!z-20 relative"
             :style="{ height: SPLITTER_PROPS.height }"
-            class="mt-8 surface-border border rounded-md hidden md:flex"
-            @resizestart="showPreview = false"
-            @resizeend="showPreview = true"
             :layout="SPLITTER_PROPS.layout"
             :pt="{
+              root: {
+                class: 'mt-0'
+              },
               gutter: { style: { backgroundColor: 'transparent' } },
               gutterHandle: { style: { backgroundColor: 'transparent' } }
             }"
@@ -368,7 +400,6 @@
               <CodeEditor
                 v-model="schemaAzionFormString"
                 runtime="json"
-                class="overflow-clip surface-border border rounded-md"
                 :initialValue="schemaAzionFormString"
                 :errors="hasAzionFormError"
                 :minimap="false"
@@ -417,11 +448,9 @@
           </Splitter>
         </div>
 
-        <div
-          v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder"
-          class="mt-8"
-        >
+        <div v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder">
           <EmptyResultsBlock
+            class="!min-h-[496px]"
             title="No form have been created"
             description="Click the button below to create configure your form."
             createButtonLabel="Form Builder"
@@ -431,15 +460,6 @@
               <Illustration />
             </template>
           </EmptyResultsBlock>
-        </div>
-
-        <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
-          <CodeEditor
-            v-model="defaultArgs"
-            runtime="json"
-            :initialValue="ARGS_INITIAL_STATE"
-            :errors="hasArgsError"
-          />
         </div>
       </div>
     </TabPanel>
