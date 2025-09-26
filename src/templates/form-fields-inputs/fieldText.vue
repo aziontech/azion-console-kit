@@ -43,7 +43,7 @@
   const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
 
-  const emit = defineEmits(['blur'])
+  const emit = defineEmits(['blur', 'input'])
 
   const customTestId = computed(() => {
     const id = attrs['data-testid'] || 'field-text'
@@ -73,6 +73,11 @@
     handleBlur(event)
     emit('blur', event)
   }
+
+  const handleChangeInput = (event) => {
+    handleChange(event)
+    emit('input', event)
+  }
 </script>
 
 <template>
@@ -94,7 +99,7 @@
     type="text"
     @keypress.enter.prevent
     :placeholder="props.placeholder"
-    @input="handleChange"
+    @input="handleChangeInput"
     :class="[{ 'p-invalid': errorMessage }, props.class]"
     @blur="onBlur"
   />
