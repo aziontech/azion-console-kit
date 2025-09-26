@@ -4,7 +4,7 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-app/edge-app-edge-connectors-service'
 
   defineOptions({
     name: 'edge-connectors-drawer'

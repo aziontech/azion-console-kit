@@ -10,7 +10,9 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-  import { networkListsService, edgeFirewallRulesEngineService } from '@/services/v2'
+
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+  import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

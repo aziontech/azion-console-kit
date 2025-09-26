@@ -4,7 +4,7 @@ import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
 import { formatDateToMonthYear, formatDateToUS } from '@/helpers/convert-date'
-import { paymentService } from '@/services/v2'
+import { paymentService } from '@/services/v2/payment/payment-service'
 
 const PAGE_SIZE = 200
 const ACCOUNTING_LIST_LIMIT = 12

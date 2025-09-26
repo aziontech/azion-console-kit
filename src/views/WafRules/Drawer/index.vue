@@ -15,7 +15,7 @@
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-  import { wafRulesTuningGqlService } from '@/services/v2'
+  import { wafRulesTuningGqlService } from '@/services/v2/waf-rules-tunning/waf-rules-tuning-gql-service'
 
   defineOptions({
     name: 'more-details'

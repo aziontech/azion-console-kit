@@ -39,7 +39,7 @@
 <script setup>
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit.vue'
   import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod.vue'
-  import { paymentService } from '@/services/v2'
+  import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'

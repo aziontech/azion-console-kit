@@ -32,7 +32,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCustomPages from '@/views/CustomPages/FormFields/CustomPages'
-  import { customPageService } from '@/services/v2'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
   import { validationSchema, defaultValues } from '@/views/CustomPages/Config/validationSchema'
 
   const initialValues = ref(defaultValues)

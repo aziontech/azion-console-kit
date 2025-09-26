@@ -10,7 +10,6 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { cacheSettingsService } from '@/services/v2'
 
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
@@ -20,7 +19,9 @@
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService, edgeApplicationFunctionService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {

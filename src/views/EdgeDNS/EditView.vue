@@ -21,7 +21,8 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeDNSService, edgeDNSRecordsService } from '@/services/v2'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

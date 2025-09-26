@@ -18,7 +18,9 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import { networkListsService, wafService, wafRulesTuningGqlService } from '@/services/v2'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+  import { wafService } from '@/services/v2/waf/waf-service'
+  import { wafRulesTuningGqlService } from '@/services/v2/waf-rules-tunning/waf-rules-tuning-gql-service'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
