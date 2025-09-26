@@ -3,7 +3,7 @@ import process from 'node:process'
 
 const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
-const environment = VITE_ENVIRONMENT || 'production'
+const environment = VITE_ENVIRONMENT || 'stage'
 
 const addStagePrefix = (origin) => {  
   if (environment === 'stage') {

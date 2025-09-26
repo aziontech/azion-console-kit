@@ -45,14 +45,16 @@ export class AxiosHttpClientAdapter {
     let axiosResponse
 
     try {
-      axiosResponse = await axios.request({
+      const requestDetails = {
         url: url,
         method: method,
         headers: headers,
         data: body,
         signal,
         ...(baseURL && { baseURL: baseURL })
-      })
+      }
+
+      axiosResponse = await axios.request(requestDetails)
     } catch (error) {
       const axiosError = error
       axiosResponse = axiosError.response

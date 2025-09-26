@@ -54,7 +54,70 @@ const getConfig = () => {
       }
     },
     server: {
+      host: true,
+      historyApiFallback: true,
       proxy: {
+        // AI Studio API - MUST be first to avoid conflicts with generic /api rule
+        '^/api/v4/workspace/ai': createProxyConfig({
+          target: `${URLStartPrefix}ai-studio-api.azion.net/`,
+          rewrite: (path) => {
+            console.log(`🚀 AI Studio API Proxy (with /api prefix) MATCHED!`)
+            console.log(`   Original path: ${path}`)
+            const cleanPath = path.replace(/^\/api/, '')
+            console.log(`   Clean path (removed /api): ${cleanPath}`)
+            console.log(`   Target: ${URLStartPrefix}ai-studio-api.azion.net${cleanPath}`)
+            console.log(`   Full target URL: ${URLStartPrefix}ai-studio-api.azion.net${cleanPath}`)
+            return cleanPath
+          },
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log(`🌐 AI API PROXY REQUEST INTERCEPTED:`)
+              console.log(`   Method: ${proxyReq.method}`)
+              console.log(`   Original URL: ${req.url}`)
+              console.log(`   Proxy Path: ${proxyReq.path}`)
+              console.log(`   Host: ${proxyReq.getHeader('host')}`)
+              console.log(`   Target URL: ${options.target}${proxyReq.path}`)
+              console.log(`   Headers:`, proxyReq.getHeaders())
+            })
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              console.log(`📥 AI API PROXY RESPONSE:`)
+              console.log(`   Status: ${proxyRes.statusCode}`)
+              console.log(`   Headers:`, proxyRes.headers)
+            })
+            proxy.on('error', (err, req, res) => {
+              console.log(`❌ AI API PROXY ERROR:`, err.message)
+            })
+          }
+        }),
+        // AI Studio API (direct v4 paths) - Fallback for direct calls
+        '^/v4/workspace/ai': createProxyConfig({
+          target: `${URLStartPrefix}ai-studio-api.azion.net/`,
+          rewrite: (path) => {
+            console.log(`🚀 AI Studio API Proxy MATCHED!`)
+            console.log(`   Original path: ${path}`)
+            console.log(`   Target: ${URLStartPrefix}ai-studio-api.azion.net${path}`)
+            console.log(`   Full target URL: ${URLStartPrefix}ai-studio-api.azion.net${path}`)
+            return path
+          },
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log(`🌐 PROXY REQUEST INTERCEPTED:`)
+              console.log(`   Method: ${proxyReq.method}`)
+              console.log(`   Path: ${proxyReq.path}`)
+              console.log(`   Host: ${proxyReq.getHeader('host')}`)
+              console.log(`   Full URL: ${options.target}${proxyReq.path}`)
+              console.log(`   Headers:`, proxyReq.getHeaders())
+            })
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              console.log(`📥 PROXY RESPONSE:`)
+              console.log(`   Status: ${proxyRes.statusCode}`)
+              console.log(`   Headers:`, proxyRes.headers)
+            })
+            proxy.on('error', (err, req, res) => {
+              console.log(`❌ PROXY ERROR:`, err.message)
+            })
+          }
+        }),
         '^/api/marketplace': createProxyConfig({
           target: `${URLStartPrefix}marketplace.azion.com/`,
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
@@ -92,7 +155,15 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api/, '')
         }),
         '/v4': createProxyConfig({
-          target: `${URLStartPrefix}api.azion.com`
+          target: `${URLStartPrefix}api.azion.com`,
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log(`⚠️ GENERIC /v4 PROXY MATCHED (should not happen for AI requests):`)
+              console.log(`   Method: ${proxyReq.method}`)
+              console.log(`   Path: ${proxyReq.path}`)
+              console.log(`   Target: ${options.target}${proxyReq.path}`)
+            })
+          }
         }),
         '/webpagetest': createProxyConfig({
           target: 'https://www.azion.com/api/webpagetest',
@@ -102,9 +173,9 @@ const getConfig = () => {
           target: 'https://www.azion.com/api/webpagetest',
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
         }),
-        '/ai': createProxyConfig({
+        '^/api/ai/copilot': createProxyConfig({
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
-          rewrite: (path) => path.replace(/^\/ai/, '')
+          rewrite: (path) => path.replace(/^\/api\/ai\/copilot/, '')
         }),
         '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
