@@ -1,3 +1,5 @@
+import { isProduction } from './get-environment'
+
 const SSO_PROVIDERS = [
   {
     name: 'GitHub',
@@ -21,7 +23,8 @@ const SSO_PROVIDERS = [
   }
 ]
 
-const SSO_BASE_URL = 'https://sso.azion.com/api/sp/social'
+const SSO_DOMAIN = isProduction() ? 'sso' : 'stage-sso'
+const SSO_BASE_URL = `https://${SSO_DOMAIN}.azion.com/api/sp/social`
 
 const getSocialIdpsData = () => {
   return SSO_PROVIDERS.map((provider) => {
