@@ -15,10 +15,18 @@ export const CACHE_TYPE = {
   NONE: 'NONE'
 }
 
-export const DEFAULT_OPTIONS = {
-  staleTime: CACHE_TIME.TWO_MINUTES,
+export const GLOBAL_OPTIONS = {
+  staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
-  refetchInterval: CACHE_TIME.TWO_MINUTES
+  refetchInterval: CACHE_TIME.FIVE_MINUTES,
+  encrypted: false
+}
+
+export const SENSITIVE_OPTIONS = {
+  staleTime: CACHE_TIME.TWO_MINUTES,
+  gcTime: CACHE_TIME.FIVE_MINUTES,
+  refetchInterval: CACHE_TIME.FIVE_MINUTES,
+  encrypted: true
 }
 
 export const GC_OPTIONS = {
