@@ -10,28 +10,14 @@ export class QueryClient {
     this.#startGarbageCollection()
   }
 
-  query({
-    queryKey,
-    queryFn,
-    staleTime,
-    gcTime,
-    refetchInterval,
-    encrypted = false
-  }) {
+  query({ queryKey, queryFn, staleTime, gcTime, refetchInterval, encrypted = false }) {
     const state = this.#createReactiveState()
     this.#registerSubscriber(queryKey, state)
     this.#resolveQuery({ queryKey, queryFn, state, staleTime, gcTime, refetchInterval, encrypted })
     return state
   }
 
-  async queryAsync({
-    queryKey,
-    queryFn,
-    staleTime,
-    gcTime,
-    refetchInterval,
-    encrypted = false
-  }) {
+  async queryAsync({ queryKey, queryFn, staleTime, gcTime, refetchInterval, encrypted = false }) {
     const cached = await cacheStore.get(queryKey, encrypted)
     if (cached && cached.data != null) {
       const isStale = Date.now() - cached.timestamp > staleTime
