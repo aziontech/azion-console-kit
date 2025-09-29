@@ -1,5 +1,5 @@
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { hasFlagBlockApiV4, hasFlagIsAzionEmail } from '@/composables/user-flag'
 
 function createHomeItem() {
   return {
@@ -251,6 +251,11 @@ export function getMenuItens(showMarketplaceProductsItens) {
       items: createMarketplaceProductsItems()
     }
   ]
+
+  if (!hasFlagIsAzionEmail()) {
+    const storeIndex = menus.findIndex((menu) => menu.label === 'Store')
+    menus.splice(storeIndex, 1)
+  }
 
   return menus
 }
