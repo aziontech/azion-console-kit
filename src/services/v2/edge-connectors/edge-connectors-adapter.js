@@ -174,7 +174,7 @@ const typeBuildersLoadRequest = {
 
 const edgeConnectorsTypes = {
   http: 'HTTP',
-  storage: 'Edge Storage',
+  storage: 'Object Storage',
   live_ingest: 'Live Ingest'
 }
 
