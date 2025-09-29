@@ -415,7 +415,7 @@
             showButtons
             :min="1"
             :max="10"
-            required
+            :required="isLoadBalancerOriginType"
             description="Assign a number from 1 to 10 to determine how much traffic this origin server can handle."
           />
         </div>
