@@ -5,40 +5,26 @@
     </template>
     <template #content>
       <ListTableBlock
-        v-if="hasContentToList"
+        ref="listServiceRef"
         :listService="listKnowledgeBaseService"
         :columns="getColumns"
+        :actions="actions"
         addButtonLabel="Knowledge Base"
         createPagePath="/ai/knowledge-base/create"
         editPagePath="/ai/knowledge-base/edit"
-        @on-load-data="handleLoadData"
+        enableEditClick
+        exportFileName="knowledge-base"
         @on-before-go-to-add-page="handleCreateTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Knowledge Base items found."
-        :actions="actions"
+        emptyListMessage="No Knowledge Base entries found."
+        class="w-full"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No Knowledge Base items have been created"
-        description="Click the button below to create your first Knowledge Base item."
-        createButtonLabel="Knowledge Base"
-        createPagePath="/ai/knowledge-base/create"
-        @click-to-create="handleCreateTrackEvent"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
 
@@ -55,18 +41,28 @@
     deleteKnowledgeBaseService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
     }
   })
 
-  let hasContentToList = ref(true)
+  const listServiceRef = ref(null)
+  const handleEdit = (item) => {
+    tracker.product.clickToEdit({
+      productName: 'Knowledge Base'
+    })
+    // The edit navigation is handled by the ListTableBlock editPagePath prop
+  }
+
   const actions = [
+    {
+      type: 'action',
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      commandAction: handleEdit
+    },
     {
       type: 'delete',
       title: 'knowledge base',
+      label: 'Delete',
       icon: 'pi pi-trash',
       service: props.deleteKnowledgeBaseService
     }
@@ -78,33 +74,27 @@
     })
   }
 
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'Knowledge Base'
-    })
-  }
 
   const getColumns = computed(() => [
     {
-      field: 'id',
-      header: 'ID',
-      sortField: 'kb_id',
-      filterPath: 'id'
-    },
-    {
       field: 'name',
       header: 'Name',
+      sortable: true,
       filterPath: 'name',
       sortField: 'name'
     },
     {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortable: true,
+      sortField: 'updated_by'
+    },
+    {
       field: 'updatedAt',
-      header: 'Last Update',
+      header: 'Last Modified',
+      sortable: true,
       sortField: 'updated_at'
     }
   ])
 
-  function handleLoadData(event) {
-    hasContentToList.value = event
-  }
 </script>

@@ -47,23 +47,36 @@ export const listKnowledgeBaseService = async () => {
         }).filter(Boolean)
         
         console.log('🎯 Returning mapped data from fetch fallback:', mappedData)
-        return mappedData
+        return {
+          body: mappedData,
+          count: mappedData.length
+        }
       }
-      
-      return []
+
+      return {
+        body: [],
+        count: 0
+      }
     }
 
     // Process AxiosHttpClientAdapter response normally
     if (httpResponse.statusCode === 204) {
       console.log('API returned 204 No Content, treating as empty data')
-      return []
+      return {
+        body: [],
+        count: 0
+      }
     }
 
     httpResponse = adapt(httpResponse)
     const finalResult = parseHttpResponse(httpResponse)
     console.log('🎯 Final result from normal flow:', finalResult)
-    
-    return finalResult
+
+    // Return in expected format for with-fetch-ordering-and-pagination template
+    return {
+      body: Array.isArray(finalResult) ? finalResult : [],
+      count: Array.isArray(finalResult) ? finalResult.length : 0
+    }
   } catch (error) {
     console.log('❌ ERROR - API REQUEST FAILED:', error)
     
@@ -92,14 +105,20 @@ export const listKnowledgeBaseService = async () => {
           }).filter(Boolean)
           
           console.log('🆘 Emergency fallback data:', mappedData)
-          return mappedData
+          return {
+            body: mappedData,
+            count: mappedData.length
+          }
         }
       } catch (parseError) {
         console.log('❌ Failed to parse fetch fallback data:', parseError)
       }
     }
-    
-    return []
+
+    return {
+      body: [],
+      count: 0
+    }
   }
 }
 
