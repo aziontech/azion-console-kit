@@ -1,7 +1,12 @@
 import { onUnmounted } from 'vue'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { globalKey, sensitiveKey } from '@/services/v2/base/query/keys'
-import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
+import {
+  CACHE_TYPE,
+  CACHE_TIME,
+  GLOBAL_OPTIONS,
+  SENSITIVE_OPTIONS
+} from '@/services/v2/base/query/config'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 
 export class BaseService {
@@ -56,20 +61,12 @@ export class BaseService {
       case this.cacheType.SENSITIVE:
         return {
           queryKey: sensitiveKey(key),
-          baseOptions: {
-            staleTime: this.cacheTime.ONE_MINUTE,
-            gcTime: this.cacheTime.ONE_MINUTE,
-            encrypted: true
-          }
+          baseOptions: SENSITIVE_OPTIONS
         }
       case this.cacheType.GLOBAL:
         return {
           queryKey: globalKey(key),
-          baseOptions: {
-            staleTime: this.cacheTime.FIVE_MINUTES,
-            gcTime: this.cacheTime.FIVE_MINUTES,
-            encrypted: false
-          }
+          baseOptions: GLOBAL_OPTIONS
         }
       case this.cacheType.NONE:
       default:
