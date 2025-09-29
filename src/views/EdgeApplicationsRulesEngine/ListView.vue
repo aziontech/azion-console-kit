@@ -10,7 +10,7 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-  import { rulesEngineService } from '@/services/v2'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

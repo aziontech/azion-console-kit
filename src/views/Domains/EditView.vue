@@ -46,7 +46,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

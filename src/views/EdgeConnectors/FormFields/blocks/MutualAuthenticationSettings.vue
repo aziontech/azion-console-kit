@@ -110,7 +110,8 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import Drawer from '@/views/DigitalCertificates/Drawer'
-  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsMutualAuthenticationSettings' })
 

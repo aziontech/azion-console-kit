@@ -84,7 +84,7 @@
   import { computed, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'

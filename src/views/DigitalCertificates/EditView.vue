@@ -40,7 +40,8 @@
   import * as yup from 'yup'
   import { inject, computed } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

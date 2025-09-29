@@ -7,7 +7,7 @@
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'

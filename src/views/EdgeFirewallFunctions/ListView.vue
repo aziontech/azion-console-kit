@@ -61,7 +61,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { edgeFirewallFunctionService } from '@/services/v2'
+  import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })

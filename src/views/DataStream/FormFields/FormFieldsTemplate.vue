@@ -70,7 +70,7 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
-  import { dataStreamService } from '@/services/v2'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 
   const { value: name } = useField('name')
   const { value: dataSet, errorMessage: dataSetErrorMessage } = useField('dataSet')

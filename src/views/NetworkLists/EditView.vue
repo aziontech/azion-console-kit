@@ -7,7 +7,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { networkListsService } from '@/services/v2'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
