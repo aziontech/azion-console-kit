@@ -30,7 +30,7 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.isDeveloperSupportPlan = true
   const isAzionEmail = accountInfo.email.endsWith('@azion.com')
   if (isAzionEmail) {
-    accountInfo.client_flags.push('is_azion_email')
+    accountInfo.client_flags?.push('is_azion_email')
   }
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
