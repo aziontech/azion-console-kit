@@ -15,12 +15,6 @@ export const CACHE_TYPE = {
   NONE: 'NONE'
 }
 
-export const DEFAULT_OPTIONS = {
-  staleTime: CACHE_TIME.TWO_MINUTES,
-  gcTime: CACHE_TIME.THIRTY_MINUTES,
-  refetchInterval: CACHE_TIME.FIVE_MINUTES
-}
-
 export const GLOBAL_OPTIONS = {
   staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
