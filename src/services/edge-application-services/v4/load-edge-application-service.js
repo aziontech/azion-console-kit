@@ -23,11 +23,11 @@ const adapt = (httpResponse) => {
   const parsedEdgeApplications = {
     id: edgeApplication.id,
     name: edgeApplication.name,
-    edgeCacheEnabled: edgeApplication.modules.edge_cache_enabled,
+    edgeCacheEnabled: edgeApplication.modules.cache_enabled,
     edgeFunctionsEnabled: edgeApplication.modules.edge_functions_enabled,
     applicationAcceleratorEnabled: edgeApplication.modules.application_accelerator_enabled,
     imageProcessorEnabled: edgeApplication.modules.image_processor_enabled,
-    tieredCacheEnabled: edgeApplication.modules.tiered_cache_enabled,
+    tieredCacheEnabled: edgeApplication.modules?.tiered_cache_enabled,
     isActive: edgeApplication.active,
     debug: edgeApplication.debug,
     productVersion: edgeApplication.product_version
