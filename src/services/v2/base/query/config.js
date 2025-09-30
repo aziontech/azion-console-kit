@@ -26,7 +26,7 @@ export const SENSITIVE_OPTIONS = {
   staleTime: CACHE_TIME.TWO_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES,
   refetchInterval: CACHE_TIME.FIVE_MINUTES,
-  encrypted: true
+  encrypted: false
 }
 
 export const GC_OPTIONS = {
