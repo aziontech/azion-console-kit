@@ -18,14 +18,14 @@ export const CACHE_TYPE = {
 export const GLOBAL_OPTIONS = {
   staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
-  refetchInterval: CACHE_TIME.FIFTEEN_MINUTES,
+  refetchInterval: CACHE_TIME.THIRTY_MINUTES,
   encrypted: false
 }
 
 export const SENSITIVE_OPTIONS = {
   staleTime: CACHE_TIME.TWO_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES,
-  refetchInterval: CACHE_TIME.THIRTY_MINUTES,
+  refetchInterval: CACHE_TIME.FIFTEEN_MINUTES,
   encrypted: true
 }
 
