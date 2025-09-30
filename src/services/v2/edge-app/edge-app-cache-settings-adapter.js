@@ -37,7 +37,7 @@ export const CacheSettingsAdapter = {
         topology: payload.tieredCacheRegion
       }
     } else {
-      delete result.modules.cache.tiered_cache
+      result.modules.cache.tiered_cache = null
     }
 
     if (result.browser_cache.behavior === 'honor') {
@@ -115,7 +115,7 @@ export const CacheSettingsAdapter = {
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.edge_cache || {}
-    const tieredCache = data.modules?.cache?.tiered_cache
+    const tieredCache = data.modules?.cache?.tiered_cache.enabled
 
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
