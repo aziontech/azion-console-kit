@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import { cacheStore } from '@/services/v2/base/query/cacheStore'
-import { DEFAULT_OPTIONS, CACHE_TYPE, GC_OPTIONS } from '@/services/v2/base/query/config'
+import { CACHE_TYPE, GC_OPTIONS } from '@/services/v2/base/query/config'
 
 export class QueryClient {
   constructor() {
@@ -10,28 +10,14 @@ export class QueryClient {
     this.#startGarbageCollection()
   }
 
-  query({
-    queryKey,
-    queryFn,
-    staleTime = DEFAULT_OPTIONS.staleTime,
-    gcTime = DEFAULT_OPTIONS.gcTime,
-    refetchInterval = DEFAULT_OPTIONS.refetchInterval,
-    encrypted = false
-  }) {
+  query({ queryKey, queryFn, staleTime, gcTime, refetchInterval, encrypted = false }) {
     const state = this.#createReactiveState()
     this.#registerSubscriber(queryKey, state)
     this.#resolveQuery({ queryKey, queryFn, state, staleTime, gcTime, refetchInterval, encrypted })
     return state
   }
 
-  async queryAsync({
-    queryKey,
-    queryFn,
-    staleTime = DEFAULT_OPTIONS.staleTime,
-    gcTime = DEFAULT_OPTIONS.gcTime,
-    refetchInterval = DEFAULT_OPTIONS.refetchInterval,
-    encrypted = false
-  }) {
+  async queryAsync({ queryKey, queryFn, staleTime, gcTime, refetchInterval, encrypted = false }) {
     const cached = await cacheStore.get(queryKey, encrypted)
     if (cached && cached.data != null) {
       const isStale = Date.now() - cached.timestamp > staleTime
