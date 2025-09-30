@@ -13,12 +13,12 @@
 
         <AzionLogo
           class="max-md:hidden cursor-pointer"
-          @click="redirectToRoute('home')"
+          @click="redirectToRoute"
         />
 
         <AzionMobileLogo
           class="md:hidden cursor-pointer"
-          @click="redirectToRoute('home')"
+          @click="redirectToRoute"
         />
 
         <SwitchAccount
@@ -48,7 +48,7 @@
     >
       <AzionLogo
         class="cursor-pointer"
-        @click="redirectToRoute('login')"
+        @click="redirectToRoute"
       />
 
       <PrimeButton
@@ -112,13 +112,8 @@
     }
   })
 
-  const redirectToRoute = (name) => {
-    const currentRoute = router.currentRoute.value
-    if (currentRoute.name === name) {
-      router.go(0)
-    } else {
-      router.push({ name })
-    }
+  const redirectToRoute = () => {
+    router.push({ path: '/' })
   }
 
   watch(
