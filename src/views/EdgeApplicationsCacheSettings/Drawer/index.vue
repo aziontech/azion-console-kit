@@ -75,7 +75,7 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: props.showTieredCache ?? true,
+    tieredCache: false,
     tieredCacheRegion: 'global',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
