@@ -8,10 +8,11 @@ export const createKnowledgeBaseService = async (payload) => {
 
   const adaptedPayload = adapt(payload)
   const url = `${makeKnowledgeBaseBaseUrl()}`
+
+  // Use cookie-based authentication instead of API token
   const headers = {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Authorization': `Token ${import.meta.env.VITE_PERSONAL_TOKEN}`
+    'Content-Type': 'application/json'
   }
 
   console.log('📝 Request Details:')
@@ -19,14 +20,14 @@ export const createKnowledgeBaseService = async (payload) => {
   console.log('  Method: POST')
   console.log('  Headers:', headers)
   console.log('  Body (adapted payload):', adaptedPayload)
-  console.log('  Personal Token:', import.meta.env.VITE_PERSONAL_TOKEN ? '***SET***' : 'NOT SET')
+  console.log('  Authentication: Using cookies (withCredentials: true)')
 
   let httpResponse
   try {
-    // Let the proxy handle routing - don't override headers
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
       method: 'POST',
+      headers,
       body: adaptedPayload
     })
 

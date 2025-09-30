@@ -13,13 +13,13 @@ export const listKnowledgeBaseService = async () => {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Authorization': `Token ${import.meta.env.VITE_PERSONAL_TOKEN}`
+        'Authorization': `Token ${import.meta.env.VITE_API_TOKEN}`
       }
     }
     
     // Log the equivalent curl command
     const fullUrl = `${window.location.origin}/${url}`
-    const token = import.meta.env.VITE_PERSONAL_TOKEN || 'TOKEN_NOT_SET'
+    const token = import.meta.env.VITE_API_TOKEN || 'TOKEN_NOT_SET'
     console.log('📋 Equivalent curl command:')
     console.log(`curl -X GET "${fullUrl}" \\`)
     console.log(`  -H "Accept: application/json" \\`)

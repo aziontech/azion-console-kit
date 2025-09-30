@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import * as Errors from '@/services/axios/errors'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const editKnowledgeBaseService = async (payload) => {
   console.log('🔄 editKnowledgeBaseService called with payload:', payload)
@@ -38,7 +39,7 @@ const parseHttpResponse = (httpResponse) => {
     case 204:
       return 'Your knowledge base item has been updated'
     case 400:
-      const apiError = extractApiError(httpResponse)
+      const apiError = getApiError(httpResponse)
       throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
@@ -67,7 +68,7 @@ const extractErrorKey = (errorSchema, key) => {
  * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
-const extractApiError = (httpResponse) => {
+const getApiError = (httpResponse) => {
   const descriptionError = extractErrorKey(httpResponse.body, 'description')
 
   return descriptionError || 'An error occurred while updating the knowledge base'
