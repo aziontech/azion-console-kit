@@ -127,7 +127,7 @@ export class EdgeFunctionService extends BaseService {
     })
 
     return {
-      feedback: 'Your function has been created',
+      feedback: 'Your Function has been created',
       urlToEditView: `/functions/edit/${data.data.id}`,
       functionId: data.data.id
     }
@@ -142,7 +142,7 @@ export class EdgeFunctionService extends BaseService {
       body
     })
 
-    return 'Your function has been updated'
+    return 'Your Function has been updated'
   }
 
   deleteEdgeFunctionService = async (id) => {

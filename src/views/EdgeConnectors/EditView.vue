@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Connectors"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Connector"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

@@ -89,7 +89,7 @@ export class WorkloadService extends BaseService {
 
     return {
       feedback:
-        'Your workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
+        'Your Workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
       urlToEditView: `/workloads/edit/${workload.id}`,
       domainName: workload.workload_domain,
       id: Number(workload.id)
