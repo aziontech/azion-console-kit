@@ -24,7 +24,7 @@
       :rowClass="stateClassRules"
       :class="[
         'overflow-clip rounded-md table-with-orange-borders',
-        { 'outline-visible': cellQuickActions.visible }
+        { 'outline-visible': !cellQuickActions.rowData?.isFolder && cellQuickActions.visible }
       ]"
     >
       <template
@@ -385,13 +385,13 @@
       @mouseenter="onPopupMouseEnter"
       @mouseleave="onPopupMouseLeave"
       :class="{
-        visible: cellQuickActions.visible
+        visible: !cellQuickActions.rowData?.isFolder && cellQuickActions.visible
       }"
     >
       <button
         v-for="item in quickActions"
         :key="item"
-        @click="item.action"
+        @click="item.action(cellQuickActions.rowData)"
         :title="item.title"
         class="px-2"
       >
@@ -506,6 +506,10 @@
     showLastModified: {
       type: Boolean,
       default: false
+    },
+    celllQuickActionsItens: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -535,7 +539,8 @@
     visible: false,
     text: '',
     posX: 0,
-    posY: 0
+    posY: 0,
+    rowData: null
   })
 
   const { openDeleteDialog } = useDeleteDialog()
@@ -768,13 +773,14 @@
         rows = document.querySelectorAll('table tbody tr')
       }
 
-      rows.forEach((row) => {
+      rows.forEach((row, rowIndex) => {
         columnsWithQuickActions.forEach((column) => {
           const cell = row.children[column.index + 1]
           if (cell && !cell.classList.contains('p-frozen-column')) {
             cell.addEventListener('mouseenter', onCellMouseEnter)
             cell.addEventListener('mouseleave', onCellMouseLeave)
             cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', rowIndex)
           }
         })
       })
@@ -831,12 +837,15 @@
 
         const rect = cellElement.getBoundingClientRect()
         const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = parseInt(cellElement.getAttribute('data-row-index') || '0')
+        const currentRowData = data.value[rowIndex] || null
 
         cellQuickActions.value = {
           visible: true,
           text: cellText,
           posX: rect.left,
-          posY: rect.top - 30
+          posY: rect.top - 28,
+          rowData: currentRowData
         }
 
         cellElement.classList.add('cell-active-hover')
@@ -907,7 +916,8 @@
       title: 'Copy to clipboard',
       icon: 'pi pi-copy',
       action: copyToClipboard
-    }
+    },
+    ...props.cellQuickActionsItens
   ]
   watch(
     () => data.value,

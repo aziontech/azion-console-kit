@@ -389,7 +389,7 @@
         position: 'fixed',
         top: cellQuickActions.posY + 'px',
         left: cellQuickActions.posX + 'px',
-        zIndex: 9999
+        zIndex: 10
       }"
       class="popup-container"
       @mouseenter="onPopupMouseEnter"
@@ -401,7 +401,7 @@
       <button
         v-for="item in quickActions"
         :key="item"
-        @click="item.action"
+        @click="item.action(cellQuickActions.rowData)"
         :title="item.title"
         class="px-2"
       >
@@ -531,6 +531,10 @@
     showContrastInactiveLine: {
       type: Boolean,
       default: false
+    },
+    celllQuickActionsItens: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -570,7 +574,8 @@
     visible: false,
     text: '',
     posX: 0,
-    posY: 0
+    posY: 0,
+    rowData: null
   })
 
   const selectedItems = computed({
@@ -954,13 +959,14 @@
         rows = document.querySelectorAll('table tbody tr')
       }
 
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         columnsWithQuickActions.forEach((column) => {
           const cell = row.children[column.index]
           if (cell && !cell.classList.contains('p-frozen-column')) {
             cell.addEventListener('mouseenter', onCellMouseEnter)
             cell.addEventListener('mouseleave', onCellMouseLeave)
             cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', index)
           }
         })
       })
@@ -1017,12 +1023,15 @@
 
         const rect = cellElement.getBoundingClientRect()
         const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = cellElement.getAttribute('data-row-index')
+        const currentRowData = data.value[rowIndex]
 
         cellQuickActions.value = {
           visible: true,
           text: cellText,
           posX: rect.left,
-          posY: rect.top - 30
+          posY: rect.top - 28,
+          rowData: currentRowData
         }
 
         cellElement.classList.add('cell-active-hover')
@@ -1120,7 +1129,8 @@
       title: 'Search text',
       icon: 'pi pi-search',
       action: searchText
-    }
+    },
+    ...props.cellQuickActionsItens
   ]
   watch(
     () => data.value,
