@@ -57,7 +57,7 @@
   })
 
   const navigateToEdgeApplications = () => {
-    router.push({ name: 'list-edge-applications' })
+    router.push({ name: 'list-applications' })
   }
 
   const navigateToPayment = () => {
