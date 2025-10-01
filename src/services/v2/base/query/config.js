@@ -1,4 +1,5 @@
 export const CACHE_TIME = {
+  NO_REFETCH: 0,
   ONE_MINUTE: 1 * 60 * 1000,
   TWO_MINUTES: 2 * 60 * 1000,
   THREE_MINUTES: 3 * 60 * 1000,
@@ -18,18 +19,18 @@ export const CACHE_TYPE = {
 export const GLOBAL_OPTIONS = {
   staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
-  refetchInterval: CACHE_TIME.FIVE_MINUTES,
+  refetchInterval: CACHE_TIME.NO_REFETCH,
   encrypted: false
 }
 
 export const SENSITIVE_OPTIONS = {
   staleTime: CACHE_TIME.TWO_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES,
-  refetchInterval: CACHE_TIME.FIVE_MINUTES,
+  refetchInterval: CACHE_TIME.NO_REFETCH,
   encrypted: false
 }
 
 export const GC_OPTIONS = {
-  INTERVAL: CACHE_TIME.THIRTY_MINUTES,
+  INTERVAL: CACHE_TIME.ONE_HOUR,
   ENABLED: true
 }
