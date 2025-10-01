@@ -1,10 +1,19 @@
 import { get, set, del, keys, createStore } from 'idb-keyval'
 
 function encode(data) {
-  return btoa(JSON.stringify(data))
+  try {
+    return btoa(JSON.stringify(data))
+  } catch (error) {
+    return data
+  }
 }
+
 function decode(value) {
-  return JSON.parse(atob(value))
+  try {
+    return JSON.parse(atob(value))
+  } catch (error) {
+    return value
+  }
 }
 
 const DB_NAME = 'AZION_CACHE'
