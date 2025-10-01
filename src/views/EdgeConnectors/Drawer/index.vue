@@ -248,7 +248,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateEdgeConnectors"
-    title="Create Edge Connector"
+    title="Create Connector"
   >
     <template #formFields>
       <FormFieldsEdgeConnectors />
