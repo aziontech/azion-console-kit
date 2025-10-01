@@ -43,3 +43,4 @@ jobs:
           VITE_SSO_GITHUB:  ${{ secrets.PROD_SSO_GITHUB }}
           VITE_SSO_GOOGLE:  ${{ secrets.PROD_SSO_GOOGLE }}
           VITE_SENTRY_UPLOAD: ${{ secrets.PROD_SENTRY_UPLOAD }}
+          VITE_SENTRY_UPLOAD: true
