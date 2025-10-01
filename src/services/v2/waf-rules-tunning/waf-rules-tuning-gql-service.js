@@ -44,8 +44,8 @@ export class WafRulesTuningGqlService extends BaseService {
     const results = []
 
     // eslint-disable-next-line id-length
-    for (let i = 0; i < pagePromises.length; i += concurrency) {
-      const batch = pagePromises.slice(i, i + concurrency)
+    for (let pageIndex = 0; pageIndex < pagePromises.length; pageIndex += concurrency) {
+      const batch = pagePromises.slice(pageIndex, pageIndex + concurrency)
       const batchResults = await Promise.allSettled(batch)
 
       batchResults.forEach((result) => {
