@@ -197,11 +197,6 @@
   ]
   const subscriptionModulesSwitchOptions = [
     {
-      title: 'Tiered Cache',
-      nameField: 'l2Caching',
-      subtitle: 'Enable an additional cache layer at the edge.'
-    },
-    {
       title: 'WebSocket Proxy',
       nameField: 'websocket',
       disabled: websocketIsEnabled.value,

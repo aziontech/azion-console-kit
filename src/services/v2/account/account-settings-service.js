@@ -20,7 +20,7 @@ export class AccountSettingsService extends BaseService {
       key: ['account', 'job-role'],
       queryFn: () => this.fetchAccountJobRole(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { refetchInterval: this.cacheTime.FIVE_MINUTES, ...options }
+      overrides: { ...options }
     })
   }
 
