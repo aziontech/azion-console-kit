@@ -8,7 +8,7 @@
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { purgeService } from '@/services/v2'
+  import { purgeService } from '@/services/v2/purge/purge-service'
   import { usePurgeStore } from '@/stores/purge'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -48,7 +48,7 @@
   })
 
   const initialValues = ref({
-    layer: 'edge_cache',
+    layer: 'cache',
     purgeType: 'cachekey',
     argumentsPurge: ''
   })

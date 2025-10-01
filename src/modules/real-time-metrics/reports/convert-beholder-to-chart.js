@@ -149,23 +149,7 @@ const getGroupByKeyValues = (groupBy, item) => {
   })
 }
 
-/**
- * Pushes the additionalSerie values to the series.
- * @param {number} countValues - The count of values.
- * @param {Object} series - The series to push the values to.
- * @param {Object} item - The item containing the additionalSerie values.
- * @param {string} additionalSerie - The additionalSerie to push to the series.
- */
-const pushToSeries = (countValues, series, item, additionalSerie) => {
-  if (countValues === 0) {
-    series[additionalSerie] = [additionalSerie]
-  }
-  let value = 0
-  if (additionalSerie in item) {
-    value = item[additionalSerie]
-  }
-  series[additionalSerie].push(value)
-}
+// Removed: pushToSeries (we set values into the current time/category slot to keep alignment consistent)
 
 /**
  * Fills the series with empty results for the cycles that do not have data records
@@ -174,7 +158,11 @@ const pushToSeries = (countValues, series, item, additionalSerie) => {
  */
 const fillSeriesKeysWithZeroes = (series, countValues) => {
   Object.keys(series).forEach((serieKey) => {
-    if (series[serieKey].lenght < countValues) series[serieKey].push(0)
+    // Ensure each series has a value for every X point already added.
+    // Subtract 1 to account for the header at index 0 (series name).
+    while (series[serieKey].length - 1 < countValues) {
+      series[serieKey].push(0)
+    }
   })
 }
 
@@ -273,7 +261,34 @@ const formatTsChartData = ({
   let lastXAxis = null
   let countValues = 0
 
+  // Helper: ensure series exists and set value for the current (last) slot
+  const setCurrentSlotValue = (key, value) => {
+    if (!(key in series)) {
+      if (isSeriesBeyondLimits(series)) return
+      series[key] = [key]
+      if (countValues > 0) {
+        series[key] = series[key].concat(Array(countValues).fill(0))
+      }
+    }
+    // pad to current slot
+    while (series[key].length - 1 < countValues) {
+      series[key].push(0)
+    }
+    if (series[key].length > 1) {
+      series[key][series[key].length - 1] = value
+    }
+  }
+
   data[report.dataset]?.forEach((item) => {
+    // 1) Add X-axis point first when needed to keep alignment
+    if (shouldAddExtraPointsToAxis(report.isTopX, lastXAxis, item, report.xAxis)) {
+      const props = { series, item, xAxis: report.xAxis, xAxisData, userUTC, countValues }
+      const newExtraPoint = addExtraPointsToXAxis(props)
+
+      lastXAxis = newExtraPoint
+      countValues += 1
+    }
+
     if (shouldHandleSeriesData(variable, groupBy)) {
       let key = variable
 
@@ -291,40 +306,18 @@ const formatTsChartData = ({
         }
       }
 
-      // Creates the HEADER of the series with the name of aggregation
-      if (!(key in series)) {
-        if (isSeriesBeyondLimits(series)) {
-          return
-        }
-
-        series[key] = [key]
-        /*
-          if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
-        */
-        if (countValues > 0) {
-          series[key] = series[key].concat(Array(countValues).fill(0))
-        }
-      }
-
       let value = item[aggregation] || 0
       if (variable === null) {
         value = item[additionalSeries[0]]
       }
-      series[key].push(value)
+      setCurrentSlotValue(key, value)
     }
 
     if (!groupBy?.length) {
       additionalSeries.forEach((additionalSerie) => {
-        pushToSeries(countValues, series, item, additionalSerie)
+        const value = additionalSerie in item ? item[additionalSerie] : 0
+        setCurrentSlotValue(additionalSerie, value)
       })
-    }
-
-    if (shouldAddExtraPointsToAxis(report.isTopX, lastXAxis, item, report.xAxis)) {
-      const props = { series, item, xAxis: report.xAxis, xAxisData, userUTC, countValues }
-      const newExtraPoint = addExtraPointsToXAxis(props)
-
-      lastXAxis = newExtraPoint
-      countValues += 1
     }
   })
 

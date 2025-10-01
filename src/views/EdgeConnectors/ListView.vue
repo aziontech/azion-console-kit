@@ -16,8 +16,8 @@
         emptyListMessage="No Connectors found."
         :actions="actions"
         addButtonLabel="Connectors"
-        createPagePath="/edge-connectors/create"
-        editPagePath="/edge-connectors/edit"
+        createPagePath="/connectors/create"
+        editPagePath="/connectors/edit"
         data-testid="edge-connectors-list-table-block"
         :apiFields="EDGE_CONNECTORS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
@@ -27,7 +27,7 @@
         title="No Connectors have been created"
         description="Click the button below to create your first Connectors."
         createButtonLabel="Connectors"
-        createPagePath="edge-connectors/create"
+        createPagePath="connectors/create"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -46,7 +46,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 
   defineOptions({ name: 'edge-connectors-view' })
 

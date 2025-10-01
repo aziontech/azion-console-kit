@@ -13,7 +13,8 @@
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
-  import { edgeFirewallService, edgeFirewallFunctionService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'

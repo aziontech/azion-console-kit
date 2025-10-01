@@ -10,14 +10,15 @@
   import { useToast } from 'primevue/usetoast'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
 
   defineOptions({
-    name: 'edge-storage-view'
+    name: 'object-storage-view'
   })
   const route = useRoute()
   const toast = useToast()
-  const { findBucketById, selectedBucket, createdBucket, validationSchema } = useEdgeStorage()
+  const { findBucketById, selectedBucket, bucketTableNeedRefresh, validationSchema } =
+    useEdgeStorage()
 
   const { openDeleteDialog } = useDeleteDialog()
   const router = useRouter()
@@ -29,7 +30,7 @@
     }
   })
 
-  const isCreatePage = computed(() => route.name === 'edge-storage-create')
+  const isCreatePage = computed(() => route.name === 'object-storage-create')
   const title = computed(() => (isCreatePage.value ? 'Create Bucket' : 'Edit Bucket'))
   const componentForm = computed(() => {
     return {
@@ -48,7 +49,7 @@
           loadService: loadService,
           schema: validationSchema,
           title: title,
-          updatedRedirect: 'edge-storage-list',
+          updatedRedirect: 'object-storage-list',
           disableAfterCreateToastFeedback: true,
           disableNameEdit: true
         }
@@ -57,7 +58,7 @@
   })
 
   const handleResponse = (response) => {
-    createdBucket.value = response.data.name
+    bucketTableNeedRefresh.value = true
     toast.add({
       severity: 'success',
       summary: 'Success',
@@ -97,7 +98,8 @@
       },
       closeCallback: () => {
         selectedBucket.value = null
-        router.push({ name: 'edge-storage-list' })
+        bucketTableNeedRefresh.value = true
+        router.push({ name: 'object-storage-list' })
       }
     })
   }
@@ -111,6 +113,7 @@
     <template #content>
       <component
         @on-edit-success="handleResponse"
+        @on-response="handleResponse"
         :is="componentForm.component"
         v-bind="componentForm.props"
       >

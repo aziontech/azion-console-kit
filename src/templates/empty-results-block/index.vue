@@ -18,7 +18,8 @@
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
     noBorder: { type: Boolean, required: false },
-    noShowBorderTop: { type: Boolean, required: false, default: false }
+    noShowBorderTop: { type: Boolean, required: false, default: false },
+    showLearnMoreButton: { type: Boolean, required: false, default: true }
   })
   function openDocumentation() {
     props.documentationService()
@@ -33,12 +34,15 @@
 
 <template>
   <div
-    class="flex flex-col"
-    :class="{ 'mt-4 pb-8': inTabs }"
+    class="flex flex-col justify-center"
+    :class="{
+      'mt-4 pb-8': inTabs,
+      'border surface-border': !noBorder,
+      'rounded-t-none': noShowBorderTop
+    }"
   >
     <div
-      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
-      :class="{ 'border surface-border': !noBorder, 'rounded-t-none': noShowBorderTop }"
+      class="min-h-[300px] flex flex-col justify-center gap-5 items-center rounded-md p-8 max-md:p-3"
     >
       <slot name="illustration">
         <Illustration />

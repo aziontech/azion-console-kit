@@ -20,7 +20,7 @@
   import MigrationMessage from './components/MigrationMessage.vue'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -162,7 +162,7 @@
       tab
     }
     router.push({
-      name: 'edit-edge-application',
+      name: 'edit-application',
       params,
       query: route.query
     })
@@ -206,10 +206,6 @@
 
   const applicationAcceleratorEnabled = computed(() => {
     return hasFlagBlockApiV4() ? 'applicationAccelerator' : 'applicationAcceleratorEnabled'
-  })
-
-  const tieredCacheEnabled = computed(() => {
-    return hasFlagBlockApiV4() ? 'l2Caching' : 'tieredCacheEnabled'
   })
 
   const imageProcessorEnabled = computed(() => {
@@ -280,7 +276,7 @@
       show: showTabs.cacheSettings,
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
-        isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
+        isTieredCacheEnabled: true,
         edgeApplicationId: edgeApplicationId.value
       })
     },

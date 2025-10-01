@@ -35,11 +35,12 @@
   import FormFieldsEditEdgeApplications from './FormFields/FormFieldsEditEdgeApplications.vue'
   import { inject } from 'vue'
 
-  defineOptions({ name: 'edit-edge-application' })
+  defineOptions({ name: 'edit-application' })
+
   const emit = defineEmits(['updatedApplication'])
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeAppService } from '@/services/v2'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
   const tracker = inject('tracker')
   const unsavedStatus = inject('unsaved')

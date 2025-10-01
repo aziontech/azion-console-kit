@@ -8,7 +8,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { useRouter } from 'vue-router'
-  import { edgeFunctionService } from '@/services/v2'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   defineOptions({
     name: 'edge-functions-drawer'
@@ -48,7 +48,7 @@
   })
   const updateObject = ref({})
 
-  const executionEnvironment = router.currentRoute.value.path.startsWith('/edge-firewall')
+  const executionEnvironment = router.currentRoute.value.path.startsWith('/firewall')
     ? 'firewall'
     : 'application'
 
@@ -58,6 +58,7 @@
     runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
+    azionForm: {},
     executionEnvironment: executionEnvironment
   }
   const handleTrackCreation = () => {

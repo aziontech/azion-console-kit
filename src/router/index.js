@@ -11,7 +11,7 @@ import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
 import { workloadRoutes } from '@/router/routes/workload-routes'
 import { domainsRoutes } from '@/router/routes/domains'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
-import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
+import { edgeFirewallRoutes } from '@routes/firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { edgePulseRoutes } from '@routes/edge-pulse-routes'
@@ -51,6 +51,7 @@ import { clientManagementRoutes } from '@routes/clients-management-routes'
 import { customPagesRoutes } from '@routes/custom-pages-routes'
 import { mfaManagementRoutes } from '@routes/mfa-management-routes'
 import { edgeConnectorsRoutes } from '@routes/edge-connectors-routes'
+import { edgeSQLRoutes } from '@routes/edge-sql-routes'
 import { edgeStorageRoutes } from '@routes/edge-storage'
 
 const router = createRouter({
@@ -101,6 +102,7 @@ const router = createRouter({
     customPagesRoutes,
     mfaManagementRoutes,
     edgeConnectorsRoutes,
+    edgeSQLRoutes,
     edgeStorageRoutes
   ].concat(errorRoutes)
 })

@@ -7,6 +7,7 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
+      :class="{ 'disabled-list': disabledList }"
       v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
@@ -55,17 +56,6 @@
                 placeholder="Search"
               />
             </span>
-
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              aria-label="Export to CSV"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
 
             <slot
               name="addButton"
@@ -139,6 +129,15 @@
             <slot
               name="actions-header"
               :exportTableCSV="handleExportTableDataToCSV"
+            />
+            <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
             <PrimeButton
               outlined
@@ -421,6 +420,10 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    isLoading: {
+      type: Boolean,
+      default: () => false
     }
   })
   const firstItemIndex = ref(0)
@@ -437,7 +440,7 @@
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-  const isLoading = ref(false)
+  const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
@@ -689,3 +692,12 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style scoped>
+  /* Style for row hover when disabledList is true */
+  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
+    .p-frozen-column {
+      background: var(--surface-section) !important;
+    }
+  }
+</style>
