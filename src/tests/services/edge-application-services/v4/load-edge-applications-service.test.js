@@ -10,7 +10,7 @@ const fixtures = {
     last_modified: '2025-02-05T14:27:15.482948Z',
     product_version: '3.0',
     modules: {
-      edge_cache_enabled: true,
+      cache_enabled: true,
       edge_functions_enabled: true,
       application_accelerator_enabled: true,
       image_processor_enabled: true,
@@ -57,7 +57,7 @@ describe('EdgeApplicationServicesV4', () => {
     expect(result).toEqual({
       id: fixtures.edgeApplicationsMock.id,
       name: fixtures.edgeApplicationsMock.name,
-      edgeCacheEnabled: fixtures.edgeApplicationsMock.modules.edge_cache_enabled,
+      edgeCacheEnabled: fixtures.edgeApplicationsMock.modules.cache_enabled,
       edgeFunctionsEnabled: fixtures.edgeApplicationsMock.modules.edge_functions_enabled,
       applicationAcceleratorEnabled:
         fixtures.edgeApplicationsMock.modules.application_accelerator_enabled,
