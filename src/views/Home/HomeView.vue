@@ -194,7 +194,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to build an application"
+                label="How to build"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -267,7 +267,7 @@
               <PrimeButton
                 type="button"
                 class="sm:w-auto w-full"
-                label="Go to Azion Copilot"
+                label="Open Azion Copilot"
                 outlined
                 size="small"
                 @click="OpenSidebarComponent('copilot')"
