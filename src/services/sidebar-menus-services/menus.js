@@ -64,8 +64,8 @@ function createSecureItems() {
       id: 'edge-dns'
     },
     {
-      label: 'Firewall',
-      to: '/firewall',
+      label: 'Firewalls',
+      to: '/firewalls',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
     }

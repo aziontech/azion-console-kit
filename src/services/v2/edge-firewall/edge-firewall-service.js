@@ -78,7 +78,7 @@ export class EdgeFirewallService extends BaseService {
 
     return {
       feedback: 'Your Firewall has been cloned',
-      urlToEditView: `/firewall/edit/${data.data.id}`,
+      urlToEditView: `/firewalls/edit/${data.data.id}`,
       id: data.data.id
     }
   }
