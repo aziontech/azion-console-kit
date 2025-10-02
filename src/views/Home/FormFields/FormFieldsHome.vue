@@ -24,6 +24,7 @@
     <div class="flex flex-col w-full gap-2">
       <FieldText
         label="Full Name"
+        placeholder="John Doe"
         required
         name="name"
         :value="name"
@@ -33,6 +34,7 @@
     <div class="flex flex-col w-full gap-2">
       <FieldText
         label="Email"
+        placeholder="email@example.com"
         required
         name="email"
         type="email"
