@@ -327,6 +327,7 @@
     'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
+    'on-row-click',
     'update:selectedItensData'
   ])
 
@@ -636,6 +637,7 @@
   }
 
   const editItemSelected = ({ data: item }) => {
+    emit('on-row-click', item)
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)

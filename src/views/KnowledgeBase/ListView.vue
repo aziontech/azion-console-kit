@@ -11,10 +11,10 @@
         :actions="actions"
         addButtonLabel="Knowledge Base"
         createPagePath="/ai/knowledge-base/create"
-        editPagePath="/ai/knowledge-base/edit"
-        enableEditClick
         exportFileName="knowledge-base"
+        :enableEditClick="false"
         @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-row-click="handleRowClick"
         emptyListMessage="No Knowledge Base entries found."
         class="w-full"
       />
@@ -26,10 +26,12 @@
   import ContentBlock from '@/templates/content-block'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { useRouter } from 'vue-router'
   import { computed, ref, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const router = useRouter()
 
   defineOptions({ name: 'knowledge-base-view' })
 
@@ -45,11 +47,38 @@
   })
 
   const listServiceRef = ref(null)
+
+  const handleRowClick = (item) => {
+    if (!item || !item.id) {
+      return
+    }
+
+    // Track analytics if available
+    try {
+      if (tracker && tracker.product && typeof tracker.product.clickToView === 'function') {
+        tracker.product.clickToView({
+          productName: 'Knowledge Base'
+        })
+      }
+    } catch (error) {
+      // Silently fail on analytics errors
+    }
+
+    router.push(`/ai/knowledge-base/${item.id}`)
+  }
+
   const handleEdit = (item) => {
-    tracker.product.clickToEdit({
-      productName: 'Knowledge Base'
-    })
-    // The edit navigation is handled by the ListTableBlock editPagePath prop
+    // Track analytics if available
+    try {
+      if (tracker && tracker.product && typeof tracker.product.clickToEdit === 'function') {
+        tracker.product.clickToEdit({
+          productName: 'Knowledge Base'
+        })
+      }
+    } catch (error) {
+      console.warn('Analytics tracking failed:', error)
+    }
+    router.push(`/ai/knowledge-base/edit/${item.id}`)
   }
 
   const actions = [

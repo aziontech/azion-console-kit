@@ -66,6 +66,27 @@ export const azionAiRoutes = [
     }
   },
   {
+    path: '/ai/knowledge-base/:id',
+    name: 'knowledge-base-detail',
+    component: () => import('@views/KnowledgeBase/DetailView.vue'),
+    meta: {
+      title: 'Knowledge Base Details',
+      breadCrumbs: [
+        {
+          label: 'AI',
+          to: '/ai'
+        },
+        {
+          label: 'Knowledge Base',
+          to: '/ai/knowledge-base'
+        },
+        {
+          label: 'Details'
+        }
+      ]
+    }
+  },
+  {
     path: '/ai/knowledge-base/edit/:id',
     name: 'edit-knowledge-base',
     component: () => import('@views/KnowledgeBase/EditView.vue'),

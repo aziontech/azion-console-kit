@@ -19,6 +19,7 @@ export const deleteKnowledgeBaseService = async (knowledgeBaseId) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
+    case 200:
     case 204:
       return 'Knowledge base item successfully deleted'
     case 400:
