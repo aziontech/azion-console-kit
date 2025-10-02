@@ -350,9 +350,9 @@
             class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="OpenSidebarComponent('copilot', { clearChat: true })"
           >
-            <div class="text-lg font-medium">Get Assistance (Support)</div>
+            <div class="text-lg font-medium">Get Assistance</div>
             <div class="text-sm text-color-secondary">
-              Access personalized assistance for all your queries, suggestions, or incident reports
+              Access personalized support for all your queries, suggestions, or incident reports
             </div>
           </button>
         </div>
