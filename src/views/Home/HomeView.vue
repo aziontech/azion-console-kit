@@ -126,7 +126,7 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full flex flex-col gap-6 lg:gap-8">
+      <section class="w-full flex flex-col gap-4 md:gap-6">
         <div
           v-if="showExperimental"
           class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
@@ -144,18 +144,18 @@
           />
         </div>
         <div
-          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
+          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-4 md:gap-6 justify-between"
         >
-          <div class="flex flex-col gap-4 max-w-4xl">
-            <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
-            <h2 class="text-sm md:text-xl text-color-secondary font-normal">
+          <div class="flex flex-col gap-2 max-w-4xl">
+            <h1 class="text-color text-xl md:text-2xl font-medium">Get Started</h1>
+            <h2 class="text-sm md:text-base text-color-secondary font-normal">
               Welcome aboard! Feel free to explore or get a head start below.
             </h2>
           </div>
           <div>
             <PrimeButton
               icon="pi pi-plus"
-              class="w-full sm:w-auto"
+              class="w-full md:w-auto md:pr-3.5"
               label="Create"
               type="button"
               size="small"
@@ -301,14 +301,13 @@
             :createService="props.inviteYourTeamService"
             :schema="validationSchema"
             disabledCallback
-            class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
+            class="flex flex-col lg:flex-row w-full items-end gap-2"
             :unSaved="false"
           >
             <template #form>
               <FormFieldsHome :teams="teams"></FormFieldsHome>
             </template>
             <template #action-bar="{ onSubmit, loading }">
-              <div class="mt-auto lg:mt-7">
                 <PrimeButton
                   severity="secondary"
                   type="submit"
@@ -317,14 +316,13 @@
                   @click="onSubmit"
                   :loading="loading"
                   :disabled="loading"
-                  class="w-full px-4 lg:w-auto"
+                  class="w-full lg:w-auto lg:min-w-[5rem]"
                 />
-              </div>
             </template>
           </CreateFormBlock>
         </div>
 
-        <div class="flex flex-col xl:flex-row gap-6">
+        <div class="flex flex-col xl:flex-row gap-4 md:gap-6">
           <!-- Product -->
           <button
             type="button"
