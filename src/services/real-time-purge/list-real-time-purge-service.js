@@ -38,7 +38,7 @@ export const listRealTimePurgeService = async (
 }
 
 const MAPLAYER = {
-  edge_cache: 'Edge Cache',
+  cache: 'Cache',
   tiered_cache: 'Tiered Cache'
 }
 

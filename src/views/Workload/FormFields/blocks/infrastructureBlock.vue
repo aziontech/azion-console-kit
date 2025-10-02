@@ -59,7 +59,7 @@
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
     title="Infrastructure"
-    description="Select the infrastructure type for your workload. Once this option is saved, it cannot be modified."
+    description="Select the infrastructure type for your Workload. Once this option is saved, it cannot be modified."
   >
     <template #inputs>
       <div class="flex flex-col gap-3">

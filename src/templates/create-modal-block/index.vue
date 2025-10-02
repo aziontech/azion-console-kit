@@ -64,10 +64,10 @@
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
-      label: 'Edge Connector',
+      label: 'Connectors',
       to: '/connectors/create',
       description:
-        'Edge Connector centralizes connections and how to connect to machines and applications.'
+        'Connector centralizes connections and how to connect to machines and applications.'
     },
     {
       label: 'Custom Page',

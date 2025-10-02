@@ -239,7 +239,7 @@
       <FormHorizontal
         class="mt-8"
         title="General"
-        description="Edit a function that runs closer to users to use with Application or Firewall."
+        description="Edit a Function that runs closer to users to use with Application or Firewall."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -249,7 +249,7 @@
               name="name"
               placeholder="My function"
               :value="name"
-              description="Give a unique and descriptive name to identify the function."
+              description="Give a unique and descriptive name to identify the Function."
             />
           </div>
         </template>
@@ -258,7 +258,7 @@
       <FormHorizontal
         class="mt-8"
         title="Runtime"
-        description="The execution runtime used to run your function"
+        description="The execution runtime used to run your Function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -276,7 +276,7 @@
       <FormHorizontal
         class="mt-8"
         title="Execution Environment"
-        description="Specify the execution environment for your function"
+        description="Specify the execution environment for your Function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">

@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="Connector Type"
-    description="Select the type of origin to connect to your edge connector."
+    description="Select the type of origin to connect to your Connector."
     data-testid="edge-connectors-form__section__connector-type"
   >
     <template #inputs>
@@ -45,7 +45,7 @@
       title: 'Live Ingest',
       inputValue: 'live_ingest',
       subtitle:
-        'Enable real-time ingestion of live streams directly into your workloads for immediate processing and delivery.'
+        'Enable real-time ingestion of live streams directly into your Workloads for immediate processing and delivery.'
     }
   ]
 
