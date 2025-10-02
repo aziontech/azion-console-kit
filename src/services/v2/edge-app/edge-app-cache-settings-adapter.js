@@ -114,7 +114,7 @@ export const CacheSettingsAdapter = {
   },
 
   transformLoadCacheSetting({ data }) {
-    const edge = data.modules?.edge_cache || {}
+    const edge = data.modules?.cache || {}
     const tieredCache = data.modules?.cache?.tiered_cache.enabled
 
     const appAccelerator = data.modules?.application_accelerator || {}
