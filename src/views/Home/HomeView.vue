@@ -179,7 +179,7 @@
               <div class="flex flex-col gap-2">
                 <div class="text-lg sm:text-xl font-medium">Manage Applications</div>
                 <div class="text-xs sm:text-sm text-color-secondary">
-                  Add and manage applications' main settings, modules, and features.
+                  Add and manage your applications' main settings, modules, and features.
                 </div>
               </div>
             </div>
@@ -248,7 +248,7 @@
               />
             </div>
           </div>
-
+          <!-- Ask Azion Copilot -->
           <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
             <div class="flex flex-row justify-start gap-3">
               <div
@@ -259,8 +259,7 @@
               <div class="flex flex-col gap-2">
                 <div class="text-lg sm:text-xl font-medium">Ask Azion Copilot</div>
                 <div class="text-xs sm:text-sm text-color-secondary">
-                  Ask your questions to Azion Copilot, an artificial intelligence with years of edge
-                  computing expertise.
+                  Ask your questions to Azion Copilot, an AI with deep edge computing expertise.
                 </div>
               </div>
             </div>
@@ -293,7 +292,7 @@
           <div class="flex flex-col gap-2">
             <div class="text-lg sm:text-xl font-medium">Invite your Team</div>
             <div class="text-xs sm:text-sm text-color-secondary">
-              All Azion plans include unlimited team seats. Invite colleagues to start building
+              All Azion plans include unlimited team seats. Invite your colleagues to start building
               together.
             </div>
           </div>
@@ -308,16 +307,16 @@
               <FormFieldsHome :teams="teams"></FormFieldsHome>
             </template>
             <template #action-bar="{ onSubmit, loading }">
-                <PrimeButton
-                  severity="secondary"
-                  type="submit"
-                  label="Invite"
-                  size="small"
-                  @click="onSubmit"
-                  :loading="loading"
-                  :disabled="loading"
-                  class="w-full lg:w-auto lg:min-w-[5rem]"
-                />
+              <PrimeButton
+                severity="secondary"
+                type="submit"
+                label="Invite"
+                size="small"
+                @click="onSubmit"
+                :loading="loading"
+                :disabled="loading"
+                class="w-full lg:w-auto lg:min-w-[5rem]"
+              />
             </template>
           </CreateFormBlock>
         </div>
@@ -331,7 +330,7 @@
           >
             <div class="text-lg font-medium">Product Documentation</div>
             <div class="text-sm text-color-secondary">
-              Understand how to configure all Azion products and their features.
+              Understand how to configure all your Azion products and their features.
             </div>
           </button>
           <!-- API -->
@@ -342,7 +341,7 @@
           >
             <div class="text-lg font-medium">API Documentation</div>
             <div class="text-sm text-color-secondary">
-              Use the Azion API to interact with Azion products through HTTPS requests.
+              Use the Azion API to interact with your Azion products through HTTPS requests.
             </div>
           </button>
           <!-- Contact -->
@@ -353,7 +352,7 @@
           >
             <div class="text-lg font-medium">Get Assistance (Support)</div>
             <div class="text-sm text-color-secondary">
-              Access personalized assistance for your queries, suggestions, or incident reports
+              Access personalized assistance for all your queries, suggestions, or incident reports
             </div>
           </button>
         </div>
