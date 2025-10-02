@@ -23,13 +23,13 @@
 
 <template>
   <div
-    class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+    class="flex w-full gap-3 justify-end h-16 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
   >
     <PrimeButton
       severity="primary"
       outlined
       data-testid="action-bar__go-back"
-      class="max-md:w-full"
+      class="max-md:w-full md:min-w-[5rem]"
       label="Back to list"
       @click="handleClick"
     />
