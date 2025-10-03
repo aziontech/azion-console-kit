@@ -77,6 +77,7 @@
       <PrimeButton
         outlined
         label="Cancel"
+        size="small"
         @click="cancelDialog()"
         data-testid="delete-dialog-footer-cancel-button"
       ></PrimeButton>
@@ -84,6 +85,7 @@
         severity="danger"
         label="Delete"
         icon-pos="right"
+        size="small"
         @click="removeItem()"
         :icon="getLoadingIcon"
         :disabled="isDisabled"
