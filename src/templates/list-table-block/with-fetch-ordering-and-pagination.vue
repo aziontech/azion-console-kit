@@ -70,6 +70,7 @@
               outlined
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
+              size="small"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
@@ -85,6 +86,7 @@
                 :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
