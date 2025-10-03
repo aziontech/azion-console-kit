@@ -13,7 +13,7 @@ const environmentConfigs = {
     dsn,
     tracesSampleRate: 0.1, // 10% - conservative sampling for production
     tracePropagationTargets: ['console.azion.com'],
-    replaysSessionSampleRate: 0.10, // 1% - minimal session replay
+    replaysSessionSampleRate: 0.1, // 1% - minimal session replay
     replaysOnErrorSampleRate: 1.0 // 100% of sessions with errors
   },
   stage: {

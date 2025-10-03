@@ -38,6 +38,7 @@
             }"
             :feedback="false"
             toggleMask
+            data-sentry-mask
             data-testid="copy-token-dialog__token-field__password-input"
           />
           <small
