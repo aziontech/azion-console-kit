@@ -28,7 +28,6 @@ export default {
             'input[name*="hmacSecretKey"]',
             'div[data-sentry-mask] input'
           ],
-          // Allow explicit opt-out of masking where business-approved
           unmask: ['[data-sentry-unmask]']
         })
       ]
