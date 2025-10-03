@@ -85,7 +85,6 @@
         severity="danger"
         label="Delete"
         icon-pos="right"
-        size="small"
         @click="removeItem()"
         :icon="getLoadingIcon"
         :disabled="isDisabled"
