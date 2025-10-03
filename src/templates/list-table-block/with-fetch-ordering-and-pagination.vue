@@ -59,7 +59,7 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
-              <div class="ml-3">
+              <div v-if="$slots['select-buttons']" class="ml-3">
                 <slot name="select-buttons" />
               </div>
             </span>
@@ -282,7 +282,6 @@
                 @click="navigateToAddPage"
                 :disabled="disabledAddButton"
                 icon="pi pi-plus"
-                size="small"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
