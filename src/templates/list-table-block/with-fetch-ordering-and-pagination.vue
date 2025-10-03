@@ -523,7 +523,7 @@
       type: Boolean,
       default: false
     },
-    celllQuickActionsItens: {
+    cellQuickActionsItens: {
       type: Array,
       default: () => []
     }
