@@ -26,11 +26,9 @@ export const getTimeInMs = (value, unit) => {
  * @param {string} direction - Direction ('ago'/'from now')
  * @returns {Date} New calculated date
  */
-export const calculateRelativeDate = (referenceDate, value, unit, direction) => {
+export const calculateRelativeDate = (referenceDate, value, unit) => {
   const timeInMs = getTimeInMs(value, unit)
-  return direction === getCurrentMonthLabel().toLowerCase() || direction === 'last'
-    ? new Date(referenceDate.getTime() - timeInMs)
-    : new Date(referenceDate.getTime() + timeInMs)
+  return new Date(referenceDate.getTime() - timeInMs)
 }
 
 /**
@@ -41,12 +39,10 @@ export const calculateRelativeDate = (referenceDate, value, unit, direction) => 
  * @param {Date} referenceDate - Reference date (default: now)
  * @returns {Object} Object with startDate and endDate
  */
-export const createRelativeRange = (value, unit, direction, referenceDate = new Date()) => {
-  const calculatedDate = calculateRelativeDate(referenceDate, value, unit, direction)
+export const createRelativeRange = (value, unit, referenceDate = new Date()) => {
+  const calculatedDate = calculateRelativeDate(referenceDate, value, unit)
 
-  return direction === getCurrentMonthLabel().toLowerCase() || direction === 'last'
-    ? { startDate: calculatedDate, endDate: referenceDate }
-    : { startDate: referenceDate, endDate: calculatedDate }
+  return { startDate: calculatedDate, endDate: referenceDate }
 }
 
 /**
@@ -57,18 +53,35 @@ export const createRelativeRange = (value, unit, direction, referenceDate = new 
 export const createStartOfDay = (date) => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
+
 /**
- * Creates a date for the end of the day
+ * Creates a date for the end of the day.
+ * If setToEndOfDay is true, sets the time to 23:59:59.
+ * Otherwise, sets the time to the current hour, minute, and second.
  * @param {Date} date - Reference date
- * @returns {Date} Date at the end of the day (23:59:59)
+ * @param {boolean} [setToEndOfDay=false] - If true, sets time to 23:59:59
+ * @returns {Date} Date at the end of the day or current time on the given day
  */
-export const createEndOfDay = (date) => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
+export const createEndOfDay = (date, setToEndOfDay = false) => {
+  if (setToEndOfDay) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)
+  } else {
+    const now = new Date()
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds()
+    )
+  }
 }
 
 /**
  * Creates a range for the current week
  * @param {Date} date - Reference date
+ * @param {boolean} [setToEndOfDay=false] - If true, sets time to 23:59:59
  * @returns {Object} Object with startDate and endDate of the week
  */
 export const createWeekRange = (date) => {
@@ -80,7 +93,7 @@ export const createWeekRange = (date) => {
 
   return {
     startDate: createStartOfDay(startOfWeek),
-    endDate: createEndOfDay(endOfWeek)
+    endDate: createEndOfDay(endOfWeek, true)
   }
 }
 
@@ -292,12 +305,13 @@ export const TIME_SLOTS = [
 ]
 
 export const RELATIVE_UNITS = [
-  { label: 'Minutes', value: 'minutes' },
-  { label: 'Hours', value: 'hours' },
-  { label: 'Days', value: 'days' },
-  { label: 'Weeks', value: 'weeks' },
-  { label: 'Months', value: 'months' },
-  { label: 'Years', value: 'years' }
+  { label: 'Seconds ago', value: 'seconds' },
+  { label: 'Minutes ago', value: 'minutes' },
+  { label: 'Hours ago', value: 'hours' },
+  { label: 'Days ago', value: 'days' },
+  { label: 'Weeks ago', value: 'weeks' },
+  { label: 'Months ago', value: 'months' },
+  { label: 'Years ago', value: 'years' }
 ]
 
 /**
@@ -317,10 +331,6 @@ export const getCurrentHourAndMinute = () => {
   const now = new Date()
   return `${now.getHours()}:${now.getMinutes()}`
 }
-
-export const RELATIVE_DIRECTIONS = [
-  { label: 'From now', value: getCurrentMonthLabel().toLowerCase() }
-]
 
 export const COMMON_DATE_RANGES = {
   today: { label: 'Today', value: 'today', maxDays: 1 },

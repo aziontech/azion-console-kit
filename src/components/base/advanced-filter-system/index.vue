@@ -24,8 +24,9 @@
 
   const filterData = defineModel('filterData')
 
+  const dataTimeRangeRef = ref(null)
   const filterDataRange = ref({})
-
+  const isPendingChange = ref(true)
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
 
@@ -72,6 +73,11 @@
     }
   }
 
+  const updateDateRange = () => {
+    dataTimeRangeRef.value.updateDateRange()
+    filterSearch()
+  }
+
   onMounted(() => {
     filterDataRange.value = {
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
@@ -101,12 +107,25 @@
           />
         </div>
         <DataTimeRange
+          ref="dataTimeRangeRef"
           class="max-md:w-full"
           v-model="filterDataRange"
+          :isPendingChange="isPendingChange"
           :maxDays="props.filterDateRangeMaxDays"
           @select="filterSearch"
         />
+
         <PrimeButton
+          v-if="isPendingChange"
+          icon="pi pi-arrow-right"
+          outlined
+          size="small"
+          label="Update"
+          @click="updateDateRange"
+        />
+
+        <PrimeButton
+          v-else
           icon="pi pi-refresh"
           outlined
           size="small"

@@ -45,217 +45,104 @@
       }"
     >
       <TabPanel header="Absolute">
-        <div class="flex justify-center">
-          <div class="flex items-center gap-3">
-            <PrimeButton
-              icon="pi pi-chevron-left"
-              size="small"
-              outlined
-              @click="previousMonth"
-            />
-            <div class="flex items-center gap-2">
-              <Dropdown
-                v-model="selectedMonth"
-                :options="MONTHS"
-                optionLabel="label"
-                optionValue="value"
-                class="min-w-[120px]"
-                @change="onMonthChange"
-              />
-              <Dropdown
-                v-model="selectedYear"
-                :options="years"
-                class="min-w-[100px]"
-                @change="onYearChange"
-              />
-            </div>
-            <PrimeButton
-              icon="pi pi-chevron-right"
-              size="small"
-              outlined
-              @click="nextMonth"
-            />
-          </div>
-        </div>
-
-        <div class="flex gap-3 mt-2">
-          <Calendar
-            v-model="selectedDate"
-            :inline="true"
-            :showIcon="false"
-            :showButtonBar="false"
-            :showWeek="false"
-            :dateFormat="'dd/mm/yy'"
-            class="w-full"
-            @date-select="onDateSelect"
-            :pt="{
-              header: { class: 'hidden' },
-              table: { class: 'w-full' },
-              daylabel: {
-                style: {
-                  padding: '0px !important',
-                  margin: '0px !important',
-                  fontSize: '0.875rem'
-                }
-              }
-            }"
-          />
-
-          <!-- Time selector -->
-          <div class="border surface-border rounded-lg p-1 w-min">
-            <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
-              <PrimeButton
-                :label="timeSlot"
-                v-for="timeSlot in TIME_SLOTS"
-                :key="timeSlot"
-                class="m-1"
-                severity="secondary"
-                size="small"
-                :outlined="selectedTime !== timeSlot"
-                @click="selectTime(timeSlot)"
-                :pt="{
-                  label: { class: 'text-xs font-normal' }
-                }"
-              />
-            </div>
-          </div>
-        </div>
+        <AbsoluteTab
+          :selected-date="selectedDate"
+          :selected-time="selectedTime"
+          :selected-month="selectedMonth"
+          :selected-year="selectedYear"
+          :years="years"
+          @previous-month="previousMonth"
+          @next-month="nextMonth"
+          @month-change="onMonthChange"
+          @year-change="onYearChange"
+          @date-select="onDateSelect"
+          @time-select="selectTime"
+        />
       </TabPanel>
       <TabPanel header="Relative">
-        <div class="flex flex-col gap-4">
-          <InputNumber
-            v-model="relativeValue"
-            @input="updateRelativeRange"
-            :min="1"
-            showButtons
-          />
-          <Dropdown
-            v-model="relativeUnit"
-            :options="RELATIVE_UNITS"
-            optionLabel="label"
-            optionValue="value"
-            @change="updateRelativeRange"
-          />
-          <Dropdown
-            v-model="relativeDirection"
-            :options="RELATIVE_DIRECTIONS"
-            @change="updateRelativeRange"
-            optionLabel="label"
-            optionValue="value"
-            disabled
-          />
-        </div>
+        <RelativeTab
+          :relative-value="relativeValue"
+          :relative-unit="relativeUnit"
+          :max-days="maxDays"
+          @value-change="onRelativeValueChange"
+          @unit-change="onRelativeUnitChange"
+        />
       </TabPanel>
     </TabView>
 
-    <div
-      class="mt-4 pt-4 border-t surface-border"
-      v-if="activeTab !== 2"
-    >
-      <div class="flex flex-col gap-1">
-        <label class="text-xs font-medium text-color">
-          {{ editingField === 'start' ? 'Start date' : 'End date' }}
-        </label>
-        <div class="flex items-center gap-2">
-          <InputText
-            v-model="inputValue"
-            :placeholder="editingField === 'start' ? startDateInput : endDateInput"
-            class="w-full"
-            :readonly="activeTab !== 0"
-            @keydown.enter="updateRange"
-          />
-          <template v-if="activeTab === 0">
-            <PrimeButton
-              v-if="hasChanges"
-              icon="pi pi-check"
-              size="small"
-              outlined
-              @click="updateRange"
-            />
-            <PrimeButton
-              v-else
-              label="Set today"
-              class="min-w-max"
-              size="small"
-              outlined
-              @click="setToNow"
-            />
-          </template>
-        </div>
-      </div>
-    </div>
+    <DateInputSection
+      :active-tab="activeTab"
+      :editing-field="editingField"
+      :input-value="inputValue"
+      :start-date-input="startDateInput"
+      :end-date-input="endDateInput"
+      @input-change="onInputValueChange"
+      @update-range="updateRange"
+      @set-to-now="setToNow"
+    />
   </OverlayPanel>
 </template>
 
 <script setup>
-  import { ref, computed, defineModel, onMounted } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import { ref, computed, defineModel, onMounted, watch } from 'vue'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import Calendar from 'primevue/calendar'
-  import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
-  import InputNumber from 'primevue/inputnumber'
   import {
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
-    MONTHS,
-    RELATIVE_UNITS,
-    RELATIVE_DIRECTIONS,
-    TIME_SLOTS,
-    getCurrentMonthLabel,
     getCurrentHourAndMinute
   } from '@utils/date.js'
+  import AbsoluteTab from './components/AbsoluteTab.vue'
+  import RelativeTab from './components/RelativeTab.vue'
+  import DateInputSection from './components/DateInputSection.vue'
 
   defineOptions({ name: 'InputDateRange' })
 
-  const emit = defineEmits(['select'])
-
-  defineProps({
+  const props = defineProps({
     maxDays: {
       type: Number,
       default: 0
     }
   })
 
+  const emit = defineEmits(['select'])
+
   const model = defineModel({
     type: Object,
     default: () => ({})
   })
 
-  // Refs
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const selectedDate = ref(new Date())
   const selectedTime = ref('')
   const editingField = ref('start')
-  const hasChanges = ref(false)
-  const tempInputValue = ref('')
-
-  const inputValue = computed({
-    get: () => {
-      return hasChanges.value
-        ? tempInputValue.value
-        : editingField.value === 'start'
-        ? formatDateSimple(model.value.startDate)
-        : formatDateSimple(model.value.endDate)
-    },
-    set: (value) => {
-      model.value.label = ''
-      tempInputValue.value = value
-      hasChanges.value = true
+  const inputValue = ref('')
+  const validationInfo = ref({
+    isValid: true,
+    hasError: false,
+    errors: [],
+    errorTypes: [],
+    hasDateOrderError: false,
+    hasFutureDateError: false,
+    hasMaxDaysError: false,
+    errorMessage: '',
+    details: {
+      startDate: null,
+      endDate: null,
+      today: new Date(),
+      diffDays: 0,
+      maxDays: 0
     }
   })
 
   const selectedMonth = ref(new Date().getMonth())
   const selectedYear = ref(new Date().getFullYear())
-
   const relativeValue = ref(15)
   const relativeUnit = ref('minutes')
-  const relativeDirection = ref(getCurrentMonthLabel().toLowerCase())
-
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
@@ -267,11 +154,101 @@
     return formatDateSimple(model.value.endDate)
   })
 
+  const validateDates = () => {
+    const errorList = []
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Reset validation info
+    validationInfo.value = {
+      isValid: true,
+      hasError: false,
+      errors: [],
+      errorTypes: [],
+      hasDateOrderError: false,
+      hasFutureDateError: false,
+      hasMaxDaysError: false,
+      errorMessage: '',
+      details: {
+        startDate: model.value.startDate,
+        endDate: model.value.endDate,
+        today: today,
+        diffDays: 0,
+        maxDays: props.maxDays
+      }
+    }
+
+    if (!model.value.startDate || !model.value.endDate) {
+      return errorList
+    }
+
+    // Calculate difference in days
+    const diffTime = Math.abs(model.value.endDate.getTime() - model.value.startDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    validationInfo.value.details.diffDays = diffDays
+
+    // Check if start date is greater than end date (full timestamp comparison)
+    if (model.value.startDate.getTime() > model.value.endDate.getTime()) {
+      const error = {
+        type: 'date_order',
+        message: 'Start date must be before end date'
+      }
+      errorList.push(error)
+      validationInfo.value.hasDateOrderError = true
+      validationInfo.value.errorTypes.push('date_order')
+    }
+
+    // Check if any date is in the future (date-only comparison, ignoring time)
+    const startDateOnly = new Date(model.value.startDate)
+    startDateOnly.setHours(0, 0, 0, 0)
+    const endDateOnly = new Date(model.value.endDate)
+    endDateOnly.setHours(0, 0, 0, 0)
+
+    if (startDateOnly.getTime() > today.getTime()) {
+      const error = {
+        type: 'future_date_start',
+        message: 'Start date cannot be in the future'
+      }
+      errorList.push(error)
+      validationInfo.value.hasFutureDateError = true
+      validationInfo.value.errorTypes.push('future_date_start')
+    }
+
+    if (endDateOnly.getTime() > today.getTime()) {
+      const error = {
+        type: 'future_date_end',
+        message: 'End date cannot be in the future'
+      }
+      errorList.push(error)
+      validationInfo.value.hasFutureDateError = true
+      validationInfo.value.errorTypes.push('future_date_end')
+    }
+
+    // Check if it exceeds the day limit (if specified)
+    if (props.maxDays > 0 && diffDays > props.maxDays) {
+      const error = {
+        type: 'max_days',
+        message: `Period cannot exceed ${props.maxDays} days (current: ${diffDays} days)`
+      }
+      errorList.push(error)
+      validationInfo.value.hasMaxDaysError = true
+      validationInfo.value.errorTypes.push('max_days')
+    }
+
+    // Update general information
+    validationInfo.value.errors = errorList
+    validationInfo.value.hasError = errorList.length > 0
+    validationInfo.value.isValid = errorList.length === 0
+    validationInfo.value.errorMessage = errorList.length > 0 ? errorList[0].message : ''
+
+    return errorList
+  }
+
   const selectStartDate = (event) => {
     activeTab.value = 0
     editingField.value = 'start'
     selectedTime.value = ''
-    hasChanges.value = false
+    inputValue.value = formatDateSimple(model.value.startDate)
     overlayPanel.value.toggle(event)
     selectedDate.value = new Date(model.value.startDate)
   }
@@ -280,7 +257,7 @@
     activeTab.value = 0
     editingField.value = 'end'
     selectedTime.value = ''
-    hasChanges.value = false
+    inputValue.value = formatDateSimple(model.value.endDate)
     selectedDate.value = new Date(model.value.endDate)
     overlayPanel.value.toggle(event)
   }
@@ -289,26 +266,22 @@
     model.value.label = ''
     selectedDate.value = date
     updateSelectedDateTime()
-    hasChanges.value = false
-    emit('select', model.value)
   }
 
-  const onMonthChange = () => {
+  const onMonthChange = (month) => {
     model.value.label = ''
-    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
+    selectedMonth.value = month
+    const newDate = new Date(selectedYear.value, month, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
-    hasChanges.value = false
-    emit('select', model.value)
   }
 
-  const onYearChange = () => {
+  const onYearChange = (year) => {
     model.value.label = ''
-    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
+    selectedYear.value = year
+    const newDate = new Date(year, selectedMonth.value, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
-    hasChanges.value = false
-    emit('select', model.value)
   }
 
   const previousMonth = () => {
@@ -319,9 +292,7 @@
     } else {
       selectedMonth.value--
     }
-    onMonthChange()
-    hasChanges.value = false
-    emit('select', model.value)
+    onMonthChange(selectedMonth.value)
   }
 
   const nextMonth = () => {
@@ -332,16 +303,13 @@
     } else {
       selectedMonth.value++
     }
-    onMonthChange()
-    emit('select', model.value)
+    onMonthChange(selectedMonth.value)
   }
 
   const selectTime = (time) => {
     model.value.label = ''
     selectedTime.value = time
     updateSelectedDateTime()
-    hasChanges.value = false
-    emit('select', model.value)
   }
 
   const updateSelectedDateTime = () => {
@@ -353,18 +321,12 @@
 
       if (editingField.value === 'start') {
         model.value.startDate = newDate
-        // if (model.value.endDate && newDate > model.value.endDate) {
-        //   model.value.endDate = newDate
-        // }
       } else {
         model.value.endDate = newDate
-        // if (model.value.startDate && newDate < model.value.startDate) {
-        //   model.value.startDate = newDate
-        // }
       }
 
-      hasChanges.value = false
-      tempInputValue.value = ''
+      inputValue.value = formatDateSimple(newDate)
+      emit('select', model.value)
     }
   }
 
@@ -374,16 +336,13 @@
       const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
         relativeValue.value,
         relativeUnit.value,
-        relativeDirection.value,
         now
       )
 
       model.value.startDate = newStartDate
       model.value.endDate = newEndDate
-
-      hasChanges.value = false
-      tempInputValue.value = ''
       model.value.label = ''
+      emit('select', model.value)
     }
   }
 
@@ -391,46 +350,64 @@
     const now = new Date()
     if (editingField.value === 'start') {
       model.value.startDate = now
-      if (model.value.endDate && now > model.value.endDate) {
+      if (model.value.endDate && now.getTime() > model.value.endDate.getTime()) {
         model.value.endDate = now
       }
     } else {
       model.value.endDate = now
-      if (model.value.startDate && now < model.value.startDate) {
+      if (model.value.startDate && now.getTime() < model.value.startDate.getTime()) {
         model.value.startDate = now
       }
     }
-    hasChanges.value = false
-    tempInputValue.value = ''
+    inputValue.value = formatDateSimple(now)
     model.value.label = ''
     emit('select', model.value)
   }
 
   const updateRange = () => {
-    const parsedDate = parseDateSimple(tempInputValue.value)
+    const parsedDate = parseDateSimple(inputValue.value)
 
     if (parsedDate) {
       if (editingField.value === 'start') {
         model.value.startDate = parsedDate
-        // Ensure end date is not before start date
-        if (model.value.endDate && parsedDate > model.value.endDate) {
+        if (model.value.endDate && parsedDate.getTime() > model.value.endDate.getTime()) {
           model.value.endDate = parsedDate
         }
       } else {
         model.value.endDate = parsedDate
-        // Ensure start date is not after end date
-        if (model.value.startDate && parsedDate < model.value.startDate) {
+        if (model.value.startDate && parsedDate.getTime() < model.value.startDate.getTime()) {
           model.value.startDate = parsedDate
         }
       }
     }
 
-    hasChanges.value = false
-    tempInputValue.value = ''
     model.value.label = ''
     emit('select', model.value)
   }
 
+  const onInputValueChange = (value) => {
+    inputValue.value = value
+  }
+
+  const onRelativeValueChange = (value) => {
+    relativeValue.value = value
+    updateRelativeRange()
+  }
+
+  const onRelativeUnitChange = (value) => {
+    relativeUnit.value = value
+    updateRelativeRange()
+  }
+
+  watch(
+    [() => model.value.startDate, () => model.value.endDate, () => props.maxDays],
+    () => {
+      validateDates()
+    },
+    { immediate: true }
+  )
+
+  // Initialization
   if (model.value.startDate) {
     model.value.startDate = new Date(model.value.startDate)
   }
@@ -439,13 +416,6 @@
   }
 
   onMounted(() => {
-    if (activeTab.value === 1) {
-      updateRelativeRange()
-    }
-  })
-
-  defineExpose({
-    selectStartDate,
-    selectEndDate
+    updateRelativeRange()
   })
 </script>

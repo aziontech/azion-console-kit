@@ -1,14 +1,15 @@
 <template>
   <div class="p-inputgroup w-fit">
     <QuickSelect
-      v-model="model"
+      v-model="dateRange"
       :maxDays="maxDays"
-      @select="emit('select', $event)"
+      @select="updateDateRange"
     />
+
     <InputDateRange
-      v-model="model"
+      v-model="dateRange"
       :maxDays="maxDays"
-      @select="emit('select', $event)"
+      @select="updateDateRange"
     />
   </div>
 </template>
@@ -22,18 +23,27 @@
 
   defineProps({
     maxDays: {
-      type: Number
+      type: Number,
+      default: 0
     }
   })
 
-  const emit = defineEmits(['select'])
-
-  const model = defineModel({
+  const dateRange = defineModel({
     type: Object,
-    required: false,
     default: () => ({
-      start: new Date(),
-      end: new Date()
+      startDate: new Date(),
+      endDate: new Date(),
+      label: ''
     })
   })
+
+  const isPendingChange = defineModel('isPendingChange', {
+    type: Boolean,
+    default: false
+  })
+
+  const updateDateRange = (data) => {
+    isPendingChange.value = false
+    console.log('updateDateRange', data)
+  }
 </script>
