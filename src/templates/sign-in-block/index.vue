@@ -41,6 +41,7 @@
                 class="w-full"
                 :class="classEmailError"
                 data-testid="signin-block__email-input"
+                data-sentry-mask
               />
               <small
                 class="p-error text-xs font-normal leading-tight"
@@ -107,7 +108,7 @@
                 v-model="password"
                 id="password"
                 @vue:mounted="({ el }) => autofocusInput(el)"
-                class="w-full"
+                class="w-full test-sentry"
                 :class="classPasswordError"
                 @keydown.enter="validateAndSubmit"
                 :feedback="false"

@@ -16,8 +16,20 @@ export default {
       enableLogs: true,
       integrations: [
         ...(router ? [Sentry.browserTracingIntegration({ router })] : []),
-        // Session replay
-        Sentry.replayIntegration()
+
+        Sentry.replayIntegration({
+          maskAllText: false,
+          blockAllMedia: false,
+          mask: [
+            '[data-sentry-mask]',
+            'input[type="password"]',
+            'textarea[type="password"]',
+            'input[name*="hmacAccessKey"]',
+            'input[name*="hmacSecretKey"]',
+          ],
+          // Allow explicit opt-out of masking where business-approved
+          unmask: ['[data-sentry-unmask]']
+        })
       ]
     })
 
