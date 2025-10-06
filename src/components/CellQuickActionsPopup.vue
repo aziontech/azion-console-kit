@@ -115,13 +115,13 @@
       }
 
       let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
-      if (rows.length === 0) {
+      if (!rows.length) {
         rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
       }
-      if (rows.length === 0) {
+      if (!rows.length) {
         rows = document.querySelectorAll('.p-datatable-tbody tr')
       }
-      if (rows.length === 0) {
+      if (!rows.length) {
         rows = document.querySelectorAll('table tbody tr')
       }
 
@@ -259,7 +259,7 @@
   watch(
     () => props.data,
     (newData) => {
-      if (newData && newData.length > 0) {
+      if (newData && newData.length) {
         setupCellEventHandlers()
       }
     },

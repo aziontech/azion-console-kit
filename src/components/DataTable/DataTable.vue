@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length > 0 || loading"
+      v-if="data.length || loading"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -282,7 +282,7 @@
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {
-    if (props.loading && props.columns.length > 0) {
+    if (props.loading && props.columns.length) {
       // eslint-disable-next-line no-unused-vars
       return Array.from({ length: props.skeletonRows }, (aux, index) => {
         const row = { id: index }

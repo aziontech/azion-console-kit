@@ -96,8 +96,6 @@
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
-      quickActions: true,
-      showInactiveTag: true,
       component: (columnData) => {
         return columnBuilder({
           data: { value: columnData.text, showMoreText: false },
@@ -138,7 +136,6 @@
       header: 'Language',
       filterPath: 'runtime.content',
       type: 'component',
-      quickActions: true,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -148,28 +145,29 @@
     },
     {
       field: 'executionEnvironment',
-      header: 'Initiator Type',
-      quickActions: true
+      header: 'Initiator Type'
     },
     {
       field: 'lastEditor',
-      header: 'Last Editor',
-      quickActions: true
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      sortField: 'status.content',
+      filterPath: 'status.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     }
-    // { field: 'lastModified', header: 'Last Modified' },
-    // {
-    //   field: 'status',
-    //   header: 'Status',
-    //   sortField: 'status.content',
-    //   filterPath: 'status.content',
-    //   type: 'component',
-    //   component: (columnData) => {
-    //     return columnBuilder({
-    //       data: columnData,
-    //       columnAppearance: 'tag'
-    //     })
-    //   }
-    // }
   ])
 
   function handleLoadData(event) {
