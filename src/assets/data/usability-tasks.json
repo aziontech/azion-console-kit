@@ -14,7 +14,7 @@
       "description": "Criar um projeto com sucesso",
       "category": "Eventos",
       "type": "toast",
-      "trigger": "Your workload has been created"
+      "trigger": "Your Workload has been created"
     }
   ]
 }
