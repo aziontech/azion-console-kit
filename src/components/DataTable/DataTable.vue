@@ -88,6 +88,7 @@
       <CellQuickActionsPopup
         :columns="columns"
         :data="data"
+        :cellQuickActionsItens="cellQuickActionsItens"
         @quick-actions-visible="(event) => (cellQuickActionsVisible = event)"
       />
     </DataTable>
@@ -236,6 +237,10 @@
     emptyListMessage: {
       type: String,
       default: 'No data available'
+    },
+    cellQuickActionsItens: {
+      type: Array,
+      default: () => []
     }
   })
 
