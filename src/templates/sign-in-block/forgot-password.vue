@@ -37,7 +37,7 @@
           </div>
 
           <PrimeButton
-            class="w-full flex-row-reverse"
+            class="w-full flex-row-reverse text-sm"
             :loading="isSendingEmailLoading"
             label="Send Email"
             severity="secondary"

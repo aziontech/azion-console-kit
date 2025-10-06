@@ -98,40 +98,42 @@
             <div class="flex flex-col gap-6">
               <!-- Password field -->
               <div class="flex flex-col gap-2">
-                <label
-                  for="password"
-                  class="font-semibold text-sm"
-                  :class="classPasswordError"
-                >
-                  Password
-                </label>
-                <Password
-                  toggleMask
-                  v-model="password"
-                  id="password"
-                  @vue:mounted="({ el }) => autofocusInput(el)"
-                  class="w-full"
-                  :class="classPasswordError"
-                  @keydown.enter="validateAndSubmit"
-                  :feedback="false"
-                  data-testid="signin-block__password-input"
-                />
-                <small
-                  class="p-error text-xs font-normal leading-tight"
-                  v-if="hasRequestErrorMessage"
-                >
-                  {{ hasRequestErrorMessage }}
-                </small>
-              </div>
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="password"
+                    class="font-semibold text-sm"
+                    :class="classPasswordError"
+                  >
+                    Password
+                  </label>
+                  <Password
+                    toggleMask
+                    v-model="password"
+                    id="password"
+                    @vue:mounted="({ el }) => autofocusInput(el)"
+                    class="w-full"
+                    :class="classPasswordError"
+                    @keydown.enter="validateAndSubmit"
+                    :feedback="false"
+                    data-testid="signin-block__password-input"
+                  />
+                  <small
+                    class="p-error text-xs font-normal leading-tight"
+                    v-if="hasRequestErrorMessage"
+                  >
+                    {{ hasRequestErrorMessage }}
+                  </small>
+                </div>
 
-              <!-- Forgot password link -->
-              <div>
-                <PrimeButton
-                  link
-                  class="p-0"
-                  label="Forgot Password?"
-                  @click="$emit('goToForgotPassword', true)"
-                />
+                <!-- Forgot password link -->
+                <div>
+                  <PrimeButton
+                    link
+                    class="p-0 text-sm"
+                    label="Forgot Password?"
+                    @click="$emit('goToForgotPassword', true)"
+                  />
+                </div>
               </div>
 
               <!-- Sign In button -->
