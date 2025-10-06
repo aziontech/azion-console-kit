@@ -108,7 +108,7 @@
                 v-model="password"
                 id="password"
                 @vue:mounted="({ el }) => autofocusInput(el)"
-                class="w-full test-sentry"
+                class="w-full"
                 :class="classPasswordError"
                 @keydown.enter="validateAndSubmit"
                 :feedback="false"
