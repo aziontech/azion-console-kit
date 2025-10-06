@@ -14,7 +14,7 @@
               data-testid="title"
               class="text-xl md:text-2xl font-medium text-left"
             >
-              Wellcome back
+              Welcome back
             </h1>
             <p class="text-sm text-color-secondary">Sign in to your account</p>
           </div>
