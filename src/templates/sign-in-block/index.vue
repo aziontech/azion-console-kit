@@ -1,160 +1,163 @@
 <template>
   <form
-    class="max-sm:min-h-[calc(100vh-120px)]"
+    class="h-full"
     @submit.prevent
   >
-    <!-- Main container -->
-    <div class="flex flex-col align-top items-center animate-fadeIn">
-      <div
-        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 sm:gap-8 flex"
-      >
-        <!-- Header -->
-        <h3
-          data-testid="title"
-          class="text-xl md:text-2xl font-medium text-left"
-        >
-          Azion Console
-        </h3>
-
-        <!-- Email step -->
+    <div class="h-full flex flex-col justify-center items-center">
+      <div class="flex flex-col align-top items-center animate-fadeIn w-full max-w-[448px]">
         <div
-          v-if="!showPassword"
-          class="flex flex-col sm:gap-8 gap-6"
+          class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 sm:gap-8 flex"
         >
-          <div class="flex flex-col gap-6">
-            <!-- Email field -->
-            <div class="flex flex-col gap-2">
-              <label
-                for="email"
-                class="font-semibold text-sm"
-                :class="classEmailError"
-              >
-                Email
-              </label>
-              <InputText
-                v-model="email"
-                id="email"
-                placeholder="example@email.com"
-                type="email"
-                @vue:mounted="({ el }) => autofocusInput(el)"
-                @keydown.enter="checkLoginMethod"
-                class="w-full"
-                :class="classEmailError"
-                data-testid="signin-block__email-input"
-              />
-              <small
-                class="p-error text-xs font-normal leading-tight"
-                v-if="errors.email"
-                severity="error"
-              >
-                {{ errors.email }}
-              </small>
-            </div>
-
-            <!-- Next button -->
-            <PrimeButton
-              class="w-full flex-row-reverse"
-              type="button"
-              label="Next"
-              data-testid="signin-block__next-button"
-              :loading="isProccedButtonLoading"
-              :disabled="!email"
-              @click="checkLoginMethod"
-            />
+          <!-- Header -->
+          <div class="flex flex-col gap-2">
+            <h1
+              data-testid="title"
+              class="text-xl md:text-2xl font-medium text-left"
+            >
+              Wellcome back
+            </h1>
+            <p class="text-sm text-color-secondary">Sign in to your account</p>
           </div>
 
-          <!-- Social IDPs section -->
+          <!-- Email step -->
           <div
-            v-if="showSocialIdps"
-            class="flex-col gap-6 sm:gap-8 flex"
+            v-if="!showPassword"
+            class="flex flex-col sm:gap-8 gap-6"
           >
-            <Divider align="center">
-              <p>or</p>
-            </Divider>
-          </div>
+            <div class="flex flex-col gap-6">
+              <!-- Email field -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="email"
+                  class="font-semibold text-sm"
+                  :class="classEmailError"
+                >
+                  Email
+                </label>
+                <InputText
+                  v-model="email"
+                  id="email"
+                  placeholder="example@email.com"
+                  type="email"
+                  @vue:mounted="({ el }) => autofocusInput(el)"
+                  @keydown.enter="checkLoginMethod"
+                  class="w-full"
+                  :class="classEmailError"
+                  data-testid="signin-block__email-input"
+                />
+                <small
+                  class="p-error text-xs font-normal leading-tight"
+                  v-if="errors.email"
+                  severity="error"
+                >
+                  {{ errors.email }}
+                </small>
+              </div>
 
-          <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
-        </div>
-
-        <!-- Password step -->
-        <div
-          v-else
-          class="flex flex-col sm:gap-8 gap-6"
-        >
-          <!-- Back button and email display -->
-          <div class="flex items-center gap-2">
-            <PrimeButton
-              v-tooltip.top="{ value: 'Back', showDelay: 200 }"
-              class="w-7 h-7"
-              outlined
-              icon="pi pi-chevron-left"
-              @click="resetPasswordStep"
-            />
-            <p class="text-sm">{{ email }}</p>
-          </div>
-          <div class="flex flex-col gap-6">
-            <!-- Password field -->
-            <div class="flex flex-col gap-2">
-              <label
-                for="password"
-                class="font-semibold text-sm"
-                :class="classPasswordError"
-              >
-                Password
-              </label>
-              <Password
-                toggleMask
-                v-model="password"
-                id="password"
-                @vue:mounted="({ el }) => autofocusInput(el)"
-                class="w-full"
-                :class="classPasswordError"
-                @keydown.enter="validateAndSubmit"
-                :feedback="false"
-                data-testid="signin-block__password-input"
-              />
-              <small
-                class="p-error text-xs font-normal leading-tight"
-                v-if="hasRequestErrorMessage"
-              >
-                {{ hasRequestErrorMessage }}
-              </small>
-            </div>
-
-            <!-- Forgot password link -->
-            <div>
+              <!-- Next button -->
               <PrimeButton
-                link
-                class="p-0"
-                label="Forgot Password?"
-                @click="$emit('goToForgotPassword', true)"
+                class="w-full flex-row-reverse"
+                type="button"
+                label="Next"
+                data-testid="signin-block__next-button"
+                :loading="isProccedButtonLoading"
+                :disabled="!email"
+                @click="checkLoginMethod"
               />
             </div>
 
-            <!-- Sign In button -->
-            <PrimeButton
-              class="w-full flex-row-reverse"
-              :loading="isButtonLoading"
-              label="Sign In"
-              type="button"
-              @click="validateAndSubmit"
-              :disabled="!password"
-              data-testid="signin-block__signin-button"
-            />
+            <!-- Social IDPs section -->
+            <div
+              v-if="showSocialIdps"
+              class="flex-col gap-6 sm:gap-8 flex"
+            >
+              <Divider align="center">
+                <p>or</p>
+              </Divider>
+            </div>
+
+            <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
+          </div>
+
+          <!-- Password step -->
+          <div
+            v-else
+            class="flex flex-col sm:gap-8 gap-6"
+          >
+            <!-- Back button and email display -->
+            <div class="flex items-center gap-2">
+              <PrimeButton
+                v-tooltip.top="{ value: 'Back', showDelay: 200 }"
+                class="w-7 h-7"
+                outlined
+                icon="pi pi-chevron-left"
+                @click="resetPasswordStep"
+              />
+              <p class="text-sm">{{ email }}</p>
+            </div>
+            <div class="flex flex-col gap-6">
+              <!-- Password field -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="password"
+                  class="font-semibold text-sm"
+                  :class="classPasswordError"
+                >
+                  Password
+                </label>
+                <Password
+                  toggleMask
+                  v-model="password"
+                  id="password"
+                  @vue:mounted="({ el }) => autofocusInput(el)"
+                  class="w-full"
+                  :class="classPasswordError"
+                  @keydown.enter="validateAndSubmit"
+                  :feedback="false"
+                  data-testid="signin-block__password-input"
+                />
+                <small
+                  class="p-error text-xs font-normal leading-tight"
+                  v-if="hasRequestErrorMessage"
+                >
+                  {{ hasRequestErrorMessage }}
+                </small>
+              </div>
+
+              <!-- Forgot password link -->
+              <div>
+                <PrimeButton
+                  link
+                  class="p-0"
+                  label="Forgot Password?"
+                  @click="$emit('goToForgotPassword', true)"
+                />
+              </div>
+
+              <!-- Sign In button -->
+              <PrimeButton
+                class="w-full flex-row-reverse"
+                :loading="isButtonLoading"
+                label="Sign In"
+                type="button"
+                @click="validateAndSubmit"
+                :disabled="!password"
+                data-testid="signin-block__signin-button"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Create account button -->
-    <div class="flex flex-wrap justify-center items-center pt-6 gap-1">
-      <div>Don't have an account?</div>
-      <PrimeButton
-        label="Sign Up"
-        class="p-0"
-        link
-        @click="goToSignup"
-      />
+      <div class="flex flex-wrap justify-center items-center pt-6 gap-1">
+        <p class="text-sm">Don't have an account?</p>
+        <PrimeButton
+          label="Sign Up"
+          class="p-0 text-sm"
+          link
+          @click="goToSignup"
+        />
+      </div>
     </div>
   </form>
 </template>
