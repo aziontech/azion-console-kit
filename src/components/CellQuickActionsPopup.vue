@@ -49,6 +49,10 @@
     cellQuickActionsItens: {
       type: Array,
       default: () => []
+    },
+    tableRef: {
+      type: Object,
+      default: null
     }
   })
 
@@ -114,15 +118,17 @@
         return
       }
 
-      let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
-      if (!rows.length) {
-        rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
-      }
-      if (!rows.length) {
-        rows = document.querySelectorAll('.p-datatable-tbody tr')
-      }
-      if (!rows.length) {
-        rows = document.querySelectorAll('table tbody tr')
+      let rows = []
+
+      if (props.tableRef?.$el) {
+        rows = props.tableRef.$el.querySelectorAll('.p-datatable-tbody tr')
+      } else {
+        const tableContainer = document.querySelector('[data-testid="data-table-container"]')
+        if (tableContainer) {
+          rows = tableContainer.querySelectorAll('.p-datatable-tbody tr')
+        } else {
+          rows = document.querySelectorAll('.p-datatable-tbody tr')
+        }
       }
 
       rows.forEach((row, rowIndex) => {

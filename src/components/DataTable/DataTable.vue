@@ -89,6 +89,7 @@
         :columns="columns"
         :data="data"
         :cellQuickActionsItens="cellQuickActionsItens"
+        :tableRef="dataTableRef"
         @quick-actions-visible="(event) => (cellQuickActionsVisible = event)"
       />
     </DataTable>
