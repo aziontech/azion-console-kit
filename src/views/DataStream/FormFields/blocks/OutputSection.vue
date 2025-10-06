@@ -408,15 +408,17 @@
             isRequired
             data-testid="data-stream-form__destination__service-account-key-field__label"
           />
-          <vue-monaco-editor
-            v-model:value="serviceAccountKey"
-            language="json"
-            :theme="theme"
-            :options="serviceAccountMonacoOptions"
-            class="min-h-[300px] surface-border border rounded-md overflow-hidden"
-            data-testid="data-stream-form__destination__service-account-key-field__input"
-            :readOnly="hasNoPermissionToEditDataStream"
-          />
+          <div data-sentry-mask>
+            <vue-monaco-editor
+              v-model:value="serviceAccountKey"
+              language="json"
+              :theme="theme"
+              :options="serviceAccountMonacoOptions"
+              class="min-h-[300px] surface-border border rounded-md overflow-hidden"
+              data-testid="data-stream-form__destination__service-account-key-field__input"
+              :readOnly="hasNoPermissionToEditDataStream"
+            />
+          </div>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__service-account-key-field__description"
@@ -452,9 +454,10 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
-            label="Encoded API Key"
             required
+            label="Encoded API Key"
             name="apiKey"
             :value="apiKey"
             rows="5"
@@ -485,9 +488,10 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
+            required
             :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
-            required
             name="splunkApiKey"
             :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
@@ -630,6 +634,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
             required
@@ -779,6 +784,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
             label="Blob SAS Token"
             required
