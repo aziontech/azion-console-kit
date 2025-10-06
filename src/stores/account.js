@@ -103,6 +103,11 @@ export const useAccountStore = defineStore({
         state.accountStatuses.REGULAR
       ].includes(state.account?.status)
     },
+    showExportBilling(state) {
+      return [state.accountStatuses.ONLINE, state.accountStatuses.TRIAL].includes(
+        state.account?.status
+      )
+    },
     paymentReviewPending(state) {
       return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
         state.account?.status
