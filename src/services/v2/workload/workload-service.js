@@ -3,7 +3,7 @@ const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
-import { DigitalCertificatesService } from '../digital-certificates/digital-certificates-service'
+import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 
 export class WorkloadService extends BaseService {
@@ -13,7 +13,7 @@ export class WorkloadService extends BaseService {
     this.baseURL = 'v4/workspace/workloads'
 
     this.workloadDeployment = workloadDeploymentService
-    this.digitalCertificate = DigitalCertificatesService
+    this.digitalCertificate = digitalCertificatesService
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
 
     this._certificateId = null
@@ -89,7 +89,7 @@ export class WorkloadService extends BaseService {
 
     return {
       feedback:
-        'Your workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
+        'Your Workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
       urlToEditView: `/workloads/edit/${workload.id}`,
       domainName: workload.workload_domain,
       id: Number(workload.id)

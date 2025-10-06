@@ -10,7 +10,7 @@
         v-if="isConnector"
       >
         <FieldDropdownLazyLoader
-          label="Edge Connector"
+          label="Connector"
           required
           name="connector"
           :value="connector"
@@ -18,7 +18,7 @@
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="value"
-          placeholder="Select a Edge Connector"
+          placeholder="Select a Connector"
         />
       </div>
       <div
