@@ -62,7 +62,7 @@
           label="Sign In"
           link
           class="p-0"
-            size="small"
+          size="small"
           @click="goToLogin"
         />
       </div>
