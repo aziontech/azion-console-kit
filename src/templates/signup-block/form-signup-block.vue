@@ -9,7 +9,7 @@
             @submit.prevent
           >
             <div class="gap-2 flex flex-col">
-              <h2 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h2>
+              <h1 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h1>
               <p class="text-sm text-start text-color-secondary">
                 US$ 300 credit to use over 12 months, no credit card is required.
               </p>
@@ -62,7 +62,7 @@
           label="Sign In"
           link
           class="p-0"
-          size="small"
+            size="small"
           @click="goToLogin"
         />
       </div>
