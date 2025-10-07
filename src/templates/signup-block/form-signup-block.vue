@@ -61,7 +61,8 @@
         <PrimeButton
           label="Sign In"
           link
-          class="p-0 text-sm"
+          class="p-0"
+          size="small"
           @click="goToLogin"
         />
       </div>
