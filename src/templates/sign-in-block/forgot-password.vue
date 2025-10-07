@@ -54,7 +54,7 @@
           label="Sign In"
           link
           class="p-0"
-          @click="goToLogin"
+          @click="$emit('goToSignIn')"
         />
       </div>
     </div>
@@ -103,6 +103,7 @@
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  
 
   const SUBMIT_TIMER = 60
 
