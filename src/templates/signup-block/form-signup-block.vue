@@ -8,9 +8,9 @@
             autocomplete="off"
             @submit.prevent
           >
-            <div class="gap-3 flex flex-col">
+            <div class="gap-2 flex flex-col">
               <h2 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h2>
-              <p class="text-start text-color-secondary">
+              <p class="text-sm text-start text-color-secondary">
                 US$ 300 credit to use over 12 months, no credit card is required.
               </p>
             </div>
@@ -40,14 +40,16 @@
               <PrimeButton
                 label="Terms of Service"
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionTermsAndServicesWindowOpener"
               />
               and
               <PrimeButton
                 label="Privacy Policy."
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionPrivacyPolicyWindowOpener"
               />
             </p>
@@ -59,7 +61,7 @@
         <PrimeButton
           label="Sign In"
           link
-          class="p-0"
+          class="p-0 text-sm"
           @click="goToLogin"
         />
       </div>

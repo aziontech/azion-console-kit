@@ -7,10 +7,10 @@
       <div
         class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col sm:gap-8 gap-6 inline-flex"
       >
-        <div class="flex flex-col gap-3">
-          <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
-          <p class="text-color-secondary">
-            Type your email to receive a link to reset your password.
+        <div class="flex flex-col gap-2">
+          <h1 class="text-start text-xl lg:text-2xl font-medium">Password Reset</h1>
+          <p class="text-sm text-color-secondary">
+            Enter your email and we'll send you a link to reset the password
           </p>
         </div>
 
@@ -37,7 +37,8 @@
           </div>
 
           <PrimeButton
-            class="w-full flex-row-reverse text-sm"
+            size="small"
+            class="w-full flex-row-reverse"
             :loading="isSendingEmailLoading"
             label="Send Email"
             severity="secondary"
@@ -45,6 +46,16 @@
             :disabled="!meta.valid"
           />
         </div>
+      </div>
+      <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
+        <p class="text-sm font-normal">Already have an account?</p>
+        <PrimeButton
+          size="small"
+          label="Sign In"
+          link
+          class="p-0"
+          @click="goToLogin"
+        />
       </div>
     </div>
 
