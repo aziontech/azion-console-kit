@@ -1,3 +1,5 @@
+import { useAccountStore } from '@stores/account'
+
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
 
@@ -150,7 +152,7 @@ const getCurrentMonthStartEnd = () => {
 }
 
 const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
-  return new Intl.DateTimeFormat('us', {
+  return new Intl.DateTimeFormat('en-US', {
     dateStyle,
     timeStyle,
     timeZone: 'UTC'
@@ -166,13 +168,31 @@ const formatDateToMonthYear = (date) => {
   return []
 }
 
-const formatDateToDayMonthYearHour = (date) => {
+const formatDateToDayMonthYearHour = (date, timezone) => {
   if (!date) return null
 
-  return new Intl.DateTimeFormat('us', {
-    dateStyle: 'full',
-    timeStyle: 'medium'
-  }).format(new Date(date))
+  let userTimezone = timezone || 'UTC'
+
+  if (!timezone) {
+    try {
+      const accountStore = useAccountStore()
+      userTimezone = accountStore.accountData?.timezone || 'UTC'
+    } catch (error) {
+      userTimezone = 'UTC'
+    }
+  }
+
+  return new Date(date).toLocaleString('en-US', {
+    timeZone: userTimezone,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  })
 }
 
 const getCurrentDateTimeIntl = () => {
