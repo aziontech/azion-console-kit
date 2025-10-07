@@ -20,11 +20,19 @@ export class MFAService extends BaseService {
     let parsedMfaUsers = []
 
     for (const user of results) {
-      if (!user.name) {
-        const { email } = await this.#loadUserService(user.user_id)
-        user.name = email
+      try {
+        if (!user.name) {
+          const { email } = await this.#loadUserService(user.user_id)
+          user.name = email
+        }
+      } catch (err) {
+        // If enrichment fails for this user, keep the original user data
+        // and continue processing the rest
+      } finally {
+        if (user.name) {
+          parsedMfaUsers.push(user)
+        }
       }
-      parsedMfaUsers.push(user)
     }
 
     const body = this.adapter?.transformListMfa?.(parsedMfaUsers) ?? parsedMfaUsers
