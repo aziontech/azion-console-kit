@@ -53,7 +53,10 @@
       </template>
 
       <template #item="{ item, props }">
-        <router-link v-bind="props.action" :to="item.to">
+        <router-link
+          v-bind="props.action"
+          :to="item.to"
+        >
           {{ item.label }}
         </router-link>
       </template>
@@ -83,6 +86,15 @@
                 >
               </div>
             </div>
+          </template>
+
+          <template #item="{ item, props }">
+            <router-link
+              v-bind="props.action"
+              :to="item.to"
+            >
+              {{ item.label }}
+            </router-link>
           </template>
         </PrimeMenu>
 
@@ -170,8 +182,7 @@
       root: { class: 'w-[280px] pb-2 pt-0' },
       content: { class: 'text-sm' }
     }"
-  > 
-  
+  >
     <template #start>
       <div class="flex flex-column px-2.5 py-3 mt-2 h-14 justify-center">
         <div class="flex flex-column align gap-1">
@@ -197,7 +208,10 @@
     </template>
 
     <template #item="{ item, props }">
-      <router-link v-bind="props.action" :to="item.to">
+      <router-link
+        v-bind="props.action"
+        :to="item.to"
+      >
         {{ item.label }}
       </router-link>
     </template>
@@ -231,7 +245,10 @@
 
         <template #item="{ item, props }">
           <!-- this not working well, now need double click to navigate -->
-          <router-link v-bind="props.action" :to="item.to">
+          <router-link
+            v-bind="props.action"
+            :to="item.to"
+          >
             {{ item.label }}
           </router-link>
         </template>
@@ -292,9 +309,9 @@
           </template>
         </Dropdown>
       </div>
-      
+
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
-      
+
       <PrimeButton
         data-testid="profile-block__mobile-menu__logout-btn"
         class="w-full rounded-md flex content-start text-left"
