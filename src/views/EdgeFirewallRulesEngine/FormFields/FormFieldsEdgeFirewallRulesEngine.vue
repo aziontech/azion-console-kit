@@ -493,6 +493,7 @@
     criteria.value[criteriaIndexSelect.value].value[criteriaInnerRowIndexSelect.value].argument =
       networkListId
     criteriaIndexSelect.value = null
+    criteriaInnerRowIndexSelect.value = null
   }
 
   const successFunction = (functionId) => {

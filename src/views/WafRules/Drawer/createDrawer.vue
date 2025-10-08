@@ -11,7 +11,6 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create WAF Rule"
-    disableToast
   >
     <template #formFields>
       <FormFieldsWafRules />
