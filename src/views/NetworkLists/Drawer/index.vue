@@ -19,30 +19,23 @@
   </CreateDrawerBlock>
 </template>
 <script setup>
-  // Vue core
   import { ref, inject } from 'vue'
-  // Utilities
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  // Components
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsCreateNetworkLists from '../FormFields/FormFieldsCreateNetworkLists.vue'
-  // Services
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { listCountriesService } from '@/services/network-lists-services'
 
-  // Emits & Injections
   const emit = defineEmits(['onSuccess'])
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  // State
   const showCreateNetworkListDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const showCreateDrawer = refDebounced(showCreateNetworkListDrawer, DEBOUNCE_TIME_IN_MS)
 
-  // Constants
   const initialValues = {
     name: '',
     selectedCountries: [],
@@ -75,7 +68,6 @@
     })
   })
 
-  // Methods - Drawer controls
   const closeCreateDrawer = () => {
     showCreateNetworkListDrawer.value = false
   }
@@ -83,13 +75,11 @@
     showCreateNetworkListDrawer.value = true
   }
 
-  // Methods - UX feedback
   const handleToast = (response) => {
     const toast = { feedback: 'Your Network has been created' }
     response.showToastWithActions(toast)
   }
 
-  // Methods - Tracking
   const handleTrackCreation = () => {
     tracker.product.productCreated({ productName: 'Network List' })
   }
@@ -106,7 +96,6 @@
       .track()
   }
 
-  // Methods - Create success
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
     handleToast(response)
@@ -114,7 +103,6 @@
     closeCreateDrawer()
   }
 
-  // Expose public API
   defineExpose({
     showCreateDrawer,
     showCreateNetworkListDrawer,

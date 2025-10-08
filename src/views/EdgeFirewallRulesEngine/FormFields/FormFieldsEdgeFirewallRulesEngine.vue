@@ -10,6 +10,7 @@
   import Divider from 'primevue/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
   import DrawerNetworkList from '@/views/NetworkLists/Drawer/index.vue'
+  import DrawerWafRules from '@/views/WafRules/Drawer/createDrawer.vue'
 
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted, watch } from 'vue'
@@ -47,6 +48,7 @@
   const edgeFirewallId = route.params.id
   const drawerFunctionRef = ref('')
   const drawerNetworkListRef = ref('')
+  const drawerWafRulesRef = ref('')
   const behaviorIndexSelect = ref(null)
   const criteriaIndexSelect = ref(null)
   const criteriaInnerRowIndexSelect = ref(null)
@@ -475,6 +477,11 @@
     drawerFunctionRef.value.openDrawerCreate()
   }
 
+  const openDrawerWafRules = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerWafRulesRef.value.openCreateDrawer()
+  }
+
   const openDrawerNetworkList = (criteriaIndex, criteriaInnerRowIndex) => {
     criteriaIndexSelect.value = criteriaIndex
     criteriaInnerRowIndexSelect.value = criteriaInnerRowIndex
@@ -494,13 +501,23 @@
     behaviorIndexSelect.value = null
   }
 
+  const successWafRules = (wafRuleId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.id = wafRuleId
+    behaviorIndexSelect.value = null
+  }
+
   watch(
     [
       () => drawerFunctionRef.value.showCreateFunctionDrawer,
-      () => drawerNetworkListRef.value.showCreateNetworkListDrawer
+      () => drawerNetworkListRef.value.showCreateNetworkListDrawer,
+      () => drawerWafRulesRef.value.showCreateWafDrawer
     ],
-    ([isFunctionDrawerOpen, isNetworkListDrawerOpen]) => {
-      emit('isOverlapped', Boolean(isFunctionDrawerOpen || isNetworkListDrawerOpen))
+    ([isFunctionDrawerOpen, isNetworkListDrawerOpen, isWafRulesDrawerOpen]) => {
+      emit(
+        'isOverlapped',
+        Boolean(isFunctionDrawerOpen || isNetworkListDrawerOpen || isWafRulesDrawerOpen)
+      )
     }
   )
 </script>
@@ -738,6 +755,13 @@
         @onSuccess="successNetworkList"
         :edgeFirewallID="edgeFirewallId"
       />
+
+      <DrawerWafRules
+        ref="drawerWafRulesRef"
+        @onSuccess="successWafRules"
+        :edgeFirewallID="edgeFirewallId"
+      />
+
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorItemIndex) in behaviors"
@@ -843,7 +867,27 @@
                 class="mb-3"
                 :value="behaviors[behaviorItemIndex].value.id"
                 inputClass="w-full"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-waf-rule-button"
+                        text
+                        @click="openDrawerWafRules(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Waf Rule"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
               <FieldDropdown
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"
                 :key="`${behaviorItem.key}-mode`"
