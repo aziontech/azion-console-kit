@@ -9,6 +9,7 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
+  import DrawerNetworkList from '@/views/NetworkLists/Drawer/index.vue'
 
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted, watch } from 'vue'
@@ -45,7 +46,10 @@
   const route = useRoute()
   const edgeFirewallId = route.params.id
   const drawerFunctionRef = ref('')
+  const drawerNetworkListRef = ref('')
   const behaviorIndexSelect = ref(null)
+  const criteriaIndexSelect = ref(null)
+  const criteriaInnerRowIndexSelect = ref(null)
   const listEdgeFunctionsServiceDecorator = async (query) => {
     return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
       ...query,
@@ -73,24 +77,13 @@
   ]
 
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
-  const networkList = ref([])
   const hasWafAccess = ref(true)
   onMounted(async () => {
-    await Promise.all([listNetworkList()])
     loaderEdgeFirewall()
   })
 
   const listWafRulesServiceOptions = async (query) => {
     return await props.listWafRulesService({ ...query, fields: 'name,id', active: true })
-  }
-
-  const listNetworkList = async () => {
-    networkList.value = await props.listNetworkListService({
-      ordering: 'name',
-      pageSize: 100,
-      page: 1
-    })
-    return networkList.value
   }
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
@@ -482,6 +475,19 @@
     drawerFunctionRef.value.openDrawerCreate()
   }
 
+  const openDrawerNetworkList = (criteriaIndex, criteriaInnerRowIndex) => {
+    criteriaIndexSelect.value = criteriaIndex
+    criteriaInnerRowIndexSelect.value = criteriaInnerRowIndex
+    drawerNetworkListRef.value.openCreateDrawer()
+  }
+
+  const successNetworkList = (networkListId) => {
+    if (criteriaIndexSelect.value === null) return
+    criteria.value[criteriaIndexSelect.value].value[criteriaInnerRowIndexSelect.value].argument =
+      networkListId
+    criteriaIndexSelect.value = null
+  }
+
   const successFunction = (functionId) => {
     if (behaviorIndexSelect.value === null) return
     behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
@@ -489,9 +495,12 @@
   }
 
   watch(
-    () => drawerFunctionRef.value.showCreateFunctionDrawer,
-    () => {
-      emit('isOverlapped', drawerFunctionRef.value.showCreateFunctionDrawer)
+    [
+      () => drawerFunctionRef.value.showCreateFunctionDrawer,
+      () => drawerNetworkListRef.value.showCreateNetworkListDrawer
+    ],
+    ([isFunctionDrawerOpen, isNetworkListDrawerOpen]) => {
+      emit('isOverlapped', Boolean(isFunctionDrawerOpen || isNetworkListDrawerOpen))
     }
   )
 </script>
@@ -631,8 +640,27 @@
                 :value="Number(criteria[criteriaIndex].value[criteriaInnerRowIndex].argument)"
                 inputClass="w-full"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
-                :initalData="networkList"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-networklist-button"
+                        text
+                        @click="openDrawerNetworkList(criteriaIndex, criteriaInnerRowIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Network List"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
             </div>
           </div>
         </div>
@@ -702,6 +730,12 @@
       <DrawerFunction
         ref="drawerFunctionRef"
         @onSuccess="successFunction"
+        :edgeFirewallID="edgeFirewallId"
+      />
+
+      <DrawerNetworkList
+        ref="drawerNetworkListRef"
+        @onSuccess="successNetworkList"
         :edgeFirewallID="edgeFirewallId"
       />
       <div
