@@ -75,7 +75,10 @@
           name="empty"
           v-if="hasEmptySlot"
         />
-        <div class="my-4 flex flex-col gap-3 justify-center items-start">
+        <div
+          v-else
+          class="my-4 flex flex-col gap-3 justify-center items-start"
+        >
           <p
             class="text-md font-normal text-secondary"
             data-testid="list-table-block__empty-message__text"
@@ -95,11 +98,11 @@
     </DataTable>
     <EmptyResultsBlock
       v-else
-      title="No applications have been created"
-      description="Click the button below to create your first Application."
-      createButtonLabel="Application"
-      createPagePath="/applications/create?origin=list"
-      :documentationService="props.documentationService"
+      :title="emptyBlock.title"
+      :description="emptyBlock.description"
+      :createButtonLabel="emptyBlock.createButtonLabel"
+      :createPagePath="emptyBlock.createPagePath"
+      :documentationService="emptyBlock.documentationService"
       data-testid="edge-applications-empty-results-block"
     >
       <template #illustration>
@@ -242,6 +245,10 @@
     cellQuickActionsItens: {
       type: Array,
       default: () => []
+    },
+    emptyBlock: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -259,6 +266,8 @@
   const slots = useSlots()
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
+  const hasEmptySlot = computed(() => !!slots.empty)
+
   const internalFilters = computed({
     get: () => props.filters,
     set: (value) => emit('update:filters', value)
@@ -285,7 +294,7 @@
   const displayData = computed(() => {
     if (props.loading && props.columns.length) {
       // eslint-disable-next-line no-unused-vars
-      return Array.from({ length: props.skeletonRows }, (aux, index) => {
+      return Array.from({ length: props.rows }, (aux, index) => {
         const row = { id: index }
         props.columns.forEach((col) => {
           row[col.field] = null

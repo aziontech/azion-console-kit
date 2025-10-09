@@ -56,6 +56,7 @@ Modular component system for creating data tables with advanced features, based 
 | `skeletonRows`          | `Number`              | `5`                                                    | -                        | Number of skeleton rows during loading               |
 | `emptyListMessage`      | `String`              | `'No data available'`                                  | -                        | Message when there's no data                         |
 | `cellQuickActionsItens` | `Array`               | `[]`                                                   | -                        | Array of custom actions for cell quick actions       |
+| `emptyBlock`            | `Object`              | `false`                                                | -                        | Configuration for EmptyResultsBlock component        |
 
 ---
 
@@ -187,6 +188,7 @@ Alias for PrimeVue Column component (primevue/column).
 
 - `@/components/CellQuickActionsPopup`
 - `@/templates/empty-results-block`
+- `@/assets/svg/illustration-layers.vue`
 - `@/composables/useDataTable`
 
 ---
@@ -628,6 +630,8 @@ Alias for PrimeVue Column component (primevue/column).
 - `data-testid="export_button"`: Export button
 - `data-testid="data-table-actions-column-body-action-button"`: Single action button
 - `data-testid="data-table-actions-column-body-actions-menu-button"`: Actions menu button
+- `data-testid="list-table-block__empty-message__text"`: Empty message text
+- `data-testid="edge-applications-empty-results-block"`: EmptyResultsBlock container
 
 ### Keyboard Navigation
 
@@ -666,7 +670,6 @@ Alias for PrimeVue Column component (primevue/column).
 
 - CSV export uses PrimeVue native implementation (may need customization for advanced cases)
 - Cell Quick Actions require additional configuration via `columns` prop
-- EmptyResultsBlock hardcoded for "Applications" in no-data mode (needs refactoring to be generic)
 
 ---
 
@@ -780,6 +783,151 @@ The `useDataTable` composable centralizes all common table logic, including:
   disabled: (rowData) => rowData.locked,
   visibleAction: (rowData) => !rowData.isSystem
 }
+```
+
+---
+
+## Empty States
+
+The DataTable component provides flexible empty state handling with two different approaches depending on your needs.
+
+### Simple Empty Message
+
+For basic cases, use the `emptyListMessage` prop or the `empty` slot:
+
+```vue
+<template>
+  <DataTable
+    :data="items"
+    empty-list-message="No items found"
+  >
+    <!-- columns -->
+  </DataTable>
+</template>
+```
+
+Or with custom content:
+
+```vue
+<template>
+  <DataTable :data="items">
+    <template #empty>
+      <div class="text-center py-8">
+        <i class="pi pi-search text-4xl text-gray-400 mb-4"></i>
+        <p class="text-lg text-gray-600">No results found</p>
+        <p class="text-sm text-gray-500">Try adjusting your search criteria</p>
+      </div>
+    </template>
+
+    <!-- columns -->
+  </DataTable>
+</template>
+```
+
+### Rich Empty State with EmptyResultsBlock
+
+For a more comprehensive empty state experience, use the `emptyBlock` prop with an object configuration:
+
+```vue
+<template>
+  <DataTable
+    :data="items"
+    :empty-block="{
+      title: 'No Applications Found',
+      description: 'Create your first application to get started with edge computing.',
+      createButtonLabel: 'Create Application',
+      createPagePath: '/applications/create',
+      documentationService: 'applications'
+    }"
+  >
+    <!-- columns -->
+  </DataTable>
+</template>
+```
+
+### EmptyBlock Configuration
+
+| Property               | Type     | Description                                 |
+| ---------------------- | -------- | ------------------------------------------- |
+| `title`                | `String` | Main title for the empty state              |
+| `description`          | `String` | Descriptive text explaining the empty state |
+| `createButtonLabel`    | `String` | Label for the create/action button          |
+| `createPagePath`       | `String` | Route path for the create action            |
+| `documentationService` | `String` | Service identifier for documentation links  |
+
+### Behavior Logic
+
+The component automatically determines which empty state to show:
+
+1. **Table with data or loading**: Shows the PrimeVue DataTable
+2. **No data + emptyBlock object**: Shows EmptyResultsBlock with illustration and action button
+3. **No data + empty slot**: Shows custom empty slot content
+4. **No data + emptyListMessage**: Shows simple text message
+
+### Example with Complete Configuration
+
+```vue
+<template>
+  <DataTable
+    :data="applications"
+    :loading="isLoading"
+    :empty-block="emptyBlockConfig"
+  >
+    <template #header>
+      <DataTable.Header>
+        <DataTable.Search
+          v-model="searchTerm"
+          placeholder="Search applications..."
+        />
+        <DataTable.Actions>
+          <DataTable.AddButton
+            label="Application"
+            @click="navigateToCreate"
+          />
+        </DataTable.Actions>
+      </DataTable.Header>
+    </template>
+
+    <DataTable.Column
+      field="name"
+      header="Name"
+      sortable
+    />
+    <DataTable.Column
+      field="status"
+      header="Status"
+    />
+    <DataTable.Column
+      field="lastModified"
+      header="Last Modified"
+      sortable
+    />
+  </DataTable>
+</template>
+
+<script setup>
+  import { ref, computed } from 'vue'
+  import { useRouter } from 'vue-router'
+  import DataTable from '@/components/DataTable'
+
+  const router = useRouter()
+  const applications = ref([])
+  const isLoading = ref(false)
+  const searchTerm = ref('')
+
+  const emptyBlockConfig = computed(() => ({
+    title: 'No Edge Applications',
+    description:
+      'Create your first edge application to start delivering content with high performance and low latency.',
+    createButtonLabel: 'Create Application',
+    createPagePath: '/edge-applications/create',
+    documentationService: 'edge-applications'
+  }))
+
+  const navigateToCreate = () => {
+    router.push('/edge-applications/create')
+  }
+</script>
 ```
 
 ---
