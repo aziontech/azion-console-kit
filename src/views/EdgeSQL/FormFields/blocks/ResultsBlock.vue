@@ -3,7 +3,7 @@
     <InlineMessage
       class="w-full mb-6"
       severity="info"
-      icon="pi pi-info"
+      icon="pi pi-info-circle"
       v-if="areActionsDisabled"
     >
       Searches across multiple database tables are read-only. For security reasons, editing or
