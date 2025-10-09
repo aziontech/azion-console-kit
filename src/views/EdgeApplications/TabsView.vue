@@ -208,6 +208,10 @@
     return hasFlagBlockApiV4() ? 'applicationAccelerator' : 'applicationAcceleratorEnabled'
   })
 
+  const tieredCacheEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'l2Caching' : 'tieredCacheEnabled'
+  })
+
   const imageProcessorEnabled = computed(() => {
     return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
   })
@@ -276,7 +280,7 @@
       show: showTabs.cacheSettings,
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
-        isTieredCacheEnabled: true,
+        isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value
       })
     },
