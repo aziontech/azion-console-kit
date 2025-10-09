@@ -275,7 +275,10 @@
         </FieldDropdownLazyLoader>
       </div>
 
-      <div class="flex flex-col gap-2 w-full" v-if="isDropdownLoaded">
+      <div
+        class="flex flex-col gap-2 w-full"
+        v-if="isDropdownLoaded"
+      >
         <div v-if="hasFormBuilder">
           <SelectPanel
             :options="selectPanelOptions"
