@@ -17,6 +17,8 @@
     drawerRef.value.openCreateDrawer()
   }
 
+  const isDropdownLoaded = ref(false)
+
   const handleDrawerSuccess = (functionId) => {
     edgeFunctionID.value = functionId
   }
@@ -27,12 +29,18 @@
     }
   }
 
-  const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return edgeFunctionService.listEdgeFunctionsDropdown({
+  const listEdgeFunctionsServiceDecorator = async (queryParams) => {
+    const res = await edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
       fields: ['id', 'name', 'default_args', 'execution_environment'],
       ...queryParams
     })
+
+    if (!isDropdownLoaded.value) {
+      isDropdownLoaded.value = true
+    }
+
+    return res
   }
 
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
@@ -129,6 +137,7 @@
 
       <div class="flex flex-col gap-2 w-full">
         <CodeEditor
+          v-if="isDropdownLoaded"
           v-model="args"
           runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
@@ -136,7 +145,7 @@
           :minimap="false"
         />
         <small
-          v-if="argsError"
+          v-if="isDropdownLoaded && argsError"
           class="p-error text-xs font-normal leading-tight"
         >
           {{ argsError }}
