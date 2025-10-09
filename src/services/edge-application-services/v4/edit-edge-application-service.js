@@ -18,7 +18,7 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     modules: {
-      cache_enabled: payload.edgeCacheEnabled,
+      edge_cache_enabled: payload.edgeCacheEnabled,
       edge_functions_enabled: payload.edgeFunctionsEnabled,
       application_accelerator_enabled: payload.applicationAcceleratorEnabled,
       image_processor_enabled: payload.imageProcessorEnabled,
