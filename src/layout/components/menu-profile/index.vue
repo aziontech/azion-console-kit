@@ -217,43 +217,30 @@
     </template>
 
     <template #end>
-      <PrimeMenu
-        data-testid="profile-block__mobile-profile-menu__settings-menu"
-        :model="profileMenuSettings"
-        :pt="{
-          root: { class: 'p-0 w-full border-none bg-transparent' },
-          submenuheader: { class: 'text-base font-medium leading-none' },
-          content: { class: 'text-sm' }
-        }"
-      >
-        <template #start>
-          <div class="flex flex-row items-center">
-            <div class="flex flex-col gap-1 px-2 py-2.5">
-              <span
-                class="text-sm font-medium leading-none"
-                data-testid="profile-block__mobile-settings-menu__full-name"
-                >{{ user.full_name }}</span
-              >
-              <span
-                class="text-xs"
-                data-testid="profile-block__mobile-settings-menu__email"
-                >{{ user.email }}</span
-              >
-            </div>
-          </div>
-        </template>
-
-        <template #item="{ item, props }">
-          <!-- this not working well, now need double click to navigate -->
-          <router-link
-            v-bind="props.action"
-            :to="item.to"
+      <div class="flex flex-row items-center">
+        <div class="flex flex-col gap-1 px-2 py-2.5">
+          <span
+            class="text-sm font-medium leading-none"
+            data-testid="profile-block__mobile-settings-menu__full-name"
+            >{{ user.full_name }}</span
           >
-            {{ item.label }}
-          </router-link>
-        </template>
-      </PrimeMenu>
+          <span
+            class="text-xs"
+            data-testid="profile-block__mobile-settings-menu__email"
+            >{{ user.email }}</span
+          >
+        </div>
+      </div>
 
+      <template v-for="item in profileMenuSettings" :key="item.label">
+        <router-link
+          :to="item.to"
+          class="text-sm leading-none block px-2 py-[12px] hover:bg-[var(--surface-hover)] rounded text-color transition-[background-color,border-color,box-shadow] duration-200"
+        >
+          {{ item.label }}
+        </router-link>
+      </template>
+      
       <div
         class="flex flex-row justify-between items-center align-middle px-2 py-1.5"
         data-testid="profile-block__mobile-settings-menu__theme"
