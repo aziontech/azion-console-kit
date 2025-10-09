@@ -3,7 +3,7 @@
   import Breadcrumb from 'primevue/breadcrumb'
   import PrimeTag from 'primevue/tag'
   import { computed, useSlots } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, RouterLink } from 'vue-router'
 
   defineOptions({
     name: 'PageHeadingBlock'
