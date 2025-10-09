@@ -39,6 +39,8 @@
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const drawerRef = ref('')
+  const isDropdownLoaded = ref(false)
+
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
@@ -64,12 +66,18 @@
     }
   }
 
-  const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return edgeFunctionService.listEdgeFunctionsDropdown({
+  const listEdgeFunctionsServiceDecorator = async (queryParams) => {
+    const result = await edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
       fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment'],
       ...queryParams
     })
+
+    if (!isDropdownLoaded.value) {
+      isDropdownLoaded.value = true
+    }
+
+    return result
   }
 
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
@@ -267,7 +275,7 @@
         </FieldDropdownLazyLoader>
       </div>
 
-      <div class="flex flex-col gap-2 w-full">
+      <div class="flex flex-col gap-2 w-full" v-if="isDropdownLoaded">
         <div v-if="hasFormBuilder">
           <SelectPanel
             :options="selectPanelOptions"
