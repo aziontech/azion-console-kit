@@ -51,13 +51,6 @@ export const TABLE_MENU_ACTIONS = [
     description: 'Show foreign key relationships'
   },
   {
-    label: 'Database Size',
-    icon: 'pi pi-database',
-    type: 'query',
-    query: TABLE_QUERIES.DATABASE_SIZE,
-    description: 'Show database disk space usage'
-  },
-  {
     separator: true
   },
   {
