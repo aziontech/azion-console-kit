@@ -232,7 +232,10 @@
         </div>
       </div>
 
-      <template v-for="item in profileMenuSettings" :key="item.label">
+      <template
+        v-for="item in profileMenuSettings"
+        :key="item.label"
+      >
         <router-link
           :to="item.to"
           class="text-sm leading-none block px-2 py-[12px] hover:bg-[var(--surface-hover)] rounded text-color transition-[background-color,border-color,box-shadow] duration-200"
@@ -240,7 +243,7 @@
           {{ item.label }}
         </router-link>
       </template>
-      
+
       <div
         class="flex flex-row justify-between items-center align-middle px-2 py-1.5"
         data-testid="profile-block__mobile-settings-menu__theme"
