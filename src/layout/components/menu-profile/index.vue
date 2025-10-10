@@ -54,11 +54,18 @@
 
       <template #item="{ item, props }">
         <router-link
+          v-if="item.to"
           v-bind="props.action"
           :to="item.to"
         >
           {{ item.label }}
         </router-link>
+        <span
+          v-else
+          v-bind="props.action"
+        >
+          {{ item.label }}
+        </span>
       </template>
 
       <template #end>
@@ -209,11 +216,17 @@
 
     <template #item="{ item, props }">
       <router-link
+        v-if="item.to"
         v-bind="props.action"
         :to="item.to"
       >
         {{ item.label }}
       </router-link>
+      <span v-else
+        v-bind="props.action"
+      >
+        {{ item.label }}
+      </span>
     </template>
 
     <template #end>
