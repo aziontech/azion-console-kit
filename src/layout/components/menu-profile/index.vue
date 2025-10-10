@@ -222,7 +222,8 @@
       >
         {{ item.label }}
       </router-link>
-      <span v-else
+      <span
+        v-else
         v-bind="props.action"
       >
         {{ item.label }}
