@@ -75,8 +75,8 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: props.showTieredCache ?? true,
-    tieredCacheRegion: 'near-edge',
+    tieredCache: false,
+    tieredCacheRegion: 'global',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
     largeFileCacheOffset: 1024
@@ -111,14 +111,6 @@
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    tieredCacheRegion: yup
-      .string()
-      .required()
-      .label('Tiered Cache Region')
-      .oneOf(
-        ['near-edge', 'br-east-1', 'us-east-1'],
-        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "us-east-1"'
-      ),
     cdnCacheSettings: yup.string().required().label('Cache Behavior'),
     cdnCacheSettingsMaximumTtl: yup
       .number()
