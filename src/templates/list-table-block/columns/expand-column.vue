@@ -1,6 +1,5 @@
 <template>
   <div class="flex gap-2 align-center">
-    {{ s }}
     <ul class="flex flex-col gap-1">
       <li
         v-for="(item, index) in splitValue"
