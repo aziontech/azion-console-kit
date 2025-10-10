@@ -1,18 +1,5 @@
 <template>
-  <EmptyResultsBlock
-    v-if="showEmptyResults"
-    title="No buckets created"
-    description="Create your first bucket here"
-    createButtonLabel="Bucket"
-    @click-to-create="handleCreateTrackEvent"
-    :documentationService="documentationGuideProducts.edgeStorage"
-  >
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
   <ListTableBlock
-    v-else
     ref="listServiceRef"
     :listService="loadBuckets"
     :columns="columns"
@@ -26,21 +13,25 @@
     exportFileName="buckets"
     class="w-full"
     :isLoading="isLoading"
+    :emptyBlock="{
+      title: 'No buckets created',
+      description: 'Create your first bucket here',
+      createButtonLabel: 'Bucket',
+      createPagePath: '/object-storage/create',
+      documentationService: documentationGuideProducts.edgeStorage
+    }"
   />
 </template>
 
 <script setup>
-  import { inject, ref, computed } from 'vue'
+  import { ref } from 'vue'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
   import { useRouter, useRoute } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
   const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
@@ -71,10 +62,6 @@
   const listServiceRef = ref(null)
 
   const isLoading = ref(true)
-
-  const showEmptyResults = computed(() => {
-    return !buckets.value.length && !isLoading.value
-  })
 
   const handleEdit = (bucket) => {
     router.push(`/object-storage/edit/${bucket.name}`)
@@ -128,13 +115,5 @@
     } finally {
       isLoading.value = false
     }
-  }
-
-  const handleCreateTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Edge Storage'
-    })
-    bucketTableNeedRefresh.value = true
-    router.push('/object-storage/create')
   }
 </script>

@@ -1,9 +1,7 @@
 <script setup>
-  import { computed, inject, ref } from 'vue'
+  import { computed, inject } from 'vue'
 
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -23,7 +21,6 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const toast = useToast()
   const actions = [
     {
@@ -62,9 +59,6 @@
     toast.add(options)
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
       productName: 'Application'
@@ -146,7 +140,6 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         addButtonLabel="Application"
         createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
@@ -160,20 +153,16 @@
         data-testid="edge-applications-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
+        :frozenColumns="['name']"
+        :emptyBlock="{
+          title: 'No applications have been created',
+          description: 'Click the button below to create your first Application.',
+          createButtonLabel: 'Application',
+          createPagePath: '/applications/create?origin=list',
+          documentationService: props.documentationService,
+          emptyListMessage: 'No applications found.'
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No applications have been created"
-        description="Click the button below to create your first Application."
-        createButtonLabel="Application"
-        createPagePath="/applications/create?origin=list"
-        :documentationService="props.documentationService"
-        data-testid="edge-applications-empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

@@ -1,46 +1,5 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
-        :createPagePath="createDomainPath"
-        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
-        :listService="workloadService.listWorkloads"
-        :columns="getColumns"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
-        :actions="actions"
-        :apiFields="DOMAINS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-        :hiddenByDefault="columnsHiddenByDefault"
-      />
-      <EmptyResultsBlock
-        v-else
-        :title="titleEmptyPage"
-        :description="descriptionEmptyPage"
-        :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
-        :createPagePath="createDomainPath"
-        @click-to-create="handleTrackEvent"
-        :documentationService="documentationHandler"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
@@ -52,7 +11,7 @@
   import * as Helpers from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -74,7 +33,6 @@
 
   const columnsHiddenByDefault = ['lastEditor', 'protocols']
 
-  const hasContentToList = ref(true)
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const actions = [
     {
@@ -123,22 +81,22 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'id',
-        header: 'ID',
-        filterPath: 'id',
-        sortField: 'id'
-      },
-      {
         field: 'name',
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
+            data: { value: columnData.text, showMoreText: false },
+            columnAppearance: 'expand-text-column'
           })
         }
+      },
+      {
+        field: 'id',
+        header: 'ID',
+        filterPath: 'id',
+        sortField: 'id'
       },
       {
         field: 'domains',
@@ -202,10 +160,6 @@
     ]
   })
 
-  function handleLoadData(event) {
-    hasContentToList.value = event
-  }
-
   const titleEmptyPage = computed(
     () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
@@ -213,3 +167,35 @@
     () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
   )
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
+        :createPagePath="createDomainPath"
+        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
+        :listService="workloadService.listWorkloads"
+        :columns="getColumns"
+        @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
+        :actions="actions"
+        :apiFields="DOMAINS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="columnsHiddenByDefault"
+        :frozenColoumns="['name']"
+        :emptyBlock="{
+          title: titleEmptyPage,
+          description: descriptionEmptyPage,
+          createButtonLabel: 'Workload',
+          documentationService: documentationHandler
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

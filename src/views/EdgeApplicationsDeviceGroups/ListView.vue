@@ -1,6 +1,4 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
@@ -29,18 +27,24 @@
 
   const drawerDeviceGroups = ref('')
   const listDeviceGroupsEdgeApplicationsRef = ref('')
-  const hasContentToList = ref(true)
 
   const reloadList = () => {
-    if (hasContentToList.value) {
-      listDeviceGroupsEdgeApplicationsRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listDeviceGroupsEdgeApplicationsRef.value.reload()
   }
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
       {
         field: 'deviceId',
         header: 'ID',
@@ -54,17 +58,6 @@
             dependencies: {
               copyContentService: props.clipboardWrite
             }
-          })
-        }
-      },
-      {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: { value: columnData },
-            columnAppearance: 'expand-text-column'
           })
         }
       },
@@ -87,10 +80,6 @@
 
   const openEditDeviceGroupDrawer = (item) => {
     drawerDeviceGroups.value.openDrawerEdit(item.id)
-  }
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
   }
 
   const listDeviceGroupsWithDecorator = async (params) => {
@@ -137,38 +126,27 @@
     :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
     :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
   />
-  <div v-if="hasContentToList">
-    <FetchListTableBlock
-      ref="listDeviceGroupsEdgeApplicationsRef"
-      :listService="listDeviceGroupsWithDecorator"
-      :editInDrawer="openEditDeviceGroupDrawer"
-      :columns="getColumns"
-      :defaultOrderingFieldName="'name'"
-      :apiFields="DEVICE_GROUP_API_FIELDS"
-      @on-load-data="handleLoadData"
-      @on-before-go-to-edit="handleTrackClickToEdit"
-      emptyListMessage="No device groups found."
-      :actions="actions"
-      isTabs
-    >
-      <template #addButton>
-        <PrimeButton
-          @click="openCreateDeviceGroupDrawer"
-          icon="pi pi-plus"
-          label="Device Group"
-        />
-      </template>
-    </FetchListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No device groups have been created"
-    description="Click the button below to create your first device group."
-    createButtonLabel="Device Group"
-    :documentationService="props.documentationService"
-    :inTabs="true"
+  <FetchListTableBlock
+    ref="listDeviceGroupsEdgeApplicationsRef"
+    :listService="listDeviceGroupsWithDecorator"
+    :editInDrawer="openEditDeviceGroupDrawer"
+    :columns="getColumns"
+    :defaultOrderingFieldName="'name'"
+    :apiFields="DEVICE_GROUP_API_FIELDS"
+    @on-before-go-to-edit="handleTrackClickToEdit"
+    emptyListMessage="No device groups found."
+    :actions="actions"
+    isTabs
+    :frozen-columns="['name']"
+    :emptyBlock="{
+      title: 'No device groups have been created',
+      description: 'Click the button below to create your first device group.',
+      createButtonLabel: 'Device Group',
+      createPagePath: '/edge-applications/device-groups/create',
+      documentationService: props.documentationService
+    }"
   >
-    <template #default>
+    <template #emptyBlockButton>
       <PrimeButton
         class="max-md:w-full w-fit"
         data-testid="create-device-group-button"
@@ -178,8 +156,5 @@
         label="Device Group"
       />
     </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
+  </FetchListTableBlock>
 </template>

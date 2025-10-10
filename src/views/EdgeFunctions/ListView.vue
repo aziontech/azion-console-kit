@@ -1,50 +1,7 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Functions" />
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="edgeFunctionService.listEdgeFunctionsService"
-        :columns="getColumns"
-        addButtonLabel="Function"
-        createPagePath="functions/create?origin=list"
-        editPagePath="functions/edit"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleCreateTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Functions found."
-        :actions="actions"
-        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-        showLastModified
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No Functions have been created"
-        description="Click the button below to create your first Function."
-        createButtonLabel="Function"
-        createPagePath="functions/create"
-        @click-to-create="handleCreateTrackEvent"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -57,7 +14,6 @@
     }
   })
 
-  let hasContentToList = ref(true)
   const EDGE_FUNCTIONS_API_FIELDS = [
     'id',
     'name',
@@ -169,8 +125,34 @@
       }
     }
   ])
-
-  function handleLoadData(event) {
-    hasContentToList.value = event
-  }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Functions" />
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="edgeFunctionService.listEdgeFunctionsService"
+        :columns="getColumns"
+        addButtonLabel="Function"
+        createPagePath="functions/create?origin=list"
+        editPagePath="functions/edit"
+        @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
+        emptyListMessage="No Functions found."
+        :actions="actions"
+        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No Functions have been created',
+          description: 'Click the button below to create your first Function.',
+          createButtonLabel: 'Function',
+          documentationService: documentationService
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

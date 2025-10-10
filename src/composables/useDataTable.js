@@ -158,14 +158,20 @@ export function useDataTable(props, emit) {
     router.push(props.createPagePath || '/')
   }
 
-  const editItemSelected = (event) => {
-    const item = event.data || event
+  const editItemSelected = (event, item) => {
     emit('on-before-go-to-edit', item)
 
     if (props.editInDrawer) {
       props.editInDrawer(item)
     } else if (props.enableEditClick !== false && !item?.disableEditClick) {
-      router.push({ path: `${props.editPagePath}/${item.id}` })
+      const editPath = `${props.editPagePath}/${item.id}`
+
+      if (event.ctrlKey || event.metaKey) {
+        const fullUrl = `${window.location.origin}${editPath}`
+        window.open(fullUrl, '_blank')
+      } else {
+        router.push({ path: editPath })
+      }
     }
   }
 
