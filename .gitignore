@@ -55,4 +55,7 @@ specs.json
 .claude/
 .serena/
 claude.md
-.z.sh
+.z.sh#Paths added by Azion CLI
+.edge/
+.vulcan
+.open-next

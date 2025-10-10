@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
+import { getAuthHeaders } from './auth-helper'
 
 export const createKnowledgeBaseService = async (payload) => {
   console.log('🚀 createKnowledgeBaseService called with payload:', payload)
@@ -9,9 +10,9 @@ export const createKnowledgeBaseService = async (payload) => {
   const adaptedPayload = adapt(payload)
   const url = `${makeKnowledgeBaseBaseUrl()}`
 
-  // Use cookie-based authentication instead of API token
+  // Get authentication headers (supports both cookie and token auth)
   const headers = {
-    'Accept': 'application/json',
+    ...getAuthHeaders(),
     'Content-Type': 'application/json'
   }
 
@@ -20,7 +21,6 @@ export const createKnowledgeBaseService = async (payload) => {
   console.log('  Method: POST')
   console.log('  Headers:', headers)
   console.log('  Body (adapted payload):', adaptedPayload)
-  console.log('  Authentication: Using cookies (withCredentials: true)')
 
   let httpResponse
   try {

@@ -80,14 +80,6 @@
               </div>
             </div>
 
-            <input
-              ref="documentFileInput"
-              type="file"
-              accept=".pdf,.txt"
-              style="display: none"
-              @change="handleDocumentUpload"
-            />
-
             <div
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
               :class="{ 'border-dashed !border-[#f3652b]': isDragOver }"
@@ -128,87 +120,6 @@
         </div>
       </div>
 
-      <!-- Document Upload Dialog -->
-      <Dialog
-        v-model:visible="showUploadDialog"
-        header="Upload Document"
-        :modal="true"
-        :style="{ width: '450px' }"
-      >
-        <div class="flex flex-col gap-4">
-          <div>
-            <label for="documentName" class="block text-sm font-medium mb-2">Document Name</label>
-            <InputText
-              id="documentName"
-              v-model="documentForm.name"
-              placeholder="Enter document name"
-              class="w-full"
-            />
-          </div>
-          <div>
-            <label for="documentType" class="block text-sm font-medium mb-2">Document Type</label>
-            <Dropdown
-              id="documentType"
-              v-model="documentForm.type"
-              :options="documentTypes"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select document type"
-              class="w-full"
-            />
-          </div>
-          <div>
-            <label for="documentDescription" class="block text-sm font-medium mb-2">Description</label>
-            <Textarea
-              id="documentDescription"
-              v-model="documentForm.description"
-              placeholder="Enter document description"
-              rows="3"
-              class="w-full"
-            />
-          </div>
-          <div>
-            <label for="chunkSize" class="block text-sm font-medium mb-2">Chunk Size</label>
-            <InputNumber
-              id="chunkSize"
-              v-model="documentForm.chunkSize"
-              :min="100"
-              :max="2000"
-              :step="100"
-              placeholder="500"
-              class="w-full"
-            />
-            <small class="text-color-secondary">Default: 500 characters per chunk</small>
-          </div>
-          <div>
-            <label for="documentFile" class="block text-sm font-medium mb-2">File</label>
-            <input
-              id="documentFile"
-              type="file"
-              accept=".pdf,.txt"
-              @change="handleFileSelect"
-              class="w-full p-2 border-1 border-gray-300 rounded"
-            />
-            <small v-if="selectedFile" class="text-color-secondary">
-              Selected: {{ selectedFile.name }}
-            </small>
-          </div>
-        </div>
-        <template #footer>
-          <div class="flex justify-end gap-2">
-            <PrimeButton
-              label="Cancel"
-              severity="secondary"
-              @click="showUploadDialog = false"
-            />
-            <PrimeButton
-              label="Upload"
-              @click="handleDocumentSubmit"
-              :loading="uploading"
-            />
-          </div>
-        </template>
-      </Dialog>
     </template>
   </ContentBlock>
 </template>
@@ -220,11 +131,7 @@
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import Textarea from 'primevue/textarea'
-  import InputNumber from 'primevue/inputnumber'
-  import Dialog from 'primevue/dialog'
-  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useToast } from 'primevue/usetoast'
@@ -248,22 +155,6 @@
   const listDocumentsRef = ref(null)
   const isDragOver = ref(false)
   const headerContainer = ref(null)
-
-  // Document upload form
-  const showUploadDialog = ref(false)
-  const uploading = ref(false)
-  const selectedFile = ref(null)
-  const documentForm = ref({
-    name: '',
-    type: 'pdf',
-    description: '',
-    chunkSize: 500
-  })
-
-  const documentTypes = [
-    { label: 'PDF', value: 'pdf' },
-    { label: 'TXT', value: 'txt' }
-  ]
 
   const uploadMenuItems = [
     {
@@ -389,22 +280,8 @@
           // Handle folder upload - process all files in the folder
           await handleFolderUpload(files)
         } else {
-          // Handle single file upload - show dialog for first file
-          const file = files[0]
-          selectedFile.value = file
-
-          // Auto-fill form
-          const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, '')
-          const extension = file.name.split('.').pop().toLowerCase()
-
-          documentForm.value = {
-            name: nameWithoutExtension,
-            type: extension === 'txt' ? 'txt' : 'pdf',
-            description: '',
-            chunkSize: 500
-          }
-
-          showUploadDialog.value = true
+          // Handle multiple file uploads directly
+          await handleMultipleFileUploads(files)
         }
       }
       document.body.removeChild(input)
@@ -414,42 +291,61 @@
     input.click()
   }
 
-  const resetDocumentForm = () => {
-    documentForm.value = {
-      name: '',
-      type: 'pdf',
-      description: '',
-      chunkSize: 500
-    }
-    selectedFile.value = null
-  }
 
-  const handleFolderUpload = async (files) => {
-    let successCount = 0
-    let errorCount = 0
+  const handleMultipleFileUploads = async (files) => {
+    const validFiles = []
     const errors = []
 
+    // Validate files first
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-
-      // Check file type
       const extension = file.name.split('.').pop().toLowerCase()
+
       if (!['pdf', 'txt'].includes(extension)) {
-        errorCount++
         errors.push(`Skipped ${file.name}: Unsupported file type`)
-        continue
+      } else {
+        validFiles.push(file)
       }
+    }
+
+    if (validFiles.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'No Valid Files',
+        detail: 'No valid PDF or TXT files to upload',
+        life: 5000
+      })
+      return
+    }
+
+    // Show uploading toast
+    const uploadingToast = toast.add({
+      severity: 'info',
+      summary: 'Uploading...',
+      detail: `Uploading ${validFiles.length} file${validFiles.length > 1 ? 's' : ''}...`,
+      life: 0, // Don't auto-dismiss
+      closable: false
+    })
+
+    let successCount = 0
+    let errorCount = 0
+
+    // Upload files
+    for (let i = 0; i < validFiles.length; i++) {
+      const file = validFiles[i]
+
+      // Update progress in toast
+      toast.add({
+        severity: 'info',
+        summary: 'Uploading...',
+        detail: `Uploading ${i + 1} of ${validFiles.length}: ${file.name}`,
+        life: 0,
+        closable: false,
+        group: 'upload-progress'
+      })
 
       try {
-        const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, '')
-
-        await createDocumentService(route.params.id, {
-          name: nameWithoutExtension,
-          type: extension,
-          description: `Uploaded from folder: ${extension.toUpperCase()} file`,
-          chunkSize: 500,
-          file: file
-        })
+        await createDocumentService(route.params.id, file)
         successCount++
       } catch (error) {
         errorCount++
@@ -457,21 +353,24 @@
       }
     }
 
+    // Remove uploading toast
+    toast.removeGroup('upload-progress')
+
     // Show results
     if (successCount > 0) {
       toast.add({
         severity: 'success',
         summary: 'Upload Complete',
-        detail: `${successCount} files uploaded successfully`,
+        detail: `${successCount} file${successCount > 1 ? 's' : ''} uploaded successfully`,
         life: 5000
       })
     }
 
-    if (errorCount > 0) {
+    if (errorCount > 0 || errors.length > 0) {
       toast.add({
         severity: 'error',
         summary: 'Upload Errors',
-        detail: `${errorCount} files failed to upload. ${errors.slice(0, 3).join('; ')}${errors.length > 3 ? '...' : ''}`,
+        detail: `${errorCount > 0 ? errorCount + ' file' + (errorCount > 1 ? 's' : '') + ' failed. ' : ''}${errors.slice(0, 3).join('; ')}${errors.length > 3 ? '...' : ''}`,
         life: 8000
       })
     }
@@ -480,89 +379,11 @@
     listDocumentsRef.value?.reload()
   }
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      selectedFile.value = file
-
-      // Auto-fill name from filename if not provided
-      if (!documentForm.value.name) {
-        const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, '')
-        documentForm.value.name = nameWithoutExtension
-      }
-
-      // Auto-detect type from file extension
-      const extension = file.name.split('.').pop().toLowerCase()
-      if (extension === 'txt') {
-        documentForm.value.type = 'txt'
-      } else if (extension === 'pdf') {
-        documentForm.value.type = 'pdf'
-      }
-    }
+  const handleFolderUpload = async (files) => {
+    await handleMultipleFileUploads(files)
   }
 
-  const handleDocumentSubmit = async () => {
-    if (!selectedFile.value || !documentForm.value.name) {
-      toast.add({
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please provide a document name and select a file',
-        life: 5000
-      })
-      return
-    }
 
-    uploading.value = true
-    try {
-      await createDocumentService(route.params.id, {
-        ...documentForm.value,
-        file: selectedFile.value
-      })
-
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Document uploaded successfully',
-        life: 5000
-      })
-
-      showUploadDialog.value = false
-      listDocumentsRef.value?.reload()
-    } catch (error) {
-      console.error('Failed to upload document:', error)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to upload document',
-        life: 5000
-      })
-    } finally {
-      uploading.value = false
-    }
-  }
-
-  const handleDocumentUpload = async (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      selectedFile.value = file
-
-      // Auto-fill form
-      const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, '')
-      const extension = file.name.split('.').pop().toLowerCase()
-
-      documentForm.value = {
-        name: nameWithoutExtension,
-        type: extension === 'txt' ? 'txt' : 'pdf',
-        description: '',
-        chunkSize: 500
-      }
-
-      showUploadDialog.value = true
-    }
-
-    // Reset input
-    event.target.value = ''
-  }
 
   const handleDrag = (value) => {
     isDragOver.value = value
@@ -572,29 +393,7 @@
     isDragOver.value = false
     const files = event.dataTransfer.files
     if (files.length > 0) {
-      const file = files[0]
-
-      // Check file type
-      const extension = file.name.split('.').pop().toLowerCase()
-      if (!['pdf', 'txt'].includes(extension)) {
-        toast.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Only PDF and TXT files are supported',
-          life: 5000
-        })
-        return
-      }
-
-      selectedFile.value = file
-      documentForm.value = {
-        name: file.name.replace(/\.[^/.]+$/, ''),
-        type: extension,
-        description: '',
-        chunkSize: 500
-      }
-
-      showUploadDialog.value = true
+      await handleMultipleFileUploads(files)
     }
   }
 

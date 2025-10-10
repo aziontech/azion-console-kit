@@ -1,46 +1,48 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import * as Errors from '@/services/axios/errors'
+import { getAuthHeaders } from './auth-helper'
 
-export const createDocumentService = async (kbId, payload) => {
-  console.log('📄 createDocumentService called with kbId:', kbId, 'payload:', payload)
+export const createDocumentService = async (kbId, file) => {
+  console.log('📄 createDocumentService called with kbId:', kbId, 'file:', file)
 
-  const adaptedPayload = adapt(payload)
   const url = `${makeKnowledgeBaseBaseUrl()}/${kbId}/documents`
-
-  // Use cookie-based authentication
-  const headers = {
-    'Accept': 'application/json',
-    'Content-Type': 'multipart/form-data'
-  }
 
   console.log('📝 Document Upload Request Details:')
   console.log('  URL:', url)
   console.log('  Method: POST')
-  console.log('  Headers:', headers)
-  console.log('  Form Data:', adaptedPayload)
+  console.log('  File:', file.name, 'Size:', file.size, 'Type:', file.type)
 
   let httpResponse
   try {
-    // For file uploads, we need to use FormData exactly as curl -F flags
+    // For file uploads, we need to use FormData with just the file
     const formData = new FormData()
-    formData.append('name', adaptedPayload.name)
-    formData.append('type', adaptedPayload.type)
-    formData.append('description', adaptedPayload.description)
-    formData.append('chunk_strategy', `{"size":${adaptedPayload.chunk_strategy.size}}`)
+    formData.append('file', file)
 
-    if (adaptedPayload.file) {
-      formData.append('file', adaptedPayload.file)
+    // Log FormData contents for debugging
+    console.log('  FormData entries:')
+    for (let pair of formData.entries()) {
+      console.log(`    ${pair[0]}:`, pair[1])
     }
+
+    // Get auth headers - for FormData, we must NOT set Content-Type
+    // The browser needs to set it automatically with the multipart boundary
+    const authHeaders = getAuthHeaders()
+
+    // IMPORTANT: Remove Content-Type so FormData can set it with boundary
+    // The makeApi sets a default Content-Type, but FormData needs its own
+    const headers = {
+      ...authHeaders,
+      'Content-Type': undefined  // This removes the default Content-Type
+    }
+
+    console.log('  Upload headers:', headers)
 
     // Create a custom request for file upload
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
       method: 'POST',
-      headers: {
-        'Accept': 'application/json'
-        // Content-Type will be set automatically for FormData
-      },
+      headers: headers,
       body: formData
     })
 
@@ -71,7 +73,8 @@ export const listDocumentsService = async (kbId) => {
   try {
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
-      method: 'GET'
+      method: 'GET',
+      headers: getAuthHeaders()
     })
 
     console.log('✅ Document List Response:', httpResponse)
@@ -96,7 +99,8 @@ export const deleteDocumentService = async (kbId, documentId) => {
   try {
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     })
 
     console.log('✅ Document Delete Response:', httpResponse)
@@ -106,23 +110,6 @@ export const deleteDocumentService = async (kbId, documentId) => {
   }
 
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = (payload) => {
-  console.log('🔧 adapt() called with payload:', payload)
-
-  const adaptedPayload = {
-    name: payload?.name,
-    type: payload?.type || 'pdf',
-    description: payload?.description || '',
-    chunk_strategy: {
-      size: payload?.chunkSize || 500
-    },
-    file: payload?.file
-  }
-
-  console.log('  🎯 Adapted payload:', adaptedPayload)
-  return adaptedPayload
 }
 
 /**
@@ -152,6 +139,12 @@ const parseHttpResponse = (httpResponse) => {
 
     case 200:
       console.log('✅ 200 OK - Success!')
+      // For list operations, extract the results array from the response
+      if (httpResponse.body && httpResponse.body.results) {
+        console.log('  Returning results array:', httpResponse.body.results)
+        return httpResponse.body.results
+      }
+      // For other operations, return the body as-is
       return httpResponse.body
 
     case 204:

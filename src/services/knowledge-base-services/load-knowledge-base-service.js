@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { getAuthHeaders } from './auth-helper'
 
 export const loadKnowledgeBaseService = async ({ id }) => {
   console.log('📥 loadKnowledgeBaseService called with id:', id)
@@ -8,7 +9,8 @@ export const loadKnowledgeBaseService = async ({ id }) => {
   try {
     let httpResponse = await AxiosHttpClientAdapter.request({
       url: `${makeKnowledgeBaseBaseUrl()}/${id}`,
-      method: 'GET'
+      method: 'GET',
+      headers: getAuthHeaders()
     })
 
     console.log('📥 Load response:', httpResponse)
@@ -48,7 +50,16 @@ const adapt = (httpResponse) => {
     id: kbData.kb_id || kbData.uuid || kbData.id,
     name: kbData.name,
     description: kbData.description,
-    embedding_model: kbData.embedding_model || 'Qwen/Qwen3-Embedding-4B'
+    embedding_model: kbData.embedding_model || 'Qwen/Qwen3-Embedding-4B',
+    lastEditor: kbData.updated_by || kbData.created_by || 'Unknown',
+    updatedAt: kbData.updated_at || kbData.created_at ?
+      new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
+        new Date(kbData.updated_at || kbData.created_at)
+      ) : 'Unknown',
+    createdAt: kbData.created_at ?
+      new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
+        new Date(kbData.created_at)
+      ) : 'Unknown'
   }
 
   console.log('📥 Adapted knowledge base:', parsedKnowledgeBase)

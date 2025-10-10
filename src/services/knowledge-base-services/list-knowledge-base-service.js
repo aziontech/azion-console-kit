@@ -1,22 +1,24 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import { testApiConnection } from './test-api-connection'
+import { getAuthHeaders } from './auth-helper'
 
 export const listKnowledgeBaseService = async () => {
   console.log('🔍 listKnowledgeBaseService called!')
-  
+
   // Test with simple fetch first to validate API connectivity
   const testResult = await testApiConnection()
   console.log('🧪 Test result:', testResult)
-  
+
   // If fetch worked, try AxiosHttpClientAdapter
   try {
     const url = `${makeKnowledgeBaseBaseUrl()}`
     console.log('🚀 Making request to:', url)
-    
+
     let httpResponse = await AxiosHttpClientAdapter.request({
       url: url,
-      method: 'GET'
+      method: 'GET',
+      headers: getAuthHeaders()
     })
 
     console.log('✅ AxiosHttpClientAdapter response:', httpResponse)

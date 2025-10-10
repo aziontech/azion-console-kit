@@ -1,11 +1,13 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import * as Errors from '@/services/axios/errors'
+import { getAuthHeaders } from './auth-helper'
 
 export const deleteKnowledgeBaseService = async (knowledgeBaseId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeKnowledgeBaseBaseUrl()}/${knowledgeBaseId}`,
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getAuthHeaders()
   })
 
   return parseHttpResponse(httpResponse)
