@@ -1,7 +1,7 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { getAuthHeaders } from './auth-helper'
+import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 
 export const loadKnowledgeBaseService = async ({ id }) => {
   console.log('📥 loadKnowledgeBaseService called with id:', id)
@@ -27,7 +27,7 @@ export const loadKnowledgeBaseService = async ({ id }) => {
       id: id,
       name: 'Test Knowledge Base (Fallback)',
       description: 'This is fallback test data when API is unavailable',
-      embedding_model: 'Qwen/Qwen3-Embedding-4B'
+      embedding_model: 'text-embedding-3-small'
     }
 
     console.log('📥 Using fallback mock data:', mockData)
@@ -50,7 +50,7 @@ const adapt = (httpResponse) => {
     id: kbData.kb_id || kbData.uuid || kbData.id,
     name: kbData.name,
     description: kbData.description,
-    embedding_model: kbData.embedding_model || 'Qwen/Qwen3-Embedding-4B',
+    embedding_model: kbData.embedding_model || 'text-embedding-3-small',
     lastEditor: kbData.updated_by || kbData.created_by || 'Unknown',
     updatedAt: kbData.updated_at || kbData.created_at ?
       new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(

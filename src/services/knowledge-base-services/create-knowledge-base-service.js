@@ -1,8 +1,8 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
-import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
+import * as Errors from '@/services/axios/errors'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { getAuthHeaders } from './auth-helper'
+import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 
 export const createKnowledgeBaseService = async (payload) => {
   console.log('🚀 createKnowledgeBaseService called with payload:', payload)
@@ -56,7 +56,7 @@ const adapt = (payload) => {
   const adaptedPayload = {
     name: payload?.name,
     description: payload?.description,
-    embedding_model: payload?.embedding_model || 'Qwen/Qwen3-Embedding-4B'
+    embedding_model: payload?.embedding_model || 'text-embedding-3-small'
   }
 
   console.log('  🎯 Adapted payload:', adaptedPayload)

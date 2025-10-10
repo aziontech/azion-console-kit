@@ -87,7 +87,7 @@
       <CreateFormBlock
         :createService="debugCreateKnowledgeBaseService"
         :schema="validationSchema"
-        :initialValues="{ embedding_model: 'Qwen/Qwen3-Embedding-4B' }"
+        :initialValues="{ embedding_model: 'text-embedding-3-small' }"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         disableToast

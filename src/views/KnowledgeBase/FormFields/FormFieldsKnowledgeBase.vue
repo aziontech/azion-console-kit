@@ -54,7 +54,7 @@
   })
 
   const embeddingModelOptions = [
-    { label: 'Qwen3 Embedding 4B (Default)', value: 'Qwen/Qwen3-Embedding-4B' }
+    { label: 'text-embedding-3-small (Default)', value: 'text-embedding-3-small' }
   ]
 
   // Debug form values

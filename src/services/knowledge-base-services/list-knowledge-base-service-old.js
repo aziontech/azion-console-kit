@@ -7,7 +7,7 @@ export const listKnowledgeBaseService = async () => {
     const url = `${makeKnowledgeBaseBaseUrl()}`
     console.log('Knowledge Base API URL:', url)
     console.log('Full request URL will be:', window.location.origin + '/' + url)
-    
+
     const requestConfig = {
       url: url,
       method: 'GET',
@@ -16,7 +16,7 @@ export const listKnowledgeBaseService = async () => {
         'Authorization': `Token ${import.meta.env.VITE_API_TOKEN}`
       }
     }
-    
+
     // Log the equivalent curl command
     const fullUrl = `${window.location.origin}/${url}`
     const token = import.meta.env.VITE_API_TOKEN || 'TOKEN_NOT_SET'
@@ -30,7 +30,7 @@ export const listKnowledgeBaseService = async () => {
     console.log(`curl -X GET "${directApiUrl}" \\`)
     console.log(`  -H "Accept: application/json" \\`)
     console.log(`  -H "Authorization: Token ${token}"`)
-    
+
     console.log('🔑 Making authenticated request with config:', requestConfig)
     let httpResponse = await AxiosHttpClientAdapter.request(requestConfig)
 
@@ -57,7 +57,7 @@ const adapt = (httpResponse) => {
   // Handle the API response format with results array
   // Ensure we always return an empty array if there's no proper data
   console.log('Adapting Knowledge Base response:', httpResponse)
-  
+
   if (!httpResponse || !httpResponse.body || typeof httpResponse.body !== 'object') {
     console.log('Invalid response body, returning empty array')
     return {
@@ -67,7 +67,7 @@ const adapt = (httpResponse) => {
   }
 
   const results = httpResponse.body.results
-  
+
   // If results is not an array, return empty array
   if (!Array.isArray(results)) {
     console.log('Results is not an array:', results, 'returning empty array')
@@ -88,11 +88,11 @@ const adapt = (httpResponse) => {
       name: item.name || 'Unnamed',
       description: item.description || '',
       embeddingModel: {
-        content: item.embedding_model === 'Qwen/Qwen3-Embedding-4B' ? 'Qwen3 Embedding 4B' : (item.embedding_model || 'Unknown'),
+        content: item.embedding_model === 'text-embedding-3-small' ? 'text-embedding-3-small' : (item.embedding_model || 'Unknown'),
         icon: 'pi pi-microchip'
       },
       lastEditor: item.updated_by || item.created_by || 'System',
-      updatedAt: item.updated_at || item.created_at ? 
+      updatedAt: item.updated_at || item.created_at ?
         new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
           new Date(item.updated_at || item.created_at)
         ) : 'Unknown',
@@ -105,7 +105,7 @@ const adapt = (httpResponse) => {
     statusCode: 200
     // Note: Not including count so parseHttpResponse returns just the body array
   }
-  
+
   console.log('Final adapted result:', finalResult)
   return finalResult
 }

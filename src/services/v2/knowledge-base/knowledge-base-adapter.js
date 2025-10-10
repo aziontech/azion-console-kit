@@ -1,11 +1,10 @@
 import {
-  adaptServiceDataResponse,
   adaptServiceDataResponseToLoad
 } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const EMBEDDING_MODEL_DISPLAY = {
-  'Qwen/Qwen3-Embedding-4B': {
-    content: 'Qwen3 Embedding 4B',
+  'text-embedding-3-small': {
+    content: 'text-embedding-3-small',
     icon: 'pi pi-microchip'
   }
 }
@@ -56,7 +55,7 @@ export const KnowledgeBaseAdapter = {
     return {
       name: payload.name,
       description: payload.description,
-      embedding_model: payload.embeddingModel || 'Qwen/Qwen3-Embedding-4B'
+      embedding_model: payload.embeddingModel || 'text-embedding-3-small'
     }
   }
 }
