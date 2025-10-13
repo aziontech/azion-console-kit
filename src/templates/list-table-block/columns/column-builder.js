@@ -37,8 +37,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'expand-column':
       return h(ExpandColumn, {
-        value: data,
-        showMore: dependencies?.showMore ?? false
+        value: data
       })
     case 'expand-text-column':
       return h(ExpandTextColumn, {

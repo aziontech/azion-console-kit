@@ -10,7 +10,7 @@
         v-if="isConnector"
       >
         <FieldDropdownLazyLoader
-          label="Edge Connector"
+          label="Connector"
           required
           name="connector"
           :value="connector"
@@ -18,7 +18,7 @@
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="value"
-          placeholder="Select a Edge Connector"
+          placeholder="Select a Connector"
         />
       </div>
       <div
@@ -93,7 +93,7 @@
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 

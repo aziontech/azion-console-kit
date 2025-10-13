@@ -21,6 +21,7 @@
       :loading="isLoading"
       data-testid="data-table"
       rowHover
+      :rowClass="stateClassRules"
     >
       <template
         #header
@@ -56,6 +57,7 @@
                 :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -66,12 +68,36 @@
       </template>
       <Column
         :class="{ '!hover:cursor-pointer': !disabledList }"
-        selectionMode="multiple"
-        :pt="{
-          rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
-        }"
         headerStyle="width: 3rem"
-      />
+      >
+        <template #header>
+          <Checkbox
+            :model-value="isAllSelected"
+            @update:model-value="toggleSelectAll"
+            binary
+          />
+        </template>
+        <template #body="{ data: rowData }">
+          <div
+            @click="toggleRowSelection(rowData)"
+            class="cursor-pointer flex items-center justify-center w-6 h-8"
+            data-testid="data-table-row-checkbox"
+          >
+            <Checkbox
+              v-if="selectedItems.includes(rowData)"
+              :model-value="selectedItems.includes(rowData)"
+              @update:model-value="toggleRowSelection(rowData)"
+              @click.stop="toggleRowSelection(rowData)"
+              binary
+            />
+            <i
+              v-else
+              class="text-xl"
+              :class="getFileIcon(rowData)"
+            ></i>
+          </div>
+        </template>
+      </Column>
       <Column
         :sortable="selectedItems.length > 0 ? false : !col.disableSort"
         v-for="(col, index) of selectedColumns"
@@ -198,8 +224,8 @@
             />
           </div>
           <div
-            class="flex justify-end"
-            v-else
+            class="flex justify-end disabled:opacity-50"
+            v-else-if="!rowData.isFolder && !rowData.isParentNav"
             data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
@@ -207,6 +233,7 @@
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
+              :disabled="rowData.isFolder"
               data-testid="data-table-actions-column-body-actions-menu"
               :pt="{
                 menuitem: ({ context }) => ({
@@ -281,6 +308,7 @@
                 :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
@@ -306,6 +334,7 @@
 <script setup>
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
+  import Checkbox from 'primevue/checkbox'
   import Column from 'primevue/column'
   import DataTable from 'primevue/datatable'
   import InputText from 'primevue/inputtext'
@@ -319,6 +348,8 @@
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { getFileIcon } from '@/utils/icons'
+
   defineOptions({ name: 'list-table-block-new' })
 
   const emit = defineEmits([
@@ -550,6 +581,31 @@
     }
   }
 
+  const toggleRowSelection = (rowData) => {
+    const isSelected = selectedItems.value.includes(rowData)
+    if (isSelected) {
+      selectedItems.value = selectedItems.value.filter((item) => item !== rowData)
+    } else {
+      selectedItems.value = [...selectedItems.value, rowData]
+    }
+  }
+
+  const toggleSelectAll = () => {
+    const selectableRows = filterData.value.filter((row) => !row.isFolder)
+    if (isAllSelected.value) {
+      selectedItems.value = []
+    } else {
+      selectedItems.value = [...selectableRows]
+    }
+  }
+
+  const isAllSelected = computed(() => {
+    const selectableRows = filterData.value.filter((row) => !row.isFolder)
+    return (
+      selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
+    )
+  })
+
   const executeCommand = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     firstAction?.command()
@@ -561,6 +617,13 @@
       icon: firstAction?.icon,
       disabled: firstAction?.disabled
     }
+  }
+
+  const stateClassRules = (row) => {
+    if (selectedItems.value.find((item) => item.id === row.id)) {
+      return 'bg-[var(--table-body-row-hover-bg)] bg-altered'
+    }
+    return ''
   }
 
   defineExpose({ reload, data, handleExportTableDataToCSV })

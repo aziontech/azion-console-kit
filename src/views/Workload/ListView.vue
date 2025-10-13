@@ -14,7 +14,7 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${handleTextDomainWorkload.singularLabel} found.`"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
@@ -47,7 +47,7 @@
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-  import { workloadService } from '@/services/v2'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
   import * as Helpers from '@/helpers'
 
@@ -79,7 +79,7 @@
   const actions = [
     {
       type: 'delete',
-      title: `${handleTextDomainWorkload.singularLabel}`,
+      title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
       service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
     }
@@ -207,9 +207,9 @@
   }
 
   const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.singularLabel} have been created`
+    () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
   const descriptionEmptyPage = computed(
-    () => `Click the button below to create your first ${handleTextDomainWorkload.singularLabel}.`
+    () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
   )
 </script>

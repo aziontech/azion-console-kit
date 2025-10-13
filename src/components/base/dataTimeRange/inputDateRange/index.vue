@@ -142,6 +142,7 @@
             @change="updateRelativeRange"
             optionLabel="label"
             optionValue="value"
+            disabled
           />
         </div>
       </TabPanel>
@@ -383,6 +384,7 @@
       hasChanges.value = false
       tempInputValue.value = ''
       model.value.label = ''
+      emit('select', model.value)
     }
   }
 

@@ -1,5 +1,5 @@
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { hasFlagBlockApiV4, hasFlagIsAzionEmail } from '@/composables/user-flag'
 
 function createHomeItem() {
   return {
@@ -36,7 +36,7 @@ function createBuildItems() {
     {
       label: 'Applications',
       icon: 'ai ai-edge-application',
-      to: '/edge-applications',
+      to: '/applications',
       id: 'edge-application'
     },
     {
@@ -52,7 +52,7 @@ function createSecureItems() {
   return [
     {
       label: 'Connectors',
-      to: '/edge-connectors',
+      to: '/connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
       visible: !hasFlagBlockApiV4()
@@ -65,7 +65,7 @@ function createSecureItems() {
     },
     {
       label: 'Firewall',
-      to: '/edge-firewall',
+      to: '/firewall',
       icon: 'ai ai-edge-firewall',
       id: 'edge-firewall'
     }
@@ -154,7 +154,7 @@ function createEdgeLibrariesItems() {
     },
     {
       label: 'Functions',
-      to: '/edge-functions',
+      to: '/functions',
       icon: 'ai ai-edge-functions',
       id: 'edge-functions'
     },
@@ -192,18 +192,25 @@ function createMarketplaceProductsItems() {
   ]
 }
 
-//  Uncoment this when store is ready
-// function createStoreItems() {
-//   return [
-//     {
-//       label: 'Object Storage',
-//       to: '/edge-storage',
-//       icon: 'ai ai-edge-storage',
-//       id: 'edge-storage',
-//       tag: 'Preview'
-//     }
-//   ]
-// }
+function createStoreItems() {
+  return [
+    {
+      label: 'Object Storage',
+      to: '/object-storage',
+      icon: 'ai ai-edge-storage',
+      id: 'object-storage',
+      tag: 'Preview'
+    }
+    //  Uncoment this when database is ready
+    //  {
+    //   label: 'SQL Database',
+    //   to: '/sql-database',
+    //   icon: 'ai ai-edge-sql',
+    //   tag: 'Preview',
+    //   id: 'sql-database'
+    //  }
+  ]
+}
 
 export function getMenuItens(showMarketplaceProductsItens) {
   const menus = [
@@ -218,11 +225,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
       label: 'Secure',
       items: createSecureItems()
     },
-    // Uncomment this when store is ready
-    // {
-    //   label: 'Store',
-    //   items: createStoreItems()
-    // },
+    {
+      label: 'Store',
+      items: createStoreItems()
+    },
     {
       label: 'Deploy',
       items: createDeployItems()
@@ -245,6 +251,11 @@ export function getMenuItens(showMarketplaceProductsItens) {
       items: createMarketplaceProductsItems()
     }
   ]
+
+  if (!hasFlagIsAzionEmail()) {
+    const storeIndex = menus.findIndex((menu) => menu.label === 'Store')
+    menus.splice(storeIndex, 1)
+  }
 
   return menus
 }

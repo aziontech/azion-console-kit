@@ -1,54 +1,77 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeStorageRoutes = {
-  path: '/edge-storage',
-  name: 'edge-storage',
+  path: '/object-storage',
+  name: 'object-storage',
   meta: {
-    flag: 'checkout_access_without_flag'
+    title: 'Object Storage',
+    flag: 'only_azion_email'
   },
   children: [
     {
       path: '',
-      name: 'edge-storage-list',
+      name: 'object-storage-list',
       component: () => import('@views/EdgeStorage/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
             label: 'Object Storage',
-            to: '/edge-storage'
+            to: '/object-storage'
           }
         ]
       }
     },
     {
+      path: ':id',
+      name: 'object-storage-view',
+      component: () => import('@/views/EdgeStorage/ListView.vue'),
+      props: {
+        mode: 'view'
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Object Storage',
+            to: '/object-storage'
+          },
+          {
+            label: 'Edit Bucket',
+            dynamic: true,
+            routeParam: 'id'
+          }
+        ]
+      },
+      alias: '/object-storage/:id'
+    },
+    {
       path: 'create',
-      name: 'edge-storage-create',
+      name: 'object-storage-create',
       component: () => import('@/views/EdgeStorage/View.vue'),
       meta: {
         breadCrumbs: [
           {
             label: 'Object Storage',
-            to: '/edge-storage'
+            to: '/object-storage'
           },
           {
             label: 'Create Bucket',
-            to: '/edge-storage/create'
+            to: '/object-storage/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edge-storage-bucket-settings',
+      name: 'object-storage-bucket-settings',
       component: () => import('@/views/EdgeStorage/View.vue'),
       props: {
         mode: 'edit',
-        updatedRedirect: 'edge-storage-list'
+        updatedRedirect: 'object-storage-list'
       },
       meta: {
         breadCrumbs: [
           {
             label: 'Object Storage',
-            to: '/edge-storage'
+            to: '/object-storage'
           },
           {
             label: 'Bucket Settings'

@@ -9,8 +9,8 @@
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
         addButtonLabel="Function"
-        createPagePath="edge-functions/create?origin=list"
-        editPagePath="edge-functions/edit"
+        createPagePath="functions/create?origin=list"
+        editPagePath="functions/edit"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
@@ -24,7 +24,7 @@
         title="No Functions have been created"
         description="Click the button below to create your first Function."
         createButtonLabel="Function"
-        createPagePath="edge-functions/create"
+        createPagePath="functions/create"
         @click-to-create="handleCreateTrackEvent"
         :documentationService="documentationService"
       >
@@ -44,7 +44,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
-  import { edgeFunctionService } from '@/services/v2'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -70,7 +70,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'function',
+      title: 'Function',
       icon: 'pi pi-trash',
       service: edgeFunctionService.deleteEdgeFunctionService
     }

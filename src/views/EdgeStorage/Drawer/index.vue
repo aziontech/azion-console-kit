@@ -3,12 +3,12 @@
   import FormFieldsEdgeStorage from '../FormFields/FormFieldsEdgeStorage'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { edgeStorageService } from '@/services/v2'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useToast } from 'primevue/usetoast'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
   defineOptions({
-    name: 'edge-storage-drawer'
+    name: 'object-storage-drawer'
   })
 
   const emit = defineEmits(['onSuccess'])

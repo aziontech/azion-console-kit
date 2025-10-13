@@ -35,7 +35,7 @@
       title: 'Tiered Cache',
       inputValue: 'tiered_cache',
       name: 'tiered-cache-layer',
-      subtitle: `Purge content from Azion's tiered cache layer. Requires subscribing to this module.`
+      subtitle: `Purge content from Azion's tiered cache layer.`
     }
   ]
 

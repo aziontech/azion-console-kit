@@ -8,8 +8,8 @@
       :aria-label="labelText"
       :label="labelText"
       :disabled="disabled"
+      size="small"
       @click="animate"
-      style="font-size: 0.875rem"
     />
   </div>
 </template>

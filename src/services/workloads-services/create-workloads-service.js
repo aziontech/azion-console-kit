@@ -80,7 +80,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
       return {
-        feedback: 'Your workload has been created',
+        feedback: 'Your Workload has been created',
         urlToEditView: `/workloads/edit/${httpResponse.body.data.id}`,
         domainName: httpResponse.body.data.domains[0].domain,
         id: parseInt(httpResponse.body.data.id)

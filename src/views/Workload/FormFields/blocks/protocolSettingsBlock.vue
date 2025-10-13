@@ -10,7 +10,7 @@
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
   import { ref, computed } from 'vue'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   import {
     HTTP_PORT_LIST_OPTIONS,
@@ -109,7 +109,7 @@
 <template>
   <form-horizontal
     title="Protocol Settings"
-    description="Configure the communication protocols used between the workload and its users. This section allows you to define security, compatibility, and performance settings to optimize how your workload operates at the edge."
+    description="Configure the communication protocols used between the Workload and its users. This section allows you to define security, compatibility, and performance settings to optimize how your Workload operates at the edge."
     data-testid="form-horizontal-protocol-settings"
   >
     <template #inputs>

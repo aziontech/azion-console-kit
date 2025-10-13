@@ -21,7 +21,7 @@
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
     title="General"
-    description="Create a workload with Azion to launch an Application and set up security with digital certificates."
+    description="Create a Workload with Azion to launch an Application and set up security with digital certificates."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -29,9 +29,9 @@
           label="Name"
           required
           name="name"
-          placeholder="My workload"
+          placeholder="My Workload"
           :value="name"
-          description="This is an identification name for the workload. Once you save the configuration, the URL will be automatically generated."
+          description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
         />
       </div>
     </template>

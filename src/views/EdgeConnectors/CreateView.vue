@@ -37,7 +37,7 @@
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { validationSchema } from './Config/validation'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 
   const initialValues = {
     name: '',
@@ -98,11 +98,11 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Edge Connector successfully created',
+      feedback: 'Connector successfully created',
       actions: {
         link: {
-          label: 'View Edge Connector',
-          callback: () => response.redirectToUrl(`/edge-connectors/edit/${response.data.id}`)
+          label: 'View Connector',
+          callback: () => response.redirectToUrl(`/connectors/edit/${response.data.id}`)
         }
       }
     }

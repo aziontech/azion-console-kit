@@ -4,14 +4,14 @@
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall'
   import { ref, inject } from 'vue'
   import * as yup from 'yup'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
 
-  defineOptions({ name: 'edit-edge-firewall' })
+  defineOptions({ name: 'edit-firewall' })
   const emit = defineEmits(['updatedFirewall'])
 
   const props = defineProps({

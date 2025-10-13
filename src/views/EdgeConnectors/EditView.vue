@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Connectors"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Connector"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -34,5 +34,5 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import { validationSchema } from './Config/validation'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 </script>

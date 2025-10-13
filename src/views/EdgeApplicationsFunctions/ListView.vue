@@ -59,7 +59,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { edgeApplicationFunctionService } from '@/services/v2'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import DrawerFunction from './Drawer'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

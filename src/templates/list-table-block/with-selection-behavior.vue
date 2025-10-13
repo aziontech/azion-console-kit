@@ -20,7 +20,6 @@
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
-      @row-click="({ data }) => editItemSelected(data)"
     >
       <template
         #header
@@ -56,6 +55,7 @@
                 :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -86,12 +86,14 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
+              @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
           <template v-else>
             <component
+              @click="editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -246,6 +248,7 @@
                 :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
@@ -450,7 +453,7 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    if (props.listService && !isLoading.value) {
+    if (props.listService) {
       try {
         isLoading.value = true
         const response = props.isGraphql

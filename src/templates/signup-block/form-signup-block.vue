@@ -8,18 +8,15 @@
             autocomplete="off"
             @submit.prevent
           >
-            <div class="gap-3 flex flex-col">
-              <h2 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h2>
-              <p class="text-start text-color-secondary">
+            <div class="gap-2 flex flex-col">
+              <h1 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h1>
+              <p class="text-sm text-start text-color-secondary">
                 US$ 300 credit to use over 12 months, no credit card is required.
               </p>
             </div>
 
             <div>
-              <SocialIdpsBlock
-                @showSocialIdps="updateEmailForm"
-                v-if="showLoginFromEmail"
-              />
+              <SocialIdpsBlock v-model:showSocialIdps="showLoginFromEmail" />
 
               <PrimeDivider
                 class="my-3"
@@ -43,14 +40,16 @@
               <PrimeButton
                 label="Terms of Service"
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionTermsAndServicesWindowOpener"
               />
               and
               <PrimeButton
                 label="Privacy Policy."
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionPrivacyPolicyWindowOpener"
               />
             </p>
@@ -63,6 +62,7 @@
           label="Sign In"
           link
           class="p-0"
+          size="small"
           @click="goToLogin"
         />
       </div>
@@ -92,10 +92,6 @@
   const router = useRouter()
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
-
-  const updateEmailForm = (value) => {
-    showLoginFromEmail.value = value
-  }
 
   const showActivationEmail = () => {
     showActivation.value = false

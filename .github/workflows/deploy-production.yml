@@ -39,3 +39,8 @@ jobs:
           CROSS_EDGE_SECRET: ${{ secrets.PROD_CROSS_EDGE_SECRET}}
           NODE_ENV: production
           VITE_ENVIRONMENT: production
+          VITE_PROD_SENTRY: ${{ secrets.PROD_SENTRY }}
+          VITE_SSO_GITHUB:  ${{ secrets.PROD_SSO_GITHUB }}
+          VITE_SSO_GOOGLE:  ${{ secrets.PROD_SSO_GOOGLE }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_UPLOAD: true
