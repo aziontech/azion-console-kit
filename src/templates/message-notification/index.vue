@@ -30,6 +30,7 @@
             class="w-full min-w-max"
             v-if="!action.hidden"
             v-bind="action"
+            size="small"
           />
         </div>
       </slot>

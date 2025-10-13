@@ -66,6 +66,7 @@
                 :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -277,6 +278,7 @@
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
+                size="small"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
               />

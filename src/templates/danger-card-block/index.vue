@@ -17,6 +17,7 @@
         :label="buttonLabel"
         danger
         icon="pi pi-trash"
+        size="small"
         @click="handleAction"
         :loading="loading"
         :disabled="disabled"
