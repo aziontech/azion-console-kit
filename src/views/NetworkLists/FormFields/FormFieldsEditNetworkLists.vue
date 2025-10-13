@@ -4,10 +4,13 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import PrimeTag from 'primevue/tag'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
   import LabelBlock from '@/templates/label-block'
+
+  import { handleTypeNetwork } from '../Config/typeNetwork'
 
   const props = defineProps({
     listCountriesService: {
@@ -18,35 +21,13 @@
 
   const countriesList = ref([])
 
-  const networkGrouRadio = computed(() => [
-    {
-      title: 'ASN',
-      subtitle:
-        'An Autonomous System Number (ASN) uniquely identifies a network on the Internet. Enter one ASN per line (e.g., 13335).',
-      inputValue: 'asn',
-      disabled: true
-    },
-    {
-      title: 'IP/CIDR',
-      subtitle:
-        'An IP Address or CIDR uniquely identifies a network on the Internet. Enter one IP Address or CIDR per line (e.g., 192.168.1.1/24).',
-      inputValue: 'ip_cidr',
-      disabled: true
-    },
-    {
-      title: 'Countries',
-      subtitle: 'Select one or more countries to build a geolocation-based list.',
-      inputValue: 'countries',
-      disabled: true
-    }
-  ])
-
   const { value: name } = useField('name')
   const { value: itemsValues } = useField('itemsValues')
   const { value: networkListType } = useField('networkListType')
   const { value: itemsValuesCountry, errorMessage: itemsValuesCountryError } =
     useField('itemsValuesCountry')
 
+  const networkGrouRadio = computed(() => handleTypeNetwork(true, networkListType.value))
   const fetchCountries = async () => {
     const result = await props.listCountriesService()
     countriesList.value = result
@@ -95,7 +76,17 @@
         isCard
         nameField="networkListType"
         :options="networkGrouRadio"
-      />
+      >
+        <template #footer="{ item }">
+          <PrimeTag
+            v-if="item?.tag"
+            :value="item.tag.value"
+            :icon="item.tag.icon"
+            severity="info"
+            class="mt-3"
+          />
+        </template>
+      </FieldGroupRadio>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isAsnNetWorkType"
