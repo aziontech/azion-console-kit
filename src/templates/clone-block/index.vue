@@ -24,6 +24,7 @@
       <PrimeButton
         outlined
         icon="pi pi-times"
+        size="small"
         @click="handleCancel"
       />
     </template>
@@ -34,6 +35,7 @@
           severity="primary"
           outlined
           label="Cancel"
+          size="small"
           @click="handleCancel"
         />
         <PrimeButton
@@ -41,6 +43,7 @@
           label="Clone"
           :disabled="isLoading"
           :icon="loadingIcon"
+          size="small"
           @click="handleClone"
         />
       </div>

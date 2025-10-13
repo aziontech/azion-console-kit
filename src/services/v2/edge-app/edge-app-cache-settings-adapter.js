@@ -18,7 +18,7 @@ export const CacheSettingsAdapter = {
         max_age: payload.browserCacheSettingsMaximumTtl || 0
       },
       modules: {
-        cache: {
+        edge_cache: {
           behavior: payload.cdnCacheSettings || 'honor',
           max_age: payload.cdnCacheSettingsMaximumTtl || 60,
           stale_cache: {
@@ -31,17 +31,18 @@ export const CacheSettingsAdapter = {
         }
       }
     }
-    if (payload.tieredCache) {
-      result.modules.cache.tiered_cache = {
-        enabled: payload.tieredCache,
-        topology: payload.tieredCacheRegion
-      }
-    } else {
-      result.modules.cache.tiered_cache = null
-    }
 
     if (result.browser_cache.behavior === 'honor') {
       result.browser_cache.max_age = 0
+    }
+
+    // Add tiered_cache module if enabled
+    if (payload.tieredCache) {
+      result.modules.tiered_cache = {
+        behavior: 'override', // readonly according to docs
+        max_age: 31536000, // readonly according to docs
+        topology: payload.tieredCacheRegion || 'near-edge'
+      }
     }
 
     // Add application_accelerator module if any of its features are used
@@ -109,14 +110,13 @@ export const CacheSettingsAdapter = {
       id: String(item.id),
       name: item.name,
       browserCache: formatCacheBehavior(item.browser_cache?.behavior || 'honor'),
-      cdnCache: formatCacheBehavior(item.modules?.cache?.behavior || 'honor')
+      cdnCache: formatCacheBehavior(item.modules?.edge_cache?.behavior || 'honor')
     }))
   },
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.edge_cache || {}
-    const tieredCache = data.modules?.cache?.tiered_cache.enabled
-
+    const tieredCache = data.modules?.tiered_cache
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
@@ -153,8 +153,7 @@ export const CacheSettingsAdapter = {
       enableLargeFileCache: edge.large_file_cache?.enabled || false,
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
       tieredCache: !!tieredCache,
-      tieredCacheRegion: tieredCache?.topology || 'global',
-
+      tieredCacheRegion: tieredCache?.topology || 'near-edge',
       cacheByQueryString,
       queryStringFields,
       enableQueryStringSort,

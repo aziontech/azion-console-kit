@@ -42,7 +42,7 @@ describe('EdgeApplicationServicesV4', () => {
       body: {
         name: fixtures.edgeApplication.name,
         modules: {
-          cache_enabled: fixtures.edgeApplication.edgeCacheEnabled,
+          edge_cache_enabled: fixtures.edgeApplication.edgeCacheEnabled,
           edge_functions_enabled: fixtures.edgeApplication.edgeFunctionsEnabled,
           application_accelerator_enabled: fixtures.edgeApplication.applicationAcceleratorEnabled,
           image_processor_enabled: fixtures.edgeApplication.imageProcessorEnabled,

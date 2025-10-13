@@ -35,7 +35,7 @@
     {
       type: 'dialog',
       label: 'Clone',
-      icon: 'pi pi-fw pi-copy',
+      icon: 'pi pi-fw pi-clone',
       dialog: {
         component: CloneBlock,
         body: (item) => ({

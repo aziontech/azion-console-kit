@@ -384,6 +384,7 @@
       hasChanges.value = false
       tempInputValue.value = ''
       model.value.label = ''
+      emit('select', model.value)
     }
   }
 

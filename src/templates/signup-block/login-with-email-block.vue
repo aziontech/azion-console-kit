@@ -8,7 +8,7 @@
         for="email"
         class="font-semibold text-sm"
       >
-        Work Email *
+        Work Email
       </label>
       <InputText
         v-model="email"
@@ -31,7 +31,7 @@
         for="password"
         class="font-semibold text-sm"
       >
-        Password *
+        Password
       </label>
       <Password
         class="col-span-1 min-w-full"

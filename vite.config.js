@@ -38,6 +38,9 @@ const getConfig = () => {
     build: {
       sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
     },
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+    },
     plugins: [
       vue(),
       vueJsx(),
