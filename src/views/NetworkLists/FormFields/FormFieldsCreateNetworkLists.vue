@@ -5,6 +5,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import LabelBlock from '@/templates/label-block'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import { networkGrouRadio } from '../Config/typeNetwork'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
@@ -44,29 +45,6 @@
   onMounted(async () => {
     await fetchCountries()
   })
-
-  const networkGrouRadio = computed(() => [
-    {
-      title: 'ASN',
-      subtitle:
-        'An Autonomous System Number (ASN) uniquely identifies a network on the Internet. Enter one ASN per line (e.g., 13335).',
-      inputValue: 'asn',
-      disabled: false
-    },
-    {
-      title: 'IP/CIDR',
-      subtitle:
-        'An IP Address or CIDR uniquely identifies a network on the Internet. Enter one IP Address or CIDR per line (e.g., 192.168.1.1/24).',
-      inputValue: 'ip_cidr',
-      disabled: false
-    },
-    {
-      title: 'Countries',
-      subtitle: 'Select one or more countries to build a geolocation-based list.',
-      inputValue: 'countries',
-      disabled: false
-    }
-  ])
 
   watch([name, networkListType, selectedCountries, ipCidr, asn], () => {
     switch (networkListType.value) {
