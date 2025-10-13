@@ -43,14 +43,14 @@
       @focus="scrollToFocusedItem"
     >
       <template #item="{ item, label, props }">
-        <a
-          class="flex h-9 focus:outline-none"
-          v-bind="props.action"
+        <router-link
+          :to="item.to"
           @click.prevent="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
-          :href="item.to"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
           v-if="hasClientFlag(item)"
+          v-bind="props.action"
+          class="flex h-9 focus:outline-none"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
@@ -60,7 +60,7 @@
             :value="item.tag"
             class="ml-2"
           />
-        </a>
+        </router-link>
       </template>
     </PrimeMenu>
   </Sidebar>
