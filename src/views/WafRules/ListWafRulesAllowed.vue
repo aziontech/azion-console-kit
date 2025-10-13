@@ -267,6 +267,7 @@
         class="max-md:w-full w-fit"
         severity="secondary"
         label="Create from Tuning"
+        outlined
         @click="goToWafRulesTuning"
       >
       </PrimeButton>
