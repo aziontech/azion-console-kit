@@ -38,14 +38,16 @@ const getConfig = () => {
     build: {
       sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
     },
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+    },
     plugins: [
       vue(),
       vueJsx(),
       istanbul({
         nycrcPath: '.nycrc'
       }),
-      ...(
-        IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
+      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
             sentryVitePlugin({
               org: 'azion-technologies',
@@ -54,8 +56,7 @@ const getConfig = () => {
               sourcemaps: { assets: './dist/assets/**' }
             })
           ]
-        : []
-      )
+        : [])
     ],
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],

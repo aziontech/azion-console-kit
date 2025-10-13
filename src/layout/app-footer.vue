@@ -20,21 +20,25 @@
         >
           <div class="flex gap-1">
             <PrimeButton
+              size="small"
               label="About"
               link
-              @click="openAzionSite"
+              @click="openAzionSiteAboutUs"
             />
             <PrimeButton
+              size="small"
               label="Blog"
               link
               @click="openAzionBlog"
             />
             <PrimeButton
+              size="small"
               label="Legal"
               link
               @click="azionPrivacyPolicyWindowOpener"
             />
             <PrimeButton
+              size="small"
               label="Docs"
               link
               @click="openDocumentation"
@@ -119,7 +123,7 @@
     openAzionBlog,
     openAzionDiscord,
     openAzionGithub,
-    openAzionSite,
+    openAzionSiteAboutUs,
     openAzionX,
     openDocumentation
   } from '@/helpers'
