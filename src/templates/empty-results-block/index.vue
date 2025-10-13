@@ -67,6 +67,7 @@
               icon="pi pi-plus"
               :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"
+              size="small"
               @click="navigateToCreatePage"
             />
           </slot>
@@ -79,6 +80,7 @@
           icon="pi pi-external-link"
           label="Learn more"
           link
+          size="small"
           @click="openDocumentation"
         />
       </div>

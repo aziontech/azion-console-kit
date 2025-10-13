@@ -63,7 +63,10 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
-              <div class="ml-3">
+              <div
+                v-if="$slots['select-buttons']"
+                class="ml-3"
+              >
                 <slot name="select-buttons" />
               </div>
             </span>
@@ -74,6 +77,7 @@
               outlined
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
+              size="small"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
@@ -89,6 +93,7 @@
                 :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -185,6 +190,7 @@
               outlined
               icon="ai ai-column"
               class="table-button"
+              size="small"
               @click="toggleColumnSelector"
               v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
@@ -337,6 +343,7 @@
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
                 :disabled="disabledAddButton"
+                size="small"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
