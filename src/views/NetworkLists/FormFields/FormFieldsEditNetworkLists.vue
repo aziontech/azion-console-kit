@@ -35,7 +35,8 @@
     },
     {
       title: 'Countries',
-      subtitle: 'Group traffic based on geographic regions or countries. Simplifies location-based configurations.',
+      subtitle:
+        'Group traffic based on geographic regions or countries. Simplifies location-based configurations.',
       inputValue: 'countries',
       disabled: true
     }
