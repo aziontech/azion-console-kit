@@ -17,6 +17,7 @@
         type="email"
         class="w-full"
         :class="{ 'p-invalid': errors.email }"
+        data-sentry-mask
       />
       <small
         v-if="errors.email"

@@ -65,6 +65,7 @@
         v-if="hmacActive"
       >
         <FieldText
+          sensitive
           label="Access Key"
           required
           description="Enter the Access Key provided by the object storage provider."
