@@ -28,7 +28,10 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.user_id = userResults.id
   accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
-
+  const isAzionEmail = accountInfo.email.endsWith('@azion.com')
+  if (isAzionEmail) {
+    accountInfo.client_flags?.push('is_azion_email')
+  }
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
 }
