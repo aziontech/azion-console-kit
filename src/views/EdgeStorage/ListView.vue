@@ -199,13 +199,6 @@
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
-  defineProps({
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
-
   const fileActions = [
     {
       label: 'Download',
@@ -606,5 +599,8 @@
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
     removeDocumentDragEvents()
+    selectedBucket.value = null
+    folderPath.value = ''
+    selectedFiles.value = []
   })
 </script>
