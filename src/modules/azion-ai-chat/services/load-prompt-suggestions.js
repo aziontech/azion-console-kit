@@ -60,12 +60,12 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   ],
   other: [
     {
-      title: 'How to build an Application',
+      title: 'How to build and manage an Application',
       icon: 'pi pi-cog',
-      context: `I want to build an Application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
+      context: `I want to build and manage an Application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
     },
     {
-      title: 'How to protect an application',
+      title: 'How to secure protect an Application',
       icon: 'pi pi-shield',
       context: `I've already deployed an Application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
     }
