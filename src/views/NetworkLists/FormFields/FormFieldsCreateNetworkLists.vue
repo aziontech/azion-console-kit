@@ -101,12 +101,12 @@
         <FieldTextArea
           label="List"
           required
-          placeholder="1234&#10;4321"
+          placeholder="13335&#10;53331"
           name="asn"
           rows="2"
           cols="30"
           :value="asn"
-          description="An Autonomous System Number (ASN) uniquely identifies a network on the Internet. Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicate entries are removed."
+          description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
           data-testid="network-list-form__asn-list"
         />
       </div>

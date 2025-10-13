@@ -21,6 +21,7 @@
 
   const countriesList = ref([])
 
+
   const { value: name } = useField('name')
   const { value: itemsValues } = useField('itemsValues')
   const { value: networkListType } = useField('networkListType')
@@ -28,6 +29,7 @@
     useField('itemsValuesCountry')
 
   const networkGrouRadio = computed(() => handleTypeNetwork(true, networkListType.value))
+
   const fetchCountries = async () => {
     const result = await props.listCountriesService()
     countriesList.value = result
@@ -94,13 +96,12 @@
         <FieldTextArea
           label="List"
           required
-          placeholder="1234&#10;4321"
+          placeholder="13335&#10;53331"
           name="itemsValues"
           rows="2"
           :value="itemsValues"
           data-testid="network-list-form__asn-list"
-          description="Separate each ASN value by using a new line. Duplicated entries are automatically
-          removed."
+          description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
       </div>
       <div
