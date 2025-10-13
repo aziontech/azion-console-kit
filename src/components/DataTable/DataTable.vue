@@ -338,10 +338,6 @@
     height: 44px;
   }
 
-  .table-with-orange-borders :deep(.p-skeleton) {
-    height: 12px;
-  }
-
   .table-with-orange-borders.outline-visible
     :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
   .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
