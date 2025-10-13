@@ -59,12 +59,19 @@
     >
       <template #item="{ item, props }">
         <router-link
+          v-if="item.to"
           :to="item.to"
           v-bind="props.action"
           :class="{ 'text-color-secondary': breadcrumbs.items.indexOf(item) === -1 }"
         >
           {{ item.label }}
         </router-link>
+        <span
+          v-else
+          class="text-sm"
+        >
+          {{ item.label }}
+        </span>
       </template>
     </Breadcrumb>
 
