@@ -115,11 +115,11 @@
               name="tieredCacheRegion"
               optionLabel="label"
               optionValue="value"
-              :value="'global'"
-              disabled
+              :options="TIERED_CACHE_REGION"
+              :value="tieredCacheRegion"
               inputId="tieredCacheRegion"
-              placeholder="Global"
-              description="Currently, the region is fixed to Global."
+              placeholder="Select an Tiered Cache Region"
+              description="Choose an Tiered Cache Region suitable for your application."
               data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
             />
           </div>
@@ -156,6 +156,21 @@
     }
   })
 
+  const TIERED_CACHE_REGION = [
+    {
+      label: 'near-edge',
+      value: 'nearest-region'
+    },
+    {
+      label: 'br-east-1',
+      value: 'br-east-1'
+    },
+    {
+      label: 'us-east-1',
+      value: 'us-east-1'
+    }
+  ]
+
   const getEdgeCacheRadioOptions = () => {
     return [
       {
@@ -179,6 +194,7 @@
   const { value: enableLargeFileCache } = useField('enableLargeFileCache')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: tieredCache } = useField('tieredCache')
+  const { value: tieredCacheRegion } = useField('tieredCacheRegion')
   const showSliceConfigurationRange = computed(() => {
     return !!enableLargeFileCache.value || !!tieredCache.value
   })

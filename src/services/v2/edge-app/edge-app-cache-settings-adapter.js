@@ -152,7 +152,7 @@ export const CacheSettingsAdapter = {
       enableLargeFileCache: edge.large_file_cache?.enabled || false,
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
       tieredCache: !!tieredCache,
-      tieredCacheRegion: tieredCache?.topology || 'global',
+      tieredCacheRegion: tieredCache?.topology || 'nearest-region',
       cacheByQueryString,
       queryStringFields,
       enableQueryStringSort,
