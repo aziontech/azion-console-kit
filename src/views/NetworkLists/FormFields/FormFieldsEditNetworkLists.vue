@@ -22,20 +22,20 @@
     {
       title: 'ASN',
       subtitle:
-        'An Autonomous System Number (ASN) uniquely identifies a network on the Internet. Enter one ASN per line (e.g., 13335).',
+        'Identify networks using Autonomous System Numbers (ASNs). Ideal for traffic grouping.',
       inputValue: 'asn',
       disabled: true
     },
     {
       title: 'IP/CIDR',
       subtitle:
-        'An IP Address or CIDR uniquely identifies a network on the Internet. Enter one IP Address or CIDR per line (e.g., 192.168.1.1/24).',
+        'Define specific IP addresses or ranges using CIDR notation. Ideal for precise traffic segmentation.',
       inputValue: 'ip_cidr',
       disabled: true
     },
     {
       title: 'Countries',
-      subtitle: 'Select one or more countries to build a geolocation-based list.',
+      subtitle: 'Group traffic based on geographic regions or countries. Simplifies location-based configurations.',
       inputValue: 'countries',
       disabled: true
     }
@@ -103,13 +103,12 @@
         <FieldTextArea
           label="List"
           required
-          placeholder="1234&#10;4321"
+          placeholder="13335&#10;53331"
           name="itemsValues"
           rows="2"
           :value="itemsValues"
           data-testid="network-list-form__asn-list"
-          description="Separate each ASN value by using a new line. Duplicated entries are automatically
-          removed."
+          description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
       </div>
       <div
