@@ -48,7 +48,7 @@
   })
   const updateObject = ref({})
 
-  const executionEnvironment = router.currentRoute.value.path.startsWith('/firewall')
+  const executionEnvironment = router.currentRoute.value.path.startsWith('/firewalls')
     ? 'firewall'
     : 'application'
 
