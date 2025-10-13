@@ -3,7 +3,8 @@
   import MultiSelect from 'primevue/multiselect'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
   import LabelBlock from '@/templates/label-block'
@@ -15,12 +16,30 @@
     }
   })
 
-  const options = ref([
-    { name: 'ASN', value: 'asn' },
-    { name: 'Countries', value: 'countries' },
-    { name: 'IP/CIDR', value: 'ip_cidr' }
-  ])
   const countriesList = ref([])
+
+  const networkGrouRadio = computed(() => [
+    {
+      title: 'ASN',
+      subtitle:
+        'An Autonomous System Number (ASN) uniquely identifies a network on the Internet. Enter one ASN per line (e.g., 13335).',
+      inputValue: 'asn',
+      disabled: true
+    },
+    {
+      title: 'IP/CIDR',
+      subtitle:
+        'An IP Address or CIDR uniquely identifies a network on the Internet. Enter one IP Address or CIDR per line (e.g., 192.168.1.1/24).',
+      inputValue: 'ip_cidr',
+      disabled: true
+    },
+    {
+      title: 'Countries',
+      subtitle: 'Select one or more countries to build a geolocation-based list.',
+      inputValue: 'countries',
+      disabled: true
+    }
+  ])
 
   const { value: name } = useField('name')
   const { value: itemsValues } = useField('itemsValues')
@@ -72,21 +91,11 @@
     description="Specificy the type of network list you want to create and the properties that'll compose the list."
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-lg gap-2">
-        <FieldDropdown
-          label="Type"
-          name="networkListType"
-          :options="options"
-          optionValue="value"
-          optionLabel="name"
-          dropdown-icon="pi pi-lock"
-          disabled
-          :value="networkListType"
-          appendTo="self"
-          description="Each list type accepts different values."
-          data-testid="network-list-form__type"
-        />
-      </div>
+      <FieldGroupRadio
+        isCard
+        nameField="networkListType"
+        :options="networkGrouRadio"
+      />
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isAsnNetWorkType"
