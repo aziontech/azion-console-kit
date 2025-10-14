@@ -133,6 +133,7 @@ export const useEdgeStorage = () => {
             invalidNameFiles.length > 1 ? 's have' : ' has'
           } invalid characters. Only letters, numbers, dots, hyphens, and underscores are allowed in file names.`
         )
+        filesTableNeedRefresh.value = false
         return
       }
 
