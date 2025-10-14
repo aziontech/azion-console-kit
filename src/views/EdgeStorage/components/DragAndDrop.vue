@@ -17,8 +17,13 @@
         <p class="text-color-secondary">
           Or
           <span
-            class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
-            @click="openFileSelector"
+            class="transition-colors"
+            :class="
+              isUploading
+                ? 'text-color-secondary cursor-not-allowed'
+                : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
+            "
+            @click="!isUploading && openFileSelector()"
             >choose your files</span
           >
         </p>
@@ -32,6 +37,7 @@
       type="file"
       multiple
       class="hidden"
+      :disabled="isUploading"
       @change="handleFileChangeDragDrop"
     />
   </div>
@@ -41,11 +47,12 @@
   import { ref, onMounted, onUnmounted } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { handleFileChange } = useEdgeStorage()
+  const { handleFileChange, isUploading } = useEdgeStorage()
   const fileInput = ref(null)
   const emit = defineEmits(['reload'])
 
   const openFileSelector = () => {
+    if (isUploading.value) return
     fileInput.value?.click()
   }
 
@@ -58,11 +65,6 @@
     event.preventDefault()
   }
 
-  const handleDocumentDrop = (event) => {
-    event.preventDefault()
-    handleFileChangeDragDrop(event)
-  }
-
   const handleDocumentDragLeave = (event) => {
     event.preventDefault()
   }
@@ -70,14 +72,12 @@
   const setupDocumentDragEvents = () => {
     document.addEventListener('dragover', handleDocumentDragOver)
     document.addEventListener('dragenter', handleDocumentDragOver)
-    document.addEventListener('drop', handleDocumentDrop)
     document.addEventListener('dragleave', handleDocumentDragLeave)
   }
 
   const removeDocumentDragEvents = () => {
     document.removeEventListener('dragover', handleDocumentDragOver)
     document.removeEventListener('dragenter', handleDocumentDragOver)
-    document.removeEventListener('drop', handleDocumentDrop)
     document.removeEventListener('dragleave', handleDocumentDragLeave)
   }
 
