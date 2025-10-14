@@ -2,7 +2,7 @@
   <div class="sm:w-80">
     <div class="flex flex-col w-full gap-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-medium text-color-primary">Database Tables</h3>
+        <h3 class="text-lg font-medium text-color-primary">Tables</h3>
         <PrimeButton
           icon="pi pi-plus"
           size="small"

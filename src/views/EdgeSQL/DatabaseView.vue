@@ -155,7 +155,6 @@
     await loadTableSchema(tableName)
 
     activeTabIndex.value = 0
-    await executeQuery()
   }
 
   const toggleTemplates = () => {
