@@ -19,6 +19,13 @@
   const { value: description, setValue: setDescription } = useField('description')
   const { value: embedding_model, setValue: setEmbeddingModel } = useField('embedding_model')
 
+  // Set default embedding model on mount if not in edit mode
+  onMounted(() => {
+    if (!props.isEditMode && !embedding_model.value) {
+      setEmbeddingModel('text-embedding-3-small')
+    }
+  })
+
   // Listen for form data changes from parent and manually set field values
   const handleExternalDataUpdate = (data) => {
     if (data && props.isEditMode) {
@@ -82,7 +89,7 @@
           required
           name="name"
           placeholder="Knowledge Base Name"
-          :readonly="props.isEditMode"
+          :disabled="props.isEditMode"
           :description="props.isEditMode ? 'Name cannot be changed after creation.' : 'Give a descriptive name for the knowledge base.'"
           data-testid="knowledge-base-form__name-field"
         />
@@ -108,8 +115,8 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Select embedding model"
-          :disabled="props.isEditMode"
-          :description="props.isEditMode ? 'Embedding model cannot be changed after creation.' : 'Choose the embedding model for this knowledge base.'"
+          disabled
+          :description="props.isEditMode ? 'Embedding model cannot be changed after creation.' : 'The default embedding model is pre-selected for this knowledge base.'"
           data-testid="knowledge-base-form__embedding-model-field"
         />
       </div>

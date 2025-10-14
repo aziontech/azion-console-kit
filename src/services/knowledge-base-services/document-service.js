@@ -43,7 +43,8 @@ export const createDocumentService = async (kbId, file) => {
       url,
       method: 'POST',
       headers: headers,
-      body: formData
+      body: formData,
+      baseURL: ''
     })
 
     console.log('✅ Document Upload Response:', httpResponse)
@@ -74,7 +75,8 @@ export const listDocumentsService = async (kbId) => {
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      baseURL: ''
     })
 
     console.log('✅ Document List Response:', httpResponse)
@@ -100,7 +102,8 @@ export const deleteDocumentService = async (kbId, documentId) => {
     httpResponse = await AxiosHttpClientAdapter.request({
       url,
       method: 'DELETE',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      baseURL: ''
     })
 
     console.log('✅ Document Delete Response:', httpResponse)

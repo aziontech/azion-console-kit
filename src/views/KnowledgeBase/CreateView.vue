@@ -18,29 +18,18 @@
     }
   })
 
-  // Debug wrapper for the create service
-  const debugCreateKnowledgeBaseService = async (payload) => {
-    console.log('🎯 CreateView: About to call createKnowledgeBaseService with payload:', payload)
-    console.log('  Service function:', props.createKnowledgeBaseService)
-
-    try {
-      const result = await props.createKnowledgeBaseService(payload)
-      console.log('✅ CreateView: Service call succeeded with result:', result)
-      return result
-    } catch (error) {
-      console.error('❌ CreateView: Service call failed with error:', error)
-      throw error
-    }
-  }
-
   const validationSchema = yup.object({
-    name: yup.string().required('Name is required'),
+    name: yup
+      .string()
+      .required('Name is required')
+      .min(6, 'Name must be at least 6 characters')
+      .max(50, 'Name must be at most 50 characters')
+      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)'),
     description: yup.string().required('Description is required'),
     embedding_model: yup.string()
   })
 
   const handleResponse = (response) => {
-    console.log('📥 CreateView.handleResponse called with:', response)
     tracker.product.productCreated({
       productName: 'Knowledge Base'
     })
@@ -61,11 +50,6 @@
   }
 
   const handleTrackFailedCreation = (error) => {
-    console.error('❌ CreateView.handleTrackFailedCreation called with error:', error)
-    console.error('  Error type:', typeof error)
-    console.error('  Error message:', error?.message)
-    console.error('  Error stack:', error?.stack)
-
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
@@ -85,7 +69,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="debugCreateKnowledgeBaseService"
+        :createService="createKnowledgeBaseService"
         :schema="validationSchema"
         :initialValues="{ embedding_model: 'text-embedding-3-small' }"
         @on-response="handleResponse"

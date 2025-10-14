@@ -5,6 +5,10 @@ import * as KnowledgeBaseService from '@/services/knowledge-base-services'
 
 export const azionAiRoutes = [
   {
+    path: '/ai',
+    redirect: '/'
+  },
+  {
     path: '/copilot',
     name: 'copilot',
     component: () => import('@views/Copilot/index.vue'),

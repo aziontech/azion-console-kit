@@ -28,7 +28,8 @@ export const createKnowledgeBaseService = async (payload) => {
       url,
       method: 'POST',
       headers,
-      body: adaptedPayload
+      body: adaptedPayload,
+      baseURL: ''
     })
 
     console.log('✅ HTTP Response received:', httpResponse)

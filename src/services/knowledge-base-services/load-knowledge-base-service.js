@@ -10,7 +10,8 @@ export const loadKnowledgeBaseService = async ({ id }) => {
     let httpResponse = await AxiosHttpClientAdapter.request({
       url: `${makeKnowledgeBaseBaseUrl()}/${id}`,
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      baseURL: ''
     })
 
     console.log('📥 Load response:', httpResponse)

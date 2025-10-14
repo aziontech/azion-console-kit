@@ -14,7 +14,8 @@ export const editKnowledgeBaseService = async (payload) => {
     url: `${makeKnowledgeBaseBaseUrl()}/${payload.id}`,
     method: 'PATCH',
     headers: getAuthHeaders(),
-    body: parsedPayload
+    body: parsedPayload,
+    baseURL: ''
   })
 
   console.log('🔄 Edit response:', httpResponse)

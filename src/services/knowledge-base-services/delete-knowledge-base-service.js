@@ -7,7 +7,8 @@ export const deleteKnowledgeBaseService = async (knowledgeBaseId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeKnowledgeBaseBaseUrl()}/${knowledgeBaseId}`,
     method: 'DELETE',
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
+    baseURL: ''
   })
 
   return parseHttpResponse(httpResponse)

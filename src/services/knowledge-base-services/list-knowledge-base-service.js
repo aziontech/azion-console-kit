@@ -18,7 +18,8 @@ export const listKnowledgeBaseService = async () => {
     let httpResponse = await AxiosHttpClientAdapter.request({
       url: url,
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      baseURL: ''
     })
 
     console.log('✅ AxiosHttpClientAdapter response:', httpResponse)

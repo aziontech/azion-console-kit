@@ -1,88 +1,76 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitle" />
+      <PageHeadingBlock
+        :pageTitle="knowledgeBase?.name ? knowledgeBase.name : 'Knowledge Base'"
+      />
     </template>
     <template #content>
       <div class="flex w-full">
         <div class="flex w-full flex-col gap-4 md:gap-8 overflow-auto">
-          <div class="flex flex-col">
+          <div
+            class="flex flex-col relative"
+            @dragover.prevent="handleDrag(true)"
+            @dragleave.prevent="handleDragLeave"
+            @drop.prevent="handleDropUpload"
+          >
             <div
-              class="flex justify-between items-start mb-4 pt-1 relative"
+              class="flex justify-end items-center gap-2.5 mb-4"
               ref="headerContainer"
             >
-              <div class="flex-shrink min-w-0 overflow-hidden">
-                <div class="flex items-center gap-2 mb-2">
-                  <i class="pi pi-book text-2xl text-primary"></i>
-                  <h1 class="text-2xl font-semibold">{{ knowledgeBase?.name || 'Knowledge Base' }}</h1>
-                </div>
-                <p v-if="knowledgeBase?.description" class="text-color-secondary mb-2">
-                  {{ knowledgeBase.description }}
-                </p>
-                <div class="flex items-center gap-4 text-sm text-color-secondary">
-                  <span class="flex items-center gap-1">
-                    <i class="pi pi-microchip"></i>
-                    {{ knowledgeBase?.embedding_model || 'Unknown' }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="pi pi-user"></i>
-                    {{ knowledgeBase?.lastEditor || 'Unknown' }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="pi pi-calendar"></i>
-                    {{ knowledgeBase?.updatedAt || 'Unknown' }}
-                  </span>
-                </div>
-              </div>
-              <div class="flex w-full md:w-auto items-center gap-2.5">
-                <div class="p-input-icon-left w-full md:w-64">
-                  <i class="pi pi-search" />
-                  <InputText
-                    v-model="documentSearchTerm"
-                    placeholder="Search documents..."
-                    class="w-full"
-                    @input="handleDocumentSearch"
-                  />
-                </div>
-                <template v-if="isGreaterThanMD">
-                  <PrimeButton
-                    icon="pi pi-refresh"
-                    size="small"
-                    outlined
-                    :label="isGreaterThanXL ? 'Refresh' : ''"
-                    class="px-4 py-1 flex items-center justify-center"
-                    @click="handleRefresh"
-                  />
-                  <PrimeButton
-                    icon="pi pi-cog"
-                    size="small"
-                    @click="handleSettings"
-                    :label="isGreaterThanXL ? 'Settings' : ''"
-                    outlined
-                    class="px-4 py-1 flex items-center justify-center"
-                  />
-                </template>
-                <SplitButton
-                  size="small"
-                  label="Add to files"
-                  @click="openDocumentSelector('files')"
-                  :model="uploadMenuItems"
-                  primary
-                  class="whitespace-nowrap"
-                  :menuButtonProps="{
-                    class: 'rounded-l-none',
-                    style: { color: 'var(--primary-text-color) !important' }
-                  }"
-                  :pt="{
-                    root: { class: 'h-[2rem]' }
-                  }"
+              <div class="p-input-icon-left w-full md:w-64">
+                <i class="pi pi-search" />
+                <InputText
+                  v-model="documentSearchTerm"
+                  placeholder="Search documents..."
+                  class="w-full"
+                  @input="handleDocumentSearch"
                 />
               </div>
+              <template v-if="isGreaterThanMD">
+                <PrimeButton
+                  icon="pi pi-refresh"
+                  size="small"
+                  outlined
+                  :label="isGreaterThanXL ? 'Refresh' : ''"
+                  class="px-4 py-1 flex items-center justify-center"
+                  @click="handleRefresh"
+                />
+                <PrimeButton
+                  icon="pi pi-cog"
+                  size="small"
+                  @click="handleSettings"
+                  :label="isGreaterThanXL ? 'Settings' : ''"
+                  outlined
+                  class="px-4 py-1 flex items-center justify-center"
+                />
+              </template>
+              <SplitButton
+                size="small"
+                label="Add to files"
+                @click="openDocumentSelector('files')"
+                :model="uploadMenuItems"
+                primary
+                class="whitespace-nowrap"
+                :menuButtonProps="{
+                  class: 'rounded-l-none',
+                  style: { color: 'var(--primary-text-color) !important' }
+                }"
+                :pt="{
+                  root: { class: 'h-[2rem]' }
+                }"
+              />
             </div>
+            <UploadCard />
 
+            <DragAndDrop
+              v-if="showDragAndDrop"
+              :kbId="route.params.id"
+              @reload="handleRefresh"
+            />
             <div
+              v-else
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
-              :class="{ 'border-dashed !border-[#f3652b]': isDragOver }"
             >
               <ListTableBlock
                 pageTitleDelete="Documents"
@@ -96,14 +84,11 @@
                 :actions="documentActions"
                 :searchFilter="documentSearchTerm"
                 @delete-selected-items="handleDeleteSelectedItems"
-                @dragover.prevent="handleDrag(true)"
-                @dragleave="handleDrag(false)"
-                @drop.prevent="handleDropUpload"
                 class="w-full"
               />
 
-              <div class="flex items-center gap-3 text-center py-4">
-                <i class="pi pi-file-upload text-xl text-color-secondary"></i>
+              <div class="flex items-center gap-3 text-center">
+                <i class="pi pi-cloud-upload text-xl text-color-secondary"></i>
                 <p class="text-sm text-color-secondary">
                   Drag documents here to add them to your knowledge base or
                   <span
@@ -111,9 +96,38 @@
                     @click="openDocumentSelector"
                   >choose your files</span>
                 </p>
-                <p class="text-xs text-color-secondary">
-                  Supported formats: PDF, TXT
-                </p>
+              </div>
+            </div>
+
+            <!-- Drag Overlay -->
+            <div
+              v-if="isDragOver && !showDragAndDrop"
+              class="fixed inset-0 flex items-center justify-center z-50 px-8"
+            >
+              <div
+                class="flex flex-col items-center gap-5 justify-center w-full max-w-4xl mx-auto text-center py-16 border border-solid surface-border rounded-lg transition-colors bg-[var(--surface-ground)]"
+              >
+                <div
+                  class="rounded-full border surface-border flex items-center justify-center w-[90px] h-[90px] mb-1"
+                >
+                  <i class="pi pi-cloud-upload text-4xl text-color-primary"></i>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <h3 class="text-lg font-medium text-color-primary">
+                    Drag documents here to add them to your knowledge base
+                  </h3>
+
+                  <p class="text-color-secondary">
+                    Or
+                    <span
+                      class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
+                      @click="openDocumentSelector"
+                    >choose your files</span>
+                  </p>
+                </div>
+
+                <p class="text-sm text-color-secondary">Only PDF and TXT files are supported. Files larger than 300 MB cannot be uploaded.</p>
               </div>
             </div>
           </div>
@@ -134,10 +148,12 @@
   import { ref, computed, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
-  import { useToast } from 'primevue/usetoast'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { createDocumentService, listDocumentsService, deleteDocumentService } from '@/services/knowledge-base-services/document-service'
+  import { listDocumentsService, deleteDocumentService } from '@/services/knowledge-base-services/document-service'
   import { loadKnowledgeBaseService } from '@/services/knowledge-base-services/load-knowledge-base-service'
+  import { useKnowledgeBase } from '@/composables/useKnowledgeBase'
+  import UploadCard from './components/UploadCard.vue'
+  import DragAndDrop from './components/DragAndDrop.vue'
 
   defineOptions({
     name: 'knowledge-base-detail'
@@ -145,16 +161,16 @@
 
   const route = useRoute()
   const router = useRouter()
-  const toast = useToast()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
+  const { uploadDocuments, removeDocuments, handleToast, selectedDocuments } = useKnowledgeBase()
 
   const knowledgeBase = ref(null)
   const documentSearchTerm = ref('')
-  const selectedDocuments = ref([])
   const listDocumentsRef = ref(null)
   const isDragOver = ref(false)
   const headerContainer = ref(null)
+  const showDragAndDrop = ref(false)
 
   const uploadMenuItems = [
     {
@@ -176,7 +192,7 @@
   const getColumns = [
     {
       field: 'name',
-      header: 'Document Name'
+      header: 'Name'
     },
     {
       field: 'type',
@@ -187,7 +203,7 @@
       header: 'Size'
     },
     {
-      field: 'created_at',
+      field: 'createdAt',
       header: 'Created At'
     },
     {
@@ -201,7 +217,7 @@
       label: 'Delete',
       icon: 'pi pi-trash',
       type: 'delete',
-      service: (item) => handleDeleteDocument(item)
+      service: (selectedID, selectedItemData) => handleDeleteDocument(selectedItemData)
     }
   ]
 
@@ -210,23 +226,51 @@
 
     try {
       const documents = await listDocumentsService(route.params.id)
-      return Array.isArray(documents) ? documents.map(doc => ({
-        id: doc.document_id || doc.id,
-        name: doc.name,
-        type: doc.type?.toUpperCase() || 'UNKNOWN',
-        size: doc.size ? formatFileSize(doc.size) : 'Unknown',
-        created_at: doc.created_at ? formatDate(doc.created_at) : 'Unknown',
-        status: doc.status || 'Processing'
-      })) : []
+      console.log('📄 Raw documents from API:', documents)
+      const mappedDocuments = Array.isArray(documents) ? documents.map(doc => {
+        console.log('📄 Mapping document:', doc)
+        const mappedDoc = {
+          id: doc.document_id || doc.id,
+          document_id: doc.document_id || doc.id, // Keep both for compatibility
+          name: doc.name,
+          type: doc.type?.toUpperCase() || 'UNKNOWN',
+          size: doc.size ? formatFileSize(doc.size) : '-',
+          createdAt: doc.created_at ? formatDate(doc.created_at) : '-',
+          status: doc.status || 'Processing'
+        }
+        console.log('📄 Mapped document:', mappedDoc)
+        return mappedDoc
+      }) : []
+
+      showDragAndDrop.value = !mappedDocuments?.length
+      return mappedDocuments
     } catch (error) {
       console.error('Failed to load documents:', error)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to load documents',
-        life: 5000
-      })
+      handleToast('error', 'Error', 'Failed to load documents')
       return []
+    }
+  }
+
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-'
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch {
+      return 'Invalid Date'
     }
   }
 
@@ -238,12 +282,7 @@
       knowledgeBase.value = kbData
     } catch (error) {
       console.error('Failed to load knowledge base:', error)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to load knowledge base details',
-        life: 5000
-      })
+      handleToast('error', 'Error', 'Failed to load knowledge base details')
       router.push('/ai/knowledge-base')
     }
   }
@@ -264,6 +303,7 @@
     const input = document.createElement('input')
     input.type = 'file'
     input.style.display = 'none'
+    input.accept = '.pdf,.txt'
 
     if (type === 'folder') {
       input.webkitdirectory = true
@@ -276,13 +316,8 @@
     input.onchange = async (event) => {
       const files = event.target.files
       if (files.length) {
-        if (type === 'folder') {
-          // Handle folder upload - process all files in the folder
-          await handleFolderUpload(files)
-        } else {
-          // Handle multiple file uploads directly
-          await handleMultipleFileUploads(files)
-        }
+        await uploadDocuments(files, route.params.id)
+        await listDocumentsRef.value?.reload()
       }
       document.body.removeChild(input)
     }
@@ -292,129 +327,49 @@
   }
 
 
-  const handleMultipleFileUploads = async (files) => {
-    const validFiles = []
-    const errors = []
-
-    // Validate files first
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const extension = file.name.split('.').pop().toLowerCase()
-
-      if (!['pdf', 'txt'].includes(extension)) {
-        errors.push(`Skipped ${file.name}: Unsupported file type`)
-      } else {
-        validFiles.push(file)
-      }
-    }
-
-    if (validFiles.length === 0) {
-      toast.add({
-        severity: 'warn',
-        summary: 'No Valid Files',
-        detail: 'No valid PDF or TXT files to upload',
-        life: 5000
-      })
-      return
-    }
-
-    // Show uploading toast
-    const uploadingToast = toast.add({
-      severity: 'info',
-      summary: 'Uploading...',
-      detail: `Uploading ${validFiles.length} file${validFiles.length > 1 ? 's' : ''}...`,
-      life: 0, // Don't auto-dismiss
-      closable: false
-    })
-
-    let successCount = 0
-    let errorCount = 0
-
-    // Upload files
-    for (let i = 0; i < validFiles.length; i++) {
-      const file = validFiles[i]
-
-      // Update progress in toast
-      toast.add({
-        severity: 'info',
-        summary: 'Uploading...',
-        detail: `Uploading ${i + 1} of ${validFiles.length}: ${file.name}`,
-        life: 0,
-        closable: false,
-        group: 'upload-progress'
-      })
-
-      try {
-        await createDocumentService(route.params.id, file)
-        successCount++
-      } catch (error) {
-        errorCount++
-        errors.push(`Failed to upload ${file.name}: ${error.message}`)
-      }
-    }
-
-    // Remove uploading toast
-    toast.removeGroup('upload-progress')
-
-    // Show results
-    if (successCount > 0) {
-      toast.add({
-        severity: 'success',
-        summary: 'Upload Complete',
-        detail: `${successCount} file${successCount > 1 ? 's' : ''} uploaded successfully`,
-        life: 5000
-      })
-    }
-
-    if (errorCount > 0 || errors.length > 0) {
-      toast.add({
-        severity: 'error',
-        summary: 'Upload Errors',
-        detail: `${errorCount > 0 ? errorCount + ' file' + (errorCount > 1 ? 's' : '') + ' failed. ' : ''}${errors.slice(0, 3).join('; ')}${errors.length > 3 ? '...' : ''}`,
-        life: 8000
-      })
-    }
-
-    // Refresh the list
-    listDocumentsRef.value?.reload()
-  }
-
-  const handleFolderUpload = async (files) => {
-    await handleMultipleFileUploads(files)
-  }
-
-
 
   const handleDrag = (value) => {
     isDragOver.value = value
   }
 
+  const handleDragLeave = (event) => {
+    // Only set isDragOver to false if we're leaving the main container
+    if (event.target === event.currentTarget) {
+      isDragOver.value = false
+    }
+  }
+
   const handleDropUpload = async (event) => {
+    event.stopPropagation()
     isDragOver.value = false
     const files = event.dataTransfer.files
     if (files.length > 0) {
-      await handleMultipleFileUploads(files)
+      await uploadDocuments(files, route.params.id)
+      await listDocumentsRef.value?.reload()
     }
   }
 
   const handleDeleteDocument = async (item) => {
+    console.log('🗑️ handleDeleteDocument called with item:', item)
+    console.log('🗑️ item.id:', item.id)
+    console.log('🗑️ item.document_id:', item.document_id)
+    console.log('🗑️ KB ID:', route.params.id)
+
+    const documentId = item.document_id || item.id
+    console.log('🗑️ Using document ID:', documentId)
+
+    if (!documentId) {
+      console.error('❌ No document ID found!', item)
+      handleToast('error', 'Error', 'Document ID is missing')
+      return
+    }
+
     try {
-      await deleteDocumentService(route.params.id, item.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Document deleted successfully',
-        life: 5000
-      })
-      listDocumentsRef.value?.reload()
+      await deleteDocumentService(route.params.id, documentId)
+      await listDocumentsRef.value?.reload()
     } catch (error) {
       console.error('Failed to delete document:', error)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete document',
-        life: 5000
-      })
+      handleToast('error', 'Error', 'Failed to delete document')
     }
   }
 
@@ -427,48 +382,15 @@
         deleteConfirmationText: selectedDocuments.value[0]?.name || ''
       },
       bypassConfirmation: selectedDocuments.value.length > 1,
-      deleteService: async () => {
-        for (const document of selectedDocuments.value) {
-          await deleteDocumentService(route.params.id, document.id)
-        }
+      deleteService: () => removeDocuments(route.params.id, selectedDocuments.value.map((doc) => doc.id)),
+      successCallback: async () => {
+        await listDocumentsRef.value?.reload()
       },
-      successCallback: () => {
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Documents deleted successfully',
-          life: 5000
-        })
-        listDocumentsRef.value?.reload()
-      },
-      closeCallback: () => {
+      closeCallback: async () => {
         selectedDocuments.value = []
-        listDocumentsRef.value?.reload()
+        await listDocumentsRef.value?.reload()
       }
     })
-  }
-
-  const formatFileSize = (bytes) => {
-    if (!bytes) return '0 B'
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch {
-      return 'Invalid Date'
-    }
   }
 
   watch(route, () => {
