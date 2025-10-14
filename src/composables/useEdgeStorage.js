@@ -131,7 +131,7 @@ export const useEdgeStorage = () => {
           'Invalid File Names',
           `${invalidNameFiles.length} file${
             invalidNameFiles.length > 1 ? 's have' : ' has'
-          } invalid characters. Only letters, numbers, dots, hyphens, and underscores are allowed in file names.`
+          } accented characters or cedilla. These characters are not allowed in file names.`
         )
         filesTableNeedRefresh.value = false
         return
