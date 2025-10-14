@@ -97,8 +97,8 @@ export const useEdgeStorage = () => {
     if (selectedBucket.value) {
       const filesArray = Array.from(fileList)
       const maxFileSize = 300 * 1024 * 1024 // 300MB in bytes
-
-      const specialCharRegex = /[^a-zA-Z0-9._\-()[\]{}]/
+      //eslint-disable-next-line
+      const specialCharRegex = /[^\u0020-\u007F]/g
       const invalidNameFiles = filesArray.filter((file) => specialCharRegex.test(file.name))
 
       if (invalidNameFiles.length) {
@@ -107,7 +107,7 @@ export const useEdgeStorage = () => {
           'Invalid File Names',
           `${invalidNameFiles.length} file${
             invalidNameFiles.length > 1 ? 's have' : ' has'
-          } invalid characters. Only letters, numbers, dots, hyphens, and underscores are allowed in file names.`
+          } accented characters or cedilla. These characters are not allowed in file names.`
         )
         filesTableNeedRefresh.value = false
         return
