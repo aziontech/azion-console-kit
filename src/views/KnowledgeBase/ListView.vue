@@ -111,6 +111,20 @@
       sortable: true,
       filterPath: 'name',
       sortField: 'name'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortable: true,
+      filterPath: 'lastEditor',
+      sortField: 'lastEditor'
+    },
+    {
+      field: 'updatedAt',
+      header: 'Last Modified',
+      sortable: true,
+      filterPath: 'updatedAtDate',
+      sortField: 'updatedAtDate'
     }
   ])
 

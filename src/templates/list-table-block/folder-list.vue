@@ -509,11 +509,11 @@
               break
             case 'delete':
               openDeleteDialog({
-                title: action.title,
+                title: rowData.name || action.title,
                 id: rowData.id,
                 data: rowData,
                 deleteService: action.service,
-                deleteConfirmationText: undefined,
+                deleteConfirmationText: rowData.name,
                 closeCallback: (opt) => {
                   if (opt.data.updated) {
                     reload()

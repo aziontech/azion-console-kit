@@ -4,7 +4,7 @@ export const testApiConnection = async () => {
   
   try {
     // Direct fetch to test
-    const response = await fetch('/v4/workspace/ai/kb', {
+    const response = await fetch('/v4/workspace/ai/kbs', {
       method: 'GET',
       headers: {
         'Accept': 'application/json'

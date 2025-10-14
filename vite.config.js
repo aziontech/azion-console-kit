@@ -9,6 +9,7 @@ import istanbul from 'vite-plugin-istanbul'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  console.log(URLStartPrefix)
   const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && env.VITE_ENVIRONMENT !== 'production'
 
@@ -58,12 +59,12 @@ const getConfig = () => {
       historyApiFallback: true,
       proxy: {
         // Knowledge Base API - MUST be first to avoid conflicts with generic /api rule
-        '^/api/v4/workspace/ai/kb': createProxyConfig({
+        '^/api/v4/workspace/ai/kbs': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com/`,
           rewrite: (path) => path.replace(/^\/api/, '')
         }),
         // Knowledge Base API (direct v4 paths) - Fallback for direct calls
-        '^/v4/workspace/ai/kb': createProxyConfig({
+        '^/v4/workspace/ai/kbs': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com/`
         }),
         // AI Studio API - MUST come after KB to avoid conflicts

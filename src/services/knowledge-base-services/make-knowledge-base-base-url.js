@@ -1,3 +1,3 @@
 export const makeKnowledgeBaseBaseUrl = () => {
-  return 'v4/workspace/ai/kb'
+  return 'v4/workspace/ai/kbs'
 }

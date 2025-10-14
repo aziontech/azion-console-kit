@@ -217,6 +217,7 @@
       label: 'Delete',
       icon: 'pi pi-trash',
       type: 'delete',
+      title: 'Document',
       service: (selectedID, selectedItemData) => handleDeleteDocument(selectedItemData)
     }
   ]

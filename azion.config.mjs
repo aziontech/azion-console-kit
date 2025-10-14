@@ -245,6 +245,40 @@ const config = {
         }
       },
       {
+        name: 'Route Knowledge Base API Requests',
+        description:
+          'Routes Knowledge Base API requests to the API origin, forwarding cookies and bypassing cache. Must be before generic /api rule.',
+        match: '^/api/v4/workspace/ai/kbs',
+        behavior: {
+          setOrigin: {
+            name: 'origin-api',
+            type: 'single_origin'
+          },
+          forwardCookies: true,
+          capture: {
+            match: '/api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
+      },
+      {
+        name: 'Route Knowledge Base API Direct V4 Requests',
+        description:
+          'Routes direct Knowledge Base v4 API requests to the API origin, forwarding cookies and bypassing cache.',
+        match: '^/v4/workspace/ai/kbs',
+        behavior: {
+          setOrigin: {
+            name: 'origin-api',
+            type: 'single_origin'
+          },
+          forwardCookies: true,
+          bypassCache: true
+        }
+      },
+      {
         name: 'Route API Default Requests to API Origin',
         description: 'Routes all default API requests to the specific API origin.',
         match: '^/api',
