@@ -77,6 +77,7 @@
       <PrimeButton
         outlined
         label="Cancel"
+        size="small"
         @click="cancelDialog()"
         data-testid="delete-dialog-footer-cancel-button"
       ></PrimeButton>

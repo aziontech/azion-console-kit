@@ -492,6 +492,7 @@
             name="hmacAccessKey"
             :value="hmacAccessKey"
             description="Enter the Access Key provided by the object storage provider."
+            sensitive
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -501,6 +502,7 @@
             name="hmacSecretKey"
             :value="hmacSecretKey"
             description="Enter the Secret Key provided by the object storage provider."
+            sensitive
           />
         </div>
       </div>
