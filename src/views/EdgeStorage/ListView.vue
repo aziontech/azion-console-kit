@@ -431,8 +431,8 @@
     input.onchange = async (event) => {
       const files = event.target.files
       if (files.length) {
-        await uploadFiles(files)
         filesTableNeedRefresh.value = true
+        await uploadFiles(files)
         listServiceFilesRef.value?.reload()
       }
       document.body.removeChild(input)
@@ -516,8 +516,8 @@
 
     const files = event.target.files || event.dataTransfer.files
     if (files.length) {
-      await uploadFiles(files)
       filesTableNeedRefresh.value = true
+      await uploadFiles(files)
       listServiceFilesRef.value?.reload()
     }
   }

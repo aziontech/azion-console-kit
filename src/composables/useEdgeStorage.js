@@ -109,6 +109,7 @@ export const useEdgeStorage = () => {
             invalidNameFiles.length > 1 ? 's have' : ' has'
           } invalid characters. Only letters, numbers, dots, hyphens, and underscores are allowed in file names.`
         )
+        filesTableNeedRefresh.value = false
         return
       }
 
@@ -266,7 +267,7 @@ export const useEdgeStorage = () => {
       if (!file?.length) {
         const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
           selectedBucket.value.name,
-          folderPath.value ? folderPath.value + '/' + file.name : file.name
+          folderPath.value ? folderPath.value + file.name : file.name
         )
         const blob = new Blob([fileData], {
           type: 'application/octet-stream'
@@ -279,7 +280,7 @@ export const useEdgeStorage = () => {
         for (const file of selectedFiles.value) {
           const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
             selectedBucket.value.name,
-            folderPath.value ? folderPath.value + '/' + file.name : file.name
+            folderPath.value ? folderPath.value + file.name : file.name
           )
           zip.file(file.name, fileData)
         }
