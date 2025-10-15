@@ -1,7 +1,7 @@
 import { AccountHandler } from '@/helpers/account-handler'
 import * as AuthServices from '@/services/auth-services'
 import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
-import { queryClient } from '@/services/v2/base/query/queryClient'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const switchAccountRoutes = {
@@ -25,10 +25,12 @@ export const switchAccountRoutes = {
         refresh,
         EnableSocialLogin
       )
-      queryClient.clearSensitive()
+      const baseService = new BaseService()
+      await baseService.clearByType('SENSITIVE')
       next(redirect)
     } catch {
-      queryClient.clearAll()
+      const baseService = new BaseService()
+      await baseService.clearAll()
       next({ name: 'login' })
     }
   }

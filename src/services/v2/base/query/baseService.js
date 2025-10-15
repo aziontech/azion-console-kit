@@ -1,13 +1,7 @@
-import { onUnmounted } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
-import { globalKey, sensitiveKey } from '@/services/v2/base/query/keys'
-import {
-  CACHE_TYPE,
-  CACHE_TIME,
-  GLOBAL_OPTIONS,
-  SENSITIVE_OPTIONS
-} from '@/services/v2/base/query/config'
-import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryClient, getCacheOptions, createQueryKey } from '@/services/v2/base/query/queryClient'
+import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 
 export class BaseService {
   constructor() {
@@ -21,59 +15,65 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  query({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    const result = this.queryClient.query({
+  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    return useQuery({
       queryKey,
       queryFn,
-      ...baseOptions,
+      ...options,
       ...overrides
     })
-
-    onUnmounted(() => {
-      this.queryClient.unregister(queryKey, result)
-    })
-
-    return result
   }
 
+  // For programmatic queries (outside Vue components)
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    return this.queryClient.queryAsync({
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    return this.queryClient.fetchQuery({
       queryKey,
       queryFn,
-      ...baseOptions,
+      ...options,
       ...overrides
     })
   }
 
+  // Invalidate specific query
   async invalidate({ key, cache = this.cacheType.GLOBAL }) {
-    const { queryKey } = this.#resolveOptions({ key, cache })
-    return this.queryClient.invalidate(queryKey)
+    const queryKey = createQueryKey(key, cache)
+    return this.queryClient.invalidateQueries({ queryKey })
   }
 
+  // Invalidate all queries by cache type
   async invalidateByType(cache = this.cacheType.GLOBAL) {
-    return this.queryClient.clearByPrefix(cache)
+    return this.queryClient.invalidateQueries({
+      predicate: (query) => query.queryKey[0] === cache
+    })
   }
 
-  #resolveOptions({ key, cache }) {
-    switch (cache) {
-      case this.cacheType.SENSITIVE:
-        return {
-          queryKey: sensitiveKey(key),
-          baseOptions: SENSITIVE_OPTIONS
-        }
-      case this.cacheType.GLOBAL:
-        return {
-          queryKey: globalKey(key),
-          baseOptions: GLOBAL_OPTIONS
-        }
-      case this.cacheType.NONE:
-      default:
-        return {
-          queryKey: key.join(':'),
-          baseOptions: { staleTime: 0, gcTime: 0, encrypted: false }
-        }
-    }
+  // Clear all queries by cache type
+  async clearByType(cache = this.cacheType.GLOBAL) {
+    return this.queryClient.removeQueries({
+      predicate: (query) => query.queryKey[0] === cache
+    })
+  }
+
+  // Clear all queries
+  async clearAll() {
+    return this.queryClient.clear()
+  }
+
+  // Get cached data without triggering a fetch
+  getQueryData({ key, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    return this.queryClient.getQueryData(queryKey)
+  }
+
+  // Set query data manually
+  setQueryData({ key, data, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    return this.queryClient.setQueryData(queryKey, data)
   }
 }
