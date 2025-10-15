@@ -63,7 +63,7 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/firewall'
+            to: '/firewalls'
           },
           {
             label: 'Edit Firewall'
