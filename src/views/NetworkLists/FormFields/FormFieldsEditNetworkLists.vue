@@ -21,7 +21,6 @@
 
   const countriesList = ref([])
 
-
   const { value: name } = useField('name')
   const { value: itemsValues } = useField('itemsValues')
   const { value: networkListType } = useField('networkListType')
