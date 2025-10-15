@@ -50,7 +50,10 @@
           :data-testid="`azion-query-language-list-item${slotProps.index}`"
           :class="[
             'p-2 cursor-pointer',
-            { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
+            {
+              'bg-[var(--dropdown-hover-bg)] text-[var(--dropdown-hover-text)]':
+                slotProps.index === highlightedIndex
+            }
           ]"
         >
           {{ slotProps.option.label }}
