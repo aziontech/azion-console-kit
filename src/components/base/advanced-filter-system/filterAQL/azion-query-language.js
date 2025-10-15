@@ -351,24 +351,23 @@ export default class Aql {
     ]
 
     const errorMessages = {
-      'quote-error':
-        'Attention: composite fields must be included in quotes. e.g: "Upstream Status".',
+      'quote-error': 'composite fields must be included in quotes. e.g: "Upstream Status".',
       'not-exists-field-error':
-        'Attention: some provided fields do not match the currently available ones. Please, check and try again.',
+        'some provided fields do not match the currently available ones. Please, check and try again.',
       'in-operator-parentheses-error':
-        "Attention: there are fields with 'in' operator that need to be inside parentheses. Please, check and try again. e.g: domain in (domain1, domain2)",
+        "there are fields with 'in' operator that need to be inside parentheses. Please, check and try again. e.g: domain in (domain1, domain2)",
       'in-operator-trailing-comma-error':
-        "Attention: fields with 'in' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.",
+        "fields with 'in' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.",
       'no-space-error':
-        'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".',
+        'please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".',
       'between-operator-error':
-        'Attention: The BETWEEN operator requires its values to be enclosed in parentheses. For example: status between (200, 300).',
+        'The BETWEEN operator requires its values to be enclosed in parentheses. For example: status between (200, 300).',
       'between-operator-error-three-values':
-        'Attention: The BETWEEN operator must have exactly two values. For example: status between (200, 300).',
+        'The BETWEEN operator must have exactly two values. For example: status between (200, 300).',
       'between-operator-error-not-parentheses':
-        'Attention: Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).',
+        'Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).',
       'between-operator-error-equal-values':
-        'Attention: The two values for the BETWEEN operator must be different. For example: status between (200, 300).'
+        'The two values for the BETWEEN operator must be different. For example: status between (200, 300).'
     }
 
     return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
