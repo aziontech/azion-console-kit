@@ -104,18 +104,17 @@
                   data-testid="data-stream-form__destination__headers-field__input"
                 />
               </div>
-              <ButtonPrimer
+              <Button
                 icon="pi pi-trash"
-                class=""
                 outlined
                 v-tooltip.top="{ value: 'Remove Header', showDelay: 200 }"
                 @click="removeHeader(index)"
                 v-if="!!index"
-              ></ButtonPrimer>
+              ></Button>
             </div>
           </div>
 
-          <ButtonPrimer
+          <Button
             :disabled="hasNoPermissionToEditDataStream"
             outlined
             icon="pi pi-plus-circle"
@@ -818,7 +817,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
-  import ButtonPrimer from 'primevue/button'
+  import Button from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import LabelBlock from '@/templates/label-block'
