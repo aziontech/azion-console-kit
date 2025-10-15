@@ -157,7 +157,7 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-6 w-full px-3">
           <div class="flex flex-col gap-2">
             <span class="text-lg font-medium"> Overview </span>
             <div
