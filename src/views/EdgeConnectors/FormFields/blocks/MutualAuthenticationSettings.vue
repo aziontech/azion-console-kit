@@ -3,6 +3,7 @@
     title="Mutual Authentication Settings"
     description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
     data-testid="edge-connectors-form__section__mutual-authentication-settings"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -114,6 +115,13 @@
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsMutualAuthenticationSettings' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: mutualAuthentication } = useField('mtls.active')
   const { value: trustedCaCertificate } = useField('mtls.config.certificate')

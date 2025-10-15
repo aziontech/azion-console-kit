@@ -2,23 +2,39 @@
   <EdgeConnectorsFormFieldsGeneral
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
+    :isDrawer="isDrawer"
   />
 
-  <EdgeConnectorsFormFieldsConnectorType />
+  <EdgeConnectorsFormFieldsConnectorType :isDrawer="isDrawer" />
 
-  <EdgeConnectorsFormFieldsConnectionOptions />
+  <EdgeConnectorsFormFieldsConnectionOptions :isDrawer="isDrawer" />
 
-  <EdgeConnectorsFormFieldsModules v-if="isHttpEnabled" />
+  <EdgeConnectorsFormFieldsModules
+    v-if="isHttpEnabled"
+    :isDrawer="isDrawer"
+  />
 
-  <EdgeConnectorsFormFieldsLoadBalancerConfiguration v-if="enableLoadBalancerConfiguration" />
+  <EdgeConnectorsFormFieldsLoadBalancerConfiguration
+    v-if="enableLoadBalancerConfiguration"
+    :isDrawer="isDrawer"
+  />
 
-  <EdgeConnectorsFormFieldsAddress v-if="isHttpEnabled" />
+  <EdgeConnectorsFormFieldsAddress
+    v-if="isHttpEnabled"
+    :isDrawer="isDrawer"
+  />
 
-  <EdgeConnectorsFormFieldsOriginIpAcl v-if="originShieldEnabled" />
+  <EdgeConnectorsFormFieldsOriginIpAcl
+    v-if="originShieldEnabled"
+    :isDrawer="isDrawer"
+  />
 
-  <EdgeConnectorsFormFieldsHmac v-if="originShieldEnabled" />
+  <EdgeConnectorsFormFieldsHmac
+    v-if="originShieldEnabled"
+    :isDrawer="isDrawer"
+  />
 
-  <EdgeConnectorsFormFieldsStatus />
+  <EdgeConnectorsFormFieldsStatus :isDrawer="isDrawer" />
 </template>
 
 <script setup>
@@ -40,6 +56,10 @@
       default: false
     },
     noBorder: {
+      type: Boolean,
+      default: false
+    },
+    isDrawer: {
       type: Boolean,
       default: false
     }

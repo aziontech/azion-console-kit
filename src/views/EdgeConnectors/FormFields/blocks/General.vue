@@ -5,6 +5,7 @@
     data-testid="edge-connectors-form__section__general"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -35,6 +36,10 @@
       default: false
     },
     noBorder: {
+      type: Boolean,
+      default: false
+    },
+    isDrawer: {
       type: Boolean,
       default: false
     }

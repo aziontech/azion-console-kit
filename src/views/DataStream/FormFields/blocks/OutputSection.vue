@@ -80,7 +80,7 @@
           />
         </div>
 
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col sm:max-w-lg w-full gap-5">
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
@@ -92,20 +92,29 @@
             :key="index"
             class="flex flex-col sm:max-w-lg w-full gap-2"
           >
-            <FieldTextIcon
-              :disabled="hasNoPermissionToEditDataStream"
-              :value="header.value"
-              required
-              label="Header"
-              @click-icon="removeHeader(index)"
-              :name="`headers[${index}].value`"
-              placeholder="header-name:value"
-              data-testid="data-stream-form__destination__headers-field__input"
-              :icon="!!index && 'pi pi-trash'"
-            />
+            <div class="w-full flex items-end gap-2">
+              <div class="w-full flex flex-col gap-2">
+                <FieldText
+                  :disabled="hasNoPermissionToEditDataStream"
+                  :value="header.value"
+                  required
+                  label="Header"
+                  :name="`headers[${index}].value`"
+                  placeholder="header-name:value"
+                  data-testid="data-stream-form__destination__headers-field__input"
+                />
+              </div>
+              <Button
+                icon="pi pi-trash"
+                outlined
+                v-tooltip.top="{ value: 'Remove Header', showDelay: 200 }"
+                @click="removeHeader(index)"
+                v-if="!!index"
+              ></Button>
+            </div>
           </div>
 
-          <ButtonPrimer
+          <Button
             :disabled="hasNoPermissionToEditDataStream"
             outlined
             icon="pi pi-plus-circle"
@@ -807,9 +816,8 @@
   import { useAccountStore } from '@/stores/account'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
-  import ButtonPrimer from 'primevue/button'
+  import Button from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import LabelBlock from '@/templates/label-block'

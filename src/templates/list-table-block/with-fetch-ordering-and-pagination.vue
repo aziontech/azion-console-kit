@@ -196,6 +196,7 @@
             <PrimeButton
               size="small"
               outlined
+              v-tooltip.top="{ value: optionsOneAction(rowData).tooltip, showDelay: 200 }"
               v-bind="optionsOneAction(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
@@ -660,7 +661,8 @@
     const [firstAction] = actionOptions(rowData)
     return {
       icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+      disabled: firstAction?.disabled,
+      tooltip: firstAction?.tooltip
     }
   }
 

@@ -3,6 +3,7 @@
     title="Modules"
     description="Enable additional features to optimize traffic management and origin protection."
     data-testid="edge-connectors-form__section__modules"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -35,6 +36,13 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsModules' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
   const { value: originShield } = useField('modules.originShield.enabled')

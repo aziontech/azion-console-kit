@@ -2,6 +2,7 @@
   <FormHorizontal
     title="Status"
     data-testid="edge-connectors-form__section__origin-ip-acl"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -25,6 +26,13 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsStatus' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: active } = useField('active')
 </script>
