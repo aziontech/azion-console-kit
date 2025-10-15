@@ -6,12 +6,12 @@ import { GLOBAL_OPTIONS, SENSITIVE_OPTIONS, NO_CACHE_OPTIONS } from './config'
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      ...GLOBAL_OPTIONS,
+      ...GLOBAL_OPTIONS
     },
     mutations: {
-      retry: 1,
-    },
-  },
+      retry: 1
+    }
+  }
 })
 
 // Initialize persistence
@@ -19,20 +19,20 @@ export async function initializeQueryPersistence() {
   try {
     // Run quick test
     const quickTest = await indexedDbPersister.quickTest()
-    
+
     // Make test results available globally for debugging
     window.queryPersistenceTest = quickTest
 
     // Restore cached queries
     const restoredQueries = await indexedDbPersister.restoreClient()
     if (restoredQueries && Array.isArray(restoredQueries)) {
-      restoredQueries.forEach(query => {
+      restoredQueries.forEach((query) => {
         if (query.queryKey && query.state) {
           queryClient.setQueryData(query.queryKey, query.state.data)
         }
       })
     }
-    
+
     // Set up automatic persistence on cache changes
     queryClient.getQueryCache().subscribe((event) => {
       if (event.type === 'updated' || event.type === 'added') {

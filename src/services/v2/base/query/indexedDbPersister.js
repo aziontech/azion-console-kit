@@ -24,11 +24,11 @@ export const indexedDbPersister = {
       const database = await getDB()
       const testKey = 'test-key'
       const testData = { queryKey: testKey, data: 'test-value', timestamp: Date.now() }
-      
+
       await database.put('queries', testData)
       const result = await database.get('queries', testKey)
       await database.delete('queries', testKey)
-      
+
       return { success: true, message: 'IndexedDB working correctly', value: result?.data }
     } catch (error) {
       return { success: false, message: 'IndexedDB test failed', error: error.message }
@@ -42,7 +42,7 @@ export const indexedDbPersister = {
       canAccessIdb: typeof openDB !== 'undefined',
       localStorageAvailable: typeof localStorage !== 'undefined'
     }
-    
+
     window.indexedDBTestResults = results
     return results
   },
@@ -51,11 +51,11 @@ export const indexedDbPersister = {
     try {
       const testQuery = { queryKey: ['test'], data: 'quick-test', timestamp: Date.now() }
       await this.persistQuery(testQuery.queryKey, testQuery.data)
-      
+
       const restored = await this.restoreQuery(testQuery.queryKey)
-      
+
       await this.removeQuery(testQuery.queryKey)
-      
+
       return {
         success: true,
         message: 'Quick test passed',
@@ -81,17 +81,24 @@ export const indexedDbPersister = {
         data: data,
         timestamp: Date.now()
       }
-      
+
       await database.put('queries', queryData)
       // Temporary debug log
       window.debugIndexedDB = { lastPersist: 'IndexedDB (idb)', timestamp: Date.now() }
     } catch (error) {
       const key = createQueryKey(queryKey)
-      localStorage.setItem(`query-${key}`, JSON.stringify({
-        data: data,
-        timestamp: Date.now()
-      }))
-          window.debugIndexedDB = { lastPersist: 'localStorage', timestamp: Date.now(), error: error.message }
+      localStorage.setItem(
+        `query-${key}`,
+        JSON.stringify({
+          data: data,
+          timestamp: Date.now()
+        })
+      )
+      window.debugIndexedDB = {
+        lastPersist: 'localStorage',
+        timestamp: Date.now(),
+        error: error.message
+      }
     }
   },
 
@@ -101,7 +108,7 @@ export const indexedDbPersister = {
       const database = await getDB()
       const key = createQueryKey(queryKey)
       const result = await database.get('queries', key)
-      
+
       if (!result) {
         return undefined
       }
@@ -141,7 +148,7 @@ export const indexedDbPersister = {
     } catch (error) {
       // Failed to remove from IndexedDB
     }
-    
+
     try {
       const key = createQueryKey(queryKey)
       localStorage.removeItem(`query-${key}`)
@@ -153,7 +160,7 @@ export const indexedDbPersister = {
   // Persist all queries (for compatibility)
   async persistClient(queries) {
     if (!Array.isArray(queries)) return
-    
+
     for (const query of queries) {
       if (query.queryKey && query.state) {
         await this.persistQuery(query.queryKey, query.state.data)
@@ -166,7 +173,7 @@ export const indexedDbPersister = {
     try {
       const database = await getDB()
       const allQueries = await database.getAll('queries')
-      
+
       const validQueries = []
       for (const query of allQueries) {
         if (Date.now() - query.timestamp <= PERSISTENCE_CONFIG.MAX_AGE) {
@@ -179,7 +186,7 @@ export const indexedDbPersister = {
           await database.delete('queries', query.queryKey)
         }
       }
-      
+
       return validQueries
     } catch (error) {
       // Fallback to localStorage
@@ -215,7 +222,7 @@ export const indexedDbPersister = {
     } catch (error) {
       // Failed to clear IndexedDB
     }
-    
+
     try {
       // Clear localStorage queries
       for (let index = localStorage.length - 1; index >= 0; index--) {
