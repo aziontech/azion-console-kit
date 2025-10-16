@@ -136,6 +136,7 @@
                 :isDownloading="isDownloading"
                 :searchFilter="fileSearchTerm"
                 :isPaginationLoading="isPaginationLoading"
+                :currentPage="currentPage"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
@@ -258,6 +259,7 @@
   const containerWidth = ref(0)
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
+  const currentPage = ref(1)
 
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
@@ -391,6 +393,7 @@
     showDragAndDrop.value = false
     selectedBucket.value = bucket
     folderPath.value = ''
+    currentPage.value = 1
     selectedFiles.value = []
     listServiceFilesRef.value?.reload()
   }
@@ -404,6 +407,7 @@
       folderPath.value = `${pathToFolder}/`
     }
 
+    currentPage.value = 1
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
@@ -451,6 +455,7 @@
     } else if (item.isFolder) {
       folderPath.value += item.name
       router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
+      currentPage.value = 1
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
@@ -461,6 +466,7 @@
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
+    currentPage.value = 1
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
@@ -523,6 +529,7 @@
   const handlePaginationChange = async (event) => {
     const { page, pageCount } = event
     const isLastPage = page >= pageCount - 1
+    currentPage.value = page + 1
 
     if (isLastPage && selectedBucket.value?.continuation_token) {
       try {

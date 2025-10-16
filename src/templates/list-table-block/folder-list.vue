@@ -439,6 +439,10 @@
     isPaginationLoading: {
       type: Boolean,
       default: false
+    },
+    currentPage: {
+      type: Number,
+      default: 1
     }
   })
 
@@ -458,7 +462,6 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const toast = useToast()
-  const currentPage = ref(1)
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
@@ -654,7 +657,6 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
-    currentPage.value = event.page + 1
     emit('page', event)
   }
 

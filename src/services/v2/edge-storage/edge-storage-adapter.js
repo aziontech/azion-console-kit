@@ -33,7 +33,6 @@ export const EdgeStorageAdapter = {
       size: file.is_folder ? '-' : formatBytes(file.size),
       isFolder: file.is_folder
     }))
-    files.sort((itemA, itemB) => itemA.name.localeCompare(itemB.name))
     return {
       files,
       continuation_token: data.continuation_token || null
