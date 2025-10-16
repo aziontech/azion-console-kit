@@ -35,6 +35,7 @@
                   Email
                 </label>
                 <InputText
+                  data-sentry-mask
                   v-model="email"
                   id="email"
                   placeholder="example@email.com"

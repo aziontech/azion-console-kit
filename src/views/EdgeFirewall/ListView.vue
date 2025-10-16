@@ -112,13 +112,13 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Firewalls"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         addButtonLabel="Firewall"
-        createPagePath="/firewall/create"
-        editPagePath="/firewall/edit"
+        createPagePath="/firewalls/create"
+        editPagePath="/firewalls/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"

@@ -9,6 +9,7 @@
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
+
   import { useField } from 'vee-validate'
   import { ref, watch } from 'vue'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
@@ -65,7 +66,8 @@
   const drawerEdgeFirewallRef = ref('')
   const hasEdgeFirewallAccess = ref(true)
 
-  const openDigitalCertificateDrawer = () => {
+  const openDigitalCertificateDrawer = (certificate) => {
+    digitalCertificateDrawerRef.value.changeCertificateType(certificate)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
@@ -131,7 +133,11 @@
     setEdgeCertificate(newEdgeCertificate)
   })
 
-  const onDigitalCertificateSuccess = ({ id }) => {
+  const onDigitalCertificateSuccess = ({ type, id }) => {
+    if (type === TRUSTED_CA_CERTIFICATE) {
+      mtlsTrustedCertificate.value = id
+      return
+    }
     edgeCertificate.value = id
   }
 
@@ -320,7 +326,7 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateDrawer"
+                  @click="openDigitalCertificateDrawer('certificate')"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
@@ -381,7 +387,27 @@
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer('trusted_ca_certificate')"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-trusted-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Trusted CA certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>

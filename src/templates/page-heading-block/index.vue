@@ -56,7 +56,25 @@
           'data-testid': `page-heading-block__breadcrumb__${props.item.label}`
         })
       }"
-    />
+    >
+      <template #item="{ item, props }">
+        <router-link
+          v-if="item.to"
+          :to="item.to"
+          v-bind="props.action"
+          :class="{ 'text-color-secondary': breadcrumbs.items.indexOf(item) === -1 }"
+        >
+          {{ item.label }}
+        </router-link>
+        <span
+          v-else
+          class="text-sm"
+        >
+          {{ item.label }}
+        </span>
+      </template>
+    </Breadcrumb>
+
     <div
       class="flex w-full py-4 items-center flex-wrap gap-3"
       :class="{ 'justify-between': !props.isRightAlignment }"

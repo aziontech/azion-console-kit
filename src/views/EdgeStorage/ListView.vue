@@ -99,6 +99,7 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
+                  :disabled="isUploading"
                   :menuButtonProps="{
                     class: 'rounded-l-none',
                     style: { color: 'var(--primary-text-color) !important' }
@@ -138,7 +139,6 @@
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
-                @drop.prevent="handleDragDropUpload"
                 @download-selected-items="handleDownload(selectedFiles)"
                 class="w-full"
               />
@@ -148,8 +148,13 @@
                 <p class="text-sm text-color-secondary">
                   Drag files here to add them to your bucket or
                   <span
-                    class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
-                    @click="openFileSelector"
+                    class="transition-colors"
+                    :class="
+                      isUploading
+                        ? 'text-color-secondary cursor-not-allowed'
+                        : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
+                    "
+                    @click="!isUploading && openFileSelector()"
                     >choose your files</span
                   >
                 </p>
@@ -194,17 +199,11 @@
     selectedFiles,
     isDownloading,
     showDragAndDrop,
-    folderPath
+    folderPath,
+    isUploading
   } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
-
-  defineProps({
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const fileActions = [
     {
@@ -415,6 +414,8 @@
   }
 
   const openFileSelector = (type = 'files') => {
+    if (isUploading.value) return
+
     const input = document.createElement('input')
     input.type = 'file'
     input.style.display = 'none'
@@ -430,8 +431,8 @@
     input.onchange = async (event) => {
       const files = event.target.files
       if (files.length) {
-        await uploadFiles(files)
         filesTableNeedRefresh.value = true
+        await uploadFiles(files)
         listServiceFilesRef.value?.reload()
       }
       document.body.removeChild(input)
@@ -511,10 +512,12 @@
 
   const handleDragDropUpload = async (event) => {
     isDragOver.value = false
+    if (isUploading.value) return
+
     const files = event.target.files || event.dataTransfer.files
     if (files.length) {
-      await uploadFiles(files)
       filesTableNeedRefresh.value = true
+      await uploadFiles(files)
       listServiceFilesRef.value?.reload()
     }
   }
@@ -606,5 +609,8 @@
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
     removeDocumentDragEvents()
+    selectedBucket.value = null
+    folderPath.value = ''
+    selectedFiles.value = []
   })
 </script>

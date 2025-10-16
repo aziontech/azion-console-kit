@@ -176,6 +176,7 @@
               outlined
               icon="ai ai-column"
               class="table-button"
+              size="small"
               @click="toggleColumnSelector"
               v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"

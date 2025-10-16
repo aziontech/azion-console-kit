@@ -73,6 +73,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                size="small"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
@@ -353,6 +354,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                size="small"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"

@@ -39,6 +39,7 @@
       type: 'delete',
       title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
+      tooltip: 'Delete',
       service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
     }
   ]
@@ -107,7 +108,10 @@
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'expand-column'
+            columnAppearance: 'expand-column',
+            dependencies: {
+              showCopy: true
+            }
           })
         }
       },
