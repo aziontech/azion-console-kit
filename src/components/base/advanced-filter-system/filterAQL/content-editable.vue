@@ -3,7 +3,7 @@
     id="editableDiv"
     ref="editable"
     contenteditable
-    placeholder="Azion Query Language"
+    placeholder="Filter using Azion Query Language syntax..."
     class="contenteditable p-inputtext font-normal text-sm w-full h-auto font-mono"
     @input="handleInput"
     v-on="$attrs"
@@ -75,7 +75,7 @@
 
   .contenteditable:empty:before {
     content: attr(placeholder);
-    color: #aaa;
+    color: var(--input-placeholder-text-color);
     pointer-events: none;
   }
 </style>

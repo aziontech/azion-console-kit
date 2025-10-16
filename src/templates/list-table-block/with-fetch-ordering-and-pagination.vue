@@ -793,7 +793,8 @@
     const [firstAction] = actionOptions(rowData)
     return {
       icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+      disabled: firstAction?.disabled,
+      tooltip: firstAction?.tooltip
     }
   }
 
