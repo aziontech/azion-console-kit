@@ -130,7 +130,7 @@
                 :selected-bucket="selectedBucket"
                 v-model:selectedItensData="selectedFiles"
                 hiddenHeader
-                :paginator="true"
+                paginator
                 enableEditClickFolder
                 :actions="fileActions"
                 :isDownloading="isDownloading"
