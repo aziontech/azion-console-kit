@@ -7,6 +7,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
+  import MainSettings from './MainSettings.vue'
+
   defineOptions({ name: 'tabs-sql-database' })
 
   const mapTabs = ref({
@@ -22,7 +24,7 @@
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
 
-  const database = ref({})
+  const database = ref(null)
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
@@ -94,7 +96,7 @@
             root: { 'data-testid': 'sql-database-tabs__tab__tables' }
           }"
         >
-          <div>Conteudo</div>
+          <div>Tables</div>
         </TabPanel>
         <TabPanel
           header="Editor"
@@ -102,7 +104,7 @@
             root: { 'data-testid': 'sql-database-tabs__tab__editor' }
           }"
         >
-          <h4>Conteudo</h4>
+          <h4>Editor</h4>
         </TabPanel>
         <TabPanel
           header="Settings"
@@ -110,7 +112,10 @@
             root: { 'data-testid': 'sql-database-tabs__tab__settings' }
           }"
         >
-          <h4>Conteudo</h4>
+          <MainSettings
+            v-if="database"
+            :database="database"
+          />
         </TabPanel>
       </TabView>
     </template>
