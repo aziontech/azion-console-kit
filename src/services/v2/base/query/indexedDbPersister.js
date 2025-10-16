@@ -14,68 +14,16 @@ const getDB = async () => {
   return db
 }
 
-const createQueryKey = (queryKey) => {
+const createQueryKeyJSON = (queryKey) => {
   return JSON.stringify(queryKey)
 }
 
 export const indexedDbPersister = {
-  async testIndexedDB() {
-    try {
-      const database = await getDB()
-      const testKey = 'test-key'
-      const testData = { queryKey: testKey, data: 'test-value', timestamp: Date.now() }
-
-      await database.put('queries', testData)
-      const result = await database.get('queries', testKey)
-      await database.delete('queries', testKey)
-
-      return { success: true, message: 'IndexedDB working correctly', value: result?.data }
-    } catch (error) {
-      return { success: false, message: 'IndexedDB test failed', error: error.message }
-    }
-  },
-
-  async manualTest() {
-    const results = {
-      testIndexedDB: await this.testIndexedDB(),
-      canAccessIndexedDB: typeof indexedDB !== 'undefined',
-      canAccessIdb: typeof openDB !== 'undefined',
-      localStorageAvailable: typeof localStorage !== 'undefined'
-    }
-
-    window.indexedDBTestResults = results
-    return results
-  },
-
-  async quickTest() {
-    try {
-      const testQuery = { queryKey: ['test'], data: 'quick-test', timestamp: Date.now() }
-      await this.persistQuery(testQuery.queryKey, testQuery.data)
-
-      const restored = await this.restoreQuery(testQuery.queryKey)
-
-      await this.removeQuery(testQuery.queryKey)
-
-      return {
-        success: true,
-        message: 'Quick test passed',
-        restored: !!restored,
-        lastPersist: window.debugIndexedDB?.lastPersist || 'unknown'
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: 'Quick test failed',
-        error: error.message
-      }
-    }
-  },
-
   // Persist individual query
   async persistQuery(queryKey, data) {
     try {
       const database = await getDB()
-      const key = createQueryKey(queryKey)
+      const key = createQueryKeyJSON(queryKey)
       const queryData = {
         queryKey: key,
         data: data,
@@ -83,10 +31,8 @@ export const indexedDbPersister = {
       }
 
       await database.put('queries', queryData)
-      // Temporary debug log
-      window.debugIndexedDB = { lastPersist: 'IndexedDB (idb)', timestamp: Date.now() }
     } catch (error) {
-      const key = createQueryKey(queryKey)
+      const key = createQueryKeyJSON(queryKey)
       localStorage.setItem(
         `query-${key}`,
         JSON.stringify({
@@ -94,11 +40,6 @@ export const indexedDbPersister = {
           timestamp: Date.now()
         })
       )
-      window.debugIndexedDB = {
-        lastPersist: 'localStorage',
-        timestamp: Date.now(),
-        error: error.message
-      }
     }
   },
 
@@ -106,7 +47,7 @@ export const indexedDbPersister = {
   async restoreQuery(queryKey) {
     try {
       const database = await getDB()
-      const key = createQueryKey(queryKey)
+      const key = createQueryKeyJSON(queryKey)
       const result = await database.get('queries', key)
 
       if (!result) {
@@ -122,7 +63,7 @@ export const indexedDbPersister = {
     } catch (error) {
       // Fallback to localStorage
       try {
-        const key = createQueryKey(queryKey)
+        const key = createQueryKeyJSON(queryKey)
         const fallbackData = localStorage.getItem(`query-${key}`)
         if (!fallbackData) return undefined
 
@@ -143,14 +84,14 @@ export const indexedDbPersister = {
   async removeQuery(queryKey) {
     try {
       const database = await getDB()
-      const key = createQueryKey(queryKey)
+      const key = createQueryKeyJSON(queryKey)
       await database.delete('queries', key)
     } catch (error) {
       // Failed to remove from IndexedDB
     }
 
     try {
-      const key = createQueryKey(queryKey)
+      const key = createQueryKeyJSON(queryKey)
       localStorage.removeItem(`query-${key}`)
     } catch (error) {
       // Failed to remove from localStorage

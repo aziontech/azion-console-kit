@@ -2,7 +2,6 @@ import { QueryClient } from '@tanstack/vue-query'
 import { indexedDbPersister } from './indexedDbPersister'
 import { GLOBAL_OPTIONS, SENSITIVE_OPTIONS, NO_CACHE_OPTIONS } from './config'
 
-// Create the query client with default options
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -14,16 +13,8 @@ export const queryClient = new QueryClient({
   }
 })
 
-// Initialize persistence
-export async function initializeQueryPersistence() {
+export const initializeQueryPersistence = async () => {
   try {
-    // Run quick test
-    const quickTest = await indexedDbPersister.quickTest()
-
-    // Make test results available globally for debugging
-    window.queryPersistenceTest = quickTest
-
-    // Restore cached queries
     const restoredQueries = await indexedDbPersister.restoreClient()
     if (restoredQueries && Array.isArray(restoredQueries)) {
       restoredQueries.forEach((query) => {
@@ -33,7 +24,6 @@ export async function initializeQueryPersistence() {
       })
     }
 
-    // Set up automatic persistence on cache changes
     queryClient.getQueryCache().subscribe((event) => {
       if (event.type === 'updated' || event.type === 'added') {
         const query = event.query
@@ -43,12 +33,11 @@ export async function initializeQueryPersistence() {
       }
     })
   } catch (error) {
-    // Failed to initialize query persistence
+    throw new Error(error)
   }
 }
 
-// Helper function to get cache options based on type
-export function getCacheOptions(cacheType) {
+export const getCacheOptions = (cacheType) => {
   switch (cacheType) {
     case 'SENSITIVE':
       return SENSITIVE_OPTIONS
@@ -60,9 +49,8 @@ export function getCacheOptions(cacheType) {
   }
 }
 
-// Helper function to create query keys with prefixes
-export const createQueryKey = (key, cacheType = 'GLOBAL') => {
-  return [cacheType, ...key]
+export const createQueryKey = (key, cacheType = 'GLOBAL', type = 'sync') => {
+  return [cacheType, ...key, type]
 }
 
 export default queryClient

@@ -1,4 +1,3 @@
-// TanStack Query configuration
 export const CACHE_TIME = {
   NO_REFETCH: 0,
   ONE_MINUTE: 1 * 60 * 1000,
@@ -13,24 +12,22 @@ export const CACHE_TIME = {
 
 export const CACHE_TYPE = {
   GLOBAL: 'GLOBAL',
-  SENSITIVE: 'SENSITIVE',
-  NONE: 'NONE'
+  SENSITIVE: 'SENSITIVE'
 }
 
-// Default query options for different cache types
 export const GLOBAL_OPTIONS = {
-  staleTime: CACHE_TIME.FIVE_MINUTES,
+  staleTime: CACHE_TIME.THIRTY_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
   refetchOnWindowFocus: false,
-  refetchOnMount: true,
+  refetchOnMount: false,
   retry: 3
 }
 
 export const SENSITIVE_OPTIONS = {
-  staleTime: CACHE_TIME.TWO_MINUTES,
+  staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES,
   refetchOnWindowFocus: false,
-  refetchOnMount: true,
+  refetchOnMount: false,
   retry: 1
 }
 
@@ -44,7 +41,8 @@ export const NO_CACHE_OPTIONS = {
 
 // Persistence configuration
 export const PERSISTENCE_CONFIG = {
-  DB_NAME: 'azion-query-cache',
-  STORE_NAME: 'query-cache',
+  DB_NAME: 'azion-cache',
+  STORE_NAME: 'queries-cache',
+  VERSION: 1,
   MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS
 }
