@@ -26,6 +26,7 @@
     exportFileName="buckets"
     class="w-full"
     :isLoading="isLoading"
+    @force-update="bucketTableNeedRefresh = true"
   />
 </template>
 
@@ -100,12 +101,12 @@
     }
   ]
 
-  const loadBuckets = async () => {
+  const loadBuckets = async (params) => {
     try {
       isLoading.value = true
       if (!buckets.value.length || bucketTableNeedRefresh.value) {
         const [listBucketsResponse, metricsResponse] = await Promise.all([
-          edgeStorageService.listEdgeStorageBuckets(),
+          edgeStorageService.listEdgeStorageBuckets(params),
           edgeStorageService.getEdgeStorageMetrics()
         ])
         buckets.value = listBucketsResponse.body

@@ -130,16 +130,18 @@
                 :selected-bucket="selectedBucket"
                 v-model:selectedItensData="selectedFiles"
                 hiddenHeader
-                :paginator="false"
+                :paginator="true"
                 enableEditClickFolder
                 :actions="fileActions"
                 :isDownloading="isDownloading"
                 :searchFilter="fileSearchTerm"
+                :isPaginationLoading="isPaginationLoading"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
+                @page="handlePaginationChange"
                 class="w-full"
               />
 
@@ -250,6 +252,7 @@
   const fileSearchTerm = ref('')
   const listServiceFilesRef = ref(null)
   const isDragOver = ref(false)
+  const isPaginationLoading = ref(false)
   const headerContainer = ref(null)
   const buttonsContainer = ref(null)
   const containerWidth = ref(0)
@@ -483,22 +486,29 @@
 
   const listEdgeStorageBucketFiles = async () => {
     if (needFetchToAPI.value) {
-      selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
+      const { files, continuation_token } = await edgeStorageService.listEdgeStorageBucketFiles(
         selectedBucket.value.name,
         false,
-        folderPath.value
+        folderPath.value,
+        { continuation_token: selectedBucket.value.continuation_token }
       )
-      selectedBucket.value.files = selectedBucket.value.files.map((file) => ({
+      selectedBucket.value.continuation_token = continuation_token
+      const filterFiles = files.map((file) => ({
         ...file,
         name: file.name.replace(folderPath.value, '')
       }))
-      if (folderPath.value) {
-        selectedBucket.value.files.unshift({
+      if (folderPath.value && !isPaginationLoading.value) {
+        filterFiles.unshift({
           id: '..',
           name: '..',
           isParentNav: true,
           isFolder: true
         })
+      }
+      if (isPaginationLoading.value) {
+        selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
+      } else {
+        selectedBucket.value.files = filterFiles
       }
       filesTableNeedRefresh.value = false
     }
@@ -508,6 +518,21 @@
 
   const handleDrag = (value) => {
     isDragOver.value = value
+  }
+
+  const handlePaginationChange = async (event) => {
+    const { page, pageCount } = event
+    const isLastPage = page >= pageCount - 1
+
+    if (isLastPage && selectedBucket.value?.continuation_token) {
+      try {
+        isPaginationLoading.value = true
+        filesTableNeedRefresh.value = true
+        await listServiceFilesRef.value?.loadData({ page: page + 1, keepCurrentPage: true })
+      } finally {
+        isPaginationLoading.value = false
+      }
+    }
   }
 
   const handleDragDropUpload = async (event) => {

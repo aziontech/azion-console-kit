@@ -335,7 +335,8 @@
     'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
-    'update:selectedItensData'
+    'update:selectedItensData',
+    'force-update'
   ])
 
   const props = defineProps({
@@ -703,6 +704,7 @@
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
     firstItemIndex.value = event.first
+    emit('force-update', true)
     reload({ page: event.page + 1 })
   }
 
@@ -727,7 +729,7 @@
 
   const fetchOnSearch = () => {
     if (!props.lazy) return
-
+    emit('force-update', true)
     const firstPage = 1
     firstItemIndex.value = firstPage
     reload()

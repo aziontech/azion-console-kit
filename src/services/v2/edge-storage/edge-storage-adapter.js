@@ -26,12 +26,17 @@ export const EdgeStorageAdapter = {
   },
 
   transformListEdgeStorageFiles(data) {
-    return data.results.map((file) => ({
+    const files = data.results.map((file) => ({
       id: file.key,
       name: file.key,
       last_modified: formatDateToDayMonthYearHour(file.last_modified) || '-',
       size: file.is_folder ? '-' : formatBytes(file.size),
       isFolder: file.is_folder
     }))
+    files.sort((itemA, itemB) => itemA.name.localeCompare(itemB.name))
+    return {
+      files,
+      continuation_token: data.continuation_token || null
+    }
   }
 }
