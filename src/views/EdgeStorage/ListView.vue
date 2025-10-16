@@ -641,7 +641,6 @@
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
     removeDocumentDragEvents()
-    selectedBucket.value = null
     folderPath.value = ''
     selectedFiles.value = []
   })

@@ -45,7 +45,7 @@
   const router = useRouter()
   const route = useRoute()
   const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
-  const fields = ['name', 'size', 'last_editor', 'last_modified']
+  const fields = ['name', 'size', 'last_editor', 'last_modified', 'edge_access']
   const columns = [
     {
       field: 'name',
