@@ -6,7 +6,7 @@
   import { ref, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   defineOptions({ name: 'tabs-sql-database' })
 
   const mapTabs = ref({
@@ -22,10 +22,17 @@
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
 
+  const database = ref({})
+
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
     const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
     return selectedTab
+  }
+
+  const getDatabase = async () => {
+    const data = await edgeSQLService.getDatabase(sqlDatabaseId.value)
+    database.value = data
   }
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
@@ -52,7 +59,8 @@
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    title.value = 'Titulo'
+    await getDatabase()
+    title.value = database.value.name
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
@@ -69,7 +77,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        :loadedItemLabel="title"
+      />
     </template>
     <template #content>
       <TabView
