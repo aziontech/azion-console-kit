@@ -3,11 +3,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import { ref, reactive, watch } from 'vue'
+  import { ref, reactive, watch, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import MainSettings from './MainSettings.vue'
+  import CodeEditor from './CodeEditor.vue'
 
   defineOptions({ name: 'tabs-sql-database' })
 
@@ -73,6 +74,10 @@
     tabHasUpdate.updated = generateCurrentTimestamp()
   })
 
+  const showActionBar = computed(() => {
+    return activeTab.value === mapTabs.value.settings
+  })
+
   renderTabCurrentRouter()
 </script>
 
@@ -104,7 +109,7 @@
             root: { 'data-testid': 'sql-database-tabs__tab__editor' }
           }"
         >
-          <h4>Editor</h4>
+          <CodeEditor />
         </TabPanel>
         <TabPanel
           header="Settings"
@@ -115,6 +120,7 @@
           <MainSettings
             v-if="database"
             :database="database"
+            :showActionBar="showActionBar"
           />
         </TabPanel>
       </TabView>
