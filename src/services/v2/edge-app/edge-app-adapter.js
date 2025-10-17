@@ -1,4 +1,4 @@
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
@@ -24,8 +24,8 @@ const transformMap = {
   active: (value) => parseStatusData(value.active),
   name: (value) => parseName(value),
   lastEditor: (value) => value.last_editor,
-  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
-  lastModified: (value) => value.last_modified,
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   disableEditClick: (value) => value.product_version === LOCKED_VALUE,
   isLocked: (value) => value.product_version === LOCKED_VALUE
 }
@@ -45,7 +45,7 @@ export const EdgeAppAdapter = {
     return {
       id: data?.id,
       name: data?.name,
-      edgeCacheEnabled: data?.modules?.edge_cache.enabled,
+      edgeCacheEnabled: data?.modules?.cache.enabled,
       edgeFunctionsEnabled: data?.modules?.functions.enabled,
       applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
       imageProcessorEnabled: data?.modules?.image_processor.enabled,
@@ -61,7 +61,8 @@ export const EdgeAppAdapter = {
     return {
       name: payload.name,
       modules: {
-        edge_cache: { enabled: payload.edgeCacheEnabled },
+        cache: { enabled: payload.edgeCacheEnabled },
+
         functions: { enabled: payload.edgeFunctionsEnabled },
         application_accelerator: { enabled: payload.applicationAcceleratorEnabled },
         image_processor: { enabled: payload.imageProcessorEnabled },

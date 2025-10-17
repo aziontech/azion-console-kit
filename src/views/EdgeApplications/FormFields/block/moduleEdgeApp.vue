@@ -33,12 +33,7 @@
         class="flex flex-col gap-2"
         data-testid="form-horizontal-modules-subscription"
       >
-        <FieldGroupSwitch
-          label="Subscription modules"
-          isCard
-          :options="subscriptionModulesSwitchOptions"
-          data-testid="form-horizontal-modules-subscription-switch"
-        />
+        <span class="text-color text-base font-medium leading-5">Subscription modules</span>
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
@@ -94,14 +89,6 @@
       title: 'Image Processor',
       nameField: 'imageProcessorEnabled',
       subtitle: 'Enable dynamic image editing options.'
-    }
-  ]
-
-  const subscriptionModulesSwitchOptions = [
-    {
-      title: 'Tiered Cache',
-      nameField: 'tieredCacheEnabled',
-      subtitle: 'Enable an additional cache layer at the edge.'
     }
   ]
 </script>

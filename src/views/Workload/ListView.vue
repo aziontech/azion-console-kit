@@ -180,6 +180,18 @@
         sortField: 'infrastructure'
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        filterPath: 'lastEditor',
+        sortField: 'lastEditor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        filterPath: 'lastModified',
+        sortField: 'lastModified'
+      },
+      {
         field: 'active',
         sortField: 'active',
         header: 'Status',
@@ -190,18 +202,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        filterPath: 'lastModified',
-        sortField: 'lastModified'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        filterPath: 'lastEditor',
-        sortField: 'lastEditor'
       }
     ]
   })

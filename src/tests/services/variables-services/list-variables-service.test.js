@@ -9,7 +9,7 @@ const fixtures = {
     key: 'Mongo-DB-Key',
     value: 'M0nG0-t3$$t1n-k3Y',
     last_editor: 'John Doe',
-    updated_at: new Date(2023, 5, 10),
+    updated_at: new Date(2023, 5, 10, 12),
     secret: true
   }
 }
@@ -66,8 +66,8 @@ describe('VariablesService', () => {
           content: fixtures.variableMock.value
         },
         lastEditor: fixtures.variableMock.last_editor,
-        updatedAt: 'Saturday, June 10, 2023',
-        updatedAtDate: new Date('2023-06-10T00:00:00.000Z')
+        updatedAt: 'Saturday, June 10, 2023 at 12:00:00 PM',
+        updatedAtDate: new Date('2023-06-10T12:00:00.000Z')
       }
     ])
   })

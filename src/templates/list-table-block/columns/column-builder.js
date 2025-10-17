@@ -17,6 +17,7 @@ import TagWithTooltip from './tag-with-tooltip'
 import LogBody from './log-body.vue'
 import TextWithIcon from './text-with-icon.vue'
 import TextFormatColumn from './text-format.vue'
+import IconWithTooltip from './icon-with-tooltip.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
@@ -43,7 +44,8 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
     case 'expand-text-column':
       return h(ExpandTextColumn, {
         value: data.value,
-        sliceValue: data.sliceValue
+        sliceValue: data.sliceValue,
+        showMoreText: data.showMoreText
       })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
@@ -130,6 +132,11 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
         text: data.text,
         leftIcon: data.leftIcon,
         rightIcon: data.rightIcon
+      })
+    case 'icon-with-tooltip':
+      return h(IconWithTooltip, {
+        vendorData: data.vendorData,
+        iconClass: data.iconClass
       })
     default:
       throw new Error('Invalid column appearance')

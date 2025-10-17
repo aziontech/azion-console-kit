@@ -47,8 +47,7 @@ const getConfig = () => {
       istanbul({
         nycrcPath: '.nycrc'
       }),
-      ...(
-        IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
+      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
             sentryVitePlugin({
               org: 'azion-technologies',
@@ -57,8 +56,7 @@ const getConfig = () => {
               sourcemaps: { assets: './dist/assets/**' }
             })
           ]
-        : []
-      )
+        : [])
     ],
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
