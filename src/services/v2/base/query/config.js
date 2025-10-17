@@ -12,25 +12,36 @@ export const CACHE_TIME = {
 
 export const CACHE_TYPE = {
   GLOBAL: 'GLOBAL',
-  SENSITIVE: 'SENSITIVE',
-  NONE: 'NONE'
+  SENSITIVE: 'SENSITIVE'
 }
 
 export const GLOBAL_OPTIONS = {
-  staleTime: CACHE_TIME.FIVE_MINUTES,
+  staleTime: CACHE_TIME.THIRTY_MINUTES,
   gcTime: CACHE_TIME.THIRTY_MINUTES,
-  refetchInterval: CACHE_TIME.NO_REFETCH,
-  encrypted: false
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  retry: 3
 }
 
 export const SENSITIVE_OPTIONS = {
-  staleTime: CACHE_TIME.TWO_MINUTES,
+  staleTime: CACHE_TIME.FIVE_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES,
-  refetchInterval: CACHE_TIME.NO_REFETCH,
-  encrypted: false
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  retry: 1
 }
 
-export const GC_OPTIONS = {
-  INTERVAL: CACHE_TIME.ONE_HOUR,
-  ENABLED: true
+export const NO_CACHE_OPTIONS = {
+  staleTime: 0,
+  gcTime: 0,
+  refetchOnWindowFocus: false,
+  refetchOnMount: true,
+  retry: 1
+}
+
+export const PERSISTENCE_CONFIG = {
+  DB_NAME: 'azion-cache',
+  STORE_NAME: 'queries-cache',
+  VERSION: 1,
+  MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS
 }

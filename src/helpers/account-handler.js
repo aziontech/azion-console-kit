@@ -1,6 +1,6 @@
 import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
-import { queryClient } from '@/services/v2/base/query/queryClient'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class AccountHandler {
   constructor(switchAccountService, listTypeAccountService) {
@@ -52,7 +52,8 @@ export class AccountHandler {
    * @param {string} accountId - Account ID
    */
   async switchAccountAndRedirect(accountId) {
-    queryClient.clearAll()
+    const baseService = new BaseService()
+    await baseService.clearAll()
     const { firstLogin } = await this.switchAccountService(accountId)
 
     if (firstLogin) {
