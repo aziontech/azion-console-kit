@@ -13,13 +13,18 @@ export const queryClient = new QueryClient({
   }
 })
 
+let isPersistenceInitialized = false
+
 export const initializeQueryPersistence = async () => {
   try {
     const restoredQueries = await indexedDbPersister.restoreClient()
+    
     if (restoredQueries && Array.isArray(restoredQueries)) {
       restoredQueries.forEach((query) => {
         if (query.queryKey && query.state) {
-          queryClient.setQueryData(query.queryKey, query.state.data)
+          queryClient.setQueryData(query.queryKey, query.state.data, {
+            updatedAt: Date.now()
+          })
         }
       })
     }
@@ -32,8 +37,16 @@ export const initializeQueryPersistence = async () => {
         }
       }
     })
+
+    isPersistenceInitialized = true
   } catch (error) {
     throw new Error(error)
+  }
+}
+
+export const waitForPersistence = async () => {
+  while (!isPersistenceInitialized) {
+    await new Promise(resolve => setTimeout(resolve, 10))
   }
 }
 
@@ -49,8 +62,8 @@ export const getCacheOptions = (cacheType) => {
   }
 }
 
-export const createQueryKey = (key, cacheType = 'GLOBAL', type = 'sync') => {
-  return [cacheType, ...key, type]
-}
+export const createQueryKey = (key, cacheType = 'GLOBAL') => {
+  return [cacheType, ...key]
+ } 
 
 export default queryClient

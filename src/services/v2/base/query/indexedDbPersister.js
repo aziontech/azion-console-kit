@@ -19,7 +19,7 @@ const createQueryKeyJSON = (queryKey) => {
 }
 
 export const indexedDbPersister = {
-  // Persist individual query
+
   async persistQuery(queryKey, data) {
     try {
       const database = await getDB()
@@ -43,7 +43,6 @@ export const indexedDbPersister = {
     }
   },
 
-  // Restore individual query
   async restoreQuery(queryKey) {
     try {
       const database = await getDB()
@@ -80,7 +79,6 @@ export const indexedDbPersister = {
     }
   },
 
-  // Remove individual query
   async removeQuery(queryKey) {
     try {
       const database = await getDB()
@@ -98,7 +96,6 @@ export const indexedDbPersister = {
     }
   },
 
-  // Persist all queries (for compatibility)
   async persistClient(queries) {
     if (!Array.isArray(queries)) return
 
@@ -109,7 +106,6 @@ export const indexedDbPersister = {
     }
   },
 
-  // Restore all queries (for compatibility)
   async restoreClient() {
     try {
       const database = await getDB()
@@ -155,7 +151,6 @@ export const indexedDbPersister = {
     }
   },
 
-  // Remove all queries
   async removeClient() {
     try {
       const database = await getDB()
