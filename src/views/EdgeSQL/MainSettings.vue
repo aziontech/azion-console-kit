@@ -13,7 +13,10 @@
       <FormFieldsMainSettings data-testid="edit-edge-sql-database-form-fields" />
     </template>
 
-    <template #action-bar="{ onSubmit, onCancel, loading }">
+    <template
+      #action-bar="{ onSubmit, onCancel, loading }"
+      v-if="showActionBar"
+    >
       <ActionBarBlockWithTeleport
         @onSubmit="onSubmit"
         @onCancel="onCancel"
@@ -39,6 +42,10 @@
   const props = defineProps({
     database: {
       type: Object,
+      required: true
+    },
+    showActionBar: {
+      type: Boolean,
       required: true
     }
   })
