@@ -5,6 +5,10 @@
     :isDrawer="props.isDrawer"
   >
     <template #inputs>
+      <ConnectorDrawer
+        ref="drawerConnectorRef"
+        @onSuccess="successCreateConnector"
+      />
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isConnector"
@@ -19,7 +23,27 @@
           optionLabel="name"
           optionValue="value"
           placeholder="Select a Connector"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
+                  @click="openDrawerConnector"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="response-details__create-connector-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Connector"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -93,9 +117,11 @@
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
+  import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
+  import PrimeButton from 'primevue/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   const { value: response } = useField('response')
 
@@ -104,6 +130,9 @@
   const { value: customStatusCode } = useField('customStatusCode')
   const { value: connector } = useField('connector')
   const { value: uri } = useField('uri')
+
+  const drawerConnectorRef = ref('')
+  const emit = defineEmits(['isOverlapped'])
 
   const isConnector = computed(() => {
     return typeValue.value === 'page_connector'
@@ -120,6 +149,14 @@
     }
   })
 
+  const openDrawerConnector = () => {
+    drawerConnectorRef.value.openCreateDrawer()
+  }
+
+  const successCreateConnector = ({ id }) => {
+    connector.value = id
+  }
+
   const listEdgeConnectors = async (params) => {
     params.fields = 'id,name,type'
     params.active = true
@@ -128,4 +165,11 @@
       (item) => item.type !== 'Live Ingest'
     )
   }
+
+  watch(
+    () => drawerConnectorRef.value.showCreateEdgeConnectorsDrawer,
+    (newValue) => {
+      emit('isOverlapped', newValue)
+    }
+  )
 </script>

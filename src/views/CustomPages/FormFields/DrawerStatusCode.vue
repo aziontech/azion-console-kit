@@ -7,6 +7,7 @@
   <block-response-details-block
     isDrawer
     :isEdit="isOption"
+    @isOverlapped="handleIsOverlapped"
   />
 </template>
 
@@ -26,4 +27,10 @@
   })
 
   const isOption = computed(() => !!props.itemStatusCode.code)
+
+  const emit = defineEmits(['isOverlapped'])
+
+  const handleIsOverlapped = (value) => {
+    emit('isOverlapped', value)
+  }
 </script>

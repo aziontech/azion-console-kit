@@ -8,7 +8,7 @@
     header="Personal token has been created"
     data-testid="copy-token-dialog__header"
   >
-    <div class="flex flex-col gap-3.5">
+    <div class="flex flex-col gap-4">
       <InlineMessage
         severity="warn"
         data-testid="copy-token-dialog__warning__inline-message"
@@ -38,6 +38,7 @@
             }"
             :feedback="false"
             toggleMask
+            data-sentry-mask
             data-testid="copy-token-dialog__token-field__password-input"
           />
           <small
@@ -54,6 +55,7 @@
           icon="pi pi-clone"
           outlined
           type="button"
+          size="small"
           aria-label="Copy Personal Token"
           label="Copy"
           :disabled="!personalTokenValue"
@@ -66,6 +68,7 @@
     <template #footer>
       <PrimeButton
         label="Confirm"
+        size="small"
         severity="secondary"
         @click="closeDialog"
         data-testid="copy-token-dialog__dialog-footer__confirm-button"

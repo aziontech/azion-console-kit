@@ -9,6 +9,7 @@
   import copyBlock from '@/templates/copy-block/copy-block.vue'
   import { useField } from 'vee-validate'
   import { watch, ref } from 'vue'
+  import { handleCopyDNSSEC } from '../Config/dnssec.js'
 
   defineProps({
     handleCopy: {
@@ -27,6 +28,8 @@
   const dnssecData = ref([])
   const refreshDNSSECTime = 5000
 
+  dnssecData.value = handleCopyDNSSEC(null, true)
+
   const loadEdgeDNSSEC = async (DNSZone) => {
     const data = await edgeDNSService.loadEdgeDNSZoneDNSSEC(DNSZone)
     if (!data) return
@@ -39,39 +42,7 @@
         loadEdgeDNSSEC(DNSZone)
       }, refreshDNSSECTime)
     }
-    dnssecData.value = [
-      {
-        label: 'Key Tag',
-        name: 'key-tag',
-        value: data?.delegationSigner?.key_tag || 'Generating... visit here again soon.',
-        disabledCopyButton: !data?.delegationSigner?.key_tag,
-        description:
-          'Unique identifier for the DNSSEC key used to sign your zone. Use this value with your domain provider.'
-      },
-      {
-        label: 'Algorithm',
-        name: 'algorithm',
-        value:
-          data?.delegationSigner?.algorithm_type.slug || 'Generating... visit here again soon.',
-        disabledCopyButton: !data?.delegationSigner?.algorithm_type.slug,
-        description: 'Specifies the algorithm used to generate the DNSSEC key.'
-      },
-      {
-        label: 'Digest Type',
-        name: 'digestType',
-        value: data?.delegationSigner?.digest_type.slug || 'Generating... visit here again soon.',
-        disabledCopyButton: !data?.delegationSigner?.digest_type.slug,
-        description: 'Indicates the hash function used for the DNSSEC digest.'
-      },
-      {
-        label: 'Digest',
-        name: 'digest',
-        value: data?.delegationSigner?.digest || 'Generating... visit here again soon.',
-        disabledCopyButton: !data?.delegationSigner?.digest,
-        description:
-          'Cryptographic hash of the public key for DNSSEC validation. Provide this to your provider.'
-      }
-    ]
+    dnssecData.value = handleCopyDNSSEC(data.delegationSigner, true)
   }
 
   watch(id, (value) => {
@@ -140,7 +111,10 @@
             />
           </div>
           <div>
-            <copyBlock :value="nameserver" />
+            <copyBlock
+              :value="nameserver"
+              v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
+            />
           </div>
         </div>
         <small class="text-xs text-color-secondary font-normal leading-5">
@@ -190,6 +164,7 @@
             <copyBlock
               :value="entry.value"
               :disabled="entry.disabledCopyButton"
+              v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
             />
           </div>
         </div>

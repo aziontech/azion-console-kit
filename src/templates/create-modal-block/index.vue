@@ -60,7 +60,7 @@
     },
     {
       label: 'Firewall',
-      to: '/firewall/create',
+      to: '/firewalls/create',
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {

@@ -15,7 +15,7 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No Connectors found."
         :actions="actions"
-        addButtonLabel="Connectors"
+        addButtonLabel="Connector"
         createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         data-testid="edge-connectors-list-table-block"
