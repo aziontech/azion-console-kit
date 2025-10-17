@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6 mt-4">
     <FormHorizontal
       title="General"
       description="Set up your new SQL database with basic configuration."
