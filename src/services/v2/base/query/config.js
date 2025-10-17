@@ -39,7 +39,6 @@ export const NO_CACHE_OPTIONS = {
   retry: 1
 }
 
-// Persistence configuration
 export const PERSISTENCE_CONFIG = {
   DB_NAME: 'azion-cache',
   STORE_NAME: 'queries-cache',

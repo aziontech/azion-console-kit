@@ -19,7 +19,6 @@ const createQueryKeyJSON = (queryKey) => {
 }
 
 export const indexedDbPersister = {
-
   async persistQuery(queryKey, data) {
     try {
       const database = await getDB()
@@ -85,14 +84,14 @@ export const indexedDbPersister = {
       const key = createQueryKeyJSON(queryKey)
       await database.delete('queries', key)
     } catch (error) {
-      // Failed to remove from IndexedDB
+      throw new Error(error)
     }
 
     try {
       const key = createQueryKeyJSON(queryKey)
       localStorage.removeItem(`query-${key}`)
     } catch (error) {
-      // Failed to remove from localStorage
+      throw new Error(error)
     }
   },
 
@@ -119,14 +118,12 @@ export const indexedDbPersister = {
             state: { data: query.data }
           })
         } else {
-          // Remove expired query
           await database.delete('queries', query.queryKey)
         }
       }
 
       return validQueries
     } catch (error) {
-      // Fallback to localStorage
       const validQueries = []
       for (let index = 0; index < localStorage.length; index++) {
         const key = localStorage.key(index)
@@ -156,11 +153,10 @@ export const indexedDbPersister = {
       const database = await getDB()
       await database.clear('queries')
     } catch (error) {
-      // Failed to clear IndexedDB
+      throw new Error(error)
     }
 
     try {
-      // Clear localStorage queries
       for (let index = localStorage.length - 1; index >= 0; index--) {
         const key = localStorage.key(index)
         if (key && key.startsWith('query-')) {
@@ -168,7 +164,7 @@ export const indexedDbPersister = {
         }
       }
     } catch (error) {
-      // Failed to clear localStorage
+      throw new Error(error)
     }
   }
 }

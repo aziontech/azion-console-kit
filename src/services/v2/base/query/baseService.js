@@ -28,17 +28,14 @@ export class BaseService {
   }
 
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    // Wait for persistence to be initialized
     await waitForPersistence()
     
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
 
-    // Check if we have cached data first
     const cachedData = this.queryClient.getQueryData(queryKey)
     
     if (cachedData !== undefined) {
-      // Check if the cached data is still fresh based on staleTime
       const query = this.queryClient.getQueryState(queryKey)
       
       if (query && query.dataUpdatedAt) {
@@ -46,13 +43,11 @@ export class BaseService {
         const isStale = (Date.now() - query.dataUpdatedAt) > staleTime
         
         if (!isStale) {
-          // Return cached data if it's still fresh
           return Promise.resolve(cachedData)
         }
       }
     }
 
-    // If no cache or cache is stale, fetch new data
     return this.queryClient.fetchQuery({
       queryKey,
       queryFn,
@@ -71,7 +66,6 @@ export class BaseService {
     return this.queryClient.clear()
   }
 
-  // Check if query has fresh cached data
   hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
@@ -88,7 +82,6 @@ export class BaseService {
     return !isStale
   }
 
-  // Get cached data without triggering a fetch
   getCachedData({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     return this.queryClient.getQueryData(queryKey)
