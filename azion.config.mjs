@@ -107,8 +107,8 @@ const config = {
       {
         name: 'origin-script-runner',
         type: 'single_origin',
-        hostHeader: `script-runner.azion.com`,
-        addresses: [`script-runner.azion.com`]
+        hostHeader: `script-runner.azion.net`,
+        addresses: [`script-runner.azion.net`]
       },
       {
         name: 'origin-template-engine',
