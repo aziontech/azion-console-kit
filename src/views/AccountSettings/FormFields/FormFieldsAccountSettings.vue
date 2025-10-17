@@ -15,6 +15,8 @@
   import { onMounted, ref, watch, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { capitalizeFirstLetter } from '@/helpers'
+  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
 
   const props = defineProps({
     listCountriesService: {
@@ -50,6 +52,10 @@
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
+  const callbackUrl = ref('')
+  const isGithubConnectLoading = ref(false)
+  const integrationsList = ref([])
+  const oauthGithubRef = ref(null)
 
   const { startLoading } = useLoadingStore()
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
@@ -75,8 +81,68 @@
     }
   }
 
-  onMounted(() => {
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
+  }
+
+  const saveIntegration = async (integration) => {
+    try {
+      isGithubConnectLoading.value = true
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
+      await loadListIntegrations()
+      showToast('GitHub integration connected successfully', 'success')
+    } catch (error) {
+      error.showWithOptions(toast, (error) => ({
+        summary: `Save failed ${error.detail}`,
+        severity: 'error'
+      }))
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
+      }
+    })
+  }
+
+  const loadListIntegrations = async () => {
+    try {
+      isGithubConnectLoading.value = true
+      const data = await vcsService.listIntegrations()
+      integrationsList.value = data
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Listing failed' })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const hasIntegrations = computed(() => {
+    if (integrationsList?.value?.length > 0) return true
+    return false
+  })
+
+  const removeGithubIntegration = async (integrationId) => {
+    try {
+      isGithubConnectLoading.value = true
+      await vcsService.deleteIntegration(integrationId)
+      await loadListIntegrations()
+      showToast('GitHub integration removed successfully', 'success')
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Remove failed' })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  onMounted(async () => {
     setCountriesOptions()
+    await loadListIntegrations()
+    listenerOnMessage()
   })
 
   const setRegionsOptions = async (countryId) => {
@@ -385,6 +451,55 @@
             outlined
             @click="navigateToMfaManagement"
           />
+        </div>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="GitHub Integration"
+    description="Connect your GitHub account to enable repository integration and deployment features."
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-5 sm:max-w-lg">
+        <div v-show="!hasIntegrations">
+          <OAuthGithub
+            ref="oauthGithubRef"
+            @onCallbackUrl="
+              (uri) => {
+                setCallbackUrl(uri.value)
+              }
+            "
+            :loading="isGithubConnectLoading"
+          />
+        </div>
+        <div
+          v-if="hasIntegrations"
+          class="flex flex-col gap-4"
+        >
+          <div
+            v-for="integration in integrationsList"
+            :key="integration.value"
+            class="flex flex-col gap-2"
+          >
+            <label class="text-color text-base font-medium leading-5"> Connected Account </label>
+            <div class="flex items-center gap-3 p-4 surface-border border rounded-md">
+              <i class="pi pi-github text-2xl" />
+              <div class="flex-1">
+                <p class="text-color font-medium">{{ integration.label }}</p>
+                <small class="text-color-secondary">Integration active</small>
+              </div>
+              <PrimeButton
+                label="Remove"
+                severity="danger"
+                outlined
+                icon="pi pi-trash"
+                size="small"
+                :loading="isGithubConnectLoading"
+                @click="removeGithubIntegration(integration.value)"
+                data-testid="account-settings__remove-github-integration"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </template>

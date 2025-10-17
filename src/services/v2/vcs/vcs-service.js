@@ -41,6 +41,14 @@ export class VcsService extends BaseService {
     })
     return data.results
   }
+
+  deleteIntegration = async (id) => {
+    const { data } = await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/integrations/${id}`
+    })
+    return data.results
+  }
 }
 
 export const vcsService = new VcsService()
