@@ -157,7 +157,7 @@
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { onMounted, ref, inject, computed, watch } from 'vue'
+  import { ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
@@ -176,10 +176,6 @@
   })
 
   const props = defineProps({
-    listAdditionalDataInfoService: {
-      type: Function,
-      required: true
-    },
     postAdditionalDataService: {
       type: Function,
       required: true
@@ -195,17 +191,159 @@
   })
 
   const currentStep = ref(1)
-  const additionalDataInfo = ref(null)
-
-  const fetchAdditionalDataInfo = async () => {
-    const response = await props.listAdditionalDataInfoService()
-
-    additionalDataInfo.value = response
-  }
-
-  onMounted(() => {
-    fetchAdditionalDataInfo()
-  })
+  const additionalDataInfo = ref([
+    {
+      id: 1,
+      key: 'How are you planning to use Azion?',
+      required: true,
+      show: true,
+      values: [
+        {
+          id: 1,
+          value: 'Personal',
+          other_values: false
+        },
+        {
+          id: 2,
+          value: 'Work',
+          other_values: false
+        },
+        {
+          id: 3,
+          value: 'Study',
+          other_values: false
+        }
+      ]
+    },
+    {
+      id: 2,
+      key: 'What best describes your role?',
+      required: true,
+      show: true,
+      values: [
+        {
+          id: 4,
+          value: 'Software Developer',
+          other_values: false
+        },
+        {
+          id: 5,
+          value: 'DevOps Engineer',
+          other_values: false
+        },
+        {
+          id: 6,
+          value: 'Infrastructure Analyst',
+          other_values: false
+        },
+        {
+          id: 7,
+          value: 'Network Engineer',
+          other_values: false
+        },
+        {
+          id: 8,
+          value: 'Security Specialist',
+          other_values: false
+        },
+        {
+          id: 9,
+          value: 'Data Engineer',
+          other_values: false
+        },
+        {
+          id: 10,
+          value: 'AI/ML Engineer',
+          other_values: false
+        },
+        {
+          id: 11,
+          value: 'IoT Engineer',
+          other_values: false
+        },
+        {
+          id: 12,
+          value: 'Team Lead',
+          other_values: false
+        },
+        {
+          id: 13,
+          value: 'Other',
+          other_values: true
+        }
+      ]
+    },
+    {
+      id: 3,
+      key: 'How big is your company?',
+      required: false,
+      show: true,
+      values: [
+        {
+          id: 14,
+          value: 'Just me',
+          other_values: false
+        },
+        {
+          id: 15,
+          value: '2 to 100 employees',
+          other_values: false
+        },
+        {
+          id: 16,
+          value: '101 to 500 employees',
+          other_values: false
+        },
+        {
+          id: 17,
+          value: '501 to 1000 employees',
+          other_values: false
+        },
+        {
+          id: 18,
+          value: '1001+ employees',
+          other_values: false
+        }
+      ]
+    },
+    {
+      id: 999,
+      key: 'Your Full Name',
+      required: true,
+      show: true
+    },
+    {
+      id: 4,
+      key: 'Company Website?',
+      required: false,
+      show: true,
+      values: [
+        {
+          id: 19,
+          value: '',
+          other_values: true
+        }
+      ]
+    },
+    {
+      id: 5,
+      key: 'Do you want to schedule a onboarding session with an Azion expert?',
+      required: false,
+      show: true,
+      values: [
+        {
+          id: 20,
+          value: 'Yes',
+          other_values: false
+        },
+        {
+          id: 21,
+          value: 'No',
+          other_values: false
+        }
+      ]
+    }
+  ])
 
   const validationSchema = yup.object({
     use: yup.string().required(),
