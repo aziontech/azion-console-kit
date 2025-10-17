@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
-import { queryClient, getCacheOptions, createQueryKey, waitForPersistence } from '@/services/v2/base/query/queryClient'
+import {
+  queryClient,
+  getCacheOptions,
+  createQueryKey,
+  waitForPersistence
+} from '@/services/v2/base/query/queryClient'
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 
 export class BaseService {
@@ -29,19 +34,19 @@ export class BaseService {
 
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
     await waitForPersistence()
-    
+
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
 
     const cachedData = this.queryClient.getQueryData(queryKey)
-    
+
     if (cachedData !== undefined) {
       const query = this.queryClient.getQueryState(queryKey)
-      
+
       if (query && query.dataUpdatedAt) {
         const staleTime = options.staleTime || 0
-        const isStale = (Date.now() - query.dataUpdatedAt) > staleTime
-        
+        const isStale = Date.now() - query.dataUpdatedAt > staleTime
+
         if (!isStale) {
           return Promise.resolve(cachedData)
         }
@@ -69,16 +74,16 @@ export class BaseService {
   hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
-    
+
     const cachedData = this.queryClient.getQueryData(queryKey)
     if (cachedData === undefined) return false
-    
+
     const query = this.queryClient.getQueryState(queryKey)
     if (!query || !query.dataUpdatedAt) return false
-    
+
     const staleTime = options.staleTime || 0
-    const isStale = (Date.now() - query.dataUpdatedAt) > staleTime
-    
+    const isStale = Date.now() - query.dataUpdatedAt > staleTime
+
     return !isStale
   }
 
@@ -86,5 +91,4 @@ export class BaseService {
     const queryKey = createQueryKey(key, cache)
     return this.queryClient.getQueryData(queryKey)
   }
-
 }

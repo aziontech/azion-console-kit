@@ -18,7 +18,7 @@ let isPersistenceInitialized = false
 export const initializeQueryPersistence = async () => {
   try {
     const restoredQueries = await indexedDbPersister.restoreClient()
-    
+
     if (restoredQueries && Array.isArray(restoredQueries)) {
       restoredQueries.forEach((query) => {
         if (query.queryKey && query.state) {
@@ -46,7 +46,7 @@ export const initializeQueryPersistence = async () => {
 
 export const waitForPersistence = async () => {
   while (!isPersistenceInitialized) {
-    await new Promise(resolve => setTimeout(resolve, 10))
+    await new Promise((resolve) => setTimeout(resolve, 10))
   }
 }
 
@@ -64,6 +64,6 @@ export const getCacheOptions = (cacheType) => {
 
 export const createQueryKey = (key, cacheType = 'GLOBAL') => {
   return [cacheType, ...key]
- } 
+}
 
 export default queryClient
