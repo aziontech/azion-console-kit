@@ -48,6 +48,7 @@
                 :disabled="disabledAddButton"
                 @click="$emit('add-button-click')"
                 icon="pi pi-plus"
+                size="small"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
               />
@@ -217,6 +218,7 @@
                 :disabled="disabledAddButton"
                 @click="$emit('add-button-click')"
                 icon="pi pi-plus"
+                size="small"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"

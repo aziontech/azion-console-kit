@@ -1,65 +1,7 @@
-<template>
-  <DrawerFunction
-    ref="drawerFunctionRef"
-    :edgeFirewallID="props.edgeFirewallID"
-    :createFunctionService="props.createFunctionService"
-    :loadFunctionService="props.loadFunctionService"
-    :editFunctionService="props.editFunctionService"
-    :listEdgeFunctionsService="listEdgeFunctionsService"
-    :loadEdgeFunctionService="loadEdgeFunctionService"
-    @onSuccess="reloadList"
-  />
-  <div v-if="hasContentToList">
-    <FetchListTableBlock
-      ref="listFunctionsEdgeFirewallRef"
-      addButtonLabel="Function Instance"
-      :listService="listFunctionsInstance"
-      :columns="getColumns"
-      :editInDrawer="openEditFunctionDrawer"
-      @on-load-data="handleLoadData"
-      :actions="actions"
-      isTabs
-      :apiFields="EDGE_FIREWALL_FUNCTIONS_API_FIELDS"
-    >
-      <template #addButton>
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Function Instance"
-          @click="openCreateFunctionDrawer"
-        />
-      </template>
-    </FetchListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No Functions have been instantiated"
-    description="Click the button below to instantiate your first Function."
-    createButtonLabel="Function Instance"
-    :documentationService="props.documentationService"
-    :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Function Instance"
-        data-testid="create_Function Instance_button"
-        @click="openCreateFunctionDrawer"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-</template>
-
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from 'primevue/button'
-  import Illustration from '@/assets/svg/illustration-layers'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
@@ -103,7 +45,6 @@
 
   const router = useRouter()
   const route = useRoute()
-  const hasContentToList = ref(true)
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
   const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
@@ -118,14 +59,14 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name'
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'functionInstanced',
@@ -161,10 +102,6 @@
     )
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const openCreateFunctionDrawer = () => {
     drawerFunctionRef.value.openDrawerCreate()
   }
@@ -187,11 +124,7 @@
   }
 
   const reloadList = () => {
-    if (hasContentToList.value) {
-      listFunctionsEdgeFirewallRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listFunctionsEdgeFirewallRef.value.reload()
   }
 
   const actions = [
@@ -207,3 +140,51 @@
     openDrawerById({ id: route.query.id })
   })
 </script>
+
+<template>
+  <DrawerFunction
+    ref="drawerFunctionRef"
+    :edgeFirewallID="props.edgeFirewallID"
+    :createFunctionService="props.createFunctionService"
+    :loadFunctionService="props.loadFunctionService"
+    :editFunctionService="props.editFunctionService"
+    :listEdgeFunctionsService="listEdgeFunctionsService"
+    :loadEdgeFunctionService="loadEdgeFunctionService"
+    @onSuccess="reloadList"
+  />
+  <FetchListTableBlock
+    ref="listFunctionsEdgeFirewallRef"
+    addButtonLabel="Function Instance"
+    :listService="listFunctionsInstance"
+    :columns="getColumns"
+    :editInDrawer="openEditFunctionDrawer"
+    :actions="actions"
+    isTabs
+    :apiFields="EDGE_FIREWALL_FUNCTIONS_API_FIELDS"
+    :frozen-columns="['name']"
+    :emptyBlock="{
+      title: 'No Functions have been instantiated',
+      description: 'Click the button below to instantiate your first Function.',
+      createButtonLabel: 'Function Instance',
+      documentationService: props.documentationService
+    }"
+  >
+    <template #addButton>
+      <PrimeButton
+        icon="pi pi-plus"
+        label="Function Instance"
+        @click="openCreateFunctionDrawer"
+      />
+    </template>
+    <template #emptyBlockButton>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Function Instance"
+        data-testid="create_Function Instance_button"
+        @click="openCreateFunctionDrawer"
+      />
+    </template>
+  </FetchListTableBlock>
+</template>

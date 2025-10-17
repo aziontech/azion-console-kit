@@ -145,7 +145,6 @@
                 :options="sensitivity"
                 optionLabel="name"
                 optionValue="value"
-                inputClass=""
                 :name="item.dropdown.value"
                 :value="item.dropdown.initialValue"
                 :data-testid="`waf-rules-form__${item.dropdown.value}-field`"

@@ -3,12 +3,12 @@ import * as DomainServices from '@/services/domains-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
-  path: '/firewall',
-  name: 'firewall',
+  path: '/firewalls',
+  name: 'firewalls',
   children: [
     {
       path: '',
-      name: 'list-firewall',
+      name: 'list-firewalls',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         documentationService: Helpers.documentationCatalog.edgeFirewall
@@ -18,7 +18,7 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/firewall'
+            to: '/firewalls'
           }
         ]
       }
@@ -35,11 +35,11 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/firewall'
+            to: '/firewalls'
           },
           {
             label: 'Create Firewall',
-            to: '/firewall/create'
+            to: '/firewalls/create'
           }
         ]
       }
@@ -63,7 +63,7 @@ export const edgeFirewallRoutes = {
         breadCrumbs: [
           {
             label: 'Firewall',
-            to: '/firewall'
+            to: '/firewalls'
           },
           {
             label: 'Edit Firewall'

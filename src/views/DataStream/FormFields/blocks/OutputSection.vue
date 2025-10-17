@@ -80,7 +80,7 @@
           />
         </div>
 
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col sm:max-w-lg w-full gap-5">
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
@@ -92,20 +92,29 @@
             :key="index"
             class="flex flex-col sm:max-w-lg w-full gap-2"
           >
-            <FieldTextIcon
-              :disabled="hasNoPermissionToEditDataStream"
-              :value="header.value"
-              required
-              label="Header"
-              @click-icon="removeHeader(index)"
-              :name="`headers[${index}].value`"
-              placeholder="header-name:value"
-              data-testid="data-stream-form__destination__headers-field__input"
-              :icon="!!index && 'pi pi-trash'"
-            />
+            <div class="w-full flex items-end gap-2">
+              <div class="w-full flex flex-col gap-2">
+                <FieldText
+                  :disabled="hasNoPermissionToEditDataStream"
+                  :value="header.value"
+                  required
+                  label="Header"
+                  :name="`headers[${index}].value`"
+                  placeholder="header-name:value"
+                  data-testid="data-stream-form__destination__headers-field__input"
+                />
+              </div>
+              <Button
+                icon="pi pi-trash"
+                outlined
+                v-tooltip.top="{ value: 'Remove Header', showDelay: 200 }"
+                @click="removeHeader(index)"
+                v-if="!!index"
+              ></Button>
+            </div>
           </div>
 
-          <ButtonPrimer
+          <Button
             :disabled="hasNoPermissionToEditDataStream"
             outlined
             icon="pi pi-plus-circle"
@@ -408,15 +417,17 @@
             isRequired
             data-testid="data-stream-form__destination__service-account-key-field__label"
           />
-          <vue-monaco-editor
-            v-model:value="serviceAccountKey"
-            language="json"
-            :theme="theme"
-            :options="serviceAccountMonacoOptions"
-            class="min-h-[300px] surface-border border rounded-md overflow-hidden"
-            data-testid="data-stream-form__destination__service-account-key-field__input"
-            :readOnly="hasNoPermissionToEditDataStream"
-          />
+          <div data-sentry-mask>
+            <vue-monaco-editor
+              v-model:value="serviceAccountKey"
+              language="json"
+              :theme="theme"
+              :options="serviceAccountMonacoOptions"
+              class="min-h-[300px] surface-border border rounded-md overflow-hidden"
+              data-testid="data-stream-form__destination__service-account-key-field__input"
+              :readOnly="hasNoPermissionToEditDataStream"
+            />
+          </div>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__service-account-key-field__description"
@@ -452,9 +463,10 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
-            label="Encoded API Key"
             required
+            label="Encoded API Key"
             name="apiKey"
             :value="apiKey"
             rows="5"
@@ -485,9 +497,10 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
+            required
             :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
-            required
             name="splunkApiKey"
             :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
@@ -630,6 +643,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
             required
@@ -779,6 +793,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            sensitive
             :disabled="hasNoPermissionToEditDataStream"
             label="Blob SAS Token"
             required
@@ -801,9 +816,8 @@
   import { useAccountStore } from '@/stores/account'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
-  import ButtonPrimer from 'primevue/button'
+  import Button from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import LabelBlock from '@/templates/label-block'

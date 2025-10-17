@@ -26,6 +26,7 @@
           type="button"
           :aria-label="`Copy ${params.title}`"
           label="Copy"
+          size="small"
           @click="params.copy(keyValue)"
           :data-testid="`copy-key-dialog__token-field__copy-key-button`"
         />
@@ -36,6 +37,7 @@
       <PrimeButton
         label="Confirm"
         severity="secondary"
+        size="small"
         @click="closeDialog"
         :data-testid="`copy-key-dialog__dialog-footer__confirm-button`"
       />

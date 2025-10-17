@@ -46,6 +46,10 @@
     iconPosition: {
       type: String,
       default: 'right'
+    },
+    sensitive: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -110,6 +114,7 @@
       @input="handleChange"
       @blur="handleBlur"
       :class="{ 'p-invalid': errorMessage }"
+      v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
     />
   </span>
 

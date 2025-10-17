@@ -75,7 +75,7 @@
           <span class="text-color-secondary">{{ permission.description }}</span>
         </div>
         <div class="text-sm text-color-secondary h-8 flex flex-row items-center">
-          <span class="">Read more about</span>
+          <span>Read more about</span>
           <PrimeButton
             label="Marketplace's Permissions"
             link

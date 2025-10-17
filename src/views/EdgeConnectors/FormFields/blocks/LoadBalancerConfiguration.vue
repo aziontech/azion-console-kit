@@ -3,6 +3,7 @@
     title="Load Balancer Configuration"
     description="Configure load balancing settings to define how the Connectors distributes traffic and manages connections with origins."
     data-testid="edge-connectors-form__section__load-balancer-configuration"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-sm w-full gap-2">
@@ -66,6 +67,13 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsLoadBalancerConfiguration' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: method } = useField('modules.loadBalancer.config.method')
   const { value: maxRetries } = useField('modules.loadBalancer.config.maxRetries')

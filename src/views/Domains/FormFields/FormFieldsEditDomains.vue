@@ -142,11 +142,17 @@
   const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
-  const openDigitalCertificateDrawer = () => {
+
+  const openDigitalCertificateDrawer = (certificate) => {
+    digitalCertificateDrawerRef.value.changeCertificateType(certificate)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
-  const onDigitalCertificateSuccess = (id) => {
+  const onDigitalCertificateSuccess = ({ type, id }) => {
+    if (type === TRUSTED_CA_CERTIFICATE) {
+      mtlsTrustedCertificate.value = id
+      return
+    }
     edgeCertificate.value = id
   }
 
@@ -382,7 +388,7 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateDrawer"
+                  @click="openDigitalCertificateDrawer(EDGE_CERTIFICATE)"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
@@ -442,7 +448,27 @@
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer(TRUSTED_CA_CERTIFICATE)"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>

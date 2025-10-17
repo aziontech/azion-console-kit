@@ -1,12 +1,9 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
-  import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -32,9 +29,11 @@
     }
   })
 
-  const hasContentToList = ref(true)
-
   const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name'
+    },
     {
       field: 'id',
       header: 'ID',
@@ -42,8 +41,13 @@
       filterPath: 'id'
     },
     {
-      field: 'name',
-      header: 'Name'
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      sortField: 'lastModifiedDate',
+      header: 'Last Modified'
     },
     {
       field: 'labelActive',
@@ -55,21 +59,8 @@
           data: columnData,
           columnAppearance: 'tag'
         })
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      sortField: 'lastModifiedDate',
-      header: 'Last Modified'
     }
   ])
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const actions = [
     {
@@ -133,7 +124,6 @@
     </template>
     <template #content>
       <ListTableBlock
-        v-if="hasContentToList"
         :listService="listEdgeServiceServices"
         :columns="getColumns"
         addButtonLabel="Service"
@@ -144,20 +134,15 @@
         emptyListMessage="No services found."
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
+        :defaultOrderingFieldName="'-last_modified'"
+        :emptyBlock="{
+          title: 'No services have been created',
+          description: 'Click the button below to create your first service.',
+          createButtonLabel: 'Service',
+          createPagePath: 'edge-services/create',
+          documentationService: documentationService
+        }"
       />
-
-      <EmptyResultsBlock
-        v-else
-        title="No services have been created"
-        description="Click the button below to create your first service."
-        createButtonLabel="Service"
-        createPagePath="edge-services/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

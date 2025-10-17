@@ -3,6 +3,7 @@
     title="Connection Options"
     :description="getDescriptionByType"
     data-testid="edge-connectors-form__section__connection-options"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <DrawerEdgeStorage
@@ -186,6 +187,13 @@
   import DrawerEdgeStorage from '@/views/EdgeStorage/Drawer/index.vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: host } = useField('connectionOptions.host')
   const { value: path } = useField('connectionOptions.path')

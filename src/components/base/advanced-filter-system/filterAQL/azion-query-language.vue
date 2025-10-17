@@ -42,15 +42,22 @@
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
       data-testid="azion-query-language-suggestions"
-      :pt="{ list: { 'data-testid': 'azion-query-language-suggestions-list' } }"
+      :pt="{
+        root: { class: 'p-0' },
+        list: { 'data-testid': 'azion-query-language-suggestions-list' },
+        item: { class: 'p-0' }
+      }"
     >
       <template #option="slotProps">
         <div
           class="w-full rounded-md font-mono"
           :data-testid="`azion-query-language-list-item${slotProps.index}`"
           :class="[
-            'p-2 cursor-pointer',
-            { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
+            'p-2 cursor-pointer ',
+            {
+              'bg-[var(--dropdown-hover-bg)] text-[var(--dropdown-hover-text)]':
+                slotProps.index === highlightedIndex
+            }
           ]"
         >
           {{ slotProps.option.label }}

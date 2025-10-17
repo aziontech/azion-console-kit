@@ -1,8 +1,5 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
@@ -42,7 +39,6 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const hasContentToList = ref(true)
   const showCreateRecordDrawer = ref(false)
   const showEditRecordDrawer = ref(false)
   const listEDNSResourcesRef = ref('')
@@ -51,12 +47,12 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
-      field: 'id',
-      header: 'ID'
-    },
-    {
       field: 'name',
       header: 'Name'
+    },
+    {
+      field: 'id',
+      header: 'ID'
     },
     {
       field: 'type',
@@ -177,11 +173,7 @@
   }
 
   const reloadResourcesList = () => {
-    if (hasContentToList.value) {
-      listEDNSResourcesRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listEDNSResourcesRef.value.reload()
   }
 
   const handleTrackEditEvent = () => {
@@ -242,10 +234,6 @@
       severity: 'success',
       summary: 'Successfully copied!'
     })
-  }
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
   }
 
   const showEditFormWithActionTab = computed(() => {
@@ -431,18 +419,24 @@
           <div v-if="showRecords">
             <FetchListTableBlock
               ref="listEDNSResourcesRef"
-              v-if="hasContentToList"
               addButtonLabel="Record"
               defaultOrderingFieldName="entry"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
-              @on-load-data="handleLoadData"
               emptyListMessage="No records found."
               :actions="actions"
               isTabs
               :apiFields="EDGE_DNS_RECORDS_FIELDS"
               @on-before-go-to-edit="handleTrackEventGoToEdit"
+              :emptyBlock="{
+                title: 'No record has been created',
+                description: 'Click the button below to create your first record.',
+                createButtonLabel: 'Record',
+                createPagePath: 'records/create',
+                documentationService: documentationService,
+                inTabs: true
+              }"
             >
               <template #addButton>
                 <PrimeButton
@@ -452,18 +446,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-            </FetchListTableBlock>
-
-            <EmptyResultsBlock
-              v-else
-              title="No record has been created"
-              description=" Click the button below to create your first record."
-              createButtonLabel="Record"
-              createPagePath="records/create"
-              :documentationService="documentationService"
-              :inTabs="true"
-            >
-              <template #default>
+              <template #emptyBlockButton>
                 <PrimeButton
                   class="max-md:w-full w-fit"
                   severity="secondary"
@@ -473,10 +456,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-              <template #illustration>
-                <Illustration />
-              </template>
-            </EmptyResultsBlock>
+            </FetchListTableBlock>
 
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"

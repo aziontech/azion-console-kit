@@ -239,7 +239,10 @@
         title="Payment Method"
       >
         <template #inputs>
-          <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
+          <div
+            data-sentry-mask
+            class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+          >
             <form
               ref="form"
               @submit.prevent="handleSubmit"

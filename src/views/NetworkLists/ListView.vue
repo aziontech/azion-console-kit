@@ -1,11 +1,9 @@
 <script setup>
-  import { computed, ref, inject } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -20,7 +18,6 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
 
   const actions = [
@@ -31,10 +28,6 @@
       service: networkListsService.deleteNetworkList
     }
   ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -51,14 +44,21 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData, showMoreText: false },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'listType',
@@ -85,7 +85,6 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
         addButtonLabel="Network List"
@@ -97,20 +96,16 @@
         emptyListMessage="No network lists found."
         :actions="actions"
         :apiFields="NETWORK_LIST_API_FIELDS"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No network lists have been added',
+          description:
+            'Click the button below to add a network list based on ASNs, countries, or IP addresses.',
+          createButtonLabel: 'Network List',
+          createPagePath: 'network-lists/create',
+          documentationService: documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No network lists have been added"
-        description="Click the button below to add a network list based on ASNs, countries, or IP addresses."
-        createButtonLabel="Network List"
-        @click-to-create="handleCreateTrackEvent"
-        createPagePath="network-lists/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

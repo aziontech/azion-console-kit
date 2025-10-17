@@ -1,54 +1,9 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Teams Permissions"
-        data-testid="teams-permissions__list-view__page-heading"
-      />
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="listTeamPermissionService"
-        :columns="getColumns"
-        addButtonLabel="Team"
-        createPagePath="teams-permission/create"
-        editPagePath="teams-permission/edit"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No teams found."
-        :actions="actions"
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
-        :defaultOrderingFieldName="'name'"
-      >
-      </FetchListTableBlock>
-      <EmptyResultsBlock
-        v-else
-        data-testid="teams-permissions__list-view__empty-results-block"
-        title="No teams have been created"
-        description="Click the button below to create your first team and add permissions."
-        createButtonLabel="Team"
-        @click-to-create="handleTrackEventGoToCreate"
-        createPagePath="teams-permission/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -58,8 +13,6 @@
     deleteTeamPermissionService: { required: true, type: Function },
     documentationService: { required: true, type: Function }
   })
-
-  const hasContentToList = ref(true)
 
   const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
 
@@ -71,10 +24,6 @@
       service: props.deleteTeamPermissionService
     }
   ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const getColumns = computed(() => {
     return [
@@ -116,3 +65,38 @@
     })
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Teams Permissions"
+        data-testid="teams-permissions__list-view__page-heading"
+      />
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="listTeamPermissionService"
+        :columns="getColumns"
+        addButtonLabel="Team"
+        createPagePath="teams-permission/create"
+        editPagePath="teams-permission/edit"
+        emptyListMessage="No teams found."
+        :actions="actions"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
+        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
+        :defaultOrderingFieldName="'name'"
+        :frozenColumns="['name']"
+        :emptyBlock="{
+          title: 'No teams have been created',
+          description: 'Click the button below to create your first team and add permissions.',
+          createButtonLabel: 'Team',
+          createPagePath: 'teams-permission/create',
+          documentationService: documentationService
+        }"
+      >
+      </FetchListTableBlock>
+    </template>
+  </ContentBlock>
+</template>

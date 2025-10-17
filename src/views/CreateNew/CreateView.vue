@@ -28,7 +28,7 @@
         v-if="!isLoading"
       />
       <div
-        class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:items-center"
+        class="flex flex-col sm:flex-row gap-4 lg:items-center"
         v-if="!isLoading"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -57,6 +57,7 @@
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
                 iconPos="right"
+                size="small"
               />
             </div>
             <div class="flex gap-1 items-center">
@@ -72,8 +73,9 @@
           </div>
         </div>
         <PrimeButton
-          label="More details"
-          severity="secondary"
+          label="View more details"
+          severity="link"
+          size="small"
           @click="openDetails"
         />
       </div>
@@ -155,7 +157,7 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-6 w-full px-3">
           <div class="flex flex-col gap-2">
             <span class="text-lg font-medium"> Overview </span>
             <div

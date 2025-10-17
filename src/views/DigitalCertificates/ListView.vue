@@ -1,71 +1,6 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="listService"
-        :columns="getColumns"
-        editPagePath="digital-certificates/edit"
-        addButtonLabel="Certificate Manager"
-        createPagePath="digital-certificates/create"
-        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No digital certificates found."
-        :actions="actions"
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        ref="listTableBlock"
-        :defaultOrderingFieldName="'-last_modified'"
-        :hiddenByDefault="hiddenColumns"
-        :firstLoadData="firstLoadData"
-      >
-        <template #select-buttons>
-          <div class="flex flex-row gap-2">
-            <SelectButton
-              v-model="digitalCertificateTypeSelected"
-              :options="optionsSelectButton"
-              aria-labelledby="basic"
-              class="h-9 p-1"
-            />
-          </div>
-        </template>
-        <template #addButton>
-          <CreateMenuBlock
-            addButtonLabel="Certificate Manager"
-            :items="items"
-          />
-        </template>
-      </FetchListTableBlock>
-
-      <EmptyResultsBlock
-        v-else
-        title="No digital certificate has been added"
-        description="Click the button below to add your first digital certificate."
-        :documentationService="documentationCatalog.digitalCertificates"
-      >
-        <template #default>
-          <CreateMenuBlock
-            addButtonLabel="Certificate Manager"
-            :items="items"
-            severity="secondary"
-          />
-        </template>
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { ref, computed, inject, watch } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
@@ -91,7 +26,6 @@
     setFirstLoadData
   } = useDigitalCertificate()
 
-  const hasContentToList = ref(true)
   const DIGITAL_CERTIFICATE_API_FIELDS = [
     'id',
     'name',
@@ -144,10 +78,7 @@
     }
   ])
 
-  const handleLoadData = (event) => {
-    if (firstLoadData.value) {
-      hasContentToList.value = event
-    }
+  const handleLoadData = () => {
     setFirstLoadData(false)
   }
 
@@ -174,18 +105,18 @@
     if (certificateTypeList.value === 'CRL') {
       return [
         {
-          field: 'id',
-          header: 'ID',
-          sortField: 'id',
-          filterPath: 'id'
-        },
-        {
           field: 'name',
           header: 'Name',
           type: 'component',
           sortField: 'name',
           component: (columnData) =>
             columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+        },
+        {
+          field: 'id',
+          header: 'ID',
+          sortField: 'id',
+          filterPath: 'id'
         },
         {
           field: 'issuer',
@@ -223,18 +154,18 @@
     }
     return [
       {
-        field: 'id',
-        header: 'ID',
-        sortField: 'id',
-        filterPath: 'id'
-      },
-      {
         field: 'name',
         header: 'Name',
         type: 'component',
         sortField: 'name',
         component: (columnData) =>
           columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      },
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
       },
       {
         field: 'subjectName',
@@ -366,3 +297,54 @@
     }
   )
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="listService"
+        :columns="getColumns"
+        editPagePath="digital-certificates/edit"
+        addButtonLabel="Certificate Manager"
+        createPagePath="digital-certificates/create"
+        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No digital certificates found."
+        :actions="actions"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
+        ref="listTableBlock"
+        :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="hiddenColumns"
+        :firstLoadData="firstLoadData"
+        :frozenColumns="['name']"
+        :emptyBlock="{
+          title: 'No digital certificate has been added',
+          description: 'Click the button below to add your first digital certificate.',
+          createPagePath: 'digital-certificates/create',
+          createButtonLabel: 'Certificate Manager',
+          documentationService: documentationCatalog.digitalCertificates
+        }"
+      >
+        <template #select-buttons>
+          <div class="flex flex-row gap-2">
+            <SelectButton
+              v-model="digitalCertificateTypeSelected"
+              :options="optionsSelectButton"
+              aria-labelledby="basic"
+              class="h-9 p-1"
+            />
+          </div>
+        </template>
+        <template #addButton>
+          <CreateMenuBlock
+            addButtonLabel="Certificate Manager"
+            :items="items"
+          />
+        </template>
+      </FetchListTableBlock>
+    </template>
+  </ContentBlock>
+</template>

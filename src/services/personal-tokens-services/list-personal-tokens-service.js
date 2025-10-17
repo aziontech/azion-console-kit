@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
+import { sortDate } from '@/utils/date-sort'
 
 export const listPersonalTokens = async ({ pageSize = 200, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -30,7 +31,7 @@ const adapt = async (httpResponse) => {
   })
 
   return {
-    body: parsedData,
+    body: sortDate(parsedData, 'createdDate'),
     statusCode: httpResponse.statusCode
   }
 }

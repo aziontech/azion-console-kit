@@ -1,8 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -50,18 +48,27 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name'
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
       },
       {
-        field: 'name',
-        header: 'Name'
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModify',
+        sortField: 'lastModified',
+        header: 'Last Modified'
       },
       {
         field: 'active',
-        header: 'Active',
+        header: 'Status',
         sortField: 'active',
         filterPath: 'active',
         type: 'component',
@@ -72,15 +79,6 @@
           })
         },
         disableSort: false
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        sortField: 'lastModified',
-        header: 'Last Modified'
       }
     ]
   })
@@ -106,7 +104,6 @@
     <template #content>
       <FetchListTableBlock
         ref="listTableBlockRef"
-        v-if="hasContentToList"
         addButtonLabel="Custom Page"
         createPagePath="custom-pages/create"
         editPagePath="custom-pages/edit"
@@ -120,20 +117,15 @@
         data-testid="custom-pages-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No custom pages have been created',
+          description: 'Click the button below to create your first custom page.',
+          createPagePath: '/custom-pages/create',
+          createButtonLabel: 'Custom Page',
+          documentationService: props.documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No custom pages have been created"
-        description="Click the button below to create your first custom page."
-        createButtonLabel="Custom Page"
-        createPagePath="custom-pages/create"
-        :documentationService="props.documentationService"
-        data-testid="custom-pages-empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

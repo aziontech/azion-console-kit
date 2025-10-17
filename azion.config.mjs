@@ -5,7 +5,7 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 
-const addStagePrefix = (origin) => {  
+const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
       const isCitiesDomain = hostHeader === 'cities.azion.com'
@@ -225,7 +225,8 @@ const config = {
         name: 'Deliver Static Assets from Storage',
         description:
           'Sets the storage origin and deliver for all requests using the default object storage.',
-        match: '.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
+        match:
+          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',

@@ -77,7 +77,7 @@ export const useEdgeStorage = () => {
       severity: severity,
       summary: summary,
       detail: message,
-      life: 5000
+      life: severity === 'error' ? 10000 : 5000
     })
   }
   /**
@@ -97,6 +97,21 @@ export const useEdgeStorage = () => {
     if (selectedBucket.value) {
       const filesArray = Array.from(fileList)
       const maxFileSize = 300 * 1024 * 1024 // 300MB in bytes
+      //eslint-disable-next-line
+      const specialCharRegex = /[^\u0020-\u007F]/g
+      const invalidNameFiles = filesArray.filter((file) => specialCharRegex.test(file.name))
+
+      if (invalidNameFiles.length) {
+        handleToast(
+          'error',
+          'Invalid File Names',
+          `${invalidNameFiles.length} file${
+            invalidNameFiles.length > 1 ? 's have' : ' has'
+          } accented characters or cedilla. These characters are not allowed in file names.`
+        )
+        filesTableNeedRefresh.value = false
+        return
+      }
 
       const oversizedFiles = filesArray.filter((file) => file.size > maxFileSize)
 
@@ -178,11 +193,21 @@ export const useEdgeStorage = () => {
         }
 
         if (failureCount && !successCount) {
-          handleToast(
-            'error',
-            'Upload Failed',
-            `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`
-          )
+          if (failedFiles.value.filter((file) => file.error.status === 413).length > 0) {
+            handleToast(
+              'error',
+              'File Too Large',
+              `${failedFiles.value.filter((file) => file.error.status === 413).length} file${
+                failedFiles.value.filter((file) => file.error.status === 413).length > 1 ? 's' : ''
+              } exceed file size limit and cannot be uploaded.`
+            )
+          } else {
+            handleToast(
+              'error',
+              'Upload Failed',
+              `All ${failureCount} file${failureCount > 1 && 's'} failed to upload`
+            )
+          }
         }
       } catch (error) {
         currentUploadingFile.value = null
@@ -242,7 +267,7 @@ export const useEdgeStorage = () => {
       if (!file?.length) {
         const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
           selectedBucket.value.name,
-          file.name
+          folderPath.value ? folderPath.value + file.name : file.name
         )
         const blob = new Blob([fileData], {
           type: 'application/octet-stream'
@@ -255,7 +280,7 @@ export const useEdgeStorage = () => {
         for (const file of selectedFiles.value) {
           const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
             selectedBucket.value.name,
-            file.name
+            folderPath.value ? folderPath.value + file.name : file.name
           )
           zip.file(file.name, fileData)
         }

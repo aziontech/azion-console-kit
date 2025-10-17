@@ -3,6 +3,7 @@
     title="HMAC"
     description="Provide HMAC authentication credentials to deliver private content."
     data-testid="edge-connectors-form__section__hmac"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -65,6 +66,7 @@
         v-if="hmacActive"
       >
         <FieldText
+          sensitive
           label="Access Key"
           required
           description="Enter the Access Key provided by the object storage provider."
@@ -114,6 +116,13 @@
   import Password from 'primevue/password'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { value: hmacActive } = useField('modules.originShield.config.hmac.enabled')
   const { value: hmacType } = useField('modules.originShield.config.hmac.config.type')

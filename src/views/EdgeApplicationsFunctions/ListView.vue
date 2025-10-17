@@ -1,62 +1,6 @@
-<template>
-  <DrawerFunction
-    ref="drawerFunctionRef"
-    :edgeApplicationId="edgeApplicationId"
-    @onSuccess="reloadList"
-  />
-  <div v-if="hasContentToList">
-    <FetchListTableBlock
-      ref="listFunctionsEdgeApplicationsRef"
-      :listService="listEdgeApplicationFunctions"
-      :columns="getColumns"
-      :editInDrawer="openEditFunctionDrawer"
-      @on-load-data="handleLoadData"
-      @on-before-go-to-edit="handleTrackClickToEdit"
-      :actions="actions"
-      isTabs
-      :defaultOrderingFieldName="'name'"
-      :apiFields="FUNCTIONS_API_FIELDS"
-    >
-      <template #addButton>
-        <PrimeButton
-          icon="pi pi-plus"
-          data-testid="functions-instance__create-button"
-          label="Function Instance"
-          @click="openCreateFunctionDrawer"
-        />
-      </template>
-    </FetchListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No Functions have been instantiated"
-    description="Click the button below to instantiate your first Function."
-    createButtonLabel="Function Instance"
-    :documentationService="props.documentationService"
-    :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        data-testid="functions-instance__create-button"
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Function Instance"
-        @click="openCreateFunctionDrawer"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-</template>
-
 <script setup>
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import PrimeButton from 'primevue/button'
-  import Illustration from '@/assets/svg/illustration-layers'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
@@ -80,7 +24,6 @@
 
   const router = useRouter()
   const route = useRoute()
-  const hasContentToList = ref(true)
   const FUNCTIONS_API_FIELDS = [
     'id',
     'name',
@@ -144,10 +87,6 @@
     )
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const openCreateFunctionDrawer = () => {
     handleTrackClickToCreate()
     drawerFunctionRef.value.openDrawerCreate()
@@ -171,11 +110,7 @@
   }
 
   const reloadList = () => {
-    if (hasContentToList.value) {
-      listFunctionsEdgeApplicationsRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listFunctionsEdgeApplicationsRef.value.reload()
   }
 
   const actions = [
@@ -206,3 +141,40 @@
     openDrawerById({ id: route.query.id })
   })
 </script>
+
+<template>
+  <DrawerFunction
+    ref="drawerFunctionRef"
+    :edgeApplicationId="edgeApplicationId"
+    @onSuccess="reloadList"
+  />
+  <FetchListTableBlock
+    ref="listFunctionsEdgeApplicationsRef"
+    :listService="listEdgeApplicationFunctions"
+    :columns="getColumns"
+    :editInDrawer="openEditFunctionDrawer"
+    @on-load-data="handleLoadData"
+    @on-before-go-to-edit="handleTrackClickToEdit"
+    :actions="actions"
+    isTabs
+    :defaultOrderingFieldName="'name'"
+    :apiFields="FUNCTIONS_API_FIELDS"
+    :emptyBlock="{
+      title: 'No Functions have been instantiated',
+      description: 'Click the button below to instantiate your first Function.',
+      createButtonLabel: 'Function Instance',
+      createPagePath: '/edge-applications/functions/create',
+      documentationService: props.documentationService
+    }"
+  >
+    <template #emptyBlockButton>
+      <PrimeButton
+        icon="pi pi-plus"
+        data-testid="functions-instance__create-button"
+        severity="secondary"
+        label="Function Instance"
+        @click="openCreateFunctionDrawer"
+      />
+    </template>
+  </FetchListTableBlock>
+</template>

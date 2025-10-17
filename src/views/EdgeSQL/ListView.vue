@@ -2,9 +2,7 @@
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
 
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
@@ -183,7 +181,6 @@
         complete.
       </InlineMessage>
       <FetchListTableBlock
-        v-if="hasContentToList"
         ref="fetchListRef"
         addButtonLabel="Database"
         createPagePath="/sql-database/create"
@@ -199,20 +196,15 @@
         data-testid="edge-sql-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'name'"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No Databases have been created',
+          description: 'Create your first SQL Database to store and query your data at the edge.',
+          createButtonLabel: 'Database',
+          createPagePath: '/sql-database/create',
+          documentationService: Helpers.documentationGuideProducts.edgeSQL
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No Databases have been created"
-        description="Create your first SQL Database to store and query your data at the edge."
-        createButtonLabel="Database"
-        createPagePath="/sql-database/create"
-        :documentationService="Helpers.documentationGuideProducts.edgeSQL"
-        data-testid="edge-sql-empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

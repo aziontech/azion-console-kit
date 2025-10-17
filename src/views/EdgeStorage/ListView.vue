@@ -99,6 +99,7 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
+                  :disabled="isUploading"
                   :menuButtonProps="{
                     class: 'rounded-l-none',
                     style: { color: 'var(--primary-text-color) !important' }
@@ -110,13 +111,6 @@
               </div>
             </div>
             <UploadCard />
-            <input
-              ref="dragDropFileInput"
-              type="file"
-              multiple
-              style="display: none"
-              @change="handleDragDropUpload"
-            />
 
             <DragAndDrop
               v-if="showDragAndDrop"
@@ -126,7 +120,7 @@
             <div
               v-else
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
-              :class="{ 'border-dashed !border-[#f3652b]': isDragOver }"
+              :class="{ 'border-dashed border-[#f3652b] rounded-md pb-4': isDragOver }"
             >
               <ListTableBlock
                 pageTitleDelete="Files"
@@ -145,7 +139,6 @@
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
-                @drop.prevent="handleDragDropUpload"
                 @download-selected-items="handleDownload(selectedFiles)"
                 class="w-full"
               />
@@ -155,8 +148,13 @@
                 <p class="text-sm text-color-secondary">
                   Drag files here to add them to your bucket or
                   <span
-                    class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
-                    @click="openFileSelector"
+                    class="transition-colors"
+                    :class="
+                      isUploading
+                        ? 'text-color-secondary cursor-not-allowed'
+                        : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
+                    "
+                    @click="!isUploading && openFileSelector()"
                     >choose your files</span
                   >
                 </p>
@@ -201,17 +199,11 @@
     selectedFiles,
     isDownloading,
     showDragAndDrop,
-    folderPath
+    folderPath,
+    isUploading
   } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
-
-  defineProps({
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const fileActions = [
     {
@@ -245,7 +237,7 @@
   ]
   const uploadMenuItems = [
     {
-      label: 'Create folder',
+      label: 'Upload folder',
       icon: 'pi pi-folder',
       command: () => openFileSelector('folder')
     },
@@ -409,6 +401,7 @@
       folderPath.value = `${pathToFolder}/`
     }
 
+    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
@@ -421,6 +414,8 @@
   }
 
   const openFileSelector = (type = 'files') => {
+    if (isUploading.value) return
+
     const input = document.createElement('input')
     input.type = 'file'
     input.style.display = 'none'
@@ -436,8 +431,8 @@
     input.onchange = async (event) => {
       const files = event.target.files
       if (files.length) {
-        await uploadFiles(files)
         filesTableNeedRefresh.value = true
+        await uploadFiles(files)
         listServiceFilesRef.value?.reload()
       }
       document.body.removeChild(input)
@@ -452,6 +447,7 @@
       goBackToBucket()
     } else if (item.isFolder) {
       folderPath.value += item.name
+      router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
@@ -461,19 +457,19 @@
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
 
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
-      title:
-        selectedFiles.value.length > 1 ? `${selectedFiles.value.length} selected files` : 'File',
+      title: selectedFiles.value.length > 1 ? `${selectedFiles.value.length} files` : 'File',
       message: 'Are you sure you want to delete the selected files?',
       data: {
-        deleteConfirmationText: selectedFiles.value[0].name
+        deleteConfirmationText:
+          selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
       },
-      bypassConfirmation: selectedFiles.value.length > 1,
       deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
       successCallback: () => {
         listServiceFilesRef.value?.reload()
@@ -516,10 +512,12 @@
 
   const handleDragDropUpload = async (event) => {
     isDragOver.value = false
+    if (isUploading.value) return
+
     const files = event.target.files || event.dataTransfer.files
     if (files.length) {
-      await uploadFiles(files)
       filesTableNeedRefresh.value = true
+      await uploadFiles(files)
       listServiceFilesRef.value?.reload()
     }
   }
@@ -541,11 +539,14 @@
     listServiceFilesRef.value?.reload()
   }
 
-  watch(route, () => {
-    const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
-    selectBucket(bucket)
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
-  })
+  watch(
+    () => route.params.id,
+    () => {
+      const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
+      selectBucket(bucket)
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+    }
+  )
 
   watch(
     breadcrumbItems,
@@ -559,17 +560,57 @@
     setTimeout(updateContainerWidth, 50)
   })
 
+  const handleDocumentDragOver = (event) => {
+    event.preventDefault()
+    handleDrag(true)
+  }
+
+  const handleDocumentDragEnter = (event) => {
+    event.preventDefault()
+    handleDrag(true)
+  }
+
+  const handleDocumentDrop = (event) => {
+    event.preventDefault()
+    handleDragDropUpload(event)
+  }
+
+  const handleDocumentDragLeave = (event) => {
+    if (!event.relatedTarget || !document.contains(event.relatedTarget)) {
+      handleDrag(false)
+    }
+  }
+
+  const setupDocumentDragEvents = () => {
+    document.addEventListener('dragover', handleDocumentDragOver)
+    document.addEventListener('dragenter', handleDocumentDragEnter)
+    document.addEventListener('drop', handleDocumentDrop)
+    document.addEventListener('dragleave', handleDocumentDragLeave)
+  }
+
+  const removeDocumentDragEvents = () => {
+    document.removeEventListener('dragover', handleDocumentDragOver)
+    document.removeEventListener('dragenter', handleDocumentDragEnter)
+    document.removeEventListener('drop', handleDocumentDrop)
+    document.removeEventListener('dragleave', handleDocumentDragLeave)
+  }
+
   onMounted(async () => {
-    if (route.params.id) {
-      router.replace('/object-storage')
+    if (route.params?.id && route.query?.folderPath) {
+      folderPath.value = route.query.folderPath
     }
 
     setTimeout(updateContainerWidth, 100)
 
     window.addEventListener('resize', updateContainerWidth)
+    setupDocumentDragEvents()
   })
 
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
+    removeDocumentDragEvents()
+    selectedBucket.value = null
+    folderPath.value = ''
+    selectedFiles.value = []
   })
 </script>

@@ -21,6 +21,7 @@ coverage
 
 # Editor directories and files
 .vscode/*
+.windsurf/*
 !.vscode/extensions.json
 .idea
 *.suo

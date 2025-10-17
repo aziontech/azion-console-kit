@@ -46,7 +46,7 @@
       actions: {
         link: {
           label: 'View Firewall',
-          callback: () => response.redirectToUrl(`/firewall/edit/${response.data.id}`)
+          callback: () => response.redirectToUrl(`/firewalls/edit/${response.data.id}`)
         }
       }
     }

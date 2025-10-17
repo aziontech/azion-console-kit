@@ -1,5 +1,5 @@
 <template>
-  <div class="gap-2 flex items-center">
+  <div class="gap-2 flex items-center w-full justify-between pr-1">
     <expand-text-column :value="content"></expand-text-column>
     <CopyBlock
       :value="content"

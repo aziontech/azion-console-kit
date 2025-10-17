@@ -35,6 +35,10 @@
     readonly: {
       type: Boolean,
       default: false
+    },
+    sensitive: {
+      type: Boolean,
+      default: false
     }
   })
   const inputRef = ref(null)
@@ -97,6 +101,7 @@
     @input="handleChange"
     :class="[{ 'p-invalid': errorMessage }, props.class]"
     @blur="onBlur"
+    v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
   />
   <small
     v-if="errorMessage"

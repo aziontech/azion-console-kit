@@ -3,6 +3,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
+  import { handleCopyDNSSEC } from '../Config/dnssec'
 
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
@@ -17,10 +19,13 @@
   const edgeDNSStore = useEdgeDNSStore()
 
   const { value: domain } = useField('domain')
+  const { value: dnssec } = useField('dnssec')
 
   watch(domain, () => {
     edgeDNSStore.addDomain(domain.value)
   })
+
+  const dnssecData = handleCopyDNSSEC(null, false)
 </script>
 
 <template>
@@ -73,6 +78,30 @@
           title="Enable DNSSEC"
           data-testid="edge-dns-form__dnssec"
         />
+      </div>
+      <div
+        v-if="dnssec"
+        class="flex flex-col gap-8"
+      >
+        <div
+          class="flex items-center sm:max-w-lg w-full gap-2"
+          v-for="(entry, index) in dnssecData"
+          :key="index"
+        >
+          <div class="sm:max-w-xs gap-2 w-full flex flex-col">
+            <FieldTextIcon
+              class="w-full"
+              :label="entry.label"
+              required
+              :name="entry.name"
+              v-model="entry.value"
+              :data-testid="`edge-dns-form__${entry.name}`"
+              :description="entry.description"
+              disabled
+              icon="pi pi-lock"
+            />
+          </div>
+        </div>
       </div>
     </template>
   </FormHorizontal>

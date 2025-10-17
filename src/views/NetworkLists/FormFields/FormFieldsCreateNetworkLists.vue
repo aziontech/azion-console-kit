@@ -3,8 +3,9 @@
   import MultiSelect from 'primevue/multiselect'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import LabelBlock from '@/templates/label-block'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import { networkGrouRadio } from '../Config/typeNetwork'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
@@ -16,11 +17,6 @@
     }
   })
 
-  const options = ref([
-    { name: 'ASN', value: 'asn' },
-    { name: 'Countries', value: 'countries' },
-    { name: 'IP/CIDR', value: 'ip_cidr' }
-  ])
   const countriesList = ref([])
 
   const { value: networkListType } = useField('networkListType')
@@ -93,19 +89,11 @@
     description="Specificy the type of network list you want to create and the properties that'll compose the list."
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
-          label="Type"
-          name="networkListType"
-          :options="options"
-          optionValue="value"
-          optionLabel="name"
-          :value="networkListType"
-          appendTo="self"
-          description="Each list type accepts different values."
-          data-testid="network-list-form__type"
-        />
-      </div>
+      <FieldGroupRadio
+        isCard
+        nameField="networkListType"
+        :options="networkGrouRadio"
+      />
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isAsnNetWorkType"
@@ -113,13 +101,12 @@
         <FieldTextArea
           label="List"
           required
-          placeholder="1234&#10;4321"
+          placeholder="13335&#10;53331"
           name="asn"
           rows="2"
           cols="30"
           :value="asn"
-          description="Separate each ASN value by using a new line. Duplicated entries are automatically
-          removed."
+          description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
           data-testid="network-list-form__asn-list"
         />
       </div>

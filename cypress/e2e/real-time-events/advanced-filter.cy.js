@@ -67,28 +67,28 @@ describe('Real-Time Events Advanced Filter', { tags: ['@dev3', '@xfail'] }, () =
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.get(selectors.realTimeEvents.input).type('statis ')
-      cy.get(selectors.realTimeEvents.errors).should('has.text', 'Attention: some provided fields do not match the currently available ones. Please, check and try again.')
+      cy.get(selectors.realTimeEvents.errors).should('has.text', 'some provided fields do not match the currently available ones. Please, check and try again.')
     })
 
     it('should open advanced filter and add filter status between incorrect', () => {
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.get(selectors.realTimeEvents.input).type('status between (200, 300')
-      cy.get(selectors.realTimeEvents.errors).should('has.text', 'Attention: Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).')
+      cy.get(selectors.realTimeEvents.errors).should('has.text', 'Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).')
     })
 
     it('should display an error when trying to add a composite field without double quotes in the field', () => {
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.get(selectors.realTimeEvents.input).type('upstream status')
-      cy.get(selectors.realTimeEvents.errors).should('has.text', 'Attention: composite fields must be included in quotes. e.g: "Upstream Status".')
+      cy.get(selectors.realTimeEvents.errors).should('has.text', 'composite fields must be included in quotes. e.g: "Upstream Status".')
     })
 
     it('should display an error when adding a filter without space between the field, operator, and value', () => {
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.get(selectors.realTimeEvents.input).type('status =200')
-      cy.get(selectors.realTimeEvents.errors).should('has.text', 'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".')
+      cy.get(selectors.realTimeEvents.errors).should('has.text', 'please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".')
     })
   })
 

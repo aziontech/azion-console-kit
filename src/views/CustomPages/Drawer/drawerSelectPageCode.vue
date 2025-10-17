@@ -23,6 +23,7 @@
   const showEditCustomPagesDrawer = ref(false)
   const selectedCustomPageToEdit = ref('')
   const debouncedDrawerAnimate = 300
+  const isOverlapped = ref(false)
 
   const showEditDrawer = refDebounced(showEditCustomPagesDrawer, debouncedDrawerAnimate)
 
@@ -96,6 +97,10 @@
     }
   }
 
+  const handleIsOverlapped = (value) => {
+    isOverlapped.value = value
+  }
+
   defineExpose({
     openEditDrawer
   })
@@ -109,11 +114,13 @@
     :loadService="loadService"
     :schema="pageSchema"
     :title="title"
+    :isOverlapped="isOverlapped"
   >
     <template #formFields>
       <FormFieldsStatusCode
         :itemStatusCode="itemStatusCode"
         :optionsStatusCode="optionsStatusCode"
+        @isOverlapped="handleIsOverlapped"
       />
     </template>
     <template #action-bar="{ handleSubmit, onCancel, formValid, scrollToErrorInDrawer }">
