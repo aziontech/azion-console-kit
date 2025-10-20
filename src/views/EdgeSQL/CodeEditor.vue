@@ -2,18 +2,7 @@
   <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full">
     <div class="flex flex-col !w-64">
       <div class="flex flex-col w-full gap-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium text-color-primary">Query History</h3>
-          <Button
-            icon="pi pi-plus"
-            size="small"
-            outlined
-            @click="emit('create-query')"
-            data-testid="create-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-        </div>
-
+        <h3 class="text-lg font-medium text-color-primary">Query History</h3>
         <div class="p-input-icon-left">
           <i class="pi pi-search" />
           <InputText
@@ -68,11 +57,11 @@
       <Splitter
         :pt="{ root: { 'data-testid': 'code-editor', class: 'border-none' } }"
         layout="vertical"
-        style="height: calc(100vh - 250px)"
+        style="height: calc(100vh - 250px); width: 100%"
         @resizeend="onResizeEnd"
       >
         <SplitterPanel
-          class="h-full"
+          class="h-full w-full"
           :size="editorPanelSize"
           :minSize="20"
           :pt="{ root: { 'data-testid': 'code-editor__panel__editor' } }"
