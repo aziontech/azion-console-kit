@@ -27,7 +27,9 @@
         </p>
       </div>
 
-      <p class="text-sm text-color-secondary">Only PDF and TXT files are supported. Files larger than 300 MB cannot be uploaded.</p>
+      <p class="text-sm text-color-secondary">
+        Only PDF and TXT files are supported. Files larger than 300 MB cannot be uploaded.
+      </p>
     </div>
 
     <input

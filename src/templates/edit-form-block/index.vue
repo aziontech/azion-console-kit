@@ -110,29 +110,15 @@
   const loadInitialData = async () => {
     try {
       const { id } = route.params
-      console.log('🔄 EditFormBlock: Loading data for id:', id)
 
       const initialValues = await props.loadService({ id })
-      console.log('🔄 EditFormBlock: Received initial values:', initialValues)
 
       emit('loaded-service-object', initialValues)
-
-      console.log('🔄 EditFormBlock: Current form values before reset:', values)
-      console.log('🔄 EditFormBlock: About to reset form with values:', initialValues)
 
       // Try both resetForm and setValues
       resetForm({ values: initialValues })
       setValues(initialValues)
-
-      console.log('🔄 EditFormBlock: Form values after reset and setValues:', values)
-
-      // Double check after nextTick
-      setTimeout(() => {
-        console.log('🔄 EditFormBlock: Form values after 100ms:', values)
-      }, 100)
-
     } catch (error) {
-      console.error('🔄 EditFormBlock: Error loading initial data:', error)
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {

@@ -1,5 +1,8 @@
 import { ref } from 'vue'
-import { createDocumentService, deleteDocumentService } from '@/services/knowledge-base-services/document-service'
+import {
+  createDocumentService,
+  deleteDocumentService
+} from '@/services/knowledge-base-services/document-service'
 import { useToast } from 'primevue/usetoast'
 
 const selectedKnowledgeBase = ref(null)
@@ -137,7 +140,11 @@ export const useKnowledgeBase = () => {
       }
     } catch (error) {
       isUploading.value = false
-      handleToast('error', 'Upload Failed', 'An unexpected error occurred during upload. Please try again.')
+      handleToast(
+        'error',
+        'Upload Failed',
+        'An unexpected error occurred during upload. Please try again.'
+      )
     }
   }
 

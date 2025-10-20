@@ -1,9 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="knowledgeBase?.name ? knowledgeBase.name : 'Knowledge Base'"
-      />
+      <PageHeadingBlock :pageTitle="knowledgeBase?.name ? knowledgeBase.name : 'Knowledge Base'" />
     </template>
     <template #content>
       <div class="flex w-full">
@@ -94,7 +92,8 @@
                   <span
                     class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
                     @click="openDocumentSelector"
-                  >choose your files</span>
+                    >choose your files</span
+                  >
                 </p>
               </div>
             </div>
@@ -123,17 +122,19 @@
                     <span
                       class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
                       @click="openDocumentSelector"
-                    >choose your files</span>
+                      >choose your files</span
+                    >
                   </p>
                 </div>
 
-                <p class="text-sm text-color-secondary">Only PDF and TXT files are supported. Files larger than 300 MB cannot be uploaded.</p>
+                <p class="text-sm text-color-secondary">
+                  Only PDF and TXT files are supported. Files larger than 300 MB cannot be uploaded.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </template>
   </ContentBlock>
 </template>
@@ -145,11 +146,14 @@
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { listDocumentsService, deleteDocumentService } from '@/services/knowledge-base-services/document-service'
+  import {
+    listDocumentsService,
+    deleteDocumentService
+  } from '@/services/knowledge-base-services/document-service'
   import { loadKnowledgeBaseService } from '@/services/knowledge-base-services/load-knowledge-base-service'
   import { useKnowledgeBase } from '@/composables/useKnowledgeBase'
   import UploadCard from './components/UploadCard.vue'
@@ -184,10 +188,6 @@
       command: () => openDocumentSelector('folder')
     }
   ]
-
-  const pageTitle = computed(() => {
-    return knowledgeBase.value?.name || 'Knowledge Base'
-  })
 
   const getColumns = [
     {
@@ -227,26 +227,24 @@
 
     try {
       const documents = await listDocumentsService(route.params.id)
-      console.log('📄 Raw documents from API:', documents)
-      const mappedDocuments = Array.isArray(documents) ? documents.map(doc => {
-        console.log('📄 Mapping document:', doc)
-        const mappedDoc = {
-          id: doc.document_id || doc.id,
-          document_id: doc.document_id || doc.id, // Keep both for compatibility
-          name: doc.name,
-          type: doc.type?.toUpperCase() || 'UNKNOWN',
-          size: doc.size ? formatFileSize(doc.size) : '-',
-          createdAt: doc.created_at ? formatDate(doc.created_at) : '-',
-          status: doc.status || 'Processing'
-        }
-        console.log('📄 Mapped document:', mappedDoc)
-        return mappedDoc
-      }) : []
+      const mappedDocuments = Array.isArray(documents)
+        ? documents.map((documentRecord) => {
+            const mappedDoc = {
+              id: documentRecord.document_id || documentRecord.id,
+              document_id: documentRecord.document_id || documentRecord.id, // Keep both for compatibility
+              name: documentRecord.name,
+              type: documentRecord.type?.toUpperCase() || 'UNKNOWN',
+              size: documentRecord.size ? formatFileSize(documentRecord.size) : '-',
+              createdAt: documentRecord.created_at ? formatDate(documentRecord.created_at) : '-',
+              status: documentRecord.status || 'Processing'
+            }
+            return mappedDoc
+          })
+        : []
 
       showDragAndDrop.value = !mappedDocuments?.length
       return mappedDocuments
     } catch (error) {
-      console.error('Failed to load documents:', error)
       handleToast('error', 'Error', 'Failed to load documents')
       return []
     }
@@ -254,10 +252,10 @@
 
   const formatFileSize = (bytes) => {
     if (!bytes) return '0 B'
-    const k = 1024
+    const kilobyte = 1024
     const sizes = ['B', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    const sizeIndex = Math.floor(Math.log(bytes) / Math.log(kilobyte))
+    return parseFloat((bytes / Math.pow(kilobyte, sizeIndex)).toFixed(2)) + ' ' + sizes[sizeIndex]
   }
 
   const formatDate = (dateString) => {
@@ -282,7 +280,6 @@
       const kbData = await loadKnowledgeBaseService({ id: route.params.id })
       knowledgeBase.value = kbData
     } catch (error) {
-      console.error('Failed to load knowledge base:', error)
       handleToast('error', 'Error', 'Failed to load knowledge base details')
       router.push('/ai/knowledge-base')
     }
@@ -327,8 +324,6 @@
     input.click()
   }
 
-
-
   const handleDrag = (value) => {
     isDragOver.value = value
   }
@@ -351,16 +346,9 @@
   }
 
   const handleDeleteDocument = async (item) => {
-    console.log('🗑️ handleDeleteDocument called with item:', item)
-    console.log('🗑️ item.id:', item.id)
-    console.log('🗑️ item.document_id:', item.document_id)
-    console.log('🗑️ KB ID:', route.params.id)
-
     const documentId = item.document_id || item.id
-    console.log('🗑️ Using document ID:', documentId)
 
     if (!documentId) {
-      console.error('❌ No document ID found!', item)
       handleToast('error', 'Error', 'Document ID is missing')
       return
     }
@@ -369,21 +357,26 @@
       await deleteDocumentService(route.params.id, documentId)
       await listDocumentsRef.value?.reload()
     } catch (error) {
-      console.error('Failed to delete document:', error)
       handleToast('error', 'Error', 'Failed to delete document')
     }
   }
 
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
-      title: selectedDocuments.value.length > 1 ?
-        `${selectedDocuments.value.length} selected documents` : 'Document',
+      title:
+        selectedDocuments.value.length > 1
+          ? `${selectedDocuments.value.length} selected documents`
+          : 'Document',
       message: 'Are you sure you want to delete the selected documents?',
       data: {
         deleteConfirmationText: selectedDocuments.value[0]?.name || ''
       },
       bypassConfirmation: selectedDocuments.value.length > 1,
-      deleteService: () => removeDocuments(route.params.id, selectedDocuments.value.map((doc) => doc.id)),
+      deleteService: () =>
+        removeDocuments(
+          route.params.id,
+          selectedDocuments.value.map((doc) => doc.id)
+        ),
       successCallback: async () => {
         await listDocumentsRef.value?.reload()
       },

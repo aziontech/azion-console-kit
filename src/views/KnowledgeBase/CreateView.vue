@@ -11,7 +11,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
+  defineProps({
     createKnowledgeBaseService: {
       type: Function,
       required: true
@@ -41,7 +41,7 @@
       feedback: 'Your knowledge base item has been created',
       actions: {
         link: {
-          label: 'View Knowledge Base List', 
+          label: 'View Knowledge Base List',
           callback: () => response.redirectToUrl('/ai/knowledge-base')
         }
       }

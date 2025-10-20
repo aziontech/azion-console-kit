@@ -12,15 +12,12 @@ export const getAuthHeaders = () => {
   const apiToken = import.meta.env.VITE_API_TOKEN
 
   const headers = {
-    'Accept': 'application/json'
+    Accept: 'application/json'
   }
 
   // If token auth is enabled and token exists, add Authorization header
   if (useTokenAuth && apiToken) {
     headers['Authorization'] = `Token ${apiToken}`
-    console.log('🔑 Using Token Authentication')
-  } else {
-    console.log('🍪 Using Cookie Authentication (withCredentials)')
   }
 
   return headers

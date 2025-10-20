@@ -4,8 +4,6 @@ import { getAuthHeaders } from './auth-helper'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 
 export const loadKnowledgeBaseService = async ({ id }) => {
-  console.log('📥 loadKnowledgeBaseService called with id:', id)
-
   try {
     let httpResponse = await AxiosHttpClientAdapter.request({
       url: `${makeKnowledgeBaseBaseUrl()}/${id}`,
@@ -14,15 +12,11 @@ export const loadKnowledgeBaseService = async ({ id }) => {
       baseURL: ''
     })
 
-    console.log('📥 Load response:', httpResponse)
     httpResponse = adapt(httpResponse)
 
     const result = parseHttpResponse(httpResponse)
-    console.log('📥 Final parsed result:', result)
     return result
   } catch (error) {
-    console.error('📥 Load service error:', error)
-
     // FALLBACK MOCK DATA FOR TESTING WHEN API IS UNAVAILABLE
     const mockData = {
       id: id,
@@ -31,7 +25,6 @@ export const loadKnowledgeBaseService = async ({ id }) => {
       embedding_model: 'text-embedding-3-small'
     }
 
-    console.log('📥 Using fallback mock data:', mockData)
     return mockData
   }
 }
@@ -41,11 +34,8 @@ const adapt = (httpResponse) => {
     throw new Error(extractApiError({ body: httpResponse.body })).message
   }
 
-  console.log('📥 Raw response body:', httpResponse.body)
-
   // The AI Studio API returns data nested under 'data' property
   const kbData = httpResponse.body.data || httpResponse.body
-  console.log('📥 Knowledge base data:', kbData)
 
   const parsedKnowledgeBase = {
     id: kbData.kb_id || kbData.uuid || kbData.id,
@@ -53,17 +43,18 @@ const adapt = (httpResponse) => {
     description: kbData.description,
     embedding_model: kbData.embedding_model || 'text-embedding-3-small',
     lastEditor: kbData.updated_by || kbData.created_by || 'Unknown',
-    updatedAt: kbData.updated_at || kbData.created_at ?
-      new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
-        new Date(kbData.updated_at || kbData.created_at)
-      ) : 'Unknown',
-    createdAt: kbData.created_at ?
-      new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
-        new Date(kbData.created_at)
-      ) : 'Unknown'
+    updatedAt:
+      kbData.updated_at || kbData.created_at
+        ? new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
+            new Date(kbData.updated_at || kbData.created_at)
+          )
+        : 'Unknown',
+    createdAt: kbData.created_at
+      ? new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(
+          new Date(kbData.created_at)
+        )
+      : 'Unknown'
   }
-
-  console.log('📥 Adapted knowledge base:', parsedKnowledgeBase)
 
   return {
     body: parsedKnowledgeBase,

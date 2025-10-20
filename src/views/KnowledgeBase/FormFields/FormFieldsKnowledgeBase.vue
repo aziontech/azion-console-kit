@@ -5,7 +5,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
   import { useField } from 'vee-validate'
-  import { watch, inject, onMounted, nextTick } from 'vue'
+  import { onMounted, nextTick } from 'vue'
   defineOptions({ name: 'form-fields-knowledge-base' })
 
   const props = defineProps({
@@ -15,8 +15,8 @@
     }
   })
 
-  const { value: name, setValue: setName } = useField('name')
-  const { value: description, setValue: setDescription } = useField('description')
+  const { setValue: setName } = useField('name')
+  const { setValue: setDescription } = useField('description')
   const { value: embedding_model, setValue: setEmbeddingModel } = useField('embedding_model')
 
   // Set default embedding model on mount if not in edit mode
@@ -29,19 +29,14 @@
   // Listen for form data changes from parent and manually set field values
   const handleExternalDataUpdate = (data) => {
     if (data && props.isEditMode) {
-      console.log('📝 FormFields: Received external data update:', data)
-
       nextTick(() => {
         if (data.name) {
-          console.log('📝 FormFields: Setting name to:', data.name)
           setName(data.name)
         }
         if (data.description) {
-          console.log('📝 FormFields: Setting description to:', data.description)
           setDescription(data.description)
         }
         if (data.embedding_model) {
-          console.log('📝 FormFields: Setting embedding_model to:', data.embedding_model)
           setEmbeddingModel(data.embedding_model)
         }
       })
@@ -64,15 +59,6 @@
     { label: 'text-embedding-3-small (Default)', value: 'text-embedding-3-small' }
   ]
 
-  // Debug form values
-  watch([name, description, embedding_model], () => {
-    console.log('📝 FormFields: Form values updated:')
-    console.log('  name:', name.value)
-    console.log('  description:', description.value)
-    console.log('  embedding_model:', embedding_model.value)
-    console.log('  isEditMode:', props.isEditMode)
-  }, { immediate: true, deep: true })
-
   // Note: Default values should be handled by the form initialization in create mode
   // or by the loaded data in edit mode - not manually set here
 </script>
@@ -90,7 +76,11 @@
           name="name"
           placeholder="Knowledge Base Name"
           :disabled="props.isEditMode"
-          :description="props.isEditMode ? 'Name cannot be changed after creation.' : 'Give a descriptive name for the knowledge base.'"
+          :description="
+            props.isEditMode
+              ? 'Name cannot be changed after creation.'
+              : 'Give a descriptive name for the knowledge base.'
+          "
           data-testid="knowledge-base-form__name-field"
         />
       </div>
@@ -116,7 +106,11 @@
           optionValue="value"
           placeholder="Select embedding model"
           disabled
-          :description="props.isEditMode ? 'Embedding model cannot be changed after creation.' : 'The default embedding model is pre-selected for this knowledge base.'"
+          :description="
+            props.isEditMode
+              ? 'Embedding model cannot be changed after creation.'
+              : 'The default embedding model is pre-selected for this knowledge base.'
+          "
           data-testid="knowledge-base-form__embedding-model-field"
         />
       </div>

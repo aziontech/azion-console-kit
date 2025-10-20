@@ -76,7 +76,7 @@
         })
       }
     } catch (error) {
-      console.warn('Analytics tracking failed:', error)
+      // Silently fail on analytics errors
     }
     router.push(`/ai/knowledge-base/edit/${item.id}`)
   }
@@ -103,7 +103,6 @@
     })
   }
 
-
   const getColumns = computed(() => [
     {
       field: 'name',
@@ -127,5 +126,4 @@
       sortField: 'updatedAtDate'
     }
   ])
-
 </script>

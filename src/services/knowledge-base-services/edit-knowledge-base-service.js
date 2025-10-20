@@ -1,14 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeKnowledgeBaseBaseUrl } from './make-knowledge-base-base-url'
 import * as Errors from '@/services/axios/errors'
-import { extractApiError } from '@/helpers/extract-api-error'
 import { getAuthHeaders } from './auth-helper'
 
 export const editKnowledgeBaseService = async (payload) => {
-  console.log('🔄 editKnowledgeBaseService called with payload:', payload)
-
   const parsedPayload = adapt(payload)
-  console.log('🔄 Adapted payload for edit:', parsedPayload)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeKnowledgeBaseBaseUrl()}/${payload.id}`,
@@ -18,7 +14,6 @@ export const editKnowledgeBaseService = async (payload) => {
     baseURL: ''
   })
 
-  console.log('🔄 Edit response:', httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
