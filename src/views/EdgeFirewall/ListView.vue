@@ -35,7 +35,7 @@
     {
       type: 'dialog',
       label: 'Clone',
-      icon: 'pi pi-fw pi-copy',
+      icon: 'pi pi-fw pi-clone',
       dialog: {
         component: CloneBlock,
         body: (item) => ({
@@ -111,19 +111,19 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Firewalls"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Firewall"
-        createPagePath="/firewall/create"
-        editPagePath="/firewall/edit"
+        createPagePath="/firewalls/create"
+        editPagePath="/firewalls/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Firewall found."
+        emptyListMessage="No Firewalls found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
@@ -131,10 +131,10 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No Firewall has been created."
+        title="No Firewalls has been created."
         description="Click the button below to create your first Firewall."
         createButtonLabel="Firewall"
-        createPagePath="/firewall/create"
+        createPagePath="/firewalls/create"
         :documentationService="props.documentationService"
         @click-to-create="handleTrackEvent"
       >

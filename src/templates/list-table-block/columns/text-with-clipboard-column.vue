@@ -1,6 +1,9 @@
 <template>
   <div class="gap-2 flex items-center">
-    <expand-text-column :value="content"></expand-text-column>
+    <expand-text-column
+      :value="content"
+      :sliceValue="30"
+    ></expand-text-column>
     <CopyBlock
       :value="content"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"

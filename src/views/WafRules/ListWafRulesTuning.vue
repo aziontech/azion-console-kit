@@ -463,7 +463,7 @@
           v-model="selectedDomainIds"
           @change="setDomainsSelectedOptions"
           class="w-full sm:max-w-xs"
-          :placeholder="`Select a ${handleTextDomainWorkload.singularLabel}`"
+          :placeholder="`Select a ${handleTextDomainWorkload.singularTitle}`"
           filter
           display="chip"
           scrollHeight="250px"
@@ -552,8 +552,8 @@
 
   <EmptyResultsBlock
     v-if="!showListTable"
-    :title="`Select a ${handleTextDomainWorkload.singularLabel} to query data`"
-    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the Firewall that has a behavior running this WAF rule set.`"
+    :title="`Select a ${handleTextDomainWorkload.singularTitle} to query data`"
+    :description="`To use this feature, a ${handleTextDomainWorkload.singularTitle} must be associated with the Firewall that has a behavior running this WAF rule set.`"
     :documentationService="props.documentationServiceTuning"
     noShowBorderTop
     class="!mt-0"

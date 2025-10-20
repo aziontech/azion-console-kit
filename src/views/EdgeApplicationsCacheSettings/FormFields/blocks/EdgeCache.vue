@@ -62,7 +62,7 @@
 
       <div
         v-if="showOffsetRange"
-        class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
+        class="flex flex-col sm:max-w-xs w-full gap-2"
       >
         <label
           for="largeFileCacheOffset"
@@ -95,30 +95,32 @@
         </small>
       </div>
       <template v-if="isTieredCacheEnabled">
-        <FieldSwitchBlock
-          nameField="tieredCache"
-          name="tieredCache"
-          description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
-          auto
-          :isCard="false"
-          title="Enable Tiered Cache"
-          data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
-        />
-
-        <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdown
-            label="Tiered Cache Region"
-            name="tieredCacheRegion"
-            :options="TIERED_CACHE_REGION"
-            optionLabel="label"
-            optionValue="value"
-            :value="tieredCacheRegion"
-            :disabled="!tieredCache"
-            inputId="tieredCacheRegion"
-            placeholder="Select an Tiered Cache Region"
-            description="Choose an Tiered Cache Region suitable for your application."
-            data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+        <div class="flex flex-col gap-2">
+          <FieldSwitchBlock
+            nameField="tieredCache"
+            name="tieredCache"
+            description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
+            auto
+            :isCard="false"
+            title="Enable Tiered Cache"
+            data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
           />
+
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <FieldDropdown
+              label="Tiered Cache Region"
+              name="tieredCacheRegion"
+              :options="TIERED_CACHE_REGION"
+              optionLabel="label"
+              optionValue="value"
+              :value="tieredCacheRegion"
+              :disabled="!tieredCache"
+              inputId="tieredCacheRegion"
+              placeholder="Select an Tiered Cache Region"
+              description="Choose an Tiered Cache Region suitable for your application."
+              data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
+            />
+          </div>
         </div>
       </template>
     </template>

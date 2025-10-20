@@ -1,8 +1,9 @@
 <template>
   <FormHorizontal
     title="Connector Type"
-    description="Select the type of origin to connect to your edge connector."
+    description="Select the type of origin to connect to your Connector."
     data-testid="edge-connectors-form__section__connector-type"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
@@ -26,6 +27,13 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
 
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectorType' })
 
   const { value: type } = useField('type')
@@ -45,7 +53,7 @@
       title: 'Live Ingest',
       inputValue: 'live_ingest',
       subtitle:
-        'Enable real-time ingestion of live streams directly into your workloads for immediate processing and delivery.'
+        'Enable real-time ingestion of live streams directly into your Workloads for immediate processing and delivery.'
     }
   ]
 

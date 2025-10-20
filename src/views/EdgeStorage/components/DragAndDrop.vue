@@ -2,9 +2,6 @@
   <div class="flex w-full items-center justify-center">
     <div
       class="flex flex-col items-center gap-5 justify-center w-full mx-auto text-center py-16 border border-solid surface-border rounded-lg transition-colors"
-      @dragover.prevent
-      @dragenter.prevent
-      @drop.prevent="handleFileChange"
     >
       <div
         class="rounded-full border surface-border flex items-center justify-center w-[90px] h-[90px] mb-1"
@@ -20,8 +17,13 @@
         <p class="text-color-secondary">
           Or
           <span
-            class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
-            @click="openFileSelector"
+            class="transition-colors"
+            :class="
+              isUploading
+                ? 'text-color-secondary cursor-not-allowed'
+                : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
+            "
+            @click="!isUploading && openFileSelector()"
             >choose your files</span
           >
         </p>
@@ -35,19 +37,22 @@
       type="file"
       multiple
       class="hidden"
+      :disabled="isUploading"
       @change="handleFileChangeDragDrop"
     />
   </div>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { handleFileChange } = useEdgeStorage()
+  const { handleFileChange, isUploading } = useEdgeStorage()
   const fileInput = ref(null)
   const emit = defineEmits(['reload'])
+
   const openFileSelector = () => {
+    if (isUploading.value) return
     fileInput.value?.click()
   }
 
@@ -55,4 +60,32 @@
     await handleFileChange(event)
     emit('reload')
   }
+
+  const handleDocumentDragOver = (event) => {
+    event.preventDefault()
+  }
+
+  const handleDocumentDragLeave = (event) => {
+    event.preventDefault()
+  }
+
+  const setupDocumentDragEvents = () => {
+    document.addEventListener('dragover', handleDocumentDragOver)
+    document.addEventListener('dragenter', handleDocumentDragOver)
+    document.addEventListener('dragleave', handleDocumentDragLeave)
+  }
+
+  const removeDocumentDragEvents = () => {
+    document.removeEventListener('dragover', handleDocumentDragOver)
+    document.removeEventListener('dragenter', handleDocumentDragOver)
+    document.removeEventListener('dragleave', handleDocumentDragLeave)
+  }
+
+  onMounted(() => {
+    setupDocumentDragEvents()
+  })
+
+  onUnmounted(() => {
+    removeDocumentDragEvents()
+  })
 </script>

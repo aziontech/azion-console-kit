@@ -15,7 +15,7 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No Connectors found."
         :actions="actions"
-        addButtonLabel="Connectors"
+        addButtonLabel="Connector"
         createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         data-testid="edge-connectors-list-table-block"
@@ -63,7 +63,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'Connectors',
+      title: 'Connector',
       icon: 'pi pi-trash',
       service: edgeConnectorsService.deleteEdgeConnectorsService
     }

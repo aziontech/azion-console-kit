@@ -1,14 +1,15 @@
 name: Manual E2E Tests
 
-on:
-  workflow_dispatch:
-    inputs:
-      specName:
-        description: 'Test file name (e.g. cypress/e2e/waf.cy.js)'
-        required: true
-      environmentName:
-        description: 'Environment name (dev | stage | prod)'
-        required: true
+# DISABLED: Manual E2E test runner
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       specName:
+#         description: 'Test file name (e.g. cypress/e2e/waf.cy.js)'
+#         required: true
+#       environmentName:
+#         description: 'Environment name (dev | stage | prod)'
+#         required: true
 
 jobs:
   run-manual-e2e-tests:

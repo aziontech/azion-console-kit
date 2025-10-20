@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.41.0",
+  "version": "1.43.1",
   "private": false,
   "type": "module",
   "repository": {
@@ -39,6 +39,7 @@
     "@jsonforms/vue": "3.6.0",
     "@jsonforms/vue-vanilla": "3.6.0",
     "@mdi/font": "^7.4.47",
+    "@sentry/vite-plugin": "^4.3.0",
     "@sentry/vue": "^10.5.0",
     "@stripe/stripe-js": "^4.1.0",
     "@vee-validate/yup": "^4.11.1",

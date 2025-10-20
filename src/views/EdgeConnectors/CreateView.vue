@@ -49,7 +49,7 @@
       realIpHeader: 'X-Real-IP',
       realPortHeader: 'X-Real-PORT',
       followingRedirect: false,
-      dnsResolution: 'preserve',
+      dnsResolution: 'both',
       transportPolicy: 'preserve',
       bucket: '',
       prefix: '/',
@@ -98,10 +98,10 @@
 
   const handleToast = (response) => {
     const toast = {
-      feedback: 'Edge Connector successfully created',
+      feedback: 'Connector successfully created',
       actions: {
         link: {
-          label: 'View Edge Connector',
+          label: 'View Connector',
           callback: () => response.redirectToUrl(`/connectors/edit/${response.data.id}`)
         }
       }
