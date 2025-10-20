@@ -210,8 +210,7 @@
   const { value: type } = useField('type')
 
   const dnsResolutionList = [
-    { label: 'Preserve', value: 'preserve' },
-    { label: 'Force IPv6', value: 'force_ipv6' },
+    { label: 'IPv4 and IPv6', value: 'both' },
     { label: 'Force IPv4', value: 'force_ipv4' }
   ]
   const transportPolicyList = [
