@@ -34,6 +34,7 @@
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
       :emptyBlock="emptyBlock"
+      @column-reorder="handleColumnReorder"
     >
       <template
         #header
@@ -94,22 +95,23 @@
         :key="col.field"
       >
         <DataTable.Column
+          :columnKey="col.field"
           :sortable="!col.disableSort"
           :field="col.field"
           :header="col.header"
           :sortField="col?.sortField"
           data-testid="data-table-column"
           :style="col.style"
-          :frozen="frozenColumns.includes(col.field)"
+          :frozen="frozenColumns.includes(col.field) && frozenColumnHasReorder"
           :alignFrozen="'left'"
-          :headerStyle="frozenColumns.includes(col.field) ? 'width: 10px' : ''"
         >
           <template #body="{ data: rowData }">
             <div
               class="flex items-center gap-2"
               :class="{
-                'cursor-pointer hover:underline': frozenColumns.includes(col.field),
-                'cursor-pointer': !frozenColumns.length
+                'cursor-pointer hover:underline':
+                  frozenColumns.includes(col.field) && frozenColumnHasReorder,
+                'cursor-pointer': !frozenColumns.length || !frozenColumnHasReorder
               }"
               @click="(event) => rowClick(event, col, rowData)"
             >
@@ -144,9 +146,9 @@
       <DataTable.Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 13rem"
         :bodyStyle="classActions"
         data-testid="data-table-actions-column"
+        :reorderableColumn="false"
       >
         <template #header>
           <div
@@ -440,9 +442,10 @@
 
   // Additional computed properties specific to this component
   const havePagination = ref(true)
+  const frozenColumnHasReorder = ref(true)
   const classActions = computed(() =>
     isRenderActions.value
-      ? ''
+      ? 'max-w-[100px]'
       : 'background-color: transparent !important; cursor: pointer !important;'
   )
   const dataKey = ref('id')
@@ -450,13 +453,18 @@
 
   defineExpose({ reload, handleExportTableDataToCSV })
 
-  function rowClick(event, col, rowData) {
-    if (!props.frozenColumns.length) {
+  const rowClick = (event, col, rowData) => {
+    if (!props.frozenColumns.length || !frozenColumnHasReorder.value) {
       return editItemSelected(event, rowData)
     } else if (props.frozenColumns.includes(col.field)) {
       return editItemSelected(event, rowData)
     }
     return null
+  }
+
+  const handleColumnReorder = (event) => {
+    const columnIndex = event.findIndex((col) => props.frozenColumns.includes(col))
+    frozenColumnHasReorder.value = !columnIndex
   }
 </script>
 <style scoped lang="scss">

@@ -41,6 +41,11 @@
       @sort="emit('sort', $event)"
       scrollable
       removableSort
+      reorderableColumns
+      @column-reorder="handleReorder"
+      resizableColumns
+      columnResizeMode="fit"
+      @columnResizeEnd="applyDirtyColumnResizeFix"
     >
       <template
         v-if="hasHeaderSlot"
@@ -260,6 +265,7 @@
     'rowClick',
     'page',
     'sort',
+    'columnReorder',
     'update:filters',
     'update:sortField',
     'update:sortOrder',
@@ -320,6 +326,25 @@
     dataTableRef,
     exportCSV: () => dataTableRef.value?.exportCSV()
   })
+
+  const handleReorder = () => {
+    emit('columnReorder', dataTableRef.value.d_columnOrder)
+  }
+
+  const applyDirtyColumnResizeFix = () => {
+    const pvIdAttribute = Array.from(dataTableRef.value?.$el?.attributes).find((attr) =>
+      attr.name.startsWith('pv_id_')
+    )?.name
+    const columnSizesStyle = Array.from(document.querySelectorAll('style')).find((style) =>
+      style.textContent.includes('data-pc-name="datatable"')
+    )
+    if (columnSizesStyle) {
+      columnSizesStyle.textContent = columnSizesStyle.textContent.replace(
+        /\[pv_id_[0-9]+\]/gim,
+        `[${pvIdAttribute}]`
+      )
+    }
+  }
 </script>
 
 <style scoped lang="scss">
