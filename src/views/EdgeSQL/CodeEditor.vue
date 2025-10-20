@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full">
-    <div class="flex flex-col !w-64">
-      <div class="flex flex-col w-full gap-4">
+  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full min-h-0">
+    <div class="flex flex-col !w-64 min-h-0 h-[calc(100vh-250px)]">
+      <div class="flex flex-col w-full gap-4 min-h-0">
         <h3 class="text-lg font-medium text-color-primary">Query History</h3>
         <div class="p-input-icon-left">
           <i class="pi pi-search" />
@@ -12,7 +12,7 @@
           />
         </div>
 
-        <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
+        <div class="flex-1 min-h-0 overflow-y-auto !w-64">
           <div
             v-if="isLoading"
             class="flex flex-col gap-3"
@@ -44,9 +44,17 @@
               @click="selectQuery(query)"
             >
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-color-primary truncate">{{
-                  query.label
-                }}</span>
+                <span class="text-sm font-medium text-color-primary truncate">
+                  {{ query.originalQuery }}
+                </span>
+                <Button
+                  icon="pi pi-ellipsis-h"
+                  size="small"
+                  outlined
+                  @click.stop="openHistoryMenu($event, query)"
+                  data-testid="table-menu-button"
+                  class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                />
               </div>
             </div>
           </div>
@@ -54,6 +62,13 @@
       </div>
     </div>
     <div class="w-full">
+      <Menu
+        ref="historyMenu"
+        :model="historyMenuItems"
+        popup
+        appendTo="body"
+        :pt="{ root: { 'data-history-menu': true } }"
+      />
       <Splitter
         :pt="{ root: { 'data-testid': 'code-editor', class: 'border-none' } }"
         layout="vertical"
@@ -73,7 +88,7 @@
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
-                @click="emit('run-query', sqlQueryCommand.value)"
+                @click="runQuery"
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
                   pt: {
@@ -86,20 +101,12 @@
 
               <div class="flex gap-2">
                 <Button
-                  label="Table Reference"
-                  icon="pi pi-table"
-                  size="small"
-                  severity="secondary"
-                  outlined
-                  @click="emit('open-table-reference')"
-                />
-                <Button
                   label="Prettify"
                   icon="pi pi-align-left"
                   size="small"
                   outlined
                   severity="secondary"
-                  @click="emit('prettify')"
+                  @click="prettifyCode"
                 />
                 <Button
                   label="Templates"
@@ -107,7 +114,7 @@
                   size="small"
                   severity="secondary"
                   outlined
-                  @click="emit('open-templates')"
+                  @click="showTemplatesModal = true"
                 />
               </div>
             </div>
@@ -132,38 +139,47 @@
         </SplitterPanel>
       </Splitter>
     </div>
+    <QuickTemplates
+      v-if="showTemplatesModal"
+      :show-templates-modal="showTemplatesModal"
+      @use-template="handleUseTemplate"
+      @update:show-templates-modal="(v) => (showTemplatesModal = v)"
+    />
   </div>
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
-  import Splitter from 'primevue/splitter'
-  import SplitterPanel from 'primevue/splitterpanel'
+  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+  import { useRoute } from 'vue-router'
+
   import Button from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import Menu from 'primevue/menu'
+  import Skeleton from 'primevue/skeleton'
+  import Splitter from 'primevue/splitter'
+  import SplitterPanel from 'primevue/splitterpanel'
+
   import { useEdgeSQL } from './composable/useEdgeSQL'
+  import { useSqlFormatter } from './composable/useSqlFormatter'
+  import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
 
   defineOptions({ name: 'CodeEditor' })
-  const emit = defineEmits([
-    'create-query',
-    'run-query',
-    'open-table-reference',
-    'prettify',
-    'open-templates'
-  ])
 
+  const showTemplatesModal = ref(false)
   const sqlQueryCommand = ref('')
   const searchTerm = ref('')
-
-  const { queryResults, isLoading } = useEdgeSQL()
-
-  const monacoTheme = 'vs-dark'
-
-  const monacoOptions = {}
-
   const isExecutingQuery = ref(false)
+  const editorPanelSize = ref(70)
+  const selectedQueryId = ref(null)
+  const historyMenu = ref(null)
+  const currentMenuQuery = ref(null)
 
-  const editorPanelSize = ref(70) // percentage height of editor panel
+  const { formatSql } = useSqlFormatter()
+  const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
+    useEdgeSQL()
+  const route = useRoute()
+  const monacoTheme = 'vs-dark'
+  const monacoOptions = {}
 
   const filteredHistory = computed(() => {
     const term = searchTerm.value.trim().toLowerCase()
@@ -175,17 +191,130 @@
     })
   })
 
-  const selectedQueryId = ref(null)
+  const historyMenuItems = computed(() => [
+    {
+      label: 'Run query',
+      icon: 'pi pi-play',
+      command: runHistoryQuery
+    },
+    {
+      label: 'Delete query',
+      icon: 'pi pi-trash',
+      command: deleteHistoryQuery
+    }
+  ])
 
   const selectQuery = (query) => {
     selectedQueryId.value = query.id
     sqlQueryCommand.value = query.originalQuery
   }
 
+  const isRunShortcut = (event) => event.key === 'Enter' && (event.metaKey || event.ctrlKey)
+
+  const handleGlobalKeydown = (event) => {
+    if (isRunShortcut(event)) {
+      event.preventDefault()
+      runQuery()
+    }
+  }
+
+  const openHistoryMenu = (event, query) => {
+    currentMenuQuery.value = query
+    historyMenu.value?.hide()
+    historyMenu.value?.show(event)
+    nextTick(() => {
+      const target = event?.currentTarget
+      const overlay = document.querySelector('[data-history-menu="true"]')
+      if (!target || !overlay) return
+
+      const rect = target.getBoundingClientRect()
+      const overlayRect = overlay.getBoundingClientRect()
+      const offset = 8
+      let top = window.scrollY + rect.top
+      let left = window.scrollX + rect.right + offset
+      let origin = 'top left'
+
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+
+      if (left + overlayRect.width > window.scrollX + viewportWidth) {
+        left = window.scrollX + rect.left - overlayRect.width - offset
+        origin = 'top right'
+      }
+
+      if (top + overlayRect.height > window.scrollY + viewportHeight) {
+        top = window.scrollY + rect.bottom - overlayRect.height
+      }
+
+      overlay.style.top = `${Math.max(top, 0)}px`
+      overlay.style.left = `${Math.max(left, 0)}px`
+      overlay.style.transformOrigin = origin
+    })
+  }
+
   const onResizeEnd = (event) => {
-    // event.sizes is an array of panel sizes in percentages
     if (Array.isArray(event?.sizes) && event.sizes.length > 0) {
       editorPanelSize.value = event.sizes[0]
     }
   }
+
+  const runQuery = async () => {
+    if (!sqlQueryCommand.value || isExecutingQuery.value) return
+    isExecutingQuery.value = true
+    try {
+      await executeQuery(sqlQueryCommand.value)
+      updateListHistory()
+    } finally {
+      isExecutingQuery.value = false
+    }
+  }
+
+  const runHistoryQuery = async () => {
+    const query = currentMenuQuery.value
+    if (!query || isExecutingQuery.value) return
+    isExecutingQuery.value = true
+    try {
+      sqlQueryCommand.value = query.originalQuery
+      await executeQuery(query.originalQuery)
+      updateListHistory()
+    } finally {
+      isExecutingQuery.value = false
+      historyMenu.value?.hide()
+    }
+  }
+
+  const deleteHistoryQuery = () => {
+    const query = currentMenuQuery.value
+    if (!query) return
+    removeQueryFromHistory(query.id)
+    updateListHistory()
+    historyMenu.value?.hide()
+  }
+
+  const handleUseTemplate = (template) => {
+    sqlQueryCommand.value = template.query
+    showTemplatesModal.value = false
+  }
+
+  onMounted(() => {
+    updateListHistory()
+    window.addEventListener('keydown', handleGlobalKeydown)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleGlobalKeydown)
+  })
+
+  const prettifyCode = () => {
+    const content = sqlQueryCommand.value || ''
+    if (!content.trim()) return
+    sqlQueryCommand.value = formatSql(content)
+  }
+
+  watch(
+    () => route.params.id,
+    () => {
+      updateListHistory()
+    }
+  )
 </script>
