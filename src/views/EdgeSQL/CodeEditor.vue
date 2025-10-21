@@ -161,6 +161,7 @@
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
+  import { useMonacoEditor } from './composable/useMonacoEditor'
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
 
   defineOptions({ name: 'CodeEditor' })
@@ -175,11 +176,18 @@
   const currentMenuQuery = ref(null)
 
   const { formatSql } = useSqlFormatter()
-  const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
-    useEdgeSQL()
+  const {
+    queryResults,
+    isLoading,
+    executeQuery,
+    updateListHistory,
+    removeQueryFromHistory,
+    currentTables
+  } = useEdgeSQL()
   const route = useRoute()
   const monacoTheme = 'vs-dark'
-  const monacoOptions = {}
+  const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
+    useMonacoEditor()
 
   const filteredHistory = computed(() => {
     const term = searchTerm.value.trim().toLowerCase()
@@ -317,4 +325,28 @@
       updateListHistory()
     }
   )
+
+  // Autocomplete: build a light tablesTree from currentTables
+  const tablesTreeForAutocomplete = computed(() => {
+    const list = Array.isArray(currentTables?.value) ? currentTables.value : []
+    return list.map((table) => ({ key: table?.name || table?.key || String(table) }))
+  })
+
+  // Register autocomplete for Monaco once loaded and whenever tables change
+  onMounted(async () => {
+    await waitForMonaco()
+    registerSqlAutocomplete(tablesTreeForAutocomplete.value)
+  })
+
+  watch(
+    () => tablesTreeForAutocomplete.value,
+    (newVal) => {
+      registerSqlAutocomplete(newVal)
+    },
+    { deep: true }
+  )
+
+  onBeforeUnmount(() => {
+    disposeProvider()
+  })
 </script>
