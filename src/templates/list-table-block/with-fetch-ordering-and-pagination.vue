@@ -34,7 +34,6 @@
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
       :emptyBlock="emptyBlock"
-      @column-reorder="handleColumnReorder"
     >
       <template
         #header
@@ -460,11 +459,6 @@
       return editItemSelected(event, rowData)
     }
     return null
-  }
-
-  const handleColumnReorder = (event) => {
-    const columnIndex = event.findIndex((col) => props.frozenColumns.includes(col))
-    frozenColumnHasReorder.value = !columnIndex
   }
 </script>
 <style scoped lang="scss">

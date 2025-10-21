@@ -41,8 +41,6 @@
       @sort="emit('sort', $event)"
       scrollable
       removableSort
-      reorderableColumns
-      @column-reorder="handleReorder"
       resizableColumns
       columnResizeMode="fit"
       @columnResizeEnd="applyDirtyColumnResizeFix"
@@ -265,7 +263,6 @@
     'rowClick',
     'page',
     'sort',
-    'columnReorder',
     'update:filters',
     'update:sortField',
     'update:sortOrder',
@@ -326,10 +323,6 @@
     dataTableRef,
     exportCSV: () => dataTableRef.value?.exportCSV()
   })
-
-  const handleReorder = () => {
-    emit('columnReorder', dataTableRef.value.d_columnOrder)
-  }
 
   const applyDirtyColumnResizeFix = () => {
     const pvIdAttribute = Array.from(dataTableRef.value?.$el?.attributes).find((attr) =>
