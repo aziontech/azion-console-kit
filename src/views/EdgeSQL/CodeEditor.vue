@@ -174,6 +174,7 @@
   const selectedQueryId = ref(null)
   const historyMenu = ref(null)
   const currentMenuQuery = ref(null)
+  const selectedText = ref('')
 
   const { formatSql } = useSqlFormatter()
   const {
@@ -226,6 +227,19 @@
     }
   }
 
+  const handleSelectionChange = () => {
+    let sel = ''
+    if (typeof window.getSelection != 'undefined') {
+      sel = window.getSelection().toString()
+    } else if (typeof document.selection != 'undefined' && document.selection.type == 'Text') {
+      sel = document.selection.createRange().text
+    }
+    if (!sel) {
+      selectedText.value = ''
+    }
+    selectedText.value = sel
+  }
+
   const openHistoryMenu = (event, query) => {
     currentMenuQuery.value = query
     historyMenu.value?.hide()
@@ -267,10 +281,11 @@
   }
 
   const runQuery = async () => {
-    if (!sqlQueryCommand.value || isExecutingQuery.value) return
+    const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
+    if (!contentToRun || isExecutingQuery.value) return
     isExecutingQuery.value = true
     try {
-      await executeQuery(sqlQueryCommand.value)
+      await executeQuery(contentToRun)
       updateListHistory()
     } finally {
       isExecutingQuery.value = false
@@ -307,10 +322,12 @@
   onMounted(() => {
     updateListHistory()
     window.addEventListener('keydown', handleGlobalKeydown)
+    window.addEventListener('selectionchange', handleSelectionChange)
   })
 
   onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
+    window.removeEventListener('selectionchange', handleSelectionChange)
   })
 
   const prettifyCode = () => {
