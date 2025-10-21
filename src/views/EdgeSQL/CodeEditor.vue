@@ -84,7 +84,7 @@
           <div class="flex flex-col h-full">
             <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
               <Button
-                label="Run Query"
+                :label="labelRunQuery"
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
@@ -198,6 +198,10 @@
       const original = queryItem.originalQuery?.toString().toLowerCase() || ''
       return label.includes(term) || original.includes(term)
     })
+  })
+
+  const labelRunQuery = computed(() => {
+    return selectedText.value ? 'Run Selected' : 'Run Query'
   })
 
   const historyMenuItems = computed(() => [
