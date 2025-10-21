@@ -66,4 +66,20 @@ export const createQueryKey = (key, cacheType = 'GLOBAL') => {
   return [cacheType, ...key]
 }
 
+export const clearCacheByType = (cacheType) => {
+  return queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] === cacheType
+  })
+}
+
+export const clearCacheSensitive = () => {
+  return queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] === 'SENSITIVE'
+  })
+}
+
+export const clearAllCache = () => {
+  return queryClient.clear()
+}
+
 export default queryClient

@@ -1,6 +1,6 @@
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
-import { BaseService } from '@/services/v2/base/query/baseService'
+import { clearCacheSensitive } from '@/services/v2/base/query/queryClient'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function accountGuard({ to, accountStore, tracker }) {
@@ -17,8 +17,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
       } catch {
         setRedirectRoute(to)
         await tracker.reset()
-        const baseService = new BaseService()
-        await baseService.clearByType('SENSITIVE')
+        await clearCacheSensitive()
         return '/login'
       }
     }

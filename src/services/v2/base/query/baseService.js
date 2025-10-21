@@ -4,7 +4,10 @@ import {
   queryClient,
   getCacheOptions,
   createQueryKey,
-  waitForPersistence
+  waitForPersistence,
+  clearCacheByType,
+  clearCacheSensitive,
+  clearAllCache
 } from '@/services/v2/base/query/queryClient'
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 
@@ -62,13 +65,15 @@ export class BaseService {
   }
 
   async clearByType(cache = this.cacheType.GLOBAL) {
-    return this.queryClient.removeQueries({
-      predicate: (query) => query.queryKey[0] === cache
-    })
+    return clearCacheByType(cache)
+  }
+
+  async clearSensitive() {
+    return clearCacheSensitive()
   }
 
   async clearAll() {
-    return this.queryClient.clear()
+    return clearAllCache()
   }
 
   hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
