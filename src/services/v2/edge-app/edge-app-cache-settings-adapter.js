@@ -115,7 +115,7 @@ export const CacheSettingsAdapter = {
 
   transformLoadCacheSetting({ data }) {
     const edge = data.modules?.cache || {}
-    const tieredCache = data.modules?.cache?.tiered_cache.enabled
+    const tieredCache = data.modules?.cache?.tiered_cache || {}
     const appAccelerator = data.modules?.application_accelerator || {}
     const browserCache = data.browser_cache || {}
 
@@ -151,7 +151,7 @@ export const CacheSettingsAdapter = {
       enableStaleCache: edge.stale_cache?.enabled || false,
       enableLargeFileCache: edge.large_file_cache?.enabled || false,
       largeFileCacheOffset: edge.large_file_cache?.offset || 1024,
-      tieredCache: !!tieredCache,
+      tieredCache: !!tieredCache.enabled,
       tieredCacheRegion: tieredCache?.topology || 'nearest-region',
       cacheByQueryString,
       queryStringFields,
