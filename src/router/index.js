@@ -94,7 +94,7 @@ const router = createRouter({
     githubRoutes,
     billingRoutes,
     importGithubRoutes,
-    azionAiRoutes,
+    ...azionAiRoutes,
     compareWithAzionRoutes,
     resellerManagementRoutes,
     groupsManagementRoutes,

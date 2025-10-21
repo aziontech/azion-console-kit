@@ -131,6 +131,17 @@ function createToolsItems() {
   ]
 }
 
+function createAiItems() {
+  return [
+    {
+      label: 'Knowledge Base',
+      to: '/ai/knowledge-base',
+      icon: 'pi pi-book',
+      id: 'knowledge-base'
+    }
+  ]
+}
+
 function createEdgeLibrariesItems() {
   return [
     {
@@ -236,6 +247,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
     {
       label: 'Observe',
       items: createObserveItems()
+    },
+    {
+      label: 'AI',
+      items: createAiItems()
     },
     {
       label: 'Tools',

@@ -75,7 +75,27 @@ const getConfig = () => {
       }
     },
     server: {
+      host: true,
+      historyApiFallback: true,
       proxy: {
+        // Knowledge Base API - MUST be first to avoid conflicts with generic /api rule
+        '^/api/v4/workspace/ai/kbs': createProxyConfig({
+          target: `${URLStartPrefix}api.azion.com/`,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }),
+        // Knowledge Base API (direct v4 paths) - Fallback for direct calls
+        '^/v4/workspace/ai/kbs': createProxyConfig({
+          target: `${URLStartPrefix}api.azion.com/`
+        }),
+        // AI Studio API - MUST come after KB to avoid conflicts
+        '^/api/v4/workspace/ai': createProxyConfig({
+          target: `${URLStartPrefix}ai-studio-api.azion.net/`,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }),
+        // AI Studio API (direct v4 paths) - Fallback for direct calls
+        '^/v4/workspace/ai': createProxyConfig({
+          target: `${URLStartPrefix}ai-studio-api.azion.net/`
+        }),
         '^/api/marketplace': createProxyConfig({
           target: `${URLStartPrefix}marketplace.azion.com/`,
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
@@ -123,9 +143,9 @@ const getConfig = () => {
           target: 'https://www.azion.com/api/webpagetest',
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
         }),
-        '/ai': createProxyConfig({
+        '^/api/ai/copilot': createProxyConfig({
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
-          rewrite: (path) => path.replace(/^\/ai/, '')
+          rewrite: (path) => path.replace(/^\/api\/ai\/copilot/, '')
         }),
         '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
