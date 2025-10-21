@@ -127,15 +127,6 @@
                   class="overflow-hidden whitespace-nowrap text-ellipsis"
                 />
               </template>
-              <PrimeTag
-                v-if="
-                  selectedColumns.indexOf(col) === 0 &&
-                  rowData.active !== undefined &&
-                  rowData.active.content !== 'Active' &&
-                  col.showInactiveTag
-                "
-                :value="rowData.active.content"
-              />
             </div>
           </template>
         </DataTable.Column>
@@ -254,7 +245,6 @@
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
-  import PrimeTag from 'primevue/tag'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table-block-new' })
@@ -370,10 +360,6 @@
       default: true
     },
     showLastModified: {
-      type: Boolean,
-      default: false
-    },
-    showContrastInactiveLine: {
       type: Boolean,
       default: false
     },
