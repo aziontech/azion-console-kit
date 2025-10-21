@@ -9,6 +9,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import MainSettings from './MainSettings.vue'
   import CodeEditor from './CodeEditor.vue'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
 
   defineOptions({ name: 'tabs-sql-database' })
 
@@ -17,6 +18,8 @@
     editor: 1,
     settings: 2
   })
+
+  const { setCurrentTables } = useEdgeSQL()
 
   const route = useRoute()
   const router = useRouter()
@@ -40,6 +43,11 @@
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
     changeTab(index)
+  }
+
+  const loadTables = async () => {
+    const result = await edgeSQLService.getTables(sqlDatabaseId.value)
+    setCurrentTables(result.body.tables)
   }
 
   const changeTab = (index) => {
@@ -79,6 +87,7 @@
   })
 
   renderTabCurrentRouter()
+  loadTables()
 </script>
 
 <template>
