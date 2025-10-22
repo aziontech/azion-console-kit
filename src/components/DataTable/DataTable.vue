@@ -41,6 +41,9 @@
       @sort="emit('sort', $event)"
       scrollable
       removableSort
+      resizableColumns
+      columnResizeMode="fit"
+      @columnResizeEnd="applyDirtyColumnResizeFix"
       scrollHeight="calc(100vh - 400px)"
     >
       <template
@@ -321,6 +324,21 @@
     dataTableRef,
     exportCSV: () => dataTableRef.value?.exportCSV()
   })
+
+  const applyDirtyColumnResizeFix = () => {
+    const pvIdAttribute = Array.from(dataTableRef.value?.$el?.attributes).find((attr) =>
+      attr.name.startsWith('pv_id_')
+    )?.name
+    const columnSizesStyle = Array.from(document.querySelectorAll('style')).find((style) =>
+      style.textContent.includes('data-pc-name="datatable"')
+    )
+    if (columnSizesStyle) {
+      columnSizesStyle.textContent = columnSizesStyle.textContent.replace(
+        /\[pv_id_[0-9]+\]/gim,
+        `[${pvIdAttribute}]`
+      )
+    }
+  }
 </script>
 
 <style scoped lang="scss">

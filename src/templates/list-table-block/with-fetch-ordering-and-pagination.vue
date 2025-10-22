@@ -135,9 +135,9 @@
       <DataTable.Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 13rem"
         :bodyStyle="classActions"
         data-testid="data-table-actions-column"
+        :reorderableColumn="false"
       >
         <template #header>
           <div
@@ -436,7 +436,7 @@
 
   defineExpose({ reload, handleExportTableDataToCSV })
 
-  function rowClick(event, col, rowData) {
+  const rowClick = (event, col, rowData) => {
     if (!props.frozenColumns.length) {
       return editItemSelected(event, rowData)
     } else if (props.frozenColumns.includes(col.field)) {
