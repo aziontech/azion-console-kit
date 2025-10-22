@@ -1,8 +1,6 @@
 <script setup>
-  import { ref, computed, inject } from 'vue'
+  import { computed, inject } from 'vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -19,7 +17,6 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const actions = [
     {
       type: 'dialog',
@@ -61,21 +58,24 @@
       .track()
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const getColumns = computed(() => {
     return [
+      {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData, showMoreText: false },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
       {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'threatsConfiguration',
@@ -118,7 +118,6 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="wafService.listWafRules"
         :columns="getColumns"
         addButtonLabel="WAF Rule"
@@ -129,20 +128,15 @@
         @on-load-data="handleLoadData"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
+        :frozenColumns="['name']"
+        :emptyBlock="{
+          title: 'No WAF rules have been created',
+          description: 'Click the button below to create your first WAF rule.',
+          createButtonLabel: 'WAF Rule',
+          createPagePath: 'waf/create',
+          documentationService: documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No WAF rules have been created"
-        description="Click the button below to create your first WAF rule."
-        createButtonLabel="WAF Rule"
-        @click-to-create="handleTrackClickToEdit"
-        createPagePath="waf/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

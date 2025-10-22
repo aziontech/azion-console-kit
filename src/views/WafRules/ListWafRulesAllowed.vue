@@ -1,6 +1,4 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -243,26 +241,15 @@
     isTabs
     :actions="actions"
     :default-ordering-field-name="'id'"
+    :emptyBlock="{
+      title: 'No allowed rule has been created.',
+      description:
+        'Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule.',
+      createButtonLabel: 'Allowed Rule',
+      documentationService: props.documentationServiceAllowed
+    }"
   >
     <template #addButton>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Allowed Rule"
-        @click="openCreateDrawerWafAllowed"
-        data-testid="create_Allowed Rule_button"
-      />
-    </template>
-  </FetchListTableBlock>
-
-  <EmptyResultsBlock
-    v-else
-    title="No allowed rule has been created."
-    description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
-    createButtonLabel="Allowed Rule"
-    :documentationService="props.documentationServiceAllowed"
-    :inTabs="true"
-  >
-    <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
         severity="secondary"
@@ -280,10 +267,7 @@
         data-testid="create_Allowed Rule_button"
       />
     </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
+  </FetchListTableBlock>
 
   <CreateDrawerBlock
     v-if="showCreateWafRulesAllowedDrawer"

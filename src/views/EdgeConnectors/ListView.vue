@@ -1,47 +1,5 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Connectors"
-        data-testid="edge-connectors-heading"
-      />
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="edgeConnectorsService.listEdgeConnectorsService"
-        :columns="getColumns"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No Connectors found."
-        :actions="actions"
-        addButtonLabel="Connector"
-        createPagePath="/connectors/create"
-        editPagePath="/connectors/edit"
-        data-testid="edge-connectors-list-table-block"
-        :apiFields="EDGE_CONNECTORS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No Connectors have been created"
-        description="Click the button below to create your first Connectors."
-        createButtonLabel="Connectors"
-        createPagePath="connectors/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -78,14 +36,21 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData, showMoreText: false },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'type',
@@ -121,3 +86,37 @@
     ]
   })
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Connectors"
+        data-testid="edge-connectors-heading"
+      />
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="edgeConnectorsService.listEdgeConnectorsService"
+        :columns="getColumns"
+        ref="refListTable"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No Connectors found."
+        :actions="actions"
+        addButtonLabel="Connectors"
+        createPagePath="/connectors/create"
+        editPagePath="/connectors/edit"
+        data-testid="edge-connectors-list-table-block"
+        :apiFields="EDGE_CONNECTORS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No Connectors have been created',
+          description: 'Click the button below to create your first Connectors.',
+          createButtonLabel: 'Connectors',
+          createPagePath: 'connectors/create',
+          documentationService: documentationService
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

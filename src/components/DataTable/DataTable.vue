@@ -41,6 +41,7 @@
       @sort="emit('sort', $event)"
       scrollable
       removableSort
+      scrollHeight="calc(100vh - 400px)"
     >
       <template
         v-if="hasHeaderSlot"
@@ -57,7 +58,7 @@
           :header="col.header"
         >
           <template #body>
-            <Skeleton />
+            <Skeleton class="h-[12px]" />
           </template>
         </Column>
       </template>
@@ -107,6 +108,9 @@
     >
       <template #illustration>
         <Illustration />
+      </template>
+      <template #default>
+        <slot name="emptyBlockButton" />
       </template>
     </EmptyResultsBlock>
   </div>
@@ -322,6 +326,17 @@
 <style scoped lang="scss">
   .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
     transition: color 0.2s ease !important;
+    height: 44px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .table-with-orange-borders :deep(.p-datatable-tbody > tr) {
+    height: 44px;
+  }
+
+  .table-with-orange-borders :deep(.p-datatable-thead > tr) {
+    height: 44px;
   }
 
   .table-with-orange-borders.outline-visible

@@ -26,7 +26,6 @@
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
             :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
-            v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
@@ -37,20 +36,16 @@
             :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
             :defaultOrderingFieldName="'-last_modified'"
-          ></FetchListTableBlock>
-          <EmptyResultsBlock
-            v-else
-            title="No stream has been created"
-            description="Click the button below to create your first stream."
-            createButtonLabel="Stream"
-            createPagePath="data-stream/create"
+            :frozenColumns="['name']"
             :documentationService="documentationService"
-            :disabledList="isMaxDomainsReached"
-          >
-            <template #illustration>
-              <Illustration />
-            </template>
-          </EmptyResultsBlock>
+            :emptyBlock="{
+              title: 'No stream has been created.',
+              description: 'Click the button below to create your first stream.',
+              createPagePath: '/data-stream/create',
+              createButtonLabel: 'Stream',
+              documentationService: documentationService
+            }"
+          />
         </div>
       </div>
     </template>
@@ -61,9 +56,7 @@
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { onBeforeRouteLeave } from 'vue-router'
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -154,14 +147,21 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData, showMoreText: false },
+            columnAppearance: 'expand-text-column'
+          })
+        }
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'dataSource',

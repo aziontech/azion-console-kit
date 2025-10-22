@@ -1,10 +1,9 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import CloneBlock from '@/templates/clone-block'
 
@@ -23,14 +22,13 @@
     'active'
   ]
 
-  const props = defineProps({
+  defineProps({
     documentationService: {
       required: true,
       type: Function
     }
   })
 
-  const hasContentToList = ref(true)
   const actions = [
     {
       type: 'dialog',
@@ -58,14 +56,21 @@
 
   const getColumns = computed(() => [
     {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: { value: columnData, showMoreText: false },
+          columnAppearance: 'expand-text-column'
+        })
+      }
+    },
+    {
       field: 'id',
       header: 'ID',
       sortField: 'id',
       filterPath: 'id'
-    },
-    {
-      field: 'name',
-      header: 'Name'
     },
     {
       field: 'lastEditor',
@@ -91,10 +96,6 @@
     }
   ])
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
       productName: 'Edge Firewall'
@@ -115,30 +116,26 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         addButtonLabel="Firewall"
         createPagePath="/firewalls/create"
         editPagePath="/firewalls/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No Firewalls found."
+        emptyListMessage="No Firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        :emptyBlock="{
+          title: 'No Firewall has been created.',
+          description: 'Click the button below to create your first Firewall.',
+          createButtonLabel: 'Firewall',
+          createPagePath: '/firewall/create',
+          documentationService: documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No Firewalls has been created."
-        description="Click the button below to create your first Firewall."
-        createButtonLabel="Firewall"
-        createPagePath="/firewalls/create"
-        :documentationService="props.documentationService"
-        @click-to-create="handleTrackEvent"
-      >
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

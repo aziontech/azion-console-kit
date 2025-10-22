@@ -1,12 +1,10 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
 
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -38,7 +36,6 @@
     })
   }
 
-  const hasContentToList = ref(true)
   const pageTitle = 'Users'
   const actions = [
     {
@@ -120,10 +117,6 @@
       }
     }
   ])
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 </script>
 
 <template>
@@ -136,34 +129,26 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="listUsersService"
         :columns="getColumns"
         addButtonLabel="User"
         createPagePath="users/create"
         editPagePath="users/edit"
-        @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
         :apiFields="USERS_API_FIELDS"
+        :frozenColumns="['firstName']"
+        :emptyBlock="{
+          title: 'No user has been created',
+          description: ' Click the button below to create your first user.',
+          createButtonLabel: 'User',
+          createPagePath: 'users/create',
+          documentationService: documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No user has been created"
-        description=" Click the button below to create your first user."
-        createButtonLabel="User"
-        createPagePath="users/create"
-        @click-to-create="handleTrackEvent"
-        :documentationService="documentationService"
-        data-testid="users__list-view__empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
