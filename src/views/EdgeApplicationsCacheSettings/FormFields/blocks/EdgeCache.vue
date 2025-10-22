@@ -154,21 +154,6 @@
     }
   })
 
-  const TIERED_CACHE_REGION = [
-    {
-      label: 'near-edge',
-      value: 'near-edge'
-    },
-    {
-      label: 'br-east-1',
-      value: 'br-east-1'
-    },
-    {
-      label: 'us-east-1',
-      value: 'us-east-1'
-    }
-  ]
-
   const getEdgeCacheRadioOptions = () => {
     return [
       {
@@ -191,7 +176,6 @@
     useField('largeFileCacheOffset')
   const { value: enableLargeFileCache } = useField('enableLargeFileCache')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-  const { value: tieredCacheRegion } = useField('tieredCacheRegion')
   const { value: tieredCache } = useField('tieredCache')
   const showSliceConfigurationRange = computed(() => {
     return !!enableLargeFileCache.value || !!tieredCache.value

@@ -1,4 +1,4 @@
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const NetworkListsAdapter = {
   transformListNetworkLists(data) {
@@ -7,7 +7,6 @@ export const NetworkListsAdapter = {
       asn: 'ASN',
       countries: 'Countries'
     }
-
     return (
       data?.map((element) => ({
         id: element.id,
@@ -15,7 +14,7 @@ export const NetworkListsAdapter = {
         name: element.name,
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
-        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
+        lastModified: formatDateToDayMonthYearHour(element.last_modified),
         lastModifiedDate: element.last_modified
       })) || []
     )

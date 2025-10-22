@@ -60,8 +60,17 @@
         header: 'Name'
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModify',
+        sortField: 'lastModified',
+        header: 'Last Modified'
+      },
+      {
         field: 'active',
-        header: 'Active',
+        header: 'Status',
         sortField: 'active',
         filterPath: 'active',
         type: 'component',
@@ -72,15 +81,6 @@
           })
         },
         disableSort: false
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        sortField: 'lastModified',
-        header: 'Last Modified'
       }
     ]
   })

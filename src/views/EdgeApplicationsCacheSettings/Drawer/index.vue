@@ -75,8 +75,8 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: props.showTieredCache ?? true,
-    tieredCacheRegion: 'near-edge',
+    tieredCache: false,
+    tieredCacheRegion: 'global',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
     largeFileCacheOffset: 1024
