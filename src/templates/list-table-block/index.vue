@@ -102,6 +102,7 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
+              class="text-[12px]"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -109,6 +110,7 @@
 
           <template v-else>
             <component
+              class="text-[12px]"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />

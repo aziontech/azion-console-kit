@@ -41,6 +41,7 @@
       @sort="emit('sort', $event)"
       scrollable
       removableSort
+      scrollHeight="calc(100vh - 400px)"
     >
       <template
         v-if="hasHeaderSlot"
