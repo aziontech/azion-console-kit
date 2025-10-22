@@ -74,7 +74,7 @@
               value: 'Truncate'
             }"
             @click="openConfirmTruncate"
-            data-testid="delete-table-button"
+            data-testid="truncate-table-button"
             class="w-8 h-8 p-0 flex items-center justify-center"
           />
           <PrimeButton
