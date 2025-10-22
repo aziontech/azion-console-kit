@@ -922,7 +922,7 @@
       icon: 'pi pi-copy',
       action: copyToClipboard
     },
-    ...(props?.cellQuickActionsItens || [])
+    ...(props.cellQuickActionsItens || [])
   ]
   watch(
     () => data.value,
