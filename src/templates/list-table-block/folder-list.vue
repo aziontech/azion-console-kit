@@ -26,6 +26,7 @@
         'overflow-clip rounded-md table-with-orange-borders',
         { 'outline-visible': !cellQuickActions.rowData?.isFolder && cellQuickActions.visible }
       ]"
+      scrollHeight="calc(100vh - 400px)"
     >
       <template
         #header
@@ -150,6 +151,7 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
+              class="text-[12px]"
               @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
@@ -160,6 +162,7 @@
               @click="editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
+              class="text-[12px]"
             />
           </template>
         </template>
@@ -919,7 +922,7 @@
       icon: 'pi pi-copy',
       action: copyToClipboard
     },
-    ...(props?.cellQuickActionsItens || [])
+    ...(props.cellQuickActionsItens || [])
   ]
   watch(
     () => data.value,

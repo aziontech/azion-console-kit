@@ -1132,7 +1132,7 @@
       icon: 'pi pi-search',
       action: searchText
     },
-    ...(props?.cellQuickActionsItens || [])
+    ...(props.cellQuickActionsItens || [])
   ]
   watch(
     () => data.value,

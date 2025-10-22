@@ -44,6 +44,7 @@
       resizableColumns
       columnResizeMode="fit"
       @columnResizeEnd="applyDirtyColumnResizeFix"
+      scrollHeight="calc(100vh - 400px)"
     >
       <template
         v-if="hasHeaderSlot"

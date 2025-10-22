@@ -94,23 +94,22 @@
         :key="col.field"
       >
         <DataTable.Column
-          :columnKey="col.field"
           :sortable="!col.disableSort"
           :field="col.field"
           :header="col.header"
           :sortField="col?.sortField"
           data-testid="data-table-column"
           :style="col.style"
-          :frozen="frozenColumns.includes(col.field) && frozenColumnHasReorder"
+          :frozen="frozenColumns.includes(col.field)"
           :alignFrozen="'left'"
+          :headerStyle="frozenColumns.includes(col.field) ? 'width: 10px' : ''"
         >
           <template #body="{ data: rowData }">
             <div
-              class="flex items-center gap-2"
+              class="flex items-center gap-2 text-[12px]"
               :class="{
-                'cursor-pointer hover:underline':
-                  frozenColumns.includes(col.field) && frozenColumnHasReorder,
-                'cursor-pointer': !frozenColumns.length || !frozenColumnHasReorder
+                'cursor-pointer hover:underline': frozenColumns.includes(col.field),
+                'cursor-pointer': !frozenColumns.length
               }"
               @click="(event) => rowClick(event, col, rowData)"
             >
@@ -128,15 +127,6 @@
                   class="overflow-hidden whitespace-nowrap text-ellipsis"
                 />
               </template>
-              <PrimeTag
-                v-if="
-                  selectedColumns.indexOf(col) === 0 &&
-                  rowData.active !== undefined &&
-                  rowData.active.content !== 'Active' &&
-                  col.showInactiveTag
-                "
-                :value="rowData.active.content"
-              />
             </div>
           </template>
         </DataTable.Column>
@@ -255,7 +245,6 @@
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
-  import PrimeTag from 'primevue/tag'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table-block-new' })
@@ -374,10 +363,6 @@
       type: Boolean,
       default: false
     },
-    showContrastInactiveLine: {
-      type: Boolean,
-      default: false
-    },
     cellQuickActionsItens: {
       type: Array,
       default: () => []
@@ -441,10 +426,9 @@
 
   // Additional computed properties specific to this component
   const havePagination = ref(true)
-  const frozenColumnHasReorder = ref(true)
   const classActions = computed(() =>
     isRenderActions.value
-      ? 'max-w-[100px]'
+      ? ''
       : 'background-color: transparent !important; cursor: pointer !important;'
   )
   const dataKey = ref('id')
@@ -453,7 +437,7 @@
   defineExpose({ reload, handleExportTableDataToCSV })
 
   const rowClick = (event, col, rowData) => {
-    if (!props.frozenColumns.length || !frozenColumnHasReorder.value) {
+    if (!props.frozenColumns.length) {
       return editItemSelected(event, rowData)
     } else if (props.frozenColumns.includes(col.field)) {
       return editItemSelected(event, rowData)
