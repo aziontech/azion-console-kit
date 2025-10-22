@@ -252,7 +252,7 @@
     selectedTables,
     (list) => {
       if (Array.isArray(list)) {
-        showCheckbox.value = list.length > 0
+        showCheckbox.value = !!list.length
       }
     },
     { deep: true }
