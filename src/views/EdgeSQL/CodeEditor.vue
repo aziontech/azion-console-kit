@@ -84,7 +84,7 @@
           <div class="flex flex-col h-full">
             <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
               <Button
-                label="Run Query"
+                :label="labelRunQuery"
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
@@ -161,9 +161,22 @@
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
+  import { useMonacoEditor } from './composable/useMonacoEditor'
+  import { QUICK_TEMPLATES } from './constants/queries'
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
 
   defineOptions({ name: 'CodeEditor' })
+  const props = defineProps({
+    listTables: {
+      type: Array,
+      default: () => []
+    },
+    showSnippetsCreateTable: {
+      type: Boolean,
+      default: false
+    }
+  })
+  const emit = defineEmits(['update:show-snippets-create-table'])
 
   const showTemplatesModal = ref(false)
   const sqlQueryCommand = ref('')
@@ -173,13 +186,15 @@
   const selectedQueryId = ref(null)
   const historyMenu = ref(null)
   const currentMenuQuery = ref(null)
+  const selectedText = ref('')
 
   const { formatSql } = useSqlFormatter()
   const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
     useEdgeSQL()
   const route = useRoute()
   const monacoTheme = 'vs-dark'
-  const monacoOptions = {}
+  const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
+    useMonacoEditor()
 
   const filteredHistory = computed(() => {
     const term = searchTerm.value.trim().toLowerCase()
@@ -189,6 +204,10 @@
       const original = queryItem.originalQuery?.toString().toLowerCase() || ''
       return label.includes(term) || original.includes(term)
     })
+  })
+
+  const labelRunQuery = computed(() => {
+    return selectedText.value ? 'Run Selected' : 'Run Query'
   })
 
   const historyMenuItems = computed(() => [
@@ -216,6 +235,16 @@
       event.preventDefault()
       runQuery()
     }
+  }
+
+  const handleSelectionChange = () => {
+    let sel = ''
+    if (typeof window.getSelection != 'undefined') {
+      sel = window.getSelection().toString()
+    } else if (typeof document.selection != 'undefined' && document.selection.type == 'Text') {
+      sel = document.selection.createRange().text
+    }
+    selectedText.value = sel
   }
 
   const openHistoryMenu = (event, query) => {
@@ -259,10 +288,11 @@
   }
 
   const runQuery = async () => {
-    if (!sqlQueryCommand.value || isExecutingQuery.value) return
+    const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
+    if (!contentToRun || isExecutingQuery.value) return
     isExecutingQuery.value = true
     try {
-      await executeQuery(sqlQueryCommand.value)
+      await executeQuery(contentToRun)
       updateListHistory()
     } finally {
       isExecutingQuery.value = false
@@ -296,13 +326,18 @@
     showTemplatesModal.value = false
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     updateListHistory()
     window.addEventListener('keydown', handleGlobalKeydown)
+    window.addEventListener('selectionchange', handleSelectionChange)
+    await waitForMonaco()
+    registerSqlAutocomplete(tablesTreeForAutocomplete.value)
   })
 
   onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
+    window.removeEventListener('selectionchange', handleSelectionChange)
+    disposeProvider()
   })
 
   const prettifyCode = () => {
@@ -315,6 +350,31 @@
     () => route.params.id,
     () => {
       updateListHistory()
+    }
+  )
+
+  // Autocomplete: build a light tablesTree from currentTables
+  const tablesTreeForAutocomplete = computed(() => {
+    const list = Array.isArray(props.listTables) ? props.listTables : []
+    return list.map((table) => ({ key: table?.name || table?.key || String(table) }))
+  })
+
+  watch(
+    () => tablesTreeForAutocomplete.value,
+    (newVal) => {
+      registerSqlAutocomplete(newVal)
+    },
+    { deep: true }
+  )
+
+  watch(
+    () => props.showSnippetsCreateTable,
+    async (newVal) => {
+      if (newVal) {
+        sqlQueryCommand.value = QUICK_TEMPLATES[0].query
+        await nextTick()
+        emit('update:show-snippets-create-table', false)
+      }
     }
   )
 </script>
