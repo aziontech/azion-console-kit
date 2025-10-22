@@ -162,9 +162,21 @@
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
   import { useMonacoEditor } from './composable/useMonacoEditor'
+  import { QUICK_TEMPLATES } from './constants/queries'
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
 
   defineOptions({ name: 'CodeEditor' })
+  const props = defineProps({
+    listTables: {
+      type: Array,
+      default: () => []
+    },
+    showSnippetsCreateTable: {
+      type: Boolean,
+      default: false
+    }
+  })
+  const emit = defineEmits(['update:show-snippets-create-table'])
 
   const showTemplatesModal = ref(false)
   const sqlQueryCommand = ref('')
@@ -177,14 +189,8 @@
   const selectedText = ref('')
 
   const { formatSql } = useSqlFormatter()
-  const {
-    queryResults,
-    isLoading,
-    executeQuery,
-    updateListHistory,
-    removeQueryFromHistory,
-    currentTables
-  } = useEdgeSQL()
+  const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
+    useEdgeSQL()
   const route = useRoute()
   const monacoTheme = 'vs-dark'
   const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
@@ -323,15 +329,18 @@
     showTemplatesModal.value = false
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     updateListHistory()
     window.addEventListener('keydown', handleGlobalKeydown)
     window.addEventListener('selectionchange', handleSelectionChange)
+    await waitForMonaco()
+    registerSqlAutocomplete(tablesTreeForAutocomplete.value)
   })
 
   onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
     window.removeEventListener('selectionchange', handleSelectionChange)
+    disposeProvider()
   })
 
   const prettifyCode = () => {
@@ -349,14 +358,8 @@
 
   // Autocomplete: build a light tablesTree from currentTables
   const tablesTreeForAutocomplete = computed(() => {
-    const list = Array.isArray(currentTables?.value) ? currentTables.value : []
+    const list = Array.isArray(props.listTables) ? props.listTables : []
     return list.map((table) => ({ key: table?.name || table?.key || String(table) }))
-  })
-
-  // Register autocomplete for Monaco once loaded and whenever tables change
-  onMounted(async () => {
-    await waitForMonaco()
-    registerSqlAutocomplete(tablesTreeForAutocomplete.value)
   })
 
   watch(
@@ -367,7 +370,14 @@
     { deep: true }
   )
 
-  onBeforeUnmount(() => {
-    disposeProvider()
-  })
+  watch(
+    () => props.showSnippetsCreateTable,
+    async (newVal) => {
+      if (newVal) {
+        sqlQueryCommand.value = QUICK_TEMPLATES[0].query
+        await nextTick()
+        emit('update:show-snippets-create-table', false)
+      }
+    }
+  )
 </script>
