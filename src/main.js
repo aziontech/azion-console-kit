@@ -20,6 +20,7 @@ import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prom
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
+import { queryPlugin } from '@/services/v2/base/query/queryPlugin'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'
@@ -41,6 +42,7 @@ app.use(pinia)
 
 app.use(router)
 app.use(DialogService)
+app.use(queryPlugin)
 app.use(TrackerPlugin)
 app.use(SentryPlugin, {
   router
