@@ -51,27 +51,27 @@ export const TABLE_MENU_ACTIONS = [
     description: 'Show foreign key relationships'
   },
   {
-    label: 'Database Size',
-    icon: 'pi pi-database',
-    type: 'query',
-    query: TABLE_QUERIES.DATABASE_SIZE,
-    description: 'Show database disk space usage'
-  },
-  {
     separator: true
   },
   {
     label: 'Delete Table',
     icon: 'pi pi-trash',
     type: 'delete',
-    description: 'Permanently delete this table'
+    action: 'deleteTable'
+  },
+  {
+    label: 'Truncate Table',
+    icon: 'ai ai-scizors',
+    type: 'truncate',
+    action: 'truncateTable'
   }
 ]
 
 const ACTION_HANDLERS = {
   query: 'executeQueryAction',
   drawer: 'executeDrawerAction',
-  delete: 'executeDeleteAction'
+  delete: 'executeDeleteAction',
+  truncate: 'executeTruncateAction'
 }
 
 export class TableActionManager {
@@ -81,7 +81,8 @@ export class TableActionManager {
     activeTabIndexRef,
     isEditorCollapsedRef,
     sqlQueryRef,
-    deleteDialogFn
+    deleteDialogFn,
+    truncateDialogFn
   ) {
     this.executeQuery = executeQueryFn
     this.showDrawer = showDrawerFn
@@ -89,6 +90,7 @@ export class TableActionManager {
     this.isEditorCollapsed = isEditorCollapsedRef
     this.sqlQuery = sqlQueryRef
     this.openDeleteDialog = deleteDialogFn
+    this.openTruncateDialog = truncateDialogFn
   }
 
   async executeTableAction(action, tableName) {
@@ -121,6 +123,12 @@ export class TableActionManager {
   executeDeleteAction(action, tableName) {
     if (this.openDeleteDialog) {
       this.openDeleteDialog(tableName)
+    }
+  }
+
+  executeTruncateAction(action, tableName) {
+    if (this.openTruncateDialog) {
+      this.openTruncateDialog(tableName)
     }
   }
 
