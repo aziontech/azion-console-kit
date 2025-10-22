@@ -9,8 +9,8 @@
   >
     <div class="flex flex-col gap-4">
       <p class="text-color-secondary">
-        All data in this table will be permanently truncated, removing all data while keeping the
-        column schema intact. Are you sure?
+        All data in {{ tables.length > 1 ? 'these tables' : 'this table' }} will be permanently
+        truncated, removing all data while keeping the column schema intact. Are you sure?
       </p>
       <div
         class="flex flex-col gap-2 self-stretch p-3.5 bg-[var(--surface-300)] rounded-md border surface-border justify-start items-start"

@@ -244,9 +244,6 @@
     } else if (typeof document.selection != 'undefined' && document.selection.type == 'Text') {
       sel = document.selection.createRange().text
     }
-    if (!sel) {
-      selectedText.value = ''
-    }
     selectedText.value = sel
   }
 
