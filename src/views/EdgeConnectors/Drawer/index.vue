@@ -27,7 +27,7 @@
       realIpHeader: 'X-Real-IP',
       realPortHeader: 'X-Real-PORT',
       followingRedirect: false,
-      dnsResolution: 'preserve',
+      dnsResolution: 'both',
       transportPolicy: 'preserve',
       bucket: '',
       prefix: '/',

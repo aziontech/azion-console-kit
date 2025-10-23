@@ -23,7 +23,7 @@ export class SolutionService extends BaseService {
   }
 
   useListSolutions({ group, type }, options = {}) {
-    return this.query({
+    return this.useQuery({
       key: ['solutions', 'list', group, type],
       queryFn: () => this.getListSolutions({ group, type }),
       cache: this.cacheType.GLOBAL,
