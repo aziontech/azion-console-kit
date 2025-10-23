@@ -3844,9 +3844,9 @@ axios@^1.7.4:
     proxy-from-env "^1.1.0"
 
 azion-theme@^1.14.5:
-  version "1.14.5"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.14.5.tgz#41b4fdf933bcbf97648b82cb98b0a933e54bc3f6"
-  integrity sha512-q1cXFy0pfWpgNZ4pIY7/lV4T7yfThLhEs1YChwJaWAVUutDUGKAv5Qcdmj6ECCmf6I5NI3rTcR8K1bmLwQtbWA==
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.15.1.tgz#dee838ea514cc1fcd0d9b61335f2637afa44c14f"
+  integrity sha512-GjiNy/9lwXTzj1a+uQ2KuSHbQQzGOUHgWPbIzOkB3fRhMYVpRBhMdovylZ0KtWW39ri10tor+pTO/BFEnkmDog==
 
 azion@^1.20.2:
   version "1.20.2"

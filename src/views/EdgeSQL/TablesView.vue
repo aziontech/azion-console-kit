@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 mt-4">
+  <div class="flex gap-8 mt-4">
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
@@ -23,10 +23,10 @@
     />
     <div class="sm:w-64 w-full">
       <div
-        class="flex justify-between items-center"
+        class="flex justify-between items-center w-64"
         v-if="!showCheckbox"
       >
-        <h3 class="text-lg font-medium text-color-primary">Tables</h3>
+        <h3 class="text-lg font-normal text-color-primary">Tables</h3>
 
         <div class="flex gap-2">
           <PrimeButton
@@ -48,7 +48,7 @@
         </div>
       </div>
       <div
-        class="flex justify-between items-center"
+        class="flex justify-between items-center w-64"
         v-else
       >
         <div class="flex gap-2 items-center">
@@ -63,7 +63,7 @@
             data-testid="cancel-table-button"
             class="w-8 h-8 p-0 flex items-center justify-center"
           />
-          {{ selectedTables.length }} itens selected
+          <span class="text-color-secondary">{{ selectedTables.length }} itens selected</span>
         </div>
         <div class="flex gap-2">
           <PrimeButton
@@ -163,6 +163,19 @@
         </div>
       </div>
     </div>
+    <div class="w-full flex flex-col">
+      <EmptyResultsBlock
+        title="No tables have been created"
+        description="Click the button below to create your first table."
+        createButtonLabel="Table"
+        createPagePath=""
+        @click-to-create="createTable"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </div>
   </div>
 </template>
 <script setup>
@@ -179,6 +192,8 @@
   import Menu from 'primevue/menu'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   const emit = defineEmits([
     'go-editor',
@@ -227,8 +242,11 @@
     emit('go-editor')
   }
 
-  const selectTable = (table) => {
+  const selectTable = async (table) => {
     selectedTable.value = table
+    const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
+    // eslint-disable-next-line no-console
+    console.log(result)
   }
 
   const reloadTables = () => {
