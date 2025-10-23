@@ -66,20 +66,25 @@ export const createQueryKey = (key, cacheType = 'GLOBAL') => {
   return [cacheType, ...key]
 }
 
-export const clearCacheByType = (cacheType) => {
-  return queryClient.removeQueries({
+export const clearCacheByType = async (cacheType) => {
+  await queryClient.removeQueries({
     predicate: (query) => query.queryKey[0] === cacheType
   })
+
+  await indexedDbPersister.removeByType(cacheType)
 }
 
-export const clearCacheSensitive = () => {
-  return queryClient.removeQueries({
+export const clearCacheSensitive = async () => {
+  await queryClient.removeQueries({
     predicate: (query) => query.queryKey[0] === 'SENSITIVE'
   })
+
+  await indexedDbPersister.removeByType('SENSITIVE')
 }
 
-export const clearAllCache = () => {
-  return queryClient.clear()
+export const clearAllCache = async () => {
+  queryClient.clear()
+  await indexedDbPersister.removeClient()
 }
 
 export default queryClient

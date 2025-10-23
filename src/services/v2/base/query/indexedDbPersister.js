@@ -148,23 +148,54 @@ export const indexedDbPersister = {
     }
   },
 
+  async removeByType(cacheType) {
+    try {
+      const database = await getDB()
+      const transaction = database.transaction('queries', 'readwrite')
+      const store = transaction.objectStore('queries')
+
+      const allKeys = await store.getAllKeys()
+      for (const key of allKeys) {
+        const query = await store.get(key)
+        if (query && query.queryKey) {
+          const queryKeyArray = JSON.parse(query.queryKey)
+          if (queryKeyArray && queryKeyArray[0] === cacheType) {
+            await store.delete(key)
+          }
+        }
+      }
+    } catch (error) {
+      // Fallback para localStorage
+      for (let index = localStorage.length - 1; index >= 0; index--) {
+        const key = localStorage.key(index)
+        if (key && key.startsWith('query-')) {
+          const queryData = localStorage.getItem(key)
+          if (queryData) {
+            const parsed = JSON.parse(queryData)
+            if (parsed.queryKey) {
+              const queryKeyArray = JSON.parse(parsed.queryKey)
+              if (queryKeyArray && queryKeyArray[0] === cacheType) {
+                localStorage.removeItem(key)
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
   async removeClient() {
     try {
       const database = await getDB()
       await database.clear('queries')
     } catch (error) {
-      throw new Error(error)
-    }
-
-    try {
+      // Fallback para localStorage em caso de erro
       for (let index = localStorage.length - 1; index >= 0; index--) {
         const key = localStorage.key(index)
         if (key && key.startsWith('query-')) {
           localStorage.removeItem(key)
         }
       }
-    } catch (error) {
-      throw new Error(error)
     }
   }
 }
