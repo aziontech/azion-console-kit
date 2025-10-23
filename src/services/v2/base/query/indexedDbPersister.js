@@ -190,17 +190,12 @@ export const indexedDbPersister = {
       await database.clear('queries')
     } catch (error) {
       // Fallback para localStorage em caso de erro
-    }
-
-    try {
       for (let index = localStorage.length - 1; index >= 0; index--) {
         const key = localStorage.key(index)
         if (key && key.startsWith('query-')) {
           localStorage.removeItem(key)
         }
       }
-    } catch (error) {
-      // Ignora erros de localStorage
     }
   }
 }
