@@ -116,13 +116,13 @@ export class EdgeSQLService extends BaseService {
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body: {
-        statements: [`PRAGMA table_info(${tableName});`]
+        statements: [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
       }
     })
 
     const adaptedData = this.adapter?.adaptTableInfo?.(data)
     return {
-      count: 3,
+      count: adaptedData?.rows?.length,
       body: adaptedData
     }
   }
