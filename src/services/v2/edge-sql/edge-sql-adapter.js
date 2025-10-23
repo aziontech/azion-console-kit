@@ -62,6 +62,10 @@ const cellValueFormatters = {
   }
 }
 
+const formatRowsForDisplay = (rows) => {
+  return rows.map((row) => row.map(formatCellValue))
+}
+
 const formatCellValue = (value) => {
   const nullValues = {
     null: 'NULL',
@@ -172,18 +176,24 @@ export const EdgeSQLAdapter = {
   },
 
   adaptTableInfo({ data }) {
-    const queryResult = data[0]
-    if (!queryResult?.results?.rows?.length) return []
+    const tableInfo = data[0]
+    const tableData = data[1]
 
-    return queryResult.results.rows.map((row) => ({
+    const columns = tableInfo.results.rows.map((row) => ({
       columns: {
         name: row[1],
         type: row[2]
-      },
-      defaultValue: row[4],
-      notNull: row[3],
-      primaryKey: row[5]
+      }
     }))
+
+    const rows = formatRowsForDisplay(tableData.results?.rows || [])
+    const columnNames = columns.map((col) => col.columns.name)
+    const mappedRows = mapRowsToObjects(columnNames, rows)
+
+    return {
+      columns,
+      rows: mappedRows
+    }
   },
 
   adaptTablesFromExecute({ data }) {
@@ -205,10 +215,6 @@ export const EdgeSQLAdapter = {
   },
 
   adaptQueryResult({ data }) {
-    const formatRowsForDisplay = (rows) => {
-      return rows.map((row) => row.map(formatCellValue))
-    }
-
     const processedResults = data.map((item) => ({
       columns: item.results?.columns || [],
       rows: formatRowsForDisplay(item.results?.rows || []),
