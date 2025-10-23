@@ -247,8 +247,14 @@
       default: () => []
     },
     emptyBlock: {
-      type: Boolean,
-      default: false
+      type: Object,
+      default: () => ({
+        title: 'No data has been created',
+        description: 'No data has been created.',
+        createButtonLabel: 'Create',
+        createPagePath: null,
+        documentationService: null
+      })
     }
   })
 
