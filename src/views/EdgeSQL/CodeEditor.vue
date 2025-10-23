@@ -377,4 +377,9 @@
       }
     }
   )
+
+  defineExpose({
+    setSql: (query) => (sqlQueryCommand.value = query),
+    run: runQuery
+  })
 </script>
