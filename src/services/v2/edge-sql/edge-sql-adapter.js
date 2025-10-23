@@ -171,6 +171,21 @@ export const EdgeSQLAdapter = {
     }))
   },
 
+  adaptTableInfo({ data }) {
+    const queryResult = data[0]
+    if (!queryResult?.results?.rows?.length) return []
+
+    return queryResult.results.rows.map((row) => ({
+      columns: {
+        name: row[1],
+        type: row[2]
+      },
+      defaultValue: row[4],
+      notNull: row[3],
+      primaryKey: row[5]
+    }))
+  },
+
   adaptTablesFromExecute({ data }) {
     const executeResult = data[0]
     if (!executeResult?.rows?.length) return []

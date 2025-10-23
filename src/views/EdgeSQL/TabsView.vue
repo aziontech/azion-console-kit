@@ -27,6 +27,7 @@
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const database = ref(null)
   const title = ref('')
+  const codeEditorRef = ref(null)
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
@@ -68,6 +69,15 @@
     showSnippetsCreateTable.value = true
     changeTab(mapTabs.value.editor)
   }
+
+  const handleExecuteQuery = (sql) => {
+    changeTab(mapTabs.value.editor)
+    codeEditorRef.value?.setSql?.(sql)
+  }
+
+  const emit = defineEmits(['show-table-info', 'show-definition'])
+  const handleShowTableInfo = (tableName) => emit('show-table-info', tableName)
+  const handleShowDefinition = (tableName) => emit('show-definition', tableName)
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
@@ -113,15 +123,19 @@
             @load-tables="loadTables"
             :listTables="listTables"
             :isLoadTables="loadedTables"
+            @execute-query="handleExecuteQuery"
+            @show-table-info="handleShowTableInfo"
+            @show-definition="handleShowDefinition"
           />
         </TabPanel>
         <TabPanel
-          header="SQL Editor"
+          header="Editor"
           :pt="{
             root: { 'data-testid': 'sql-database-tabs__tab__editor' }
           }"
         >
           <CodeEditor
+            ref="codeEditorRef"
             :listTables="listTables"
             :showSnippetsCreateTable="showSnippetsCreateTable"
             @update:show-snippets-create-table="(v) => (showSnippetsCreateTable = v)"

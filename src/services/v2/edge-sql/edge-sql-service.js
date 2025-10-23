@@ -111,6 +111,22 @@ export class EdgeSQLService extends BaseService {
     }
   }
 
+  getTableInfo = async (databaseId, tableName) => {
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body: {
+        statements: [`PRAGMA table_info(${tableName});`]
+      }
+    })
+
+    const adaptedData = this.adapter?.adaptTableInfo?.(data)
+    return {
+      count: 3,
+      body: adaptedData
+    }
+  }
+
   queryDatabase = async (databaseId, { statements }) => {
     const body = this.adapter?.adaptSqlCommands?.(statements)
 
