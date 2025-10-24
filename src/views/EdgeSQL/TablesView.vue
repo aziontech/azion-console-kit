@@ -163,15 +163,24 @@
         </div>
       </div>
     </div>
-    <div class="w-full flex flex-col">
+    <div class="w-full flex flex-col gap-4">
+      <InlineMessage
+        v-if="isLoadChanges"
+        severity="info"
+        icon="pi pi-spin pi-spinner"
+        data-testid="table-loading-message"
+      >
+        SQL requests are queued. The table will update automatically once processing is complete.
+      </InlineMessage>
       <SqlDatabaseList
         :data="dataTable"
         :title="tableName"
         :columns="tableColumns"
         data-testid="table-list"
         @row-click="onRowClick"
-        @row-edit-saved="onRowEditSave"
+        @row-edit-saved="handleActionRow"
         @row-edit-cancel="onRowEditCancel"
+        :disabled-action="isLoadChanges"
       >
       </SqlDatabaseList>
     </div>
@@ -184,6 +193,7 @@
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import { useEdgeSQL } from './composable/useEdgeSQL'
+  import InlineMessage from 'primevue/inlinemessage'
   import Checkbox from 'primevue/checkbox'
   import ConfirmDialog from 'primevue/confirmdialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
@@ -223,6 +233,8 @@
   const tableColumns = computed(() => {
     return Array.isArray(columns.value) ? columns.value : []
   })
+  const tableSchema = ref([])
+  const isLoadChanges = ref(false)
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -245,7 +257,40 @@
     emit('go-editor')
   }
 
-  const onRowEditSave = () => {}
+  const filterValidSchemaKeys = (obj, schemaKeys) => {
+    const allowedKeys = schemaKeys.map((key) => key.name)
+    const filteredObj = {}
+
+    Object.keys(obj).forEach((key) => {
+      if (allowedKeys.includes(key)) {
+        filteredObj[key] = obj[key]
+      }
+    })
+
+    return filteredObj
+  }
+
+  const handleActionRow = async (row) => {
+    await onRowEditSave(row.newData, row.oldData)
+  }
+
+  const onRowEditSave = async (newData, whereData) => {
+    isLoadChanges.value = true
+    const filteredNewData = filterValidSchemaKeys(newData, tableSchema.value)
+    const filteredWhereData = filterValidSchemaKeys(whereData, tableSchema.value)
+
+    try {
+      await edgeSQLService.updatedRow(currentDatabase.value.id, {
+        tableName: selectedTable.value.name,
+        newData: filteredNewData,
+        whereData: filteredWhereData,
+        tableSchema: tableSchema.value
+      })
+    } finally {
+      await selectTable(selectedTable.value)
+      isLoadChanges.value = false
+    }
+  }
 
   const onRowEditCancel = () => {}
 
@@ -260,6 +305,7 @@
     }))
 
     dataTable.value = result.body.rows
+    tableSchema.value = result.body.tableSchema
   }
 
   const tableName = computed(() => selectedTable.value?.name)

@@ -151,7 +151,7 @@
         <template #header>
           <span class="flex items-center gap-2 text-color"
             >{{ col.header }}
-            <span class="text-color-secondary font-mono">{{ col.tagType }}</span></span
+            <span class="text-color-secondary font-mono text-xs">{{ col.tagType }}</span></span
           >
         </template>
         <template #body="{ data, field }">
@@ -205,6 +205,7 @@
             <PrimeButton
               icon="pi pi-ellipsis-h"
               size="small"
+              :disabled="disabledAction"
               outlined
               @click.stop="showRowMenu($event, data)"
               class="w-8 h-8 p-0"
@@ -244,6 +245,7 @@
     addButtonLabel: { type: String, default: '' },
     disabledAddButton: { type: Boolean, default: false },
     title: { type: String, required: true },
+    disabledAction: { type: Boolean, default: false },
     options: {
       type: Array,
       default: () => [
