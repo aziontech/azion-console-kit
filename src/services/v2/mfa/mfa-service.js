@@ -17,15 +17,23 @@ export class MFAService extends BaseService {
 
     const { results, count } = data
 
-    let parsedMfaUsers = []
+    const enrichmentResults = await Promise.allSettled(
+      results.map(async (user) => {
+        if (!user.name) {
+          const { email } = await this.#loadUserService(user.user_id)
+          user.name = email
+        }
+        return user
+      })
+    )
 
-    for (const user of results) {
-      if (!user.name) {
-        const { email } = await this.#loadUserService(user.user_id)
-        user.name = email
-      }
-      parsedMfaUsers.push(user)
-    }
+    const parsedMfaUsers = enrichmentResults
+      .map((res, idx) => {
+        if (res.status === 'fulfilled') return res.value
+        const original = results[idx]
+        return original?.name ? original : null
+      })
+      .filter(Boolean)
 
     const body = this.adapter?.transformListMfa?.(parsedMfaUsers) ?? parsedMfaUsers
 
