@@ -133,7 +133,14 @@
         schema.of(
           yup.object().shape({
             address: yup.string().label('Address').required(),
-            weight: yup.number().nullable().label('Weight'),
+            weight: yup
+              .number()
+              .label('Weight')
+              .when('$originType', {
+                is: 'load_balancer',
+                then: (schema) => schema.required().min(1).max(10),
+                otherwise: (schema) => schema.optional().min(1).max(10)
+              }),
             isActive: yup.boolean().default(true).label('Active')
           })
         )
