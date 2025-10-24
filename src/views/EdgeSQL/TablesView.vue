@@ -245,11 +245,9 @@
     emit('go-editor')
   }
 
-  const onRowEditSave = () => {
-  }
+  const onRowEditSave = () => {}
 
-  const onRowEditCancel = () => {
-  }
+  const onRowEditCancel = () => {}
 
   const selectTable = async (table) => {
     selectedTable.value = table
