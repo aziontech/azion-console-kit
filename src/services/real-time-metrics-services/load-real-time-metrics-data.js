@@ -10,6 +10,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
  */
 export async function loadRealTimeMetricsData({ query, signal }) {
   const response = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
     url: makeBeholderBaseUrl(),
     method: 'POST',
     body: adapt(query),

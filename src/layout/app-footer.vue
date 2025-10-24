@@ -1,5 +1,5 @@
 <template>
-  <footer class="z-0">
+  <footer class="z-50">
     <Toolbar
       class="gap-6 border-noround border-x-none w-full m-0 md:px-8 md:py-3 px-3 py-6 z-10 md:flex-row flex-col max-sm:justify-center border-bottom-none"
       :class="toolbarClass"
@@ -20,21 +20,25 @@
         >
           <div class="flex gap-1">
             <PrimeButton
+              size="small"
               label="About"
               link
-              @click="openAzionSite"
+              @click="openAzionSiteAboutUs"
             />
             <PrimeButton
+              size="small"
               label="Blog"
               link
               @click="openAzionBlog"
             />
             <PrimeButton
+              size="small"
               label="Legal"
               link
               @click="azionPrivacyPolicyWindowOpener"
             />
             <PrimeButton
+              size="small"
               label="Docs"
               link
               @click="openDocumentation"
@@ -46,6 +50,7 @@
               icon="pi pi-github"
               outlined
               size="small"
+              aria-label="Visit Azion on GitHub"
               v-tooltip.top="{ value: 'Github', showDelay: 200 }"
               @click="openAzionGithub"
             />
@@ -53,6 +58,7 @@
               icon="pi pi-discord"
               outlined
               size="small"
+              aria-label="Join Azion Discord community"
               v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
               @click="openAzionDiscord"
             />
@@ -60,6 +66,7 @@
               icon="ai ai-x"
               outlined
               size="small"
+              aria-label="Follow Azion on X (Twitter)"
               v-tooltip.top="{ value: 'X', showDelay: 200 }"
               @click="openAzionX"
             />
@@ -85,6 +92,7 @@
               :options="themeOptions"
               :autoOptionFocus="false"
               :pt="dropdownPt"
+              aria-label="Select theme mode"
             >
               <template #value="slotProps">
                 <div
@@ -115,7 +123,7 @@
     openAzionBlog,
     openAzionDiscord,
     openAzionGithub,
-    openAzionSite,
+    openAzionSiteAboutUs,
     openAzionX,
     openDocumentation
   } from '@/helpers'

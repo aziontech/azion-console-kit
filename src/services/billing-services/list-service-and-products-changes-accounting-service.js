@@ -1,7 +1,7 @@
 import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
+const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -27,14 +27,12 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
     query: BILL_DETAIL_QUERY
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeAccountingBaseUrl()}`,
-      method: 'POST',
-      body: graphQLPayload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeAccountingBaseUrl()}`,
+    method: 'POST',
+    body: graphQLPayload
+  })
 
   httpResponse = adapt(httpResponse)
 
@@ -66,30 +64,34 @@ const adapt = ({ body, statusCode }) => {
 
   const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
 
+  const filteredProducts = productsGrouped.filter(
+    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
+  )
+
   const productsGroupedByRegion = groupBy(accountingDetail, [
     'productSlug',
     'metricSlug',
     'regionName'
   ])
 
-  const adaptedBody = mapProducts(productsGrouped, productsGroupedByRegion)
+  const adaptedBody = mapProducts(filteredProducts, productsGroupedByRegion)
+  const data = joinEdgeApplicationWithTieredCache(adaptedBody)
 
-  return { body: adaptedBody, statusCode }
+  return { body: data, statusCode }
 }
 
 const PRODUCT_NAMES = {
-  edge_application: 'Edge Application',
+  edge_application: 'Application',
   application_accelerator: 'Application Accelerator',
   load_balancer: 'Load Balancer',
   image_processor: 'Image Processor',
-  edge_functions: 'Edge Functions',
-  network_layer_protection: 'Network Layer Protection',
+  edge_functions: 'Functions',
+  network_layer_protection: 'Network Shield',
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',
-  real_time_events: 'Real-Time Events',
+  realtime_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
@@ -100,23 +102,24 @@ const PRODUCT_NAMES = {
   support_enterprise: 'Support Enterprise',
   support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
-  tiered_cache: 'Tiered Cache'
+  tiered_cache: 'Tiered Cache',
+  edge_storage: 'Object Storage'
 }
 
 const METRIC_SLUGS = {
-  application_accelerator_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  requests: { title: 'Total Requests (per 10,000)' },
-  data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  data_stream_requests: { title: 'Total Requests (per 10,000)' },
-  network_layer_protection_requests: { title: 'Total Requests (per 10,000)' },
-  tiered_cache_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  load_balancer_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  waf_requests: { title: 'Total Requests (per 10,000)' },
+  application_accelerator_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  requests: { title: 'Total Requests' },
+  data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  data_stream_requests: { title: 'Total Requests' },
+  network_layer_protection_requests: { title: 'Total Requests' },
+  tiered_cache_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  load_balancer_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  waf_requests: { title: 'Total Requests' },
   ddos_protection_20gbps: { title: 'DDoS Protection 20Gbps' },
   ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
-  ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  ddos_protection_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
   ddos_protection_unlimited: { title: 'DDoS Protection Unlimited', unit: 'Days' },
-  compute_time: { title: 'Compute Time' },
+  compute_time: { title: 'Compute Time', unit: 'ms' },
   invocations: { title: 'Invocations' },
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
@@ -127,7 +130,11 @@ const METRIC_SLUGS = {
   plan_missioncritical: { title: 'Plan Mission critical' },
   support_enterprise: { title: 'Total Days', unit: 'Days' },
   support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
+  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  edge_storage_class_a_operations: { title: 'Class A Operations' },
+  edge_storage_class_b_operations: { title: 'Class B Operations' },
+  edge_storage_class_c_operations: { title: 'Class C Operations' },
+  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {
@@ -143,8 +150,10 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
         productsGroupedByRegion
       )
     } else {
+      const service = PRODUCT_NAMES[product.productSlug]
+      if (!service) return
       uniqueProducts.push({
-        service: PRODUCT_NAMES[product.productSlug],
+        service,
         value: 0,
         slug: product.productSlug,
         currency: 0,
@@ -157,6 +166,9 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
 }
 
 const mapDescriptions = (product, productsGrouped, productsGroupedByRegion) => {
+  productsGroupedByRegion.sort((regionA, regionB) =>
+    regionA.regionName.localeCompare(regionB.regionName)
+  )
   return productsGrouped.reduce((list, metric) => {
     if (metric.productSlug === product.productSlug) {
       const unit = METRIC_SLUGS[metric.metricSlug]?.unit
@@ -187,4 +199,65 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
     }
     return list
   }, [])
+}
+
+export const joinEdgeApplicationWithTieredCache = (services) => {
+  const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
+  const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
+  const botManagerServiceIndex = services.findIndex((service) => service.slug === 'bot_manager')
+
+  if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
+
+  const edgeDataTransferDescription = edgeApplicationService.descriptions.find(
+    (desc) => desc.slug === 'data_transferred'
+  )
+
+  const tieredCacheService = services[tieredCacheServiceIndex]
+  const tieredCacheDataTransferDescription = tieredCacheService.descriptions.find(
+    (desc) => desc.slug === 'tiered_cache_data_transferred'
+  )
+
+  if (!edgeDataTransferDescription || !tieredCacheDataTransferDescription) return services
+
+  const parseQuantityValue = (qtd) => parseFloat(qtd.replace(/,/g, '').replace(' GB', ''))
+
+  const edgeTotalDataTransfer = parseQuantityValue(edgeDataTransferDescription.quantity)
+  const tieredCacheTotalDataTransfer = parseQuantityValue(
+    tieredCacheDataTransferDescription.quantity
+  )
+  const combinedTotalDataTransfer = edgeTotalDataTransfer + tieredCacheTotalDataTransfer
+
+  edgeDataTransferDescription.quantity = formatUnitValue(combinedTotalDataTransfer, 'GB')
+
+  tieredCacheDataTransferDescription.data.forEach((tieredCountryData) => {
+    const tieredCountryTransfer = parseQuantityValue(tieredCountryData.quantity)
+    const edgeCountryData = edgeDataTransferDescription.data.find(
+      (item) => item.country === tieredCountryData.country
+    )
+
+    if (edgeCountryData) {
+      const edgeQty = parseQuantityValue(edgeCountryData.quantity)
+      const newQty = edgeQty + tieredCountryTransfer
+      edgeCountryData.quantity = formatUnitValue(newQty, 'GB')
+    } else {
+      edgeDataTransferDescription.data.push({
+        country: tieredCountryData.country,
+        quantity: formatUnitValue(tieredCountryTransfer, 'GB'),
+        price: tieredCountryData.price,
+        slug: 'data_transferred'
+      })
+    }
+  })
+
+  const indicesToRemove = [tieredCacheServiceIndex, botManagerServiceIndex].sort(
+    (first, second) => second - first
+  )
+
+  indicesToRemove.forEach((index) => {
+    if (index !== -1) {
+      services.splice(index, 1)
+    }
+  })
+
+  return services
 }

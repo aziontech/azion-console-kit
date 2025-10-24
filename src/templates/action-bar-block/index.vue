@@ -1,6 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import PrimeButton from 'primevue/button'
+
   defineOptions({ name: 'action-bar-block' })
 
   const emit = defineEmits(['onSubmit', 'onCancel'])
@@ -40,7 +41,7 @@
 </script>
 <template>
   <div
-    class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+    class="flex w-full gap-4 justify-end h-16 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
     data-testid="form-actions-container"
   >
     <div
@@ -52,7 +53,7 @@
       data-testid="form-actions-content"
     >
       <div
-        class="flex gap-4 self-stretch items-center justify-end w-full"
+        class="flex gap-3 self-stretch items-center justify-end w-full"
         data-testid="form-actions-buttons"
       >
         <slot>
@@ -70,7 +71,7 @@
             :label="props.primaryActionLabel"
             @click="handleSubmit"
             icon-pos="right"
-            class="max-md:w-full"
+            class="max-md:w-full md:min-w-[5rem]"
             :icon="calculateLoadIconByLoadingState"
             :disabled="isDisabledSubmit"
             data-testid="form-actions-submit-button"

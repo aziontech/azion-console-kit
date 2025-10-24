@@ -1,173 +1,215 @@
-const FILTER_BLACK_LIST = [
-  'clientId',
-  'clientIdNe',
-  'clientIdLike',
-  'clientIdEq',
-  'clientIdIlike',
-  'naxsiAttackFamilyEq',
-  'naxsiAttackFamilyNe',
-  'naxsiAttackFamilyLike',
-  'naxsiAttackFamilyIlike',
-  'classifiedLike',
-  'classifiedIlike',
-  'classifiedIn',
-  'classifiedNotIn',
-  'classifiedIsNull',
-  'actionLike',
-  'actionIlike',
-  'actionIn',
-  'actionNotIn',
-  'actionIsNull'
-]
+import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
 
-const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']
-const FIELDS_LIKE = [
-  'configurationIdIn',
-  'zoneIdIn',
-  'edgeFunctionIdIn',
-  'botCategoryIn',
-  'challengeSolvedEq'
-]
+const FILTERS_RULES = () => {
+  const FILTER_BLACK_LIST = [
+    'clientId',
+    'clientIdNe',
+    'clientIdLike',
+    'clientIdEq',
+    'clientIdIlike',
+    'naxsiAttackFamilyEq',
+    'naxsiAttackFamilyNe',
+    'naxsiAttackFamilyLike',
+    'naxsiAttackFamilyIlike',
+    'classifiedLike',
+    'classifiedIlike',
+    'classifiedIn',
+    'classifiedNotIn',
+    'classifiedIsNull',
+    'actionLike',
+    'actionIlike',
+    'actionIn',
+    'actionNotIn',
+    'actionIsNull',
+    'sourceEq',
+    'sourceNe',
+    'sourceLike',
+    'sourceIlike',
+    'sourceIn',
+    'sourceNotIn',
+    'source'
+  ]
 
-const ALIAS_MAPPING = {
-  configurationId: 'domain'
-}
+  const SUPPORTED_FILTER_TYPE = [
+    'String',
+    'Int',
+    'Float',
+    'IntRange',
+    'FloatRange',
+    'GenericScalar'
+  ]
+  const FIELDS_LIKE = [
+    'configurationIdIn',
+    'zoneIdIn',
+    'edgeFunctionIdIn',
+    'botCategoryIn',
+    'challengeSolvedEq'
+  ]
 
-const FILTER_WHITELIST = {
-  SUPPORTED_FILTER_TYPE,
-  FIELDS_LIKE
-}
+  const ALIAS_MAPPING = {
+    configurationId: TEXT_DOMAIN_WORKLOAD().singularLabel
+  }
 
-const MOST_RELEVANT_FIELDS = {
-  httpMetrics: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
-  httpEvents: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
-  l2CacheMetrics: [
-    'Upstream Bytes Received',
-    'Status',
-    'Upstream Status',
-    'Upstream Cache Status',
-    'Request Time'
-  ],
-  l2CacheEvents: [
-    'Upstream Bytes Received',
-    'Status',
-    'Upstream Status',
-    'Upstream Cache Status',
-    'Request Time'
-  ],
-  edgeFunctionsMetrics: [
-    'Domain',
-    'Edge Function Id',
-    'Compute Time',
-    'Invocations',
-    'Edge Functions Instance Id List'
-  ],
-  edgeFunctionsEvents: [
-    'Domain',
-    'Edge Function Id',
-    'Compute Time',
-    'Invocations',
-    'Edge Functions Instance Id List'
-  ],
-  imagesProcessedMetrics: [
-    'Domain',
-    'Status',
-    'Upstream Status',
-    'Upstream Cache Status',
-    'Request Time'
-  ],
-  imagesProcessedEvents: [
-    'Domain',
-    'Status',
-    'Upstream Status',
-    'Upstream Cache Status',
-    'Request Time'
-  ],
-  idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
-  idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
-  dataStreamedEvents: ['Domain', 'Data Streamed', 'Endpoint Type', 'Requests', 'Configuration Id'],
-  dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
-}
+  const FILTER_WHITELIST = {
+    SUPPORTED_FILTER_TYPE,
+    FIELDS_LIKE
+  }
 
-const FILTER_LIKE_TYPE = {
-  configurationIdIn: 'ArrayObjectDomain',
-  zoneIdIn: 'ArrayObject',
-  edgeFunctionIdIn: 'ArrayObject',
-  botCategoryIn: 'ArrayObject',
-  challengeSolvedEq: 'Boolean',
-  classifiedEq: 'StringObject',
-  classifiedNe: 'StringObject',
-  actionEq: 'StringObject',
-  actionNe: 'StringObject'
-}
+  const MOST_RELEVANT_FIELDS = {
+    httpMetrics: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    httpEvents: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    l2CacheMetrics: [
+      'Upstream Bytes Received',
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    l2CacheEvents: [
+      'Upstream Bytes Received',
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    edgeFunctionsMetrics: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Edge Function Id',
+      'Compute Time',
+      'Invocations',
+      'Edge Functions Instance Id List'
+    ],
+    edgeFunctionsEvents: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Edge Function Id',
+      'Compute Time',
+      'Invocations',
+      'Edge Functions Instance Id List'
+    ],
+    imagesProcessedMetrics: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    imagesProcessedEvents: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Status',
+      'Upstream Status',
+      'Upstream Cache Status',
+      'Request Time'
+    ],
+    idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+    idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+    dataStreamedEvents: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Data Streamed',
+      'Endpoint Type',
+      'Requests',
+      'Configuration Id'
+    ],
+    dataStreamedMetrics: [
+      TEXT_DOMAIN_WORKLOAD().singularTitle,
+      'Status',
+      'Data Streamed',
+      'Endpoint Type',
+      'Requests'
+    ]
+  }
 
-const FILTER_LIKE_ALIAS = {
-  configurationIdIn: 'Domain',
-  classifiedEq: 'Classified',
-  classifiedNe: 'Classified'
-}
+  const FILTER_LIKE_TYPE = {
+    configurationIdIn: 'ArrayObjectDomain',
+    zoneIdIn: 'ArrayObject',
+    edgeFunctionIdIn: 'ArrayObject',
+    botCategoryIn: 'ArrayObject',
+    challengeSolvedEq: 'Boolean',
+    classifiedEq: 'StringObject',
+    classifiedNe: 'StringObject',
+    actionEq: 'StringObject',
+    actionNe: 'StringObject'
+  }
 
-/**
- * Order by more relevant
- *
- * @param {array} fields - List to be sorted.
- * @return {array} Sorted list.
- */
+  const FILTER_LIKE_ALIAS = {
+    configurationIdIn: TEXT_DOMAIN_WORKLOAD().singularTitle,
+    classifiedEq: 'Classified',
+    classifiedNe: 'Classified'
+  }
 
-const sortFields = (fields) => {
-  const notRelevant = -1
-  fields.sort((fieldA, fieldB) => {
-    if (fieldA.mostRelevant === notRelevant && fieldB.mostRelevant !== notRelevant) {
-      return 1
-    }
+  /**
+   * Order by more relevant
+   *
+   * @param {array} fields - List to be sorted.
+   * @return {array} Sorted list.
+   */
 
-    if (fieldA.mostRelevant !== notRelevant && fieldB.mostRelevant === notRelevant) {
-      return -1
-    }
+  const sortFields = (fields) => {
+    const notRelevant = -1
+    fields.sort((fieldA, fieldB) => {
+      if (fieldA.mostRelevant === notRelevant && fieldB.mostRelevant !== notRelevant) {
+        return 1
+      }
 
-    if (fieldA.mostRelevant !== fieldB.mostRelevant) {
-      return fieldA.mostRelevant - fieldB.mostRelevant
-    }
+      if (fieldA.mostRelevant !== notRelevant && fieldB.mostRelevant === notRelevant) {
+        return -1
+      }
 
-    return fieldA.label.localeCompare(fieldB.label)
-  })
-}
+      if (fieldA.mostRelevant !== fieldB.mostRelevant) {
+        return fieldA.mostRelevant - fieldB.mostRelevant
+      }
 
-/**
- * Verify if the provided name is blacklisted.
- *
- * @param {object} name - The name to be verified.
- * @return {boolean} Whether the name is blacklisted or not.
- */
-const verifyBlackListFields = ({ name }) => {
-  return !FILTERS_RULES.FILTER_BLACK_LIST.includes(name)
-}
+      return fieldA.label.localeCompare(fieldB.label)
+    })
+  }
 
-/**
- * Verify if the whitelist fields are supported.
- *
- * @param {object} name - the name of the field
- * @param {object} type - the type object containing the name of the type
- * @param {string} type.name - the name of the type
- * @return {boolean} true if the field is supported, false otherwise
- */
-const verifyWhiteListFields = ({ name, type: { name: typeName } }) => {
-  return (
-    FILTERS_RULES.FILTER_WHITELIST.SUPPORTED_FILTER_TYPE.includes(typeName) ||
-    FILTERS_RULES.FILTER_WHITELIST.FIELDS_LIKE.includes(name)
-  )
-}
+  /**
+   * Verify if the provided name is blacklisted.
+   *
+   * @param {object} name - The name to be verified.
+   * @return {boolean} Whether the name is blacklisted or not.
+   */
+  const verifyBlackListFields = ({ name }) => {
+    return !FILTER_BLACK_LIST.includes(name)
+  }
 
-const FILTERS_RULES = {
-  FILTER_BLACK_LIST,
-  FILTER_WHITELIST,
-  verifyWhiteListFields,
-  verifyBlackListFields,
-  sortFields,
-  MOST_RELEVANT_FIELDS,
-  FILTER_LIKE_TYPE,
-  FILTER_LIKE_ALIAS,
-  ALIAS_MAPPING
+  /**
+   * Verify if the whitelist fields are supported.
+   *
+   * @param {object} name - the name of the field
+   * @param {object} type - the type object containing the name of the type
+   * @param {string} type.name - the name of the type
+   * @return {boolean} true if the field is supported, false otherwise
+   */
+  const verifyWhiteListFields = ({ name, type: { name: typeName } }) => {
+    return (
+      FILTER_WHITELIST.SUPPORTED_FILTER_TYPE.includes(typeName) ||
+      FILTER_WHITELIST.FIELDS_LIKE.includes(name)
+    )
+  }
+
+  return {
+    FILTER_BLACK_LIST,
+    FILTER_WHITELIST,
+    verifyWhiteListFields,
+    verifyBlackListFields,
+    sortFields,
+    MOST_RELEVANT_FIELDS,
+    FILTER_LIKE_TYPE,
+    FILTER_LIKE_ALIAS,
+    ALIAS_MAPPING
+  }
 }
 
 export default FILTERS_RULES

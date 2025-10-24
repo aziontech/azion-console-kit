@@ -6,6 +6,16 @@
     <template #content>
       <div class="flex flex-col gap-3 items-start">
         <InlineMessage
+          v-if="hasNoPermissionToCreateDataStream"
+          class="w-fit"
+          severity="info"
+          data-testid="permission-rule-message-data-stream"
+        >
+          This account has <strong>View Data Stream</strong> permission only. It allows viewing the
+          account’s streams but doesn't permit creating, editing, or deleting streams.
+        </InlineMessage>
+
+        <InlineMessage
           v-if="isMaxDomainsReached"
           severity="info"
         >
@@ -13,18 +23,21 @@
           through Azion Console. Please use the Data Stream API.
         </InlineMessage>
         <div class="w-full">
-          <ListTableBlock
-            :disabledList="disabledList"
+          <FetchListTableBlock
+            :disabledList="hasNoPermissionToCreateDataStream || disabledList"
+            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
-            :listService="listDataStreamService"
+            :listService="dataStreamService.listDataStreamService"
             :columns="getColumns"
             @on-load-data="handleLoadData"
             emptyListMessage="No streams found."
+            :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
-          ></ListTableBlock>
+            :defaultOrderingFieldName="'-last_modified'"
+          ></FetchListTableBlock>
           <EmptyResultsBlock
             v-else
             title="No stream has been created"
@@ -47,32 +60,38 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { onBeforeRouteLeave } from 'vue-router'
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { listWorkloadsService } from '@/services/workloads-services'
+  import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
+  import { useAccountStore } from '@/stores/account'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   defineOptions({ name: 'data-stream-view' })
 
-  const props = defineProps({
-    listDataStreamService: {
-      required: true,
-      type: Function
-    },
-    deleteDataStreamService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
     }
   })
 
+  const store = useAccountStore()
+  const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
+  const DATA_STREAM_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'outputs',
+    'transform',
+    'inputs',
+    'last_editor',
+    'last_modified'
+  ]
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -80,7 +99,7 @@
   const loadWorkloads = async () => {
     try {
       domainsLoading.value = true
-      const response = await listWorkloadsService({
+      const response = await listWorkloadsDynamicFieldsService({
         fields: 'id',
         ordering: 'id',
         page: 1,
@@ -104,7 +123,7 @@
       type: 'delete',
       title: 'stream',
       icon: 'pi pi-trash',
-      service: props.deleteDataStreamService
+      service: dataStreamService.deleteDataStreamService
     }
   ]
 
@@ -135,20 +154,29 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Name'
       },
       {
         field: 'dataSource',
-        header: 'Source'
+        header: 'Source',
+        disableSort: true
       },
       {
         field: 'templateName',
-        header: 'Template'
+        header: 'Template',
+        disableSort: true
       },
       {
         field: 'endpointType',
-        header: 'Connector'
+        header: 'Connector',
+        disableSort: true
       },
       {
         field: 'active',
@@ -159,6 +187,14 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })

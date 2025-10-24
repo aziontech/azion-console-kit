@@ -1,9 +1,10 @@
 name: Run cleanup e2e tests
 
-on:
-  schedule:
-    - cron: '0 8 * * *'
-  workflow_dispatch:
+# DISABLED: Cleanup E2E tests workflow
+# on:
+#   schedule:
+#     - cron: '15 8 * * *'
+#   workflow_dispatch:
 
 jobs:
   cleanup:

@@ -1,7 +1,7 @@
-import { billingRoutes } from '@/router/routes/billing-routes'
+const BILLING_PATH = '/billing'
 
 const BILLING_REDIRECT_OPTIONS = {
-  path: `${billingRoutes.path}/payment`,
+  path: `${BILLING_PATH}/bills`,
   query: { paymentSession: 'true' }
 }
 
@@ -9,20 +9,23 @@ const BILLING_REDIRECT_OPTIONS = {
 export async function billingGuard({ to, accountStore }) {
   const { hasActiveUserId, billingAccessPermitted, paymentReviewPending } = accountStore
 
-  const isPrivateRoute = !to.meta.isPublic
-  const isCurrentRouteBilling = to.fullPath.includes(billingRoutes.path)
-
-  if (isPrivateRoute && hasActiveUserId) {
-    if (isCurrentRouteBilling) {
-      if (!billingAccessPermitted) {
-        return '/'
-      }
-
-      if (to.name === 'billing-tabs') {
-        return true
-      }
-    } else if (paymentReviewPending) {
-      return BILLING_REDIRECT_OPTIONS
-    }
+  if (to.meta.isPublic || !hasActiveUserId) {
+    return true
   }
+
+  const isBillingRoute = to.fullPath.includes(BILLING_PATH)
+
+  if (isBillingRoute) {
+    if (!billingAccessPermitted) {
+      return '/'
+    }
+
+    return true
+  }
+
+  if (paymentReviewPending) {
+    return BILLING_REDIRECT_OPTIONS
+  }
+
+  return
 }

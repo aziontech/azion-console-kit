@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-wrap justify-center gap-3">
     <Card
-      class="p-4 w-52 cursor-pointer select-none"
+      class="p-4 w-52 cursor-pointer select-none border surface-border hover:border-primary shadow-none"
       v-for="(suggestion, index) in suggestions"
       :key="index"
       @click="selectSuggestion(suggestion)"

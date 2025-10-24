@@ -24,14 +24,14 @@ jobs:
 
       - name: Download Azion CLI
         run: |
-          wget https://github.com/aziontech/azion/releases/download/1.36.1/azion_1.36.1_linux_amd64.apk
-          apk add --allow-untrusted azion_1.36.1_linux_amd64.apk
+          wget https://github.com/aziontech/azion/releases/download/4.2.0/azion_4.2.0_linux_amd64.apk
+          apk add --allow-untrusted azion_4.2.0_linux_amd64.apk
 
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Build & Deploy
-        run: azion deploy --auto --config-dir azion/production
+        run: azion deploy --auto --local --debug --config-dir azion/production
         env:
           VITE_STRIPE_TOKEN_PROD: ${{ secrets.PROD_STRIPE_TOKEN }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
@@ -39,3 +39,8 @@ jobs:
           CROSS_EDGE_SECRET: ${{ secrets.PROD_CROSS_EDGE_SECRET}}
           NODE_ENV: production
           VITE_ENVIRONMENT: production
+          VITE_PROD_SENTRY: ${{ secrets.PROD_SENTRY }}
+          VITE_SSO_GITHUB:  ${{ secrets.PROD_SSO_GITHUB }}
+          VITE_SSO_GOOGLE:  ${{ secrets.PROD_SSO_GOOGLE }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_UPLOAD: true

@@ -7,11 +7,11 @@
       :verifyLoginService="props.verifyLoginService"
       :refreshLoginService="props.refreshLoginService"
       :accountHandler="props.accountHandler"
-      :listSocialIdpsService="props.listSocialIdpsService"
     />
 
     <ForgotPassword
       v-if="showForgotPasswordStep"
+      @goToSignIn="showForgotPasswordStep = false"
       :sendResetPasswordEmailService="props.sendResetPasswordEmailService"
     />
   </div>
@@ -48,10 +48,6 @@
     accountHandler: {
       required: true,
       type: Object
-    },
-    listSocialIdpsService: {
-      required: true,
-      type: Function
     }
   })
 

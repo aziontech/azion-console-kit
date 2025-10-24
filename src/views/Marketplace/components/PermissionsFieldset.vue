@@ -62,7 +62,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Permissions"
-    description="Azion Marketplace requires the following privileges on the selected edge application."
+    description="Azion Marketplace requires the following privileges on the selected Application."
   >
     <template #inputs>
       <div class="text-sm text-color-secondary flex flex-col gap-4">
@@ -75,7 +75,7 @@
           <span class="text-color-secondary">{{ permission.description }}</span>
         </div>
         <div class="text-sm text-color-secondary h-8 flex flex-row items-center">
-          <span class="">Read more about</span>
+          <span>Read more about</span>
           <PrimeButton
             label="Marketplace's Permissions"
             link

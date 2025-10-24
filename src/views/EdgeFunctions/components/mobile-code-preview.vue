@@ -49,13 +49,13 @@
       type: Object,
       required: true
     },
-    language: {
+    runtime: {
       type: String
     }
   })
 
   const buttonClasses = computed(() => {
-    return props.language !== 'lua' ? 'flex md:hidden' : 'hidden'
+    return props.runtime !== 'azion_lua' ? 'flex md:hidden' : 'hidden'
   })
 
   const showMobilePreview = ref(false)

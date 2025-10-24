@@ -7,7 +7,6 @@
       :listTypeAccountService="listTypeAccountService"
       :accountHandler="accountHandler"
     />
-    <PageLoadingBlock :showLoading="showLoading" />
 
     <AppSidebar />
 
@@ -16,7 +15,7 @@
       :class="{ 'mr-[32rem]': showSidebar }"
       :style="{ transition: 'margin-right 0.2s' }"
     >
-      <router-view class="flex flex-1" />
+      <router-view class="flex flex-1 flex-col" />
       <AppFooter v-if="!showLoading" />
     </main>
   </div>
@@ -28,12 +27,11 @@
   import AppNavbar from './app-navbar.vue'
   import ToastBlock from '@/templates/toast-block'
   import AppSidebar from './app-sidebar.vue'
+
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
-  import PageLoadingBlock from '@/templates/loading-block'
   import { useLayout } from '@/composables/use-layout'
-
   import { useLoadingStore } from '@/stores/loading'
   import { storeToRefs } from 'pinia'
 
@@ -43,9 +41,10 @@
     isLogged: Boolean
   })
 
-  const { showLoading } = storeToRefs(useLoadingStore())
   const accountHandler = new AccountHandler(switchAccountService, listTypeAccountService)
   const { isSidebarActive, isVisibleMobileSidebar } = useLayout()
+  const { showLoading } = storeToRefs(useLoadingStore())
+
   const showNavItems = computed(() => props.isLogged && !showLoading.value)
   const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
 </script>

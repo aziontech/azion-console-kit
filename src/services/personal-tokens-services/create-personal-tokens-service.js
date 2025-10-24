@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 import * as Errors from '@/services/axios/errors'
 
 export const createPersonalToken = async (payload) => {
@@ -33,15 +34,9 @@ const parseHttpResponse = (httpResponse) => {
         token: httpResponse.body.key,
         urlToEditView: '/personal-tokens'
       }
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
 }

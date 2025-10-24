@@ -16,15 +16,12 @@
         <template #form>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
-            :edgeFirewallsData="edgeFirewallsData"
-            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             hasDomainName
             @copyDomainName="copyDomainName"
-            :loadingEdgeApplications="loadingEdgeApplications"
-            :updateDigitalCertificates="updateDigitalCertificates"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -40,7 +37,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -48,9 +45,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -60,15 +56,23 @@
       type: Function,
       required: true
     },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
     listEdgeApplicationsService: {
       type: Function,
       required: true
     },
+    loadEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
     loadDomainService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
       type: Function,
       required: true
     },
@@ -104,86 +108,16 @@
       .track()
   }
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
-  const toast = useToast()
-  const loadingEdgeApplications = ref(true)
   const domainName = ref()
-  const edgeFirewallsData = ref([])
-  const isLoadingEdgeFirewalls = ref(true)
 
-  const requestEdgeApplications = async () => {
-    loadingEdgeApplications.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
-
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
-  }
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
-  }
-
-  const toastError = (error) => {
-    showToast('error', error)
-  }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
-  }
-
-  const scrollToTop = () => {
-    window.scrollTo(0, 0)
   }
 
   const setDomainName = async (domain) => {
     domainName.value = domain.name
   }
-
-  const requestEdgeFirewalls = async () => {
-    isLoadingEdgeFirewalls.value = true
-    try {
-      edgeFirewallsData.value = await listEdgeFirewallService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingEdgeFirewalls.value = false
-    }
-  }
-
-  const handleEdgeFirewallCreated = async () => {
-    await requestEdgeFirewalls()
-  }
-
-  onMounted(async () => {
-    try {
-      scrollToTop()
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  })
 
   const validationSchema = yup.object({
     id: yup.string().required(),
@@ -199,7 +133,7 @@
         }
       ),
     domainName: yup.string().required(),
-    edgeApplication: yup.number().label('Edge Application'),
+    edgeApplication: yup.number().label('Application'),
     cnames: yup
       .string()
       .label('CNAME')
@@ -226,15 +160,4 @@
     active: yup.boolean(),
     environment: yup.string()
   })
-
-  const updateDigitalCertificates = async () => {
-    try {
-      loadingEdgeApplications.value = true
-      digitalCertificates.value = await props.listDigitalCertificatesService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
 </script>

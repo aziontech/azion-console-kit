@@ -7,7 +7,8 @@
   import Sidebar from 'primevue/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-
+  import PrimeButton from 'primevue/button'
+  import { capitalizeFirstLetter } from '@/helpers'
   import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
@@ -47,6 +48,18 @@
     showBarGoBack: {
       type: Boolean,
       default: false
+    },
+    disableToast: {
+      type: Boolean,
+      default: false
+    },
+    expandable: {
+      type: Boolean,
+      default: false
+    },
+    expandedDefault: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -55,6 +68,11 @@
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
+  const isExpanded = ref(props.expandedDefault)
+
+  const toggleExpandDrawer = () => {
+    isExpanded.value = !isExpanded.value
+  }
 
   const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
@@ -66,10 +84,10 @@
     set: (value) => {
       if (formHasChanges.value) {
         formDrawerHasUpdated.value = !formDrawerHasUpdated.value
-        changeVisisbleDrawer(!value, false)
+        changeVisibleDrawer(!value, false)
         return
       }
-      changeVisisbleDrawer(value, true)
+      changeVisibleDrawer(value, true)
     }
   })
 
@@ -78,7 +96,7 @@
     return blockViewRedirection.value && isDirty.value
   })
 
-  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+  const changeVisibleDrawer = (isVisible, isResetForm) => {
     emit('update:visible', isVisible)
     if (isResetForm) resetForm()
   }
@@ -95,8 +113,21 @@
     const options = {
       closable: true,
       severity: severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail: summary
+    }
+
+    toast.add(options)
+  }
+
+  const showToastWithActions = (toastData) => {
+    const options = {
+      closable: true,
+      severity: 'success',
+      summary: 'Success',
+      detail: toastData.feedback,
+      additionalDetails: toastData?.additionalFeedback,
+      action: toastData?.actions
     }
 
     toast.add(options)
@@ -107,8 +138,8 @@
       try {
         const response = await props.createService(values)
         blockViewRedirection.value = false
-        emit('onSuccess', response)
-        showToast('success', response.feedback)
+        emit('onSuccess', { ...response, showToastWithActions })
+        if (!props.disableToast) showToast('success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = true
@@ -118,8 +149,16 @@
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true
-        emit('onError', error)
-        showToast('error', error)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
@@ -133,7 +172,7 @@
   }
 
   provide('drawerUnsaved', {
-    changeVisisbleDrawer,
+    changeVisibleDrawer,
     formDrawerHasUpdated
   })
 </script>
@@ -146,9 +185,16 @@
       position="right"
       :pt="{
         root: {
-          class: `w-full transition-all duration-300 ease-in-out ${
-            props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
-          }`
+          class: [
+            'w-full',
+            'transition-all',
+            'duration-300',
+            'ease-in-out',
+            {
+              'max-w-5xl': !isExpanded && props.isOverlapped,
+              'max-w-4xl': !isExpanded && !props.isOverlapped
+            }
+          ]
         },
         headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
         content: { class: 'p-8' }
@@ -156,7 +202,15 @@
     >
       <template #header>
         <h2>{{ title }}</h2>
-        <ConsoleFeedback />
+        <div class="flex items-center gap-2">
+          <ConsoleFeedback styleTextColor="text-color" />
+          <PrimeButton
+            v-if="expandable"
+            @click="toggleExpandDrawer"
+            outlined
+            :icon="isExpanded ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+          />
+        </div>
       </template>
 
       <div class="flex w-full">
@@ -172,7 +226,7 @@
           />
         </form>
       </div>
-      <div class="fixed w-full left-0 bottom-0">
+      <div class="fixed w-full left-0 bottom-0 z-10">
         <slot
           name="actionBar"
           :goBack="handleGoBack"

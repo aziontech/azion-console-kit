@@ -1,14 +1,24 @@
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import { computed, onBeforeMount, onMounted, ref } from 'vue'
-  import ContentFilterBlock from '@/views/RealTimeEvents/Blocks/content-filter-block'
+  import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
+  import { eventsPlaygroundOpener } from '@/helpers'
+  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'TabPanelBlock' })
 
+  const toast = useToast()
+
   const props = defineProps({
     loadService: {
+      type: Function,
+      required: true
+    },
+    getTotalRecords: {
       type: Function,
       required: true
     },
@@ -28,9 +38,14 @@
   const listTableBlockRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
+  const recordsFound = ref(0)
 
   const defaultFilter = {
-    tsRange: {},
+    tsRange: {
+      tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
+      tsRangeEnd: new Date(),
+      label: 'Last 5 minutes'
+    },
     fields: [],
     dataset: ''
   }
@@ -62,10 +77,6 @@
     reloadListTable()
   }
 
-  const exportTableCSV = () => {
-    listTableBlockRef.value?.handleExportTableDataToCSV()
-  }
-
   const refreshFilterData = () => {
     const filter = getFiltersFromHash()
     filterData.value = defaultFilter
@@ -76,11 +87,35 @@
   }
 
   const listProvider = async () => {
-    return await props.listService({ ...filterData.value })
+    try {
+      const [response, total] = await Promise.all([
+        props.listService({ ...filterData.value }),
+        props.getTotalRecords({
+          filter: { ...filterData.value },
+          dataset: props.tabSelected.dataset
+        })
+      ])
+
+      recordsFound.value = total
+      return response.data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error
+      })
+      recordsFound.value = 0
+      return []
+    }
   }
 
   onBeforeMount(() => {
     refreshFilterData()
+  })
+
+  const totalRecordsFound = computed(() => {
+    return `${recordsFound.value} records found`
   })
 
   onMounted(() => {
@@ -103,26 +138,55 @@
         </p>
       </div>
     </div>
-    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
-      <ContentFilterBlock
+    <div class="border-1 p-4 surface-border rounded-md mb-2">
+      <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :downloadCSV="exportTableCSV"
+        :filterDateRangeMaxDays="7"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
-    <ListTableBlock
-      lazyLoad
-      hiddenHeader
-      :pt="{ root: { class: 'rounded-t-none' } }"
-      isGraphql
-      ref="listTableBlockRef"
-      :listService="listProvider"
-      :columns="props.tabSelected.columns"
-      :editInDrawer="openDetailDrawer"
-      emptyListMessage="No logs have been found for this period."
-      :csvMapper="props.tabSelected.customColumnMapper"
-      :exportFileName="`${props.tabSelected.tabRouter}-logs`"
-    />
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-2 justify-end">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+        <PrimeButton
+          outlined
+          icon="ai ai-graphql"
+          class="min-w-max"
+          @click="eventsPlaygroundOpener"
+          v-tooltip.left="{ value: 'View on GraphQL', showDelay: 200 }"
+          data-testid="data-table-actions-column-header-toggle-columns"
+        />
+      </div>
+      <ListTableBlock
+        lazyLoad
+        hiddenHeader
+        :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
+        isGraphql
+        frozenSize="3rem"
+        ref="listTableBlockRef"
+        :listService="listProvider"
+        :columns="props.tabSelected.columns"
+        :editInDrawer="openDetailDrawer"
+        emptyListMessage="No logs have been found for this period."
+        :csvMapper="props.tabSelected.customColumnMapper"
+        :exportFileName="`${props.tabSelected.tabRouter}-logs`"
+        data-testid="table-tab-panel-block"
+      >
+        <template #actions-header="{ exportTableCSV }">
+          <PrimeButton
+            outlined
+            icon="pi pi-download"
+            class="min-w-max"
+            @click="exportTableCSV"
+            v-tooltip.left="{ value: 'Export to CSV', showDelay: 200 }"
+            data-testid="data-table-actions-column-header-toggle-columns"
+          />
+        </template>
+      </ListTableBlock>
+    </div>
   </data>
 </template>

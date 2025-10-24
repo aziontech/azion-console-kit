@@ -1,4 +1,15 @@
 import * as idpService from '@/services/identity-providers-services'
+import { useAccountStore } from '@/stores/account'
+
+function checkSSOAccess(to, from, next) {
+  const accountStore = useAccountStore()
+
+  if (!accountStore.hasAccessToSSOManagement) {
+    return next('/')
+  }
+
+  return next()
+}
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const identityProvidersRoutes = {
@@ -9,7 +20,9 @@ export const identityProvidersRoutes = {
       path: '',
       name: 'list-identity-providers',
       component: () => import('@views/IdentityProviders/ListView.vue'),
+      beforeEnter: checkSSOAccess,
       meta: {
+        title: 'Identity Providers',
         breadCrumbs: [
           {
             label: 'Identity Providers',
@@ -28,11 +41,13 @@ export const identityProvidersRoutes = {
       path: 'create',
       name: 'create-identity-provider',
       component: () => import('@views/IdentityProviders/CreateView.vue'),
+      beforeEnter: checkSSOAccess,
       props: {
         createOIDCIdentityProviderService: idpService.createOIDCIdentityProviderService,
         createSAMLIdentityProviderService: idpService.createSAMLIdentityProviderService
       },
       meta: {
+        title: 'Create Identity Provider',
         breadCrumbs: [
           {
             label: 'Identity Providers',
@@ -49,6 +64,7 @@ export const identityProvidersRoutes = {
       path: 'edit/:protocol/:id',
       name: 'edit-identity-providers',
       component: () => import('@views/IdentityProviders/EditView.vue'),
+      beforeEnter: checkSSOAccess,
       props: {
         editOIDCIdentityProviderService: idpService.editOIDCIdentityProviderService,
         editSAMLIdentityProviderService: idpService.editSAMLIdentityProviderService,
@@ -57,6 +73,7 @@ export const identityProvidersRoutes = {
         updatedRedirect: 'list-identity-providers'
       },
       meta: {
+        title: 'Edit Identity Provider',
         breadCrumbs: [
           {
             label: 'Identity Providers',

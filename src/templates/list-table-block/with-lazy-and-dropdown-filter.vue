@@ -93,7 +93,7 @@
                 outlined
                 icon="pi pi-bars"
                 @click="toggleColumnSelector"
-                v-tooltip.left="'Hidden columns'"
+                v-tooltip.left="'Available Columns'"
               >
               </PrimeButton>
               <OverlayPanel
@@ -106,7 +106,7 @@
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden columns', items: columns }]"
+                  :options="[{ label: 'Available Columns', items: columns }]"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"

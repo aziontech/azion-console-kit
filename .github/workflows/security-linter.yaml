@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - dev
+      - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 
 env:
@@ -27,6 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn ci
-        
+
       - name: Run security-linter
         run: yarn security-check

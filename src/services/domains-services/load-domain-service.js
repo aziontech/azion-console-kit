@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadDomainService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -13,6 +14,10 @@ export const loadDomainService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const body = httpResponse.body?.results
 
   const parsedVariable = {

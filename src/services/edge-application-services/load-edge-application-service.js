@@ -7,12 +7,18 @@ export const loadEdgeApplicationService = async ({ id }) => {
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
-
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  const body = httpResponse.body.results
+  const body = httpResponse.body?.results
+  let responseData = {
+    body: [],
+    statusCode: httpResponse.statusCode
+  }
+
+  if (!body) return responseData
+
   const httpPorts = []
   const httpsPorts = []
 
@@ -50,10 +56,9 @@ const adapt = (httpResponse) => {
     webApplicationFirewall: body.web_application_firewall
   }
 
-  return {
-    body: parsedBody,
-    statusCode: httpResponse.statusCode
-  }
+  responseData.body = parsedBody
+
+  return responseData
 }
 
 const HTTP_PORT_LIST_OPTIONS = [

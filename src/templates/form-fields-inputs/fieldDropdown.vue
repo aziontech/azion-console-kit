@@ -56,6 +56,30 @@
     filter: {
       type: Boolean,
       default: false
+    },
+    pt: {
+      type: Object,
+      default: () => {}
+    },
+    optionGroupLabel: {
+      type: String,
+      default: ''
+    },
+    optionGroupChildren: {
+      type: String,
+      default: ''
+    },
+    editable: {
+      type: Boolean,
+      default: false
+    },
+    emptyMessage: {
+      type: String,
+      default: 'No available options'
+    },
+    emptyFilterMessage: {
+      type: String,
+      default: 'No results found'
     }
   })
 
@@ -120,6 +144,27 @@
       loadingIcon: `${id}__loading-icon`
     }
   })
+
+  const isDisabledIcon = computed(() => {
+    const iconDisabled = props.iconDisabled || 'pi pi-lock'
+    return props.disabled ? iconDisabled : ''
+  })
+
+  const passThrough = computed(() => {
+    return {
+      filterInput: {
+        class: 'w-full',
+        'data-testid': customTestId.value.filterInput
+      },
+      trigger: {
+        'data-testid': customTestId.value.trigger
+      },
+      loadingIcon: {
+        'data-testid': customTestId.value.loadingIcon
+      },
+      ...props.pt
+    }
+  })
 </script>
 
 <template>
@@ -128,8 +173,11 @@
     :label="props.label"
     :isRequired="$attrs.required"
     :data-testid="customTestId.label"
+    v-if="props.label"
   />
   <Dropdown
+    :dropdown-icon="isDisabledIcon"
+    :editable="props.editable"
     appendTo="self"
     :id="name"
     :name="props.name"
@@ -140,26 +188,19 @@
     :optionDisabled="props.optionDisabled"
     :filter="props.filter"
     :optionValue="props.optionValue"
+    :optionGroupLabel="props.optionGroupLabel"
+    :optionGroupChildren="props.optionGroupChildren"
     :placeholder="props.placeholder"
     :autoFilterFocus="props.filter"
+    :emptyMessage="props.emptyMessage"
+    :emptyFilterMessage="props.emptyFilterMessage"
     @change="emitChange"
     @blur="emitBlur"
     :class="{ 'p-invalid': errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
     class="w-full"
-    :pt="{
-      filterInput: {
-        class: 'w-full',
-        'data-testid': customTestId.filterInput
-      },
-      trigger: {
-        'data-testid': customTestId.trigger
-      },
-      loadingIcon: {
-        'data-testid': customTestId.loadingIcon
-      }
-    }"
+    :pt="passThrough"
     :data-testid="customTestId.dropdown"
   >
     <template

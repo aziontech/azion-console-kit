@@ -24,12 +24,16 @@
     value: {
       type: String,
       required: true
+    },
+    sliceValue: {
+      type: Number,
+      default: 25
     }
   })
 
   const showAllItems = ref(false)
   const textColumn = ref(props.value)
-  const SLICE_VALUE = 15
+  const SLICE_VALUE = props.sliceValue
   const displayShowMore = textColumn.value?.length > SLICE_VALUE
 
   const formatValue = textColumn.value?.toString().slice(0, SLICE_VALUE)

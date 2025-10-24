@@ -1,91 +1,3 @@
-<template>
-  <FetchListTableBlock
-    ref="listAllowedRef"
-    v-if="hasContentToList"
-    addButtonLabel="Allowed Rule"
-    :editInDrawer="openEditDrawerWafRulesAllowed"
-    :columns="wafRulesAllowedColumns"
-    :listService="handleListWafRulesAllowedService"
-    @on-load-data="handleLoadData"
-    emptyListMessage="No allowed rules found."
-    isTabs
-    :actions="actions"
-    :apiFields="ALLOWED_RULES_API_FIELDS"
-  >
-    <template #addButton>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Allowed Rule"
-        @click="openCreateDrawerWafAllowed"
-        data-testid="create_Allowed Rule_button"
-      />
-    </template>
-  </FetchListTableBlock>
-
-  <EmptyResultsBlock
-    v-else
-    title="No allowed rule has been created."
-    description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
-    createButtonLabel="Allowed Rule"
-    :documentationService="documentationServiceAllowed"
-    :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        label="Create from Tuning"
-        @click="goToWafRulesTuning"
-      >
-      </PrimeButton>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Allowed Rule"
-        @click="openCreateDrawerWafAllowed"
-        data-testid="create_Allowed Rule_button"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-
-  <CreateDrawerBlock
-    v-if="showCreateWafRulesAllowedDrawer"
-    v-model:visible="showCreateWafRulesAllowedDrawer"
-    :createService="handleCreateWafRulesAllowedService"
-    :schema="validationSchemaAllowed"
-    :initialValues="initialValues"
-    @onError="handleFailedToCreate"
-    @onSuccess="handleSucessCreation"
-    title="Create Allowed Rule"
-  >
-    <template #formFields>
-      <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
-    </template>
-  </CreateDrawerBlock>
-
-  <EditDrawerBlock
-    v-if="showEditWafRulesAllowedDrawer"
-    :id="selectedWafRulesAllowedToEdit"
-    v-model:visible="showEditWafRulesAllowedDrawer"
-    :loadService="handleLoadWafRulesAllowedService"
-    :editService="handleEditWafRulesAllowedService"
-    :schema="validationSchemaAllowed"
-    @onSuccess="handleSuccessEdit"
-    @onError="handleFailedToEdit"
-    title="Edit Allowed Rule"
-  >
-    <template #formFields>
-      <FormFieldsAllowed
-        :disabledRuleId="true"
-        :optionsRuleIds="props.optionsRuleIds"
-      />
-    </template>
-  </EditDrawerBlock>
-</template>
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
@@ -99,6 +11,8 @@
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
+  import { wafService } from '@/services/v2/waf/waf-service'
+  import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -109,66 +23,41 @@
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
-  const ALLOWED_RULES_API_FIELDS = [
-    'id',
-    'last_modified',
-    'rule_id',
-    'name',
-    'path',
-    'match_zones',
-    'active'
-  ]
 
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
   const props = defineProps({
-    listWafRulesAllowedService: {
-      type: Function,
-      required: true
-    },
-    deleteWafRulesAllowedService: {
-      type: Function,
-      required: true
-    },
-    createWafRulesAllowedService: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesAllowedService: {
-      type: Function,
-      required: true
-    },
-    editWafRulesAllowedService: {
-      type: Function,
-      required: true
-    },
     documentationServiceAllowed: {
       required: true,
       type: Function
-    },
-    optionsRuleIds: {
-      required: true,
-      type: Array,
-      default: () => []
     }
   })
 
+  const schemaConditions = yup.object().shape({
+    field: yup.string().when('match', {
+      is: (match) => match.startsWith('specific_'),
+      then: (schema) => schema.required('field is required'),
+      otherwise: (schema) => schema.nullable()
+    }),
+    match: yup.string().required()
+  })
+
   const validationSchemaAllowed = yup.object({
-    ruleId: yup.string().required().label('rule id'),
+    ruleId: yup.string().required().label('Rule Id'),
     name: yup.string().required(),
-    path: yup.string(),
-    matchZones: yup.array(),
+    path: yup.string().nullable(),
+    conditions: yup.array().of(schemaConditions),
     status: yup.boolean(),
-    useRegex: yup.boolean()
+    operator: yup.boolean()
   })
 
   const initialValues = {
-    matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
+    conditions: [itemDefaultCondition],
     path: '',
     name: '',
     ruleId: 0,
     status: true,
-    useRegex: false
+    operator: false
   }
 
   const wafRuleId = ref(route.params.id)
@@ -218,26 +107,23 @@
   const wafRulesAllowedColumns = ref([
     {
       field: 'ruleId',
-      header: 'Rule ID',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+      header: 'Rule ID'
     },
     {
       field: 'name',
-      header: 'Name',
+      header: 'Description',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
     },
 
     {
       field: 'path',
-      header: 'URI'
+      header: 'Path'
     },
     {
-      field: 'matchZones',
-      header: 'Match Zones',
+      field: 'conditions',
+      header: 'Conditions',
       type: 'component',
       disableSort: true,
       component: (columnData) =>
@@ -288,26 +174,26 @@
     emit('handle-go-to-tuning', { index: 1 })
   }
   const handleListWafRulesAllowedService = async (query) => {
-    return await props.listWafRulesAllowedService({ wafId: wafRuleId.value, ...query })
+    return await wafService.listWafRulesAllowed({ wafId: wafRuleId.value, ...query })
   }
 
   const handleDeleteWafRulesAllowedService = async (id) => {
-    return await props.deleteWafRulesAllowedService({
+    return await wafService.deleteWafRuleAllowed({
       wafId: wafRuleId.value,
       allowedId: id
     })
   }
 
   const handleCreateWafRulesAllowedService = async (payload) => {
-    return await props.createWafRulesAllowedService({ payload, id: wafRuleId.value })
+    return await wafService.createWafRuleAllowed({ payload, id: wafRuleId.value })
   }
 
   const handleLoadWafRulesAllowedService = async (allowedId) => {
-    return await props.loadWafRulesAllowedService({ id: wafRuleId.value, allowedId })
+    return await wafService.loadWafRuleAllowed({ id: wafRuleId.value, allowedId })
   }
 
   const handleEditWafRulesAllowedService = async (payload) => {
-    return await props.editWafRulesAllowedService({
+    return await wafService.editWafRuleAllowed({
       payload,
       wafId: wafRuleId.value,
       allowedId: selectedWafRulesAllowedToEdit.value
@@ -339,3 +225,92 @@
     }
   ]
 </script>
+
+<template>
+  <FetchListTableBlock
+    ref="listAllowedRef"
+    v-if="hasContentToList"
+    addButtonLabel="Allowed Rule"
+    :editInDrawer="openEditDrawerWafRulesAllowed"
+    :columns="wafRulesAllowedColumns"
+    :listService="handleListWafRulesAllowedService"
+    @on-load-data="handleLoadData"
+    emptyListMessage="No allowed rules found."
+    isTabs
+    :actions="actions"
+  >
+    <template #addButton>
+      <PrimeButton
+        icon="pi pi-plus"
+        label="Allowed Rule"
+        @click="openCreateDrawerWafAllowed"
+        data-testid="create_Allowed Rule_button"
+      />
+    </template>
+  </FetchListTableBlock>
+
+  <EmptyResultsBlock
+    v-else
+    title="No allowed rule has been created."
+    description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
+    createButtonLabel="Allowed Rule"
+    :documentationService="props.documentationServiceAllowed"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        label="Create from Tuning"
+        outlined
+        @click="goToWafRulesTuning"
+      >
+      </PrimeButton>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Allowed Rule"
+        @click="openCreateDrawerWafAllowed"
+        data-testid="create_Allowed Rule_button"
+      />
+    </template>
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
+
+  <CreateDrawerBlock
+    v-if="showCreateWafRulesAllowedDrawer"
+    v-model:visible="showCreateWafRulesAllowedDrawer"
+    :createService="handleCreateWafRulesAllowedService"
+    :schema="validationSchemaAllowed"
+    :initialValues="initialValues"
+    @onError="handleFailedToCreate"
+    @onSuccess="handleSucessCreation"
+    title="Create Allowed Rule"
+  >
+    <template #formFields>
+      <FormFieldsAllowed :optionsRuleIds="optionsRuleIds"></FormFieldsAllowed>
+    </template>
+  </CreateDrawerBlock>
+
+  <EditDrawerBlock
+    v-if="showEditWafRulesAllowedDrawer"
+    :id="selectedWafRulesAllowedToEdit"
+    v-model:visible="showEditWafRulesAllowedDrawer"
+    :loadService="handleLoadWafRulesAllowedService"
+    :editService="handleEditWafRulesAllowedService"
+    :schema="validationSchemaAllowed"
+    @onSuccess="handleSuccessEdit"
+    @onError="handleFailedToEdit"
+    title="Edit Allowed Rule"
+  >
+    <template #formFields>
+      <FormFieldsAllowed
+        :disabledRuleId="true"
+        :optionsRuleIds="optionsRuleIds"
+      />
+    </template>
+  </EditDrawerBlock>
+</template>

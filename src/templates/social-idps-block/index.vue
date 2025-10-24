@@ -33,22 +33,16 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
+  import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import PrimeButton from 'primevue/button'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
+  import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
+  import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
-  const emit = defineEmits(['showSocialIdps'])
 
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    socialIdpsService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const idps = ref([])
   const submittedIdp = ref(null)
@@ -61,20 +55,11 @@
   })
 
   const toast = useToast()
-  const showIdps = ref(true)
-  const loadSocialIdps = async () => {
-    try {
-      idps.value = await props.socialIdpsService()
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      showIdps.value = idps.value.length > 0
-      emit('showSocialIdps', showIdps.value)
-    }
+  const showIdps = defineModel('showSocialIdps')
+
+  const loadSocialIdps = () => {
+    idps.value = socialIdpsData
+    showIdps.value = idps.value.length > 0
   }
 
   const formatName = (name) => {
@@ -99,9 +84,19 @@
 
     loadingStore.startLoading()
 
-    accountStore.setSsoSignUpMethod(idp.slug)
-    window.location.href = idp.loginUrl
-    tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
+    if (validateOAuthRedirect(idp.loginUrl)) {
+      accountStore.setSsoSignUpMethod(idp.slug)
+      window.location.href = idp.loginUrl
+      tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
+    } else {
+      loadingStore.finishLoading()
+      submittedIdp.value = null
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Invalid OAuth URL detected'
+      })
+    }
   }
 
   /*

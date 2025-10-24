@@ -12,27 +12,13 @@
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
   import LabelBlock from '@/templates/label-block'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
 
   const toast = useToast()
   const router = useRouter()
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function
-    },
-    postCallbackUrlService: {
-      type: Function
-    },
-    listIntegrationsService: {
-      type: Function
-    },
-    listRepositoriesService: {
-      type: Function
-    },
     listVulcanPresetsService: {
-      type: Function
-    },
-    getModesByPresetService: {
       type: Function
     },
     frameworkDetectorService: {
@@ -46,7 +32,6 @@
   const { value: repository } = useField('repository')
   const { value: applicationName } = useField('applicationName')
   const { value: rootDirectory } = useField('rootDirectory')
-  const { value: mode } = useField('mode')
   const { value: installCommand } = useField('installCommand')
   const { value: newVariables } = useField('newVariables')
 
@@ -66,6 +51,7 @@
 
   const callbackUrl = ref('')
   const isGithubConnectLoading = ref(false)
+  const presetsList = ref([])
 
   const setCallbackUrl = (uri) => {
     callbackUrl.value = uri
@@ -73,15 +59,13 @@
   const saveIntegration = async (integration) => {
     try {
       isGithubConnectLoading.value = true
-      await props.postCallbackUrlService(callbackUrl.value, integration.data)
-      await listIntegrations()
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
+      await loadListIntegrations()
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Save failed',
-        detail: error
-      })
+      error.showWithOptions(toast, (error) => ({
+        summary: `Save failed ${error.detail}`,
+        severity: 'error'
+      }))
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -96,19 +80,13 @@
   }
 
   const integrationsList = ref([])
-  const listIntegrations = async () => {
+  const loadListIntegrations = async () => {
     try {
       isGithubConnectLoading.value = true
-      const data = await props.listIntegrationsService()
-
+      const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Listing failed',
-        detail: error
-      })
+      error.showWithOptions(toast, { summary: 'Listing failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -119,53 +97,28 @@
     return false
   })
 
-  const presetsList = computed(() => {
-    return props.listVulcanPresetsService()
-  })
-
   const repositoriesList = ref([])
   const loadingRepositories = ref(false)
   const setListRepositories = async () => {
     try {
       repositoriesList.value = []
       loadingRepositories.value = true
-      const data = await props.listRepositoriesService(gitScope.value)
+      const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Loading failed',
-        detail: error
-      })
+      error.showWithOptions(toast, { summary: 'Loading failed' })
     } finally {
       loadingRepositories.value = false
     }
   }
-  const modeList = ref([
-    { label: 'Deliver - Static', value: 'deliver', disabled: false },
-    { label: 'Compute - Edge processing (SSR or Back-End)', value: 'compute', disabled: false }
-  ])
-
-  const setModeByPreset = () => {
-    const availableModes = props.getModesByPresetService(preset.value)
-
-    mode.value = availableModes[0]
-
-    disableUnavailableModes(availableModes)
-  }
-  const disableUnavailableModes = (availableModes) => {
-    modeList.value = modeList.value.map((modeOption) => ({
-      ...modeOption,
-      disabled: !availableModes.includes(modeOption.value)
-    }))
-  }
 
   const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
-      const framework = await props.frameworkDetectorService({ accountName, repositoryName })
+      const framework = await props.frameworkDetectorService({
+        accountName,
+        repositoryName
+      })
       preset.value = framework
-      setModeByPreset()
     } catch (error) {
       toast.add({
         closable: true,
@@ -200,10 +153,6 @@
     return selectedOption ? selectedOption.label : ''
   }
 
-  const getPresetIconClass = (preset) => {
-    return `ai ai-${preset}`
-  }
-
   const goToVariablesPage = () => {
     const route = router.resolve({ name: 'variables' })
     windowOpen(route.href, '_blank')
@@ -214,9 +163,14 @@
   }
 
   onMounted(async () => {
-    await listIntegrations()
+    await loadListIntegrations()
     listenerOnMessage()
+    presetsList.value = await props.listVulcanPresetsService()
   })
+
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
+  }
 </script>
 
 <template>
@@ -236,7 +190,6 @@
       <div v-show="!hasIntegrations">
         <OAuthGithub
           ref="oauthGithubRef"
-          :listPlatformsService="listPlatformsService"
           @onCallbackUrl="
             (uri) => {
               setCallbackUrl(uri.value)
@@ -345,12 +298,12 @@
           required
           name="applicationName"
           :value="applicationName"
-          description="Give a unique name to the application. It’ll also be used for the bucket for storage and the edge function."
+          description="Give a unique name to the Application. It’ll also be used for the bucket for storage and the function."
         />
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="flex flex-col sm:w-2/5 gap-2">
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col gap-2">
           <LabelBlock
             for="preset"
             label="Preset"
@@ -366,7 +319,6 @@
             autoFilterFocus
             placeholder="Select a framework preset"
             class="w-full md:w-14rem"
-            @change="setModeByPreset"
           >
             <template #value="slotProps">
               <div
@@ -404,21 +356,6 @@
           <small class="text-xs text-color-secondary font-normal leading-5">
             Defines the initial settings to work with web frameworks.
           </small>
-        </div>
-        <div class="flex flex-col sm:w-2/5 gap-2">
-          <FieldDropdown
-            :options="modeList"
-            optionLabel="label"
-            optionValue="value"
-            optionDisabled="disabled"
-            placeholder="Select the mode"
-            :disabled="!preset"
-            label="Mode"
-            required
-            name="mode"
-            :value="mode"
-            description="Defines the operational mode of application within the framework."
-          />
         </div>
       </div>
 

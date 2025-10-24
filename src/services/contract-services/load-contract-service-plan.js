@@ -13,6 +13,7 @@ export const loadContractServicePlan = async ({ clientId }) => {
 const PLAN_MAP = {
   business: 'Business',
   enterprise: 'Enterprise',
+  missioncritical: 'Mission Critical',
   mission_critical: 'Mission Critical'
 }
 
@@ -35,23 +36,22 @@ function extractWordFromSlug(slug) {
 const adapt = (httpResponse) => {
   const products = httpResponse.body || []
   const slugs = products?.map((product) => product.slug)
-
   const isDeveloperSupportPlan = slugs.every((slug) => {
     return !slug.includes(KEYWORDS.PLAN) && !slug.includes(KEYWORDS.SUPPORT)
   })
-
   let yourServicePlan = 'Developer'
 
   if (!isDeveloperSupportPlan) {
-    const contractProduct = products.find(
+    const contractProduct = products.filter(
       (product) =>
-        product.slug.includes(KEYWORDS.CONTRACT) || product.slug.includes(KEYWORDS.SUPPORT)
+        product.slug.includes(KEYWORDS.CONTRACT) ||
+        product.slug.includes(KEYWORDS.SUPPORT) ||
+        product.slug.includes(KEYWORDS.PLAN)
     )
-
-    if (contractProduct) {
-      const planType = extractWordFromSlug(contractProduct.slug)
+    contractProduct.forEach((product) => {
+      const planType = extractWordFromSlug(product.slug)
       yourServicePlan = PLAN_MAP[planType] || 'Developer'
-    }
+    })
   }
 
   return {

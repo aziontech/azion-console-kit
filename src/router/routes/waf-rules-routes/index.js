@@ -1,6 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
-import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
+import * as DomainsService from '@/services/domains-services'
 
 import { listCountriesService } from '@/services/network-lists-services'
 
@@ -14,11 +14,10 @@ export const wafRulesRoutes = {
       name: 'list-waf-rules',
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
-        listWafRulesService: WafRulesServiceV4.listWafRulesService,
-        deleteWafRulesService: WafRulesService.deleteWafRulesService,
         documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
+        title: 'WAF Rules',
         breadCrumbs: [
           {
             label: 'WAF Rules',
@@ -31,10 +30,8 @@ export const wafRulesRoutes = {
       path: 'create',
       name: 'create-waf-rules',
       component: () => import('@views/WafRules/CreateView.vue'),
-      props: {
-        createWafRulesService: WafRulesService.createWafRulesService
-      },
       meta: {
+        title: 'Create WAF Rule',
         breadCrumbs: [
           {
             label: 'WAF Rules',
@@ -53,30 +50,23 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/TabsView.vue'),
       props: {
         wafRulesAllowed: {
-          deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-          createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
-          loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-          editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
-          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
-          optionsRuleIds: WafRulesService.optionsRuleIds
+          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed
         },
         wafServices: {
-          updatedRedirect: 'list-waf-rules',
-          editWafRulesService: WafRulesService.editWafRulesService,
-          loadWafRulesService: WafRulesService.loadWafRulesService
+          updatedRedirect: 'list-waf-rules'
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,
           listWafRulesTuningService: WafRulesService.listWafRulesTuningService,
-          listNetworkListService: WafRulesService.listNetworkListService,
           listCountriesService: listCountriesService,
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
-          createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
-          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService
+          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService,
+          listDomainsService: WafRulesService.listWafRulesDomainsService,
+          loadDomainService: DomainsService.loadDomainService
         }
       },
       meta: {
+        title: 'Edit WAF Rule',
         breadCrumbs: [
           {
             label: 'WAF Rules',

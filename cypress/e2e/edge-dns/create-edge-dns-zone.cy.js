@@ -18,21 +18,14 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.domainInput).clear()
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS has been created')
-    cy.get(selectors.edgeDns.cancelButton).click()
+    cy.verifyToast('success', 'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.')
 
     // Assert
     cy.get(selectors.edgeDns.searchInput).clear()
     cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow).should('have.text', zoneName)
     cy.get(selectors.edgeDns.showMore).click()
-    cy.get(selectors.edgeDns.domainRow).should('contain', zoneName.toLowerCase())
+    cy.get(selectors.edgeDns.domainRow).should('contain', zoneName)
     cy.get(selectors.edgeDns.statusRow).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
-      cy.verifyToast('Your Edge DNS has been deleted')
-    })
   })
 })

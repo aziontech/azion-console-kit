@@ -1,14 +1,15 @@
 name: Manual E2E Tests
 
-on:
-  workflow_dispatch:
-    inputs:
-      specName:
-        description: 'Test file name (e.g. cypress/e2e/waf.cy.js)'
-        required: true
-      environmentName:
-        description: 'Environment name (dev | stage | prod)'
-        required: true
+# DISABLED: Manual E2E test runner
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       specName:
+#         description: 'Test file name (e.g. cypress/e2e/waf.cy.js)'
+#         required: true
+#       environmentName:
+#         description: 'Environment name (dev | stage | prod)'
+#         required: true
 
 jobs:
   run-manual-e2e-tests:
@@ -42,7 +43,7 @@ jobs:
           env: environment=${{ github.event.inputs.environmentName }}
 
       - name: Upload Manual Cypress Screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: cypress_screenshots
@@ -50,7 +51,7 @@ jobs:
           retention-days: 4
 
       - name: Upload Manual Cypress Videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: cypress_videos

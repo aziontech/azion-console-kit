@@ -1,9 +1,11 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
+import * as Errors from '@/services/axios/errors'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -14,12 +16,13 @@ export const listDataStream = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -34,34 +37,46 @@ const adapt = (filter) => {
       'statusCode',
       'ts',
       'dataStreamed',
-      'source',
       'streamedLines'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const { body } = response
-
-  return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
-    id: generateCurrentTimestamp(),
+  const data = response.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     configurationId: dataStreamedEvents.configurationId,
-    jobName: {
-      content: dataStreamedEvents.jobName,
-      severity: 'info'
-    },
-    endpointType: {
-      content: dataStreamedEvents.endpointType,
-      severity: 'info'
-    },
-    url: dataStreamedEvents.url,
-    statusCode: dataStreamedEvents.statusCode,
+    id: generateCurrentTimestamp(),
+    summary: buildSummary(dataStreamedEvents),
     ts: dataStreamedEvents.ts,
-    dataStreamed: dataStreamedEvents.dataStreamed,
-    source: dataStreamedEvents.source,
-    streamedLines: dataStreamedEvents.streamedLines,
-    tsFormat: convertValueToDate(dataStreamedEvents.ts)
+    tsFormat: getCurrentTimezone(dataStreamedEvents.ts)
   }))
+
+  return {
+    data
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
+  }
 }

@@ -9,6 +9,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import MultiSelect from 'primevue/multiselect'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
 
@@ -61,6 +62,8 @@
   })
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
+
+  const disabledUserTeams = computed(() => isAccountOwner.value || !optionsTeams.value.length)
 
   const setCountriesOptions = (countries) => {
     optionsCountriesMobile.value = countries
@@ -134,7 +137,8 @@
         mobile: mobile.value,
         isAccountOwner: accountIsOwner.value,
         teamsIds: [defaultTeamId],
-        twoFactorEnabled: forceMfaEnabled
+        twoFactorEnabled: forceMfaEnabled,
+        isActive: true
       }
       props.resetForm({ values: initialValues })
       loadingCountry.value = false
@@ -145,12 +149,12 @@
 
   const switchOptions = computed(() => [
     {
-      title: 'Social login',
+      title: 'Account owner',
       nameField: 'isAccountOwner',
       readonly: accountIsOwner.value,
       disabled: accountIsOwner.value,
       subtitle:
-        'The Account Owner can enable or disable the Social Login functionality. When enabled, users linked to the account can authenticate on Azion using their social networks. When disabled, users must authenticate on Azion with their email and password.'
+        'Account owner: Full access to all features, including account and solution management. Non-owner: Restricted access to solution management, based on Teams permissions.'
     },
     {
       title: 'Enforce Multi-Factor Authentication',
@@ -163,7 +167,7 @@
   ])
 
   watch(isAccountOwner, (newValue) => {
-    if (!newValue && !isInitializing.value) {
+    if (newValue && !isInitializing.value) {
       teamsIds.value = []
     }
   })
@@ -359,7 +363,7 @@
           filter
           autoFilterFocus
           id="teams"
-          :disabled="isAccountOwner"
+          :disabled="disabledUserTeams"
           :loading="!optionsTeams.length"
           :options="optionsTeams"
           optionLabel="label"
@@ -391,4 +395,16 @@
       />
     </template>
   </FormHorizontal>
+  <form-horizontal title="Status">
+    <template #inputs>
+      <FieldSwitchBlock
+        data-testid="user-form__active-field"
+        nameField="isActive"
+        name="isActive"
+        auto
+        :isCard="false"
+        title="Active"
+      />
+    </template>
+  </form-horizontal>
 </template>

@@ -28,7 +28,13 @@ export const documentationCatalog = {
   records: () => openSearchResult('records'),
   waf: () => openSearchResult('waf'),
   wafAllowed: () => openSearchResult('Allowed Rules'),
-  wafTuning: () => openSearchResult('Tune')
+  wafTuning: () => openSearchResult('Tune'),
+  customPages: () => openSearchResult('Error Responses'),
+  mfaManagement: () => openSearchResult('MFA Management'),
+  edgeConnectors: () => openSearchResult('Origins'),
+  workload: () => openSearchResult('workload'),
+  edgeSQL: () => openSearchResult('edge-sql'),
+  edgeStorage: () => openSearchResult('edge storage')
 }
 
 export const documentationGuideProducts = {
@@ -54,5 +60,12 @@ export const documentationGuideProducts = {
   paymentMethods: () =>
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-methods'),
   paymentHistory: () =>
-    openDocumentationProducts('guides/billing-and-subscriptions/#payment-history')
+    openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
+  customPages: () => openDocumentationProducts('guides/customizing-error-response-page'),
+  edgeStorage: () => openDocumentationProducts('store/edge-storage'),
+  edgeSQL: () => openDocumentationProducts('store/edge-sql')
+}
+
+export const documentationStoreProducts = {
+  bucket: () => openDocumentationProducts('store/storage/create-bucket/')
 }

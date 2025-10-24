@@ -5,7 +5,7 @@ import * as Errors from '@/services/axios/errors'
 export const listWafRulesTuningService = async ({ wafId, domains, network, hourRange, filter }) => {
   if (!wafId) {
     return parseHttpResponse({
-      body: [],
+      body: { data: [], recordsFound: 0 },
       statusCode: 200
     })
   }
@@ -65,14 +65,14 @@ const adapt = (httpResponse) => {
    */
 
   if (httpResponse.statusCode !== 200) return httpResponse
-
   const isArray = Array.isArray(httpResponse.body.results)
+  const count = isArray ? httpResponse.body.results.length : 0
   const parsedWafRulesTuning = isArray
-    ? httpResponse.body.results.map((event) => {
+    ? httpResponse.body.results.map((event, index) => {
         const values = {
           hitCount: event.hit_count,
           topIps: event?.top_10_ips?.[0]?.[1] || '',
-          id: event.rule_id,
+          id: `${event.rule_id}${index}`,
           ruleId: event.rule_id,
           ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
           ipCount: event.ip_count,
@@ -89,7 +89,7 @@ const adapt = (httpResponse) => {
     : []
 
   return {
-    body: parsedWafRulesTuning,
+    body: { data: parsedWafRulesTuning, recordsFound: count },
     statusCode: httpResponse.statusCode
   }
 }

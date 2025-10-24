@@ -1,7 +1,7 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -98,14 +98,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
     }
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeBillingBaseUrl()}`,
-      method: 'POST',
-      body: graphQLPayload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeBillingBaseUrl()}`,
+    method: 'POST',
+    body: graphQLPayload
+  })
 
   httpResponse = adapt(httpResponse)
 
@@ -127,18 +125,17 @@ const groupBy = (firstData, secondData, groupParams) => {
 }
 
 const PRODUCT_NAMES = {
-  edge_application: 'Edge Application',
+  edge_application: 'Application',
   application_accelerator: 'Application Accelerator',
   load_balancer: 'Load Balancer',
   image_processor: 'Image Processor',
-  edge_functions: 'Edge Functions',
-  network_layer_protection: 'Network Layer Protection',
+  edge_functions: 'Functions',
+  network_layer_protection: 'Network Shield',
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',
-  real_time_events: 'Real-Time Events',
+  realtime_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
@@ -149,21 +146,22 @@ const PRODUCT_NAMES = {
   support_enterprise: 'Support Enterprise',
   support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
-  tiered_cache: 'Tiered Cache'
+  tiered_cache: 'Tiered Cache',
+  edge_storage: 'Object Storage'
 }
 
 const METRIC_SLUGS = {
-  application_accelerator_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  requests: { title: 'Total Requests (per 10,000)' },
-  data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  data_stream_requests: { title: 'Total Requests (per 10,000)' },
-  network_layer_protection_requests: { title: 'Total Requests (per 10,000)' },
-  tiered_cache_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  load_balancer_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  waf_requests: { title: 'Total Requests (per 10,000)' },
+  application_accelerator_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  requests: { title: 'Total Requests' },
+  data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  data_stream_requests: { title: 'Total Requests' },
+  network_layer_protection_requests: { title: 'Total Requests' },
+  tiered_cache_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  load_balancer_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  waf_requests: { title: 'Total Requests' },
   ddos_protection_20gbps: { title: 'DDoS Protection 20Gbps' },
   ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
-  ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  ddos_protection_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
   ddos_protection_unlimited: { title: 'DDoS Protection Unlimited' },
   compute_time: { title: 'Compute Time' },
   invocations: { title: 'Invocations' },
@@ -176,7 +174,11 @@ const METRIC_SLUGS = {
   plan_missioncritical: { title: 'Plan Mission critical' },
   support_enterprise: { title: 'Total Days', unit: 'Days' },
   support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
+  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  edge_storage_class_a_operations: { title: 'Class A Operations' },
+  edge_storage_class_b_operations: { title: 'Class B Operations' },
+  edge_storage_class_c_operations: { title: 'Class C Operations' },
+  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
 }
 
 const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
@@ -213,13 +215,19 @@ const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
 }
 
 const mapProducts = (products, metricsGrouped, regionMetricsGrouped) => {
-  return products.map((product) => ({
-    service: PRODUCT_NAMES[product.productSlug],
-    value: formatCurrencyString(product.currency, product.value),
-    slug: product.productSlug,
-    currency: product.currency,
-    descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
-  }))
+  return products
+    .map((product) => {
+      const service = PRODUCT_NAMES[product.productSlug]
+      if (!service) return null
+      return {
+        service,
+        value: formatCurrencyString(product.currency, product.value),
+        slug: product.productSlug,
+        currency: product.currency,
+        descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
+      }
+    })
+    .filter(Boolean)
 }
 
 const adapt = ({ body, statusCode }) => {
@@ -231,8 +239,10 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  if (!products.length) {
-    return { body: products, statusCode }
+  const filteredProducts = products.filter((item) => ![BOT_MANAGER_SLUG].includes(item.productSlug))
+
+  if (!filteredProducts.length) {
+    return { body: filteredProducts, statusCode }
   }
 
   const groupedMetrics = groupBy(productMetricsValue, productMetricsAccounted, [
@@ -246,7 +256,7 @@ const adapt = ({ body, statusCode }) => {
     'regionName'
   ])
 
-  const data = mapProducts(products, groupedMetrics, groupedRegionMetrics)
+  const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
 
   return { body: data, statusCode }
 }

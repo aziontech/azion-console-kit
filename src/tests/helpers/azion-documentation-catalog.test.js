@@ -161,7 +161,7 @@ describe('AzionDocumentationCatalog', () => {
     )
   })
 
-  it('should open edge application documentation with correct link', () => {
+  it('should open Application documentation with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
@@ -213,7 +213,7 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=records&filter=doc`
     )
   })
-  it('should edge application cache settings documentation with correct link', () => {
+  it('should Application cache settings documentation with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 

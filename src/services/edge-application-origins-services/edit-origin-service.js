@@ -23,6 +23,14 @@ const adapt = (payload) => {
     }
   }
 
+  if (payload.originType === 'live_ingest') {
+    return {
+      name: payload.name,
+      origin_type: payload.originType,
+      streaming_endpoint: payload.streamingEndpoint
+    }
+  }
+
   let payloadAdapted = {
     name: payload.name,
     host_header: payload.hostHeader,
@@ -44,9 +52,7 @@ const adapt = (payload) => {
     hmac_authentication: payload.hmacAuthentication,
     hmac_region_name: payload.hmacRegionName,
     hmac_access_key: payload.hmacAccessKey,
-    hmac_secret_key: payload.hmacSecretKey,
-    connection_timeout: payload.connectionTimeout,
-    timeout_between_bytes: payload.timeoutBetweenBytes
+    hmac_secret_key: payload.hmacSecretKey
   }
 
   if (payload.method) {

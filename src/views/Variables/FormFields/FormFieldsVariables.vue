@@ -14,7 +14,7 @@
 <template>
   <FormHorizontal
     title="Variables"
-    description="Create environment variables or secrets to use with configured edge functions."
+    description="Create environment variables or secrets to use with configured Functions."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -27,6 +27,7 @@
           description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
           underscore."
           data-testid="variables-form__key-field"
+          sensitive
         />
       </div>
 
@@ -39,6 +40,7 @@
           :value="value"
           description="Enter the data associated with the variable key."
           data-testid="variables-form__value-field"
+          sensitive
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

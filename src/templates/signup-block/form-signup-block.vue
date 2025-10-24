@@ -8,19 +8,15 @@
             autocomplete="off"
             @submit.prevent
           >
-            <div class="gap-3 flex flex-col">
-              <h2 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h2>
-              <p class="text-start text-color-secondary">
+            <div class="gap-2 flex flex-col">
+              <h1 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h1>
+              <p class="text-sm text-start text-color-secondary">
                 US$ 300 credit to use over 12 months, no credit card is required.
               </p>
             </div>
 
             <div>
-              <SocialIdpsBlock
-                :socialIdpsService="props.listSocialIdpsService"
-                @showSocialIdps="updateEmailForm"
-                v-if="showLoginFromEmail"
-              />
+              <SocialIdpsBlock v-model:showSocialIdps="showLoginFromEmail" />
 
               <PrimeDivider
                 class="my-3"
@@ -44,25 +40,29 @@
               <PrimeButton
                 label="Terms of Service"
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionTermsAndServicesWindowOpener"
               />
               and
               <PrimeButton
                 label="Privacy Policy."
                 link
-                class="p-0 text-sm"
+                class="p-0"
+                size="small"
                 @click="azionPrivacyPolicyWindowOpener"
               />
             </p>
           </form>
         </div>
       </div>
-      <div class="flex flex-wrap justify-center items-center gap-3 mt-8">
+      <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
         <PrimeButton
           label="Sign In"
-          severity="secondary"
+          link
+          class="p-0"
+          size="small"
           @click="goToLogin"
         />
       </div>
@@ -86,17 +86,12 @@
 
   const props = defineProps({
     signupService: { required: true, type: Function },
-    listSocialIdpsService: { required: true, type: Function },
     resendEmailService: { required: true, type: Function }
   })
 
   const router = useRouter()
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
-
-  const updateEmailForm = (value) => {
-    showLoginFromEmail.value = value
-  }
 
   const showActivationEmail = () => {
     showActivation.value = false

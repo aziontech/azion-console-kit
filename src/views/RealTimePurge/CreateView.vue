@@ -1,38 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create Real-Time Purge"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createRealTimePurgeService"
-        :schema="validationSchema"
-        @on-response="handleResponse"
-        @on-response-fail="handleTrackFailedCreation"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <InlineMessage
-            class="w-fit"
-            severity="info"
-            >After a purge is added, the results may take some time to propagate to all edge nodes.
-          </InlineMessage>
-          <FormFieldsCreateRealTimePurge
-            :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService"
-          />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -43,15 +8,14 @@
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { purgeService } from '@/services/v2/purge/purge-service'
+  import { usePurgeStore } from '@/stores/purge'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const purgeStore = usePurgeStore()
 
-  const props = defineProps({
-    createRealTimePurgeService: {
-      type: Function,
-      required: true
-    },
+  defineProps({
     contactSalesRealTimePurgeService: {
       type: Function,
       required: true
@@ -59,6 +23,7 @@
   })
 
   const handleResponse = () => {
+    purgeStore.incrementPurgeCount()
     tracker.product.productCreated({
       productName: 'Purge'
     })
@@ -83,8 +48,44 @@
   })
 
   const initialValues = ref({
-    layer: 'edge_cache',
+    layer: 'cache',
     purgeType: 'cachekey',
     argumentsPurge: ''
   })
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create Real-Time Purge"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="purgeService.createPurge"
+        :schema="validationSchema"
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
+        :initialValues="initialValues"
+      >
+        <template #form>
+          <InlineMessage
+            class="w-fit"
+            severity="info"
+          >
+            After a purge is added, the results may take some time to propagate to all edge nodes.
+          </InlineMessage>
+          <FormFieldsCreateRealTimePurge
+            :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService"
+          />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>

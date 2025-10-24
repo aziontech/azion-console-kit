@@ -1,9 +1,11 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
+import * as Errors from '@/services/axios/errors'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -14,12 +16,13 @@ export const listEdgeFunctions = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -32,24 +35,48 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsList',
       'edgeFunctionsTime',
-      'ts'
+      'ts',
+      'virtualhostid',
+      'edgeFunctionsInstanceIdList'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const { body } = response
-
-  return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+  const data = response.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
-    configurationId: edgeFunctionsEvents.configurationId,
-    functionLanguage: edgeFunctionsEvents.functionLanguage,
-    edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
-    edgeFunctionsTime: `${edgeFunctionsEvents.edgeFunctionsTime}ms`,
+    summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
-    tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
+    tsFormat: getCurrentTimezone(edgeFunctionsEvents.ts),
+    configurationId: edgeFunctionsEvents.configurationId
   }))
+
+  return {
+    data
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
+  }
 }

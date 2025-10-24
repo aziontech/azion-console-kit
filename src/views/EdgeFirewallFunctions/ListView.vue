@@ -3,9 +3,10 @@
     ref="drawerFunctionRef"
     :edgeFirewallID="props.edgeFirewallID"
     :createFunctionService="props.createFunctionService"
-    :listEdgeFunctionsService="props.listEdgeFunctionsService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
+    :listEdgeFunctionsService="listEdgeFunctionsService"
+    :loadEdgeFunctionService="loadEdgeFunctionService"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
@@ -31,8 +32,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No functions have been instantiated"
-    description="Click the button below to instantiate your first edge function."
+    title="No Functions have been instantiated"
+    description="Click the button below to instantiate your first Function."
     createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
@@ -54,32 +55,31 @@
 </template>
 
 <script setup>
+  import { computed, ref, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
-  import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import { computed, ref } from 'vue'
+  import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
-
-  const hasContentToList = ref(true)
 
   const props = defineProps({
     edgeFirewallID: {
       required: true,
       type: String
     },
+    loadFunctionService: {
+      required: true,
+      type: Function
+    },
     listEdgeFunctionsService: {
       required: true,
       type: Function
     },
-    listEdgeFirewallFunctionService: {
-      required: true,
-      type: Function
-    },
-    loadFunctionService: {
+    loadEdgeFunctionService: {
       required: true,
       type: Function
     },
@@ -101,6 +101,9 @@
     }
   })
 
+  const router = useRouter()
+  const route = useRoute()
+  const hasContentToList = ref(true)
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
   const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
@@ -109,18 +112,24 @@
     'last_editor',
     'last_modified',
     'version',
-    'edge_function'
+    'function'
   ]
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name'
       },
       {
         field: 'functionInstanced',
-        header: 'Edge Function',
+        header: 'Function',
         sortField: 'edge_function',
         disableSort: true
       },
@@ -138,11 +147,18 @@
   })
 
   const listFunctionsInstance = async (query) => {
-    return await props.listEdgeFirewallFunctionService(props.edgeFirewallID, query)
+    const data = await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
+      props.edgeFirewallID,
+      query
+    )
+    return data
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionService(functionId, props.edgeFirewallID)
+    return await edgeFirewallFunctionService.deleteEdgeFirewallFunctionService(
+      functionId,
+      props.edgeFirewallID
+    )
   }
 
   const handleLoadData = (event) => {
@@ -154,6 +170,19 @@
   }
 
   const openEditFunctionDrawer = (data) => {
+    openDrawer({ id: data.id })
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
+  }
+
+  const openDrawerById = (data) => {
+    openDrawer({ id: data.id })
+  }
+
+  const openDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
@@ -173,4 +202,8 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  onMounted(() => {
+    openDrawerById({ id: route.query.id })
+  })
 </script>

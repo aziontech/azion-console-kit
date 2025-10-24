@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let teamsPermissionsName
 
-describe('Teams Permissions', { tags: ['@dev6', '@xfail'] }, () => {
+describe('Teams Permissions', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
     teamsPermissionsName = generateUniqueName('Team')
     cy.login()
@@ -24,11 +24,6 @@ describe('Teams Permissions', { tags: ['@dev6', '@xfail'] }, () => {
     cy.wait('@loadPermissions')
 
     cy.get(selectors.teams.allPermissionsToTarget).click()
-    cy.get(selectors.teams.allPermissionsToSource).click()
-    cy.get(selectors.teams.permission('View Content Delivery Settings')).click()
-    cy.get(selectors.teams.singlePermissionToTarget).click()
-    cy.get(selectors.teams.allPermissionsToTarget).click()
-
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
@@ -36,17 +31,8 @@ describe('Teams Permissions', { tags: ['@dev6', '@xfail'] }, () => {
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchField).type(teamsPermissionsName)
+    cy.get(selectors.list.searchField).type(`${teamsPermissionsName}{enter}`)
     cy.get(selectors.teams.listRow('name')).should('have.text', teamsPermissionsName)
-    cy.get(selectors.teams.listRow('permissions')).should(
-      'have.text',
-      'View Content Delivery SettingsEdit Content Delivery SettingsShow more (47)'
-    )
     cy.get(selectors.teams.listRow('status')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Delete the team permissions
-    cy.deleteEntityFromLoadedList()
   })
 })

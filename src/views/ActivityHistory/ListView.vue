@@ -6,7 +6,8 @@
     <template #content>
       <div v-if="hasContentToList">
         <ActivityHistoryBlock
-          :listEventsService="listEventsService"
+          :listActivityHistoryEventsService="activityHistoryService.listActivityHistoryEvents"
+          :getActivityHistoryTotalRecords="activityHistoryService.getTotalRecords"
           @on-load-data="handleLoadData"
         />
       </div>
@@ -32,45 +33,38 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import ActivityHistoryBlock from '@templates/activity-history-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { activityHistoryService } from '@/services/v2/activity-history/activity-history-service'
 
-  export default {
-    name: 'activity-history-view',
-    components: {
-      PageHeadingBlock,
-      ActivityHistoryBlock,
-      EmptyResultsBlock,
-      Illustration,
-      PrimeButton,
-      ContentBlock
-    },
-    data: () => ({
-      pageTitle: 'Activity History',
-      hasContentToList: true
-    }),
-    props: {
-      listEventsService: {
-        type: Function,
-        required: true
-      },
-      documentationService: {
-        type: Function,
-        required: true
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      },
-      navigateToHomePage() {
-        this.$router.push('/')
-      }
+  defineProps({
+    documentationService: {
+      type: Function,
+      required: true
     }
+  })
+
+  const hasContentToList = ref(true)
+  const router = useRouter()
+
+  onMounted(() => {
+    if (!activityHistoryService.listActivityHistoryEvents) {
+      hasContentToList.value = false
+    }
+  })
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const navigateToHomePage = () => {
+    router.push('/')
   }
 </script>

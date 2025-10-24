@@ -1,7 +1,8 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
+import { getCurrentTimezone } from '@/helpers'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -9,6 +10,7 @@ export const loadImageProcessor = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -65,30 +67,11 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [imagesProcessedEvents = {}] = body.data.imagesProcessedEvents
+
   return {
-    bytesSent: imagesProcessedEvents.bytesSent,
-    configurationId: imagesProcessedEvents.configurationId,
-    host: imagesProcessedEvents.host,
-    httpReferer: imagesProcessedEvents.httpReferer,
-    httpUserAgent: imagesProcessedEvents.httpUserAgent,
-    referenceError: imagesProcessedEvents.referenceError,
-    remoteAddr: imagesProcessedEvents.remoteAddr,
-    remotePort: imagesProcessedEvents.remotePort,
-    requestMethod: imagesProcessedEvents.requestMethod,
-    requestTime: imagesProcessedEvents.requestTime,
-    requestUri: imagesProcessedEvents.requestUri,
     scheme: imagesProcessedEvents.scheme?.toUpperCase(),
-    solution: imagesProcessedEvents.solution,
-    sslCipher: imagesProcessedEvents.sslCipher,
-    sslProtocol: imagesProcessedEvents.sslProtocol,
-    sslSessionReused: imagesProcessedEvents.sslSessionReused,
-    status: imagesProcessedEvents.status,
-    tcpinfoRtt: imagesProcessedEvents.tcpinfoRtt,
-    ts: convertValueToDate(imagesProcessedEvents.ts),
-    upstreamCacheStatus: imagesProcessedEvents.upstreamCacheStatus,
-    upstreamResponseTime: imagesProcessedEvents.upstreamResponseTime,
-    upstreamResponseTimeStr: imagesProcessedEvents.upstreamResponseTimeStr,
-    upstreamStatus: imagesProcessedEvents.upstreamStatus,
-    upstreamStatusStr: imagesProcessedEvents.upstreamStatusStr
+    host: imagesProcessedEvents.host,
+    ts: getCurrentTimezone(imagesProcessedEvents.ts),
+    data: buildSummary(imagesProcessedEvents)
   }
 }

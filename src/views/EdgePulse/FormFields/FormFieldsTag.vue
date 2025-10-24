@@ -1,10 +1,9 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
-  defineEmits(['handleCopy'])
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
   const preLoadingTagCode = ref(
     `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`
   )
@@ -43,13 +42,9 @@
         </div>
       </div>
       <div>
-        <PrimeButton
-          icon="pi pi-copy"
-          label="Copy"
-          data-testid="edge-pulse__pre-loading-tag-copy-button"
-          class="max-md:w-full"
-          outlined
-          @click="$emit('handleCopy', { code: preLoadingTagCode })"
+        <copyBlock
+          :value="preLoadingTagCode"
+          label="Copy script"
         />
       </div>
     </template>

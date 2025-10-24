@@ -10,6 +10,7 @@
     :class="buttonClasses"
     icon="pi pi-question-circle"
     size="small"
+    aria-label="Open help center"
     v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
   />
 </template>

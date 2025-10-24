@@ -1,3 +1,83 @@
+<script setup>
+  import { computed, ref, inject } from 'vue'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+
+  import PageHeadingBlock from '@/templates/page-heading-block'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  defineOptions({ name: 'network-list-view' })
+
+  defineProps({
+    documentationService: {
+      required: true,
+      type: Function
+    }
+  })
+
+  const hasContentToList = ref(true)
+  const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'network list',
+      icon: 'pi pi-trash',
+      service: networkListsService.deleteNetworkList
+    }
+  ]
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Network List'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Network List'
+    })
+  }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'listType',
+        header: 'List Type',
+        sortField: 'type'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        sortField: 'last_modified',
+        header: 'Last Modified'
+      }
+    ]
+  })
+</script>
+
 <template>
   <ContentBlock>
     <template #heading>
@@ -6,7 +86,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listNetworkListService"
+        :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
         addButtonLabel="Network List"
         createPagePath="network-lists/create"
@@ -34,84 +114,3 @@
     </template>
   </ContentBlock>
 </template>
-
-<script setup>
-  import { computed, ref, inject } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import PageHeadingBlock from '@/templates/page-heading-block'
-
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
-
-  defineOptions({ name: 'network-list-view' })
-
-  const props = defineProps({
-    listNetworkListService: {
-      required: true,
-      type: Function
-    },
-    deleteNetworkListService: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
-
-  const hasContentToList = ref(true)
-  const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
-
-  const actions = [
-    {
-      type: 'delete',
-      title: 'network list',
-      icon: 'pi pi-trash',
-      service: props.deleteNetworkListService
-    }
-  ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
-  const handleCreateTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Network List'
-    })
-  }
-
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'Network List'
-    })
-  }
-
-  const getColumns = computed(() => {
-    return [
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'listType',
-        header: 'List Type',
-        sortField: 'type'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        sortField: 'last_modified',
-        header: 'Last Modified'
-      }
-    ]
-  })
-</script>

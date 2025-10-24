@@ -186,6 +186,24 @@ describe.concurrent('ContractServices', () => {
     })
   })
 
+  it('should correctly identify the Mission Critical plan with plan_ prefix', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: [{ slug: 'plan_missioncritical' }]
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Mission Critical'
+    })
+  })
+
   it('should handle an empty response body', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

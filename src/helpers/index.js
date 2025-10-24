@@ -6,14 +6,18 @@ import {
   openGoogleAuthenticatorAppDocumentation,
   openSearchResult,
   openAzionSite,
+  openAzionSiteAboutUs,
   openAzionBlog,
   openAzionDiscord,
   openAzionGithub,
   openAzionX,
-  openShowMorePlan
+  openShowMorePlan,
+  openMarketplaceIntegrationsDocumentation,
+  azionJsonFormWindowOpener
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
+import { contactSalesEdgeApplicationService } from './azion-contact-sales-window-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
@@ -24,7 +28,15 @@ import InviteSession from './invite-session'
 import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
-import { convertValueToDate, convertDateToLocalTimezone, formatDateToUS } from './convert-date'
+import {
+  convertValueToDate,
+  convertDateToLocalTimezone,
+  formatDateToUS,
+  convertValueToDateByUserTimezone,
+  formatDateMonthAndYear,
+  getRemainingDays,
+  getCurrentDateTimeIntl
+} from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
@@ -36,9 +48,35 @@ import FILTERS_RULES from './real-time-filters-rules'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
 import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
+import { disabledBackButton } from './browser-back-button'
+import { buildSummary } from './build-summary'
+import INFORMATION_TEXTS from './azion-information-texts'
+import { getCurrentTimezone } from './account-timezone'
+import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
+import { adaptServiceDataResponse } from '../services/v2/utils/adaptServiceDataResponse'
+import { formatString } from './format-strings'
+import {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS
+} from './workload-protocol-settings'
+
+const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
+import { getExpiredDate } from './payment-method'
 
 export {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS,
+  checkIfFieldExist,
   InviteSession,
+  azionJsonFormWindowOpener,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,
   azionTermsAndServicesWindowOpener,
@@ -54,8 +92,10 @@ export {
   openContactSupport,
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
+  openMarketplaceIntegrationsDocumentation,
   openSearchResult,
   openAzionSite,
+  openAzionSiteAboutUs,
   openAzionBlog,
   openAzionDiscord,
   openAzionGithub,
@@ -79,5 +119,18 @@ export {
   openGraphQlPlayground,
   eventsPlaygroundOpener,
   setRedirectRoute,
-  getRedirectRoute
+  getRedirectRoute,
+  disabledBackButton,
+  buildSummary,
+  INFORMATION_TEXTS,
+  convertValueToDateByUserTimezone,
+  getCurrentTimezone,
+  TEXT_DOMAIN_WORKLOAD,
+  adaptServiceDataResponse,
+  formatDateMonthAndYear,
+  getExpiredDate,
+  getRemainingDays,
+  getCurrentDateTimeIntl,
+  contactSalesEdgeApplicationService,
+  formatString
 }

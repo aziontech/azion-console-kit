@@ -72,11 +72,8 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return {
-        feedback: 'Your edge application has been created',
-        urlToEditView: `/edge-applications/edit/${httpResponse.body.results.id}`,
-        applicationId: httpResponse.body.results.id
-      }
+      const data = httpResponse.body.results
+      return data
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message

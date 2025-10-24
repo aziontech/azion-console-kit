@@ -8,14 +8,14 @@ export const realTimePurgeRoutes = {
   children: [
     {
       path: '',
-      name: 'real-time-purge',
+      name: 'list-real-time-purge',
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
         listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
-        createRealTimePurgeService: RealTimePurgeService.createRealTimePurgeService,
         documentationService: Helpers.documentationCatalog.realTimePurge
       },
       meta: {
+        title: 'Real-Time Purge',
         breadCrumbs: [
           {
             label: 'Real-Time Purge',
@@ -29,10 +29,10 @@ export const realTimePurgeRoutes = {
       name: 'create-real-time-purge',
       component: () => import('@views/RealTimePurge/CreateView.vue'),
       props: {
-        createRealTimePurgeService: RealTimePurgeService.createRealTimePurgeService,
         contactSalesRealTimePurgeService: RealTimePurgeService.contactSalesRealTimePurgeService
       },
       meta: {
+        title: 'Create Real-Time Purge',
         breadCrumbs: [
           {
             label: 'Real-Time Purge',

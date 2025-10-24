@@ -1,7 +1,19 @@
-import * as DigitalCertificatesService from '@/services/digital-certificates-services'
-import * as DigitalCertificatesServiceV4 from '@/services/digital-certificates-services/v4'
-
 import * as Helpers from '@/helpers'
+
+const certificateTypeMapping = {
+  certificateRevogationList: {
+    create: 'Create Certificate Revogation List',
+    edit: 'Edit Certificate Revogation List'
+  },
+  trusted_ca_certificate: {
+    create: 'Importing Trusted Certificate',
+    edit: 'Edit Trusted Certificate'
+  },
+  edge_certificate: {
+    create: 'Create Server Certificate',
+    edit: 'Edit Server Certificate'
+  }
+}
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const digitalCertificatesRoutes = {
@@ -12,16 +24,11 @@ export const digitalCertificatesRoutes = {
       path: '',
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
-      props: {
-        listDigitalCertificatesService: DigitalCertificatesServiceV4.listDigitalCertificatesService,
-        deleteDigitalCertificatesService:
-          DigitalCertificatesService.deleteDigitalCertificatesService,
-        documentationService: Helpers.documentationCatalog.digitalCertificates
-      },
       meta: {
+        title: 'Certificate Manager',
         breadCrumbs: [
           {
-            label: 'Digital Certificates',
+            label: 'Certificate Manager',
             to: '/digital-certificates'
           }
         ]
@@ -31,21 +38,20 @@ export const digitalCertificatesRoutes = {
       path: 'create',
       name: 'create-digital-certificates',
       component: () => import('@views/DigitalCertificates/CreateView.vue'),
-      props: {
-        createDigitalCertificatesCSRService:
-          DigitalCertificatesService.createDigitalCertificatesCSRService,
-        createDigitalCertificatesService:
-          DigitalCertificatesService.createDigitalCertificatesService
-      },
       meta: {
+        title: 'Create Digital Certificate',
         breadCrumbs: [
           {
-            label: 'Digital Certificates',
+            label: 'Certificate Manager',
             to: '/digital-certificates'
           },
           {
             label: 'Create Digital Certificate',
-            to: '/digital-certificates/create'
+            to: '/digital-certificates/create',
+            dynamic: true,
+            baseLabel: 'Create Digital Certificate',
+            queryParam: 'certificate',
+            typeMapping: certificateTypeMapping
           }
         ]
       }
@@ -55,20 +61,22 @@ export const digitalCertificatesRoutes = {
       name: 'edit-digital-certificates',
       component: () => import('@views/DigitalCertificates/EditView.vue'),
       props: {
-        editDigitalCertificateService: DigitalCertificatesService.editDigitalCertificateService,
-        loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService,
-        updatedRedirect: 'list-digital-certificates',
         clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
       },
       meta: {
+        title: 'Edit Digital Certificate',
         breadCrumbs: [
           {
-            label: 'Digital Certificates',
+            label: 'Certificate Manager',
             to: '/digital-certificates'
           },
           {
-            label: 'Edit Digital Certificate'
+            label: 'Edit Digital Certificate',
+            dynamic: true,
+            baseLabel: 'Edit Digital Certificate',
+            queryParam: 'certificate',
+            typeMapping: certificateTypeMapping
           }
         ]
       }

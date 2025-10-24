@@ -1,6 +1,40 @@
 import { describe, expect, it, vi } from 'vitest'
-import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'
+import {
+  listServiceAndProductsChangesAccountingService,
+  joinEdgeApplicationWithTieredCache
+} from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+
+const mockDescription = [
+  {
+    service: 'Total Data Transfered',
+    slug: 'data_transferred',
+    quantity: '848,506 GB',
+    price: 0,
+    data: [
+      {
+        country: 'Brazil',
+        quantity: '848,506 GB',
+        price: 0,
+        slug: 'data_transferred'
+      }
+    ]
+  },
+  {
+    service: 'Total Data Transfered',
+    slug: 'tiered_cache_data_transferred',
+    quantity: '1.727 GB',
+    price: 0,
+    data: [
+      {
+        country: 'Brazil',
+        quantity: '1.727 GB',
+        price: 0,
+        slug: 'data_transferred'
+      }
+    ]
+  }
+]
 
 const fixtures = {
   mockResponse: {
@@ -30,13 +64,13 @@ const fixtures = {
   formattedResponse: {
     data: [
       {
-        service: 'Edge Application',
+        service: 'Application',
         value: 0,
         slug: 'edge_application',
         currency: 0,
         descriptions: [
           {
-            service: 'Total Requests (per 10,000)',
+            service: 'Total Requests',
             slug: 'requests',
             quantity: '848,506',
             price: 0,
@@ -50,7 +84,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Data Transfered (per GB)',
+            service: 'Total Data Transfered',
             slug: 'data_transferred',
             quantity: '1.727 GB',
             price: 0,
@@ -67,7 +101,49 @@ const fixtures = {
       }
     ]
   },
-  mockError: [{ message: 'Error' }]
+  mockError: [{ message: 'Error' }],
+  mockJoinEdgeApplicationWithTieredCache: [
+    {
+      service: 'Application Accelerator',
+      slug: 'application_accelerator',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Application',
+      slug: 'edge_application',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Data Stream',
+      slug: 'data_stream',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Image Processor',
+      slug: 'image_processor',
+      descriptions: mockDescription
+    },
+    {
+      service: 'WAF',
+      slug: 'waf',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Tiered Cache',
+      slug: 'tiered_cache',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Object Storage',
+      slug: 'edge_storage',
+      descriptions: mockDescription
+    },
+    {
+      service: 'Bot Manager',
+      slug: 'bot_manager',
+      descriptions: mockDescription
+    }
+  ]
 }
 
 const makeSut = () => {
@@ -105,5 +181,46 @@ describe('BillingServices', () => {
     const result = await sut('123')
 
     expect(result).toEqual([])
+  })
+
+  it('should correctly remove specified services without affecting others', async () => {
+    const expectedServices = [
+      {
+        service: 'Application Accelerator',
+        slug: 'application_accelerator',
+        descriptions: mockDescription
+      },
+      {
+        service: 'Application',
+        slug: 'edge_application',
+        descriptions: mockDescription
+      },
+      {
+        service: 'Data Stream',
+        slug: 'data_stream',
+        descriptions: mockDescription
+      },
+      {
+        service: 'Image Processor',
+        slug: 'image_processor',
+        descriptions: mockDescription
+      },
+      {
+        service: 'WAF',
+        slug: 'waf',
+        descriptions: mockDescription
+      },
+      {
+        service: 'Object Storage',
+        slug: 'edge_storage',
+        descriptions: mockDescription
+      }
+    ]
+
+    const result = joinEdgeApplicationWithTieredCache(
+      fixtures.mockJoinEdgeApplicationWithTieredCache
+    )
+
+    expect(result).toEqual(expectedServices)
   })
 })

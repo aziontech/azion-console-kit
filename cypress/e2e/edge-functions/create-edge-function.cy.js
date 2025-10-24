@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let functionName = ''
 
-describe('Edge Functions spec', { tags: ['@dev5', '@xfail'] }, () => {
+describe('Edge Functions spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     functionName = generateUniqueName('Function')
@@ -17,19 +17,12 @@ describe('Edge Functions spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
     cy.get(selectors.functions.saveButton).click()
     cy.verifyToast('success', 'Your edge function has been created')
-    cy.get(selectors.functions.cancelButton).click()
 
     // Assert
     cy.get(selectors.functions.searchInput).clear()
-    cy.get(selectors.functions.searchInput).type(functionName, { delay: 0 })
+    cy.get(selectors.functions.searchInput).type(`${functionName} {enter}`, { delay: 0 })
     cy.get(selectors.functions.nameRow).should('have.text', functionName)
     cy.get(selectors.functions.languageRow).should('have.text', 'JavaScript')
     cy.get(selectors.functions.initiatorTypeRow).should('have.text', 'edge_application')
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge function successfully deleted')
-    })
   })
 })

@@ -1,9 +1,10 @@
 name: Failed E2E Tests
 
-on:
-  schedule:
-    - cron: '0 3 * * 1-5' # Runs at 00:00 in UTC-3 
-  workflow_dispatch:
+# DISABLED: E2E tests for stage environment
+# on:
+#   schedule:
+#     - cron: '0 3 * * 1-5' # Runs at 00:00 in UTC-3 
+#   workflow_dispatch:
 
 jobs:
   run-failed-e2e-tests:
@@ -39,7 +40,7 @@ jobs:
 
       - name: Upload E2E Coverage Report Artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage_e2e_report
           path: coverage.zip
@@ -47,7 +48,7 @@ jobs:
 
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress_screenshots
           path: cypress/screenshots
@@ -55,7 +56,7 @@ jobs:
 
       - name: Upload Cypress Videos Artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress_videos
           path: cypress/videos

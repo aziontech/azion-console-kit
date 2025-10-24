@@ -12,7 +12,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
 
   it('Create a record of type NS', () => {
     // Arrange
-    cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
+    cy.intercept('/v4/edge_dns/zones/*').as('loadZone')
 
     const recordTypeFixtures = {
       name: generateUniqueName('record'),
@@ -22,15 +22,14 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
       value: 'ns4.aziondns.net',
       policyType: 'simple',
       policyTypeOption: 0,
-      description: '-'
+      description: ''
     }
 
     cy.get(selectors.edgeDns.createButton).click()
     cy.get(selectors.edgeDns.nameInput).type(zoneName)
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS has been created')
-    cy.get(selectors.edgeDns.cancelButton).click()
+    cy.verifyToast('success', 'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.')
     cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)
       .should('contain', zoneName)
@@ -46,6 +45,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.records.nameInput).type(recordTypeFixtures.name)
     cy.get(selectors.edgeDns.records.recordTypeDropdown).click()
     cy.get(selectors.edgeDns.records.recordTypeOption(recordTypeFixtures.recordTypeOption)).click()
+    cy.get(selectors.edgeDns.records.ttlInput).clear()
     cy.get(selectors.edgeDns.records.ttlInput).type(recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.records.valueTextarea).type(recordTypeFixtures.value)
     cy.get(selectors.edgeDns.records.policyTypeDropdown).click()
@@ -72,16 +72,5 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
       'have.text',
       recordTypeFixtures.description
     )
-
-    // Cleanup
-    cy.deleteEntityFromLoadedList().then(() => {
-        cy.verifyToast('Edge DNS Record successfully deleted')
-      })
-    })
-
-    afterEach(() => {
-      cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
-        cy.verifyToast('Your Edge DNS has been deleted')
-      })
-    })
   })
+})

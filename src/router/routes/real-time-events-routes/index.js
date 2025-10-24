@@ -38,9 +38,11 @@ export const realTimeEventsRoutes = {
       listService: RealTimeEventsService.listActivityHistory,
       loadService: RealTimeEventsService.loadActivityHistory
     },
-    loadFieldsData: RealTimeEventsService.loadFieldsEventsData
+    loadFieldsData: RealTimeEventsService.loadFieldsEventsData,
+    getTotalRecords: RealTimeEventsService.getTotalRecords
   },
   meta: {
+    title: 'Real-Time Events',
     breadCrumbs: [
       {
         label: 'Real-Time Events',

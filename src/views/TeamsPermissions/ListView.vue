@@ -7,7 +7,7 @@
       />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listTeamPermissionService"
         :columns="getColumns"
@@ -19,8 +19,10 @@
         :actions="actions"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
+        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
+        :defaultOrderingFieldName="'name'"
       >
-      </ListTableBlock>
+      </FetchListTableBlock>
       <EmptyResultsBlock
         v-else
         data-testid="teams-permissions__list-view__empty-results-block"
@@ -43,9 +45,9 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -58,6 +60,9 @@
   })
 
   const hasContentToList = ref(true)
+
+  const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
+
   const actions = [
     {
       type: 'delete',
@@ -81,6 +86,7 @@
         field: 'permissions',
         header: 'Permissions',
         type: 'component',
+        disableSort: true,
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
@@ -88,6 +94,7 @@
         field: 'status',
         header: 'Status',
         type: 'component',
+        sortField: 'is_active',
         component: (columnData) =>
           columnBuilder({
             data: columnData,

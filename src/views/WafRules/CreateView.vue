@@ -1,30 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create WAF Rules" />
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createWafRulesService"
-        @on-response="handleTrackCreation"
-        @on-response-fail="handleTrackFailedCreation"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormFieldsWafRules />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -34,21 +7,16 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import { inject } from 'vue'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    createWafRulesService: {
-      type: Function,
-      required: true
-    }
-  })
-
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'WAF Rules'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -104,4 +72,46 @@
     sqlInjection: true,
     active: true
   }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your waf rule has been created',
+      actions: {
+        link: {
+          label: 'View WAF Rule',
+          callback: () => response.redirectToUrl(`/waf/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create WAF Rules" />
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="wafService.createWafRule"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+        disableToast
+      >
+        <template #form>
+          <FormFieldsWafRules />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>

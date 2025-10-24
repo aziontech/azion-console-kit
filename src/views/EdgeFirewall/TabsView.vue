@@ -7,7 +7,7 @@
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
-
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -17,8 +17,7 @@
   const props = defineProps({
     edgeFirewallServices: { type: Object, required: true },
     listDomainsService: { type: Function, required: true },
-    rulesEngineServices: { type: Object, required: true },
-    listNetworkListService: { type: Function, required: true }
+    rulesEngineServices: { type: Object, required: true }
   })
 
   const defaultTabs = {
@@ -41,7 +40,7 @@
 
   const loaderEdgeFirewall = async () => {
     try {
-      return await props.edgeFirewallServices.loadEdgeFirewallService({
+      return await edgeFirewallService.loadEdgeFirewallService({
         id: edgeFirewallId.value
       })
     } catch (error) {
@@ -109,15 +108,6 @@
     verifyTab(edgeFirewall.value)
   }
 
-  const edgeFirewallModules = computed(() => {
-    return {
-      webApplicationFirewall: edgeFirewall.value.wafEnabled,
-      debugRules: edgeFirewall.value.debugRules,
-      networkProtectionLayer: edgeFirewall.value.networkProtectionEnabled,
-      edgeFunctions: edgeFirewall.value.edgeFunctionsEnabled
-    }
-  })
-
   onMounted(() => {
     renderTabCurrentRouter()
   })
@@ -131,8 +121,9 @@
       tab
     }
     router.push({
-      name: 'edit-edge-firewall',
-      params
+      name: 'edit-firewall',
+      params,
+      query: route.query
     })
   }
 
@@ -178,7 +169,6 @@
         >
           <EditView
             v-if="showMainSettingsTab"
-            :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"
@@ -211,10 +201,8 @@
         >
           <EdgeFirewallRulesEngineListView
             v-if="showRulesEngine"
-            :edgeFirewallModules="edgeFirewallModules"
             :edgeFirewallId="edgeFirewallId"
             v-bind="props.rulesEngineServices"
-            :listNetworkListService="props.listNetworkListService"
           />
         </TabPanel>
       </TabView>

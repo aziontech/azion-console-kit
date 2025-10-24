@@ -1,30 +1,32 @@
 <script setup>
-  import {
-    EDGE_CERTIFICATE,
-    TRUSTED_CA_CERTIFICATE
-  } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import Drawer from '@/views/EdgeApplications/Drawer'
+  import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   const props = defineProps({
     digitalCertificates: {
       type: Array,
       required: true
     },
-    edgeApplicationsData: {
-      type: Array,
+    listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
+      type: Function,
       required: true
     },
     hasDomainName: {
@@ -32,22 +34,18 @@
       required: false,
       default: false
     },
-    loadingEdgeApplications: {
-      type: Boolean
-    },
-    updateDigitalCertificates: {
+    listEdgeFirewallService: {
       type: Function,
       required: true
     },
-    edgeFirewallsData: {
-      type: Array,
-      required: true
-    },
-    isLoadingEdgeFirewalls: {
-      type: Boolean,
+    loadEdgeFirewallService: {
+      type: Function,
       required: true
     }
   })
+
+  const EDGE_CERTIFICATE = 'edge_certificate'
+  const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
 
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -72,46 +70,18 @@
     emit('edgeFirewallCreated')
   }
 
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await props.listEdgeApplicationsService({
+      ...queryParams,
+      isDropdown: true
+    })
+  }
 
-  const edgeCertificates = computed(() => {
-    return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
-  })
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
 
-  const trustedCACertificates = computed(() => {
-    return props.digitalCertificates.filter(
-      (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
-    )
-  })
-
-  const edgeApplicationOptions = computed(() => {
-    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
-  })
-
-  const edgeCertificatesOptions = computed(() => {
-    const defaultCertificate = [
-      { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt", value: 'lets_encrypt' }
-    ]
-    const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-
-    return [...defaultCertificate, ...parsedCertificates]
-  })
-
-  const trustedCACertificatesOptions = computed(() => {
-    return trustedCACertificates.value.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-  })
+  const hasEdgeFirewallAccess = ref(true)
 
   const mtlsModeRadioOptions = ref([
     {
@@ -123,7 +93,7 @@
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
-              request in Edge Firewall, if necessary.`,
+              request in Firewall, if necessary.`,
       inputValue: 'permissive'
     }
   ])
@@ -155,38 +125,58 @@
     return environmentOptionsRadios
   })
 
-  const isLoadingEdgeApplications = computed(() => {
-    return props.loadingEdgeApplications
-  })
-
   const drawerRef = ref('')
 
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
-    emit('edgeApplicationCreated')
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
   }
 
-  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName', 'edgeFirewallCreated'])
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
+  }
+
+  const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
-  const openDigitalCertificateDrawer = () => {
+
+  const openDigitalCertificateDrawer = (certificate) => {
+    digitalCertificateDrawerRef.value.changeCertificateType(certificate)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
-  const onDigitalCertificateSuccess = (id) => {
-    props.updateDigitalCertificates()
+  const onDigitalCertificateSuccess = ({ type, id }) => {
+    if (type === TRUSTED_CA_CERTIFICATE) {
+      mtlsTrustedCertificate.value = id
+      return
+    }
     edgeCertificate.value = id
+  }
+
+  const listDigitalCertificatesByType = async (type, queryParams) => {
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
+      type,
+      fields: ['id,name'],
+      ...queryParams
+    })
+  }
+
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
+  }
+
+  const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
+    return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
 </script>
 
 <template>
   <form-horizontal
     title="General"
-    description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
+    description="Check the details of the Azion domain, including the domain address to access the Application, and modify digital certificate options."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -254,16 +244,7 @@
               disabled
             />
           </span>
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            aria-label="Copy to Clipboard"
-            label="Copy to Clipboard"
-            :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: domainName })"
-          />
+          <copyBlock :value="domainName" />
         </div>
       </div>
     </template>
@@ -271,7 +252,7 @@
 
   <form-horizontal
     title="Settings"
-    description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the Application of the domain and its digital certificate. To link an existing domain to an Application, add it to the CNAME field and block access to the Application via the Azion domain."
   >
     <template #inputs>
       <Drawer
@@ -286,20 +267,20 @@
         ref="drawerEdgeFirewallRef"
         @onSuccess="handleEdgeFirewallCreated"
       />
+
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
-          label="Edge Application"
+        <FieldDropdownLazyLoader
+          label="Application"
           required
+          data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :options="edgeApplicationOptions"
-          :loading="isLoadingEdgeApplications"
-          :disabled="isLoadingEdgeApplications"
+          :service="listEdgeApplicationsDecorator"
+          :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          filter
           appendTo="self"
-          placeholder="Select an edge application"
+          placeholder="Select an Application"
         >
           <template #footer>
             <ul class="p-2">
@@ -315,12 +296,12 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Application"
+                  label="Create Application"
                 />
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -328,19 +309,21 @@
           ref="drawerEdgeFirewallRef"
           @onSuccess="handleEdgeFirewallCreated"
         />
-        <FieldDropdown
-          label="Edge Firewall"
+        <FieldDropdownLazyLoader
+          label="Firewall"
+          enableClearOption
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          @onClear="handleEdgeFirewallClear"
+          v-if="hasEdgeFirewallAccess"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select a Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -356,12 +339,12 @@
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Edge Firewall"
+                  label="Create Firewall"
                 />
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
@@ -369,7 +352,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+        subtitle="Check this option to make the Application accessible only through the domains listed in the CNAME field. Attempts to access the Application through the Azion domain will be blocked."
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -385,24 +368,27 @@
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Digital Certificate"
           name="edgeCertificate"
-          :options="edgeCertificatesOptions"
-          :loading="!edgeCertificatesOptions.length"
-          :disabled="!edgeCertificatesOptions.length"
+          data-testid="domains-form__digital-certificates-field"
+          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
-          filter
+          :defaultPosition="1"
           appendTo="self"
           placeholder="Select a certificate"
+          showGroup
+          optionGroupLabel="group"
+          optionGroupChildren="items"
         >
           <template #footer>
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateDrawer"
+                  @click="openDigitalCertificateDrawer(EDGE_CERTIFICATE)"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
@@ -417,7 +403,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>
@@ -450,20 +436,39 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           required
           name="mtlsTrustedCertificate"
-          :options="trustedCACertificatesOptions"
-          :loading="!trustedCACertificatesOptions.length"
+          :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"
           :value="mtlsTrustedCertificate"
-          filter
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
-        />
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Certificate Manager to upload one."
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer(TRUSTED_CA_CERTIFICATE)"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>

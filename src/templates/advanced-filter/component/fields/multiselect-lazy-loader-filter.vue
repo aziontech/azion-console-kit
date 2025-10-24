@@ -43,7 +43,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import { watchDebounced } from '@vueuse/core'
-  import { listWorkloadsService } from '@/services/workloads-services/list-workloads-service'
+  import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   import MultiSelect from 'primevue/multiselect'
@@ -89,13 +89,9 @@
   const totalCount = ref(0)
   const search = ref('')
 
-  const { value: selectedValue, errorMessage } = useField(
-    'selectedValue',
-    yup.array().min(1).required(),
-    {
-      initialValue: props.value
-    }
-  )
+  const { value: selectedValue, errorMessage } = useField('selectedValue', yup.array().min(1), {
+    initialValue: props.value
+  })
 
   onMounted(async () => {
     await loadDomains()
@@ -118,7 +114,7 @@
         items.value = []
       }
 
-      const response = await listWorkloadsService({
+      const response = await listWorkloadsDynamicFieldsService({
         pageSize: PAGE_SIZE,
         page: page.value,
         fields: 'id,name',

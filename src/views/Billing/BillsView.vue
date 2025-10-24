@@ -1,8 +1,6 @@
 <template>
-  <div class="w-full flex flex-col-reverse sm:flex-row gap-6 mt-6">
-    <div
-      class="w-full sm:w-1/2 flex flex-col justify-between h-[25.00rem] border surface-border rounded-md"
-    >
+  <div class="w-full flex flex-col-reverse sm:flex-row gap-6 mt-4">
+    <div class="w-full sm:w-1/2 flex flex-col justify-between border surface-border rounded-md">
       <div class="p-3 md:p-6 flex flex-col gap-4">
         <div class="flex justify-between">
           <span class="font-medium text-lg text-color">Current Invoice</span>
@@ -13,7 +11,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
-            :disabled="currentInvoice.billId"
+            :disabled="disabledCurrentInvoice"
           />
         </div>
         <div class="flex justify-between mt-4">
@@ -57,7 +55,7 @@
         v-if="accountIsNotRegular"
       >
         <div class="flex justify-between">
-          <span class="text-color-secondary text-sm">Credit Used for Payment</span>
+          <span class="text-color-secondary text-sm">Credit that will be used for payment</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
             class="text-color"
@@ -85,9 +83,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="w-full sm:w-1/2 h-[25.00rem] border surface-border rounded-md flex flex-col justify-between"
-    >
+    <div class="w-full sm:w-1/2 border surface-border rounded-md flex flex-col justify-between">
       <div class="p-3 md:p-6 flex flex-col gap-4">
         <div class="flex justify-between">
           <span class="font-medium text-lg text-color">Service Plan</span>
@@ -120,7 +116,7 @@
             class="font-medium text-color text-sm"
             elementType="span"
           >
-            {{ yourServicePlan.paymentDate }}
+            {{ yourServicePlan.paymentDate || '---' }}
           </SkeletonBlock>
         </div>
         <div
@@ -171,7 +167,7 @@
             elementType="span"
           >
             <span class="text-color-secondary text-sm">$</span>
-            {{ yourServicePlan.creditBalance }}
+            {{ user.formatCredit || '0.00' }}
           </SkeletonBlock>
         </div>
       </div>
@@ -193,14 +189,6 @@
     </div>
   </div>
 
-  <NotificationPayment
-    v-if="user.disclaimer"
-    :clickAddCredit="drawersMethods.openDrawerAddCredit"
-    :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
-    :clickLinkPaymentMethod="goToPayment"
-    :disabledBtnAddCredit="!defaultCardStatus.hasData"
-  />
-
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
@@ -215,6 +203,7 @@
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
   />
+
   <EmptyResultsBlock
     v-else
     title="No payment activity has been recorded"
@@ -229,7 +218,7 @@
         label="Credit"
         icon="pi pi-plus"
         :disabled="!defaultCardStatus.hasData"
-        @click="drawersMethods.openDrawerAddCredit"
+        @click="goToPayment"
         outlined
       >
       </PrimeButton>
@@ -238,7 +227,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Payment Method"
-        @click="drawersMethods.openDrawerPaymentMethod"
+        @click="goToPayment"
       />
     </template>
   </EmptyResultsBlock>
@@ -250,14 +239,13 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
-  import NotificationPayment from './components/notification-payment'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
-  import { ref, computed, onMounted, inject } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
 
   const router = useRouter()
   const hasContentToList = ref(true)
@@ -269,7 +257,6 @@
   const { accountData, accountIsNotRegular } = storeToRefs(accountStore)
 
   const user = accountData
-  const drawersMethods = inject('drawersMethods')
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -302,10 +289,29 @@
     },
     cardDefault: {
       type: Object
+    },
+    loadPaymentMethodDefaultService: {
+      type: Function
+    },
+    loadInvoiceDataService: {
+      type: Function
+    },
+    listServiceAndProductsChangesService: {
+      type: Function
+    },
+    getStripeClientService: {
+      type: Function
+    },
+    documentPaymentMethodService: {
+      type: Function
+    },
+    loadInvoiceLastUpdatedService: {
+      type: Function
     }
   })
 
   const currentInvoice = ref({})
+  const disabledCurrentInvoice = ref(true)
 
   const defaultCardStatus = computed(() => ({
     loaded: props.cardDefault.loader,
@@ -324,6 +330,7 @@
     isCurrentInvoiceLoaded.value = false
     try {
       currentInvoice.value = await props.loadCurrentInvoiceService()
+      disabledCurrentInvoice.value = !currentInvoice.value.redirectId
     } finally {
       isCurrentInvoiceLoaded.value = true
     }
@@ -346,7 +353,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
-      disabled: (item) => !item.invoiceUrl,
+      disabled: (item) => item.disabled,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
       }
@@ -393,9 +400,9 @@
 
   const isTrail = computed(() => user.value.status === 'TRIAL')
 
-  const reloadList = () => {
+  const reloadList = async () => {
     if (hasContentToList.value) {
-      listPaymentHistoryRef.value.reload()
+      await listPaymentHistoryRef.value.reload()
       return
     }
     hasContentToList.value = true
@@ -435,7 +442,7 @@
         },
         {
           field: 'amount',
-          header: 'Amount'
+          header: 'Transactions Amount'
         },
         {
           field: 'status',

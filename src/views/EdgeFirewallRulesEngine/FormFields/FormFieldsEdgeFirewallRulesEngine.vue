@@ -1,43 +1,71 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
   import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import PrimeMenu from 'primevue/menu'
-  import { useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
+  import DrawerNetworkList from '@/views/NetworkLists/Drawer/index.vue'
+  import DrawerWafRules from '@/views/WafRules/Drawer/createDrawer.vue'
 
-  const toast = useToast()
+  import { useFieldArray } from 'vee-validate'
+  import { computed, nextTick, ref, onMounted, watch } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
   })
-
+  const emit = defineEmits(['isOverlapped'])
   const props = defineProps({
-    edgeFirewallFunctionsOptions: {
-      type: Array,
+    listWafRulesService: {
+      type: Function,
       required: true
     },
-    wafRulesOptions: {
-      type: Array,
+    loadWafRulesService: {
+      type: Function,
       required: true
     },
-    enabledModules: {
-      type: Object,
-      required: true
+    hasEdgeFunctionsProductAccess: {
+      type: Boolean,
+      default: true
     },
     listNetworkListService: {
       type: Function,
       required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
+  const route = useRoute()
+  const edgeFirewallId = route.params.id
+  const drawerFunctionRef = ref('')
+  const drawerNetworkListRef = ref('')
+  const drawerWafRulesRef = ref('')
+  const behaviorIndexSelect = ref(null)
+  const criteriaIndexSelect = ref(null)
+  const criteriaInnerRowIndexSelect = ref(null)
+  const listEdgeFunctionsServiceDecorator = async (query) => {
+    return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
+      ...query,
+      fields: 'name,id',
+      active: true
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = async ({ id }) => {
+    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, id)
+  }
 
   const YEAR_IN_SECONDS = 31536000
+  const enabledModules = ref({})
   const DEFAULT_CRITERIA_OPTION = {
     variable: '',
     operator: '',
@@ -50,46 +78,52 @@
     { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
   ]
 
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
+  const hasWafAccess = ref(true)
+  onMounted(async () => {
+    loaderEdgeFirewall()
+  })
+
+  const listWafRulesServiceOptions = async (query) => {
+    return await props.listWafRulesService({ ...query, fields: 'name,id', active: true })
+  }
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
     switch (criteriaVariable) {
-      case 'header_accept':
-      case 'header_accept_encoding':
-      case 'header_accept_language':
-      case 'header_cookie':
-      case 'header_origin':
-      case 'header_referer':
-      case 'header_user_agent':
+      case '${header_accept}':
+      case '${header_accept_encoding}':
+      case '${header_accept_language}':
+      case '${header_cookie}':
+      case '${header_origin}':
+      case '${header_referer}':
+      case '${header_user_agent}':
         return [
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
-      case 'network':
+      case '${network}':
         return [
           { label: 'matches', value: 'is_in_list' },
           { label: 'does not match', value: 'is_not_in_list' }
         ]
-      case 'request_method':
-      case 'scheme':
-      case 'ssl_verification_status':
-      case 'client_certificate_validation':
+      case '${request_method}':
+      case '${scheme}':
+      case '${ssl_verification_status}':
+      case '${client_certificate_validation}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' }
         ]
-      case 'host':
+      case '${host}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
-      case 'request_args':
+      case '${request_args}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
@@ -98,12 +132,12 @@
           { label: 'exists', value: 'exists' },
           { label: 'does not exist', value: 'does_not_exist' }
         ]
-      case 'request_uri':
+      case '${request_uri}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
           { label: 'starts with', value: 'starts_with' },
-          { label: 'does not start with', value: 'does_not_starts_with' },
+          { label: 'does not start with', value: 'does_not_start_with' },
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
@@ -146,107 +180,100 @@
   const showArgumentBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaRow = criteria.value[criteriaIndex].value[criteriaInnerRowIndex]
     return (
-      criteriaRow.operator !== 'exists' &&
-      criteriaRow.operator !== 'does_not_exist' &&
-      criteriaRow.variable !== 'ssl_verification_status' &&
-      criteriaRow.variable !== 'network'
+      criteriaRow.operator !== '${exists}' &&
+      criteriaRow.operator !== '${does_not_exist}' &&
+      criteriaRow.variable !== '${ssl_verification_status}' &&
+      criteriaRow.variable !== '${network}'
     )
   }
   const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
-    return criteriaVariable === 'ssl_verification_status'
+    return criteriaVariable === '${ssl_verification_status}'
   }
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
-    const isCriteriaNetworkSelected = criteriaVariable === 'network'
-    const hasNetworkOptionsToSelect = networkListOptions.value.length
-
-    if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
-      setNetworkListOptions()
-    }
+    const isCriteriaNetworkSelected = criteriaVariable === '${network}'
 
     return isCriteriaNetworkSelected
   }
 
   const generateCriteriaVariableOptions = () => {
-    const edgeFirewallModules = props.enabledModules
+    const edgeFirewallModules = enabledModules.value
     const hasNetworkProtectionLayerModuleEnabled = edgeFirewallModules.networkProtectionLayer
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
 
     const criteriaVariableOptions = [
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - required WAF'
         }`,
-        value: 'header_accept',
+        value: '${header_accept}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Accept Encoding'
-            : 'Header Accept Encoding - requires WAF'
+            : 'Header Accept Encoding - required WAF'
         }`,
-        value: 'header_accept_encoding',
+        value: '${header_accept_encoding}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Accept Language'
-            : 'Header Accept Language - requires WAF'
+            : 'Header Accept Language - required WAF'
         }`,
-        value: 'header_accept_language',
+        value: '${header_accept_language}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - required WAF'
         }`,
-        value: 'header_cookie',
+        value: '${header_cookie}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
-          hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - requires WAF'
+          hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - required WAF'
         }`,
-        value: 'header_origin',
+        value: '${header_origin}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header Referer'
-            : 'Header Referer - requires WAF'
+            : 'Header Referer - required WAF'
         }`,
-        value: 'header_referer',
+        value: '${header_referer}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Header User Agent'
-            : 'Header User Agent - requires WAF'
+            : 'Header User Agent - required WAF'
         }`,
-        value: 'header_user_agent',
+        value: '${header_user_agent}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
-      { label: 'Host', value: 'host', disabled: false },
+      { label: 'Host', value: '${host}', disabled: false },
       {
         label: `${
-          hasNetworkProtectionLayerModuleEnabled
-            ? 'Network'
-            : 'Network - required Network Layer Protection'
+          hasNetworkProtectionLayerModuleEnabled ? 'Network' : 'Network - required Network Shield'
         }`,
-        value: 'network',
+        value: '${network}',
         disabled: !hasNetworkProtectionLayerModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled ? 'Request Args' : 'Request Args - required WAF'
         }`,
-        value: 'request_args',
+        value: '${request_args}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -255,15 +282,15 @@
             ? 'Request Method'
             : 'Request Method - required WAF'
         }`,
-        value: 'request_method',
+        value: '${request_method}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
-      { label: 'Request Uri', value: 'request_uri', disabled: false },
-      { label: 'Scheme', value: 'scheme', disabled: false },
-      { label: 'Ssl Verification Status', value: 'ssl_verification_status', disabled: false },
+      { label: 'Request Uri', value: '${request_uri}', disabled: false },
+      { label: 'Scheme', value: '${scheme}', disabled: false },
+      { label: 'Ssl Verification Status', value: '${ssl_verification_status}', disabled: false },
       {
         label: 'Client Certificate Validation',
-        value: 'client_certificate_validation',
+        value: '${client_certificate_validation}',
         disabled: false
       }
     ]
@@ -271,63 +298,16 @@
     return criteriaVariableOptions
   }
 
-  /**
-   * Checks if a criteria can be deleted.
-   * @param {number} index - The index of the criteria.
-   * @returns {boolean}
-   */
-  const isNotFirstCriteria = (index) => {
-    return criteria.value.length > 1 && index < criteria.value.length - 1
-  }
-
-  /**
-   * Checks if is the last criteria divider.
-   * @param {number} criteriaIndex
-   * @returns {boolean}
-   */
   const isLastCriteriaSectionDivider = (criteriaIndex) => {
     return criteriaIndex !== criteria.value.length - 1
   }
 
-  /**
-   * Toggle the visibility of the conditional menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   * @param {number} conditionalIndex - The index of the conditional inside a criteria.
-   */
-  const toggleConditionalMenu = (event, index, conditionalIndex) => {
-    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
-  }
-
-  /**
-   * Toggle the visibility of the criteria menu.
-   * @param {Event} event
-   * @param {number} criteriaIndex
-   */
-  const toggleCriteriaMenu = ({ event, criteriaIndex }) => {
-    criteriaMenuRef.value[criteriaIndex].toggle(event)
-  }
-
-  /**
-   * @param {number} criteriaIndex
-   * @param {number} [criteriaInnerRowIndex]
-   * @returns {Array} options for the criteria menu available commands.
-   */
-  const criteriaMenuOptions = (criteriaIndex, criteriaInnerRowIndex = null) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          if (criteriaInnerRowIndex === null) {
-            removeCriteria(criteriaIndex)
-          } else {
-            removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
-          }
-        }
-      }
-    ]
+  const handleDeleteCriteria = (criteriaIndex, criteriaInnerRowIndex) => {
+    if (criteriaInnerRowIndex === null) {
+      removeCriteria(criteriaIndex)
+    } else {
+      removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
+    }
   }
 
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
@@ -340,61 +320,55 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
+  const notPermission = () => {
+    hasWafAccess.value = false
+  }
+
   // Behaviors - extract to another form fields
   const {
     push: pushBehavior,
     remove: removeBehavior,
     fields: behaviors
   } = useFieldArray('behaviors')
-  const behaviorsMenuRef = ref({})
 
-  const behaviorsOptions = computed(() => {
-    const edgeFirewallModules = props.enabledModules
+  const behaviorsOptions = ({ name }) => {
+    const edgeFirewallModules = enabledModules.value
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset_and_waf_mode')
-    const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
+    const wafBehaviorIsAlreadySelected = name !== 'set_waf' && currentBehaviors.includes('set_waf')
+    const runFunctionBehaviorIsAlreadySelected =
+      name !== 'run_function' && currentBehaviors.includes('run_function')
 
+    const disableWafBehavior =
+      wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled || !hasWafAccess.value
+    const disableRunFunctionBehavior =
+      runFunctionBehaviorIsAlreadySelected ||
+      !hasEdgeFunctionsModuleEnabled ||
+      !props.hasEdgeFunctionsProductAccess
     return [
-      { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
-      { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
-      { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
+      { value: 'deny', label: 'Deny (403 Forbidden)' },
+      { value: 'tag_event', label: 'Tag Event' },
+      { value: 'drop', label: 'Drop (Close Without Response)' },
+      { value: 'set_rate_limit', label: 'Set Rate Limit' },
       {
-        value: 'set_waf_ruleset_and_waf_mode',
-        label: `${
-          hasWebApplicationFirewallModuleEnabled
-            ? 'Set WAF Rule Set'
-            : 'Set WAF Rule Set - requires WAF'
-        }`,
-        disabled: wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled
+        value: 'set_waf',
+        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - required WAF'}`,
+        disabled: disableWafBehavior
       },
       {
         value: 'run_function',
         label: `${
-          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
+          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Functions '
         }`,
-        disabled: runFunctionBehaviorIsAlreadySelected || !hasEdgeFunctionsModuleEnabled
+        disabled: disableRunFunctionBehavior
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
-  })
-
-  const toggleBehaviorMenu = (event, behaviorItemIndex) => {
-    behaviorsMenuRef.value[behaviorItemIndex].toggle(event)
   }
 
-  const behaviorMenuOptions = (behaviorItemIndex) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          removeBehavior(behaviorItemIndex)
-        }
-      }
-    ]
+  const handleDeleteBehavior = (behaviorItemIndex) => {
+    removeBehavior(behaviorItemIndex)
   }
 
   const generateBehaviorLabelSection = (behaviorItem) => {
@@ -431,8 +405,13 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset_and_waf_mode'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
   }
+
+  const isTagEvent = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
+  }
+
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
   }
@@ -457,26 +436,28 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset_and_waf_mode']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
 
-  const networkListOptions = ref([])
-  const loadingNetworkList = ref(false)
-  const setNetworkListOptions = async () => {
-    try {
-      loadingNetworkList.value = true
-      const result = await props.listNetworkListService()
-      networkListOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      loadingNetworkList.value = false
+  const loaderEdgeFirewall = async () => {
+    const edgeFirewall = await edgeFirewallService.loadEdgeFirewallService({
+      id: route.params.id
+    })
+
+    const {
+      wafEnabled: webApplicationFirewall,
+      debugRules,
+      networkProtectionEnabled: networkProtectionLayer,
+      edgeFunctionsEnabled: edgeFunctions
+    } = edgeFirewall
+
+    enabledModules.value = {
+      webApplicationFirewall,
+      debugRules,
+      networkProtectionLayer,
+      edgeFunctions
     }
   }
 
@@ -485,9 +466,61 @@
     criteriaIndex,
     criteriaInnerRowIndex
   }) => {
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    nextTick(() => {
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    })
   }
+
+  const openDrawerFunction = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
+  const openDrawerWafRules = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerWafRulesRef.value.openCreateDrawer()
+  }
+
+  const openDrawerNetworkList = (criteriaIndex, criteriaInnerRowIndex) => {
+    criteriaIndexSelect.value = criteriaIndex
+    criteriaInnerRowIndexSelect.value = criteriaInnerRowIndex
+    drawerNetworkListRef.value.openCreateDrawer()
+  }
+
+  const successNetworkList = (networkListId) => {
+    if (criteriaIndexSelect.value === null) return
+    criteria.value[criteriaIndexSelect.value].value[criteriaInnerRowIndexSelect.value].argument =
+      networkListId
+    criteriaIndexSelect.value = null
+    criteriaInnerRowIndexSelect.value = null
+  }
+
+  const successFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
+  }
+
+  const successWafRules = (wafRuleId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.id = wafRuleId
+    behaviorIndexSelect.value = null
+  }
+
+  watch(
+    [
+      () => drawerFunctionRef.value.showCreateFunctionDrawer,
+      () => drawerNetworkListRef.value.showCreateNetworkListDrawer,
+      () => drawerWafRulesRef.value.showCreateWafDrawer
+    ],
+    ([isFunctionDrawerOpen, isNetworkListDrawerOpen, isWafRulesDrawerOpen]) => {
+      emit(
+        'isOverlapped',
+        Boolean(isFunctionDrawerOpen || isNetworkListDrawerOpen || isWafRulesDrawerOpen)
+      )
+    }
+  )
 </script>
 <template>
   <FormHorizontal
@@ -538,28 +571,22 @@
             <Divider
               align="left"
               type="dashed"
-              class="capitalize"
+              class="capitalize z-0"
             >
               {{ criteriaRow.conditional }}
             </Divider>
 
             <PrimeButton
               v-if="criteriaInnerRowIndex !== 0"
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-trash"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, criteriaIndex, criteriaInnerRowIndex)"
-            />
-            <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${criteriaInnerRowIndex}`] = el)"
-              id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(criteriaIndex, criteriaInnerRowIndex)"
-              :popup="true"
+              @click="handleDeleteCriteria(criteriaIndex, criteriaInnerRowIndex)"
             />
           </div>
 
-          <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col sm:flex-row">
-            <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
+          <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
+            <div class="flex flex-col h-fit sm:max-w-lg w-full">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -619,20 +646,39 @@
                 class="w-full"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
-              <FieldDropdown
+              <FieldDropdownLazyLoader
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
                 :data-testid="`edge-firewall-rules-form__network-list[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
-                :options="networkListOptions"
-                :loading="loadingNetworkList"
+                :service="listNetworkListService"
+                :loadService="loadNetworkListService"
                 placeholder="Select a Network"
                 optionLabel="name"
-                optionValue="stringId"
-                v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
+                optionValue="id"
+                :value="Number(criteria[criteriaIndex].value[criteriaInnerRowIndex].argument)"
                 inputClass="w-full"
-                :filter="true"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-networklist-button"
+                        text
+                        @click="openDrawerNetworkList(criteriaIndex, criteriaInnerRowIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Network List"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
             </div>
           </div>
         </div>
@@ -670,19 +716,12 @@
             align="left"
             type="solid"
           />
-
           <PrimeButton
-            v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-ellipsis-h"
+            v-if="criteriaIndex !== criteria.length - 1"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu({ event, criteriaIndex: criteriaIndex + 1 })"
-          />
-          <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
-            id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(criteriaIndex + 1)"
-            :popup="true"
+            @click="handleDeleteCriteria(criteriaIndex + 1, null)"
           />
         </div>
       </div>
@@ -706,6 +745,24 @@
     :isDrawer="true"
   >
     <template #inputs>
+      <DrawerFunction
+        ref="drawerFunctionRef"
+        @onSuccess="successFunction"
+        :edgeFirewallID="edgeFirewallId"
+      />
+
+      <DrawerNetworkList
+        ref="drawerNetworkListRef"
+        @onSuccess="successNetworkList"
+        :edgeFirewallID="edgeFirewallId"
+      />
+
+      <DrawerWafRules
+        ref="drawerWafRulesRef"
+        @onSuccess="successWafRules"
+        :edgeFirewallID="edgeFirewallId"
+      />
+
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorItemIndex) in behaviors"
@@ -715,23 +772,16 @@
           <Divider
             align="left"
             type="dashed"
+            class="z-0"
           >
             {{ generateBehaviorLabelSection(behaviorItem) }}
           </Divider>
-
           <PrimeButton
             v-if="behaviorItemIndex !== 0"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, behaviorItemIndex)"
-          />
-
-          <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[behaviorItemIndex] = el)"
-            id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(behaviorItemIndex)"
-            :popup="true"
+            @click="handleDeleteBehavior(behaviorItemIndex)"
           />
         </div>
 
@@ -742,7 +792,8 @@
               :enableWorkaroundLabelToDisabledOptions="true"
               :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
-              :options="behaviorsOptions"
+              :options="behaviorsOptions(behaviors[behaviorItemIndex].value)"
+              filter
               placeholder="Select a behavior"
               optionLabel="label"
               optionValue="value"
@@ -759,40 +810,93 @@
           </div>
           <div class="w-1/2 max-sm:w-full">
             <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
+                :service="listEdgeFunctionsServiceDecorator"
+                :loadService="loadEdgeFunctionServiceDecorator"
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
-                :options="props.edgeFirewallFunctionsOptions"
                 placeholder="Select an function"
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-function-instance-button"
+                        text
+                        @click="openDrawerFunction(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Function Instance"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
+            </template>
+
+            <template v-if="isTagEvent(behaviorItemIndex)">
+              <FieldText
+                class="w-full"
+                id="`behaviors[${behaviorItemIndex}].tag_event`"
+                :key="`${behaviorItem.key}-tag_event`"
+                placeholder="Tag Event"
+                :value="behaviors[behaviorItemIndex].value.tag_event"
+                :name="`behaviors[${behaviorItemIndex}].tag_event`"
               />
             </template>
 
             <template v-if="isWafBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
-                :key="`${behaviorItem.key}-waf_id`"
-                :name="`behaviors[${behaviorItemIndex}].waf_id`"
-                :options="wafRulesOptions"
-                :filter="true"
-                placeholder="Select a waf rule"
+                :name="`behaviors[${behaviorItemIndex}].id`"
+                :service="listWafRulesServiceOptions"
+                :loadService="loadWafRulesService"
+                @onAccessDenied="notPermission"
+                placeholder="Select a Waf"
                 optionLabel="name"
                 optionValue="id"
-                v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
-                class="w-full mb-3"
-              />
+                class="mb-3"
+                :value="behaviors[behaviorItemIndex].value.id"
+                inputClass="w-full"
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-waf-rule-button"
+                        text
+                        @click="openDrawerWafRules(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Waf Rule"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
               <FieldDropdown
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"
                 :key="`${behaviorItem.key}-mode`"
                 :name="`behaviors[${behaviorItemIndex}].mode`"
                 :options="[
                   {
-                    label: 'Learning',
-                    value: 'learning'
+                    label: 'Logging',
+                    value: 'logging'
                   },
                   {
                     label: 'Blocking',

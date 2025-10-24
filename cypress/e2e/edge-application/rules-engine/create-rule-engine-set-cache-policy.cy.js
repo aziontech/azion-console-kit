@@ -10,11 +10,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
@@ -30,6 +29,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -39,7 +41,9 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       edgeApplicationName: generateUniqueName('EdgeApp'),
       originName: generateUniqueName('origin'),
       rulesEngineName: generateUniqueName('RulesEng'),
-      cacheSettingName: generateUniqueName('cacheSetting')
+      cacheSettingName: generateUniqueName('cacheSetting'),
+      domainName: generateUniqueName('domain'),
+      edgeConnectorName: generateUniqueName('EdgeConnector')
     }
   })
 
@@ -58,45 +62,28 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
+    cy.intercept('POST', '/v4/edge_application/applications/*/cache_settings').as('createCacheSetting')
+    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings?page_size=100').as('getCacheSetting')
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Set Cache Policy')).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
-    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
 
-    cy.intercept('GET', 'api/v3/edge_applications/*/cache_settings?page_size=200').as(
-      'getCachePolicy'
-    )
-    cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
+
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type('Default Cache Settings')
+    cy.get(selectors.edgeApplication.cacheSettings.saveCacheSetting)
       .find(selectors.form.actionsSubmitButton)
       .click()
-    cy.verifyToast('success', 'Cache Settings successfully created')
+    cy.wait('@createCacheSetting', { timeout: 3000 })
+    cy.wait('@getCacheSetting')
 
-    cy.wait('@getCachePolicy', { timeout: 10000 })
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
-      .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))
-      .click()
+    cy.get(selectors.edgeApplication.rulesEngine.cachePolicyOption('Default Cache Settings')).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your Rules Engine has been created.')
+    cy.verifyToast('success', 'Rule successfully created')
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
-
-    // Cleanup - Remove the rule engine
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

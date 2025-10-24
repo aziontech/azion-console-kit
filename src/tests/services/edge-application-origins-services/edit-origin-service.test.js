@@ -26,9 +26,7 @@ const fixtures = {
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: '',
-    connectionTimeout: 60,
-    timeoutBetweenBytes: 35
+    hmacSecretKey: ''
   },
   originTypeObjectStorage: {
     id: '0000000-00000000-00a0a00s0as0-000000',
@@ -38,6 +36,13 @@ const fixtures = {
     originType: 'object_storage',
     bucketName: 'my-bucket',
     prefix: '/test'
+  },
+  requestPayloadMockLiveIngest: {
+    id: '0000000-00000000-00a0a00s0as0-000000',
+    edgeApplicationId: 123,
+    name: 'New Origin',
+    originType: 'live_ingest',
+    streamingEndpoint: 'br-east-1.azioningest.net'
   },
   emptyPrefixOrigin: {
     id: '0000000-00000000-00a0a00s0as0-000000',
@@ -92,9 +97,7 @@ describe('EdgeApplicationOriginsServices', () => {
         hmac_authentication: fixtures.originMock.hmacAuthentication,
         hmac_region_name: fixtures.originMock.hmacRegionName,
         hmac_access_key: fixtures.originMock.hmacAccessKey,
-        hmac_secret_key: fixtures.originMock.hmacSecretKey,
-        connection_timeout: fixtures.originMock.connectionTimeout,
-        timeout_between_bytes: fixtures.originMock.timeoutBetweenBytes
+        hmac_secret_key: fixtures.originMock.hmacSecretKey
       }
     })
   })
@@ -120,6 +123,28 @@ describe('EdgeApplicationOriginsServices', () => {
       }
     })
   })
+
+  it('should call API with correct params when origin type is live ingest', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+
+    await sut(fixtures.requestPayloadMockLiveIngest)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/edge_applications/${fixtures.requestPayloadMockLiveIngest.edgeApplicationId}/origins/${fixtures.requestPayloadMockLiveIngest.id}`,
+      method: 'PATCH',
+      body: {
+        origin_type: fixtures.requestPayloadMockLiveIngest.originType,
+        name: fixtures.requestPayloadMockLiveIngest.name,
+        streaming_endpoint: fixtures.requestPayloadMockLiveIngest.streamingEndpoint
+      }
+    })
+  })
+
   it('should adapt prefix to / when the field is empty', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
@@ -153,7 +178,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).toBe('Your Origin has been edited')
   })
 
-  it('Should return an API array error to an invalid edge application', async () => {
+  it('Should return an API array error to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -168,7 +193,7 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid edge application', async () => {
+  it('Should return an API error to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

@@ -77,9 +77,11 @@ const adapt = (payload) => {
  */
 const extractErrorKey = (errorSchema, key) => {
   if (key === 'user_has_no_product') {
-    const noProductErrorMessage =
-      'In order to perform this action, you must first have access to the product Tiered Cache'
-    return `${key}: ${noProductErrorMessage}`
+    const isWebSocket = errorSchema?.[key]?.includes('Websocket')
+
+    if (isWebSocket) {
+      return 'WebSocket support is not available for Developer and Business plans. Please contact sales'
+    }
   }
 
   if (typeof errorSchema[key] === 'string') {
@@ -110,7 +112,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Your edge application has been updated'
+      return 'Your Application has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message

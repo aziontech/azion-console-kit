@@ -5,17 +5,17 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editDigitalCertificateService"
-        :loadService="props.loadDigitalCertificateService"
+        :editService="editServiceRender"
+        :loadService="loadServiceRender"
         :schema="validationSchema"
-        :updatedRedirect="props.updatedRedirect"
+        updatedRedirect="list-digital-certificates"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
           <FormFieldsEditDigitalCertificates
-            :clipboardWrite="clipboardWrite"
-            :documentationService="documentationService"
+            :clipboardWrite="props.clipboardWrite"
+            :documentationService="props.documentationService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -38,25 +38,16 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEditDigitalCertificates from './FormFields/FormFieldsEditDigitalCertificates.vue'
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, computed } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
+  import { useDigitalCertificate } from './FormFields/composables/certificate'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    loadDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
-    editDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -67,12 +58,14 @@
     }
   })
 
+  const { certificateTypeList } = useDigitalCertificate()
+
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field.'),
-    certificateType: yup.string(),
+    type: yup.string(),
     csr: yup.string(),
-    certificate: yup.string(),
-    privateKey: yup.string(),
+    certificate: yup.string().nullable(),
+    privateKey: yup.string().nullable(),
     managed: yup
       .boolean()
       .isFalse(
@@ -87,6 +80,7 @@
       })
       .track()
   }
+
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -98,4 +92,16 @@
       })
       .track()
   }
+
+  const editServiceRender = computed(() => {
+    return certificateTypeList.value === 'Certificates'
+      ? digitalCertificatesService.editDigitalCertificate
+      : digitalCertificatesCRLService.editDigitalCertificateCRL
+  })
+
+  const loadServiceRender = computed(() => {
+    return certificateTypeList.value === 'Certificates'
+      ? digitalCertificatesService.loadDigitalCertificate
+      : digitalCertificatesCRLService.loadDigitalCertificateCRL
+  })
 </script>

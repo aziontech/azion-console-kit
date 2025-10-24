@@ -1,11 +1,33 @@
 export default {
   tabs: (tabName) => `[data-testid="edge-application-details-tab-panel__${tabName}__tab"] a`,
+  edgeApplicationTable:
+    '[data-testid="edge-applications-list-table-block"] [data-pc-section="bodyrow"]',
   mainSettings: {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    unsaved: '[data-testid="dialog-unsaved__leave-page"]',
     modulesSwitch: (moduleName) =>
-      `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
+      `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
+    l2CachingSwitch:
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
+    tieredCacheEnabled:
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
+  },
+  accordionStepEdgeConnector: {
+    createEdgeConnector: '[data-testid="create-edge-connector-accordion"]',
+    addressOriginInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    hostOriginInput: '[data-testid="form-horizontal-default-origin-host-header-field-text__input"]'
+  },
+  accordionStepCache: {
+    createCache: '[data-testid="create-cache-accordion"]',
+    browserCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
+    cdnCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
+  },
+  accordionStepDomain: {
+    createDomain: '[data-testid="create-domain-accordion"]'
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',
@@ -14,6 +36,7 @@ export default {
   },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
+
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     createCachePolicyButton:
       '[data-testid="edge-applications-rules-engine-form__create-cache-policy-button"]',
@@ -57,17 +80,33 @@ export default {
     firstBehaviorValueOption: '#behaviors\\[0\\]\\.functionId_0',
     dropdownLoadingIcon:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
-    phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]'
+    phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]',
+
+    clickOnTabRulesEngine: '#tab_5 > .p-tabview-title',
+    checkDefaultRulesEngine: '[data-testid="list-table-block__column__name__row"]',
+    saveButton: '[data-testid="form-actions-submit-button"]',
+    inputNumberFirstPosition:
+      '#row-1 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+    reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
+    reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
+    saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label',
+    edgeConnectorsDropdown:
+      '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
+    edgeConnectorsDropdownItem: '#behaviors\\[0\\]\\.edgeConnectorId_0'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',
     addressInput: '[data-testid="origin-form__address__input"]',
+    addressesInput: (index) => `[data-testid="origin-form__address-${index}__input"]`,
     originType: '[data-testid="origin-form__origin-type__dropdown"]',
-    nameInput: '[data-testid="form-horizontal-general-name__input"]'
+    nameInput: '[data-testid="form-horizontal-general-name__input"]',
+    dialogCopyButton: '[data-testid="copy-key-dialog__token-field__copy-key-button"]',
+    dialogCloseButton: '[data-testid="copy-key-dialog__dialog-footer__confirm-button"]'
   },
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',
     origin: '[data-testid="error-responses-form__origin__dropdown"]',
+    statusCodeDropdown: '#errorResponses[1].code_list',
     statusCodes: (optionIdx) =>
       `[data-testid="error-responses-form__error-response__${optionIdx}__status-code__dropdown"]`,
     customStatus: (optionIdx) =>
@@ -76,6 +115,14 @@ export default {
       `[data-testid="error-responses-form__error-response__${optionIdx}__path__input"]`
   },
   cacheSettings: {
+    saveCacheSetting: '[data-testid="create-cache-settings-drawer__action-bar"]',
+    tieredCacheRegionDropdown:
+      '[data-testid="edge-application-cache-settings-form__tiered-caching-region-field__dropdown"]',
+    largeFileOptimizationSwitch:
+      '[data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field__switch"] > .p-inputswitch-slider',
+    tieredCacheRegionOption: (option) => `#l2Region_${option}`,
+    enableTieredCachingSwitch:
+      '[data-testid="edge-application-cache-settings-form__tiered-caching-enabled-field__switch"] > .p-inputswitch-slider',
     createButton:
       '[data-testid="edge-application-cache-settings-list__create-cache-settings__button"]',
     nameInput: '[data-testid="edge-application-cache-settings-form__name-field__input"]',
@@ -96,8 +143,9 @@ export default {
     createFunctionButton:
       '[data-testid="edge-applications-functions-form__create-function-button"]',
     edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
+    functionInstanceActionbar: '[data-testid="create-function-instance-drawer__action-bar"]',
     dropdownFilter:
-      '[data-testid="edge-application-function-instance-form__edge-function__dropdown-filter-input"]',
+      '[data-testid="edge-application-function-instance-form__edge-function__dropdown-search"]',
     firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
     createButton: '[data-testid="functions-instance__create-button"]',
     edgeFunctionsDropdown:

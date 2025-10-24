@@ -8,7 +8,7 @@
       scrollable
       removableSort
       :lazy="props.lazy"
-      rowHover
+      :rowHover="!disabledList"
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       dataKey="id"
@@ -32,6 +32,7 @@
       @row-click="editItemSelected"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
+      :first="firstItemIndex"
     >
       <template
         #header
@@ -58,6 +59,12 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
+              <div
+                v-if="$slots['select-buttons']"
+                class="ml-3"
+              >
+                <slot name="select-buttons" />
+              </div>
             </span>
 
             <PrimeButton
@@ -66,6 +73,7 @@
               outlined
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
+              size="small"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
@@ -78,8 +86,10 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -109,7 +119,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        :class="col.disableSort ? '' : 'hover:cursor-pointer'"
+        :class="{ 'hover:cursor-pointer': !col.disableSort || !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -132,6 +142,7 @@
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -143,8 +154,9 @@
               outlined
               icon="ai ai-column"
               class="table-button"
+              size="small"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -158,7 +170,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: columns }]"
+                :options="[{ label: 'Available Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -184,6 +196,7 @@
             <PrimeButton
               size="small"
               outlined
+              v-tooltip.top="{ value: optionsOneAction(rowData).tooltip, showDelay: 200 }"
               v-bind="optionsOneAction(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
@@ -237,6 +250,7 @@
     </DataTable>
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -271,6 +285,8 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                :disabled="disabledAddButton"
+                size="small"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -304,9 +320,9 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
@@ -330,7 +346,17 @@
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
     },
+    hiddenByDefault: {
+      type: Array,
+      default: () => []
+    },
     loadDisabled: {
+      type: Boolean
+    },
+    disabledAddButton: {
+      type: Boolean
+    },
+    disabledList: {
       type: Boolean
     },
     isGraphql: {
@@ -428,6 +454,9 @@
   const itemsByPage = ref(getSpecificPageCount.value)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
 
@@ -441,9 +470,11 @@
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
+  const firstLoadData = ref(true)
 
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
@@ -451,8 +482,7 @@
   const totalRecords = ref()
   const savedSearch = ref('')
   const savedOrdering = ref('')
-
-  const firstLoadData = ref(true)
+  const firstItemIndex = ref(0)
 
   const filtersDynamically = computed(() => {
     return props.lazy ? {} : filters.value
@@ -489,13 +519,14 @@
   /**
    * Moves an item within the original array based on updated positions in a reference array.
    *
-   * @param {Array} originalArray - The array to be modified.
+   * @param {Array} originalData - The array to be modified.
    * @param {Array} referenceArray - The reference array with the new order.
    * @param {number} fromIndex - The index of the item to move in the reference array.
    * @param {number} toIndex - The target index  in the reference array.
    * @returns {Array} The updated array with the item moved.
    */
-  const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
+  const moveItem = (originalData, referenceArray, fromIndex, toIndex) => {
+    const originalArray = [...originalData]
     const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
     const itemToMoveId = referenceArray[toIndex]
     const targetItemId = referenceArray[oldItemMove]
@@ -528,20 +559,19 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  if (opt.data.updated) {
+                    reload()
+                    updateDataTablePagination()
+                  }
                 }
-                openDialog(DeleteDialog, bodyDelete)
-              }
+              })
               break
             case 'action':
               action.commandAction(rowData)
@@ -558,31 +588,45 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
-      try {
-        isLoading.value = true
+  const loadData = async ({ page, ...query }, service) => {
+    try {
+      isLoading.value = true
+      if (service) {
+        const { count = 0, body = [] } = props.isGraphql
+          ? await service()
+          : await service({ page, ...query })
+
+        data.value = body
+        totalRecords.value = count
+      } else {
         const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
+
         data.value = body
         totalRecords.value = count
-      } catch (error) {
+      }
+    } catch (error) {
+      // Check if error is an ErrorHandler instance (from v2 services)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
         const errorMessage = error.message || error
         toast.add({
           closable: true,
           severity: 'error',
-          summary: 'error',
+          summary: 'Error',
           detail: errorMessage
         })
-      } finally {
-        isLoading.value = false
-        if (firstLoadData.value) {
-          const hasData = data.value?.length > 0
-          emit('on-load-data', !!hasData)
-        }
-        firstLoadData.value = false
       }
+    } finally {
+      isLoading.value = false
+      if (firstLoadData.value) {
+        const hasData = data.value?.length > 0
+        emit('on-load-data', !!hasData)
+      }
+      firstLoadData.value = false
     }
   }
 
@@ -603,7 +647,7 @@
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
-    } else if (props.enableEditClick) {
+    } else if (props.enableEditClick && !item?.disableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
@@ -617,19 +661,29 @@
     const [firstAction] = actionOptions(rowData)
     return {
       icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+      disabled: firstAction?.disabled,
+      tooltip: firstAction?.tooltip
     }
   }
 
-  const reload = async (query = {}) => {
-    loadData({
+  const reload = async (query = {}, listService = props.listService) => {
+    if (!savedOrdering.value) {
+      savedOrdering.value = props.defaultOrderingFieldName
+    }
+
+    const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
       fields: props.apiFields,
-      search: savedSearch.value,
       ordering: savedOrdering.value,
       ...query
-    })
+    }
+
+    if (props.lazy) {
+      commonParams.search = savedSearch.value
+    }
+
+    loadData(commonParams, listService)
   }
 
   const extractFieldValue = (rowData, field) => {
@@ -648,7 +702,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
-
+    firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
 
@@ -663,16 +717,25 @@
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     await reload({ ordering })
-
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
 
   const fetchOnSearch = () => {
+    if (!props.lazy) return
+
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     reload()
+  }
+
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 1
+    firstItemIndex.value = FIRST_NUMBER_PAGE
   }
 
   const handleSearchValue = () => {
@@ -689,8 +752,18 @@
         ordering: props.defaultOrderingFieldName
       })
     }
-    selectedColumns.value = props.columns
+    selectedColumns.value = props.columns.filter(
+      (col) => !props.hiddenByDefault?.includes(col.field)
+    )
   })
+
+  watch(
+    () => props.columns,
+    (newColumns) => {
+      selectedColumns.value = newColumns
+    },
+    { deep: true }
+  )
 
   defineExpose({ reload, handleExportTableDataToCSV })
 </script>

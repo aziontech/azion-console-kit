@@ -31,11 +31,4 @@ describe('Variables spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.variables.listRow('value')).should('have.text', secretValue)
     cy.get(selectors.variables.listRow('value')).find('button').should('not.exist')
   })
-
-  afterEach(() => {
-    // Delete the variable
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Variable successfully deleted')
-    })
-  })
 })

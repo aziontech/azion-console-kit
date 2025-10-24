@@ -19,7 +19,6 @@
       content: { class: 'p-0' }
     }"
   >
-    <!-- Mobile Menu Navigation -->
     <PrimeMenu
       data-testid="profile-block__sidebar__profile-menu"
       :model="profileMenuItems"
@@ -52,6 +51,23 @@
           </div>
         </div>
       </template>
+
+      <template #item="{ item, props }">
+        <router-link
+          v-if="item.to"
+          v-bind="props.action"
+          :to="item.to"
+        >
+          {{ item.label }}
+        </router-link>
+        <span
+          v-else
+          v-bind="props.action"
+        >
+          {{ item.label }}
+        </span>
+      </template>
+
       <template #end>
         <PrimeMenu
           data-testid="profile-block__sidebar__settings-menu"
@@ -77,6 +93,15 @@
                 >
               </div>
             </div>
+          </template>
+
+          <template #item="{ item, props }">
+            <router-link
+              v-bind="props.action"
+              :to="item.to"
+            >
+              {{ item.label }}
+            </router-link>
           </template>
         </PrimeMenu>
 
@@ -132,7 +157,7 @@
             </template>
           </Dropdown>
         </div>
-        <Divider class="surface-border p-1 m-0" />
+        <Divider class="surface-border p-1 m-0 mb-2" />
         <PrimeButton
           data-testid="profile-block__sidebar__logout-btn"
           class="w-full rounded-md flex content-start text-left"
@@ -145,6 +170,7 @@
             }
           }"
           label="Logout"
+          size="small"
           icon="pi pi-sign-out"
           text
           @click="logout"
@@ -187,33 +213,51 @@
         </div>
       </div>
     </template>
-    <template #end>
-      <PrimeMenu
-        data-testid="profile-block__mobile-profile-menu__settings-menu"
-        :model="profileMenuSettings"
-        :pt="{
-          root: { class: 'p-0 w-full border-none bg-transparent' },
-          submenuheader: { class: 'text-base font-medium leading-none' },
-          content: { class: 'text-sm' }
-        }"
+
+    <template #item="{ item, props }">
+      <router-link
+        v-if="item.to"
+        v-bind="props.action"
+        :to="item.to"
       >
-        <template #start>
-          <div class="flex flex-row items-center">
-            <div class="flex flex-col gap-1 px-2 py-2.5">
-              <span
-                class="text-sm font-medium leading-none"
-                data-testid="profile-block__mobile-settings-menu__full-name"
-                >{{ user.full_name }}</span
-              >
-              <span
-                class="text-xs"
-                data-testid="profile-block__mobile-settings-menu__email"
-                >{{ user.email }}</span
-              >
-            </div>
-          </div>
-        </template>
-      </PrimeMenu>
+        {{ item.label }}
+      </router-link>
+      <span
+        v-else
+        v-bind="props.action"
+      >
+        {{ item.label }}
+      </span>
+    </template>
+
+    <template #end>
+      <div class="flex flex-row items-center">
+        <div class="flex flex-col gap-1 px-2 py-2.5">
+          <span
+            class="text-sm font-medium leading-none"
+            data-testid="profile-block__mobile-settings-menu__full-name"
+            >{{ user.full_name }}</span
+          >
+          <span
+            class="text-xs"
+            data-testid="profile-block__mobile-settings-menu__email"
+            >{{ user.email }}</span
+          >
+        </div>
+      </div>
+
+      <template
+        v-for="item in profileMenuSettings"
+        :key="item.label"
+      >
+        <router-link
+          :to="item.to"
+          class="text-sm leading-none block px-2 py-[12px] hover:bg-[var(--surface-hover)] rounded text-color transition-[background-color,border-color,box-shadow] duration-200"
+        >
+          {{ item.label }}
+        </router-link>
+      </template>
+
       <div
         class="flex flex-row justify-between items-center align-middle px-2 py-1.5"
         data-testid="profile-block__mobile-settings-menu__theme"
@@ -269,7 +313,9 @@
           </template>
         </Dropdown>
       </div>
+
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
+
       <PrimeButton
         data-testid="profile-block__mobile-menu__logout-btn"
         class="w-full rounded-md flex content-start text-left"
@@ -282,6 +328,7 @@
           }
         }"
         label="Logout"
+        size="small"
         icon="pi pi-sign-out"
         text
         @click="logout"
@@ -293,6 +340,7 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
+  import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import Avatar from 'primevue/avatar'
   import PrimeButton from 'primevue/button'
@@ -303,11 +351,16 @@
   import { useLoadingStore } from '@/stores/loading'
 
   defineOptions({ name: 'profile-block' })
+
   const { startLoading } = useLoadingStore()
   const user = useAccountStore().accountData
   const { currentTheme } = storeToRefs(useAccountStore())
   const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
+
+  const hasAccessToActivityHistory = computed(() => {
+    return user.kind === 'client'
+  })
 
   onBeforeMount(() => {
     switch (user.kind) {
@@ -344,12 +397,13 @@
       to: '/users'
     },
     {
-      label: 'Billing & Subscriptions',
+      label: 'Billing',
       to: '/billing'
     },
     {
       label: 'Activity History',
-      to: '/activity-history'
+      to: '/activity-history',
+      visible: hasAccessToActivityHistory.value
     },
     {
       label: 'Teams Permissions',

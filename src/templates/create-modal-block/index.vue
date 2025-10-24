@@ -2,10 +2,12 @@
   import PrimeButton from 'primevue/button'
   import PrimeInputText from 'primevue/inputtext'
   import LoadingState from './create-modal-block-loading-state.vue'
-  import { computed, onMounted, ref, inject } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  const { pluralTitle, pluralLabel } = TEXT_DOMAIN_WORKLOAD()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -13,27 +15,43 @@
     name: 'create-modal-block'
   })
   const props = defineProps({
-    listSolutionsService: {
-      type: Function,
-      required: true
+    solutions: {
+      type: Object,
+      default: () => ({
+        recommended: [],
+        templates: [],
+        githubImport: []
+      })
+    },
+    loading: {
+      type: Object,
+      default: () => ({
+        recommended: false,
+        templates: false,
+        githubImport: false
+      })
     }
   })
 
+  const accountStore = useAccountStore()
+
+  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
+
   const RESOURCES = [
     {
-      label: 'Domains',
-      to: '/domains/create?origin=create',
-      description: 'Launch an edge application and set up security with digital certificates.'
+      label: `${pluralTitle}`,
+      to: `/${pluralLabel}/create?origin=create`,
+      description: 'Launch an application and set up security with digital certificates.'
     },
     {
-      label: 'Edge Application',
-      to: '/edge-applications/create?origin=create',
-      description: 'Deploy an edge application to deliver content from the edge.'
+      label: 'Application',
+      to: '/applications/create?origin=create',
+      description: 'Deploy an application to deliver content from the edge.'
     },
     {
       label: 'Variables',
       to: '/variables/create',
-      description: 'Create environment variables or secrets to use with configured edge functions.'
+      description: 'Create environment variables or secrets to use with configured Functions.'
     },
     {
       label: 'Edge DNS',
@@ -41,9 +59,21 @@
       description: 'Use an authoritative DNS server to host a domain.'
     },
     {
-      label: 'Edge Firewall',
-      to: '/edge-firewall/create',
+      label: 'Firewall',
+      to: '/firewalls/create',
       description: 'Create security settings to protect applications against threats and attacks.'
+    },
+    {
+      label: 'Connectors',
+      to: '/connectors/create',
+      description:
+        'Connector centralizes connections and how to connect to machines and applications.'
+    },
+    {
+      label: 'Custom Page',
+      to: '/custom-pages/create',
+      description:
+        'Create custom page to display personalized error pages for specific HTTP errors.'
     },
     {
       label: 'Edge Nodes',
@@ -53,12 +83,12 @@
     {
       label: 'Data Stream',
       to: '/data-stream/create',
-      description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
+      description: 'Feed streaming, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
-      label: 'Edge Functions',
-      to: '/edge-functions/create?origin=create',
-      description: 'Create edge functions to use with Edge Application or Edge Firewall.'
+      label: 'Functions',
+      to: '/functions/create?origin=create',
+      description: 'Create Functions to use with Application or Firewall.'
     },
     {
       label: 'Edge Services',
@@ -66,102 +96,92 @@
       description: 'Create new services to define dependencies between edge resources.'
     },
     {
-      label: 'Digital Certificates',
+      label: 'Certificate Manager',
       to: '/digital-certificates/create',
-      description: 'Add a digital certificate entry to secure HTTPS edge applications.'
+      description: 'Add a digital certificate entry to secure HTTPS applications.'
     },
     {
       label: 'Network Lists',
       to: '/network-lists/create',
       description:
-        'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
+        'Add allowlists, blocklists, and greylists to use with Rules Engine for Firewall.'
     }
   ]
 
   const TABS = [
     {
       label: 'Recommended',
-      value: 'recommended'
+      value: 'recommended',
+      show: !hideCreateOptions.value
     },
     {
       label: 'Templates',
-      value: 'templates'
+      value: 'templates',
+      show: !hideCreateOptions.value
     },
     {
       label: 'Resources',
-      value: 'newResource'
+      value: 'newResource',
+      show: true
     },
     {
       label: 'Import from GitHub',
-      value: 'githubImport'
+      value: 'githubImport',
+      show: !hideCreateOptions.value
     }
   ]
 
-  const emit = defineEmits('closeModal')
-
-  onMounted(async () => {
-    await loadRecommendedSolutions()
+  const filteredTabs = computed(() => {
+    return TABS.filter((menuitem) => menuitem.show)
   })
 
-  const router = useRouter()
-  const toast = useToast()
+  const emit = defineEmits('closeModal')
 
-  const isLoading = ref(false)
+  const router = useRouter()
+
   const selectedTab = ref('recommended')
   const search = ref('')
   const isSearching = computed(() => !!search.value.trim().length)
 
-  const templatesData = ref({
-    recommended: [],
-    templates: [],
-    newResource: RESOURCES,
-    githubImport: []
+  if (hideCreateOptions.value) {
+    selectedTab.value = 'newResource'
+  }
+
+  const filteredResources = computed(() => {
+    const showRosourceOnlyV4 = ['Edge Connector', 'Custom Page']
+    if (!hasFlagBlockApiV4()) return RESOURCES
+
+    return RESOURCES.filter((resource) => !showRosourceOnlyV4.includes(resource.label))
+  })
+
+  const templatesData = computed(() => ({
+    recommended: props.solutions.recommended || [],
+    templates: props.solutions.templates || [],
+    newResource: filteredResources.value,
+    githubImport: props.solutions.githubImport || []
+  }))
+
+  const isLoading = computed(() => {
+    return props.loading[selectedTab.value] && selectedTab.value !== 'newResource'
   })
 
   const tabInfo = computed(() => {
     return {
-      recommended: { show: selectedTab.value === 'recommended', title: 'Select a Template' },
+      recommended: {
+        show: selectedTab.value === 'recommended',
+        title: 'Select a Template'
+      },
       templates: { show: selectedTab.value === 'templates', title: 'Select a Template' },
-      newResource: { show: selectedTab.value === 'newResource', title: 'Select a Resource' },
-      githubImport: { show: selectedTab.value === 'githubImport', title: 'Import from GitHub' }
+      newResource: {
+        show: selectedTab.value === 'newResource',
+        title: 'Select a Resource'
+      },
+      githubImport: {
+        show: selectedTab.value === 'githubImport',
+        title: 'Import from GitHub'
+      }
     }
   })
-
-  const toastBuilder = (severity, detail) => {
-    if (!detail) return
-    const options = {
-      closable: true,
-      severity,
-      summary: severity,
-      detail
-    }
-
-    toast.add(options)
-  }
-
-  const loadSolutions = async ({ group, type }) => {
-    try {
-      isLoading.value = true
-      templatesData.value[group] = await props.listSolutionsService({ group, type })
-    } catch (error) {
-      toastBuilder('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const loadRecommendedSolutions = async () => {
-    const accountStore = useAccountStore().accountData
-    await loadSolutions({ group: 'recommended', type: accountStore.jobRole })
-  }
-
-  const loadTemplates = async () => {
-    await loadSolutions({ group: 'templates', type: 'onboarding' })
-  }
-
-  const loadGithubImportSolution = async () => {
-    await loadSolutions({ group: 'githubImport', type: 'import-from-github' })
-  }
 
   const redirect = (toLink, selection) => {
     tracker.create.selectedOnCreate({
@@ -199,18 +219,10 @@
     emit('closeModal')
   }
 
-  const onTabChange = async (target) => {
+  const onTabChange = (target) => {
     resetFilters()
-    if (isLoading.value) {
-      return
-    }
 
     selectedTab.value = target.value || selectedTab.value
-    if (target.value === 'templates' && templatesData.value.templates.length === 0) {
-      await loadTemplates()
-    } else if (target.value === 'githubImport' && templatesData.value.githubImport.length === 0) {
-      await loadGithubImportSolution()
-    }
   }
 
   const filterBySearchField = (filter) => {
@@ -241,6 +253,14 @@
 
   const filteredTemplates = computed(() => {
     return filterBySearchField(search.value)
+  })
+
+  const hasInitialData = computed(() => {
+    return templatesData.value[selectedTab.value].length > 0
+  })
+
+  const isEmptyDueToNoData = computed(() => {
+    return !hasInitialData.value && filteredTemplates.value.length === 0 && !isLoading.value
   })
 
   const resetFilters = () => {
@@ -274,11 +294,13 @@
         data-testid="integrations-list-menu-items"
       >
         <li
-          v-for="(menuitem, index) in TABS"
+          v-for="(menuitem, index) in filteredTabs"
           :key="index"
         >
           <PrimeButton
-            :class="{ 'surface-200': menuitem.value === selectedTab, 'p-disabled': isLoading }"
+            :class="{
+              'surface-200': menuitem.value === selectedTab
+            }"
             class="w-full whitespace-nowrap h-[38px] flex"
             text
             size="small"
@@ -307,11 +329,14 @@
           class="flex flex-col gap-3"
           data-testid="integrations-list-content-header"
         >
-          <div class="text-base font-medium">
+          <div
+            v-if="hasInitialData"
+            class="text-base font-medium"
+          >
             {{ tabInfo[selectedTab].title }}
           </div>
           <span
-            v-if="!tabInfo.githubImport.show"
+            v-if="!tabInfo.githubImport.show && hasInitialData"
             class="p-input-icon-left"
             data-testid="integrations-list-content-search"
           >
@@ -346,149 +371,192 @@
           </template>
         </template>
       </div>
-
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         v-if="tabInfo.recommended.show"
         data-testid="integrations-list-content-recommended"
       >
-        <PrimeButton
-          v-for="template in filteredTemplates"
-          :key="template.id"
-          @click="redirectToSolution(template, 'recommended')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-recommended-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
-              >
-                <div class="bg-white flex h-full w-full rounded">
-                  <img
-                    class="object-contain"
-                    :src="template.vendor.icon"
-                    :alt="template.vendor.name"
-                  />
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="template in filteredTemplates"
+            :key="template.id"
+            @click="redirectToSolution(template, 'recommended')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-recommended-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+                >
+                  <div class="bg-white flex h-full w-full rounded">
+                    <img
+                      class="object-contain"
+                      :src="template.vendor.icon"
+                      :alt="template.vendor.name"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ template.headline }}
+                  </span>
                 </div>
               </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ template.headline }}
-                </span>
-              </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-recommended-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No recommended templates found</h3>
+          <p class="text-color-secondary">Check back later for new recommendations.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.templates.show"
         data-testid="integrations-list-content-templates"
       >
-        <PrimeButton
-          v-for="template in filteredTemplates"
-          :key="template.id"
-          @click="redirectToSolution(template, 'templates')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-templates-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
-              >
-                <div class="bg-white flex h-full w-full rounded">
-                  <img
-                    class="object-contain"
-                    :src="template.vendor.icon"
-                    :alt="template.name"
-                  />
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="template in filteredTemplates"
+            :key="template.id"
+            @click="redirectToSolution(template, 'templates')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-templates-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+                >
+                  <div class="bg-white flex h-full w-full rounded">
+                    <img
+                      class="object-contain"
+                      :src="template.vendor.icon"
+                      :alt="template.name"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ template.headline }}
+                  </span>
                 </div>
               </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ template.headline }}
-                </span>
-              </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-templates-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No templates found</h3>
+          <p class="text-color-secondary">Check back later for new templates.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.newResource.show"
         data-testid="integrations-list-content-new-resources"
       >
-        <PrimeButton
-          v-for="resource in filteredTemplates"
-          :key="resource.to"
-          @click="redirect(resource.to, resource.label)"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-new-resources-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ resource.label }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ resource.description }}
-                </span>
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="resource in filteredTemplates"
+            :key="resource.to"
+            @click="redirect(resource.to, resource.label)"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-new-resources-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ resource.label }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    {{ resource.description }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-new-resources-empty"
+        >
+          <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No resources found</h3>
+          <p class="text-color-secondary">No resources are currently available.</p>
+        </div>
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.githubImport.show"
         data-testid="integrations-list-content-github-import"
       >
-        <PrimeButton
-          v-for="(template, index) in filteredTemplates"
-          :key="index"
-          @click="redirectGithubImport(template, 'githubImport')"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-          data-testid="integrations-list-content-github-import-item"
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
-              >
-                <i class="pi pi-github text-white text-2xl"></i>
-              </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.name }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+        <template v-if="filteredTemplates.length > 0">
+          <PrimeButton
+            v-for="(template, index) in filteredTemplates"
+            :key="index"
+            @click="redirectGithubImport(template, 'githubImport')"
+            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-github-import-item"
+          >
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
                 >
-                  Import an existing project to deploy it on Azion's edge.
-                </span>
+                  <i class="pi pi-github text-white text-2xl"></i>
+                </div>
+                <div class="flex flex-col">
+                  <span class="line-clamp-1 h-5 text-color text-sm font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span
+                    class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                  >
+                    Import an existing project to deploy it on Azion's edge.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </PrimeButton>
+          </PrimeButton>
+        </template>
+        <div
+          v-else-if="isEmptyDueToNoData"
+          class="col-span-full flex flex-col items-center justify-center py-12 text-center"
+          data-testid="integrations-list-content-github-import-empty"
+        >
+          <i class="pi pi-github text-4xl text-color-secondary mb-4"></i>
+          <h3 class="text-lg font-medium text-color mb-2">No GitHub repositories found</h3>
+          <p class="text-color-secondary">No repositories are currently available for import.</p>
+        </div>
       </div>
     </div>
   </div>

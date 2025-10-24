@@ -4,7 +4,7 @@ import selectors from '../../support/selectors'
 let variableKey
 let variableValue
 
-describe('Variables spec', { tags: ['@dev7', '@xfail'] }, () => {
+describe('Variables spec', { tags: ['@dev7'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Variables')
@@ -26,8 +26,6 @@ describe('Variables spec', { tags: ['@dev7', '@xfail'] }, () => {
 
     // Assert
     cy.verifyToast('success', 'Your variable has been created')
-
-    cy.get(selectors.form.actionsCancelButton).click()
 
     cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
@@ -51,12 +49,5 @@ describe('Variables spec', { tags: ['@dev7', '@xfail'] }, () => {
 
     cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
-  })
-
-  afterEach(() => {
-    // Delete the variable
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Variable successfully deleted')
-    })
   })
 })

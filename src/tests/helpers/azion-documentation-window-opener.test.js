@@ -134,4 +134,16 @@ describe('AzionDocumentationWindowOpener', () => {
       '_blank'
     )
   })
+
+  it('should open a new window with Azion Integrations link', () => {
+    const { sut } = makeSut()
+    const openWindowSpy = vi.spyOn(window, 'open')
+
+    sut.openMarketplaceIntegrationsDocumentation()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://www.azion.com/en/documentation/products/marketplace/integrations/',
+      '_blank'
+    )
+  })
 })

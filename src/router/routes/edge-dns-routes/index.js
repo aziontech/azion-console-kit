@@ -1,5 +1,3 @@
-import * as EdgeDNSService from '@/services/edge-dns-services'
-import * as EdgeDNSRecordsService from '@/services/edge-dns-records-services'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -12,12 +10,11 @@ export const edgeDnsRoutes = {
       name: 'list-edge-dns',
       component: () => import('@views/EdgeDNS/ListView.vue'),
       props: {
-        listEdgeDNSService: EdgeDNSService.listEdgeDNSService,
-        deleteEdgeDNSService: EdgeDNSService.deleteEdgeDNSService,
         documentationService: Helpers.documentationCatalog.edgeDNS,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Edge DNS',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -31,10 +28,10 @@ export const edgeDnsRoutes = {
       name: 'create-edge-dns',
       component: () => import('@views/EdgeDNS/CreateView.vue'),
       props: {
-        createEdgeDNSService: EdgeDNSService.createEdgeDNSService,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Create Zone',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -52,14 +49,11 @@ export const edgeDnsRoutes = {
       name: 'edit-edge-dns',
       component: () => import('@views/EdgeDNS/EditView.vue'),
       props: {
-        editEdgeDNSService: EdgeDNSService.editEdgeDNSService,
-        loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
-        deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
         updatedRedirect: 'list-edge-dns'
       },
       meta: {
+        title: 'Edit Zone',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -76,17 +70,11 @@ export const edgeDnsRoutes = {
       name: 'edge-dns-records',
       component: () => import('@views/EdgeDNS/EditView.vue'),
       props: {
-        editEdgeDNSService: EdgeDNSService.editEdgeDNSService,
-        loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
-        deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
-        createRecordsService: EdgeDNSRecordsService.createRecordsService,
-        editRecordsService: EdgeDNSRecordsService.editRecordsService,
-        loadRecordsService: EdgeDNSRecordsService.loadRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationCatalog.records
       },
       meta: {
+        title: 'Edit Record',
         breadCrumbs: [
           {
             label: 'Edge DNS',

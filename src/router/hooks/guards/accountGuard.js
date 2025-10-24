@@ -1,46 +1,25 @@
-import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
-import { loadAccountJobRoleService } from '@/services/account-settings-services'
+import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
+import { clearCacheSensitive } from '@/services/v2/base/query/queryClient'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function accountGuard({ to, accountStore, tracker, loadContractServicePlan }) {
-  const isPrivateRoute = !to.meta.isPublic
+export async function accountGuard({ to, accountStore, tracker }) {
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
+  const isPrivateRoute = !to.meta.isPublic
 
-  if (userNotIsLoggedIn && isPrivateRoute) {
-    try {
-      const [accountInfo, userInfo, accountJobRole] = await Promise.all([
-        getAccountInfoService(),
-        getUserInfoService(),
-        loadAccountJobRoleService()
-      ])
-
-      accountInfo.is_account_owner = userInfo.results.is_account_owner
-      accountInfo.client_id = userInfo.results.client_id
-      accountInfo.timezone = userInfo.results.timezone
-      accountInfo.utc_offset = userInfo.results.utc_offset
-      accountInfo.first_name = userInfo.results.first_name
-      accountInfo.last_name = userInfo.results.last_name
-      accountInfo.permissions = userInfo.results.permissions
-      accountInfo.email = userInfo.results.email
-      accountInfo.user_id = userInfo.results.id
-      accountInfo.colorTheme = accountStore.theme
-      accountInfo.jobRole = accountJobRole.jobRole
-      accountInfo.isDeveloperSupportPlan = true
-
-      if (accountInfo.client_id) {
-        const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
-          clientId: accountInfo.client_id
-        })
-        accountInfo.isDeveloperSupportPlan = isDeveloperSupportPlan
-        accountInfo.yourServicePlan = yourServicePlan
+  if (userNotIsLoggedIn) {
+    if (isPrivateRoute) {
+      try {
+        await loadUserAndAccountInfo()
+        if (to.meta.isPublic) {
+          return '/'
+        }
+      } catch {
+        setRedirectRoute(to)
+        await tracker.reset()
+        await clearCacheSensitive()
+        return '/login'
       }
-
-      accountStore.setAccountData(accountInfo)
-    } catch {
-      setRedirectRoute(to)
-      await tracker.reset()
-      return '/login'
     }
   }
 }

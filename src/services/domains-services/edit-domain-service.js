@@ -13,18 +13,24 @@ export const editDomainService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  return {
+  const basePayload = {
     name: payload.name,
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
     cname_access_only: payload.cnameAccessOnly,
     edge_application_id: payload.edgeApplication,
-    edge_firewall_id: payload.edgeFirewall,
     digital_certificate_id: payload.edgeCertificate || null,
     is_mtls_enabled: payload.mtlsIsEnabled,
     is_active: payload.active,
     mtls_verification: payload.mtlsVerification,
+    edge_firewall_id: payload.edgeFirewall || null,
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
+
+  if (!payload.mtlsTrustedCertificate || !payload.mtlsIsEnabled) {
+    delete basePayload.mtls_trusted_ca_certificate_id
+  }
+
+  return basePayload
 }
 /**
  * @param {Object} errorSchema - The error schema.
@@ -32,10 +38,16 @@ const adapt = (payload) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    return errorSchema[key]?.[0]
+  if (typeof errorSchema[key] === 'string') {
+    return `${key}: ${errorSchema[key]}`
   }
-  return errorSchema[key]
+
+  if (typeof errorSchema[key] === 'object') {
+    const [firstKey] = Object.keys(errorSchema[key])
+    return `${firstKey}: ${errorSchema[key][firstKey]}`
+  }
+
+  return `${key}: ${errorSchema[key][0]}`
 }
 
 /**
@@ -44,9 +56,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
+  return errorMessage
 }
 
 /**

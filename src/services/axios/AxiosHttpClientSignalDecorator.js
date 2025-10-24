@@ -5,13 +5,14 @@ export class AxiosHttpClientSignalDecorator {
     this.signal = signal
   }
 
-  async request({ url, method, headers, body }) {
+  async request({ url, method, headers, body, baseURL }) {
     return await AxiosHttpClientAdapter.request({
       url,
       method,
       headers,
       body,
-      signal: this.signal
+      signal: this.signal,
+      baseURL
     })
   }
 }

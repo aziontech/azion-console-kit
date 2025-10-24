@@ -159,7 +159,7 @@
   }
 
   const handleCreateNew = () => {
-    router.push('/edge-applications/create?origin=marketplace')
+    router.push('/applications/create?origin=marketplace')
   }
 
   const handleLoading = () => {
@@ -223,15 +223,15 @@
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"
-            title="Select an edge application"
-            description="Browse and select the desired edge application to install this integration."
+            title="Select an Application"
+            description="Browse and select the desired Application to install this integration."
           >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-8">
                 <div class="flex flex-col sm:max-w-lg w-full gap-2">
                   <LabelBlock
                     for="edge_application"
-                    label="Edge Application"
+                    label="Application"
                     isRequired
                   />
                   <Dropdown
@@ -246,9 +246,9 @@
                     optionLabel="label"
                     optionValue="value"
                     class="w-full"
-                    placeholder="Select an edge application"
+                    placeholder="Select an Application"
                     filterIcon="pi pi-search"
-                    emptyMessage="No edge application found with integrations to install or update."
+                    emptyMessage="No Application found with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"
                     :loading="loadingEdges"
                   >
@@ -299,10 +299,10 @@
                   severity="info"
                   class="max-w-lg"
                 >
-                  No edge application has been created. Go to
+                  No Application has been created. Go to
                   <PrimeButton
                     class="p-0"
-                    label="Edge Application"
+                    label="Application"
                     link
                     size="small"
                     @click="handleCreateNew"

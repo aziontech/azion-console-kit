@@ -3,6 +3,8 @@
   import { useField } from 'vee-validate'
   import Dropdown from 'primevue/dropdown'
 
+  const emit = defineEmits(['onChange'])
+
   const props = defineProps({
     value: {
       type: String,
@@ -62,6 +64,10 @@
     initialValue: props.value
   })
 
+  const handleChangeEvent = ({ value }) => {
+    emit('onChange', value)
+  }
+
   defineExpose({
     autoCompleteRef
   })
@@ -104,6 +110,7 @@
       @input="handleChange"
       @blur="handleBlur"
       v-bind="$attrs"
+      @change="handleChangeEvent"
     />
   </div>
 

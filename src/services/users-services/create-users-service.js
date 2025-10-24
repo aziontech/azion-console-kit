@@ -25,7 +25,8 @@ const adapt = (payload) => {
     mobile: payload.mobile?.toString(),
     is_account_owner: payload.isAccountOwner,
     teams_ids: payload.teamsIds,
-    two_factor_enabled: payload.twoFactorEnabled
+    two_factor_enabled: payload.twoFactorEnabled,
+    is_active: payload.isActive
   }
 }
 

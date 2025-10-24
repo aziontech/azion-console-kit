@@ -1,3 +1,6 @@
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+import { hasFlagBlockApiV4, hasFlagIsAzionEmail } from '@/composables/user-flag'
+
 function createHomeItem() {
   return {
     label: 'Home',
@@ -17,20 +20,23 @@ function createMarketplaceItem() {
 }
 
 function createDomainsItem() {
-  return {
-    label: 'Domains',
-    icon: 'ai ai-domains',
-    to: '/domains',
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  const menuOption = {
+    label: handleTextDomainWorkload.pluralTitle,
+    icon: hasFlagBlockApiV4() ? 'pi pi-globe' : 'ai ai-workloads',
+    to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains'
   }
+
+  return menuOption
 }
 
 function createBuildItems() {
   return [
     {
-      label: 'Edge Application',
+      label: 'Applications',
       icon: 'ai ai-edge-application',
-      to: '/edge-applications',
+      to: '/applications',
       id: 'edge-application'
     },
     {
@@ -45,16 +51,23 @@ function createBuildItems() {
 function createSecureItems() {
   return [
     {
-      label: 'Edge Firewall',
-      to: '/edge-firewall',
-      icon: 'ai ai-edge-firewall',
-      id: 'edge-firewall'
+      label: 'Connectors',
+      to: '/connectors',
+      icon: 'ai ai-edge-connectors',
+      id: 'edge-connectors',
+      visible: !hasFlagBlockApiV4()
     },
     {
       label: 'Edge DNS',
       to: '/edge-dns',
       icon: 'ai ai-edge-dns',
       id: 'edge-dns'
+    },
+    {
+      label: 'Firewalls',
+      to: '/firewalls',
+      icon: 'ai ai-edge-firewall',
+      id: 'edge-firewall'
     }
   ]
 }
@@ -96,6 +109,13 @@ function createObserveItems() {
       icon: 'ai ai-real-time-events',
       tag: 'Preview',
       id: 'real-time-events'
+    },
+    {
+      label: 'SIEM',
+      to: '/siem',
+      icon: 'pi pi-chart-bar',
+      clientFlag: 'siem_bb',
+      id: 'siem'
     }
   ]
 }
@@ -114,10 +134,17 @@ function createToolsItems() {
 function createEdgeLibrariesItems() {
   return [
     {
-      label: 'Edge Functions',
-      to: '/edge-functions',
-      icon: 'ai ai-edge-functions',
-      id: 'edge-functions'
+      label: 'Certificate Manager',
+      to: '/digital-certificates',
+      icon: 'ai ai-digital-certificates',
+      id: 'digital-certificates'
+    },
+    {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'ai ai-custom-pages',
+      id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
     },
     {
       label: 'Edge Services',
@@ -126,10 +153,10 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
-      label: 'Digital Certificates',
-      to: '/digital-certificates',
-      icon: 'ai ai-digital-certificates',
-      id: 'digital-certificates'
+      label: 'Functions',
+      to: '/functions',
+      icon: 'ai ai-edge-functions',
+      id: 'edge-functions'
     },
     {
       label: 'Network Lists',
@@ -157,11 +184,31 @@ function createMarketplaceProductsItems() {
     },
     {
       label: 'SIEM',
-      to: 'https://f0semqqgv4.map.azionedge.net/login',
+      to: 'https://caixa-siem.azion.com/login',
       icon: 'pi pi-chart-bar',
       id: 'siem',
       external: true
     }
+  ]
+}
+
+function createStoreItems() {
+  return [
+    {
+      label: 'Object Storage',
+      to: '/object-storage',
+      icon: 'ai ai-edge-storage',
+      id: 'object-storage',
+      tag: 'Preview'
+    }
+    //  Uncoment this when database is ready
+    //  {
+    //   label: 'SQL Database',
+    //   to: '/sql-database',
+    //   icon: 'ai ai-edge-sql',
+    //   tag: 'Preview',
+    //   id: 'sql-database'
+    //  }
   ]
 }
 
@@ -177,6 +224,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
     {
       label: 'Secure',
       items: createSecureItems()
+    },
+    {
+      label: 'Store',
+      items: createStoreItems()
     },
     {
       label: 'Deploy',
@@ -200,6 +251,11 @@ export function getMenuItens(showMarketplaceProductsItens) {
       items: createMarketplaceProductsItems()
     }
   ]
+
+  if (!hasFlagIsAzionEmail()) {
+    const storeIndex = menus.findIndex((menu) => menu.label === 'Store')
+    menus.splice(storeIndex, 1)
+  }
 
   return menus
 }

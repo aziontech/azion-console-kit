@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let dataStreamName
 
-describe('Data Stream spec', { tags: ['@dev2', '@xfail'] }, () => {
+describe('Data Stream spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
@@ -13,7 +13,7 @@ describe('Data Stream spec', { tags: ['@dev2', '@xfail'] }, () => {
 
   it('should create a data stream with the azureBlobStorage connector', () => {
     // Arrange
-    cy.intercept('api/v3/data_streaming/templates').as('getTemplates')
+    cy.intercept('/v4/data_stream/templates?page=1&page_size=100&fields=id%2Cname').as('getTemplates')
 
     const azureBlobStorageOption = 10
 
@@ -44,21 +44,10 @@ describe('Data Stream spec', { tags: ['@dev2', '@xfail'] }, () => {
       'have.text',
       'Edge Applications'
     )
-    cy.get(selectors.dataStream.list.columnName('templateName')).should(
-      'have.text',
-      'Template teste'
-    )
     cy.get(selectors.dataStream.list.columnName('endpointType')).should(
       'have.text',
       'azure_blob_storage'
     )
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
-      cy.verifyToast('Data Stream successfully deleted')
-    })
   })
 })

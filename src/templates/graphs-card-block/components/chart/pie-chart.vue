@@ -15,13 +15,17 @@
   const generateGraph = () => {
     const c3Props = FormatC3GraphProps({
       chartData: props.chartData,
-      resultChart: props.resultChart
+      resultChart: filterEmptyValues(props.resultChart)
     })
 
     c3.generate({
       bindto: `#pie-chart-${props.chartData?.id}`,
       ...c3Props
     })
+  }
+
+  const filterEmptyValues = (data) => {
+    return data.filter((item) => item[0] !== undefined && item[0] !== null)
   }
 </script>
 

@@ -1,23 +1,21 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-import { formatDateToUSBilling } from '@/helpers/convert-date'
+import { formatDateToUSBilling, formatDateToMonthYear } from '@/helpers/convert-date'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { useAccountStore } from '@/stores/account'
+import { getLinkDownloadInvoice } from '@/helpers/invoice'
 
 export const loadInvoiceDataService = async (invoiceId) => {
   const { accountIsNotRegular } = useAccountStore()
   const payload = getQueryByAccountType(accountIsNotRegular, invoiceId)
   const url = accountIsNotRegular ? `${makeBillingBaseUrl()}` : `${makeAccountingBaseUrl()}`
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url,
+    method: 'POST',
+    body: payload
+  })
 
   httpResponse = adapt(httpResponse, accountIsNotRegular)
 
@@ -29,12 +27,13 @@ const adapt = (httpResponse, accountIsNotRegular) => {
     body: { data },
     statusCode
   } = httpResponse
-
   const invoiceData = accountIsNotRegular ? data?.billDetail : data?.accountingDetail
   const parseInvoice = invoiceData?.map((invoice) => {
+    let disabledExport = false
     if (accountIsNotRegular) {
       return {
         billId: invoice.billId,
+        disabledExport,
         billDetailId: invoice.billDetailId,
         total: invoice.totalValue,
         currency: invoice.currency,
@@ -44,15 +43,19 @@ const adapt = (httpResponse, accountIsNotRegular) => {
         productChanges: '---',
         servicePlan: '---',
         creditUsedForPayment: 0.0,
-        temporaryBill: invoice.temporaryBill
+        temporaryBill: invoice.temporaryBill,
+        invoiceDownloadURL: getLinkDownloadInvoice(formatDateToMonthYear(invoice.periodFrom))
       }
     }
+    disabledExport = true
     return {
       billId: invoice.billId,
+      disabledExport,
       invoiceId: invoice.invoiceNumber,
       billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
         invoice.periodTo
-      )}`
+      )}`,
+      invoiceDownloadURL: getLinkDownloadInvoice(formatDateToMonthYear(invoice.periodTo))
     }
   })
   return {

@@ -69,6 +69,7 @@
               label="Open a support ticket"
               @click="openContactSupport"
               iconPos="right"
+              size="small"
               link
               icon="pi pi-external-link"
             />

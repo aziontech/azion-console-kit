@@ -48,10 +48,4 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
   })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-  })
 })

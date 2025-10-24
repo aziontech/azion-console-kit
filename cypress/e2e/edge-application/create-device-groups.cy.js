@@ -7,11 +7,11 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
+
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
@@ -26,11 +26,17 @@ const createEdgeApplicationCase = () => {
 
 describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     cy.login()
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     fixtures.deviceGroupName = generateUniqueName('DeviceGroup')
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAcceleratorEnabled')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Device Groups')).click()
   })
 
@@ -41,18 +47,8 @@ describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     //assert
-    cy.verifyToast('success', 'Your Device Group has been created')
+    cy.verifyToast('success', 'Device Group successfully created')
     cy.get(selectors.list.searchInput).type(`${fixtures.deviceGroupName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.deviceGroupName)
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

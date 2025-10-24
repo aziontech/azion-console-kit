@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadOriginService = async ({ edgeApplicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,7 +13,24 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const origin = httpResponse.body?.results
+  if (origin.origin_type === 'live_ingest') {
+    return {
+      body: {
+        originId: origin.origin_id,
+        originKey: origin.origin_key,
+        name: origin.name,
+        originType: origin.origin_type,
+        streamingEndpoint: origin.streaming_endpoint
+      },
+      statusCode: httpResponse.statusCode
+    }
+  }
+
   const parsedBody = {
     originId: origin.origin_id,
     originKey: origin.origin_key,

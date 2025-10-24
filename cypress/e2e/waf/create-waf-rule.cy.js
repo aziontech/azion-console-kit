@@ -8,8 +8,6 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.login()
     cy.openProduct('WAF Rules')
 
-    cy.intercept('/api/v3/waf/rulesets/*').as('saveRuleset')
-
     wafName = generateUniqueName('WAF')
   })
 
@@ -24,24 +22,15 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your waf rule has been created')
 
-    cy.wait('@saveRuleset')
-    cy.get(selectors.wafs.breadcrumbToList).click()
-
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     // Assert
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
-    cy.get(selectors.wafs.listRow('threatTypes')).should(
+
+    cy.get(selectors.wafs.listRow('threatsConfiguration')).should(
       'have.text',
       'File uploadEvading TricksShow more (6)'
     )
-  })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
   })
 })
