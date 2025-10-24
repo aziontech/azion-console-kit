@@ -164,17 +164,16 @@
       </div>
     </div>
     <div class="w-full flex flex-col">
-      <EmptyResultsBlock
-        title="No tables have been created"
-        description="Click the button below to create your first table."
-        createButtonLabel="Table"
-        createPagePath=""
-        @click-to-create="createTable"
+      <SqlDatabaseList
+        :data="dataTable"
+        :title="tableName"
+        :columns="tableColumns"
+        data-testid="table-list"
+        @row-click="onRowClick"
+        @row-edit-saved="onRowEditSave"
+        @row-edit-cancel="onRowEditCancel"
       >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
+      </SqlDatabaseList>
     </div>
   </div>
 </template>
@@ -192,8 +191,7 @@
   import Menu from 'primevue/menu'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
 
   const emit = defineEmits([
     'go-editor',
@@ -220,6 +218,11 @@
   const tableMenuRef = ref(null)
   const selectedTable = ref(null)
   const truncateTableVisible = ref(false)
+  const columns = ref([])
+  const dataTable = ref([])
+  const tableColumns = computed(() => {
+    return Array.isArray(columns.value) ? columns.value : []
+  })
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -242,12 +245,26 @@
     emit('go-editor')
   }
 
+  const onRowEditSave = () => {
+  }
+
+  const onRowEditCancel = () => {
+  }
+
   const selectTable = async (table) => {
     selectedTable.value = table
     const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
-    // eslint-disable-next-line no-console
-    console.log(result)
+    columns.value = result.body.columns.map(({ columns }) => ({
+      field: columns.name,
+      tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
+      header: columns.name,
+      sortable: true
+    }))
+
+    dataTable.value = result.body.rows
   }
+
+  const tableName = computed(() => selectedTable.value?.name)
 
   const reloadTables = () => {
     emit('load-tables')
@@ -320,9 +337,9 @@
 
   const tableMenuItems = computed(() => {
     if (!selectedTable.value) return []
-    const tableName =
+    const menuTableName =
       selectedTable.value?.name || selectedTable.value?.label || selectedTable.value?.key
-    return tableActionManager.generateMenuItems(tableName)
+    return tableActionManager.generateMenuItems(menuTableName)
   })
 
   const showCheckboxAndSelectTable = (table) => {
@@ -350,6 +367,10 @@
 
   const searchTerm = ref('')
   const isLoading = computed(() => props.isLoadTables)
+  const onRowClick = (event) => {
+    const row = event?.data || event
+    if (row) selectTable(row)
+  }
   const filteredTables = computed(() => {
     const list = Array.isArray(props.listTables) ? props.listTables : []
     const term = (searchTerm.value || '').toString().toLowerCase()
