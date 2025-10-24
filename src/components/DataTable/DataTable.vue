@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length || loading"
+      v-if="data.length || loading || hasHeaderSlot"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -20,6 +20,8 @@
       v-model:filters="internalFilters"
       v-model:sortField="internalSortField"
       v-model:sortOrder="internalSortOrder"
+      :editMode="editMode"
+      v-model:editingRows="internalEditingRows"
       :paginator="paginator"
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="rows"
@@ -39,13 +41,12 @@
       @row-click="emit('rowClick', $event)"
       @page="emit('page', $event)"
       @sort="emit('sort', $event)"
+      @row-edit-save="emit('rowEditSave', $event)"
+      @row-edit-cancel="emit('rowEditCancel', $event)"
       scrollable
       removableSort
     >
-      <template
-        v-if="hasHeaderSlot"
-        #header
-      >
+      <template #header>
         <slot name="header" />
       </template>
 
@@ -162,6 +163,14 @@
       type: Number,
       default: 1
     },
+    editMode: {
+      type: String,
+      default: 'row'
+    },
+    editingRows: {
+      type: Array,
+      default: () => []
+    },
     paginator: {
       type: Boolean,
       default: false
@@ -260,7 +269,10 @@
     'update:filters',
     'update:sortField',
     'update:sortOrder',
-    'update:expandedRowGroups'
+    'update:expandedRowGroups',
+    'update:editingRows',
+    'rowEditSave',
+    'rowEditCancel'
   ])
 
   const slots = useSlots()
@@ -286,6 +298,11 @@
   const internalExpandedGroups = computed({
     get: () => props.expandedRowGroups,
     set: (value) => emit('update:expandedRowGroups', value)
+  })
+
+  const internalEditingRows = computed({
+    get: () => props.editingRows,
+    set: (value) => emit('update:editingRows', value)
   })
 
   const hasHeaderSlot = computed(() => !!slots.header)
