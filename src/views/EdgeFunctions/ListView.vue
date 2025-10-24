@@ -18,6 +18,7 @@
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
+        showLastModified
       />
       <EmptyResultsBlock
         v-else
@@ -65,7 +66,8 @@
     'vendor',
     'execution_environment',
     'reference_count',
-    'last_editor'
+    'last_editor',
+    'last_modified'
   ]
   const actions = [
     {
@@ -90,22 +92,22 @@
 
   const getColumns = computed(() => [
     {
-      field: 'id',
-      header: 'ID',
-      sortField: 'id',
-      filterPath: 'id'
-    },
-    {
       field: 'name',
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-with-tag'
+          data: { value: columnData.text, showMoreText: false },
+          columnAppearance: 'expand-text-column'
         })
       }
+    },
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
     },
     {
       field: 'version',
@@ -122,10 +124,10 @@
       component: (columnData) => {
         return columnBuilder({
           data: {
-            text: columnData || '-',
-            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
+            vendorData: columnData,
+            iconClass: 'pi pi-shopping-cart text-xl'
           },
-          columnAppearance: 'text-with-icon'
+          columnAppearance: 'icon-with-tooltip'
         })
       }
     },
@@ -148,6 +150,10 @@
     {
       field: 'lastEditor',
       header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
     },
     {
       field: 'status',

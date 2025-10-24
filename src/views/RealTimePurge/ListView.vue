@@ -15,7 +15,6 @@
       <ListTableBlock
         ref="listPurgeRef"
         v-if="hasContentToList"
-        disabledList
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         addButtonLabel="Purge"
@@ -26,6 +25,7 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
+        :defaultOrderingFieldName="'-last_modified'"
       >
       </ListTableBlock>
       <EmptyResultsBlock

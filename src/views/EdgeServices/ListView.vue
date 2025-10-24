@@ -46,6 +46,15 @@
       header: 'Name'
     },
     {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      sortField: 'lastModifiedDate',
+      header: 'Last Modified'
+    },
+    {
       field: 'labelActive',
       header: 'Status',
       filterPath: 'labelActive.content',
@@ -55,15 +64,6 @@
           data: columnData,
           columnAppearance: 'tag'
         })
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      sortField: 'lastModifiedDate',
-      header: 'Last Modified'
     }
   ])
 
@@ -144,6 +144,7 @@
         emptyListMessage="No services found."
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
+        :defaultOrderingFieldName="'-last_modified'"
       />
 
       <EmptyResultsBlock
