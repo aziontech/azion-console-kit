@@ -37,6 +37,8 @@
             :actions="actions"
             :defaultOrderingFieldName="'-last_modified'"
             :frozenColumns="['name']"
+            exportFileName="Data Stream"
+            :csvMapper="csvMapper"
             :documentationService="documentationService"
             :emptyBlock="{
               title: 'No stream has been created.',
@@ -143,6 +145,19 @@
   const disabledList = computed(() => {
     return isMaxDomainsReached.value || domainsLoading.value
   })
+
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      dataSource: rowData.dataSource,
+      templateName: rowData.templateName,
+      endpointType: rowData.endpointType,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      active: rowData.data?.content || rowData.active
+    }
+  }
 
   const getColumns = computed(() => {
     return [

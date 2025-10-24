@@ -1,6 +1,6 @@
 <template>
   <span
-    class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+    class="flex flex-row p-input-icon-left items-center w-full max-w-[512px]"
     data-testid="data-table-search"
   >
     <i class="pi pi-search" />
@@ -32,7 +32,7 @@
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: 'Search keywords...'
     },
     debounce: {
       type: Number,

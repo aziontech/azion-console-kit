@@ -193,6 +193,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColoumns="['name']"
+        exportFileName="Workload"
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,

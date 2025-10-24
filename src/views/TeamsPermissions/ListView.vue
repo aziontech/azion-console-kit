@@ -25,6 +25,14 @@
     }
   ]
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      permissions: rowData.permissions,
+      status: rowData.data?.content || rowData.status
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -88,6 +96,8 @@
         :apiFields="TEAM_PERMISSIONS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
         :frozenColumns="['name']"
+        exportFileName="Teams Permissions"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No teams have been created',
           description: 'Click the button below to create your first team and add permissions.',

@@ -101,6 +101,34 @@
     return ['managed', 'challenge', 'authority', 'keyAlgorithm']
   })
 
+  const csvMapper = (rowData) => {
+    if (certificateTypeList.value === 'CRL') {
+      return {
+        name: rowData.name,
+        id: rowData.id,
+        issuer: rowData.issuer,
+        lastEditor: rowData.lastEditor,
+        lastModified: rowData.lastModified,
+        status: rowData.data.status?.content || rowData.status
+      }
+    }
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      subjectName: rowData.subjectName,
+      issuer: rowData.issuer,
+      type: rowData.type,
+      validity: rowData.validity,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      status: rowData.data.status?.content || rowData.status,
+      managed: rowData.managed,
+      challenge: rowData.challenge,
+      authority: rowData.authority,
+      keyAlgorithm: rowData.keyAlgorithm
+    }
+  }
+
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
@@ -320,6 +348,8 @@
         :hiddenByDefault="hiddenColumns"
         :firstLoadData="firstLoadData"
         :frozenColumns="['name']"
+        exportFileName="Certificate Manager"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No digital certificate has been added',
           description: 'Click the button below to add your first digital certificate.',

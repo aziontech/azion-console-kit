@@ -14,6 +14,8 @@
         emptyListMessage="No clients found."
         editPagePath="management/edit"
         enableEditClick
+        exportFileName="Client Management"
+        :csvMapper="csvMapper"
       />
 
       <EmptyResultsBlock
@@ -54,6 +56,14 @@
       router.push('/')
     }
   })
+
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      company: rowData.company,
+      status: rowData.status?.content || rowData.status
+    }
+  }
 
   const getColumns = computed(() => {
     return [
