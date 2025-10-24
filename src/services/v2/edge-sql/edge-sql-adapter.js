@@ -186,13 +186,22 @@ export const EdgeSQLAdapter = {
       }
     }))
 
+    const tableSchema = tableInfo.results.rows.map((row) => ({
+      name: row[1],
+      type: row[2],
+      notNull: row[3],
+      default: row[4],
+      primaryKey: row[5]
+    }))
+
     const rows = formatRowsForDisplay(tableData.results?.rows || [])
     const columnNames = columns.map((col) => col.columns.name)
     const mappedRows = mapRowsToObjects(columnNames, rows)
 
     return {
       columns,
-      rows: mappedRows
+      rows: mappedRows,
+      tableSchema
     }
   },
 
