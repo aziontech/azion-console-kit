@@ -21,36 +21,38 @@
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
-    <label class="flex text-sm gap-1 items-center font-medium">
-      {{ props.label }}
+  <div class="flex items-start justify-start">
+    <div class="flex flex-col w-full">
+      <label class="flex text-sm gap-1 items-center font-medium">
+        {{ props.label }}
 
-      <span class="just-hover">
+        <span>
+          <PrimeButton
+            class="max-md:hidden"
+            icon="pi pi-question-circle"
+            text
+            rounded
+            v-tooltip="props.tooltipMessage"
+            :pt="{
+              root: { class: 'shadow-none' }
+            }"
+          />
+        </span>
+
         <PrimeButton
-          class="whitespace-nowrap max-md:hidden"
+          class="whitespace-nowrap md:hidden"
           icon="pi pi-question-circle"
           text
           rounded
-          v-tooltip="props.tooltipMessage"
-          :pt="{
-            root: { class: 'shadow-none' }
-          }"
+          v-tooltip.focus="props.tooltipMessage"
         />
-      </span>
-
-      <PrimeButton
-        class="whitespace-nowrap md:hidden"
-        icon="pi pi-question-circle"
-        text
-        rounded
-        v-tooltip.focus="props.tooltipMessage"
-      />
-    </label>
-    <div class="flex gap-1 items-center">
-      <span class="text-2xl font-medium">
-        <slot></slot>
-      </span>
-      <span class="text-sm text-color">{{ props.sufix }}</span>
+      </label>
+      <div class="flex gap-1 items-center">
+        <span class="text-2xl font-medium">
+          <slot></slot>
+        </span>
+        <span class="text-sm text-color">{{ props.sufix }}</span>
+      </div>
     </div>
   </div>
 </template>

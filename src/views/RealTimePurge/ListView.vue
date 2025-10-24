@@ -7,16 +7,21 @@
       <InlineMessage
         class="w-fit mb-8"
         severity="info"
-        >When creating a new purge, it's queued for execution and will appear in the history once
-        completed.
+        icon="pi pi-spin pi-spinner"
+        v-if="isLoading"
+      >
+        Purge requests are queued. The table will update automatically once processing is complete.
       </InlineMessage>
       <ListTableBlock
+        ref="listPurgeRef"
         v-if="hasContentToList"
+        disabledList
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
         :isGraphql="true"
         :enableEditClick="false"
         emptyListMessage="No purge found."
@@ -28,6 +33,7 @@
         title="No purges have been added"
         description="Click the button below to add your first purge."
         createButtonLabel="Purge"
+        @click-to-create="handleTrackEvent"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"
       >
@@ -46,35 +52,67 @@
   import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
-  import DialogPurge from './Dialog'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
+  import { purgeService } from '@/services/v2/purge/purge-service'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
+  import { usePurgeStore } from '@/stores/purge'
+  import { capitalizeFirstLetter } from '@/helpers'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
-    createRealTimePurgeService: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       required: true,
       type: Function
     }
   })
 
+  const listPurgeRef = ref('')
+  const route = useRoute()
+  const router = useRouter()
   const hasContentToList = ref(true)
-  const showDialogPurge = ref(false)
   const isLoading = ref(null)
   const toast = useToast()
+  const timeToReload = 9000
+  const { accountData } = useAccountStore()
+  const purgeStore = usePurgeStore()
+  const repurgesNeedingFocus = ref(0)
+  const feedbackPurge = ref(
+    'The purge has been successfully triggered and is now listed in the table.'
+  )
 
-  const handleLoadData = (event) => {
+  const user = accountData
+  const countPurge = ref(0)
+
+  const handleLoadData = async (event) => {
+    countPurge.value = listPurgeRef.value.data.filter((item) => item.user === user.email).length
     hasContentToList.value = event
+    const { isPending } = route.query
+    const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
+    if (hasPendingMismatch) {
+      isLoading.value = true
+      countPurge.value++
+      repurgesNeedingFocus.value++
+      handleTimeLoad()
+    } else {
+      router.replace({ query: {} })
+    }
   }
 
-  const closeDialog = () => {
-    isLoading.value = null
-    showDialogPurge.value = false
+  const handleTrackEvent = () => {
+    purgeStore.setPurgeCount(countPurge.value)
+    tracker.product.clickToCreate({
+      productName: 'Purge'
+    })
+  }
+
+  const handleClickedOnEvent = (purgeType) => {
+    tracker.product.clickedOnEvent('Purge', { purgeType })
   }
 
   const showToast = (severity, detail) => {
@@ -82,7 +120,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -96,30 +134,48 @@
       layer: purgeToRepurge.layer
     }
     try {
-      const { feedback } = await props.createRealTimePurgeService(dataPurge)
-      showToast('success', feedback)
+      await purgeService.createPurge(dataPurge)
+      handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
-      showToast('error', error)
-    } finally {
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
+        const errorMessage = error?.message || error
+        showToast('error', errorMessage)
+      }
       isLoading.value = false
-      closeDialog()
+      throw error
+    }
+  }
+
+  const handleRepurge = async (item) => {
+    isLoading.value = true
+    item.disabled = true
+    countPurge.value++
+    repurgesNeedingFocus.value++
+    try {
+      await repurgeEvent(item)
+      await handleTimeLoad()
+    } catch (error) {
+      isLoading.value = false
+    } finally {
+      item.disabled = false
     }
   }
 
   const actionsRow = [
     {
-      type: 'dialog',
+      type: 'action',
       label: 'Repurge',
       icon: 'pi pi-refresh',
-      dialog: {
-        component: DialogPurge,
-        body: (item) => ({
-          data: {
-            isLoading,
-            item,
-            repurge: repurgeEvent
-          }
-        })
+      tooltip: 'Repurge',
+      shouldLoadOnClick: true,
+      disabled: (rowData) => rowData.disabled,
+      commandAction: async (item) => {
+        if (!item.disabled) {
+          handleRepurge(item)
+        }
       }
     }
   ]
@@ -128,7 +184,8 @@
     return [
       {
         field: 'time',
-        header: 'Date'
+        header: 'Date',
+        sortField: 'ts'
       },
       {
         field: 'user',
@@ -152,4 +209,35 @@
       }
     ]
   })
+
+  const applyFocus = (usersPurge, listPurge) => {
+    const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
+    const focusIds = newPurge.map((item) => item.id)
+    return listPurge.map((item) => ({
+      ...item,
+      focus: focusIds.includes(item.id)
+    }))
+  }
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+  const handleTimeLoad = async () => {
+    let totalOfUserPurges = 0
+    do {
+      await sleep(timeToReload)
+      const listPurge = await props.listRealTimePurgeService()
+      if (!repurgesNeedingFocus.value) return
+      const usersPurge = listPurge.filter((item) => item.user === user.email)
+      totalOfUserPurges = usersPurge.length
+
+      if (totalOfUserPurges === countPurge.value) {
+        listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
+        listPurgeRef.value.updateDataTablePagination()
+        router.replace({ query: {} })
+        showToast('success', feedbackPurge.value)
+      }
+    } while (totalOfUserPurges !== countPurge.value)
+    isLoading.value = false
+    repurgesNeedingFocus.value = 0
+  }
 </script>

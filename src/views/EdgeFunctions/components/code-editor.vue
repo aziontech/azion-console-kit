@@ -1,11 +1,12 @@
 <template>
   <vue-monaco-editor
     v-model:value="code"
-    :language="language"
+    :language="runtime"
     :theme="theme"
-    class="!w-[99%] h-full surface-border border-r"
+    class="w-full min-h-[400px] h-full border surface-border border-r rounded-md"
     :class="{
-      'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors,
+      'border-transparent': !errors,
+      '!border-red-500 border h-[calc(100%-1.5rem)]': errors,
       'cursor-not-allowed': EDITOR_OPTIONS.readOnly
     }"
     :options="EDITOR_OPTIONS"
@@ -21,10 +22,14 @@
   const props = defineProps({
     modelValue: String,
     initialValue: String,
+    minimap: {
+      type: Boolean,
+      default: true
+    },
     readOnly: {
       type: Boolean
     },
-    language: {
+    runtime: {
       type: String,
       default: 'javascript',
       validator: (value) => {
@@ -41,6 +46,7 @@
 
   const code = ref(props.initialValue)
   const EDITOR_OPTIONS = ref({
+    minimap: { enabled: props.minimap },
     tabSize: 2,
     formatOnPaste: true,
     readOnly: props.readOnly

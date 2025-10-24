@@ -32,16 +32,16 @@
     }
   })
 
-  const listService = ref([])
   const showEditServiceDrawer = ref(false)
   const showCreateServiceDrawer = ref(false)
+  const isOverlapped = ref(false)
   const debouncedDrawerAnimate = 300
   const selectedServiceToEdit = ref('0')
   const loadCreateServiceDrawer = refDebounced(showCreateServiceDrawer, debouncedDrawerAnimate)
   const loadEditServiceDrawer = refDebounced(showEditServiceDrawer, debouncedDrawerAnimate)
 
   const initialValues = {
-    service: {},
+    serviceId: 0,
     variables: '',
     id: props.edgeNodeId
   }
@@ -53,9 +53,7 @@
   }
 
   const validationSchema = yup.object({
-    service: yup.object().shape({
-      serviceId: yup.number().required().label('Service')
-    }),
+    serviceId: yup.number().required().label('Service'),
     variables: yup
       .string()
       .test('validateFilePath', 'The format provided is invalid', validateCode),
@@ -74,26 +72,19 @@
       ...payload,
       edgeNodeId: props.edgeNodeId
     })
-    listService.value = [edgeNode.service]
     return edgeNode
   }
 
-  const listServiceEdgeNode = async () => {
-    listService.value = await props.listServiceEdgeNodeService({
-      edgeNodeId: props.edgeNodeId,
-      bound: false
-    })
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
   }
 
   const openDrawerCreate = () => {
-    listService.value = []
-    listServiceEdgeNode()
     showCreateServiceDrawer.value = true
   }
 
   const openDrawerEdit = (id) => {
     if (id) {
-      listService.value = []
       selectedServiceToEdit.value = id.toString()
       showEditServiceDrawer.value = true
     }
@@ -111,14 +102,18 @@
     v-model:visible="showCreateServiceDrawer"
     :createService="createServiceEdgeNodeService"
     :schema="validationSchema"
+    :isOverlapped="isOverlapped"
     :initialValues="initialValues"
     @onSuccess="emit('onSuccess')"
     title="Bind Service"
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
-        :listServices="listService"
+        :edgeNodeId="edgeNodeId"
+        @toggleDrawer="handleToggleDrawer"
+        :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
+        :bound="false"
       />
     </template>
   </CreateDrawerBlock>
@@ -135,8 +130,11 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
-        :listServices="listService"
+        :edgeNodeId="edgeNodeId"
+        @toggleDrawer="handleToggleDrawer"
+        :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
+        bound
       />
     </template>
   </EditDrawerBlock>

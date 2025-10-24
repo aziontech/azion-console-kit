@@ -1,28 +1,35 @@
 <template>
-  <section class="w-full min-h-[calc(100vh-120px)] relative">
-    <section class="w-full h-full flex flex-col mx-auto">
-      <div
-        class="mx-3 md:mx-8 mt-4"
-        v-if="hasHeadingSlot"
-      >
-        <slot name="heading"></slot>
+  <section class="w-full flex flex-col flex-1 relative">
+    <section
+      class="w-full flex flex-col flex-1"
+      :class="classPadding"
+    >
+      <div v-if="hasHeadingSlot">
+        <slot name="heading" />
       </div>
       <div
-        class="mx-3 md:mx-8 mb-8 h-full"
-        :class="{ 'mt-4 md:mx-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
+        class="h-full flex flex-1 flex-col"
+        :class="{ 'mt-4': hasHeadingSlot }"
       >
         <slot name="content"></slot>
       </div>
     </section>
     <div
-      class="sticky bottom-0"
+      class="sticky bottom-0 z-50"
       id="action-bar"
     ></div>
   </section>
 </template>
 <script setup>
   defineOptions({ name: 'ContentBlock' })
+  const props = defineProps({
+    disablePadding: {
+      type: Boolean,
+      default: false
+    }
+  })
 
+  const classPadding = props.disablePadding ? '' : 'px-8 pt-4 pb-8'
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
   const hasHeadingSlot = computed(() => !!slots.heading)

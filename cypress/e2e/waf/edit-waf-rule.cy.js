@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let wafName
 
-describe('WAF spec', { tags: ['@dev7'] }, () => {
+describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('WAF Rules')
@@ -35,7 +35,7 @@ describe('WAF spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
     cy.get(selectors.wafs.seeMore('threatTypes')).click()
@@ -69,7 +69,7 @@ describe('WAF spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
     cy.get(selectors.wafs.seeMore('threatTypes')).click()
@@ -78,12 +78,5 @@ describe('WAF spec', { tags: ['@dev7'] }, () => {
       'File uploadUnwanted AccessDirectory TraversalSQL InjectionShow less'
     )
     cy.get(selectors.wafs.listRow('active')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
   })
 })

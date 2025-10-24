@@ -4,8 +4,10 @@
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
+    :defaultOrderingFieldName="'is_default'"
+    :apiFields="API_FIELDS"
     :columns="paymentsColumns"
-    :listService="props.listPaymentMethodsService"
+    :listService="listCreditCards"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
@@ -16,7 +18,7 @@
           icon="pi pi-plus"
           label="Credit"
           size="small"
-          @click="drawersMethods.openDrawerAddCredit"
+          @click="openDrawerAddCreditWithValidation"
           data-testid="payment-methods__add-credit__button"
           outlined
         />
@@ -25,7 +27,7 @@
           data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
           size="small"
-          @click="drawersMethods.openDrawerPaymentMethod"
+          @click="openDrawerPaymentMethod"
           label="Payment Method"
         />
       </div>
@@ -37,7 +39,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
-    @click-to-create="drawersMethods.openDrawerPaymentMethod"
+    @click-to-create="openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -53,34 +55,64 @@
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import { paymentService } from '@/services/v2/payment/payment-service'
+  import { openContactSupport, openAzionDiscord } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { h, ref } from 'vue'
+  import { capitalizeFirstLetter } from '@/helpers'
 
-  import { ref, inject } from 'vue'
-  const emit = defineEmits(['update-credit-event'])
+  const emit = defineEmits([
+    'update-credit-event',
+    'openDrawerAddCredit',
+    'openDrawerAddPaymentMethod'
+  ])
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const props = defineProps({
-    listPaymentMethodsService: {
-      type: Function,
-      required: true
-    },
-    deletePaymentService: {
-      type: Function,
-      required: true
-    },
-    setAsDefaultPaymentService: {
-      type: Function,
-      required: true
-    },
     documentPaymentMethodService: {
+      type: Function,
+      required: true
+    },
+    cardDefault: {
+      type: Object,
+      required: true
+    },
+    getStripeClientService: {
       type: Function,
       required: true
     }
   })
 
+  const listCreditCards = async (params) => {
+    const { body } = await paymentService.listCreditCards({
+      ...params,
+      pageSize: 200
+    })
+    return body
+  }
+
   const listPaymentMethodsRef = ref('')
 
-  const drawersMethods = inject('drawersMethods')
+  const openDrawerAddCreditWithValidation = () => {
+    if (props.cardDefault.cardData) {
+      emit('openDrawerAddCredit')
+    }
+  }
+
+  const openDrawerPaymentMethod = () => {
+    emit('openDrawerAddPaymentMethod')
+  }
+
+  const API_FIELDS = [
+    'id',
+    'card_holder',
+    'card_brand',
+    'card_expiration_month',
+    'card_expiration_year',
+    'is_default',
+    'card_last_4_digits'
+  ]
 
   const paymentsColumns = ref([
     {
@@ -114,24 +146,28 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    const options = {
+    toast.add({
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
-    }
-
-    toast.add(options)
+    })
   }
 
   const setPaymentAsDefault = async (payment) => {
     try {
-      const feedback = await props.setAsDefaultPaymentService(payment.id)
-      showToast('success', feedback)
+      await paymentService.editCreditCard(payment.id, {
+        is_default: true
+      })
+      showToast('success', 'Payment Method successfully set as default')
       emit('update-credit-event')
       reloadList()
     } catch (error) {
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     }
   }
 
@@ -141,6 +177,15 @@
       type: 'action',
       icon: 'pi pi-fw pi-check-circle',
       commandAction: async (item) => {
+        if (item.isDefault) {
+          toast.add({
+            closable: true,
+            severity: 'warning',
+            summary: 'Warning',
+            detail: 'This payment method is already set as default'
+          })
+          return
+        }
         await setPaymentAsDefault(item)
       }
     },
@@ -149,13 +194,37 @@
       type: 'delete',
       icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
-      service: props.deletePaymentService
+      tryExecuteCommand: (item) => {
+        if (!item.isDefault) {
+          return true
+        }
+
+        const { account } = useAccountStore()
+        const hasSupport = !account.isDeveloperSupportPlan
+
+        toast.add({
+          closable: true,
+          severity: 'warning',
+          summary: 'Warning',
+          component: h('div', [
+            'You need to have at least one credit card to use the platform. If you need help access the ',
+            h(PrimeButton, {
+              class: 'p-0 text-sm',
+              link: true,
+              label: 'support center.',
+              onClick: () => (hasSupport ? openContactSupport() : openAzionDiscord())
+            })
+          ])
+        })
+        return false
+      },
+      service: paymentService.deleteCreditCard
     }
   ])
 
-  const reloadList = () => {
+  const reloadList = async () => {
     if (hasContentToList.value) {
-      listPaymentMethodsRef.value.reload()
+      await listPaymentMethodsRef.value.reload()
       return
     }
     hasContentToList.value = true

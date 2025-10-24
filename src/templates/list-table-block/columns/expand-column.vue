@@ -1,23 +1,32 @@
 <template>
-  <ul class="flex flex-col gap-1">
-    <li
-      v-for="(item, index) in splitValue"
-      :key="index"
-    >
-      {{ item }}
-    </li>
-    <li
-      v-if="displayShowMore"
-      @click.stop="toggleShowAll"
-      class="underline cursor-pointer"
-      data-testid="table-column-expand-column__show-more__toggle"
-    >
-      {{ displayRemainingItems }}
-    </li>
-  </ul>
+  <div class="flex gap-2 align-center">
+    <ul class="flex flex-col gap-1">
+      <li
+        v-for="(item, index) in splitValue"
+        :key="index"
+      >
+        {{ item }}
+      </li>
+      <li
+        v-if="displayShowMore"
+        @click.stop="toggleShowAll"
+        class="underline cursor-pointer"
+        data-testid="table-column-expand-column__show-more__toggle"
+      >
+        {{ displayRemainingItems }}
+      </li>
+    </ul>
+    <copyBlock
+      v-if="shouldShowCopy"
+      :value="value"
+      data-testid="table-column-expand-column__copy"
+      v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
+    />
+  </div>
 </template>
 
 <script setup>
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
   defineOptions({ name: 'expand-column' })
   import { ref, computed } from 'vue'
 
@@ -25,6 +34,9 @@
     value: {
       type: Array,
       required: true
+    },
+    showCopy: {
+      type: Boolean
     }
   })
 
@@ -37,6 +49,10 @@
 
   const splitValue = computed(() => {
     return showAllItems.value ? props.value : formatValue
+  })
+
+  const shouldShowCopy = computed(() => {
+    return props.showCopy && props.value?.length
   })
 
   const displayRemainingItems = computed(() => {

@@ -1,10 +1,5 @@
-/**
- * Lists the available Vulcan presets.
- * Each object has a 'label' property which is the name of the preset and a 'value' property which is the identifier for the preset.
- * @returns {Object[]} An array of objects containing the Vulcan presets.
- */
-export const listVulcanPresetsService = () => {
-  const vulcanPresets = [
+export const listVulcanPresetsService = async () => {
+  const mockPresets = [
     {
       label: 'Next.js',
       value: 'next'
@@ -31,5 +26,5 @@ export const listVulcanPresetsService = () => {
     }
   ]
 
-  return vulcanPresets
+  return Promise.resolve(mockPresets)
 }

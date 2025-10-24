@@ -78,6 +78,7 @@
                 size="small"
                 class="p-0"
                 v-if="solution.isLaunched"
+                @click="openMarketplaceIntegrationsDocumentation()"
               />
             </p>
             <InlineMessage
@@ -122,6 +123,7 @@
                 link
                 icon="pi pi-external-link"
                 iconPos="right"
+                @click="contactSalesEdgeApplicationService()"
               />
             </div>
           </div>
@@ -161,10 +163,12 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import IntegrationInstall from './drawer/IntegrationInstall'
   import CreateEdgeApplication from './drawer/CreateEdgeApplication'
+  import { contactSalesEdgeApplicationService } from '@/services/edge-application-services/contact-sales-service.js'
 
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error'
+    severity: 'error',
+    summary: 'Error'
   }
 
   const solution = ref()
@@ -194,6 +198,10 @@
     },
     windowOpen: {
       type: Function,
+      required: true
+    },
+    windowManager: {
+      type: Object,
       required: true
     },
     launchSolutionService: {
@@ -232,12 +240,17 @@
         solution: route.params.solution
       })
     } catch (error) {
-      toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, detail: error })
+      loading.value = false
     }
   }
 
   const openVendorSite = () => {
     props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openMarketplaceIntegrationsDocumentation = () => {
+    props.windowManager.openMarketplaceIntegrationsDocumentation()
   }
 
   const startLaunchSolution = () => {
@@ -255,7 +268,7 @@
       summary: feedback,
       action: {
         link: {
-          label: 'Go to Edge Functions',
+          label: 'Go to Functions',
           callback: () => {
             router.push({ name: 'list-edge-functions' })
           }
@@ -276,7 +289,8 @@
 
       reloadSolution(feedback)
     } catch (error) {
-      toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, detail: error })
+      loading.value = false
     }
   }
 
@@ -289,7 +303,7 @@
   const handleIntegrationFail = async (error) => {
     showIntegration.value = false
     loading.value = false
-    toast.add({ ...ERROR_PROPS, summary: error })
+    toast.add({ ...ERROR_PROPS, detail: error })
     await loadSolution()
   }
 

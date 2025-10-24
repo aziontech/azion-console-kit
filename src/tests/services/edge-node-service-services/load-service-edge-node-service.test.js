@@ -55,12 +55,19 @@ describe('EdgeNodeServices', () => {
 
     expect(result).toEqual({
       id: fixtures.mockIds.id,
-      service: {
-        id: fixtures.mockResponse.id,
-        name: fixtures.mockResponse.service_name,
-        serviceId: fixtures.mockResponse.service_id
-      },
+      serviceId: fixtures.mockResponse.service_id,
       variables: 'var1=value1'
     })
+  })
+
+  it('should return an error when the request fails with status 400', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: { detail: 'Bad Request' }
+    })
+
+    const { sut } = makeSut()
+
+    await expect(sut(fixtures.mockIds)).rejects.toThrow('Bad Request')
   })
 })

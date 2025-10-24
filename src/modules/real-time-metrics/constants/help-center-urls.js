@@ -26,6 +26,8 @@ const HELP_CENTER_URLS = {
         '/real-time-metrics/edge-applications/requests/missed-requests-per-second',
       missedRequests: '/real-time-metrics/edge-applications/requests/missed-requests',
       requestsByMethod: '/real-time-metrics/edge-applications/requests/requests-by-method',
+      averageRequestTime: '/real-time-metrics/edge-applications/requests/average-request-time',
+      requestByScheme: '/real-time-metrics/edge-applications/requests/requests-by-scheme',
       requestsOffloaded: '/real-time-metrics/edge-applications/requests/requests-offloaded',
       requestsPerSecondOffloaded:
         '/real-time-metrics/edge-applications/requests/requests-per-second-offloaded',
@@ -34,13 +36,16 @@ const HELP_CENTER_URLS = {
       savedRequests: '/real-time-metrics/edge-applications/requests/saved-requests',
       totalRequestsPerSecond:
         '/real-time-metrics/edge-applications/requests/total-requests-per-second',
-      totalRequests: '/real-time-metrics/edge-applications/requests/total-requests'
+      totalRequests: '/real-time-metrics/edge-applications/requests/total-requests',
+      ipAdressInformation:
+        '/real-time-metrics/edge-applications/request-breakdown/ip-address-information'
     },
     statusCodes: {
       httpStatusCodes2xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
       httpStatusCodes3xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
       httpStatusCodes4xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-4xx',
-      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx'
+      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx',
+      statusUpstream: '/real-time-metrics/edge-applications/status-codes/status-upstream'
     }
   },
   edgeFunctions: {
@@ -74,23 +79,40 @@ const HELP_CENTER_URLS = {
       remoteFileInclusionRfiThreats:
         '/real-time-metrics/waf/threats/remote-file-inclusion-rfi-threats',
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
-      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests'
+      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests',
+      wafThreatsRequestsByFamilyAttack:
+        '/real-time-metrics/waf/threats/waf-threat-requests-by-family-attack',
+      wafThreatsRequestsByCountryBarChart:
+        '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
+      wafThreatsRequestsByCountryPieChart:
+        '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph'
     }
   },
   botManager: {
-    botManagerSummary: {
+    botManagerOverview: {
       badBotHits: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
       goodBotHits: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
       transactions: '/real-time-metrics/bot-manager-advanced/overview/transactions',
       botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
+      topBotTraffic: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
       topBotAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
       botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
-      topBotCaptchaPie: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
-      topBotClassification: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
+      topBotCaptchaPie:
+        '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
+      topBotClassification:
+        '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
       botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
+    },
+    botManagerBreakdown: {
+      impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls',
+      topBadBotIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips',
+      topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
   },
+  threatsBreakdown: {
+    topWAFThreatRequestsByIP: '/real-time-metrics/threats/breakdown/top-waf-threat-requests-by-ip'
+  }
 }
 
 export default HELP_CENTER_URLS

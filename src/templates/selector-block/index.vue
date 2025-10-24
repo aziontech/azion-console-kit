@@ -1,12 +1,12 @@
 <template>
   <Card
     :pt="{
-      root: { class: ['select-none', classStateRoot] }
+      root: { class: ['select-none', classStateRoot, rootClass] }
     }"
   >
     <template #content>
       <label
-        class="flex gap-3"
+        class="flex gap-3 cursor-pointer"
         :class="classStateRootItem"
         :for="props.nameId"
       >
@@ -91,6 +91,9 @@
       required: true
     },
     inputClass: {
+      type: String
+    },
+    rootClass: {
       type: String
     }
   })

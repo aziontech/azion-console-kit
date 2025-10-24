@@ -3,10 +3,12 @@
     blockScroll
     modal
     visible
+    :closeOnEscape="false"
     :header="`Delete ${data.title}`"
     :draggable="false"
     class="max-w-2xl"
     @keyup.enter="removeItem()"
+    @keydown.esc="cancelDialog"
     data-testid="delete-dialog"
   >
     <div
@@ -26,12 +28,14 @@
           class="pt-4 text-color-secondary"
           data-testid="delete-dialog-warning-message-details"
         >
-          This {{ data.title }} will be deleted along with any associated settings or instances.
-          Check Help Center for more details.
+          {{ deleteMessage }}
         </p>
       </div>
 
-      <div data-testid="delete-dialog-confirmation">
+      <div
+        data-testid="delete-dialog-confirmation"
+        v-if="!data.bypassConfirmation"
+      >
         <div
           class="flex flex-col w-full gap-2"
           data-testid="delete-dialog-confirmation-input"
@@ -40,12 +44,13 @@
             for="confirm-input"
             class="font-semibold text-sm"
             data-testid="delete-dialog-confirmation-input-label"
-            >Type “delete” to confirm:</label
+            >To confirm, type "{{ data.deleteConfirmationText }}" in the box below:</label
           >
           <InputText
             id="confirm-input"
             type="text"
             autofocus
+            :disabled="loading"
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
             data-testid="delete-dialog-confirmation-input-field"
@@ -72,6 +77,7 @@
       <PrimeButton
         outlined
         label="Cancel"
+        size="small"
         @click="cancelDialog()"
         data-testid="delete-dialog-footer-cancel-button"
       ></PrimeButton>
@@ -108,7 +114,11 @@
   const canDelete = ref(false)
 
   const validationSchema = yup.object({
-    confirmation: yup.string().equals(['delete'], '').required('This is a required field')
+    confirmation: yup
+      .string()
+      .equals([data.deleteConfirmationText], '')
+      .label('Confirmation')
+      .required()
   })
 
   const { errors, meta, resetForm } = useForm({
@@ -121,17 +131,24 @@
   const { value: confirmation } = useField('confirmation')
 
   const removeItem = async () => {
-    if (!canDelete.value || !meta.value.valid) return
+    if ((!canDelete.value || !meta.value.valid) && !data.bypassConfirmation) return
 
     loading.value = true
     try {
       const feedback = await data.deleteService(data.selectedID, data.selectedItemData)
-      showToast('success', feedback ?? 'Deleted successfully!')
+      showToast('success', 'Success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
       dialogRef.value.close({ updated: true })
+      if (data.onSuccess) {
+        data.onSuccess()
+      }
     } catch (error) {
-      showToast('error', 'Error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     } finally {
       loading.value = false
     }
@@ -142,7 +159,7 @@
       closable: true,
       severity,
       summary,
-      detail
+      detail: detail || 'An error occurred while trying to delete the item. Please try again.'
     })
   }
 
@@ -156,7 +173,14 @@
   })
 
   const isDisabled = computed(() => {
-    return !meta.value.valid || loading.value
+    return (!meta.value.valid && !data.bypassConfirmation) || loading.value
+  })
+
+  const deleteMessage = computed(() => {
+    return (
+      data.entityDeleteMessage ||
+      `The selected ${data.title} will be deleted, along with all associated settings or instances. Check the Help Center for more details.`
+    )
   })
 
   watch(

@@ -6,7 +6,11 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   defineOptions({ name: 'list-edge-service' })
 
   const props = defineProps({
@@ -31,6 +35,12 @@
   const hasContentToList = ref(true)
 
   const getColumns = computed(() => [
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
     {
       field: 'name',
       header: 'Name'
@@ -102,6 +112,18 @@
       service: props.deleteEdgeServiceServices
     }
   ]
+
+  const handleTrackEventGoToCreate = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge Service'
+    })
+  }
+
+  const handleTrackEventGoToEdit = () => {
+    tracker.product.clickToEdit({
+      productName: 'Edge Service'
+    })
+  }
 </script>
 
 <template>
@@ -120,6 +142,8 @@
         @on-load-data="handleLoadData"
         :actions="actions"
         emptyListMessage="No services found."
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
       />
 
       <EmptyResultsBlock

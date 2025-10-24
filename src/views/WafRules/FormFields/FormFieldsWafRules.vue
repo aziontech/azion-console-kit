@@ -111,7 +111,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a WAF rule set to protect servers and edge applications against threat families. Configure a behavior on Rules Engine for Edge Firewall to apply and run this rule set."
+    description="Create a WAF rule set to protect servers and applications against threat families. Configure a behavior on Rules Engine for Firewall to apply and run this rule set."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -145,7 +145,6 @@
                 :options="sensitivity"
                 optionLabel="name"
                 optionValue="value"
-                inputClass=""
                 :name="item.dropdown.value"
                 :value="item.dropdown.initialValue"
                 :data-testid="`waf-rules-form__${item.dropdown.value}-field`"

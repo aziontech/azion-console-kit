@@ -28,7 +28,7 @@
         v-if="!isLoading"
       />
       <div
-        class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:items-center"
+        class="flex flex-col sm:flex-row gap-4 lg:items-center"
         v-if="!isLoading"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -57,6 +57,7 @@
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
                 iconPos="right"
+                size="small"
               />
             </div>
             <div class="flex gap-1 items-center">
@@ -72,8 +73,9 @@
           </div>
         </div>
         <PrimeButton
-          label="More details"
-          severity="secondary"
+          label="View more details"
+          severity="link"
+          size="small"
           @click="openDetails"
         />
       </div>
@@ -85,9 +87,6 @@
         v-else
       >
         <TemplateEngineBlock
-          :postCallbackUrlService="props.postCallbackUrlService"
-          :listIntegrationsService="props.listIntegrationsService"
-          :listPlatformsService="props.listPlatformsService"
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
           @instantiate="handleInstantiate"
@@ -158,7 +157,7 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-6 w-full px-3">
           <div class="flex flex-col gap-2">
             <span class="text-lg font-medium"> Overview </span>
             <div
@@ -262,7 +261,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { inject, onMounted, ref, watchEffect } from 'vue'
@@ -282,18 +281,6 @@
 
   const props = defineProps({
     getTemplateService: {
-      type: Function,
-      required: true
-    },
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
-    postCallbackUrlService: {
-      type: Function,
-      required: true
-    },
-    listIntegrationsService: {
       type: Function,
       required: true
     },

@@ -18,7 +18,11 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.nameInput).type(`${networkListName}`)
 
     cy.get(selectors.networkLists.typeDropdown).click()
-    cy.get(selectors.networkLists.typeDropdown).find('li').eq(1).should('have.text', 'Countries').click()
+    cy.get(selectors.networkLists.typeDropdown)
+      .find('li')
+      .eq(1)
+      .should('have.text', 'Countries')
+      .click()
 
     cy.get(selectors.networkLists.countriesMultiselect).click()
     cy.get(selectors.networkLists.countriesListOption(0)).click()
@@ -26,19 +30,11 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
     cy.get(selectors.networkLists.typeRow).should('have.text', 'Countries')
-  })
-
-  afterEach(() => {
-    // Delete the network list
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

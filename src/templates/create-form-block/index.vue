@@ -6,6 +6,7 @@
   import { useRouter } from 'vue-router'
   import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -37,10 +38,14 @@
     unSaved: {
       type: Boolean,
       default: true
+    },
+    disableToast: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const emit = defineEmits(['on-response', 'on-response-fail'])
+  const emit = defineEmits(['on-response', 'on-response-fail', 'onError'])
   const attrs = useAttrs()
   const { scrollToError } = useScrollToError()
 
@@ -71,8 +76,21 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
+    }
+
+    toast.add(options)
+  }
+
+  const showToastWithActions = (toastData) => {
+    const options = {
+      closable: true,
+      severity: 'success',
+      summary: 'Success',
+      detail: toastData.feedback,
+      additionalDetails: toastData?.additionalFeedback,
+      action: toastData?.actions
     }
 
     toast.add(options)
@@ -86,15 +104,19 @@
     showToast('success', feedbackMessage)
   }
 
-  const redirectToUrl = (path) => {
-    router.push({ path })
+  const redirectToUrl = (path, params = {}) => {
+    router.push({ path, params, query: params })
   }
 
   const handleSuccess = (response) => {
-    emit('on-response', response)
+    emit('on-response', { ...response, showToastWithActions, redirectToUrl })
+    if (props.disableToast) {
+      router.go(-1)
+      return
+    }
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
-    redirectToUrl(response.urlToEditView)
+    redirectToUrl(response?.urlToEditView, response?.params)
   }
 
   const onSubmit = handleSubmit(
@@ -104,15 +126,29 @@
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
-        showToast('error', error)
-        emit('on-response-fail', error)
-        blockViewRedirection.value = true
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('on-response-fail', error.message[0] || error)
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
       scrollToError(errors)
     }
   )
+
+  defineExpose({
+    resetForm,
+    values,
+    showToastWithActions,
+    showFeedback,
+    redirectToUrl
+  })
 </script>
 
 <template>

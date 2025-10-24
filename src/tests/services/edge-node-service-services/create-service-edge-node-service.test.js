@@ -6,9 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   mock: {
     id: '123',
-    service: {
-      serviceId: '123'
-    },
+    serviceId: '123',
     variables: 'port=8080',
     name: 'X Edge Service'
   }

@@ -42,9 +42,10 @@ describe('ActivityHistoryServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -67,14 +68,18 @@ describe('ActivityHistoryServices', () => {
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
-      accountId: fixtures.activityHistory.accountId,
-      authorEmail: fixtures.activityHistory.authorEmail,
       type: fixtures.activityHistory.type,
-      authorName: fixtures.activityHistory.authorName,
-      userId: fixtures.activityHistory.userId,
       title: fixtures.activityHistory.title,
-      comment: fixtures.activityHistory.comment,
-      ts: 'February 23, 2024 at 06:07 PM'
+      data: [
+        { key: 'accountId', value: fixtures.activityHistory.accountId },
+        { key: 'authorEmail', value: fixtures.activityHistory.authorEmail },
+        { key: 'authorName', value: fixtures.activityHistory.authorName },
+        { key: 'comment', value: fixtures.activityHistory.comment },
+        { key: 'title', value: fixtures.activityHistory.title },
+        { key: 'type', value: fixtures.activityHistory.type },
+        { key: 'userId', value: fixtures.activityHistory.userId }
+      ],
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

@@ -40,6 +40,10 @@
     nameField: {
       type: String,
       required: true
+    },
+    isRequired: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -83,10 +87,17 @@
 <template>
   <div :class="['flex flex-col gap-2', classStateRoot]">
     <label
-      class="text-color text-base font-medium leading-5"
+      class="text-color text-base font-medium leading-5 flex gap-1 align-items-center"
       :data-testid="customTestId.label"
     >
       {{ props.label }}
+      <div
+        v-if="props.isRequired"
+        class="text-sm text-orange-500 flex gap-1"
+      >
+        *
+        <span class="text-[0.625rem] text-color-secondary">(Required)</span>
+      </div>
     </label>
     <div
       class="flex"

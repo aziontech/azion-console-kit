@@ -1,28 +1,31 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Functions" />
+      <PageHeadingBlock pageTitle="Functions" />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeFunctionsService"
+        :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
-        addButtonLabel="Edge Function"
-        createPagePath="edge-functions/create?origin=list"
-        editPagePath="edge-functions/edit"
+        addButtonLabel="Function"
+        createPagePath="functions/create?origin=list"
+        editPagePath="functions/edit"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No edge functions found."
+        emptyListMessage="No Functions found."
         :actions="actions"
+        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
-        title="No functions have been created"
-        description="Click the button below to create your first function."
-        createButtonLabel="Edge Function"
-        createPagePath="edge-functions/create"
+        title="No Functions have been created"
+        description="Click the button below to create your first Function."
+        createButtonLabel="Function"
+        createPagePath="functions/create"
+        @click-to-create="handleCreateTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -37,23 +40,16 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -61,12 +57,22 @@
   })
 
   let hasContentToList = ref(true)
+  const EDGE_FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'runtime',
+    'vendor',
+    'execution_environment',
+    'reference_count',
+    'last_editor'
+  ]
   const actions = [
     {
       type: 'delete',
-      title: 'edge function',
+      title: 'Function',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeFunctionsService
+      service: edgeFunctionService.deleteEdgeFunctionService
     }
   ]
 
@@ -83,6 +89,12 @@
   }
 
   const getColumns = computed(() => [
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
     {
       field: 'name',
       header: 'Name',
@@ -104,9 +116,23 @@
       header: 'Ref. Count'
     },
     {
-      field: 'language',
+      field: 'vendor',
+      header: 'Vendor',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: {
+            text: columnData || '-',
+            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
+          },
+          columnAppearance: 'text-with-icon'
+        })
+      }
+    },
+    {
+      field: 'runtime',
       header: 'Language',
-      filterPath: 'language.content',
+      filterPath: 'runtime.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -116,17 +142,12 @@
       }
     },
     {
-      field: 'initiatorType',
+      field: 'executionEnvironment',
       header: 'Initiator Type'
     },
     {
       field: 'lastEditor',
       header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      sortField: 'lastModifiedDate',
-      header: 'Last Modified'
     },
     {
       field: 'status',

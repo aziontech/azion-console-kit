@@ -4,6 +4,7 @@ import FORM_FIELDS_SELECTORS from './selectors/block-selectors/form-fields-block
 import MENU_SIDEBAR_SELECTORS from './selectors/block-selectors/menu-sidebar.js'
 import MENU_ACCOUNT_SELECTORS from './selectors/block-selectors/menu-account.js'
 import TEAMS_BLOCK_SELECTORS from './selectors/block-selectors/teams-block.js'
+import HEADER_BLOCK_SELECTORS from './selectors/block-selectors/header-block.js'
 
 // Views
 import LOGIN_VIEW_SELECTORS from './selectors/view-selectors/login.js'
@@ -28,12 +29,19 @@ import DOMAINS_PRODUCT_SELECTORS from './selectors/product-selectors/domains.js'
 import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selectors/digital-certificates.js'
 import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
 import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
-
+import WAF_TUNING_PRODUCT_SELECTORS from './selectors/product-selectors/waf-tuning.js'
+import REAL_TIME_EVENTS_SELECTORS from './selectors/product-selectors/real-time-events.js'
+import WORKLOAD_SELECTORS from './selectors/product-selectors/workload.js'
+import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.js'
+import EDGE_CONNECTOR_SELECTORS from './selectors/product-selectors/edge-connectors.js'
+import EDGE_SQL_SELECTORS from './selectors/product-selectors/edge-sql.js'
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
+  wafTuning: WAF_TUNING_PRODUCT_SELECTORS,
   form: FORM_FIELDS_SELECTORS,
   login: LOGIN_VIEW_SELECTORS,
+  header: HEADER_BLOCK_SELECTORS,
   menuSidebar: MENU_SIDEBAR_SELECTORS,
   menuAccount: MENU_ACCOUNT_SELECTORS,
   activityHistory: ACTIVITY_HISTORY_VIEW_SELECTORS,
@@ -54,7 +62,12 @@ const selectors = {
   digitalCertificates: DIGITAL_CERTIFICATES_PRODUCT_SELECTORS,
   purge: EDGE_PURGE_PRODUCT_SELECTORS,
   usersManagement: USERS_MANAGEMENT_VIEW_SELECTORS,
-  teams: TEAMS_BLOCK_SELECTORS
+  teams: TEAMS_BLOCK_SELECTORS,
+  realTimeEvents: REAL_TIME_EVENTS_SELECTORS,
+  workload: WORKLOAD_SELECTORS,
+  customPages: CUSTOM_PAGES_SELECTORS,
+  edgeConnector: EDGE_CONNECTOR_SELECTORS,
+  edgeSQL: EDGE_SQL_SELECTORS
 }
 
 export default selectors

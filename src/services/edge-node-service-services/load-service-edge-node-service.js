@@ -1,17 +1,21 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadServiceEdgeNodeService = async ({ id, edgeNodeId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeNodeBaseUrl()}/${edgeNodeId}/services/${id}`,
     method: 'GET'
   })
-
   httpResponse = adapt(httpResponse, id)
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse, id) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   let variables = ''
 
   if (httpResponse.body.variables?.length) {
@@ -20,11 +24,7 @@ const adapt = (httpResponse, id) => {
 
   const service = {
     id: id,
-    service: {
-      name: httpResponse.body.service_name,
-      serviceId: httpResponse.body.service_id,
-      id: httpResponse.body.id
-    },
+    serviceId: httpResponse.body.service_id,
     variables: variables
   }
 

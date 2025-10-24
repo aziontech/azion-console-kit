@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import convertGQL from '@/helpers/convert-gql'
+import { convertGQL } from '@/helpers/convert-gql'
 
 const fixtures = {
   table: {
@@ -28,7 +28,8 @@ describe('convertGQL', () => {
           { value: 'value3', label: 'test1' },
           { value: 'value4', label: 'test2' }
         ]
-      }
+      },
+      fields: [{ valueField: 'value2', operator: 'Eq', value: 'value2' }]
     }
 
     const { sut } = makeSut()
@@ -40,7 +41,8 @@ describe('convertGQL', () => {
         and_field2: 'value2',
         in_field3: ['value3', 'value4'],
         tsRange_begin: '2022-01-01',
-        tsRange_end: '2022-01-31'
+        tsRange_end: '2022-01-31',
+        and_value2Eq: 'value2'
       }
     })
   })

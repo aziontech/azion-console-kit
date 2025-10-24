@@ -1,11 +1,21 @@
 import { getRedirectRoute } from '@/helpers'
+import { handleCLIRedirect } from '@/helpers/redirect-cli'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export function redirectGuard(to, next, router) {
+export async function redirectGuard({ to, router }) {
   if (to.name === 'home') {
+    const redirectUrl = await handleCLIRedirect()
+
+    if (redirectUrl) {
+      window.location.href = redirectUrl
+      return false
+    }
+
     const redirectRoute = getRedirectRoute(router)
     if (redirectRoute) {
-      return next(redirectRoute)
+      return redirectRoute
     }
+
+    return true
   }
 }

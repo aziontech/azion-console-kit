@@ -19,7 +19,8 @@ const adapt = (payload) => {
     name: payload.name,
     hashId: payload.hashId,
     groups,
-    status: payload.status
+    status: payload.status,
+    has_services: payload.hasServices
   }
 }
 

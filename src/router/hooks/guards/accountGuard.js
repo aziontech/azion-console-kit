@@ -1,36 +1,25 @@
-import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
-import { loadAccountJobRoleService } from '@/services/account-settings-services'
-import { useAccountStore } from '@/stores/account'
+import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
+import { clearCacheSensitive } from '@/services/v2/base/query/queryClient'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function accountGuard(to, next) {
-  const accountStore = useAccountStore()
-  const isPrivateRoute = !to.meta.isPublic
+export async function accountGuard({ to, accountStore, tracker }) {
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
+  const isPrivateRoute = !to.meta.isPublic
 
-  if (userNotIsLoggedIn && isPrivateRoute) {
-    try {
-      const [accountInfo, userInfo, accountJobRole] = await Promise.all([
-        getAccountInfoService(),
-        getUserInfoService(),
-        loadAccountJobRoleService()
-      ])
-
-      accountInfo.is_account_owner = userInfo.results.is_account_owner
-      accountInfo.client_id = userInfo.results.client_id
-      accountInfo.timezone = userInfo.results.timezone
-      accountInfo.utc_offset = userInfo.results.utc_offset
-      accountInfo.permissions = userInfo.results.permissions
-      accountInfo.email = userInfo.results.email
-      accountInfo.user_id = userInfo.results.id
-      accountInfo.colorTheme = accountStore.theme
-      accountInfo.jobRole = accountJobRole.jobRole
-
-      accountStore.setAccountData(accountInfo)
-    } catch {
-      setRedirectRoute(to)
-      return next('/login')
+  if (userNotIsLoggedIn) {
+    if (isPrivateRoute) {
+      try {
+        await loadUserAndAccountInfo()
+        if (to.meta.isPublic) {
+          return '/'
+        }
+      } catch {
+        setRedirectRoute(to)
+        await tracker.reset()
+        await clearCacheSensitive()
+        return '/login'
+      }
     }
   }
 }

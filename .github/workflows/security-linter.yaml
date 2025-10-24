@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - dev
+      - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 
 env:
@@ -20,13 +21,13 @@ jobs:
       image: node:18-alpine3.18
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install SO deps
         run: apk add curl bash git
 
       - name: Install dependencies
         run: yarn ci
-        
+
       - name: Run security-linter
         run: yarn security-check

@@ -6,6 +6,9 @@
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
+  import customPagesGif from '@/assets/images/customPages.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -18,26 +21,18 @@
     listOriginsService: {
       type: Function,
       required: true
-    },
-    editErrorResponsesService: {
-      type: Function,
-      required: true
-    },
-    loadErrorResponsesService: {
-      type: Function,
-      required: true
     }
   })
 
   const editService = async (payload) => {
-    return await props.editErrorResponsesService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    return await edgeAppErrorResponseService.editEdgeApplicationErrorResponseService(
+      payload,
+      props.edgeApplicationId
+    )
   }
 
   const loadService = async (payload) => {
-    return await props.loadErrorResponsesService({
+    return await edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -91,28 +86,47 @@
 </script>
 
 <template>
-  <EditFormBlock
-    :editService="editService"
-    :loadService="loadService"
-    :schema="validationSchema"
-    isTabs
-    @on-edit-success="handleTrackSuccessEdit"
-    @on-edit-fail="handleTrackFailedToEdit"
-    disableRedirect
+  <div v-if="hasFlagBlockApiV4()">
+    <EditFormBlock
+      :editService="editService"
+      :loadService="loadService"
+      :schema="validationSchema"
+      isTabs
+      @on-edit-success="handleTrackSuccessEdit"
+      @on-edit-fail="handleTrackFailedToEdit"
+      disableRedirect
+    >
+      <template #form="{ errors }">
+        <FormFieldsErrorResponses
+          :edgeApplicationId="edgeApplicationId"
+          :listOriginsService="props.listOriginsService"
+          :errors="errors"
+        />
+      </template>
+      <template #action-bar="{ onSubmit, loading }">
+        <ActionBarBlockWithTeleport
+          @onSubmit="onSubmit"
+          @onCancel="gotToList"
+          :loading="loading"
+        />
+      </template>
+    </EditFormBlock>
+  </div>
+  <div
+    v-else
+    class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex flex-col xl:flex-row items-center xl:items-start justify-center lg:px-8 lg:py-16 max-w-screen-2xl-test mx-auto w-full"
   >
-    <template #form="{ errors }">
-      <FormFieldsErrorResponses
-        :edgeApplicationId="edgeApplicationId"
-        :listOriginsService="props.listOriginsService"
-        :errors="errors"
+    <div class="flex-col gap-4 text-center items-center justify-center">
+      <div class="text-xl font-medium">Error Responses is now Custom Pages!</div>
+      <div class="text-sm text-color-secondary">
+        All settings that were previously made in Error Responses will now be made in the new Custom
+        Pages menu.
+      </div>
+      <img
+        class="mt-8"
+        :src="customPagesGif"
+        alt="Error Responses to Custom Pages"
       />
-    </template>
-    <template #action-bar="{ onSubmit, loading }">
-      <ActionBarBlockWithTeleport
-        @onSubmit="onSubmit"
-        @onCancel="gotToList"
-        :loading="loading"
-      />
-    </template>
-  </EditFormBlock>
+    </div>
+  </div>
 </template>

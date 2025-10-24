@@ -1,7 +1,7 @@
 <template>
   <form
     @submit.prevent="validateCode()"
-    class="max-sm:min-h-[calc(100vh-120px)]"
+    class="max-sm:min-h-[calc(100vh-120px)] justify-center items-center"
   >
     <div
       class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
@@ -22,6 +22,11 @@
           <div class="flex flex-wrap gap-1.5 sm:gap-4 mt-4">
             <InputText
               v-for="(digits, i) in digitsMfa"
+              @vue:mounted="
+                ({ el }) => {
+                  if (i === 0) autofocusInput(el)
+                }
+              "
               :key="i"
               maxlength="1"
               :disabled="isButtonLoading"
@@ -187,5 +192,10 @@
         ? new ProccessRequestError().message
         : new UserIsNotClientError().message
     }
+  }
+
+  const autofocusInput = (inputEl) => {
+    const inputElement = inputEl.querySelector('input') || inputEl
+    inputElement.focus()
   }
 </script>

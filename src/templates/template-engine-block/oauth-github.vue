@@ -5,21 +5,21 @@
     outlined
     icon="pi pi-github"
     iconPos="left"
-    :loading="loading"
+    :loading="props.loading"
   />
 </template>
 
 <script setup>
   import { ref, watch } from 'vue'
   import PrimeButton from 'primevue/button'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
 
   const emit = defineEmits(['onCallbackUrl'])
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
     loading: {
       type: Boolean,
       required: true
@@ -30,16 +30,20 @@
   const callbackUrl = ref('')
 
   const connectWithGithub = async () => {
-    const response = await props.listPlatformsService()
+    try {
+      const response = await vcsService.listPlatforms()
 
-    response.forEach((platform) => {
-      if (platform.id === 'github') {
-        githubInstallation.value = platform
-        callbackUrl.value = platform.callbackUrl
-      }
-    })
+      response.forEach((platform) => {
+        if (platform.id === 'github') {
+          githubInstallation.value = platform
+          callbackUrl.value = platform.callbackUrl
+        }
+      })
 
-    openPopupGithub()
+      openPopupGithub()
+    } catch (error) {
+      error.showErrors(toast)
+    }
   }
 
   const openPopupGithub = () => {

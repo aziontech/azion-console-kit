@@ -7,15 +7,17 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
+      :class="{ 'disabled-list': disabledList }"
       v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
+      :scrollHeight="props.scrollHeight"
       removableSort
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
-      rowHover
+      :rowHover="!disabledList"
       v-model:filters="filters"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -27,6 +29,8 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
+      :first="firstItemIndex"
+      :rowClass="stateClass"
     >
       <template
         #header
@@ -53,24 +57,16 @@
               />
             </span>
 
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
-
             <slot
               name="addButton"
               data-testid="data-table-add-button"
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -94,13 +90,13 @@
       />
 
       <Column
-        sortable
+        :sortable="!col.disableSort"
         v-for="col of selectedColumns"
         :key="col.field"
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        class="hover:cursor-pointer"
+        :class="{ 'hover:cursor-pointer': !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -110,6 +106,7 @@
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
+
           <template v-else>
             <component
               :is="col.component(extractFieldValue(rowData, col.field))"
@@ -118,24 +115,37 @@
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 13rem"
+        :headerStyle="`width: ${frozenSize}`"
+        :bodyStyle="classActions"
         data-testid="data-table-actions-column"
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+            <slot
+              name="actions-header"
+              :exportTableCSV="handleExportTableDataToCSV"
+            />
+            <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -149,7 +159,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: columns }]"
+                :options="[{ label: 'Available Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -176,6 +186,7 @@
               size="small"
               outlined
               v-bind="optionsOneAction(rowData)"
+              v-tooltip.top="getTooltipConfig(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
               data-testid="data-table-actions-column-body-action-button"
@@ -229,6 +240,7 @@
 
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -262,9 +274,11 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
+                size="small"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
               />
@@ -273,7 +287,6 @@
         </slot>
       </template>
       <Column
-        sortable
         v-for="col of columns"
         :key="col.field"
         :field="col.field"
@@ -300,7 +313,7 @@
   import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
@@ -317,8 +330,18 @@
   ])
 
   const props = defineProps({
+    disabledList: {
+      type: Boolean
+    },
+    disabledAddButton: {
+      type: Boolean
+    },
     hiddenHeader: {
       type: Boolean
+    },
+    frozenSize: {
+      type: String,
+      default: () => '13rem'
     },
     columns: {
       type: Array,
@@ -349,9 +372,17 @@
       required: true,
       type: Function
     },
+    scrollHeight: {
+      type: String,
+      default: () => ''
+    },
     enableEditClick: {
       type: Boolean,
       default: true
+    },
+    enableEditCustomRedirect: {
+      type: Boolean,
+      default: false
     },
     reorderableRows: {
       type: Boolean
@@ -391,26 +422,34 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    isLoading: {
+      type: Boolean,
+      default: () => false
     }
   })
-
+  const firstItemIndex = ref(0)
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
+  const classActions = isRenderActions
+    ? ''
+    : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-  const isLoading = ref(false)
+  const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
@@ -431,6 +470,20 @@
     selectedColumns.value = props.columns
   })
 
+  const stateClass = (data) => {
+    if (data?.focus) {
+      return 'transition-colors duration-1000 animate-highlight-fade'
+    }
+  }
+
+  const formatSummaryToCSV = (summary) => {
+    const summaryValue = summary
+      .map((item) => `${item.key}: ${item.value.toString().replace(/"/g, '""')}`)
+      .join(' | ')
+    const csvString = `"${summaryValue}"`
+
+    return csvString
+  }
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -439,6 +492,10 @@
       return
     }
     const columnMapper = props.csvMapper(rowData)
+    if (rowData.field === 'summary') {
+      const values = [...columnMapper.summary]
+      columnMapper.summary = formatSummaryToCSV(values)
+    }
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 
@@ -485,20 +542,19 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
-                }
-                openDialog(DeleteDialog, bodyDelete)
+              if (action.tryExecuteCommand && !action.tryExecuteCommand(rowData)) {
+                return
               }
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  opt.data.updated && reload()
+                }
+              })
               break
             case 'action':
               action.commandAction(rowData)
@@ -524,13 +580,17 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'error',
-          detail: errorMessage
-        })
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          const errorMessage = error.message || error
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'error',
+            detail: errorMessage
+          })
+        }
       } finally {
         isLoading.value = false
       }
@@ -552,8 +612,11 @@
 
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
+
     if (props.editInDrawer) {
       props.editInDrawer(item)
+    } else if (props.enableEditCustomRedirect) {
+      emit('on-row-click-edit-redirect', item)
     } else if (props.enableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
@@ -565,18 +628,40 @@
   }
 
   const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    return {
-      icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+    const [firstAction] = actionOptions(rowData) || []
+
+    if (!firstAction) {
+      return {
+        icon: '',
+        tooltip: '',
+        disabled: true
+      }
     }
+
+    const { icon, tooltip, disabled } = firstAction
+
+    return {
+      icon,
+      tooltip,
+      disabled
+    }
+  }
+
+  const getTooltipConfig = (rowData) => {
+    const actionOptions = optionsOneAction(rowData)
+    return actionOptions.tooltip ? { value: actionOptions.tooltip, showDelay: 200 } : null
   }
 
   const reload = (query = {}) => {
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 0
+    firstItemIndex.value = FIRST_NUMBER_PAGE
+  }
+
+  defineExpose({ reload, handleExportTableDataToCSV, data, updateDataTablePagination })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -594,6 +679,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
+    firstItemIndex.value = event.first
   }
 
   const filterBy = computed(() => {
@@ -608,3 +694,12 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style scoped>
+  /* Style for row hover when disabledList is true */
+  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
+    .p-frozen-column {
+      background: var(--surface-section) !important;
+    }
+  }
+</style>

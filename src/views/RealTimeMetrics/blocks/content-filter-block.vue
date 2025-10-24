@@ -1,20 +1,13 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import advancedFilter from '@/templates/advanced-filter'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
   import { GetRelevantField } from '@/modules/real-time-metrics/filters'
+  import { FILTERS_RULES } from '@/helpers'
 
-  const {
-    getDatasetAvailableFilters,
-    infoAvailableFiltersCurrent,
-    getIsLoadingFilters,
-    dashboardCurrent,
-    currentFilters
-  } = props.moduleGetters
-
-  const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
-    props.moduleActions
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const emit = defineEmits(['clearHash'])
   const props = defineProps({
@@ -47,6 +40,17 @@
       required: true
     }
   })
+
+  const {
+    getDatasetAvailableFilters,
+    infoAvailableFiltersCurrent,
+    getIsLoadingFilters,
+    dashboardCurrent,
+    currentFilters
+  } = props.moduleGetters
+  const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
+    props.moduleActions
+
   const refAdvancedFilter = ref('')
 
   const disabledFilter = computed(() => {
@@ -84,7 +88,7 @@
         }))
       }
     })
-    sortFields(newOptions)
+    FILTERS_RULES().sortFields(newOptions)
     return newOptions
   })
 
@@ -136,26 +140,21 @@
     }
   })
 
-  const sortFields = (fields) => {
-    const notRelevant = -1
-    fields.sort((fieldA, fieldB) => {
-      if (fieldA.mostRelevant === notRelevant && fieldB.mostRelevant !== notRelevant) {
-        return 1
-      }
-
-      if (fieldA.mostRelevant !== notRelevant && fieldB.mostRelevant === notRelevant) {
-        return -1
-      }
-
-      if (fieldA.mostRelevant !== fieldB.mostRelevant) {
-        return fieldA.mostRelevant - fieldB.mostRelevant
-      }
-
-      return fieldA.label.localeCompare(fieldB.label)
-    })
+  const clickedAppliedFilterOnRealTimeMetrics = () => {
+    const payload = {
+      section: props.groupData.current.value,
+      page: props.groupData.currentPage.label
+    }
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName: 'Applied Filter on Real-Time Metrics',
+        payload
+      })
+      .track()
   }
 
   const applyFilter = async (filter) => {
+    clickedAppliedFilterOnRealTimeMetrics()
     resetFilters()
 
     filter?.forEach((item) => {
@@ -190,9 +189,21 @@
         return
       }
 
+      if (item.type === 'StringObject') {
+        createAndFilter({
+          [field]: {
+            value: item.value.value,
+            meta: {
+              inputType: 'String'
+            }
+          }
+        })
+        return
+      }
+
       createAndFilter({
         [field]: {
-          value: item.value,
+          value: item.type !== 'Boolean' ? item.value : item.value.value,
           meta: {
             inputType: item.type
           }
@@ -205,8 +216,10 @@
 
   watch(
     () => currentDashboard.value,
-    async () => {
-      refAdvancedFilter.value.clearDisplayFilter()
+    async (newVal, oldVal) => {
+      if (newVal.dataset !== oldVal.dataset) {
+        refAdvancedFilter.value.clearDisplayFilter()
+      }
     }
   )
 </script>

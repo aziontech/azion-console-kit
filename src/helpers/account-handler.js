@@ -1,5 +1,6 @@
 import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
+import { clearAllCache } from '@/services/v2/base/query/queryClient'
 
 export class AccountHandler {
   constructor(switchAccountService, listTypeAccountService) {
@@ -51,6 +52,7 @@ export class AccountHandler {
    * @param {string} accountId - Account ID
    */
   async switchAccountAndRedirect(accountId) {
+    await clearAllCache()
     const { firstLogin } = await this.switchAccountService(accountId)
 
     if (firstLogin) {
@@ -83,7 +85,7 @@ export class AccountHandler {
    * @param {function} refreshService - The function that refreshes the service.
    * @return {string | object} The URL string or object to redirect to.
    */
-  async switchAccountFromSocialIdp(verifyService, refreshService) {
+  async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 
@@ -91,7 +93,7 @@ export class AccountHandler {
         return '/login'
       }
 
-      if (twoFactor) {
+      if (twoFactor && !EnableSocialLogin) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         return `/mfa/${mfaRoute}`
       }

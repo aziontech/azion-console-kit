@@ -14,7 +14,7 @@
       <li
         v-for="item in props.items"
         :key="item.label"
-        class="p-4 surface-border border p-0 m-0"
+        class="p-4 surface-border border m-0"
       >
         <p>
           <small class="font-semibold">{{ item.label }}</small>

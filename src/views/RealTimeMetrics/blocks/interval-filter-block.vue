@@ -2,7 +2,7 @@
   import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch, inject } from 'vue'
 
   const props = defineProps({
     moduleActions: {
@@ -20,8 +20,15 @@
     userUTC: {
       type: String,
       required: true
+    },
+    groupData: {
+      type: Object,
+      required: true
     }
   })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const { setTimeRange } = props.moduleActions
 
@@ -62,6 +69,36 @@
   const classError = computed(() => {
     return hasError.value ? 'p-invalid' : ''
   })
+
+  const clickedOnTimeRangerRealTimeMetrics = () => {
+    const payload = {
+      product: 'Real-Time Metrics',
+      section: props.groupData.current.value,
+      page: props.groupData.currentPage.label,
+      option: interval.value.code === 'custom' ? 'none' : interval.value.name
+    }
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName: 'Clicked on Time Range',
+        payload
+      })
+      .track()
+  }
+
+  const clickedOnDatePickerRealTimeMetrics = () => {
+    const payload = {
+      product: 'Real-Time Metrics',
+      section: props.groupData.current.value,
+      page: props.groupData.currentPage.label,
+      option: interval.value.code === 'custom' ? 'none' : interval.value.name
+    }
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName: 'Clicked on Date Picker',
+        payload
+      })
+      .track()
+  }
 
   const updateCurrentTime = () => {
     const max = new Date().removeSelectedAmountOfHours(0)
@@ -145,6 +182,7 @@
   }
 
   const showCalendar = () => {
+    clickedOnDatePickerRealTimeMetrics()
     isVisibleCalendar.value = false
   }
 
@@ -178,6 +216,7 @@
         :options="intervalOptions"
         optionLabel="name"
         @change="dropdownChange"
+        @click="clickedOnTimeRangerRealTimeMetrics()"
         :loading="disabledFilter"
         :disabled="disabledFilter"
         data-testid="real-time-metrics__interval-filter-block__dropdown"

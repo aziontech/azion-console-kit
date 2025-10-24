@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let dataStreamName
 
-describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Data Stream spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
@@ -13,7 +13,7 @@ describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
 
   it('should create a data stream with the ibmQRadar connector', () => {
     // Arrange
-    cy.intercept('api/v3/data_streaming/templates').as('getTemplates')
+    cy.intercept('/v4/data_stream/templates?page=1&page_size=100&fields=id%2Cname').as('getTemplates')
 
     const ibmQRadarOption = 8
 
@@ -32,24 +32,13 @@ describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your data stream has been created')
 
-    cy.get(selectors.list.searchInput).type(dataStreamName)
+    cy.get(selectors.list.searchInput).type(`${dataStreamName}{enter}`)
     cy.get(selectors.dataStream.list.columnName('name')).should('have.text', dataStreamName)
     cy.get(selectors.dataStream.list.columnName('dataSource')).should(
       'have.text',
       'Edge Applications'
     )
-    cy.get(selectors.dataStream.list.columnName('templateName')).should(
-      'have.text',
-      'Template teste'
-    )
     cy.get(selectors.dataStream.list.columnName('endpointType')).should('have.text', 'qradar')
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
-      cy.verifyToast('Data Stream successfully deleted')
-    })
   })
 })

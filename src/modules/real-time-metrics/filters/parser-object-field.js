@@ -8,7 +8,7 @@ import { FILTERS_RULES } from '@/helpers'
  * @return {String} The field type.
  */
 const getTypeField = (name, typeName) => {
-  return FILTERS_RULES.FILTER_LIKE_TYPE[name] || typeName || 'String'
+  return FILTERS_RULES().FILTER_LIKE_TYPE[name] || typeName || 'String'
 }
 
 /**
@@ -22,8 +22,8 @@ export const formatFieldName = (text) => {
   if (words.length > 1) words.pop()
   const name = words.join('')
   const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  const label = FILTERS_RULES.FILTER_LIKE_ALIAS[text] || formattedWords.join(' ')
-  const group = FILTERS_RULES.FILTER_LIKE_ALIAS[text] || name
+  const label = FILTERS_RULES().FILTER_LIKE_ALIAS[text] || formattedWords.join(' ')
+  const group = FILTERS_RULES().FILTER_LIKE_ALIAS[text] || name
 
   return {
     label,

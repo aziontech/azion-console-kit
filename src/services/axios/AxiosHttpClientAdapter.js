@@ -11,7 +11,11 @@ import {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return httpResponse?.body || null
+      const { count = 0, body = null } = httpResponse
+
+      if (!count) return body
+
+      return { count, body }
     case 201:
       return 'Resource successfully created'
     case 202:
@@ -35,7 +39,7 @@ export const parseHttpResponse = (httpResponse) => {
 
 export class AxiosHttpClientAdapter {
   static async request(
-    { url, method, headers, body, signal },
+    { url, method, headers, body, signal, baseURL },
     axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)
   ) {
     let axiosResponse
@@ -46,7 +50,8 @@ export class AxiosHttpClientAdapter {
         method: method,
         headers: headers,
         data: body,
-        signal
+        signal,
+        ...(baseURL && { baseURL: baseURL })
       })
     } catch (error) {
       const axiosError = error

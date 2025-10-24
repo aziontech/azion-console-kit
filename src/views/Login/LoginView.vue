@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-60px-56px)] sm:py-20 pt-4 pb-8 px-3">
+  <div class="flex flex-col sm:py-20 pt-4 pb-8 px-3">
     <SignInBlock
       v-if="!showForgotPasswordStep"
       @goToForgotPassword="(value) => (showForgotPasswordStep = value)"
@@ -7,11 +7,11 @@
       :verifyLoginService="props.verifyLoginService"
       :refreshLoginService="props.refreshLoginService"
       :accountHandler="props.accountHandler"
-      :listSocialIdpsService="props.listSocialIdpsService"
     />
 
     <ForgotPassword
       v-if="showForgotPasswordStep"
+      @goToSignIn="showForgotPasswordStep = false"
       :sendResetPasswordEmailService="props.sendResetPasswordEmailService"
     />
   </div>
@@ -48,10 +48,6 @@
     accountHandler: {
       required: true,
       type: Object
-    },
-    listSocialIdpsService: {
-      required: true,
-      type: Function
     }
   })
 

@@ -7,7 +7,7 @@ import { listImageProcessor, loadImageProcessor } from './image-processor'
 import { listEdgeDNS, loadEdgeDNS } from './edge-dns'
 import { listTieredCache, loadTieredCache } from './tiered-cache'
 import { loadFieldsEventsData } from './load-fields-real-time-events-data'
-
+import { getTotalRecords } from './get-total-records'
 export {
   listActivityHistory,
   loadActivityHistory,
@@ -25,5 +25,6 @@ export {
   loadEdgeDNS,
   listTieredCache,
   loadTieredCache,
-  loadFieldsEventsData
+  loadFieldsEventsData,
+  getTotalRecords
 }

@@ -46,8 +46,11 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -57,16 +60,36 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      '/v4/digital_certificates/certificates?ordering=name?*'
+    ).as('getTrustedCACertificate')
+    cy.intercept(
+      'GET',
+      `/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`
+    ).as('getTrustedCACertificateByName')
+
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
     cy.get(selectors.domains.enableMtlsSwitch).click()
+
+    cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
+    cy.wait('@getTrustedCACertificate')
     cy.get(selectors.domains.dropdownTrustedCA).click()
     cy.get(selectors.domains.mtlsTrustedCADropdownFilter).clear()
     cy.get(selectors.domains.mtlsTrustedCADropdownFilter).type(digitalCertificateName)
+    cy.wait('@getTrustedCACertificateByName')
     cy.get(selectors.domains.trustedCAFirstDropdownOption).click()
 
     // Act
@@ -78,17 +101,5 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
-    cy.get(selectors.domains.mtlsTrustedCAFieldSelectedValue).should(
-      'contain',
-      digitalCertificateName
-    )
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

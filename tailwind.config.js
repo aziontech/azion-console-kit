@@ -22,20 +22,12 @@ export default {
         'orange-base': '#F3652B'
       },
       backgroundColor: {
-        'orange-bullet': '#F3652B',
-        'scale-red': '#ff7c75',
-        'scale-orange': '#fa9e64',
-        'scale-yellow': '#f0ca5b',
-        'scale-green': '#6bd690'
+        'orange-bullet': '#F3652B'
       },
       borderColor: {
         header: '#3e3e3e',
         'header-hover': '#F3652B',
-        'radio-card-active': '#F3652B',
-        'scale-red': '#ff7c75',
-        'scale-orange': '#fa9e64',
-        'scale-yellow': '#f0ca5b',
-        'scale-green': '#6bd690'
+        'radio-card-active': '#F3652B'
       },
       textColor: {
         header: '#b5b5b5',
@@ -58,9 +50,15 @@ export default {
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
-        slideDown: 'slideDown 220ms ease-in-out'
+        slideDown: 'slideDown 220ms ease-in-out',
+        blink: 'blink 1.4s infinite both',
+        'highlight-fade': 'highlight ease-in forwards',
       },
       keyframes: {
+        highlight: {
+          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500'},
+          '100%': { backgroundColor: 'var(--surface-hover)',  fontWeight: '500'}
+        },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' }
@@ -72,6 +70,10 @@ export default {
         slideDown: {
           '0%': { height: '0' },
           '100%': { height: 'auto' }
+        },
+        blink: {
+          '0%, 100% ': { opacity: '0.2' },
+          '20%': { opacity: '1' }
         }
       }
     }

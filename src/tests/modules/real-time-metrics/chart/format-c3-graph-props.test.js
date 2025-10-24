@@ -28,7 +28,7 @@ describe('RealTimeMetricsModule', () => {
           x: 'ts',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE,
           type: 'line',
-          xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+          xFormat: '%Y-%m-%dT%H:%M:%SZ',
           names: {
             serieTest1: 'Serie Test 1 - 6100T/s',
             serieTest2: 'Serie Test 2 - 650T/s',
@@ -125,7 +125,7 @@ describe('RealTimeMetricsModule', () => {
           x: 'ts',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE_PER_SERIES,
           type: 'bar',
-          xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+          xFormat: '%Y-%m-%dT%H:%M:%SZ',
           names: {
             serieTest1: 'Serie Test 1 - 406,666,666,666,666.70%',
             'Mean Line - Serie Test 1': 'Mean Line - Serie Test 1 - 27,111,111,111,111.12%',
@@ -235,7 +235,7 @@ describe('RealTimeMetricsModule', () => {
           x: 'ts',
           columns: FIXTURES.RESULTS,
           type: 'spline',
-          xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+          xFormat: '%Y-%m-%dT%H:%M:%SZ',
           names: {
             serieTest1: 'Serie Test 1 - 6.1KTb/s',
             serieTest2: 'Serie Test 2 - 650.0Tb/s',

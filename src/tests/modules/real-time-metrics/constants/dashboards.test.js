@@ -16,7 +16,7 @@ describe('RealTimeMetricsModule', () => {
           pagesDashboards: [
             {
               id: 1,
-              label: 'Edge Applications',
+              label: 'Applications',
               path: 'edge-applications',
               groupId: 1,
               dashboards: [
@@ -43,6 +43,12 @@ describe('RealTimeMetricsModule', () => {
                   label: 'Bandwidth Saving',
                   path: 'bandwidth-saving',
                   dataset: 'httpMetrics'
+                },
+                {
+                  dataset: 'httpBreakdownMetrics',
+                  id: '357549179454620240',
+                  label: 'Request Breakdown',
+                  path: 'request-breakdown'
                 }
               ]
             },
@@ -62,7 +68,7 @@ describe('RealTimeMetricsModule', () => {
             },
             {
               id: 3,
-              label: 'Edge Functions',
+              label: 'Functions',
               path: 'edge-functions',
               groupId: 1,
               dashboards: [
@@ -125,7 +131,7 @@ describe('RealTimeMetricsModule', () => {
             },
             {
               id: 9,
-              label: 'Bot Manager Advanced',
+              label: 'Bot Manager',
               path: 'bot-manager-advanced',
               groupId: 2,
               dashboards: [
@@ -134,6 +140,26 @@ describe('RealTimeMetricsModule', () => {
                   label: 'Overview',
                   path: 'overview',
                   dataset: 'botManagerMetrics'
+                },
+                {
+                  id: '659868342290523846',
+                  label: 'Breakdown',
+                  path: 'breakdown',
+                  dataset: 'botManagerBreakdownMetrics'
+                }
+              ]
+            },
+            {
+              id: 10,
+              label: 'Threats Breakdown',
+              path: 'threats',
+              groupId: 2,
+              dashboards: [
+                {
+                  id: '357548675837198934',
+                  label: 'Threats Breakdown',
+                  path: 'breakdown',
+                  dataset: 'httpBreakdownMetrics'
                 }
               ]
             }

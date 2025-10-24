@@ -3,7 +3,8 @@ import {
   SignInTracker,
   CreateTracker,
   ProductTracker,
-  WafRulesTracker
+  WafRulesTracker,
+  RealTimeMetricsTracker
 } from './trackers'
 
 /**
@@ -35,6 +36,8 @@ export class AnalyticsTrackerAdapter {
   #productTracker = null
   /** @type {WafTracker} */
   #wafRulesTracker = null
+  /** @type {RealTimeMetricsTracker} */
+  #realTimeMetricsTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -49,6 +52,7 @@ export class AnalyticsTrackerAdapter {
     this.#createTracker = new CreateTracker(this)
     this.#productTracker = new ProductTracker(this)
     this.#wafRulesTracker = new WafRulesTracker(this)
+    this.#realTimeMetricsTracker = new RealTimeMetricsTracker(this)
   }
 
   /**
@@ -84,9 +88,21 @@ export class AnalyticsTrackerAdapter {
    * @return {Promise<void>}
    */
   async identify(id) {
-    if (!id || !this.#hasAnalytics()) return
+    const userId = `${id}`
+    if (!userId || !this.#hasAnalytics()) return
 
-    await this.#analyticsClient.identify(id, this.#traits)
+    await this.#analyticsClient.identify(userId, this.#traits)
+  }
+
+  /**
+   * Resets the internal state of the tracker, including any queued events and traits.
+   */
+  reset() {
+    this.#events = []
+    this.#traits = {}
+    if (this.#hasAnalytics()) {
+      this.#analyticsClient.reset()
+    }
   }
 
   /**
@@ -134,5 +150,12 @@ export class AnalyticsTrackerAdapter {
    */
   get wafRules() {
     return this.#wafRulesTracker
+  }
+
+  /**
+   * @return {RealTimeMetricsTracker}
+   */
+  get realTimeMetrics() {
+    return this.#realTimeMetricsTracker
   }
 }

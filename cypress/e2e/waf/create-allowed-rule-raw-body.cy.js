@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let wafName
 
-describe('WAF spec', { tags: ['@dev7'] }, () => {
+describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('WAF Rules')
@@ -49,7 +49,7 @@ describe('WAF spec', { tags: ['@dev7'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your waf rule allowed has been created')
 
-    cy.get(selectors.list.searchInput).type(fixtures.ruleId)
+    cy.get(selectors.list.searchInput).type(`${fixtures.ruleId}{enter}`)
     cy.get(selectors.wafs.seeMore('ruleId')).click()
 
     cy.get(selectors.wafs.listRow('ruleId')).should('contain.text', fixtures.ruleId)
@@ -60,13 +60,6 @@ describe('WAF spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
     cy.get(selectors.wafs.breadcrumbToList).click()
-    cy.get(selectors.list.searchInput).type(wafName)
-  })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
   })
 })

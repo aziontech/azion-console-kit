@@ -1,26 +1,29 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'edge-firewall-view' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   const tracker = inject('tracker')
+  const EDGE_FIREWALL_API_FIELDS = [
+    'id',
+    'name',
+    'debug_rules',
+    'last_editor',
+    'last_modified',
+    'last_modify',
+    'active'
+  ]
 
   const props = defineProps({
-    listEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -30,30 +33,39 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      type: 'dialog',
+      label: 'Clone',
+      icon: 'pi pi-fw pi-clone',
+      dialog: {
+        component: CloneBlock,
+        body: (item) => ({
+          data: {
+            service: edgeFirewallService.cloneEdgeFirewallService,
+            itemType: 'Firewall',
+            ...item
+          }
+        })
+      }
+    },
+    {
+      label: 'Delete',
       type: 'delete',
-      title: 'edge firewall',
+      title: 'Firewall',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeFirewallService
+      service: edgeFirewallService.deleteEdgeFirewallService
     }
   ]
 
   const getColumns = computed(() => [
     {
-      field: 'name',
-      header: 'Name'
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
     },
     {
-      field: 'status',
-      header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
+      field: 'name',
+      header: 'Name'
     },
     {
       field: 'lastEditor',
@@ -61,8 +73,21 @@
     },
     {
       field: 'lastModify',
-      sortField: 'lastModifyDate',
+      sortField: 'last_modified',
       header: 'Last Modified'
+    },
+    {
+      field: 'active',
+      header: 'Status',
+      sortField: 'active',
+      filterPath: 'active',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     }
   ])
 
@@ -86,28 +111,30 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Firewalls"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Edge Firewall"
-        createPagePath="/edge-firewall/create"
-        editPagePath="/edge-firewall/edit"
-        :listService="listEdgeFirewallService"
+        addButtonLabel="Firewall"
+        createPagePath="/firewalls/create"
+        editPagePath="/firewalls/edit"
+        :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No edge firewall found."
+        emptyListMessage="No Firewalls found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
+        :apiFields="EDGE_FIREWALL_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
-        title="No edge firewall has been created."
-        description="Click the button below to create your first edge firewall."
-        createButtonLabel="Edge Firewall"
-        createPagePath="/edge-firewall/create"
+        title="No Firewalls has been created."
+        description="Click the button below to create your first Firewall."
+        createButtonLabel="Firewall"
+        createPagePath="/firewalls/create"
         :documentationService="props.documentationService"
         @click-to-create="handleTrackEvent"
       >

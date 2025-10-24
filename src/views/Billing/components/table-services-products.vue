@@ -1,5 +1,10 @@
 <template>
+  <SkeletonBlock
+    v-if="props.isLoading"
+    class="w-full sm:w-1/2 h-[200px]"
+  />
   <DataTable
+    v-else
     v-model:expandedRows="expandedRows"
     :value="props.listProduct"
     rowGroupMode="subheader"
@@ -28,6 +33,7 @@
       field="value"
       class="font-medium !text-sm"
       bodyStyle="text-align:right"
+      v-if="accountIsNotRegular"
     />
     <template #expansion="slotProps">
       <div class="p-0 m-0">
@@ -58,16 +64,25 @@
             field="price"
             :header="expansionColuns.price"
             bodyStyle="text-align:right"
+            v-if="accountIsNotRegular"
           />
         </DataTable>
       </div>
     </template>
   </DataTable>
 </template>
+
 <script setup>
   import { ref } from 'vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
+  import SkeletonBlock from '@/templates/skeleton-block'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+
+  const accountStore = useAccountStore()
+
+  const { accountIsNotRegular } = storeToRefs(accountStore)
 
   defineOptions({
     name: 'table-services-products'
@@ -77,6 +92,10 @@
     listProduct: {
       type: Array,
       required: true
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   })
 

@@ -15,6 +15,7 @@ const convertValueToDate = (value) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
     hour12: true
   }
   return date.toLocaleString('en-US', options)
@@ -27,7 +28,9 @@ const convertValueToDate = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUS = (value) => {
-  const date = new Date(value)
+  const [year, month, day] = value.split('-')
+
+  const date = new Date(year, month - 1, day)
 
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date')
@@ -146,11 +149,91 @@ const getCurrentMonthStartEnd = () => {
   }
 }
 
+const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
+  return new Intl.DateTimeFormat('us', {
+    dateStyle,
+    timeStyle,
+    timeZone: 'UTC'
+  }).format(new Date(dateString))
+}
+
+const formatDateToMonthYear = (date) => {
+  if (!date) return ''
+
+  const [year, month] = date.split('-') ?? []
+  if (year && month) return `${month}-${year}`
+
+  return []
+}
+
+const formatDateToDayMonthYearHour = (date) => {
+  if (!date) return null
+
+  return new Intl.DateTimeFormat('us', {
+    dateStyle: 'full',
+    timeStyle: 'medium'
+  }).format(new Date(date))
+}
+
+const getCurrentDateTimeIntl = () => {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(new Date())
+}
+
+const convertValueToDateByUserTimezone = (value, timezone) => {
+  const date = new Date(value)
+  const options = {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }
+  return date.toLocaleString('en-US', options)
+}
+
+/**
+ * Calculate remaining days between today and expiration date
+ * @param {string} dateStr - Date string in YYYY-MM-DD format
+ * @returns {number} Number of days remaining including today
+ */
+function getRemainingDays(dateStr) {
+  if (!dateStr || isNaN(Date.parse(dateStr))) return 0
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const expirationDate = new Date(year, month - 1, day)
+  expirationDate.setHours(0, 0, 0, 0)
+
+  const diffMs = expirationDate - today
+  if (diffMs < 0) return 0
+
+  const days = diffMs / (1000 * 60 * 60 * 24) + 1
+  return Math.floor(days)
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateMonthAndYear,
   formatDateToUS,
   formatDateToUSBilling,
-  getCurrentMonthStartEnd
+  getCurrentMonthStartEnd,
+  formatExhibitionDate,
+  formatDateToMonthYear,
+  convertValueToDateByUserTimezone,
+  formatDateToDayMonthYearHour,
+  getRemainingDays,
+  getCurrentDateTimeIntl
 }

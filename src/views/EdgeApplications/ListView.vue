@@ -4,23 +4,19 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useToast } from 'primevue/usetoast'
+  import { INFORMATION_TEXTS } from '@/helpers'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listEdgeApplicationsService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeApplicationService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -28,43 +24,80 @@
   })
 
   const hasContentToList = ref(true)
+  const toast = useToast()
   const actions = [
     {
+      type: 'dialog',
+      label: 'Clone',
+      icon: 'pi pi-fw pi-clone',
+      dialog: {
+        component: CloneBlock,
+        body: (item) => ({
+          data: {
+            ...item,
+            service: edgeAppService.cloneEdgeApplicationService,
+            itemType: 'Application',
+            name: item.name.text
+          }
+        })
+      }
+    },
+    {
       type: 'delete',
-      title: 'edge application',
+      label: 'Delete',
+      title: 'Application',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeApplicationService
+      service: edgeAppService.deleteEdgeApplicationService
     }
   ]
+
+  const showLockedMessage = () => {
+    const options = {
+      closable: true,
+      severity: 'warn',
+      summary: 'Warning',
+      detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+    }
+
+    toast.add(options)
+  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Edge Application'
+      productName: 'Application'
     })
   }
-  const handleTrackEditEvent = () => {
+
+  const handleTrackEditEvent = (edgeApplication) => {
     tracker.product.clickToEdit({
-      productName: 'Edge Application'
+      productName: 'Application'
     })
+
+    if (edgeApplication.isLocked) {
+      showLockedMessage()
+    }
   }
 
   const getColumns = computed(() => {
     return [
       {
-        field: 'name',
-        header: 'Name'
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
       },
       {
-        field: 'origins',
-        header: 'Origins',
+        field: 'name',
+        header: 'Name',
+        filterPath: 'name.text',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'expand-column'
+            columnAppearance: 'text-with-tag'
           })
         }
       },
@@ -74,42 +107,67 @@
       },
       {
         field: 'lastModify',
-        sortField: 'lastModifyDate',
+        sortField: 'lastModified',
         header: 'Last Modified'
+      },
+      {
+        field: 'active',
+        header: 'Status',
+        sortField: 'active',
+        filterPath: 'active',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
     ]
   })
+
+  const EDGE_APPLICATION_API_FIELDS = [
+    'id',
+    'name',
+    'last_editor',
+    'last_modified',
+    'last_modify',
+    'product_version',
+    'active'
+  ]
 </script>
 
 <template>
   <ContentBlock data-testid="edge-applications-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edge Applications"
+        pageTitle="Applications"
         data-testid="edge-applications-heading"
       />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create?origin=list"
-        editPagePath="/edge-applications/edit"
-        :listService="listEdgeApplicationsService"
+        addButtonLabel="Application"
+        createPagePath="/applications/create?origin=list"
+        editPagePath="/applications/edit"
+        :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
+        :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No edge applications found."
+        emptyListMessage="No applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
-        title="No edge applications have been created"
-        description="Click the button below to create your first edge application."
-        createButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create?origin=list"
+        title="No applications have been created"
+        description="Click the button below to create your first Application."
+        createButtonLabel="Application"
+        createPagePath="/applications/create?origin=list"
         :documentationService="props.documentationService"
         data-testid="edge-applications-empty-results-block"
       >

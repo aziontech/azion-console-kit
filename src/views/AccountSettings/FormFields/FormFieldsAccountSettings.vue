@@ -4,10 +4,19 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
+  import { useLoadingStore } from '@/stores/loading'
+  import { deleteAccountService } from '@/services/account-services/delete-account-service'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import PrimeButton from 'primevue/button'
   import { onMounted, ref, watch, computed } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { capitalizeFirstLetter } from '@/helpers'
+  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
 
   const props = defineProps({
     listCountriesService: {
@@ -24,6 +33,8 @@
     }
   })
 
+  const accountStore = useAccountStore()
+  const router = useRouter()
   const { value: accountName } = useField('accountName')
   const { value: clientId } = useField('clientId')
   const { value: companyName } = useField('companyName')
@@ -36,15 +47,23 @@
   const { value: address } = useField('address')
   const { value: complement } = useField('complement')
 
+  const ENTITY_DELETE_MESSAGE =
+    "This action permanently deletes this Personal Account and all associated data from Azion's platform. It cannot be undone."
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
+  const callbackUrl = ref('')
+  const isGithubConnectLoading = ref(false)
+  const integrationsList = ref([])
+  const oauthGithubRef = ref(null)
 
+  const { startLoading } = useLoadingStore()
+  const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
   const toast = useToast()
   const showToast = (summary, severity) => {
     const options = {
       severity,
-      summary,
+      summary: capitalizeFirstLetter(summary),
       closable: true
     }
 
@@ -62,8 +81,68 @@
     }
   }
 
-  onMounted(() => {
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
+  }
+
+  const saveIntegration = async (integration) => {
+    try {
+      isGithubConnectLoading.value = true
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
+      await loadListIntegrations()
+      showToast('GitHub integration connected successfully', 'success')
+    } catch (error) {
+      error.showWithOptions(toast, (error) => ({
+        summary: `Save failed ${error.detail}`,
+        severity: 'error'
+      }))
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
+      }
+    })
+  }
+
+  const loadListIntegrations = async () => {
+    try {
+      isGithubConnectLoading.value = true
+      const data = await vcsService.listIntegrations()
+      integrationsList.value = data
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Listing failed' })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const hasIntegrations = computed(() => {
+    if (integrationsList?.value?.length > 0) return true
+    return false
+  })
+
+  const removeGithubIntegration = async (integrationId) => {
+    try {
+      isGithubConnectLoading.value = true
+      await vcsService.deleteIntegration(integrationId)
+      await loadListIntegrations()
+      showToast('GitHub integration removed successfully', 'success')
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Remove failed' })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  onMounted(async () => {
     setCountriesOptions()
+    await loadListIntegrations()
+    listenerOnMessage()
   })
 
   const setRegionsOptions = async (countryId) => {
@@ -79,6 +158,28 @@
     } finally {
       regionsOptions.value.done = true
     }
+  }
+
+  const logout = () => {
+    startLoading()
+    window.location.href = '/logout'
+  }
+
+  const decorateDeleteService = async () => {
+    return await deleteAccountService(accountStore.account.id)
+  }
+
+  const openDeleteDialog = () => {
+    openDeleteDialogComposable({
+      title: 'Personal Account',
+      id: accountStore.account.id,
+      data: {
+        deleteConfirmationText: accountStore.account.full_name,
+        entityDeleteMessage: ENTITY_DELETE_MESSAGE
+      },
+      deleteService: decorateDeleteService,
+      successCallback: logout
+    })
   }
 
   const setCitiesOptions = async (regionId) => {
@@ -138,6 +239,10 @@
   const resetRegionAndCity = () => {
     region.value = ''
     city.value = ''
+  }
+
+  const navigateToMfaManagement = () => {
+    router.push('/mfa-management')
   }
 
   const hasNoCountryListOrNotSelected = computed(
@@ -338,6 +443,91 @@
           :options="switchOptions"
           data-testid="account-settings__login-settings"
         />
+      </div>
+      <div class="flex sm:max-w-lg">
+        <div>
+          <PrimeButton
+            label="Multi-Factor Authentication Management"
+            outlined
+            @click="navigateToMfaManagement"
+          />
+        </div>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="GitHub Integration"
+    description="Connect your GitHub account to enable repository integration and deployment features."
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-5 sm:max-w-lg">
+        <div v-show="!hasIntegrations">
+          <OAuthGithub
+            ref="oauthGithubRef"
+            @onCallbackUrl="
+              (uri) => {
+                setCallbackUrl(uri.value)
+              }
+            "
+            :loading="isGithubConnectLoading"
+          />
+        </div>
+        <div
+          v-if="hasIntegrations"
+          class="flex flex-col gap-4"
+        >
+          <div
+            v-for="integration in integrationsList"
+            :key="integration.value"
+            class="flex flex-col gap-2"
+          >
+            <label class="text-color text-base font-medium leading-5"> Connected Account </label>
+            <div class="flex items-center gap-3 p-4 surface-border border rounded-md">
+              <i class="pi pi-github text-2xl" />
+              <div class="flex-1">
+                <p class="text-color font-medium">{{ integration.label }}</p>
+                <small class="text-color-secondary">Integration active</small>
+              </div>
+              <PrimeButton
+                label="Remove"
+                severity="danger"
+                outlined
+                icon="pi pi-trash"
+                size="small"
+                :loading="isGithubConnectLoading"
+                @click="removeGithubIntegration(integration.value)"
+                data-testid="account-settings__remove-github-integration"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="Danger Zone"
+    severity="danger"
+    description="Actions in this area are irreversible and may permanently impact the account and its data. Proceed with caution."
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-5 sm:max-w-lg">
+        <div class="flex flex-col gap-2">
+          <label class="text-color text-base font-medium leading-5 flex gap-1 align-items-center">
+            Remove Personal Account
+          </label>
+          <small class="text-sm text-color-secondary font-normal leading-5">
+            This action permanently deletes this Personal Account and all associated data from
+            Azion's platform. It cannot be undone.
+          </small>
+        </div>
+        <div>
+          <PrimeButton
+            data-testid="account-settings__delete-account"
+            label="Delete account"
+            severity="danger"
+            @click="openDeleteDialog"
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>

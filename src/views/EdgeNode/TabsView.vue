@@ -48,7 +48,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Error',
         detail: error
       })
     }

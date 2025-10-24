@@ -42,9 +42,10 @@ describe('EdgeFunctionsConsoleServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -67,19 +68,23 @@ describe('EdgeFunctionsConsoleServices', () => {
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
-      configurationId: fixtures.edgeFunctionConsole.configurationId,
-      functionId: fixtures.edgeFunctionConsole.functionId,
-      id: fixtures.edgeFunctionConsole.id,
+      lineSource: fixtures.edgeFunctionConsole.lineSource,
       level: {
         content: 'Info',
-        severity: 'info',
-        icon: 'pi pi-info-circle'
+        icon: 'pi pi-info-circle',
+        severity: 'info'
       },
-      line: fixtures.edgeFunctionConsole.line,
-      lineSource: fixtures.edgeFunctionConsole.lineSource,
-      solutionId: fixtures.edgeFunctionConsole.solutionId,
-      source: fixtures.edgeFunctionConsole.source,
-      ts: 'February 23, 2024 at 06:07 PM'
+      data: [
+        { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
+        { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },
+        { key: 'id', value: '1234' },
+        { key: 'level', value: 'INFO' },
+        { key: 'line', value: fixtures.edgeFunctionConsole.line },
+        { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource },
+        { key: 'solutionId', value: fixtures.edgeFunctionConsole.solutionId },
+        { key: 'source', value: fixtures.edgeFunctionConsole.source }
+      ],
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

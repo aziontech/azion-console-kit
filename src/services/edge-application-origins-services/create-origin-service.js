@@ -23,6 +23,14 @@ const adapt = (payload) => {
     }
   }
 
+  if (payload.originType === 'live_ingest') {
+    return {
+      name: payload.name,
+      origin_type: payload.originType,
+      streaming_endpoint: payload.streamingEndpoint
+    }
+  }
+
   return {
     name: payload.name,
     origin_type: payload.originType,
@@ -46,9 +54,7 @@ const adapt = (payload) => {
     hmac_authentication: payload.hmacAuthentication,
     hmac_region_name: payload.hmacRegionName,
     hmac_access_key: payload.hmacAccessKey,
-    hmac_secret_key: payload.hmacSecretKey,
-    connection_timeout: payload.connectionTimeout,
-    timeout_between_bytes: payload.timeoutBetweenBytes
+    hmac_secret_key: payload.hmacSecretKey
   }
 }
 
@@ -95,7 +101,8 @@ const parseHttpResponse = (httpResponse, edgeApplicationId) => {
       return {
         feedback: 'Your origin has been created',
         originKey: httpResponse.body.results.origin_key,
-        urlToEditView: `/edge-applications/edit/${edgeApplicationId}/origins/edit/${httpResponse.body.results.origin_key}`
+        originId: httpResponse.body.results.origin_id,
+        urlToEditView: `/applications/edit/${edgeApplicationId}/origins/edit/${httpResponse.body.results.origin_key}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)

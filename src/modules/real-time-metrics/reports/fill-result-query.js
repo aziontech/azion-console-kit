@@ -21,7 +21,7 @@ function getTsRangeDifference(tsRange) {
  * @return {string} The determined query interval ('minute', 'day', or 'hour').
  */
 function getQueryInterval(tsRangeDifference) {
-  if (tsRangeDifference < TIME_INTERVALS.RESAMPLING_INTERVALS.THREE_DAYS) return 'minute'
+  if (tsRangeDifference < TIME_INTERVALS.RESAMPLING_INTERVALS.TWO_AND_A_HALF_DAYS) return 'minute'
   if (tsRangeDifference > TIME_INTERVALS.RESAMPLING_INTERVALS.SIXTY_DAYS) return 'day'
   return 'hour'
 }

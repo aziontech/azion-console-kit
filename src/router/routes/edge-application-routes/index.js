@@ -1,127 +1,109 @@
 import * as Helpers from '@/helpers'
-import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
-import * as FunctionsService from '@/services/edge-application-functions-services'
-import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
-import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
-import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
+import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
-  path: '/edge-applications',
-  name: 'edge-applications',
+  path: '/applications',
+  name: 'applications',
   children: [
     {
       path: '',
-      name: 'list-edge-applications',
+      name: 'list-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
-        listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
+        title: 'Applications',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
-            to: '/edge-applications'
+            label: 'Applications',
+            to: '/applications'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-application',
-      component: () => import('@views/EdgeApplications/CreateView.vue'),
-      props: {
-        createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService
+      name: 'create-application',
+      component: () =>
+        hasFlagBlockApiV4()
+          ? import('@views/EdgeApplications/V3/CreateView.vue')
+          : import('@views/EdgeApplications/CreateView.vue'),
+      props: () => {
+        const EdgeApplicationServices = useEdgeApplicationServices()
+
+        return {
+          createEdgeApplicationService: EdgeApplicationServices?.createEdgeApplicationService
+        }
       },
       meta: {
+        title: 'Create Application',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
-            to: '/edge-applications'
+            label: 'Applications',
+            to: '/applications'
           },
           {
-            label: 'Create Edge Application',
-            to: '/edge-applications/create'
+            label: 'Create Application',
+            to: '/applications/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
-      name: 'edit-edge-application',
+      name: 'edit-application',
       component: () => import('@views/EdgeApplications/TabsView.vue'),
-      props: {
-        edgeApplicationServices: {
-          editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
-          loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
-          updatedRedirect: 'list-edge-applications',
-          contactSalesEdgeApplicationService:
-            EdgeApplicationsService.contactSalesEdgeApplicationService
-        },
-        originsServices: {
-          listOriginsService: OriginsService.listOriginsService,
-          deleteOriginsService: OriginsService.deleteOriginsService,
-          createOriginService: OriginsService.createOriginService,
-          editOriginService: OriginsService.editOriginService,
-          loadOriginService: OriginsService.loadOriginService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
+      props: () => {
+        const EdgeApplicationServices = useEdgeApplicationServices()
+
+        return {
+          edgeApplicationServices: {
+            checkgeApplicationsLockedService:
+              EdgeApplicationServices?.checkgeApplicationsLockedService,
+            editEdgeApplication: EdgeApplicationServices?.editEdgeApplicationService,
+            loadEdgeApplication: EdgeApplicationServices?.loadEdgeApplicationService,
+            updatedRedirect: 'list-applications',
+            contactSalesEdgeApplicationService:
+              EdgeApplicationServices?.contactSalesEdgeApplicationService
+          },
+          originsServices: {
+            listOriginsService: OriginsService.listOriginsService,
+            deleteOriginsService: OriginsService.deleteOriginsService,
+            createOriginService: OriginsService.createOriginService,
+            editOriginService: OriginsService.editOriginService,
+            loadOriginService: OriginsService.loadOriginService,
+            documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
+            clipboardWrite: Helpers.clipboardWrite
+          },
+          cacheSettingsServices: {
+            documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
+          },
+          functionsServices: {
+            documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
+          },
+          deviceGroupsServices: {
+            documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups
+          },
+          rulesEngineServices: {
+            documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
+            listOriginsService: OriginsService.listOriginsService
+          },
           clipboardWrite: Helpers.clipboardWrite
-        },
-        cacheSettingsServices: {
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
-          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
-          createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
-          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
-          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
-        },
-        functionsServices: {
-          createFunctionService: FunctionsService.createFunctionService,
-          deleteFunctionService: FunctionsService.deleteFunctionService,
-          listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
-          listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
-          loadFunctionService: FunctionsService.loadFunctionService,
-          editFunctionService: FunctionsService.editFunctionService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
-        },
-        deviceGroupsServices: {
-          listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
-          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
-          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
-          editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
-          loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
-        },
-        errorResponsesServices: {
-          loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
-          editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
-        },
-        rulesEngineServices: {
-          listRulesEngineService: RulesEngineService.listRulesEngineService,
-          deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
-          editRulesEngineService: RulesEngineService.editRulesEngineService,
-          createRulesEngineService: RulesEngineService.createRulesEngineService,
-          loadRulesEngineService: RulesEngineService.loadRulesEngineService,
-          reorderRulesEngine: RulesEngineService.reorderRulesEngine,
-          documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
-          listOriginsService: OriginsService.listOriginsService,
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
-          listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
-        },
-        clipboardWrite: Helpers.clipboardWrite
+        }
       },
       meta: {
+        title: 'Edit Application',
         breadCrumbs: [
           {
-            label: 'Edge Applications',
-            to: '/edge-applications'
+            label: 'Applications',
+            to: '/applications'
           },
           {
-            label: 'Edit Edge Application'
+            label: 'Edit Application'
           }
         ]
       }

@@ -2,34 +2,40 @@
   import FormFieldsDrawerOrigin from '@/views/EdgeApplicationsOrigins/FormFields/FormFieldsEdgeApplicationsOrigins'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
+  import CopyKeyDialog from '@templates/dialog-copy-key'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { inject, ref } from 'vue'
+  import { onMounted } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { loadProductsListService } from '@/services/contract-services'
+  import { useDialog } from 'primevue/usedialog'
+  import { createOriginService } from '@/services/edge-application-origins-services'
+  import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
+  const edgeApplication = inject('edgeApplication')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
+  const dialog = useDialog()
 
   const props = defineProps({
+    showBarGoBack: {
+      type: Boolean,
+      default: true
+    },
     edgeApplicationId: {
       type: String,
       required: true
     },
-    createOriginService: {
-      type: Function,
-      required: true
-    },
     editOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     loadOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     documentationService: {
       type: Function,
@@ -38,21 +44,31 @@
     clipboardWrite: {
       type: Function,
       required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
     }
   })
 
+  onMounted(async () => {
+    const products = await loadProductsListService({ clientId: accountStore.account.client_id })
+    if (products.slugs.includes('live_ingest')) {
+      hasLiveIngest.value = true
+    }
+    originTypesOptions.value.push({
+      label: 'Live Ingest',
+      value: 'live_ingest',
+      disabled: !hasLiveIngest.value
+    })
+  })
+
+  const accountStore = useAccountStore()
   const toast = useToast()
   const showCreateOriginDrawer = ref(false)
+  const hasLiveIngest = ref(false)
   const showEditOriginDrawer = ref(false)
   const debouncedDrawerAnimate = 300
   const loadCreateOriginDrawer = refDebounced(showCreateOriginDrawer, debouncedDrawerAnimate)
   const loadEditOriginDrawer = refDebounced(showEditOriginDrawer, debouncedDrawerAnimate)
   const selectedOriginToEdit = ref('')
-  const ORIGIN_TYPES_OPTIONS = [
+  const originTypesOptions = computed(() => [
     {
       label: 'Single Origin',
       value: 'single_origin',
@@ -61,14 +77,14 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: !props.isLoadBalancerEnabled
+      disabled: !edgeApplication.value?.loadBalancer
     },
     {
-      label: 'Edge Storage',
+      label: 'Object Storage',
       value: 'object_storage',
       disabled: false
     }
-  ]
+  ])
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -107,11 +123,11 @@
       .string()
       .label('Host Header')
       .when('originType', {
-        is: (originType) => originType !== 'object_storage',
+        is: (originType) => originType !== 'object_storage' && originType !== 'live_ingest',
         then: (schema) => schema.required()
       }),
     addresses: yup.array().when('originType', {
-      is: (originType) => originType === 'object_storage',
+      is: (originType) => originType === 'object_storage' || originType === 'live_ingest',
       then: (schema) => schema.optional(),
       otherwise: (schema) =>
         schema.of(
@@ -128,6 +144,13 @@
         return /^(\/\.?[\w][\w.-]*)+$/.test(value) || !value
       })
       .label('Origin Path'),
+    streamingEndpoint: yup
+      .string()
+      .label('Streaming Endpoint')
+      .when('originType', {
+        is: (originType) => originType === 'live_ingest',
+        then: (schema) => schema.required()
+      }),
     hmacAuthentication: yup.boolean(),
     hmacRegionName: yup
       .string()
@@ -201,10 +224,6 @@
     emit('onSuccess')
   }
 
-  const closeDrawerEdit = () => {
-    showEditOriginDrawer.value = false
-  }
-
   const handleTrackCreation = () => {
     tracker.product
       .productCreated({
@@ -233,8 +252,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   const handleFailedCreateOrigin = (error) => {
@@ -251,12 +268,21 @@
 
   const handleCreateOrigin = (feedback) => {
     handleTrackCreation()
-    createFormDrawer.value.scrollOriginKey()
+
+    dialog.open(CopyKeyDialog, {
+      data: {
+        title: 'Origin Key',
+        key: feedback.originKey,
+        copy: copyToKey
+      }
+    })
+
     originKey.value = feedback.originKey
     emit('onSuccess')
   }
 
   defineExpose({
+    showCreateOriginDrawer,
     openDrawerCreate,
     openDrawerEdit
   })
@@ -266,21 +292,20 @@
   <CreateDrawerBlock
     v-if="loadCreateOriginDrawer"
     v-model:visible="showCreateOriginDrawer"
-    :createService="props.createOriginService"
+    :createService="createOriginService"
+    drawerId="create-origin-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
     @onError="handleFailedCreateOrigin"
-    showBarGoBack
     title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin
         ref="createFormDrawer"
         :disabledFields="disabledFields"
-        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :listOrigins="originTypesOptions"
         :copyToClipboard="copyToKey"
-        :generatedOriginKey="originKey"
       />
     </template>
   </CreateDrawerBlock>
@@ -298,8 +323,9 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin
+        isEditMode
         :disabledFields="disabledFields"
-        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :listOrigins="originTypesOptions"
         :copyToClipboard="copyToKey"
       />
     </template>

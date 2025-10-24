@@ -16,6 +16,7 @@ export const usersListsRoutes = {
         documentationService: Helpers.documentationCatalog.users
       },
       meta: {
+        title: 'Users',
         breadCrumbs: [
           {
             label: 'Users',
@@ -36,6 +37,7 @@ export const usersListsRoutes = {
         listTeamsService: UsersService.listTeamsService
       },
       meta: {
+        title: 'Create User',
         breadCrumbs: [
           {
             label: 'Users',
@@ -62,6 +64,7 @@ export const usersListsRoutes = {
         updatedRedirect: 'list-users'
       },
       meta: {
+        title: 'Edit User',
         breadCrumbs: [
           {
             label: 'Users',

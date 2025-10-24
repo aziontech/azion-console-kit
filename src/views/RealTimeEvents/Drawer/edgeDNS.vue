@@ -1,8 +1,13 @@
 <script setup>
   import { ref, watch, computed } from 'vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import TableEvents from './tableEvents.vue'
+  import Skeleton from 'primevue/skeleton'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+
   defineOptions({ name: 'drawer-events-image-processor' })
 
   const props = defineProps({
@@ -13,10 +18,22 @@
   })
   const details = ref({})
   const showDrawer = ref(false)
+  const loading = ref(false)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
-    details.value = await props.loadService(item)
+    loading.value = true
+
+    try {
+      details.value = await props.loadService(item)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
   }
 
   watch(
@@ -57,22 +74,50 @@
           :title="`Q Type - ${details.qtype}`"
           :date="details.ts"
           :tags="tags"
+          :loading="loading"
+          hideDivider
+        />
+        <TabView
+          class="w-full h-full"
+          v-if="!loading"
         >
-          <template #body>
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="UUID">{{ details.uuid }}</TextInfo>
-                <TextInfo label="Q Type Description">{{ details.qTypeDescription }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Zone ID">{{ details.zoneId }}</TextInfo>
-                <TextInfo label="Status Code">{{ details.statusCode }}</TextInfo>
-                <TextInfo label="Resolution Type">{{ details.resolutionType }}</TextInfo>
-                <TextInfo label="Solution ID">{{ details.solutionId }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <InfoSection
+              class="mt-4"
+              hideDivider
+            >
+              <template #body>
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="UUID">{{ getValueByKey('uuid') }}</TextInfo>
+                    <TextInfo label="Q Type Description">{{ details.qTypeDescription }}</TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Zone ID">{{ getValueByKey('zoneId') }}</TextInfo>
+                    <TextInfo label="Status Code">{{ getValueByKey('statusCode') }}</TextInfo>
+                    <TextInfo label="Resolution Type">{{
+                      getValueByKey('resolutionType')
+                    }}</TextInfo>
+                    <TextInfo label="Solution ID">{{ getValueByKey('solutionId') }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
+          </TabPanel>
+        </TabView>
+        <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
+          v-else
+        >
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
+        </div>
       </div>
     </template>
   </InfoDrawerBlock>

@@ -1,67 +1,61 @@
 import * as Helpers from '@/helpers'
 
-import * as EdgeFunctionsService from '@/services/edge-functions-services'
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFunctionsRoutes = {
-  path: '/edge-functions',
-  name: 'edge-functions',
+  path: '/functions',
+  name: 'functions',
   children: [
     {
       path: '',
-      name: 'list-edge-functions',
+      name: 'list-functions',
       component: () => import('@views/EdgeFunctions/ListView.vue'),
       props: {
-        deleteEdgeFunctionsService: EdgeFunctionsService.deleteEdgeFunctionsService,
-        listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
         documentationService: Helpers.documentationCatalog.edgeFunctions
       },
       meta: {
+        title: 'Functions',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
-            to: '/edge-functions'
+            label: 'Functions',
+            to: '/functions'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-edge-functions',
+      name: 'create-functions',
       component: () => import('@views/EdgeFunctions/CreateView.vue'),
-      props: {
-        createEdgeFunctionsService: EdgeFunctionsService.createEdgeFunctionsService
-      },
       meta: {
+        title: 'Create Function',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
-            to: '/edge-functions'
+            label: 'Functions',
+            to: '/functions'
           },
           {
-            label: 'Create Edge Function',
-            to: '/edge-functions/create'
+            label: 'Create Function',
+            to: '/functions/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edit-edge-functions',
+      name: 'edit-functions',
       component: () => import('@views/EdgeFunctions/EditView.vue'),
       props: {
-        loadEdgeFunctionsService: EdgeFunctionsService.loadEdgeFunctionsService,
-        editEdgeFunctionsService: EdgeFunctionsService.editEdgeFunctionsService,
-        updatedRedirect: 'list-edge-functions'
+        updatedRedirect: 'list-functions'
       },
       meta: {
+        title: 'Edit Function',
         breadCrumbs: [
           {
-            label: 'Edge Functions',
-            to: '/edge-functions'
+            label: 'Functions',
+            to: '/functions'
           },
           {
-            label: 'Edit Edge Function'
+            label: 'Edit Function'
           }
         ]
       }

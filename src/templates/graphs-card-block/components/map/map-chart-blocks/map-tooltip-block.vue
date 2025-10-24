@@ -2,7 +2,7 @@
   <div
     v-if="data?.kind"
     ref="mapTooltipRef"
-    class="absolute surface-card rounded border surface-border px-4 py-3 pointer-events-none"
+    class="absolute surface-card rounded border surface-border px-4 py-3 pointer-events-none z-10"
     :style="tooltipStyle"
   >
     <component

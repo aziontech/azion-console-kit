@@ -1,9 +1,10 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -13,29 +14,9 @@
       required: true,
       type: String
     },
-    listCacheSettingsService: {
-      type: Function,
-      required: true
-    },
     isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
-    },
-    loadCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    editCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    deleteCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    createCacheSettingsService: {
-      type: Function,
-      required: true
     },
     documentationService: {
       type: Function,
@@ -51,15 +32,18 @@
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
 
-  const listCacheSettingsServiceWithDecorator = async () => {
-    return await props.listCacheSettingsService({ id: props.edgeApplicationId })
+  //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
+  const CACHE_SETTING_API_FIELDS = []
+
+  const listCacheSettingsServiceWithDecorator = async (query) => {
+    return await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
   }
 
   const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await props.deleteCacheSettingsService({
-      edgeApplicationId: props.edgeApplicationId,
-      id: cacheSettingsId
-    })
+    return await cacheSettingsService.deleteCacheSettingService(
+      props.edgeApplicationId,
+      cacheSettingsId
+    )
   }
 
   const actions = [
@@ -94,6 +78,12 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Origin Name'
       },
@@ -103,7 +93,7 @@
       },
       {
         field: 'cdnCache',
-        header: 'Edge Cache'
+        header: 'Cache'
       }
     ]
   })
@@ -128,16 +118,17 @@
 <template>
   <Drawer
     ref="drawerRef"
+    :isOverlapped="true"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
-    :createService="createCacheSettingsService"
-    :loadService="loadCacheSettingsService"
-    :editService="editCacheSettingsService"
+    :createService="cacheSettingsService.createCacheSettingsService"
+    :loadService="cacheSettingsService.loadCacheSettingsService"
+    :editService="cacheSettingsService.editCacheSettingsService"
     :showTieredCache="isTieredCacheEnabled"
     @onSuccess="reloadList"
   />
 
-  <ListTableBlock
+  <FetchListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
     :listService="listCacheSettingsServiceWithDecorator"
@@ -148,6 +139,7 @@
     emptyListMessage="No cache settings found."
     :actions="actions"
     isTabs
+    :apiFields="CACHE_SETTING_API_FIELDS"
   >
     <template #addButton>
       <PrimeButton
@@ -157,7 +149,7 @@
         data-testid="edge-application-cache-settings-list__create-cache-settings__button"
       />
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
 
   <EmptyResultsBlock
     v-else

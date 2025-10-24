@@ -5,6 +5,11 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createVariablesService: {
@@ -23,6 +28,46 @@
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
   })
+
+  const handleResponse = (response) => {
+    tracker.product.productCreated({
+      productName: 'Variable'
+    })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your variable has been created',
+      actions: {}
+    }
+
+    if (response?.secret) {
+      response.showToastWithActions(toast)
+      response.redirectToUrl('/variables')
+      return
+    }
+
+    toast.actions = {
+      link: {
+        label: 'View Variables',
+        callback: () => response.redirectToUrl(`/variables/edit/${response.uuid}`)
+      }
+    }
+    response.showToastWithActions(toast)
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Variable',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -34,6 +79,9 @@
       <CreateFormBlock
         :createService="props.createVariablesService"
         :schema="validationSchema"
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
+        disableToast
       >
         <template #form>
           <FormFieldsVariables />

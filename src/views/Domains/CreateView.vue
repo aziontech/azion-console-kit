@@ -16,7 +16,10 @@
         <template #form>
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             :isLoadingRequests="isLoadingRequests"
           />
         </template>
@@ -33,7 +36,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   import CreateFormBlock from '@/templates/create-form-block'
@@ -46,6 +49,7 @@
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -56,15 +60,15 @@
       type: Function,
       required: true
     },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
     },
     listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
       type: Function,
       required: true
     }
@@ -75,7 +79,6 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
   const isLoadingRequests = ref(true)
@@ -140,41 +143,11 @@
       .track()
   }
 
-  const requestEdgeApplications = async () => {
-    edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-  }
-
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const showToast = (severity, summary) => {
-    const options = {
-      closable: true,
-      severity,
-      summary
-    }
-
-    toast.add(options)
-  }
-
-  const toastError = (error) => {
-    showToast('error', error)
-  }
-
-  onMounted(async () => {
-    try {
-      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  })
-
   const initialValues = {
     name: '',
+    environment: 'production',
     edgeApplication: null,
+    edgeFirewall: null,
     cnames: '',
     cnameAccessOnly: true,
     mtlsIsEnabled: false,
@@ -195,7 +168,7 @@
           return nameRegex.test(value)
         }
       ),
-    edgeApplication: yup.number().label('Edge Application'),
+    edgeApplication: yup.number().label('Application'),
     cnames: yup
       .string()
       .label('CNAME')
@@ -219,6 +192,7 @@
         then: (schema) => schema.required()
       })
       .label('Trusted CA Certificate'),
-    active: yup.boolean()
+    active: yup.boolean(),
+    environment: yup.string()
   })
 </script>

@@ -30,26 +30,36 @@ export default {
   ruleCriteriaVariableDropdown:
     '[data-testid="edge-firewall-rules-form__variable[0]"] > .p-dropdown-label',
   ruleCriteriaVariableDropdownNetworkLists: '#criteria\\[0\\]\\[0\\]\\.variable_8',
+  createFunctionButton: '[data-testid="edge-firewall-functions-form__create-function-button"]',
+  edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
   ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
+  ruleCriteriaVariableDropdownHeaderAccept: '#criteria\\[0\\]\\[0\\]\\.variable_1',
   ruleCriteriaOperatorDropdown: '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"]',
   ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
+  ruleCriteriaOperatorMatches: '#criteria\\[0\\]\\[0\\]\\.operator_0',
   ruleCriteriaOperatorFirstOption: '#criteria\\[0\\]\\[0\\]\\.operator_0',
   ruleCriteriaValueFirstOption: '#criteria\\[0\\]\\[0\\]\\.argument_0',
   ruleCriteriaInput: '[data-testid="edge-firewall-rules-form__argument[0][0]__input"]',
   ruleCriteriaNetworkListDropdown:
-    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-trigger"]',
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"]',
+  ruleCriteriaNetworkListDropdownValue:
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown__value"]',
   ruleCriteriaNetworkListFilter:
-    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-filter-input"]',
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-search"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
-  ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
+  ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_5',
+  ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_3',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
+  ruleBehaviorTagEventOption: '#behaviors\\[0\\]\\.name_1',
+  scrollWafDropdown: '.p-dropdown-items-wrapper .p-virtualscroller',
+  selectTheLastWaf: '.p-dropdown-items-wrapper .p-virtualscroller ul li',
   rulesWafDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
   rulesWafDropdownFilter:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown-filter-input"]',
-  rulesWafFirstOption: '#behaviors\\[0\\]\\.waf_id_0',
+  rulesWafFirstOption: '#behaviors\\[0\\]\\.id_0',
   rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
-  behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
+  behaviorsWafOption: '#behaviors\\[0\\]\\.name_4',
   rulesWafModeDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf-mode__dropdown"] > .p-dropdown-label',
   ruleBehaviorFunctionToRunDropdown:
@@ -65,5 +75,18 @@ export default {
   cancelButton: '[data-testid="form-actions-cancel-button"]',
   searchInput: '[data-testid="data-table-search-input"]',
   nameRow: '[data-testid="list-table-block__column__name__row"]',
-  activeRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+  activeRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+  behaviorRateLimitType: '#behaviors\\[0\\]\\.type > .p-dropdown-label',
+  behaviorRateLimitTypeFirstOption: '#behaviors\\[0\\]\\.type_1',
+  behaviorAverageRateLimitInput: '[data-testid="field-number__input"] > .p-inputtext',
+  behaviorLimitBy: '#behaviors\\[0\\]\\.limit_by > .p-dropdown-label',
+  behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
+  behaviorTagEventOption: '#behaviors\\[0\\]\\.tag_event',
+
+  createRulesEngine: '[data-testid="rules-engine-create-button"] > .p-button-label',
+  inputNumberFirstPosition:
+    '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+  reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
+  reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
+  saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
 }

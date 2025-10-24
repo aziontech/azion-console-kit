@@ -3,6 +3,12 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormCreateEdgeService from '@/views/EdgeServices/FormFields/FormFieldsEdgeService'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   defineOptions({ name: 'edit-edge-service' })
 
   const emit = defineEmits(['handleEdgeServiceUpdated'])
@@ -30,6 +36,25 @@
     await onSubmit()
     emit('handleEdgeServiceUpdated', values)
   }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Service'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge Service',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -41,6 +66,8 @@
       :schema="validationSchema"
       :disableRedirect="true"
       :isTabs="true"
+      @on-edit-success="handleTrackSuccessEdit"
+      @on-edit-fail="handleTrackFailEdit"
     >
       <template #form>
         <FormCreateEdgeService />

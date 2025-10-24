@@ -1,5 +1,33 @@
 import * as Helpers from '@/helpers'
-import * as DataStreamService from '@/services/data-stream-services'
+import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
+import { useAccountStore } from '@/stores/account'
+
+async function checkDomainsLimit(to, from, next) {
+  const accountStore = useAccountStore()
+  const { hasActiveUserId } = accountStore
+
+  if (!hasActiveUserId) {
+    return next()
+  }
+
+  try {
+    const workloads = await listWorkloadsDynamicFieldsService({
+      fields: 'id',
+      ordering: 'id',
+      page: 1,
+      pageSize: 1
+    })
+
+    const isMaxDomainsReached = workloads.count >= 3000
+    if (isMaxDomainsReached) {
+      return next('/')
+    }
+
+    return next()
+  } catch (error) {
+    return next()
+  }
+}
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
@@ -11,11 +39,10 @@ export const dataStreamRoutes = {
       name: 'list-data-stream',
       component: () => import('@views/DataStream/ListView.vue'),
       props: {
-        listDataStreamService: DataStreamService.listDataStreamService,
-        deleteDataStreamService: DataStreamService.deleteDataStreamService,
         documentationService: Helpers.documentationCatalog.dataStream
       },
       meta: {
+        title: 'Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',
@@ -28,12 +55,9 @@ export const dataStreamRoutes = {
       path: 'create',
       name: 'create-data-stream',
       component: () => import('@views/DataStream/CreateView.vue'),
-      props: {
-        listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
-        listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        createDataStreamService: DataStreamService.createDataStreamService
-      },
+      beforeEnter: checkDomainsLimit,
       meta: {
+        title: 'Create Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',
@@ -50,14 +74,12 @@ export const dataStreamRoutes = {
       path: 'edit/:id',
       name: 'edit-data-stream',
       component: () => import('@views/DataStream/EditView.vue'),
+      beforeEnter: checkDomainsLimit,
       props: {
-        listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
-        listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        loadDataStreamService: DataStreamService.loadDataStreamService,
-        editDataStreamService: DataStreamService.editDataStreamService,
         updatedRedirect: 'list-data-stream'
       },
       meta: {
+        title: 'Edit Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',

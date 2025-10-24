@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listTieredCache } from '@/services/real-time-events-service/tiered-cache'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   filter: {
@@ -17,7 +18,6 @@ const fixtures = {
     requestMethod: 'GET',
     upstreamCacheStatus: 'HIT',
     proxyHost: 'proxy.example.com',
-    source: 'CDN',
     ts: '2024-02-23T18:07:25.000Z'
   }
 }
@@ -47,27 +47,50 @@ describe('tieredCacheServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
       `\t) {`,
+      `\t\tbytesSent`,
+      `\t\tcacheKey`,
+      `\t\tcacheTtl`,
       `\t\tconfigurationId`,
       `\t\thost`,
-      `\t\trequestUri`,
-      `\t\trequestMethod`,
-      `\t\tupstreamCacheStatus`,
-      `\t\tts`,
       `\t\tproxyHost`,
-      `\t\tsource`,
+      `\t\tproxyStatus`,
+      `\t\tproxyUpstream`,
+      `\t\treferenceError`,
+      `\t\tremoteAddr`,
+      `\t\tremotePort`,
+      `\t\trequestLength`,
+      `\t\trequestMethod`,
+      `\t\trequestTime`,
+      `\t\trequestUri`,
+      `\t\tscheme`,
+      `\t\tsentHttpContentType`,
+      `\t\tserverProtocol`,
+      `\t\tsolution`,
+      `\t\tstatus`,
+      `\t\ttcpinfoRtt`,
+      `\t\tts`,
+      `\t\tupstreamBytesReceived`,
+      `\t\tupstreamBytesReceivedStr`,
+      `\t\tupstreamCacheStatus`,
+      `\t\tupstreamConnectTime`,
+      `\t\tupstreamHeaderTime`,
+      `\t\tupstreamResponseTime`,
+      `\t\tupstreamStatus`,
+      `\t\tclientId`,
       `\t}`,
       `}`
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -91,22 +114,78 @@ describe('tieredCacheServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        configurationId: fixtures.tieredCache.configurationId,
-        host: fixtures.tieredCache.host,
-        requestUri: fixtures.tieredCache.requestUri,
-        requestMethod: fixtures.tieredCache.requestMethod,
-        upstreamCacheStatus: {
-          content: fixtures.tieredCache.upstreamCacheStatus,
-          severity: 'info'
-        },
-        proxyHost: fixtures.tieredCache.proxyHost,
-        source: fixtures.tieredCache.source,
-        ts: fixtures.tieredCache.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          configurationId: fixtures.tieredCache.configurationId,
+          host: fixtures.tieredCache.host,
+          proxyHost: fixtures.tieredCache.proxyHost,
+          summary: [
+            { key: 'configurationId', value: fixtures.tieredCache.configurationId },
+            { key: 'host', value: fixtures.tieredCache.host },
+            { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
+            { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
+            { key: 'requestUri', value: fixtures.tieredCache.requestUri },
+            { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus }
+          ],
+          ts: fixtures.tieredCache.ts,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+        }
+      ]
+    })
   })
+  it.each([
+    {
+      apiErrorMock: 'Access denied. You do not have permission to access this resource.',
+      statusCode: 403
+    },
+    {
+      apiErrorMock: 'You have exceeded the limit amount allowed for selected fields (37 fields)',
+      statusCode: 400
+    }
+  ])('Should return an API error for an $statusCode', async ({ statusCode, apiErrorMock }) => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: statusCode,
+      body: {
+        detail: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.variableMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.filter)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

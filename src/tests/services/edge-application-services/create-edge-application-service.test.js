@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeApplicationMock: {
-    name: 'Edge Application',
+    name: 'Application',
     deliveryProtocol: 'http',
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],
@@ -69,22 +69,6 @@ describe('EdgeApplicationServices', () => {
         debug_rules: fixtures.edgeApplicationMock.debugRules
       }
     })
-  })
-
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        results: {
-          id: 1
-        }
-      }
-    })
-    const { sut } = makeSut()
-
-    const data = await sut(fixtures.edgeApplicationMock)
-
-    expect(data.feedback).toBe('Your edge application has been created')
   })
 
   it.each([

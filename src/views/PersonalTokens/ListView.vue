@@ -22,6 +22,7 @@
         description="Click the button below to generate your first personal token."
         createButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -79,7 +80,7 @@
       header: 'Description',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
     },
     {
       field: 'scope',

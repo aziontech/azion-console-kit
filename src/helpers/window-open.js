@@ -1,3 +1,3 @@
-export const windowOpen = (url, options) => {
+export const windowOpen = (url = '', options) => {
   window.open(url, options)
 }

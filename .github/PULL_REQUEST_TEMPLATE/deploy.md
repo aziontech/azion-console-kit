@@ -3,6 +3,7 @@
 ### CHANGELOG
 
 ### Does this deploy introduce breaking changes?
+
 - [ ] No
 - [ ] Yes
 
@@ -14,7 +15,7 @@
 
 #### Make sure your pull request fits the checklist below (when applicable):
 
-- [ ] The issue title follows the format: DEPLOY YYYY.MM.DD
+- [ ] The issue title follows the format: DEPLOY YYYY-MM-DD
 - [ ] The team was notified of the deploy
-- [ ] Every change is validated in stage environment 
+- [ ] Every change is validated in stage environment
 - [ ] Project version is incremented

@@ -17,15 +17,42 @@ export const useAccountStore = defineStore({
     },
     flags: {
       RESTRICT_ACCESS_TO_METRICS_ONLY: 'allow_only_metrics_on_console',
-      FULL_CONSOLE_ACCESS: 'allow_console'
+      FULL_CONSOLE_ACCESS: 'allow_console',
+      SSO_MANAGEMENT: 'federated_auth',
+      DATA_STREAM_SAMPLING: 'data_streaming_sampling',
+      MARKETPLACE_PRODUCTS: 'marketplace_products',
+      HIDE_CREATE_OPTIONS: 'hide_create_options',
+      FORCE_REDIRECT_TO_CONSOLE: 'force_redirect_to_console',
+      ENABLE_WAF_TUNING: 'enable_waf_tuning_details_save'
     }
   }),
   getters: {
     accountData(state) {
       return state.account
     },
+    clientFlags(state) {
+      return state.account?.client_flags
+    },
+    hasEnableWafTuning(state) {
+      return state.account?.client_flags?.includes(state.flags.ENABLE_WAF_TUNING)
+    },
     hasActiveUserId(state) {
       return !!state.account?.id
+    },
+    hasPermissionToEditDataStream(state) {
+      const permissionToEditDataStream = 'Edit Data Stream'
+      const hasPermissionToEdit = !!state.account.permissions?.some(
+        (permission) => permission.name === permissionToEditDataStream
+      )
+      return hasPermissionToEdit || state.account.is_account_owner
+    },
+    hasPermissionToViewDataStream(state) {
+      return !!state.account.permissions.find(
+        (permission) => permission.name === 'View Data Stream'
+      )
+    },
+    hasSamplingFlag(state) {
+      return state.account?.client_flags?.includes(state.flags.DATA_STREAM_SAMPLING)
     },
     metricsOnlyAccessRestriction(state) {
       const flags = state.flags
@@ -35,9 +62,16 @@ export const useAccountStore = defineStore({
         !client_flags.includes(flags.FULL_CONSOLE_ACCESS)
       )
     },
+    hasAccessToSSOManagement(state) {
+      return state.account?.client_flags?.includes(state.flags.SSO_MANAGEMENT)
+    },
     hasAccessConsole(state) {
       const { client_flags = [], isDeveloperSupportPlan } = state.account
       return client_flags.includes(state.flags.FULL_CONSOLE_ACCESS) || !!isDeveloperSupportPlan
+    },
+    isBannerVisible(state) {
+      const { client_flags = [] } = state.account
+      return !client_flags.includes(state.flags.FORCE_REDIRECT_TO_CONSOLE)
     },
     currentTheme(state) {
       return state.account?.colorTheme
@@ -65,13 +99,25 @@ export const useAccountStore = defineStore({
         state.accountStatuses.BLOCKED,
         state.accountStatuses.DEFAULTING,
         state.accountStatuses.TRIAL,
-        state.accountStatuses.ONLINE
+        state.accountStatuses.ONLINE,
+        state.accountStatuses.REGULAR
       ].includes(state.account?.status)
     },
     paymentReviewPending(state) {
       return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
         state.account?.status
       )
+    },
+    hasAccessToMarketplaceProducts(state) {
+      const { flags, account } = state
+      return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
+    },
+    accountIsNotRegular(state) {
+      return state.account?.status !== state.accountStatuses.REGULAR
+    },
+
+    hasHideCreateOptionsFlag(state) {
+      return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
     }
   },
   actions: {

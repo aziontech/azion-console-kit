@@ -7,6 +7,13 @@
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-edge-service' })
 
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const { value: name } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
 
@@ -26,6 +33,7 @@
   <FormHorizontal
     title="General"
     description="Services define dependencies between resources."
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -45,6 +53,7 @@
   <FormHorizontal
     title="Variables"
     description="Variables are dynamic values that affect the edge services that will be orchestrated and run on Edge Nodes."
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col h-full gap-2">
@@ -72,7 +81,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Status">
+  <FormHorizontal
+    title="Status"
+    :isDrawer="isDrawer"
+  >
     <template #inputs>
       <FieldSwitchBlock
         nameField="active"

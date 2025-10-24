@@ -16,6 +16,10 @@ const fixture = {
     { name: 'product-A', slug: 'plan_ABC' },
     { name: 'product-B', slug: 'support_ABC' },
     { name: 'product-C', slug: 'ABC' }
+  ],
+  productsWithoutSupport: [
+    { name: 'product-A', slug: 'plan_ABC' },
+    { name: 'product-C', slug: 'ABC' }
   ]
 }
 
@@ -127,4 +131,94 @@ describe.concurrent('ContractServices', () => {
       expect(response).rejects.toThrow(expectedError)
     }
   )
+
+  it('should correctly identify the Business plan', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: [...fixture.productsWithoutSupport, { name: 'business', slug: 'contract_business' }]
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Business'
+    })
+  })
+
+  it('should correctly identify the Enterprise plan', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: [...fixture.productsWithoutSupport, { slug: 'contract_enterprise' }]
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Enterprise'
+    })
+  })
+
+  it('should correctly identify the Mission Critical plan', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: [...fixture.productsWithoutSupport, { slug: 'contract_mission_critical' }]
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Mission Critical'
+    })
+  })
+
+  it('should correctly identify the Mission Critical plan with plan_ prefix', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: [{ slug: 'plan_missioncritical' }]
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Mission Critical'
+    })
+  })
+
+  it('should handle an empty response body', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: null
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut({
+      clientId: 'stub-client-id'
+    })
+
+    expect(response).toEqual({
+      isDeveloperSupportPlan: true,
+      yourServicePlan: 'Developer'
+    })
+  })
 })

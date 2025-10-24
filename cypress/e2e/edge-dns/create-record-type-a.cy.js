@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let zoneName = ''
 
-describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
+describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
   beforeEach(() => {
     cy.login()
     zoneName = generateUniqueName('DNSZone')
@@ -12,7 +12,7 @@ describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
 
   it('Create a record of type A', () => {
     // Arrange
-    cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
+    cy.intercept('/v4/edge_dns/zones/*').as('loadZone')
 
     const recordTypeFixtures = {
       name: generateUniqueName('record'),
@@ -30,9 +30,8 @@ describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeDns.nameInput).type(zoneName)
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS has been created')
-    cy.get(selectors.edgeDns.cancelButton).click()
-    cy.get(selectors.edgeDns.searchInput).type(zoneName)
+    cy.verifyToast('success', 'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.')
+    cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)
       .should('contain', zoneName)
       .then(() => {
@@ -47,10 +46,12 @@ describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeDns.records.nameInput).type(recordTypeFixtures.name)
     cy.get(selectors.edgeDns.records.recordTypeDropdown).click()
     cy.get(selectors.edgeDns.records.recordTypeOption(recordTypeFixtures.recordTypeOption)).click()
+    cy.get(selectors.edgeDns.records.ttlInput).clear()
     cy.get(selectors.edgeDns.records.ttlInput).type(recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.records.valueTextarea).type(recordTypeFixtures.value)
     cy.get(selectors.edgeDns.records.policyTypeDropdown).click()
     cy.get(selectors.edgeDns.records.policyTypeOption(recordTypeFixtures.policyTypeOption)).click()
+    cy.get(selectors.edgeDns.records.weightInput).clear()
     cy.get(selectors.edgeDns.records.weightInput).type(recordTypeFixtures.weight)
     cy.get(selectors.edgeDns.records.descriptionTextarea).type(recordTypeFixtures.description)
 
@@ -59,7 +60,7 @@ describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.list.searchInput).type(`${recordTypeFixtures.name}{enter}`)
     cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
@@ -79,16 +80,5 @@ describe('Edge DNS spec', { tags: ['@dev4'] }, () => {
       'have.text',
       recordTypeFixtures.description
     )
-
-    // Cleanup
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge DNS Record successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
-      cy.verifyToast('Your Edge DNS has been deleted')
-    })
   })
 })

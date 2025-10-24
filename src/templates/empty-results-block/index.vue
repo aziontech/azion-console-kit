@@ -12,11 +12,14 @@
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    documentationService: { type: Function, required: true },
+    documentationService: { type: Function, required: false },
     createPagePath: { type: String, required: false },
+    disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
-    noBorder: { type: Boolean, required: false }
+    noBorder: { type: Boolean, required: false },
+    noShowBorderTop: { type: Boolean, required: false, default: false },
+    showLearnMoreButton: { type: Boolean, required: false, default: true }
   })
   function openDocumentation() {
     props.documentationService()
@@ -31,12 +34,15 @@
 
 <template>
   <div
-    class="flex flex-col"
-    :class="{ 'mt-4 pb-8': inTabs }"
+    class="flex flex-col justify-center"
+    :class="{
+      'mt-4 pb-8': inTabs,
+      'border surface-border': !noBorder,
+      'rounded-t-none': noShowBorderTop
+    }"
   >
     <div
-      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
-      :class="{ 'border surface-border': !noBorder }"
+      class="min-h-[300px] flex flex-col justify-center gap-5 items-center rounded-md p-8 max-md:p-3"
     >
       <slot name="illustration">
         <Illustration />
@@ -57,20 +63,24 @@
               v-if="props.createButtonLabel"
               class="max-md:w-full w-fit"
               severity="secondary"
+              :disabled="disabledList"
               icon="pi pi-plus"
               :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"
+              size="small"
               @click="navigateToCreatePage"
             />
           </slot>
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
+          v-if="props.documentationService"
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
           label="Learn more"
           link
+          size="small"
           @click="openDocumentation"
         />
       </div>

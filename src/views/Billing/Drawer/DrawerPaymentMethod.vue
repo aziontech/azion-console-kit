@@ -11,10 +11,7 @@
   const emit = defineEmits(['onSuccess'])
 
   const props = defineProps({
-    createPaymentMethodService: {
-      type: Function,
-      required: true
-    }
+    getStripeClientService: { type: Function, required: true }
   })
 
   const showCreatePaymentMethodDrawer = ref(false)
@@ -38,13 +35,13 @@
   }
 
   const showPaymentMethod = () => {
-    if (route.query.paymentSession) {
+    if (route.query.paymentSession || route.query.payment) {
       openDrawer()
-      router.push({ query: {} })
+      router.replace({ query: {} })
     }
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     showPaymentMethod()
   })
 
@@ -55,7 +52,7 @@
 
 <template>
   <CreatePaymentMethodBlock
-    :createService="props.createPaymentMethodService"
+    :stripeClientService="props.getStripeClientService"
     v-model:visible="showCreatePaymentMethodDrawer"
     v-if="showCreateDrawer"
     @onSuccess="handleCreatePaymentMethod"

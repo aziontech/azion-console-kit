@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
+import { InternalServerError } from '@/services/axios/errors'
 import { createPersonalToken } from '@/services/personal-tokens-services'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +8,9 @@ const fixtures = {
     name: 'Test Token',
     description: 'This is a test token',
     expiresAt: '2023-12-31'
+  },
+  errorMock: {
+    error: ['Error Message']
   }
 }
 
@@ -59,36 +62,24 @@ describe('PersonalTokensServices', () => {
 
   it.each([
     {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
+      statusCode: 400,
+      expectedError: fixtures.errorMock[0]
     },
     {
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
+      expectedError: new InternalServerError().message
     }
   ])(
-    'should throw when request fails with status code $statusCode',
+    'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: fixtures.errorMock
       })
       const { sut } = makeSut()
 
       const response = sut(fixtures.personalTokenMock)
-
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })

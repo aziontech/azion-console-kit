@@ -2,21 +2,20 @@
   <DrawerFunction
     ref="drawerFunctionRef"
     :edgeApplicationId="edgeApplicationId"
-    :createFunctionService="createFunctionService"
-    :listEdgeFunctionsService="listEdgeFunctionsService"
-    :loadFunctionService="loadFunctionService"
-    :editFunctionService="editFunctionService"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
-    <ListTableBlock
+    <FetchListTableBlock
       ref="listFunctionsEdgeApplicationsRef"
-      :listService="listFunctionsInstance"
+      :listService="listEdgeApplicationFunctions"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
       @on-load-data="handleLoadData"
+      @on-before-go-to-edit="handleTrackClickToEdit"
       :actions="actions"
       isTabs
+      :defaultOrderingFieldName="'name'"
+      :apiFields="FUNCTIONS_API_FIELDS"
     >
       <template #addButton>
         <PrimeButton
@@ -26,12 +25,12 @@
           @click="openCreateFunctionDrawer"
         />
       </template>
-    </ListTableBlock>
+    </FetchListTableBlock>
   </div>
   <EmptyResultsBlock
     v-else
-    title="No functions have been instantiated"
-    description="Click the button below to instantiate your first edge function."
+    title="No Functions have been instantiated"
+    description="Click the button below to instantiate your first Function."
     createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
@@ -53,58 +52,54 @@
 </template>
 
 <script setup>
+  import { onMounted, computed, ref, inject } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block'
-  import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import DrawerFunction from './Drawer'
 
-  defineOptions({ name: 'list-edge-applications-functions-tab' })
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
-  const hasContentToList = ref(true)
+  defineOptions({ name: 'list-edge-applications-functions-tab' })
 
   const props = defineProps({
     edgeApplicationId: {
       required: true,
       type: String
     },
-    listEdgeApplicationFunctionsService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
-      required: true,
-      type: Function
-    },
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    loadFunctionService: {
-      required: true,
-      type: Function
-    },
-    createFunctionService: {
-      required: true,
-      type: Function
-    },
-    editFunctionService: {
-      required: true,
-      type: Function
-    },
-    deleteFunctionService: {
       required: true,
       type: Function
     }
   })
 
+  const router = useRouter()
+  const route = useRoute()
+  const hasContentToList = ref(true)
+  const FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'edge_function',
+    'args',
+    'last_modified',
+    'last_editor'
+  ]
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeApplicationsRef = ref('')
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name',
@@ -119,30 +114,34 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Function Instanced'
-      },
-      {
-        field: 'version',
-        header: 'Version'
+        header: 'Function',
+        disableSort: true
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor'
+        header: 'Last Editor',
+        sortField: 'last_editor'
       },
       {
-        field: 'modified',
-        sortField: 'lastModifiedDate',
+        field: 'lastModified',
+        sortField: 'last_modified',
         header: 'Last Modified'
       }
     ]
   })
 
-  const listFunctionsInstance = async () => {
-    return await props.listEdgeApplicationFunctionsService(props.edgeApplicationId)
+  const listEdgeApplicationFunctions = async (query) => {
+    return await edgeApplicationFunctionService.listEdgeApplicationFunctions(
+      props.edgeApplicationId,
+      query
+    )
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionService(functionId, props.edgeApplicationId)
+    return await edgeApplicationFunctionService.deleteEdgeApplicationFunction(
+      functionId,
+      props.edgeApplicationId
+    )
   }
 
   const handleLoadData = (event) => {
@@ -150,10 +149,24 @@
   }
 
   const openCreateFunctionDrawer = () => {
+    handleTrackClickToCreate()
     drawerFunctionRef.value.openDrawerCreate()
   }
 
   const openEditFunctionDrawer = (data) => {
+    openDrawer({ id: data.id })
+    router.push({
+      query: {
+        id: data.id
+      }
+    })
+  }
+
+  const openDrawerById = (data) => {
+    openDrawer({ id: data.id })
+  }
+
+  const openDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
@@ -173,4 +186,23 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  const handleTrackClickToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Function Instances'
+      })
+      .track()
+  }
+  const handleTrackClickToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Function Instances'
+      })
+      .track()
+  }
+
+  onMounted(() => {
+    openDrawerById({ id: route.query.id })
+  })
 </script>

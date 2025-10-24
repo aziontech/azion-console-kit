@@ -384,17 +384,72 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsHttpMethodGet',
-      'requestsHttpMethodPost',
-      'requestsHttpMethodHead',
-      'requestsHttpMethodOthers'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    fields: [],
+    groupBy: ['ts', 'requestMethod'],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsByMethod
+  },
+  {
+    id: '357825388709151310',
+    chartOwner: 'azion',
+    label: 'Average Request Time',
+    description: REPORTS_TEXTS.edgeApplications.httpMethods.averageRequestTime.description,
+    aggregationType: 'avg',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'perSecond',
+    limit: 10000,
+    fields: [],
+    groupBy: [],
+    aggregations: [
+      {
+        aggregation: 'avg',
+        variable: 'requestTime'
+      }
+    ],
+    orderDirection: 'ASC',
+    variationType: 'inverse',
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+  },
+  {
+    id: '357825388709151312',
+    chartOwner: 'azion',
+    label: 'Requests by Scheme',
+    description: 'Sum of requests, categorized by scheme, over the selected period.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    fields: [],
+    groupBy: ['ts', 'scheme'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'ASC',
+    variationType: 'inverse',
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestByScheme
   },
   /**
    * BUILD
@@ -413,14 +468,21 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsStatusCode200',
-      'requestsStatusCode204',
-      'requestsStatusCode206',
-      'requestsStatusCode2xx'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    filters: {
+      statusRange: {
+        begin: 200,
+        end: 299
+      }
+    },
+    fields: [],
+    groupBy: ['ts', 'status'],
     orderDirection: 'ASC',
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes2xx
@@ -438,14 +500,21 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsStatusCode301',
-      'requestsStatusCode302',
-      'requestsStatusCode304',
-      'requestsStatusCode3xx'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    filters: {
+      statusRange: {
+        begin: 300,
+        end: 399
+      }
+    },
+    fields: [],
+    groupBy: ['ts', 'status'],
     orderDirection: 'ASC',
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes3xx
@@ -500,6 +569,34 @@ const REPORTS = [
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes5xx
   },
+  {
+    id: '357825388709151322',
+    chartOwner: 'azion',
+    label: 'Requests by Status and Upstream Status ',
+    description:
+      'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'list',
+    xAxis: 'cat',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    fields: ['status', 'upstreamStatus'],
+    groupBy: ['status', 'upstreamStatus'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'DESC',
+    variationType: 'inverse',
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+  },
   /**
    * BUILD
    * Edge Applications - Bandwidth Saving
@@ -525,6 +622,39 @@ const REPORTS = [
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.bandwidthSaving.bandwidthSaving
   },
+
+  /**
+   * BUILD
+   * Resquest Breakdown
+   */
+  {
+    id: '357825388709151326',
+    chartOwner: 'azion',
+    label: 'IP Address Information',
+    description: REPORTS_TEXTS.edgeApplications.requestBreakdown.iPAddressInformation.description,
+    aggregationType: 'sum',
+    columns: 12,
+    type: 'list',
+    xAxis: 'cat',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpBreakdownMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+    groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'DESC',
+    variationType: 'inverse',
+    dashboardId: '357549179454620240',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.ipAdressInformation
+  },
+
   /**
    * BUILD
    * Tiered Cache - Caching Offload
@@ -800,6 +930,136 @@ const REPORTS = [
     variationType: 'inverse',
     helpCenterPath: HELP_CENTER_URLS.waf.threats.otherThreats
   },
+  {
+    id: '357842851576414806',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by Country',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the data in percentages.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 20,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['geolocCountryName'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByCountryPieChart
+  },
+  {
+    id: '357842851576414807',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by Country',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 20,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['geolocCountryName'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByCountryBarChart
+  },
+  {
+    id: '357842851576414808',
+    chartOwner: 'azion',
+    label: 'WAF Threat Requests by Family Attack',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['wafAttackFamily'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByFamilyAttack
+  },
+  {
+    id: '357842851576414809',
+    chartOwner: 'azion',
+    label: 'WAF Threat Requests by Host',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
+    aggregationType: 'sum',
+    columns: 12,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['ts', 'host'],
+    orderDirection: 'ASC',
+    dashboardId: '357548675837198933',
+    variationType: 'inverse',
+    helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+    doNotConvertToCamelCase: true,
+    largeTooltip: true
+  },
   /**
    * SECURE
    * Edge DNS - Standard Queries
@@ -832,13 +1092,13 @@ const REPORTS = [
   },
   /**
    * SECURE
-   * Bot Manager - Bot Manager Summary
+   * Bot Manager - Bot Manager Overview
    */
   {
     id: '892249168369791027',
     chartOwner: 'azion',
     label: 'Bad Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.badBotHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.badBotHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -862,13 +1122,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'inverse',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.badBotHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.badBotHits
   },
   {
     id: '934654293238823255',
     chartOwner: 'azion',
     label: 'Good Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.goodBotHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.goodBotHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -892,13 +1152,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'neutral',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.goodBotHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.goodBotHits
   },
   {
     id: '259047966206560862',
     chartOwner: 'azion',
     label: 'Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -922,13 +1182,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'inverse',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botHits
   },
   {
     id: '541669034905662013',
     chartOwner: 'azion',
     label: 'Transactions',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.transactions.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.transactions.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -949,13 +1209,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'neutral',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.transactions
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.transactions
   },
   {
     id: '329891149133127508',
     chartOwner: 'azion',
     label: 'Bot Traffic',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botTraffic.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botTraffic.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -975,13 +1235,40 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botTraffic
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botTraffic
+  },
+  {
+    id: '329891149133127509',
+    chartOwner: 'azion',
+    label: 'Top Bot Traffic',
+    description:
+      'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    limit: 10000,
+    groupBy: ['classified'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotTraffic
   },
   {
     id: '577704475532819772',
     chartOwner: 'azion',
     label: 'Top Bot Action',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botAction.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botAction.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -1007,13 +1294,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotAction
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotAction
   },
   {
     id: '071851224118431167',
     chartOwner: 'azion',
     label: 'Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -1028,21 +1315,19 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 5000,
     groupBy: ['challengeSolved'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botCaptchaLine
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botCaptchaLine
   },
   {
     id: '455330743572401794',
     chartOwner: 'azion',
     label: 'Top Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -1057,22 +1342,20 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 2,
     groupBy: ['challengeSolved'],
     fields: ['challengeSolved'],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotCaptchaPie
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotCaptchaPie
   },
   {
     id: '424388331488145485',
     chartOwner: 'azion',
     label: 'Top Bot Classifications',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botClassification.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botClassification.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -1098,15 +1381,15 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotClassification
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotClassification
   },
   {
     id: '190246009413028885',
     chartOwner: 'azion',
     label: 'Bot Activity Map',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botActivityMap.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botActivityMap.description,
     aggregationType: 'sum',
-    columns: 6,
+    columns: 12,
     type: 'map',
     xAxis: 'cat',
     isTopX: true,
@@ -1128,7 +1411,90 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botActivityMap
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botActivityMap
+  },
+  /**
+   * SECURE
+   * Bot Manager - Bot Manager Breakdown
+   */
+  {
+    id: '847143804009563421',
+    chartOwner: 'azion',
+    label: 'Impacted URLs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.impactedUrls.description,
+    aggregationType: 'sum',
+    columns: 3,
+    type: 'big-numbers',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'botManagerBreakdownMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [],
+    filters: {},
+    groupBy: [],
+    fields: ['uniqRequestUrl'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.impactedUrls
+  },
+  {
+    id: '978435123222265554',
+    chartOwner: 'azion',
+    label: 'Top Bad Bot IPs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topBadBotIps.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'botManagerBreakdownMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'badBotRequests'
+      }
+    ],
+    filters: {},
+    limit: 10,
+    groupBy: ['remoteAddr'],
+    fields: ['remoteAddr'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topBadBotIps
+  },
+  {
+    id: '1030427483148242',
+    chartOwner: 'azion',
+    label: 'Top Impacted URLs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topImpactedUrls.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'botManagerBreakdownMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'botRequests'
+      }
+    ],
+    filters: {},
+    limit: 10,
+    groupBy: ['requestUrl'],
+    fields: ['requestUrl'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topImpactedUrls
   },
   /**
    * OBSERVE
@@ -1185,6 +1551,35 @@ const REPORTS = [
     dashboardId: '352149476039721549',
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalRequests
+  },
+  {
+    id: '424388331488145487',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by IP',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'httpBreakdownMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'wafThreatRequests'
+      }
+    ],
+    filters: {},
+    limit: 10,
+    groupBy: ['remoteAddress'],
+    fields: ['remoteAddress'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198934',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.threatsBreakdown.topWAFThreatRequestsByIP
   }
 ]
 

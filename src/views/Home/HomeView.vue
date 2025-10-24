@@ -11,6 +11,7 @@
   import { removeHtmlTagFromText } from '@/helpers'
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
   import CreateFormBlock from '@/templates/create-form-block'
+  import { useLayout } from '@/composables/use-layout'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -39,11 +40,14 @@
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
-  const user = useAccountStore().accountData
+  const { accountData } = useAccountStore()
+  const user = accountData
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
+  const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
 
+  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
   })
@@ -53,11 +57,11 @@
   })
 
   const navigateToEdgeApplications = () => {
-    router.push({ name: 'list-edge-applications' })
+    router.push({ name: 'list-applications' })
   }
 
   const navigateToPayment = () => {
-    router.push({ name: 'billing' })
+    router.push({ name: 'billing-tabs' })
   }
 
   const navigateToRealTimeMetrics = () => {
@@ -78,10 +82,6 @@
 
   const openAPIDocumentation = () => {
     props.windowManager.openAPIDocumentation()
-  }
-
-  const openContactSupport = () => {
-    props.windowManager.openContactSupport()
   }
 
   const validationSchema = yup.object({
@@ -126,8 +126,7 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full flex flex-col gap-6 lg:gap-8">
-        <!-- Getting Started -->
+      <section class="w-full flex flex-col gap-4 md:gap-6">
         <div
           v-if="showExperimental"
           class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
@@ -145,18 +144,18 @@
           />
         </div>
         <div
-          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
+          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-4 md:gap-6 justify-between"
         >
-          <div class="flex flex-col gap-4 max-w-4xl">
-            <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
-            <h2 class="text-sm md:text-xl text-color-secondary font-normal">
+          <div class="flex flex-col gap-2 max-w-4xl">
+            <h1 class="text-color text-xl md:text-2xl font-medium">Get Started</h1>
+            <h2 class="text-sm md:text-base text-color-secondary font-normal">
               Welcome aboard! Feel free to explore or get a head start below.
             </h2>
           </div>
           <div>
             <PrimeButton
               icon="pi pi-plus"
-              class="w-full sm:w-auto"
+              class="w-full md:w-auto md:pr-3.5"
               label="Create"
               type="button"
               size="small"
@@ -165,7 +164,10 @@
           </div>
         </div>
 
-        <div class="flex flex-col xl:flex-row gap-6">
+        <div
+          class="flex gap-6 flex-col"
+          :class="{ 'xl:flex-row': !showSidebar }"
+        >
           <!-- Manage Applications -->
           <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
             <div class="flex flex-row justify-start gap-3">
@@ -175,9 +177,9 @@
                 <span class="ai ai-edge-application"></span>
               </div>
               <div class="flex flex-col gap-2">
-                <div class="text-lg sm:text-xl font-medium">Manage Edge Applications</div>
+                <div class="text-lg sm:text-xl font-medium">Manage Applications</div>
                 <div class="text-xs sm:text-sm text-color-secondary">
-                  Add and manage edge applications' main settings, modules, and features.
+                  Add and manage your applications' main settings, modules, and features.
                 </div>
               </div>
             </div>
@@ -192,7 +194,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to build an application"
+                label="How to build"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -232,7 +234,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to use Real-Time Metrics"
+                label="How to use"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -243,6 +245,32 @@
                   root: { class: 'justify-center' },
                   label: { class: 'grow-0' }
                 }"
+              />
+            </div>
+          </div>
+          <!-- Ask Azion Copilot -->
+          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+            <div class="flex flex-row justify-start gap-3">
+              <div
+                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+              >
+                <span class="ai ai-ask-azion"></span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="text-lg sm:text-xl font-medium">Ask Azion Copilot</div>
+                <div class="text-xs sm:text-sm text-color-secondary">
+                  Ask your questions to Azion Copilot, an AI with deep edge computing expertise.
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+              <PrimeButton
+                type="button"
+                class="sm:w-auto w-full"
+                label="Open Azion Copilot"
+                outlined
+                size="small"
+                @click="OpenSidebarComponent('copilot')"
               />
             </div>
           </div>
@@ -258,12 +286,13 @@
             class="absolute right-3 top-3 sm:right-6 sm:top-6"
             size="small"
             type="button"
+            aria-label="Close invite session"
             @click="closeInviteSession"
           />
           <div class="flex flex-col gap-2">
             <div class="text-lg sm:text-xl font-medium">Invite your Team</div>
             <div class="text-xs sm:text-sm text-color-secondary">
-              All Azion plans include unlimited team seats. Invite colleagues to start building
+              All Azion plans include unlimited team seats. Invite your colleagues to start building
               together.
             </div>
           </div>
@@ -271,30 +300,28 @@
             :createService="props.inviteYourTeamService"
             :schema="validationSchema"
             disabledCallback
-            class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
+            class="flex flex-col lg:flex-row w-full items-end gap-2"
             :unSaved="false"
           >
             <template #form>
               <FormFieldsHome :teams="teams"></FormFieldsHome>
             </template>
             <template #action-bar="{ onSubmit, loading }">
-              <div class="mt-auto lg:mt-7">
-                <PrimeButton
-                  severity="secondary"
-                  type="submit"
-                  label="Invite"
-                  size="small"
-                  @click="onSubmit"
-                  :loading="loading"
-                  :disabled="loading"
-                  class="w-full px-4 lg:w-auto"
-                />
-              </div>
+              <PrimeButton
+                severity="secondary"
+                type="submit"
+                label="Invite"
+                size="small"
+                @click="onSubmit"
+                :loading="loading"
+                :disabled="loading"
+                class="w-full lg:w-auto lg:min-w-[5rem]"
+              />
             </template>
           </CreateFormBlock>
         </div>
 
-        <div class="w-full flex flex-col lg:flex-row gap-6 justify-between">
+        <div class="flex flex-col xl:flex-row gap-4 md:gap-6">
           <!-- Product -->
           <button
             type="button"
@@ -303,7 +330,7 @@
           >
             <div class="text-lg font-medium">Product Documentation</div>
             <div class="text-sm text-color-secondary">
-              Understand how to configure all Azion products and their features.
+              Understand how to configure all your Azion products and their features.
             </div>
           </button>
           <!-- API -->
@@ -314,18 +341,18 @@
           >
             <div class="text-lg font-medium">API Documentation</div>
             <div class="text-sm text-color-secondary">
-              Use the Azion API to interact with Azion products through HTTPS requests.
+              Use the Azion API to interact with your Azion products through HTTPS requests.
             </div>
           </button>
           <!-- Contact -->
           <button
             type="button"
             class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
-            @click="openContactSupport"
+            @click="OpenSidebarComponent('copilot', { clearChat: true })"
           >
-            <div class="text-lg font-medium">Contact Support</div>
+            <div class="text-lg font-medium">Get Assistance</div>
             <div class="text-sm text-color-secondary">
-              Send queries, suggestions, or report incidents to the specialized support team.
+              Access personalized support for all your queries, suggestions, or incident reports
             </div>
           </button>
         </div>

@@ -26,7 +26,7 @@ const PAGES_DASHBOARDS = {
   build: [
     {
       id: 1,
-      label: 'Edge Applications',
+      label: 'Applications',
       path: 'edge-applications',
       groupId: 1,
       dashboards: [
@@ -53,6 +53,12 @@ const PAGES_DASHBOARDS = {
           label: 'Bandwidth Saving',
           path: 'bandwidth-saving',
           dataset: 'httpMetrics'
+        },
+        {
+          id: '357549179454620240',
+          label: 'Request Breakdown',
+          path: 'request-breakdown',
+          dataset: 'httpBreakdownMetrics'
         }
       ]
     },
@@ -72,7 +78,7 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 3,
-      label: 'Edge Functions',
+      label: 'Functions',
       path: 'edge-functions',
       groupId: 1,
       dashboards: [
@@ -130,7 +136,7 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 9,
-      label: 'Bot Manager Advanced',
+      label: 'Bot Manager',
       path: 'bot-manager-advanced',
       groupId: 2,
       dashboards: [
@@ -139,6 +145,26 @@ const PAGES_DASHBOARDS = {
           label: 'Overview',
           path: 'overview',
           dataset: 'botManagerMetrics'
+        },
+        {
+          id: '659868342290523846',
+          label: 'Breakdown',
+          path: 'breakdown',
+          dataset: 'botManagerBreakdownMetrics'
+        }
+      ]
+    },
+    {
+      id: 10,
+      label: 'Threats Breakdown',
+      path: 'threats',
+      groupId: 2,
+      dashboards: [
+        {
+          id: '357548675837198934',
+          label: 'Threats Breakdown',
+          path: 'breakdown',
+          dataset: 'httpBreakdownMetrics'
         }
       ]
     }

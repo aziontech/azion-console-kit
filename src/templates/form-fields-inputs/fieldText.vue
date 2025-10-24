@@ -9,6 +9,9 @@
       type: String,
       default: ''
     },
+    class: {
+      type: String
+    },
     name: {
       type: String,
       required: true
@@ -32,6 +35,10 @@
     readonly: {
       type: Boolean,
       default: false
+    },
+    sensitive: {
+      type: Boolean,
+      default: false
     }
   })
   const inputRef = ref(null)
@@ -39,6 +46,8 @@
   const slots = useSlots()
   const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
+
+  const emit = defineEmits(['blur'])
 
   const customTestId = computed(() => {
     const id = attrs['data-testid'] || 'field-text'
@@ -63,10 +72,16 @@
   defineExpose({
     inputRef
   })
+
+  const onBlur = (event) => {
+    handleBlur(event)
+    emit('blur', event)
+  }
 </script>
 
 <template>
   <LabelBlock
+    v-if="props.label"
     :for="props.name"
     :data-testid="customTestId.label"
     :label="props.label"
@@ -81,10 +96,12 @@
     :readonly="readonly"
     :disabled="disabled"
     type="text"
+    @keypress.enter.prevent
     :placeholder="props.placeholder"
     @input="handleChange"
-    :class="{ 'p-invalid': errorMessage }"
-    @blur="handleBlur"
+    :class="[{ 'p-invalid': errorMessage }, props.class]"
+    @blur="onBlur"
+    v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
   />
   <small
     v-if="errorMessage"

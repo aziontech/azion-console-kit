@@ -1,16 +1,19 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateToUS,
   formatDateMonthAndYear,
-  formatDateToUSBilling
+  formatDateToUSBilling,
+  formatExhibitionDate,
+  getCurrentMonthStartEnd
 } from '@/helpers/convert-date'
+import { localeMock } from '../utils/localeMock'
 
 describe('convertDate', () => {
   it('should convert a given value to a date string in a specific format', () => {
     const value = '2022-01-01T00:00:00'
-    const expectedDate = 'January 1, 2022 at 12:00 AM'
+    const expectedDate = 'January 1, 2022 at 12:00:00 AM'
 
     expect(convertValueToDate(value)).toBe(expectedDate)
   })
@@ -34,16 +37,8 @@ describe('convertDate', () => {
   })
 
   it('should format a timestamp to "MM/DD/YYYY"', () => {
-    const input = 1720224000000 // timestamp for '2024-07-02'
-    const expectedDateString = '07/06/2024'
-    const actualDateString = formatDateToUS(input)
-
-    expect(actualDateString).toEqual(expectedDateString)
-  })
-
-  it('should format a Date object to "MM/DD/YYYY"', () => {
-    const input = new Date('2024-07-02')
-    const expectedDateString = '07/02/2024'
+    const input = '2024-07-30' // timestamp for '2024-07-02'
+    const expectedDateString = '07/30/2024'
     const actualDateString = formatDateToUS(input)
 
     expect(actualDateString).toEqual(expectedDateString)
@@ -89,5 +84,34 @@ describe('convertDate', () => {
 
     expect(actualDateString).toEqual(expectedDateString)
     expect(actualDateStringSecondCheck).toEqual(expectedDateString)
+  })
+
+  it('correctly formats a valid date string with short date and time styles', () => {
+    localeMock()
+
+    const dateString = '2023-10-05T15:30:00Z'
+    const result = formatExhibitionDate(dateString, 'short', 'short')
+    expect(result).toBe('10/5/23, 3:30 PM')
+  })
+
+  it('throws an error when given an invalid date string', () => {
+    localeMock()
+
+    const dateString = 'invalid-date'
+    expect(() => formatExhibitionDate(dateString, 'short', 'short')).toThrow()
+  })
+
+  it('should return the correct start and end dates for the current month', () => {
+    const mockDate = new Date('2023-11-15T10:00:00Z')
+    vi.setSystemTime(mockDate)
+
+    const result = getCurrentMonthStartEnd()
+
+    expect(result).toEqual({
+      dateInitial: '2023-11-01',
+      dateFinal: '2023-11-30'
+    })
+
+    vi.useRealTimers()
   })
 })

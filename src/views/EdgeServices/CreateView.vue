@@ -5,6 +5,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeService from './FormFields/FormFieldsEdgeService'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   defineOptions({ name: 'create-edge-service' })
 
   const props = defineProps({
@@ -31,6 +37,38 @@
     code: '',
     active: true
   }
+
+  const handleTrackSuccessCreated = (response) => {
+    tracker.product.productCreated({
+      productName: 'Edge Service'
+    })
+    handleToast(response)
+  }
+
+  const handleTrackFailCreated = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge Service',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Service has been created',
+      actions: {
+        link: {
+          label: 'View Edge Service',
+          callback: () => response.redirectToUrl(`/edge-services/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -43,6 +81,9 @@
         :createService="props.createEdgeServiceServices"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleTrackSuccessCreated"
+        @on-response-fail="handleTrackFailCreated"
+        disableToast
       >
         <template #form>
           <FormFieldsEdgeService />

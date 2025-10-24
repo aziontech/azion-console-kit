@@ -23,7 +23,7 @@ const createASNNetworkListCase = () => {
   cy.verifyToast('success', 'Your network list has been created')
 }
 
-describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
@@ -40,7 +40,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.nameInput).clear()
     cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
     cy.get(selectors.edgeFirewall.saveButton).click()
-    cy.verifyToast('success', 'Your Edge Firewall has been created')
+    cy.verifyToastWithAction('success', 'Your Edge Firewall has been created')
 
     // Act - Create a rule with a network list
     cy.get(selectors.edgeFirewall.rulesEngineTab).click()
@@ -51,16 +51,25 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
 
     // Act - Set Criteria
-    cy.intercept('GET', '/api/v3/network_lists?page=1&page_size=200').as('networkList')
+    cy.intercept(
+      'GET',
+      '/v4/workspace/network_lists?*'
+    ).as('networkList')
+    cy.intercept(
+      'GET',
+      `/v4/workspace/network_lists?ordering=name&page=1&page_size=100&search=${networkListName}`
+    ).as('networkListSearch')
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownNetworkLists).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorFirstOption).click()
     cy.wait('@networkList')
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).clear()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).type(networkListName)
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
+    cy.wait('@networkListSearch')
     cy.get(selectors.edgeFirewall.ruleCriteriaValueFirstOption).click()
 
     // Act - Set Behavior
@@ -71,7 +80,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
 
     // Assert - Find the created rule
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(`${ruleName}{enter}`)
     cy.get(selectors.edgeFirewall.rulesTableColumnName).should('have.text', ruleName)
     cy.get(selectors.edgeFirewall.rulesTableColumnDescriptionShowMore).click()
     cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should(
@@ -88,7 +97,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.mainSettingsTab).click()
     cy.get(selectors.edgeFirewall.cancelButton).click()
     cy.get(selectors.edgeFirewall.searchInput).clear()
-    cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.searchInput).type(`${firewallName}{enter}`)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })

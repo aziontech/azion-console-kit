@@ -1,6 +1,6 @@
 <script setup>
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   const emit = defineEmits(['update:visible'])
 
   const props = defineProps({
@@ -31,7 +31,7 @@
     }"
   >
     <template #header>
-      <div>Create Edge Application</div>
+      <div>Create Application</div>
       <ConsoleFeedback />
     </template>
     <template #default>

@@ -10,6 +10,7 @@ export const realTimeMetricsRoutes = {
     clipboardWrite
   },
   meta: {
+    title: 'Real-Time Metrics',
     breadCrumbs: [
       {
         label: 'Real-Time Metrics',

@@ -1,39 +1,31 @@
-import { useAccountStore } from '@/stores/account'
-import { billingRoutes } from '@/router/routes/billing-routes'
-import { getStaticUrlsByEnvironment } from '@/helpers'
+const BILLING_PATH = '/billing'
 
 const BILLING_REDIRECT_OPTIONS = {
-  path: `${billingRoutes.path}/payment`,
+  path: `${BILLING_PATH}/bills`,
   query: { paymentSession: 'true' }
 }
 
-const billingUrl = getStaticUrlsByEnvironment('billing')
-
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function billingGuard(to, next) {
-  const accountStore = useAccountStore()
-  const {
-    hasActiveUserId,
-    redirectToExternalBillingNeeded,
-    billingAccessPermitted,
-    paymentReviewPending
-  } = accountStore
+export async function billingGuard({ to, accountStore }) {
+  const { hasActiveUserId, billingAccessPermitted, paymentReviewPending } = accountStore
 
-  const isPrivateRoute = !to.meta.isPublic
-  const isCurrentRouteBilling = to.fullPath.includes(billingRoutes.path)
-
-  if (isPrivateRoute && hasActiveUserId) {
-    if (isCurrentRouteBilling) {
-      if (redirectToExternalBillingNeeded) {
-        window.open(billingUrl, '_blank')
-        return next(false)
-      }
-
-      if (!billingAccessPermitted) {
-        return next('/')
-      }
-    } else if (paymentReviewPending) {
-      return next(BILLING_REDIRECT_OPTIONS)
-    }
+  if (to.meta.isPublic || !hasActiveUserId) {
+    return true
   }
+
+  const isBillingRoute = to.fullPath.includes(BILLING_PATH)
+
+  if (isBillingRoute) {
+    if (!billingAccessPermitted) {
+      return '/'
+    }
+
+    return true
+  }
+
+  if (paymentReviewPending) {
+    return BILLING_REDIRECT_OPTIONS
+  }
+
+  return
 }

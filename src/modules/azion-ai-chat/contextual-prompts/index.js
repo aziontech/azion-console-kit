@@ -1,3 +1,4 @@
 import DomainsPrompts from './domains'
+import Generic from './generic'
 
-export { DomainsPrompts }
+export { DomainsPrompts, Generic }

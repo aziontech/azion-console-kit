@@ -1,3 +1,4 @@
+import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { azionAiRoutes } from '@routes/azion-ai-routes'
@@ -7,9 +8,10 @@ import { createNewRoutes } from '@routes/create-new-routes'
 import { compareWithAzionRoutes } from '@routes/compare-with-azion'
 import { dataStreamRoutes } from '@/router/routes/data-stream-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
-import { domainsRoutes } from '@routes/domains-routes'
+import { workloadRoutes } from '@/router/routes/workload-routes'
+import { domainsRoutes } from '@/router/routes/domains'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
-import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
+import { edgeFirewallRoutes } from '@routes/firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { edgePulseRoutes } from '@routes/edge-pulse-routes'
@@ -40,17 +42,29 @@ import { billingRoutes } from '@/router/routes/billing-routes'
 import { createRouter, createWebHistory } from 'vue-router'
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
-import redirectToManager from './hooks/redirectToManager'
+import { useAccountStore } from '@/stores/account'
+import { identityProvidersRoutes } from '@routes/identity-providers-routes'
+import { loadContractServicePlan } from '@/services/contract-services'
+import { resellerManagementRoutes } from '@routes/reseller-management-routes'
+import { groupsManagementRoutes } from '@routes/groups-management-routes'
+import { clientManagementRoutes } from '@routes/clients-management-routes'
+import { customPagesRoutes } from '@routes/custom-pages-routes'
+import { mfaManagementRoutes } from '@routes/mfa-management-routes'
+import { edgeConnectorsRoutes } from '@routes/edge-connectors-routes'
+import { edgeSQLRoutes } from '@routes/edge-sql-routes'
+import { edgeStorageRoutes } from '@routes/edge-storage'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     cliCallbackRoutes,
     dataStreamRoutes,
-    digitalCertificatesRoutes,
     domainsRoutes,
+    digitalCertificatesRoutes,
+    workloadRoutes,
     edgeApplicationRoutes,
     edgeFirewallRoutes,
+    identityProvidersRoutes,
     edgeFunctionsRoutes,
     edgePulseRoutes,
     edgeServicesRoutes,
@@ -81,12 +95,33 @@ const router = createRouter({
     billingRoutes,
     importGithubRoutes,
     azionAiRoutes,
-    compareWithAzionRoutes
+    compareWithAzionRoutes,
+    resellerManagementRoutes,
+    groupsManagementRoutes,
+    clientManagementRoutes,
+    customPagesRoutes,
+    mfaManagementRoutes,
+    edgeConnectorsRoutes,
+    edgeSQLRoutes,
+    edgeStorageRoutes
   ].concat(errorRoutes)
 })
 
-router.beforeEach(beforeEachRoute)
-router.beforeEach(redirectToManager)
+router.beforeEach(async (to, from, next) => {
+  const accountStore = useAccountStore()
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  await beforeEachRoute({
+    to,
+    from,
+    next,
+    accountStore,
+    loadContractServicePlan,
+    tracker
+  })
+})
+
 router.afterEach(afterEachRouteGuard)
 
 export default router

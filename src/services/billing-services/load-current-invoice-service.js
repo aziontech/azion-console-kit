@@ -1,78 +1,51 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
+import { getCurrentMonthStartEnd } from '@/helpers/get-current-month-start-end'
+import { useAccountStore } from '@/stores/account'
 
 export const loadCurrentInvoiceService = async () => {
-  const dateRange = getCurrentMonthStartEnd()
-  const payload = {
-    query: `query getBillDetail {
-      billDetail(
-          limit: 1,
-          aggregate: { sum: value }
-          groupBy: [billId]
-          orderBy: [productSlug_ASC, metricSlug_ASC]
-          filter: {
-            periodFromRange: {
-              begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
-            }
-          }
-      ) {
-          billId,
-          billDetailId,
-          createdDate,
-          periodFrom,
-          periodTo,
-          invoiceNumber,
-          totalValue,
-          currency,
-          temporaryBill
-      }
-    }`
-  }
+  const { accountIsNotRegular } = useAccountStore()
+  const payload = getQueryByAccountType(accountIsNotRegular)
+  const url = accountIsNotRegular ? `${makeBillingBaseUrl()}` : `${makeAccountingBaseUrl()}`
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeBillingBaseUrl()}`,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url,
+    method: 'POST',
+    body: payload
+  })
 
-  httpResponse = adapt(httpResponse)
+  httpResponse = adapt(httpResponse, accountIsNotRegular)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (httpResponse) => {
+const adapt = (httpResponse, accountIsNotRegular) => {
+  const emptyDefaultValue = '---'
   const {
-    body: {
-      data: { billDetail }
-    },
+    body: { data },
     statusCode
   } = httpResponse
 
-  const invoice = billDetail.length > 0 ? billDetail[0] : {}
-
-  const emptyDefaultValue = '---'
-
-  let billingPeriod = emptyDefaultValue
-  if (invoice.periodFrom && invoice.periodTo) {
-    billingPeriod = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
-      invoice.periodTo
-    )}`
-  }
-
+  const invoiceData = accountIsNotRegular ? data?.billDetail?.[0] : data?.accountingDetail?.[0]
+  const billingPeriod =
+    invoiceData?.periodFrom && invoiceData?.periodTo
+      ? `${formatDateToUSBilling(invoiceData.periodFrom)} - ${formatDateToUSBilling(
+          invoiceData.periodTo
+        )}`
+      : emptyDefaultValue
   const parseInvoice = {
-    billId: invoice.billId || emptyDefaultValue,
-    total: invoice.totalValue || emptyDefaultValue,
-    currency: invoice.currency || emptyDefaultValue,
+    redirectId: invoiceData?.billId,
+    billId: invoiceData?.billId || emptyDefaultValue,
+    total: invoiceData?.totalValue || 0,
+    currency: invoiceData?.currency || emptyDefaultValue,
     billingPeriod,
     productChanges: emptyDefaultValue,
     servicePlan: emptyDefaultValue,
-    creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
-    temporaryBill: invoice.temporaryBill || emptyDefaultValue
+    creditUsedForPayment: invoiceData?.creditUsedForPayment || 0.0,
+    temporaryBill: invoiceData?.temporaryBill || emptyDefaultValue
   }
 
   return {
@@ -81,16 +54,57 @@ const adapt = (httpResponse) => {
   }
 }
 
-const getCurrentMonthStartEnd = () => {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
+const getQueryByAccountType = (accountIsNotRegular) => {
+  const dateRange = getCurrentMonthStartEnd()
 
-  const dateInitial = new Date(year, month, 1)
-  const dateFinal = new Date(year, month + 1, 0)
-
-  return {
-    dateInitial: dateInitial.toISOString().split('T')[0],
-    dateFinal: dateFinal.toISOString().split('T')[0]
+  if (accountIsNotRegular) {
+    return {
+      query: `query getBillDetail {
+        billDetail(
+            limit: 1,
+            aggregate: { sum: value }
+            groupBy: [billId]
+            orderBy: [productSlug_ASC, metricSlug_ASC]
+            filter: {
+              periodFromRange: {
+                begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
+              }
+            }
+        ) {
+            billId,
+            billDetailId,
+            createdDate,
+            periodFrom,
+            periodTo,
+            invoiceNumber,
+            totalValue,
+            currency,
+            temporaryBill
+        }
+      }`
+    }
+  } else {
+    return {
+      query: `query {
+        accountingDetail (
+          limit: 1
+          filter: {
+            periodFromRange: {
+              begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
+            }
+          },
+          groupBy: [billId]
+        ) {
+          billId,
+          periodFrom,
+          periodTo,
+          accounted,
+          invoiceNumber,
+          regionName,
+          productSlug,
+          metricSlug
+        }
+      }`
+    }
   }
 }

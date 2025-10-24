@@ -116,10 +116,11 @@ For more details, see the official [@cypress/grep documentation](https://github.
 
 ### Tags Used in the Project
 
-| Tag   | Description                                         |
-|-------|-----------------------------------------------------|
-| @dev  | Runs the test in the DEV environment                |
-| @xfail| Prevents the test from running in workflows         |
+| Tag             | Description                                         |
+|-----------------|-----------------------------------------------------|
+| @dev            | Runs the test in the DEV environment                |
+| @xfail          | Prevents the test from running in workflows         |
+| @dont_run_prod  | Prevents the test from running in prod workflow     |
 
 ## Naming `data-testid`
 

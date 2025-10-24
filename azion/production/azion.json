@@ -2,7 +2,6 @@
   "name": "console_kit_31-07-2024",
   "bucket": "consolekit31-07-2024",
   "preset": "vue",
-  "mode": "deliver",
   "env": "production",
   "prefix": "20240731102422",
   "not-first-run": true,
@@ -20,10 +19,10 @@
     "name": "__DEFAULT__"
   },
   "domain": {
-    "id": 1722432873,
-    "name": "console_kit_31-07-2024",
-    "domain_name": "gzjntb7vdt.map.azionedge.net",
-    "url": "https://gzjntb7vdt.map.azionedge.net"
+    "id": 1698431301,
+    "name": "Console PK - Production",
+    "domain_name": "j65rq1emi4.map.azionedge.net",
+    "url": "https://j65rq1emi4.map.azionedge.net"
   },
   "rt-purge": {
     "purge_on_publish": true
@@ -35,19 +34,19 @@
       "name": "origin-storage-default"
     },
     {
-      "origin-id": 142753,
-      "origin-key": "c9f8a8c3-8121-414c-9a3c-208a263bc846",
-      "name": "origin-manager"
-    },
-    {
-      "origin-id": 142755,
-      "origin-key": "341ed3e6-59ef-4b9b-a19b-f43a1d1501d4",
-      "name": "origin-cities"
-    },
-    {
       "origin-id": 142756,
       "origin-key": "dcd816a3-8680-4281-96b9-ce1e8cb05e0d",
       "name": "origin-sso"
+    },
+    {
+      "origin-id": 199947,
+      "origin-key": "0b7d0aa1-15d0-45c8-8cae-7414007f5798",
+      "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 152310,
+      "origin-key": "1b3c2fd6-4ac1-4063-9ff5-e2b4352f917c",
+      "name": "origin-marketplace"
     },
     {
       "origin-id": 142757,
@@ -55,9 +54,9 @@
       "name": "origin-api"
     },
     {
-      "origin-id": 152310,
-      "origin-key": "1b3c2fd6-4ac1-4063-9ff5-e2b4352f917c",
-      "name": "origin-marketplace"
+      "origin-id": 142755,
+      "origin-key": "341ed3e6-59ef-4b9b-a19b-f43a1d1501d4",
+      "name": "origin-cities"
     },
     {
       "origin-id": 142751,
@@ -68,6 +67,21 @@
       "origin-id": 154233,
       "origin-key": "8c16e835-20af-41d5-a688-cac8e6aefa94",
       "name": "origin-console-feedback"
+    },
+    {
+      "origin-id": 199946,
+      "origin-key": "9c6a26e3-07b2-4cb1-8bb7-2040cfb1e60c",
+      "name": "origin-billing"
+    },
+    {
+      "origin-id": 199949,
+      "origin-key": "bbd3561e-ba36-4227-be0b-bcbfd0bd32bd",
+      "name": "origin-iam-api"
+    },
+    {
+      "origin-id": 199948,
+      "origin-key": "bd1c28b8-dc47-4ac4-8079-f05686d4bdee",
+      "name": "origin-template-engine"
     }
   ],
   "rules-engine": {
@@ -124,34 +138,69 @@
         "phase": "request"
       },
       {
-        "id": 269759,
-        "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": "request"
-      },
-      {
-        "id": 269760,
-        "name": "Rewrite _azrt Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269761,
-        "name": "Rewrite azsid Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269762,
-        "name": "Rewrite _azat Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269763,
-        "name": "Secure Headers",
-        "phase": "response"
-      },
-      {
         "id": 297983,
         "name": "Route Send Feedback",
         "phase": "request"
+      },
+      {
+        "id": 313139,
+        "name": "Route API Identity Providers",
+        "phase": "request"
+      },
+      {
+        "id": 372222,
+        "name": "API Version 4 Routing",
+        "phase": "request"
+      },
+      {
+        "id": 381598,
+        "name": "Billing PDF",
+        "phase": "request"
+      },
+      {
+        "id": 368275,
+        "name": "Rewrite azrt Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368276,
+        "name": "Rewrite azrt Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368277,
+        "name": "Rewrite azsid Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368278,
+        "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368279,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368280,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 468656,
+        "name": "OAuth Security Headers - Login and Signup",
+        "phase": "response"
+      },
+      {
+        "id": 468657,
+        "name": "OAuth Security Headers - GitHub Connection",
+        "phase": "response"
+      },
+      {
+        "id": 468658,
+        "name": "Secure Headers - General",
+        "phase": "response"
       }
     ]
   },
@@ -159,10 +208,6 @@
     {
       "id": 161051,
       "name": "Statics - Cache"
-    },
-    {
-      "id": 161052,
-      "name": "Marketplace - Cache"
     },
     {
       "id": 161053,

@@ -13,11 +13,16 @@ import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
 import TextWithTagColumn from './text-with-tag-column.vue'
 import CreditCardColumn from './credit-card-column.vue'
 import CountryFlagColumn from './country-flag-column.vue'
+import TagWithTooltip from './tag-with-tooltip'
+import LogBody from './log-body.vue'
+import TextWithIcon from './text-with-icon.vue'
+import TextFormatColumn from './text-format.vue'
+
 /**
  * Build and return a specific column based on the given appearance.
  *
  * @param {Object} params - The parameters to build the column.
- * @param {'expand-column'| 'expand-text-column'| 'avatar-with-text'| 'avatar-with-text-and-tooltip'| 'text-with-clipboard'| 'clickable-text'| 'clickable-tag'| 'clickable-link'| 'tag'| 'language-icon-with-text'| 'text-with-tag'| 'credit-card-column' | 'country-flag-column'} params.columnAppearance - The appearance of the column.
+ * @param {'expand-column'| 'expand-text-column'| 'avatar-with-text'| 'avatar-with-text-and-tooltip'| 'text-with-clipboard'| 'clickable-text'| 'clickable-tag'| 'clickable-link'| 'tag'| 'language-icon-with-text'| 'text-with-tag'| 'credit-card-column' | 'country-flag-column' | 'log-body'} params.columnAppearance - The appearance of the column.
  * @param {Object} params.data - The data with specific properties of the column appearance.
  * @param {Object} [params.dependencies] - (Optional) The dependencies needed for rendering this column appearance.
  *
@@ -26,13 +31,19 @@ import CountryFlagColumn from './country-flag-column.vue'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
+    case 'text-format':
+      return h(TextFormatColumn, {
+        text: data.text
+      })
     case 'expand-column':
       return h(ExpandColumn, {
-        value: data
+        value: data,
+        showCopy: dependencies?.showCopy || false
       })
     case 'expand-text-column':
       return h(ExpandTextColumn, {
-        value: data
+        value: data.value,
+        sliceValue: data.sliceValue
       })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
@@ -100,6 +111,25 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(CountryFlagColumn, {
         country: data?.country,
         code: data?.code
+      })
+    case 'tag-with-tooltip':
+      return h(TagWithTooltip, {
+        tagProps: {
+          value: data.content,
+          icon: data.icon,
+          severity: data.severity
+        },
+        tooltipText: data.tooltipText
+      })
+    case 'log-body':
+      return h(LogBody, {
+        value: data
+      })
+    case 'text-with-icon':
+      return h(TextWithIcon, {
+        text: data.text,
+        leftIcon: data.leftIcon,
+        rightIcon: data.rightIcon
       })
     default:
       throw new Error('Invalid column appearance')

@@ -1,10 +1,9 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
-  defineEmits(['handleCopy'])
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
   const defaultTagCode = ref(`<script>
     if (typeof window.addEventListener === 'function') {
       window.addEventListener('load', function() {
@@ -51,13 +50,9 @@
         </div>
       </div>
       <div>
-        <PrimeButton
-          label="Copy"
-          icon="pi pi-copy"
-          class="max-md:w-full"
-          data-testid="edge-pulse__default-tag-copy-button"
-          @click="$emit('handleCopy', { code: defaultTagCode })"
-          outlined
+        <copyBlock
+          :value="defaultTagCode"
+          label="Copy script"
         />
       </div>
     </template>

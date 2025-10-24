@@ -7,7 +7,8 @@ const fixtures = {
     id: 76789,
     active: true,
     groups: [],
-    name: 'My Edge Service'
+    name: 'My Edge Service',
+    has_services: true
   }
 }
 
@@ -49,7 +50,19 @@ describe('EdgeNodeServices', () => {
       name: fixtures.mock.name,
       groups: fixtures.mock.groups,
       hashId: fixtures.mock.hashId,
-      id: fixtures.mock.id
+      id: fixtures.mock.id,
+      hasServices: fixtures.mock.has_services
     })
+  })
+
+  it('should return an error when the request fails with status 400', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: { detail: 'Bad Request' }
+    })
+
+    const { sut } = makeSut()
+
+    await expect(sut({ id: fixtures.mock.id })).rejects.toThrow('Bad Request')
   })
 })

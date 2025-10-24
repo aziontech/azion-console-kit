@@ -10,6 +10,7 @@
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { wafService } from '@/services/v2/waf/waf-service'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -37,14 +38,18 @@
 
   const getWafDat = async () => {
     try {
-      return await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
+      return await wafService.loadWafRule({ id: wafRuleId.value })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Processing failed',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Processing failed',
+          detail: error.message || error
+        })
+      }
     }
   }
 
@@ -132,7 +137,6 @@
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
             :updatedRedirect="props.wafServices.updatedRedirect"
-            :editWafRulesService="props.wafServices.editWafRulesService"
             :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
             @handleWafRulesUpdated="updateWafRulesValue"
@@ -150,11 +154,11 @@
             :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
             :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
             :listCountriesService="props.wafTuning.listCountriesService"
-            :listNetworkListService="props.wafTuning.listNetworkListService"
             :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
+            :listDomainsService="props.wafTuning.listDomainsService"
             :showActionBar="activeTab === mapTabs.tuning"
-            :createWafRulesAllowedTuningService="props.wafTuning.createWafRulesAllowedTuningService"
             :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
+            :loadDomainService="props.wafTuning.loadDomainService"
           />
         </TabPanel>
         <TabPanel
@@ -165,13 +169,7 @@
         >
           <ListWafRulesAllowed
             v-if="activeTab === mapTabs.allowed"
-            :listWafRulesAllowedService="props.wafRulesAllowed.listWafRulesAllowedService"
-            :deleteWafRulesAllowedService="props.wafRulesAllowed.deleteWafRulesAllowedService"
-            :createWafRulesAllowedService="props.wafRulesAllowed.createWafRulesAllowedService"
-            :loadWafRulesAllowedService="props.wafRulesAllowed.loadWafRulesAllowedService"
-            :editWafRulesAllowedService="props.wafRulesAllowed.editWafRulesAllowedService"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
-            :optionsRuleIds="props.wafRulesAllowed.optionsRuleIds"
             @handle-go-to-tuning="changeRouteByClickingOnTab"
           />
         </TabPanel>

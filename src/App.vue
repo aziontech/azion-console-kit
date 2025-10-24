@@ -1,31 +1,56 @@
 <script setup>
   import DynamicDialog from 'primevue/dynamicdialog'
   import { computed, inject, watch } from 'vue'
-  import { RouterView, useRoute } from 'vue-router'
-  import ShellBlock from '@/templates/shell-block'
+  import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
+  import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+
+  const DEFAULT_TITLE = 'Azion Console'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()
-
   const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
 
   const route = useRoute()
 
-  const updateTrackingTraits = () => {
-    const { kind: accountType, client_id: clientId, email, name } = accountStore.account
-    const isAccountTypeWithoutClientId = accountType !== 'client'
-    if (isAccountTypeWithoutClientId) return
+  watch(
+    () => route,
+    (to) => {
+      const hasId = to.params.id
+      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
+      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
+    },
+    { immediate: true, deep: true }
+  )
 
-    const defaultTraits = { client_id: clientId, email, name }
+  const updateTrackingTraits = () => {
+    const {
+      user_id: userID,
+      id: accountId,
+      client_id: clientId,
+      email,
+      name,
+      kind: accountType,
+      status
+    } = accountStore.account
+
+    const defaultTraits = {
+      client_id: clientId,
+      email,
+      account_id: accountId,
+      account_name: name,
+      account_type: accountType,
+      client_status: status
+    }
+
     tracker.assignGroupTraits(defaultTraits)
-    tracker.identify(clientId)
+    tracker.identify(userID)
   }
 
   const isLogged = computed(() => {
@@ -41,16 +66,6 @@
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <DynamicDialog />
-    <ShellBlock
-      v-slot:default="{ customClass }"
-      :isLogged="isLogged"
-    >
-      <RouterView
-        :class="customClass"
-        class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
-      />
-    </ShellBlock>
-  </div>
+  <DynamicDialog />
+  <Layout :isLogged="isLogged" />
 </template>

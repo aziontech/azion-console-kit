@@ -5,7 +5,7 @@ const userFirstName = generateUniqueName('FirstName')
 const userLastName = generateUniqueName('LastName')
 const userEmail = `${userFirstName}@azion.com`
 
-describe('Users Management spec', { tags: ['@dev7', '@xfail'] }, () => {
+describe('Users Management spec', { tags: ['@dev7'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Users Management')
@@ -40,7 +40,7 @@ describe('Users Management spec', { tags: ['@dev7', '@xfail'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your user has been created')
 
-    cy.get(selectors.list.searchInput).type(userFirstName)
+    cy.get(selectors.list.searchInput).type(`${userFirstName}{enter}`)
 
     cy.get(selectors.usersManagement.listRow('firstName')).should('have.text', userFirstName)
     cy.get(selectors.usersManagement.listRow('lastName')).should('have.text', userLastName)
@@ -49,12 +49,5 @@ describe('Users Management spec', { tags: ['@dev7', '@xfail'] }, () => {
     cy.get(selectors.usersManagement.listRow('mfa')).should('have.text', 'Active')
     cy.get(selectors.usersManagement.listRow('status')).should('have.text', 'Inactive')
     cy.get(selectors.usersManagement.listRow('owner')).should('have.text', 'No')
-  })
-
-  afterEach(() => {
-    // Delete the user
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('User successfully deleted')
-    })
   })
 })

@@ -22,9 +22,12 @@ const fixtures = {
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: '',
-    connectionTimeout: 60,
-    timeoutBetweenBytes: 35
+    hmacSecretKey: ''
+  },
+  requestPayloadMockLiveIngest: {
+    name: 'New Origin',
+    originType: 'live_ingest',
+    streamingEndpoint: 'br-east-1.azioningest.net'
   },
   adaptedPayloadMock: {
     name: 'New Origin',
@@ -43,9 +46,7 @@ const fixtures = {
     hmac_authentication: false,
     hmac_region_name: '',
     hmac_access_key: '',
-    hmac_secret_key: '',
-    connection_timeout: 60,
-    timeout_between_bytes: 35
+    hmac_secret_key: ''
   }
 }
 
@@ -107,6 +108,15 @@ const scenarios = [
       bucket: 'my-bucket',
       prefix: '/'
     }
+  },
+  {
+    label: 'should call API with correct params when origin type is live ingest',
+    payload: fixtures.requestPayloadMockLiveIngest,
+    adaptedPayload: {
+      name: 'New Origin',
+      origin_type: 'live_ingest',
+      streaming_endpoint: 'br-east-1.azioningest.net'
+    }
   }
 ]
 
@@ -138,7 +148,7 @@ describe('EdgeApplicationOriginsServices', () => {
     })
   })
 
-  it('Should return an API array error to an invalid edge application', async () => {
+  it('Should return an API array error to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -154,7 +164,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error to an invalid edge application ', async () => {
+  it('Should return an API error to an invalid Application ', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -170,7 +180,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error with object to an invalid edge application', async () => {
+  it('Should return an API error with object to an invalid Application', async () => {
     const apiErrorMock = 'name should not be empty'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,

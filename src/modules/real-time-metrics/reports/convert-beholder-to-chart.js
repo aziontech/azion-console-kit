@@ -2,7 +2,6 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatDataUnit } from '../chart/format-graph'
-import countries from '../helpers/countries-code.json'
 
 import {
   formatYAxisLabels,
@@ -150,23 +149,7 @@ const getGroupByKeyValues = (groupBy, item) => {
   })
 }
 
-/**
- * Pushes the additionalSerie values to the series.
- * @param {number} countValues - The count of values.
- * @param {Object} series - The series to push the values to.
- * @param {Object} item - The item containing the additionalSerie values.
- * @param {string} additionalSerie - The additionalSerie to push to the series.
- */
-const pushToSeries = (countValues, series, item, additionalSerie) => {
-  if (countValues === 0) {
-    series[additionalSerie] = [additionalSerie]
-  }
-  let value = 0
-  if (additionalSerie in item) {
-    value = item[additionalSerie]
-  }
-  series[additionalSerie].push(value)
-}
+// Removed: pushToSeries (we set values into the current time/category slot to keep alignment consistent)
 
 /**
  * Fills the series with empty results for the cycles that do not have data records
@@ -175,7 +158,11 @@ const pushToSeries = (countValues, series, item, additionalSerie) => {
  */
 const fillSeriesKeysWithZeroes = (series, countValues) => {
   Object.keys(series).forEach((serieKey) => {
-    if (series[serieKey].lenght < countValues) series[serieKey].push(0)
+    // Ensure each series has a value for every X point already added.
+    // Subtract 1 to account for the header at index 0 (series name).
+    while (series[serieKey].length - 1 < countValues) {
+      series[serieKey].push(0)
+    }
   })
 }
 
@@ -274,7 +261,34 @@ const formatTsChartData = ({
   let lastXAxis = null
   let countValues = 0
 
+  // Helper: ensure series exists and set value for the current (last) slot
+  const setCurrentSlotValue = (key, value) => {
+    if (!(key in series)) {
+      if (isSeriesBeyondLimits(series)) return
+      series[key] = [key]
+      if (countValues > 0) {
+        series[key] = series[key].concat(Array(countValues).fill(0))
+      }
+    }
+    // pad to current slot
+    while (series[key].length - 1 < countValues) {
+      series[key].push(0)
+    }
+    if (series[key].length > 1) {
+      series[key][series[key].length - 1] = value
+    }
+  }
+
   data[report.dataset]?.forEach((item) => {
+    // 1) Add X-axis point first when needed to keep alignment
+    if (shouldAddExtraPointsToAxis(report.isTopX, lastXAxis, item, report.xAxis)) {
+      const props = { series, item, xAxis: report.xAxis, xAxisData, userUTC, countValues }
+      const newExtraPoint = addExtraPointsToXAxis(props)
+
+      lastXAxis = newExtraPoint
+      countValues += 1
+    }
+
     if (shouldHandleSeriesData(variable, groupBy)) {
       let key = variable
 
@@ -292,44 +306,29 @@ const formatTsChartData = ({
         }
       }
 
-      // Creates the HEADER of the series with the name of aggregation
-      if (!(key in series)) {
-        if (isSeriesBeyondLimits(series)) {
-          return
-        }
-
-        series[key] = [key]
-        /*
-          if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
-        */
-        if (countValues > 0) {
-          series[key] = series[key].concat(Array(countValues).fill(0))
-        }
-      }
-
       let value = item[aggregation] || 0
       if (variable === null) {
         value = item[additionalSeries[0]]
       }
-      series[key].push(value)
+      setCurrentSlotValue(key, value)
     }
 
     if (!groupBy?.length) {
       additionalSeries.forEach((additionalSerie) => {
-        pushToSeries(countValues, series, item, additionalSerie)
+        const value = additionalSerie in item ? item[additionalSerie] : 0
+        setCurrentSlotValue(additionalSerie, value)
       })
-    }
-
-    if (shouldAddExtraPointsToAxis(report.isTopX, lastXAxis, item, report.xAxis)) {
-      const props = { series, item, xAxis: report.xAxis, xAxisData, userUTC, countValues }
-      const newExtraPoint = addExtraPointsToXAxis(props)
-
-      lastXAxis = newExtraPoint
-      countValues += 1
     }
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
+
+  const BOT_CAPTCHA_CHART = '071851224118431167'
+  if (report.id === BOT_CAPTCHA_CHART) {
+    seriesArray.forEach((serie) => {
+      serie[0] = serie[0] === 'true' ? 'Solved' : 'Not Solved'
+    })
+  }
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
@@ -346,9 +345,9 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   const seriesName = report.groupBy[0]
   const fieldName = report.aggregationType || report.fields[0]
 
-  const botCaptchaIds = ['455330743572401794', '071851224118431167']
+  const BOT_CAPTCHA_IDS = ['455330743572401794', '071851224118431167']
 
-  if (botCaptchaIds.includes(report.id)) {
+  if (BOT_CAPTCHA_IDS.includes(report.id)) {
     return data[dataset].map((item) => {
       const captchaSeriesName = item[seriesName] == 'true' ? 'Solved' : 'Not Solved'
       return [camelToTitle(captchaSeriesName), item[fieldName]]
@@ -408,10 +407,22 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const series = [seriesName]
   const values = [dataUnit]
 
+  const TOP_IMPACTED_URLS_CHART = '1030427483148242'
+  const WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART = '357842851576414808'
+
   data[dataset].forEach((item) => {
-    series.push(camelToTitle(item[seriesName]))
+    report.id !== TOP_IMPACTED_URLS_CHART
+      ? series.push(camelToTitle(item[seriesName]))
+      : series.push(item[seriesName])
     values.push(item[aggregation] || item[fieldName])
   })
+
+  if (report.id === WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART) {
+    const newSeries = series.map((value) =>
+      typeof value === 'string' ? value.replaceAll('$', '') : value
+    )
+    return [newSeries, values]
+  }
 
   return [series, values]
 }
@@ -428,8 +439,16 @@ const formatBigNumbers = ({ report, data }) => {
   const fieldName = report.fields[0]
   const aggregation = report.aggregationType
 
-  const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
-  const { unit, value } = formatDataUnit(total, report)
+  const total = data[dataset].reduce(
+    (acc, current) => acc + (current[aggregation] || current[fieldName]),
+    0
+  )
+  let { unit, value } = formatDataUnit(total, report)
+
+  const IMPACTED_URLS_CHART = '847143804009563421'
+  if (report.id === IMPACTED_URLS_CHART) {
+    unit = 'URLs'
+  }
 
   return [
     {
@@ -447,37 +466,33 @@ const formatBigNumbers = ({ report, data }) => {
  * @param {Array} data - The data to be formatted.
  */
 const formatListChart = ({ report, data }) => {
-  const dataset = Object.keys(data)
-  const fieldsRequest = Object.keys(data[dataset][0])
-  const fieldNames = report.fields
-  const fieldCountryName = report.groupBy[0]
+  const datasetKey = report.dataset
+  const dataset = data[datasetKey] || []
 
-  const dataValue = data[dataset].map((obj) => {
-    const extractedObj = {}
-    fieldNames.forEach((key) => {
-      extractedObj[key] = formatYAxisLabels(obj[key], report)
-      extractedObj[fieldCountryName] = {
-        code: countries[obj[fieldCountryName]] || '-',
-        country: obj[fieldCountryName]
-      }
-    })
+  if (!dataset.length) return { data: [], columns: [] }
 
-    return { ...obj, ...extractedObj }
-  })
+  const { fields, aggregations } = report
+  const fieldsHandle = [...new Set(fields)]
 
-  const header = fieldsRequest.map((field) => camelToTitle(field))
+  const aggregationKey = aggregations[0]?.aggregation
 
-  const columns = fieldsRequest.map((field, index) => ({
-    field: field,
-    header: header[index]
+  if (!aggregationKey) return { data: [], columns: [] }
+
+  // Formata os valores da agregação para exibição
+  const formattedData = dataset.map((item) => ({
+    ...item,
+    [aggregationKey]: formatDataUnit(item[aggregationKey], report)?.value
   }))
 
-  return [
-    {
-      data: dataValue,
-      columns
-    }
-  ]
+  fieldsHandle.push(aggregationKey)
+
+  // Define as colunas com os nomes corretos
+  const columns = fieldsHandle.map((field) => ({
+    field,
+    header: CHART_RULES.COLUMN_NAMES_FIELD[field] || camelToTitle(field)
+  }))
+
+  return [{ data: formattedData, columns }]
 }
 
 const formatMapChartData = ({ report, data }) => {
@@ -503,6 +518,10 @@ const formatMapChartData = ({ report, data }) => {
 
     return result
   })
+
+  if (!heatmap.length) {
+    return []
+  }
 
   return [
     {

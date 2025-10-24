@@ -40,15 +40,10 @@ describe('Users Management spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.verifyToast('error', 'You cannot assign an account owner user to a Team.')
-
-    cy.get(selectors.usersManagement.switchSocialLogin).click()
-    cy.get(selectors.usersManagement.switchSocialLogin).click()
-    cy.get(selectors.form.submitButton).click()
 
     cy.verifyToast('success', 'Your user has been created')
 
-    cy.get(selectors.list.searchInput).type(userFirstName)
+    cy.get(selectors.list.searchInput).type(`${userFirstName}{enter}`)
 
     cy.get(selectors.usersManagement.listRow('firstName')).should('have.text', userFirstName)
     cy.get(selectors.usersManagement.listRow('lastName')).should('have.text', userLastName)
@@ -57,12 +52,5 @@ describe('Users Management spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.usersManagement.listRow('mfa')).should('have.text', 'Active')
     cy.get(selectors.usersManagement.listRow('status')).should('have.text', 'Inactive')
     cy.get(selectors.usersManagement.listRow('owner')).should('have.text', 'Yes')
-  })
-
-  afterEach(() => {
-    // Delete the user
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('User successfully deleted')
-    })
   })
 })

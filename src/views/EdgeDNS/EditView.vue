@@ -6,28 +6,28 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
-  import ListTableNoHeaderBlock from '@templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import PageHeadingBlock from '@templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onBeforeMount, ref, watch, reactive, provide } from 'vue'
+  import { computed, onBeforeMount, ref, watch, reactive, provide, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
-  import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
+  import FormFieldsEdgeDnsEdit from './FormFields/FormFieldsEditEdgeDns.vue'
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
-    loadEdgeDNSService: { type: Function, required: true },
-    editEdgeDNSService: { type: Function, required: true },
-
-    listRecordsService: { type: Function, required: true },
-    deleteRecordsService: { type: Function, required: true },
-    loadRecordsService: { type: Function, required: true },
     editRecordsService: { type: Function, required: true },
 
     clipboardWrite: { type: Function, required: true },
@@ -51,6 +51,10 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
+      field: 'id',
+      header: 'ID'
+    },
+    {
       field: 'name',
       header: 'Name'
     },
@@ -61,6 +65,7 @@
     {
       field: 'value',
       header: 'Value',
+      sortField: 'answers_list',
       filterPath: 'value.content',
       type: 'component',
       component: (columnData) =>
@@ -68,19 +73,23 @@
     },
     {
       field: 'ttl',
-      header: 'TTL (seconds)'
+      header: 'TTL (seconds)',
+      sortField: 'ttl'
     },
     {
       field: 'policy',
-      header: 'Policy'
+      header: 'Policy',
+      sortField: 'policy'
     },
     {
       field: 'weight',
-      header: 'Weight'
+      header: 'Weight',
+      sortField: 'weight'
     },
     {
       field: 'description',
-      header: 'Description'
+      header: 'Description',
+      sortField: 'description'
     }
   ])
   const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
@@ -88,6 +97,7 @@
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
   const visibleOnSaved = ref(false)
+  const edgeDNSName = ref('')
 
   const defaultTabs = {
     mainSettings: 0,
@@ -130,22 +140,40 @@
         is: 'weighted',
         then: (schema) => schema.min(0).max(255).required()
       }),
-    description: yup.string().when('selectedPolicy', {
-      is: 'weighted',
-      then: (schema) => schema.required().label('Description')
-    }),
+    description: yup.string().label('Description'),
     edgeDNSID: yup.number()
   })
+
+  const EDGE_DNS_RECORDS_FIELDS = [
+    'id',
+    'name',
+    'type',
+    'rdata',
+    'ttl',
+    'policy',
+    'weight',
+    'description'
+  ]
 
   const initialValuesCreateRecords = {
     name: '',
     selectedRecordType: 'A',
     value: '',
-    ttl: TTL_MAX_VALUE_RECORDS,
+    ttl: TTL_DEFAULT,
     selectedPolicy: 'simple',
     weight: '100',
     description: '',
     edgeDNSID: route.params.id
+  }
+
+  const handleCreatedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessCreated()
+  }
+
+  const handleEditedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessEdit()
   }
 
   const reloadResourcesList = () => {
@@ -156,12 +184,31 @@
     hasContentToList.value = true
   }
 
-  const listRecordsServiceEdgeDNSDecorator = async () => {
-    return await props.listRecordsService({ id: edgeDNSID.value })
+  const handleTrackEditEvent = () => {
+    tracker.product.productEdited({
+      productName: 'Edge DNS Zone'
+    })
+  }
+
+  const handleTrackFailEditEvent = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge DNS Zone',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const listRecordsServiceEdgeDNSDecorator = async (query) => {
+    const params = { ...query }
+    return await edgeDNSRecordsService.listRecords(edgeDNSID.value, params)
   }
 
   const deleteRecordsServiceEdgeDNSDecorator = async (recordID) => {
-    return await props.deleteRecordsService({
+    return await edgeDNSRecordsService.deleteRecord({
       recordID: recordID,
       edgeDNSID: edgeDNSID.value
     })
@@ -169,6 +216,7 @@
 
   const openCreateDrawerEDNSResource = () => {
     showCreateRecordDrawer.value = true
+    handleTrackEventGoToCreate()
   }
   const openEditDrawerEDNSResource = (event) => {
     selectedEdgeDnsRecordToEdit.value = event.id
@@ -187,8 +235,8 @@
     changeTab(tabEvent.index)
   }
 
-  const handleCopyNameServers = () => {
-    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+  const handleCopy = (nameserver) => {
+    props.clipboardWrite(nameserver)
     toast.add({
       closable: true,
       severity: 'success',
@@ -209,14 +257,17 @@
   })
 
   const loadRecordServiceWithEDNSIdDecorator = async (payload) => {
-    return await props.loadRecordsService({
+    return await edgeDNSRecordsService.loadRecord({
       id: payload.id,
       edgeDNSId: edgeDNSID.value
     })
   }
 
   const editRecordServiceWithEDNSIdDecorator = async (payload) => {
-    return await props.editRecordsService({ edgeDNSId: edgeDNSID.value, ...payload })
+    return await edgeDNSRecordsService.editRecordsService({
+      edgeDNSId: edgeDNSID.value,
+      ...payload
+    })
   }
 
   watch(route, () => {
@@ -265,25 +316,73 @@
       service: deleteRecordsServiceEdgeDNSDecorator
     }
   ]
+
+  const handleTrackEventGoToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackEventGoToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackSuccessCreated = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackFailCreated = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Record',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Record'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Record',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const loadEdgeDNS = async (id) => {
+    const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
+    edgeDNSName.value = edgeDNS.name
+    return edgeDNS
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Edit Zone"
-        description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
-      >
-        <template #default>
-          <PrimeButton
-            outlined
-            icon="pi pi-copy"
-            class="max-md:w-full"
-            label="Copy Nameserver Values"
-            @click="handleCopyNameServers"
-          ></PrimeButton>
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="edgeDNSName" />
     </template>
     <template #content>
       <TabView
@@ -300,14 +399,16 @@
           }"
         >
           <EditFormBlock
-            :editService="editEdgeDNSService"
-            :loadService="loadEdgeDNSService"
+            :editService="edgeDNSService.editEdgeDNSService"
+            :loadService="loadEdgeDNS"
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
+            @on-edit-success="handleTrackEditEvent"
+            @on-edit-fail="handleTrackFailEditEvent"
           >
             <template #form>
-              <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
+              <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
             </template>
             <template #action-bar="{ onSubmit, onCancel, loading }">
               <ActionBarTemplate
@@ -328,10 +429,11 @@
           }"
         >
           <div v-if="showRecords">
-            <ListTableNoHeaderBlock
+            <FetchListTableBlock
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
               addButtonLabel="Record"
+              defaultOrderingFieldName="entry"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
@@ -339,6 +441,8 @@
               emptyListMessage="No records found."
               :actions="actions"
               isTabs
+              :apiFields="EDGE_DNS_RECORDS_FIELDS"
+              @on-before-go-to-edit="handleTrackEventGoToEdit"
             >
               <template #addButton>
                 <PrimeButton
@@ -348,7 +452,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-            </ListTableNoHeaderBlock>
+            </FetchListTableBlock>
 
             <EmptyResultsBlock
               v-else
@@ -377,10 +481,11 @@
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"
               v-model:visible="showCreateRecordDrawer"
-              :createService="createRecordsService"
+              :createService="edgeDNSRecordsService.createRecord"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
-              @onSuccess="reloadResourcesList"
+              @onSuccess="handleCreatedSuccessfully"
+              @onError="handleTrackFailCreated"
               title="Create Record"
             >
               <template #formFields>
@@ -395,7 +500,8 @@
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"
               :schema="validationSchemaEDNSRecords"
-              @onSuccess="reloadResourcesList"
+              @onSuccess="handleEditedSuccessfully"
+              @onError="handleTrackFailEdit"
               title="Edit Record"
             >
               <template #formFields>

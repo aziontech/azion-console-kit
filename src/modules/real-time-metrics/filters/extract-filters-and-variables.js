@@ -90,7 +90,9 @@ function extractDatasets(filters) {
  * @returns {boolean} - True if the value is a single filter, false otherwise.
  */
 const isSingleFilter = (value, inputType) => {
-  return value || value === 0 || inputType === 'String'
+  return (
+    value || value === 0 || inputType === 'String' || (inputType === 'Boolean' && value === false)
+  )
 }
 
 /**

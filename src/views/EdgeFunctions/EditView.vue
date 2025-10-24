@@ -1,32 +1,33 @@
 <script setup>
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+
   import ContentBlock from '@/templates/content-block'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+
+  import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref, inject } from 'vue'
+
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   const props = defineProps({
-    loadEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    editEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
     }
   })
+
+  const isLoading = ref(false)
+  const additionalErrors = ref([])
   const updateObject = ref({})
-  const language = ref(null)
+  const runtime = ref(null)
+  const name = ref('')
 
   const handleTrackSuccessEdit = () => {
     tracker.product
@@ -50,7 +51,8 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    azionForm: yup.object(),
+    defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -60,24 +62,44 @@
       return isValidJson
     }),
     active: yup.boolean(),
-    language: yup.string()
+    runtime: yup.string()
   })
+
+  const hasAdditionalErrors = () => {
+    return additionalErrors.value.length
+  }
+
+  const handleAdditionalErrors = (errors) => {
+    additionalErrors.value = errors
+  }
+
+  const formSubmit = async (onSubmit) => {
+    isLoading.value = true
+
+    if (hasAdditionalErrors()) {
+      isLoading.value = false
+      return
+    }
+
+    await onSubmit()
+    isLoading.value = false
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Function">
+      <PageHeadingBlock :pageTitle="name">
         <MobileCodePreview
           :updateObject="updateObject"
-          :language="language"
+          :runtime="runtime"
         />
       </PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
+        :editService="edgeFunctionService.editEdgeFunctionService"
+        :loadService="edgeFunctionService.loadEdgeFunctionService"
         :updatedRedirect="props.updatedRedirect"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
@@ -86,14 +108,16 @@
         <template #form>
           <FormFieldsEditEdgeFunctions
             v-model:preview-data="updateObject"
-            v-model:lang="language"
+            v-model:run="runtime"
+            v-model:name="name"
+            @additionalErrors="handleAdditionalErrors"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            @onSubmit="formSubmit(onSubmit)"
             @onCancel="onCancel"
-            :loading="loading"
+            :loading="isLoading || loading"
           />
         </template>
       </EditFormBlock>

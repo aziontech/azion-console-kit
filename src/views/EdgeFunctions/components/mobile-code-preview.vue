@@ -42,20 +42,20 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import CodePreview from './code-preview.vue'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   const props = defineProps({
     updateObject: {
       type: Object,
       required: true
     },
-    language: {
+    runtime: {
       type: String
     }
   })
 
   const buttonClasses = computed(() => {
-    return props.language !== 'lua' ? 'flex md:hidden' : 'hidden'
+    return props.runtime !== 'azion_lua' ? 'flex md:hidden' : 'hidden'
   })
 
   const showMobilePreview = ref(false)

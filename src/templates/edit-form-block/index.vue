@@ -5,6 +5,7 @@
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { capitalizeFirstLetter } from '@/helpers'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -35,10 +36,20 @@
     disableAfterCreateToastFeedback: {
       type: Boolean,
       default: false
+    },
+    initialValues: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const emit = defineEmits(['on-edit-success', 'on-edit-fail', 'on-load-fail'])
+  const emit = defineEmits([
+    'on-edit-success',
+    'on-edit-fail',
+    'on-load-fail',
+    'loaded-service-object',
+    'onError'
+  ])
 
   const { scrollToError } = useScrollToError()
   const router = useRouter()
@@ -47,7 +58,8 @@
   const blockViewRedirection = ref(true)
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
-    validationSchema: props.schema
+    validationSchema: props.schema,
+    initialValues: props.initialValues
   })
 
   let formHasUpdated, visibleOnSaved
@@ -88,7 +100,7 @@
     const options = {
       closable: true,
       severity,
-      summary: severity,
+      summary: capitalizeFirstLetter(severity),
       detail
     }
 
@@ -99,10 +111,16 @@
     try {
       const { id } = route.params
       const initialValues = await props.loadService({ id })
+      emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
-      emit('on-load-fail', error)
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        emit('on-load-fail', error)
+        showToast('error', error)
+      }
+      goBackToList()
     }
   }
 
@@ -111,7 +129,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('success', feedback ?? 'edited successfully')
+          showToast('success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
@@ -122,9 +140,18 @@
         }
         goBackToList()
       } catch (error) {
-        emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        showToast('error', error)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          emit('on-edit-fail', error)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {

@@ -34,7 +34,7 @@
 
   const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } = props.moduleGetters
 
-  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } =
+  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters, resetFilters } =
     props.moduleActions
 
   const dashboards = computed(() => {
@@ -67,8 +67,13 @@
     () => reports.value.generalReports.length || reports.value.bigNumberReports.length
   )
 
-  const changeDashboard = async (evt) => {
-    setCurrentDashboard(evt.value)
+  const changeDashboard = async ({ value }) => {
+    if (!value) return
+
+    if (value?.dataset !== props.groupData?.currentDashboard?.dataset) {
+      resetFilters()
+    }
+    setCurrentDashboard(value)
     await setDatasetAvailableFilters()
     await loadCurrentReports(props.userUTC)
   }
@@ -79,7 +84,7 @@
 </script>
 
 <template>
-  <div class="flex flex-column mt-8 gap-4">
+  <div class="flex flex-column mt-4 gap-4">
     <SelectButton
       class="w-full whitespace-nowrap overflow-x-auto"
       :modelValue="selectedDashboard"
@@ -105,6 +110,7 @@
             <BigNumbers
               :report="bigNumberReport"
               :clipboardWrite="clipboardWrite"
+              :groupData="groupData"
             />
           </template>
         </div>
@@ -116,6 +122,7 @@
       >
         <GraphsCardBlock
           :report="report"
+          :groupData="groupData"
           :clipboardWrite="clipboardWrite"
         />
       </template>

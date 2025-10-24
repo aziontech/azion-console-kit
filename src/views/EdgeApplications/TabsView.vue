@@ -7,13 +7,20 @@
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
+  import InlineMessage from 'primevue/inlinemessage'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, ref, reactive, provide, watch, inject } from 'vue'
+  import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import EditViewV3 from './V3/EditView.vue'
+  import { INFORMATION_TEXTS } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import MigrationMessage from './components/MigrationMessage.vue'
+
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -22,25 +29,25 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true }
+    functionsServices: { type: Object, required: true },
+    edgeFunctionsServices: { type: Object, required: true }
   })
 
-  const defaultTabs = {
+  const defaultTabs = ref({
     'main-settings': 0,
-    origins: 1,
-    'device-groups': 2,
-    'error-responses': 3,
-    'cache-settings': 4,
-    functions: 5,
-    'rules-engine': 6
-  }
-
-  const mapTabs = ref({ ...defaultTabs })
+    origins: !hasFlagBlockApiV4() ? null : 1,
+    'device-groups': !hasFlagBlockApiV4() ? 1 : 2,
+    'error-responses': !hasFlagBlockApiV4() ? null : 3,
+    'cache-settings': !hasFlagBlockApiV4() ? 2 : 4,
+    functions: !hasFlagBlockApiV4() ? 3 : 5,
+    'rules-engine': !hasFlagBlockApiV4() ? 4 : 6
+  })
+  const mapTabs = ref({
+    ...defaultTabs.value
+  })
 
   const toast = useToast()
   const route = useRoute()
@@ -48,6 +55,7 @@
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
+  const isLocked = ref(false)
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -60,11 +68,28 @@
       .track()
   }
 
+  const checkIsLocked = async () => {
+    if (hasFlagBlockApiV4()) {
+      const edgeApplication = await edgeAppService.loadEdgeApplicationService({
+        id: edgeApplicationId.value,
+        params: {
+          fields: 'product_version'
+        }
+      })
+
+      isLocked.value = edgeApplication.productVersion === 'custom'
+    }
+  }
+
   const handleLoadEdgeApplication = async () => {
     try {
-      return await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const params = { id: edgeApplicationId.value }
+
+      if (hasFlagBlockApiV4()) {
+        return await props.edgeApplicationServices.loadEdgeApplication(params)
+      }
+
+      return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
       toast.add({
         closable: true,
@@ -77,17 +102,20 @@
 
   const reindexMapTabs = () => {
     mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+      if (!hasFlagBlockApiV4() && (key === 'origins' || key === 'error-responses')) {
+        return acc
+      }
       acc[key] = index
       return acc
     }, {})
   }
-  const verifyTab = ({ edgeFunctions }) => {
-    if (!edgeFunctions) {
+  const verifyTab = (edgeApplication) => {
+    if (!edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()
       return
     }
-    mapTabs.value = { ...defaultTabs }
+    mapTabs.value = { ...defaultTabs.value }
   }
 
   const renderTabByCurrentRouter = async () => {
@@ -105,8 +133,6 @@
 
   const tabTitle = computed(() => edgeApplication.value?.name || '')
 
-  const isHttpsEnabled = () =>
-    computed(() => edgeApplication.value?.deliveryProtocol.includes('https'))
   const isModuleEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
 
   const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
@@ -136,8 +162,9 @@
       tab
     }
     router.push({
-      name: 'edit-edge-application',
-      params
+      name: 'edit-application',
+      params,
+      query: route.query
     })
   }
   const changeTab = (index) => {
@@ -158,6 +185,33 @@
     visibleOnSaved
   })
 
+  provide('edgeApplication', edgeApplication)
+
+  const tagProps = {
+    value: 'Locked',
+    severity: 'warning',
+    tooltip: INFORMATION_TEXTS.LOCKED_MESSAGE_TOOLTIP
+  }
+
+  const tagLocked = computed(() => {
+    if (isLocked.value) {
+      return tagProps
+    }
+    return null
+  })
+
+  const edgeFunctionsEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+  })
+
+  const applicationAcceleratorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'applicationAccelerator' : 'applicationAcceleratorEnabled'
+  })
+
+  const imageProcessorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
+  })
+
   watch(activeTab, (newValue, oldValue) => {
     if (visibleOnSaved.value) {
       return
@@ -171,7 +225,7 @@
   const tabs = ref([
     {
       header: 'Main Settings',
-      component: EditView,
+      component: hasFlagBlockApiV4() ? EditViewV3 : EditView,
       condition: true,
       show: showTabs.mainSettings,
       props: () => ({
@@ -186,11 +240,10 @@
     {
       header: 'Origins',
       component: EdgeApplicationsOriginsListView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
       props: () => ({
         ...props.originsServices,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite
       })
@@ -209,10 +262,9 @@
     {
       header: 'Error Responses',
       component: EdgeApplicationsErrorResponseEditView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.errorResponses,
       props: () => ({
-        ...props.errorResponsesServices,
         edgeApplicationId: edgeApplicationId.value,
         listOriginsService: props.originsServices.listOriginsService
       })
@@ -223,19 +275,19 @@
       condition: true,
       show: showTabs.cacheSettings,
       props: () => ({
-        ...props.cacheSettingsServices,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isTieredCacheEnabled: isModuleEnabled('l2Caching').value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isTieredCacheEnabled: true,
         edgeApplicationId: edgeApplicationId.value
       })
     },
     {
       header: 'Functions Instances',
       component: EdgeApplicationsFunctionsListView,
-      condition: isModuleEnabled('edgeFunctions'),
+      condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
       props: () => ({
         ...props.functionsServices,
+        ...props.edgeFunctionsServices,
         edgeApplicationId: edgeApplicationId.value
       })
     },
@@ -246,12 +298,14 @@
       show: showTabs.rulesEngine,
       props: () => ({
         ...props.rulesEngineServices,
-        isImageOptimizationEnabled: isModuleEnabled('imageOptimization').value,
-        isDeliveryProtocolHttps: isHttpsEnabled().value,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctions').value,
+        isImageOptimizationEnabled: isModuleEnabled(imageProcessorEnabled.value).value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
-        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
+        clipboardWrite: props.clipboardWrite,
+        hideApplicationAcceleratorInDescription:
+          edgeApplication.value[applicationAcceleratorEnabled.value],
+        navigateToApplicationAccelerator: navigateToApplicationAccelerator
       })
     }
   ])
@@ -261,13 +315,40 @@
   })
 
   renderTabByCurrentRouter()
+
+  const navigateToApplicationAccelerator = () => {
+    changeTab(mapTabs.value['main-settings'])
+    setTimeout(() => {
+      const element = document.querySelector('label[for="applicationAccelerator-switch-0"]')
+      if (element) {
+        const headerHeight = document.querySelector('header')?.offsetHeight || 0
+        const additionalOffset = 100
+        const totalOffset = headerHeight + additionalOffset
+
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        const offsetPosition = elementPosition - totalOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }, 50)
+  }
+
+  onMounted(() => {
+    checkIsLocked()
+  })
 </script>
 
 <template>
   <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
+      <MigrationMessage />
+
       <PageHeadingBlock
         :pageTitle="tabTitle"
+        :tag="tagLocked"
         data-testid="edge-application-details-heading"
       />
     </template>
@@ -292,6 +373,14 @@
           :key="index"
           :header="tab.header"
         >
+          <InlineMessage
+            class="mt-4 w-full"
+            severity="warn"
+            v-if="isLocked"
+          >
+            <b>Warning</b>
+            {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
+          </InlineMessage>
           <component
             :is="tab.component"
             v-if="tab.show"
