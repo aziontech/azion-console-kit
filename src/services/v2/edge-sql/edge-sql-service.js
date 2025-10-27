@@ -186,6 +186,18 @@ export class EdgeSQLService extends BaseService {
 
     return this.adapter?.adaptExecuteResult?.(data)
   }
+
+  updateColumn = async (databaseId, { tableName, columnData, oldColumnData }) => {
+    const body = this.adapter?.adaptUpdateColumn?.({ tableName, columnData, oldColumnData })
+
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body
+    })
+
+    return this.adapter?.adaptExecuteResult?.(data)
+  }
 }
 
 export const edgeSQLService = new EdgeSQLService()
