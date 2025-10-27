@@ -173,14 +173,15 @@
         SQL requests are queued. The table will update automatically once processing is complete.
       </InlineMessage>
       <SqlDatabaseList
-        :data="dataTable"
+        :data="dataFiltered"
         :title="tableName"
         :columns="tableColumns"
         data-testid="table-list"
         @row-click="onRowClick"
-        @row-edit-saved="handleActionRow"
+        @row-edit-saved="handleActionRowTable"
         @row-edit-cancel="onRowEditCancel"
         :disabled-action="isLoadChanges"
+        @view-change="onViewChange"
       >
       </SqlDatabaseList>
     </div>
@@ -231,10 +232,28 @@
   const columns = ref([])
   const dataTable = ref([])
   const tableColumns = computed(() => {
-    return Array.isArray(columns.value) ? columns.value : []
+    if (viewChange.value === 'table') {
+      return Array.isArray(columns.value) ? columns.value : []
+    } else {
+      return columnsSchema.value
+    }
+  })
+
+  const dataFiltered = computed(() => {
+    if (viewChange.value === 'table') {
+      return dataTable.value
+    } else {
+      return tableSchema.value
+    }
   })
   const tableSchema = ref([])
   const isLoadChanges = ref(false)
+
+  const viewChange = ref('table')
+
+  const onViewChange = (event) => {
+    viewChange.value = event.value.value
+  }
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -257,6 +276,25 @@
     emit('go-editor')
   }
 
+  const columnsSchema = ref([
+    {
+      field: 'name',
+      header: 'Column Name'
+    },
+    {
+      field: 'type',
+      header: 'Data Type'
+    },
+    {
+      field: 'default',
+      header: 'Default'
+    },
+    {
+      field: 'notNull',
+      header: 'Nullable'
+    }
+  ])
+
   const filterValidSchemaKeys = (obj, schemaKeys) => {
     const allowedKeys = schemaKeys.map((key) => key.name)
     const filteredObj = {}
@@ -268,6 +306,40 @@
     })
 
     return filteredObj
+  }
+
+  const insertColumnService = async (columnData) => {
+    await edgeSQLService.insertColumn(currentDatabase.value.id, {
+      tableName: selectedTable.value.name,
+      columnData
+    })
+    await selectTable(selectedTable.value)
+  }
+
+  const handleActionRowSchema = (action) => {
+    if (action.newData._isNew) {
+      insertColumnService(action.newData)
+    } else {
+      updateColumnService(action.newData, action.oldData)
+    }
+  }
+
+  const updateColumnService = async (newData, oldData) => {
+    await edgeSQLService.updatedRow(currentDatabase.value.id, {
+      tableName: selectedTable.value.name,
+      newData,
+      whereData: oldData,
+      tableSchema: tableSchema.value
+    })
+    await selectTable(selectedTable.value)
+  }
+
+  const handleActionRowTable = (action) => {
+    if (viewChange.value === 'table') {
+      handleActionRow(action)
+    } else {
+      handleActionRowSchema(action)
+    }
   }
 
   const handleActionRow = async (row) => {

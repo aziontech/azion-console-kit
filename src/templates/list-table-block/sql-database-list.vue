@@ -16,7 +16,6 @@
       :rows="minimumOfItemsPerPage"
       @page="onPage"
       @sort="(e) => $emit('sort', e)"
-      @row-click="(e) => $emit('row-click', e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
       removableSort
@@ -70,6 +69,7 @@
                   optionLabel="value"
                   dataKey="value"
                   aria-labelledby="custom"
+                  @change="onViewChange"
                 >
                   <template #option="slotProps">
                     <div class="flex items-center gap-2">
@@ -165,7 +165,17 @@
           </slot>
         </template>
         <template #editor="{ data, field }">
+          <Dropdown
+            v-if="isSchemaView && field === 'type'"
+            v-model="data[field]"
+            :options="dataTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            filter
+          />
           <InputText
+            v-else
             v-model="data[field]"
             class="w-full"
           />
@@ -232,6 +242,7 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
   import InputText from 'primevue/inputtext'
+  import Dropdown from 'primevue/dropdown'
   import Menu from 'primevue/menu'
 
   import DataTable from '@/components/DataTable'
@@ -262,6 +273,24 @@
       ]
     }
   })
+
+  const dataTypes = [
+    'INTEGER',
+    'BIGINT',
+    'DECIMAL',
+    'FLOAT',
+    'VARCHAR',
+    'TEXT',
+    'BOOLEAN',
+    'DATE',
+    'DATETIME',
+    'TIMESTAMP',
+    'JSON',
+    'UUID'
+  ]
+
+  const dataTypeOptions = dataTypes.map((type) => ({ label: type, value: type }))
+  const isSchemaView = computed(() => selectedView.value?.value === 'schema')
 
   const emit = defineEmits([
     'on-load-data',
@@ -420,6 +449,10 @@
     return base
   })
 
+  const onViewChange = (event) => {
+    emit('view-change', event)
+  }
+
   const onPage = (event) => {
     changeNumberOfLinesPerPage(event)
     emit('page', event)
@@ -500,7 +533,7 @@
       acc[key] = ''
       return acc
     }, {})
-    if (hasId) base.id = generateUniqueId()
+    base.id = generateUniqueId()
     const newRow = { ...base, _tempKey: generateUniqueKey(), _isNew: true }
     editableData.value = [newRow, ...editableData.value]
     if (hasId) {

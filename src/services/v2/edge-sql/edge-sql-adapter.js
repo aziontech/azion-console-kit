@@ -95,6 +95,35 @@ const mapRowsToObjects = (columns, rows) => {
   })
 }
 
+const formatDefaultClause = (value, colType) => {
+  if (value === undefined || value === null) return ''
+
+  const colTypeUpper = String(colType || '').toUpperCase()
+
+  const isSqlKeywordDefault = typeof value === 'string' && /^CURRENT_|^NOW\(\)$/.test(value)
+  if (isSqlKeywordDefault) return `DEFAULT ${value}`
+
+  const numericTypes = ['INTEGER', 'INT', 'REAL', 'NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE']
+  const booleanTypes = ['BOOLEAN', 'BOOL', 'TINYINT(1)']
+
+  if (numericTypes.includes(colTypeUpper)) {
+    const num = Number(value)
+    return isNaN(num) ? `DEFAULT '${String(value).replace(/'/g, "''")}'` : `DEFAULT ${num}`
+  }
+
+  if (booleanTypes.includes(colTypeUpper) || colTypeUpper.includes('BOOL')) {
+    const boolNum =
+      value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true'
+        ? 1
+        : 0
+    return `DEFAULT ${boolNum}`
+  }
+
+  // Text-like: quote and escape
+  const stringVal = String(value).replace(/'/g, "''")
+  return `DEFAULT '${stringVal}'`
+}
+
 export const EdgeSQLAdapter = {
   adaptDatabaseStatus({ data }) {
     return {
@@ -186,7 +215,8 @@ export const EdgeSQLAdapter = {
       }
     }))
 
-    const tableSchema = tableInfo.results.rows.map((row) => ({
+    const tableSchema = tableInfo.results.rows.map((row, index) => ({
+      id: index,
       name: row[1],
       type: row[2],
       notNull: row[3],
@@ -202,6 +232,24 @@ export const EdgeSQLAdapter = {
       columns,
       rows: mappedRows,
       tableSchema
+    }
+  },
+
+  adaptInsertColumn({ tableName, columnData }) {
+    const { name, type, default: defaultValue, notNull } = columnData || {}
+
+    const parts = []
+    parts.push(`"${name}"`)
+    if (type) parts.push(type)
+    if (notNull) parts.push('NOT NULL')
+
+    const defaultClause = formatDefaultClause(defaultValue, type)
+    if (defaultClause) parts.push(defaultClause)
+
+    const query = `ALTER TABLE "${tableName}" ADD COLUMN ${parts.join(' ')};`
+
+    return {
+      statements: [query]
     }
   },
 
