@@ -42,7 +42,7 @@
               <SplitButton
                 icon="pi pi-plus"
                 label="Insert"
-                @click="save"
+                @click="insertRow"
                 :model="items"
               />
             </div>
@@ -346,6 +346,22 @@
   const onRowEditCancel = (event) => {
     const { data } = event || {}
     const id = data?.id
+    const isNew = data?._isNew === true
+    if (isNew) {
+      if (id != null) {
+        editableData.value = editableData.value.filter((item) => item.id !== id)
+        backups.value.delete(id)
+        editingRows.value = editingRows.value.filter((row) => row?.id !== id)
+      } else if (data?._tempKey) {
+        editableData.value = editableData.value.filter((item) => item?._tempKey !== data._tempKey)
+        editingRows.value = editingRows.value.filter((row) => row !== data)
+      } else {
+        editableData.value = editableData.value.filter((item) => item !== data)
+        editingRows.value = editingRows.value.filter((row) => row !== data)
+      }
+      emit('row-edit-cancel', { id, removed: true })
+      return
+    }
     if (id == null) return
     const original = backups.value.get(id)
     if (original) {
@@ -362,7 +378,8 @@
   const isRowEditing = (rowIndex) => {
     const row = editableData.value[rowIndex]
     if (!row) return false
-    return editingRows.value.some((editing) => editing?.id === row.id)
+    if (row?.id != null) return editingRows.value.some((editing) => editing?.id === row.id)
+    return editingRows.value.includes(row)
   }
 
   const showRowMenu = (event, rowData) => {
@@ -423,7 +440,77 @@
     }
   ]
 
-  const save = () => {}
+  const generateUniqueKey = () => {
+    const prefix = 'new-'
+    if (typeof crypto !== 'undefined' && crypto?.randomUUID) {
+      return `${prefix}${crypto.randomUUID()}`
+    }
+    return `${prefix}${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  }
+
+  const generateUniqueId = () => {
+    const existingIds = editableData.value
+      .map((rowItem) => rowItem?.id)
+      .filter((val) => val != null)
+    const existingSet = new Set(existingIds)
+
+    const idColumn = (props.columns || []).find((col) => col?.field === 'id')
+    const typeLabel = (idColumn?.tagType || '').toString().toLowerCase()
+    const isNumericId = [
+      'int',
+      'integer',
+      'bigint',
+      'smallint',
+      'tinyint',
+      'number',
+      'numeric'
+    ].some((type) => typeLabel.includes(type))
+
+    if (isNumericId) {
+      const numericIds = existingIds
+        .map((value) => (typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value))
+        .filter((num) => Number.isFinite(num))
+      const next = (numericIds.length ? Math.max(...numericIds) : 0) + 1
+      let candidate = next
+      while (existingSet.has(candidate) || existingSet.has(String(candidate))) {
+        candidate += 1
+      }
+      return candidate
+    }
+
+    let candidate =
+      typeof crypto !== 'undefined' && crypto?.randomUUID
+        ? crypto.randomUUID()
+        : `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    while (existingSet.has(candidate)) {
+      candidate =
+        typeof crypto !== 'undefined' && crypto?.randomUUID
+          ? crypto.randomUUID()
+          : `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    }
+    return candidate
+  }
+
+  const insertRow = () => {
+    const fields = (props.columns || [])
+      .filter((col) => col?.field && col.field !== 'actions')
+      .map((col) => col.field)
+    const hasId = fields.includes('id')
+    const base = fields.reduce((acc, key) => {
+      acc[key] = ''
+      return acc
+    }, {})
+    if (hasId) base.id = generateUniqueId()
+    const newRow = { ...base, _tempKey: generateUniqueKey(), _isNew: true }
+    editableData.value = [newRow, ...editableData.value]
+    if (hasId) {
+      editRow(newRow)
+    } else {
+      if (!editingRows.value.includes(newRow)) {
+        editingRows.value = [...editingRows.value, newRow]
+      }
+    }
+  }
 </script>
 
 <style scoped>
