@@ -1,6 +1,6 @@
 <template>
   <span
-    class="flex flex-row p-input-icon-left items-center w-full max-w-[512px]"
+    class="flex flex-row p-input-icon-left items-center w-full max-w-[32rem]"
     data-testid="data-table-search"
   >
     <i class="pi pi-search" />

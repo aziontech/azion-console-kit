@@ -76,7 +76,6 @@
         v-if="hasFooterSlot"
         #footer
       >
-        <span class="bg-transparent">teste</span>
         <slot name="footer" />
       </template>
 
