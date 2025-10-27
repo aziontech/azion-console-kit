@@ -18,7 +18,7 @@ export const CACHE_TYPE = {
 
 export const GLOBAL_OPTIONS = {
   staleTime: CACHE_TIME.THIRTY_MINUTES,
-  gcTime: CACHE_TIME.THIRTY_MINUTES,
+  gcTime: CACHE_TIME.TWENTY_FOUR_HOURS,
   refetchOnWindowFocus: false,
   refetchOnMount: false,
   retry: 3
@@ -41,8 +41,21 @@ export const NO_CACHE_OPTIONS = {
 }
 
 export const PERSISTENCE_CONFIG = {
-  DB_NAME: 'azion-cache',
-  STORE_NAME: 'queries-cache',
-  VERSION: 1,
-  MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS
+  IDB_NAME: 'azion',
+  IDB_STORE_NAME: 'cache-store',
+  CACHE_KEY: 'query-cache',
+  VERSION: 'v1',
+  MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS,
+  DEHYDRATE_OPTIONS: {
+    shouldDehydrateQuery: (query) => {
+      return query.state.status === 'success'
+    }
+  },
+  HYDRATE_OPTIONS: {
+    defaultOptions: {
+      queries: {
+        gcTime: CACHE_TIME.TWENTY_FOUR_HOURS
+      }
+    }
+  }
 }
