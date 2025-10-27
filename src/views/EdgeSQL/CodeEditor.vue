@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full">
+    <div class="flex-1 min-h-[calc(100vh-250px)]">
       <Menu
         ref="historyMenu"
         :model="historyMenuItems"
@@ -69,19 +69,17 @@
         appendTo="body"
         :pt="{ root: { 'data-history-menu': true } }"
       />
-      <Splitter
-        :pt="{ root: { 'data-testid': 'code-editor', class: 'border-none' } }"
-        layout="vertical"
-        style="height: calc(100vh - 250px); width: 100%"
+      <ResizableSplitter
+        class="w-full h-full"
+        :panelSizes="panelSizes"
+        :minSize="[20, 5]"
+        :maxSize="[80, 95]"
+        :initialAPx="320"
+        @update:panelSizes="onUpdatePanelSizes"
         @resizeend="onResizeEnd"
       >
-        <SplitterPanel
-          class="h-full w-full"
-          :size="editorPanelSize"
-          :minSize="20"
-          :pt="{ root: { 'data-testid': 'code-editor__panel__editor' } }"
-        >
-          <div class="flex flex-col h-full">
+        <template #panel-a>
+          <div class="flex flex-col h-full min-h-0">
             <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
               <Button
                 :label="labelRunQuery"
@@ -120,7 +118,7 @@
             </div>
             <div class="flex-1 min-h-0">
               <vue-monaco-editor
-                :key="`editor-${editorPanelSize}`"
+                :key="`editor-${panelSizes[0]}`"
                 v-model:value="sqlQueryCommand"
                 language="sql"
                 :theme="monacoTheme"
@@ -129,15 +127,26 @@
               />
             </div>
           </div>
-        </SplitterPanel>
-        <SplitterPanel
-          :size="100 - editorPanelSize"
-          :minSize="20"
-          :pt="{ root: { 'data-testid': 'code-editor__panel__console' } }"
-        >
-          <h3>Console</h3>
-        </SplitterPanel>
-      </Splitter>
+        </template>
+
+        <template #panel-b>
+          <div class="flex flex-col h-full min-h-0">
+            <SqlDatabaseList
+              class="flex-1 min-h-0"
+              :data="dataFiltered"
+              title="Results"
+              :columns="columns"
+              data-testid="table-list"
+              @row-click="onRowClick"
+              @row-edit-saved="handleActionRowTable"
+              @row-edit-cancel="onRowEditCancel"
+              :disabled-action="isLoadChanges"
+              @view-change="onViewChange"
+              :options="options"
+            />
+          </div>
+        </template>
+      </ResizableSplitter>
     </div>
     <QuickTemplates
       v-if="showTemplatesModal"
@@ -156,14 +165,14 @@
   import InputText from 'primevue/inputtext'
   import Menu from 'primevue/menu'
   import Skeleton from 'primevue/skeleton'
-  import Splitter from 'primevue/splitter'
-  import SplitterPanel from 'primevue/splitterpanel'
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
   import { useMonacoEditor } from './composable/useMonacoEditor'
   import { QUICK_TEMPLATES } from './constants/queries'
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
+  import ResizableSplitter from '@/components/ResizableSplitter.vue'
+  import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
 
   defineOptions({ name: 'CodeEditor' })
   const props = defineProps({
@@ -183,10 +192,26 @@
   const searchTerm = ref('')
   const isExecutingQuery = ref(false)
   const editorPanelSize = ref(70)
+  const panelSizes = ref([editorPanelSize.value, 100 - editorPanelSize.value])
   const selectedQueryId = ref(null)
   const historyMenu = ref(null)
   const currentMenuQuery = ref(null)
   const selectedText = ref('')
+  const viewChange = ref('table')
+  const columns = ref([])
+  const dataTable = ref([])
+  const options = ref([
+    {
+      label: 'Table',
+      value: 'table',
+      icon: 'pi pi-table'
+    },
+    {
+      label: 'Json',
+      value: 'json',
+      icon: 'ai ai-json'
+    }
+  ])
 
   const { formatSql } = useSqlFormatter()
   const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
@@ -208,6 +233,14 @@
 
   const labelRunQuery = computed(() => {
     return selectedText.value ? 'Run Selected' : 'Run Query'
+  })
+
+  const dataFiltered = computed(() => {
+    if (viewChange.value === 'table') {
+      return dataTable.value
+    } else {
+      return JSON.stringify(dataTable.value)
+    }
   })
 
   const historyMenuItems = computed(() => [
@@ -284,15 +317,48 @@
   const onResizeEnd = (event) => {
     if (Array.isArray(event?.sizes) && event.sizes.length > 0) {
       editorPanelSize.value = event.sizes[0]
+      panelSizes.value = [...event.sizes]
     }
   }
+
+  const onUpdatePanelSizes = (sizes) => {
+    if (Array.isArray(sizes) && sizes.length === 2) {
+      panelSizes.value = [...sizes]
+    }
+  }
+
+  watch(
+    () => editorPanelSize.value,
+    (val) => {
+      const nextSize = Number(val)
+      if (Number.isFinite(nextSize)) {
+        panelSizes.value = [nextSize, 100 - nextSize]
+      }
+    }
+  )
+
+  watch(
+    () => panelSizes.value,
+    async () => {
+      await nextTick()
+      window.dispatchEvent(new Event('resize'))
+    },
+    { deep: true }
+  )
 
   const runQuery = async () => {
     const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
     if (!contentToRun || isExecutingQuery.value) return
     isExecutingQuery.value = true
     try {
-      await executeQuery(contentToRun)
+      const result = await executeQuery(contentToRun)
+      columns.value = result[1].rows.map((column) => ({
+        field: column.name,
+        tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
+        header: column.name,
+        sortable: true
+      }))
+      dataTable.value = result[0].rows
       updateListHistory()
     } finally {
       isExecutingQuery.value = false

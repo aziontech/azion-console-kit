@@ -345,13 +345,27 @@ export function useEdgeSQL() {
     try {
       const startTime = Date.now()
       if (isSelectQuery) {
+        const statements = Array.isArray(query) ? [...query] : [query]
+
+        let tableName = selectedTable.value?.name || null
+        if (!tableName) {
+          const first = statements[0] || ''
+          const match = first.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
+          if (match && match[1]) tableName = match[1]
+        }
+
+        if (tableName) {
+          statements.push(`; PRAGMA table_info(${tableName});`)
+        }
+
         const { results } = await edgeSQLService.queryDatabase(databaseId, {
-          statements: query
+          statements
         })
         queryResults = results
       } else {
+        const statements = Array.isArray(query) ? [...query] : [query]
         const { results } = await edgeSQLService.executeDatabase(databaseId, {
-          statements: query
+          statements
         })
         queryResults = results
       }

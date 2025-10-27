@@ -1,6 +1,7 @@
 <template>
-  <div class="sql-database-list w-full">
+  <div class="sql-database-list w-full h-full flex flex-col min-h-0">
     <DataTable
+      class="flex-1 min-h-0"
       :data="editableData"
       :columns="props.columns"
       :loading="isLoading"
@@ -20,6 +21,7 @@
       :globalFilterFields="filterBy"
       removableSort
       scrollable
+      scrollHeight="flex"
       :pt="{
         header: {
           class: 'bg-gray-50 text-gray-900'
