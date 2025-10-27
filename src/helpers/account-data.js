@@ -35,7 +35,7 @@ export const loadUserAndAccountInfo = async () => {
   }
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
-  
+
   await solutionService.invalidateSolutionsCache()
 }
 
