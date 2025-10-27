@@ -271,7 +271,27 @@
   }
 
   const handleActionRow = async (row) => {
-    await onRowEditSave(row.newData, row.oldData)
+    if (row.newData._isNew) {
+      await onRowInsert(row.newData)
+    } else {
+      await onRowEditSave(row.newData, row.oldData)
+    }
+  }
+
+  const onRowInsert = async (row) => {
+    const filteredData = filterValidSchemaKeys(row, tableSchema.value)
+
+    try {
+      isLoadChanges.value = true
+      await edgeSQLService.insertRow(currentDatabase.value.id, {
+        tableName: selectedTable.value.name,
+        dataToInsert: filteredData,
+        tableSchema: tableSchema.value
+      })
+      await selectTable(selectedTable.value)
+    } finally {
+      isLoadChanges.value = false
+    }
   }
 
   const onRowEditSave = async (newData, whereData) => {
