@@ -20,6 +20,8 @@
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
+      paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     >
       <template
         #header
@@ -100,7 +102,9 @@
           </template>
         </template>
       </Column>
-
+      <template #paginatorstart>
+        <div class="flex-1"></div>
+      </template>
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -545,3 +549,51 @@
     emit('on-load-data', !!hasData)
   })
 </script>
+
+<style scoped lang="scss">
+  /* Paginator styling */
+  :deep(.p-paginator) {
+    height: 48px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 21px;
+  }
+
+  :deep(.p-paginator .p-paginator-current) {
+    margin: 0;
+  }
+
+  /* Paginator buttons styling */
+  :deep(.p-paginator .p-paginator-first),
+  :deep(.p-paginator .p-paginator-prev),
+  :deep(.p-paginator .p-paginator-next),
+  :deep(.p-paginator .p-paginator-last),
+  :deep(.p-paginator .p-paginator-page) {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 21px;
+    margin: 0;
+  }
+
+  :deep(.p-paginator .p-dropdown) {
+    width: 61px;
+    height: 32px;
+    font-size: 12px;
+    line-height: 21px;
+    .p-dropdown-label {
+      width: fit-content;
+    }
+    .p-dropdown-trigger {
+      width: 16px;
+      padding-right: 6px;
+    }
+  }
+  :deep(.p-paginator-page-input .p-inputtext) {
+    width: fit-content;
+    height: 32px;
+    font-size: 12px;
+    line-height: 21px;
+    text-align: center;
+  }
+</style>

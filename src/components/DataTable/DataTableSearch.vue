@@ -5,7 +5,7 @@
   >
     <i class="pi pi-search" />
     <InputText
-      class="h-8 w-full md:min-w-[20rem]"
+      class="h-8 w-full"
       :modelValue="modelValue"
       @update:modelValue="handleInput"
       data-testid="data-table-search-input"
