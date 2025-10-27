@@ -5,6 +5,7 @@ import {
   contractService
 } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
+import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
@@ -34,6 +35,8 @@ export const loadUserAndAccountInfo = async () => {
   }
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
+  
+  await solutionService.invalidateSolutionsCache()
 }
 
 export const loadProfileAndAccountInfo = async () => {
