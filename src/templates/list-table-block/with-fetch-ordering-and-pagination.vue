@@ -254,7 +254,8 @@
     'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
-    'update:selectedItensData'
+    'update:selectedItensData',
+    'force-update'
   ])
 
   const props = defineProps({

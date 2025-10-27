@@ -158,7 +158,7 @@
 
   const TIERED_CACHE_REGION = [
     {
-      label: 'near-edge',
+      label: 'nearest-region',
       value: 'nearest-region'
     },
     {

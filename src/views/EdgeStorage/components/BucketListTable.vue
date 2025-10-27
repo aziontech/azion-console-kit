@@ -20,6 +20,7 @@
       createPagePath: '/object-storage/create',
       documentationService: documentationGuideProducts.edgeStorage
     }"
+    @force-update="bucketTableNeedRefresh = true"
   />
 </template>
 
@@ -35,7 +36,7 @@
   const router = useRouter()
   const route = useRoute()
   const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
-  const fields = ['name', 'size', 'last_editor', 'last_modified']
+  const fields = ['name', 'size', 'last_editor', 'last_modified', 'edge_access']
   const columns = [
     {
       field: 'name',
@@ -87,15 +88,18 @@
     }
   ]
 
-  const loadBuckets = async () => {
+  const loadBuckets = async (params) => {
     try {
       isLoading.value = true
+      let bucketCount = 0
       if (!buckets.value.length || bucketTableNeedRefresh.value) {
         const [listBucketsResponse, metricsResponse] = await Promise.all([
-          edgeStorageService.listEdgeStorageBuckets(),
+          edgeStorageService.listEdgeStorageBuckets(params),
           edgeStorageService.getEdgeStorageMetrics()
         ])
+
         buckets.value = listBucketsResponse.body
+        bucketCount = listBucketsResponse.count
         buckets.value.forEach((bucket) => {
           const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
           bucket.size = size ? `${size} GB` : '-'
@@ -110,7 +114,7 @@
       }
       return {
         body: buckets.value,
-        count: buckets.value.length
+        count: bucketCount || buckets.value.length
       }
     } finally {
       isLoading.value = false

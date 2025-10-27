@@ -1,13 +1,15 @@
-import { onUnmounted } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
-import { globalKey, sensitiveKey } from '@/services/v2/base/query/keys'
 import {
-  CACHE_TYPE,
-  CACHE_TIME,
-  GLOBAL_OPTIONS,
-  SENSITIVE_OPTIONS
-} from '@/services/v2/base/query/config'
-import { queryClient } from '@/services/v2/base/query/queryClient'
+  queryClient,
+  getCacheOptions,
+  createQueryKey,
+  waitForPersistence,
+  clearCacheByType,
+  clearCacheSensitive,
+  clearAllCache
+} from '@/services/v2/base/query/queryClient'
+import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 
 export class BaseService {
   constructor() {
@@ -21,59 +23,77 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  query({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    const result = this.queryClient.query({
+  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    return useQuery({
       queryKey,
       queryFn,
-      ...baseOptions,
+      ...options,
       ...overrides
     })
-
-    onUnmounted(() => {
-      this.queryClient.unregister(queryKey, result)
-    })
-
-    return result
   }
 
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    return this.queryClient.queryAsync({
+    await waitForPersistence()
+
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    const cachedData = this.queryClient.getQueryData(queryKey)
+
+    if (cachedData !== undefined) {
+      const query = this.queryClient.getQueryState(queryKey)
+
+      if (query && query.dataUpdatedAt) {
+        const staleTime = options.staleTime || 0
+        const isStale = Date.now() - query.dataUpdatedAt > staleTime
+
+        if (!isStale) {
+          return Promise.resolve(cachedData)
+        }
+      }
+    }
+
+    return this.queryClient.fetchQuery({
       queryKey,
       queryFn,
-      ...baseOptions,
+      ...options,
       ...overrides
     })
   }
 
-  async invalidate({ key, cache = this.cacheType.GLOBAL }) {
-    const { queryKey } = this.#resolveOptions({ key, cache })
-    return this.queryClient.invalidate(queryKey)
+  async clearByType(cache = this.cacheType.GLOBAL) {
+    return clearCacheByType(cache)
   }
 
-  async invalidateByType(cache = this.cacheType.GLOBAL) {
-    return this.queryClient.clearByPrefix(cache)
+  async clearSensitive() {
+    return clearCacheSensitive()
   }
 
-  #resolveOptions({ key, cache }) {
-    switch (cache) {
-      case this.cacheType.SENSITIVE:
-        return {
-          queryKey: sensitiveKey(key),
-          baseOptions: SENSITIVE_OPTIONS
-        }
-      case this.cacheType.GLOBAL:
-        return {
-          queryKey: globalKey(key),
-          baseOptions: GLOBAL_OPTIONS
-        }
-      case this.cacheType.NONE:
-      default:
-        return {
-          queryKey: key.join(':'),
-          baseOptions: { staleTime: 0, gcTime: 0, encrypted: false }
-        }
-    }
+  async clearAll() {
+    return clearAllCache()
+  }
+
+  hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    const cachedData = this.queryClient.getQueryData(queryKey)
+    if (cachedData === undefined) return false
+
+    const query = this.queryClient.getQueryState(queryKey)
+    if (!query || !query.dataUpdatedAt) return false
+
+    const staleTime = options.staleTime || 0
+    const isStale = Date.now() - query.dataUpdatedAt > staleTime
+
+    return !isStale
+  }
+
+  getCachedData({ key, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    return this.queryClient.getQueryData(queryKey)
   }
 }
