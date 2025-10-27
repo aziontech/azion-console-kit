@@ -253,6 +253,25 @@ export const EdgeSQLAdapter = {
     }
   },
 
+  adaptUpdateColumn({ tableName, columnData, oldColumnData }) {
+    const { name, type, default: defaultValue, notNull } = columnData || {}
+    const oldName = oldColumnData?.name || columnData?.oldName || name
+
+    const constraintParts = []
+    if (notNull) constraintParts.push('NOT NULL')
+    const defaultClause = formatDefaultClause(defaultValue, type)
+    if (defaultClause) constraintParts.push(defaultClause)
+
+    const typePart = type ? ` ${type}` : ''
+    const constraintsPart = constraintParts.length ? ` ${constraintParts.join(' ')}` : ''
+
+    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${oldName}\`  \`${name}\`${typePart}${constraintsPart};`
+
+    return {
+      statements: [query]
+    }
+  },
+
   adaptTablesFromExecute({ data }) {
     const executeResult = data[0]
     if (!executeResult?.rows?.length) return []

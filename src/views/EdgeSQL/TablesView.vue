@@ -325,12 +325,12 @@
   }
 
   const updateColumnService = async (newData, oldData) => {
-    await edgeSQLService.updatedRow(currentDatabase.value.id, {
+    await edgeSQLService.updateColumn(currentDatabase.value.id, {
       tableName: selectedTable.value.name,
-      newData,
-      whereData: oldData,
-      tableSchema: tableSchema.value
+      columnData: newData,
+      oldColumnData: oldData
     })
+
     await selectTable(selectedTable.value)
   }
 
