@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full min-h-0">
-    <div class="flex flex-col !w-64 min-h-0 h-[calc(100vh-250px)]">
+  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-150px)]">
+    <div class="flex flex-col !w-64 h-full">
       <div class="flex flex-col w-full gap-4 min-h-0">
         <h3 class="text-lg font-medium text-color-primary">Query History</h3>
         <div class="p-input-icon-left">
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-1 min-h-[calc(100vh-250px)]">
+    <div class="flex-1 min-h-0 h-full">
       <Menu
         ref="historyMenu"
         :model="historyMenuItems"
@@ -74,7 +74,7 @@
         :panelSizes="panelSizes"
         :minSize="[20, 5]"
         :maxSize="[80, 95]"
-        :initialAPx="320"
+        :initialA="50"
         @update:panelSizes="onUpdatePanelSizes"
         @resizeend="onResizeEnd"
       >
@@ -130,13 +130,14 @@
         </template>
 
         <template #panel-b>
-          <div class="flex flex-col h-full min-h-0">
+          <div class="flex flex-col h-full min-h-0 overflow-hidden">
             <SqlDatabaseList
-              class="flex-1 min-h-0"
+              class="flex-1 min-h-0 overflow-auto"
               :data="dataFiltered"
               title="Results"
               :columns="columns"
               data-testid="table-list"
+              :monacoTheme="monacoTheme"
               @row-click="onRowClick"
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"

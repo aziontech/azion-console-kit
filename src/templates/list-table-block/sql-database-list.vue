@@ -2,7 +2,7 @@
   <div class="sql-database-list w-full h-full flex flex-col min-h-0">
     <DataTable
       class="flex-1 min-h-0"
-      :data="editableData"
+      :data="displayDataForView"
       :columns="props.columns"
       :loading="isLoading"
       v-model:filters="filters"
@@ -31,6 +31,9 @@
         },
         headerText: {
           class: 'text-left'
+        },
+        emptyMessage: {
+          class: 'p-0 h-full'
         }
       }"
     >
@@ -130,102 +133,120 @@
           </div>
         </DataTable.Header>
       </template>
-      <Column
-        v-for="col in selectedColumns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
-        :style="col.style || 'width: 20%'"
-        :sortable="col.sortable !== false"
-        :sortField="col.sortField"
-        :pt="{
-          header: {
-            class: 'bg-gray-50 text-gray-900'
-          },
-          headerContent: {
-            class: 'flex items-center gap-2'
-          },
-          headerText: {
-            class: 'hidden'
-          }
-        }"
-      >
-        <template #header>
-          <span class="flex items-center gap-2 text-color"
-            >{{ col.header }}
-            <span class="text-color-secondary font-mono text-xs">{{ col.tagType }}</span></span
-          >
-        </template>
-        <template #body="{ data, field }">
-          <slot
-            :name="`body-${col.field}`"
-            :data="data"
-            :field="field"
-            :value="data[field]"
-          >
-            {{ data[field] }}
-          </slot>
-        </template>
-        <template #editor="{ data, field }">
-          <Dropdown
-            v-if="isSchemaView && field === 'type'"
-            v-model="data[field]"
-            :options="dataTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-            filter
+      <template #empty>
+        <div class="w-full h-full min-h-0 flex-1">
+          <vue-monaco-editor
+            v-if="selectedView?.value === 'json'"
+            :value="jsonPreview"
+            language="json"
+            :options="monacoOptions"
+            :theme="monacoTheme"
+            class="w-full h-full"
           />
-          <InputText
-            v-else
-            v-model="data[field]"
-            class="w-full"
-          />
-        </template>
-      </Column>
-      <DataTable.Column header="Actions">
-        <template #body="{ data, index }">
-          <div
-            v-if="isRowEditing(index)"
-            class="flex gap-1 justify-end"
-          >
-            <PrimeButton
-              :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
-              size="small"
-              @click.stop="saveRowEdit(data, index)"
-              outlined
-              iconOnly
-              data-testid="row-save-button"
-              v-tooltip.top="'Save'"
-              :disabled="isLoadingEditRow"
-            />
-            <PrimeButton
-              icon="pi pi-times"
-              size="small"
-              severity="secondary"
-              outlined
-              iconOnly
-              @click.stop="cancelRowEdit(data, index)"
-              data-testid="row-cancel-button"
-              v-tooltip.top="'Cancel'"
-            />
-          </div>
           <div
             v-else
-            class="flex justify-end"
-          >
-            <PrimeButton
-              icon="pi pi-ellipsis-h"
-              size="small"
-              :disabled="disabledAction"
-              outlined
-              @click.stop="showRowMenu($event, data)"
-              class="w-8 h-8 p-0"
-              data-testid="row-actions-menu-button"
+            class="w-full h-full"
+          ></div>
+        </div>
+      </template>
+      <template v-if="selectedView?.value !== 'json'">
+        <Column
+          v-for="col in selectedColumns"
+          :key="col.field"
+          :field="col.field"
+          :header="col.header"
+          :style="col.style || 'width: 20%'"
+          :sortable="col.sortable !== false"
+          :sortField="col.sortField"
+          :pt="{
+            header: {
+              class: 'bg-gray-50 text-gray-900'
+            },
+            headerContent: {
+              class: 'flex items-center gap-2'
+            },
+            headerText: {
+              class: 'hidden'
+            }
+          }"
+        >
+          <template #header>
+            <span class="flex items-center gap-2 text-color">
+              {{ col.header }}
+              <span class="text-color-secondary font-mono text-xs">{{ col.tagType }}</span>
+            </span>
+          </template>
+          <template #body="{ data, field }">
+            <slot
+              :name="`body-${col.field}`"
+              :data="data"
+              :field="field"
+              :value="data[field]"
+            >
+              {{ data[field] }}
+            </slot>
+          </template>
+          <template #editor="{ data, field }">
+            <Dropdown
+              v-if="isSchemaView && field === 'type'"
+              v-model="data[field]"
+              :options="dataTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              filter
             />
-          </div>
-        </template>
-      </DataTable.Column>
+            <InputText
+              v-else
+              v-model="data[field]"
+              class="w-full"
+            />
+          </template>
+        </Column>
+        <DataTable.Column header="Actions">
+          <template #body="{ data, index }">
+            <div
+              v-if="isRowEditing(index)"
+              class="flex gap-1 justify-end"
+            >
+              <PrimeButton
+                :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
+                size="small"
+                @click.stop="saveRowEdit(data, index)"
+                outlined
+                iconOnly
+                data-testid="row-save-button"
+                v-tooltip.top="'Save'"
+                :disabled="isLoadingEditRow"
+              />
+              <PrimeButton
+                icon="pi pi-times"
+                size="small"
+                severity="secondary"
+                outlined
+                iconOnly
+                @click.stop="cancelRowEdit(data, index)"
+                data-testid="row-cancel-button"
+                v-tooltip.top="'Cancel'"
+              />
+            </div>
+            <div
+              v-else
+              class="flex justify-end"
+            >
+              <PrimeButton
+                icon="pi pi-ellipsis-h"
+                size="small"
+                :disabled="disabledAction"
+                outlined
+                @click.stop="showRowMenu($event, data)"
+                class="w-8 h-8 p-0"
+                data-testid="row-actions-menu-button"
+              />
+            </div>
+          </template>
+        </DataTable.Column>
+      </template>
     </DataTable>
     <Menu
       ref="rowMenuRef"
@@ -249,6 +270,7 @@
 
   import DataTable from '@/components/DataTable'
   import { useDataTable } from '@/composables/useDataTable'
+  import { VueMonacoEditor as vueMonacoEditor } from '@guolao/vue-monaco-editor'
 
   defineOptions({ name: 'sql-database-list' })
 
@@ -259,6 +281,7 @@
     disabledAddButton: { type: Boolean, default: false },
     title: { type: String, required: true },
     disabledAction: { type: Boolean, default: false },
+    monacoTheme: { type: String, default: 'vs-dark' },
     options: {
       type: Array,
       default: () => [
@@ -293,6 +316,22 @@
 
   const dataTypeOptions = dataTypes.map((type) => ({ label: type, value: type }))
   const isSchemaView = computed(() => selectedView.value?.value === 'schema')
+  const displayDataForView = computed(() =>
+    selectedView.value?.value === 'json' ? [] : editableData.value
+  )
+  const jsonPreview = computed(() => {
+    try {
+      return JSON.stringify(editableData.value ?? [], null, 2)
+    } catch (err) {
+      return '[]'
+    }
+  })
+  const monacoOptions = {
+    readOnly: true,
+    automaticLayout: true,
+    wordWrap: 'on',
+    minimap: { enabled: false }
+  }
 
   const emit = defineEmits([
     'on-load-data',
@@ -551,5 +590,11 @@
 <style scoped>
   :deep(.p-column-title) {
     display: none !important;
+  }
+  /* Make the DataTable empty message row and cell fill the body height */
+
+  :deep(.p-datatable-emptymessage > td) {
+    height: 600px !important;
+    padding: 0 !important;
   }
 </style>
