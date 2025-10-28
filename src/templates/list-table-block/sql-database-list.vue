@@ -271,6 +271,7 @@
   import DataTable from '@/components/DataTable'
   import { useDataTable } from '@/composables/useDataTable'
   import { VueMonacoEditor as vueMonacoEditor } from '@guolao/vue-monaco-editor'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
 
   defineOptions({ name: 'sql-database-list' })
 
@@ -282,6 +283,7 @@
     title: { type: String, required: true },
     disabledAction: { type: Boolean, default: false },
     monacoTheme: { type: String, default: 'vs-dark' },
+    deleteService: { type: Function },
     options: {
       type: Array,
       default: () => [
@@ -353,6 +355,7 @@
   const rowMenuRef = ref(null)
   const selectedRowData = ref(null)
   const isLoadingEditRow = ref(false)
+  const { openDeleteDialog } = useDeleteDialog()
   watch(
     () => props.data,
     (val) => {
@@ -390,14 +393,6 @@
     if (!editingRows.value.some((editing) => editing?.id === id)) {
       editingRows.value = [...editingRows.value, row]
     }
-  }
-
-  const deleteRow = (row) => {
-    const id = row?.id
-    if (id == null) return
-    editableData.value = editableData.value.filter((item) => item.id !== id)
-    backups.value.delete(id)
-    editingRows.value = editingRows.value.filter((editing) => editing?.id !== id)
   }
 
   const onRowEditSave = (event) => {
@@ -484,7 +479,16 @@
       label: 'Delete',
       icon: 'pi pi-trash',
       command: () => {
-        if (selectedRowData.value) deleteRow(selectedRowData.value)
+        if (!selectedRowData.value) return
+        const row = selectedRowData.value
+        openDeleteDialog({
+          id: row.id,
+          data: row,
+          deleteService: props.deleteService,
+          closeCallback: (opt) => {
+            if (opt?.data?.updated) reload()
+          }
+        })
       }
     })
     return base

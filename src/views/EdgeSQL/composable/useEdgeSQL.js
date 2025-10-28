@@ -337,20 +337,17 @@ export function useEdgeSQL() {
     isLoading.value = true
 
     const databaseId = currentDatabase.value?.id || route.params.id
-    const isSelectQuery = Array.isArray(query)
-      ? query[0].trim().toLowerCase().startsWith('select')
-      : query.trim().toLowerCase().startsWith('select')
+    const statements = Array.isArray(query) ? [...query] : [query]
+    const firstNonEmpty = statements.find((stmt) => typeof stmt === 'string' && stmt.trim()) || ''
+    const isSelectQuery = firstNonEmpty.trim().toLowerCase().startsWith('select')
     let queryResults = []
+    let tableName = selectedTable.value?.name || null
 
     try {
       const startTime = Date.now()
       if (isSelectQuery) {
-        const statements = Array.isArray(query) ? [...query] : [query]
-
-        let tableName = selectedTable.value?.name || null
         if (!tableName) {
-          const first = statements[0] || ''
-          const match = first.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
+          const match = firstNonEmpty.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
           if (match && match[1]) tableName = match[1]
         }
 
@@ -363,7 +360,6 @@ export function useEdgeSQL() {
         })
         queryResults = results
       } else {
-        const statements = Array.isArray(query) ? [...query] : [query]
         const { results } = await edgeSQLService.executeDatabase(databaseId, {
           statements
         })
@@ -386,7 +382,10 @@ export function useEdgeSQL() {
         })
       }
 
-      return queryResults
+      return {
+        results: queryResults,
+        tableNameExecuted: tableName
+      }
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)

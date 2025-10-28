@@ -163,7 +163,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full flex flex-col gap-4">
+    <div class="w-full flex flex-col gap-4 overflow-hidden">
       <InlineMessage
         v-if="isLoadChanges"
         severity="info"
@@ -176,6 +176,7 @@
         :data="dataFiltered"
         :title="tableName"
         :columns="tableColumns"
+        :delete-service="deleteService"
         data-testid="table-list"
         @row-click="onRowClick"
         @row-edit-saved="handleActionRowTable"
@@ -203,7 +204,11 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
-
+  import {
+    createDeleteService,
+    createInsertRowService,
+    createUpdateRowService
+  } from './utils/row-actions'
   const emit = defineEmits([
     'go-editor',
     'load-tables',
@@ -223,7 +228,7 @@
     }
   })
 
-  const { currentDatabase } = useEdgeSQL()
+  const { currentDatabase, executeQuery } = useEdgeSQL()
   const showCheckbox = ref(false)
   const selectedTables = ref([])
   const tableMenuRef = ref(null)
@@ -295,19 +300,6 @@
     }
   ])
 
-  const filterValidSchemaKeys = (obj, schemaKeys) => {
-    const allowedKeys = schemaKeys.map((key) => key.name)
-    const filteredObj = {}
-
-    Object.keys(obj).forEach((key) => {
-      if (allowedKeys.includes(key)) {
-        filteredObj[key] = obj[key]
-      }
-    })
-
-    return filteredObj
-  }
-
   const insertColumnService = async (columnData) => {
     await edgeSQLService.insertColumn(currentDatabase.value.id, {
       tableName: selectedTable.value.name,
@@ -350,36 +342,43 @@
     }
   }
 
-  const onRowInsert = async (row) => {
-    const filteredData = filterValidSchemaKeys(row, tableSchema.value)
+  const deleteService = createDeleteService(
+    (stmts) => executeQuery(stmts),
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value)
+  )
 
+  const insertRowService = createInsertRowService(
+    (databaseId, payload) => edgeSQLService.insertRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value)
+  )
+
+  const onRowInsert = async (row) => {
     try {
       isLoadChanges.value = true
-      await edgeSQLService.insertRow(currentDatabase.value.id, {
-        tableName: selectedTable.value.name,
-        dataToInsert: filteredData,
-        tableSchema: tableSchema.value
-      })
-      await selectTable(selectedTable.value)
+      await insertRowService(row)
     } finally {
       isLoadChanges.value = false
     }
   }
 
+  const updateRowService = createUpdateRowService(
+    (databaseId, payload) => edgeSQLService.updatedRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value)
+  )
+
   const onRowEditSave = async (newData, whereData) => {
     isLoadChanges.value = true
-    const filteredNewData = filterValidSchemaKeys(newData, tableSchema.value)
-    const filteredWhereData = filterValidSchemaKeys(whereData, tableSchema.value)
-
     try {
-      await edgeSQLService.updatedRow(currentDatabase.value.id, {
-        tableName: selectedTable.value.name,
-        newData: filteredNewData,
-        whereData: filteredWhereData,
-        tableSchema: tableSchema.value
-      })
+      await updateRowService(newData, whereData)
     } finally {
-      await selectTable(selectedTable.value)
       isLoadChanges.value = false
     }
   }
