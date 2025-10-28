@@ -1,17 +1,18 @@
 <template>
   <div
-    class="flex flex-wrap justify-between gap-2 w-full"
+    class="flex flex-col gap-2 w-full"
     data-testid="data-table-header"
   >
-    <slot />
+    <slot name="actions" />
+    <Divider v-if="hasFiltersSlot" />
+    <slot name="filters" />
   </div>
 </template>
 
 <script setup>
-  defineProps({
-    class: {
-      type: [String, Object, Array],
-      default: ''
-    }
-  })
+  import Divider from 'primevue/divider'
+  import { computed, useSlots } from 'vue'
+
+  const slots = useSlots()
+  const hasFiltersSlot = computed(() => !!slots.filters)
 </script>

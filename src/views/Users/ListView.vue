@@ -58,6 +58,18 @@
     'last_modified'
   ]
 
+  const csvMapper = (rowData) => {
+    return {
+      firstName: rowData.firstName,
+      lastName: rowData.lastName,
+      email: rowData.email,
+      teams: rowData.teams,
+      mfa: rowData.mfa?.content || rowData.mfa,
+      owner: rowData.owner?.content || rowData.owner,
+      status: rowData.status?.content || rowData.status
+    }
+  }
+
   const getColumns = computed(() => [
     {
       field: 'firstName',
@@ -141,6 +153,8 @@
         :defaultOrderingFieldName="'-last_modified'"
         :apiFields="USERS_API_FIELDS"
         :frozenColumns="['firstName']"
+        exportFileName="Users"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No user has been created',
           description: ' Click the button below to create your first user.',

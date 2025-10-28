@@ -154,6 +154,7 @@
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
         :frozenColumns="['name']"
+        exportFileName="Applications"
         :emptyBlock="{
           title: 'No applications have been created',
           description: 'Click the button below to create your first Application.',

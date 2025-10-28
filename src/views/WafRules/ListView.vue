@@ -58,6 +58,17 @@
       .track()
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      threatsConfiguration: rowData.threatsConfiguration,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      active: rowData.data?.content || rowData.active
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -129,6 +140,8 @@
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
         :frozenColumns="['name']"
+        exportFileName="WAF Rules"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No WAF rules have been created',
           description: 'Click the button below to create your first WAF rule.',

@@ -118,6 +118,7 @@
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
+        exportFileName="Custom Pages"
         :emptyBlock="{
           title: 'No custom pages have been created',
           description: 'Click the button below to create your first custom page.',

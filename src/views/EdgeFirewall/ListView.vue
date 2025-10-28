@@ -128,6 +128,7 @@
         :apiFields="EDGE_FIREWALL_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
+        exportFileName="Firewalls"
         :emptyBlock="{
           title: 'No Firewall has been created.',
           description: 'Click the button below to create your first Firewall.',

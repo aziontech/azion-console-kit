@@ -1,244 +1,3 @@
-<template>
-  <div
-    class="max-w-full"
-    :class="{ 'mt-4': isTabs }"
-    data-testid="data-table-container"
-  >
-    <DataTable
-      :data="data"
-      :lazy="lazy"
-      :rowHover="!disabledList"
-      ref="dataTableRef"
-      :dataKey="dataKey"
-      data-testid="data-table"
-      :loading="isLoading"
-      :pt="pt"
-      :containerClass="{ 'mt-4': isTabs }"
-      v-model:filters="filtersDynamically"
-      v-model:sortField="sortFieldValue"
-      v-model:sortOrder="sortOrderValue"
-      :paginator="havePagination"
-      :rowsPerPageOptions="rowsPerPageOptions"
-      :rows="itemsByPage"
-      :globalFilterFields="filterBy"
-      :selection="selectedItems"
-      :exportFilename="exportFileName"
-      :exportFunction="exportFunctionMapper"
-      :totalRecords="totalRecords"
-      :first="firstItemIndex"
-      :rowClass="getRowClass"
-      :emptyListMessage="emptyListMessage"
-      :cellQuickActionsItens="cellQuickActionsItens"
-      :columns="columns"
-      @rowReorder="onRowReorder"
-      @page="changeNumberOfLinesPerPage"
-      @sort="fetchOnSort"
-      :emptyBlock="emptyBlock"
-    >
-      <template
-        #header
-        v-if="!hiddenHeader"
-      >
-        <slot
-          name="header"
-          :exportTableCSV="handleExportTableDataToCSV"
-        >
-          <DataTable.Header>
-            <DataTable.Search
-              v-model="filters.global.value"
-              @search="fetchOnSearch"
-              @input="handleSearchValue"
-            >
-              <slot name="select-buttons" />
-            </DataTable.Search>
-
-            <DataTable.Actions>
-              <DataTable.Export
-                v-if="hasExportToCsvMapper"
-                @click="handleExportTableDataToCSV"
-              />
-
-              <slot
-                name="addButton"
-                data-testid="data-table-add-button"
-                :reload="reload"
-                :data="data"
-              >
-                <DataTable.AddButton
-                  v-if="addButtonLabel"
-                  :disabled="disabledAddButton"
-                  @click="navigateToAddPage"
-                  :label="addButtonLabel"
-                  :data-testid="`create_${addButtonLabel}_button`"
-                />
-              </slot>
-            </DataTable.Actions>
-          </DataTable.Header>
-        </slot>
-      </template>
-
-      <DataTable.Column
-        v-if="reorderableRows"
-        rowReorder
-        headerStyle="width: 3rem"
-        data-testid="data-table-reorder-column"
-      />
-
-      <DataTable.Column
-        v-if="showSelectionMode"
-        selectionMode="multiple"
-        headerStyle="width: 3rem"
-      />
-      <template
-        v-for="col of selectedColumns"
-        :key="col.field"
-      >
-        <DataTable.Column
-          :sortable="!col.disableSort"
-          :field="col.field"
-          :header="col.header"
-          :sortField="col?.sortField"
-          data-testid="data-table-column"
-          :style="col.style"
-          :frozen="frozenColumns.includes(col.field)"
-          :alignFrozen="'left'"
-          :headerStyle="frozenColumns.includes(col.field) ? 'width: 10px' : ''"
-        >
-          <template #body="{ data: rowData }">
-            <div
-              class="flex items-center gap-2 text-[12px]"
-              :class="{
-                'cursor-pointer hover:underline': frozenColumns.includes(col.field),
-                'cursor-pointer': !frozenColumns.length
-              }"
-              @click="(event) => rowClick(event, col, rowData)"
-            >
-              <template v-if="col.type !== 'component'">
-                <div
-                  v-html="rowData[col.field]"
-                  :data-testid="`list-table-block__column__${col.field}__row`"
-                  class="overflow-hidden whitespace-nowrap text-ellipsis"
-                />
-              </template>
-              <template v-else>
-                <component
-                  :is="col.component(extractFieldValue(rowData, col.field), rowData)"
-                  :data-testid="`list-table-block__column__${col.field}__row`"
-                  class="overflow-hidden whitespace-nowrap text-ellipsis"
-                />
-              </template>
-            </div>
-          </template>
-        </DataTable.Column>
-      </template>
-
-      <DataTable.Column
-        :frozen="true"
-        :alignFrozen="'right'"
-        :bodyStyle="classActions"
-        data-testid="data-table-actions-column"
-        :reorderableColumn="false"
-      >
-        <template #header>
-          <div
-            class="flex items-center gap-2 justify-end w-full"
-            data-testid="data-table-actions-column-header"
-          >
-            <span
-              @click="sortByLastModified"
-              v-if="showLastModified"
-              class="cursor-pointer select-none flex items-center gap-2 group"
-              data-testid="last-modified-header-sort"
-            >
-              <i
-                v-if="sortFieldValue === 'lastModified'"
-                :class="{
-                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
-                  'pi pi-sort-amount-down': sortOrderValue === -1
-                }"
-              />
-              <i
-                v-else
-                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              Last Modified
-            </span>
-            <PrimeButton
-              outlined
-              icon="ai ai-column"
-              class="table-button"
-              size="small"
-              @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
-              data-testid="data-table-actions-column-header-toggle-columns"
-            >
-            </PrimeButton>
-            <OverlayPanel
-              ref="columnSelectorPanel"
-              :pt="{
-                content: { class: 'p-0' }
-              }"
-              data-testid="data-table-actions-column-header-toggle-columns-panel"
-            >
-              <Listbox
-                v-model="selectedColumns"
-                multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
-                class="hidden-columns-panel"
-                optionLabel="header"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-              >
-                <template #optiongroup="slotProps">
-                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                </template>
-              </Listbox>
-            </OverlayPanel>
-          </div>
-        </template>
-        <template
-          #body="{ data: rowData }"
-          v-if="isRenderActions"
-        >
-          <div class="flex items-center gap-2 justify-end">
-            <div
-              v-if="showLastModified"
-              :data-testid="`list-table-block__column__lastModify__row`"
-              class="cursor-pointer"
-              @click.stop="toggleLastModifiedDisplay"
-            >
-              <div
-                v-if="!lastModifiedToggled"
-                v-html="rowData.lastModify || rowData.lastModified"
-                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
-              />
-              <div
-                v-else
-                v-html="rowData.lastModified"
-                v-tooltip.top="{
-                  value: rowData.lastModify || rowData.lastModified,
-                  showDelay: 300
-                }"
-              />
-            </div>
-            <DataTable.RowActions
-              :rowData="rowData"
-              :actions="actionOptions(rowData)"
-              :singleAction="isRenderOneOption ? optionsOneAction(rowData) : null"
-              :onActionExecute="executeCommand"
-              :onMenuToggle="toggleActionsMenu"
-              :menuRefSetter="setMenuRefForRow"
-            />
-          </div>
-        </template>
-      </DataTable.Column>
-      <template #emptyBlockButton>
-        <slot name="emptyBlockButton" />
-      </template>
-    </DataTable>
-  </div>
-</template>
 <script setup>
   import { computed, ref } from 'vue'
   import DataTable from '@/components/DataTable'
@@ -335,7 +94,16 @@
       default: () => []
     },
     csvMapper: {
-      type: Function
+      type: Function,
+      default: (rowData) => {
+        return {
+          name: rowData.data?.text || rowData.data,
+          id: rowData.data,
+          lastEditor: rowData.data,
+          lastModify: rowData.data,
+          active: rowData.data?.content || rowData.data
+        }
+      }
     },
     exportFileName: {
       type: String
@@ -372,12 +140,15 @@
       type: Array,
       default: () => []
     },
+    documentationLink: {
+      type: String,
+      default: () => ''
+    },
     emptyBlock: {
       type: Object,
       default: () => ({})
     }
   })
-
   // Use the composable for all data table functionality
   const {
     // Reactive variables
@@ -399,7 +170,6 @@
     // Computed properties
     isRenderActions,
     isRenderOneOption,
-    hasExportToCsvMapper,
     filterBy,
     getRowClass,
 
@@ -445,7 +215,305 @@
     }
     return null
   }
+
+  const navigateToOtherLink = () => {
+    window.open('https://www.azion.com', '_blank')
+  }
+
+  const navigateToGetHelp = () => {
+    window.open('https://www.azion.com', '_blank')
+  }
 </script>
+
+<template>
+  <div
+    class="max-w-full"
+    :class="{ 'mt-4': isTabs }"
+    data-testid="data-table-container"
+  >
+    <DataTable
+      :data="data"
+      :lazy="lazy"
+      :rowHover="!disabledList"
+      ref="dataTableRef"
+      :dataKey="dataKey"
+      data-testid="data-table"
+      :loading="isLoading"
+      :pt="pt"
+      :containerClass="{ 'mt-4': isTabs }"
+      v-model:filters="filtersDynamically"
+      v-model:sortField="sortFieldValue"
+      v-model:sortOrder="sortOrderValue"
+      :paginator="havePagination"
+      :rowsPerPageOptions="rowsPerPageOptions"
+      :rows="itemsByPage"
+      :globalFilterFields="filterBy"
+      :selection="selectedItems"
+      :exportFilename="exportFileName"
+      :exportFunction="exportFunctionMapper"
+      :totalRecords="totalRecords"
+      :first="firstItemIndex"
+      :rowClass="getRowClass"
+      :emptyListMessage="emptyListMessage"
+      :cellQuickActionsItens="cellQuickActionsItens"
+      :columns="columns"
+      @rowReorder="onRowReorder"
+      @page="changeNumberOfLinesPerPage"
+      @sort="fetchOnSort"
+      :emptyBlock="emptyBlock"
+    >
+      <template
+        #header
+        v-if="!hiddenHeader"
+      >
+        <slot name="header">
+          <div class="flex flex-col gap-2 w-full">
+            <DataTable.Header>
+              <template #actions>
+                <div class="flex justify-between gap-2 w-full">
+                  <DataTable.Search
+                    v-model="filters.global.value"
+                    @search="fetchOnSearch"
+                    @input="handleSearchValue"
+                  >
+                    <slot name="select-buttons" />
+                  </DataTable.Search>
+
+                  <DataTable.Actions>
+                    <div class="flex gap-2">
+                      <PrimeButton
+                        size="small"
+                        link
+                        @click="navigateToOtherLink"
+                      >
+                        Other Link
+                      </PrimeButton>
+                      <PrimeButton
+                        size="small"
+                        link
+                        @click="navigateToGetHelp"
+                      >
+                        Get Help
+                      </PrimeButton>
+                    </div>
+                    <slot
+                      name="addButton"
+                      data-testid="data-table-add-button"
+                      :reload="reload"
+                      :data="data"
+                    >
+                      <PrimeButton
+                        size="small"
+                        icon="pi pi-upload"
+                        @click="handleOtherActions"
+                        label="Other Actions"
+                        severity="primary"
+                        outlined
+                        data-testid="data-table-other-actions-button"
+                      />
+                      <DataTable.AddButton
+                        size="small"
+                        v-if="addButtonLabel"
+                        :disabled="disabledAddButton"
+                        @click="navigateToAddPage"
+                        :label="addButtonLabel"
+                        :data-testid="`create_${addButtonLabel}_button`"
+                      />
+                    </slot>
+                  </DataTable.Actions>
+                </div>
+              </template>
+
+              <template #filters>
+                <div class="flex flex-wrap justify-end gap-2 w-full">
+                  <!-- We dont have this fun yet, but we will add -in the future -->
+                  <!-- So comment the component for now, in the future change the justify to justify-between  -->
+                  <!-- <PrimeButton
+                    outlined
+                    icon="pi pi-filter"
+                    label="Filter"
+                    size="small"
+                    @click="toggleFilter"
+                    data-testid="data-table-actions-column-header-toggle-filter"
+                  /> -->
+                  <div class="flex gap-2">
+                    <PrimeButton
+                      outlined
+                      icon="pi pi-refresh"
+                      size="small"
+                      @click="reload"
+                      data-testid="data-table-actions-column-header-refresh"
+                    />
+                    <DataTable.Export @export="handleExportTableDataToCSV($event)" />
+                    <PrimeButton
+                      outlined
+                      icon="ai ai-column"
+                      size="small"
+                      @click="toggleColumnSelector"
+                      v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+                      data-testid="data-table-actions-column-header-toggle-columns"
+                    />
+                    <OverlayPanel
+                      ref="columnSelectorPanel"
+                      :pt="{
+                        content: { class: 'p-0' }
+                      }"
+                      data-testid="data-table-actions-column-header-toggle-columns-panel"
+                    >
+                      <Listbox
+                        v-model="selectedColumns"
+                        multiple
+                        :options="[{ label: 'Available Columns', items: columns }]"
+                        class="hidden-columns-panel"
+                        optionLabel="header"
+                        optionGroupLabel="label"
+                        optionGroupChildren="items"
+                        data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                      >
+                        <template #optiongroup="slotProps">
+                          <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                        </template>
+                      </Listbox>
+                    </OverlayPanel>
+                  </div>
+                </div>
+              </template>
+            </DataTable.Header>
+          </div>
+        </slot>
+      </template>
+
+      <DataTable.Column
+        v-if="reorderableRows"
+        rowReorder
+        headerStyle="width: 3rem"
+        data-testid="data-table-reorder-column"
+      />
+
+      <DataTable.Column
+        v-if="showSelectionMode"
+        selectionMode="multiple"
+        headerStyle="width: 3rem"
+      />
+      <template
+        v-for="col of selectedColumns"
+        :key="col.field"
+      >
+        <DataTable.Column
+          :sortable="!col.disableSort"
+          :field="col.field"
+          :header="col.header"
+          :sortField="col?.sortField"
+          data-testid="data-table-column"
+          :style="col.style"
+          :frozen="frozenColumns.includes(col.field)"
+          :alignFrozen="'left'"
+          :headerStyle="frozenColumns.includes(col.field) ? 'width: 10px' : ''"
+        >
+          <template #body="{ data: rowData }">
+            <div
+              class="flex items-center gap-2 text-[12px]"
+              :class="{
+                'cursor-pointer hover:underline': frozenColumns.includes(col.field),
+                'cursor-pointer': !frozenColumns.length
+              }"
+              @click="(event) => rowClick(event, col, rowData)"
+            >
+              <template v-if="col.type !== 'component'">
+                <div
+                  v-html="rowData[col.field]"
+                  :data-testid="`list-table-block__column__${col.field}__row`"
+                  class="overflow-hidden whitespace-nowrap text-ellipsis"
+                />
+              </template>
+              <template v-else>
+                <component
+                  :is="col.component(extractFieldValue(rowData, col.field), rowData)"
+                  :data-testid="`list-table-block__column__${col.field}__row`"
+                  class="overflow-hidden whitespace-nowrap text-ellipsis"
+                />
+              </template>
+            </div>
+          </template>
+        </DataTable.Column>
+      </template>
+
+      <DataTable.Column
+        :frozen="true"
+        :alignFrozen="'right'"
+        :bodyStyle="classActions"
+        data-testid="data-table-actions-column"
+        :reorderableColumn="false"
+      >
+        <template #header>
+          <div
+            class="flex items-center gap-2 justify-end w-full"
+            data-testid="data-table-actions-column-header"
+          >
+            <span
+              @click="sortByLastModified"
+              v-if="showLastModified"
+              class="cursor-pointer select-none flex items-center gap-2 group"
+              data-testid="last-modified-header-sort"
+            >
+              <i
+                v-if="sortFieldValue === 'lastModified'"
+                :class="{
+                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
+                  'pi pi-sort-amount-down': sortOrderValue === -1
+                }"
+              />
+              <i
+                v-else
+                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+              Last Modified
+            </span>
+          </div>
+        </template>
+        <template
+          #body="{ data: rowData }"
+          v-if="isRenderActions"
+        >
+          <div class="flex items-center gap-2 justify-end">
+            <div
+              v-if="showLastModified"
+              :data-testid="`list-table-block__column__lastModify__row`"
+              class="cursor-pointer"
+              @click.stop="toggleLastModifiedDisplay"
+            >
+              <div
+                v-if="!lastModifiedToggled"
+                v-html="rowData.lastModify || rowData.lastModified"
+                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
+              />
+              <div
+                v-else
+                v-html="rowData.lastModified"
+                v-tooltip.top="{
+                  value: rowData.lastModify || rowData.lastModified,
+                  showDelay: 300
+                }"
+              />
+            </div>
+            <DataTable.RowActions
+              :rowData="rowData"
+              :actions="actionOptions(rowData)"
+              :singleAction="isRenderOneOption ? optionsOneAction(rowData) : null"
+              :onActionExecute="executeCommand"
+              :onMenuToggle="toggleActionsMenu"
+              :menuRefSetter="setMenuRefForRow"
+            />
+          </div>
+        </template>
+      </DataTable.Column>
+      <template #emptyBlockButton>
+        <slot name="emptyBlockButton" />
+      </template>
+    </DataTable>
+  </div>
+</template>
+
 <style scoped lang="scss">
   .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
     transition: color 0.2s ease;

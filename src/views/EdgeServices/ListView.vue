@@ -2,6 +2,7 @@
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ContentBlock from '@/templates/content-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, inject } from 'vue'
 
@@ -28,6 +29,16 @@
       required: true
     }
   })
+
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      labelActive: rowData.data?.content
+    }
+  }
 
   const getColumns = computed(() => [
     {
@@ -135,6 +146,8 @@
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         :defaultOrderingFieldName="'-last_modified'"
+        exportFileName="Edge Services"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No services have been created',
           description: 'Click the button below to create your first service.',

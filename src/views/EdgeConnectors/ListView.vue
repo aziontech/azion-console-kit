@@ -33,6 +33,19 @@
 
   const EDGE_CONNECTORS_API_FIELDS = []
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      type: rowData.type,
+      header: rowData.header,
+      address: rowData.address,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      active: rowData.data?.content || rowData.active
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -109,6 +122,8 @@
         :apiFields="EDGE_CONNECTORS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
+        exportFileName="Connectors"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No Connectors have been created',
           description: 'Click the button below to create your first Connectors.',
