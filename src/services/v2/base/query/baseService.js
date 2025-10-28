@@ -10,6 +10,7 @@ import {
 } from '@/services/v2/base/query/queryClient'
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
 
 export class BaseService {
   constructor() {
@@ -23,13 +24,26 @@ export class BaseService {
     this.constructor.instance = this
   }
 
+  serializeQueryKey(queryKey) {
+    try {
+      return JSON.stringify(queryKey)
+    } catch {
+      return String(queryKey)
+    }
+  }
+
   useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
+    const serializedKey = this.serializeQueryKey(queryKey)
+    const coalescedQueryFn = coalesceRequest(serializedKey, queryFn)
 
     return useQuery({
       queryKey,
-      queryFn,
+      queryFn: coalescedQueryFn,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
       ...options,
       ...overrides
     })
@@ -40,13 +54,23 @@ export class BaseService {
 
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
+    const serializedKey = this.serializeQueryKey(queryKey)
+    const coalescedQueryFn = coalesceRequest(serializedKey, queryFn)
 
     return this.queryClient.ensureQueryData({
       queryKey,
-      queryFn,
+      queryFn: coalescedQueryFn,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
       ...options,
       ...overrides
     })
+  }
+
+  withMutex(key, mutationFn) {
+    const mutex = getMutex(key)
+    return (variables) => mutex.run(() => mutationFn(variables))
   }
 
   async clearByType(cache = this.cacheType.GLOBAL) {
