@@ -138,18 +138,6 @@
         sortField: 'infrastructure'
       },
       {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        filterPath: 'lastEditor',
-        sortField: 'lastEditor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        filterPath: 'lastModified',
-        sortField: 'lastModified'
-      },
-      {
         field: 'active',
         sortField: 'active',
         header: 'Status',

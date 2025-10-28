@@ -139,6 +139,7 @@
     isTabs
     :frozen-columns="['name']"
     exportFileName="Device Groups"
+    hideLastModifiedColumn
     :emptyBlock="{
       title: 'No device groups have been created',
       description: 'Click the button below to create your first device group.',

@@ -114,8 +114,6 @@
 
   const getColumns = computed(() => [
     { field: 'name', header: 'Name' },
-    { field: 'lastEditor', header: 'Last Editor' },
-    { field: 'lastModified', header: 'Last Modified' },
     {
       field: 'status',
       header: 'Status',

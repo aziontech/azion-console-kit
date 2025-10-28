@@ -1,6 +1,6 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import * as Errors from '@/services/axios/errors'
-import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 
 const mapDataSourceName = {
   http: 'Edge Applications',
@@ -263,7 +263,7 @@ export const DataStreamAdapter = {
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           active: parseStatusData(dataStream.active),
           lastEditor: dataStream.last_editor || '-',
-          lastModified: formatDateToDayMonthYearHour(dataStream.last_modified),
+          lastModified: dataStream.last_modified,
           lastModify: convertToRelativeTime(dataStream.last_modified)
         }
       }) || []

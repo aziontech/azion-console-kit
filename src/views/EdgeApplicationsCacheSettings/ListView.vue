@@ -130,6 +130,7 @@
     :apiFields="CACHE_SETTING_API_FIELDS"
     :frozenColumns="['name']"
     exportFileName="Cache Settings"
+    hideLastModifiedColumn
     :emptyBlock="{
       title: 'No cache settings have been created',
       description: 'Click the button below to create your first cache setting.',

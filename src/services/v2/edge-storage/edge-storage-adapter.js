@@ -8,9 +8,9 @@ const transformMap = {
   name: (value) => value.name || value.key,
   active: (value) => parseStatusData(value.active),
   edgeAccess: (value) => value.edge_access,
-  lastEditor: (value) => value.last_editor || '-',
-  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified) || '-',
-  lastModify: (value) => (value.last_modified ? convertToRelativeTime(value.last_modified) : '-'),
+  lastEditor: (value) => value.last_editor,
+  lastModified: (value) => value.last_modified,
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
   productVersion: (value) => value.product_version,
   size: (value) => value.size || '-'
 }

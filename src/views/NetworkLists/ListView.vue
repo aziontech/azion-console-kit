@@ -74,15 +74,6 @@
         field: 'listType',
         header: 'List Type',
         sortField: 'type'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        sortField: 'last_modified',
-        header: 'Last Modified'
       }
     ]
   })

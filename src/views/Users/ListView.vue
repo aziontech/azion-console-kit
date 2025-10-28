@@ -155,6 +155,7 @@
         :frozenColumns="['firstName']"
         exportFileName="Users"
         :csvMapper="csvMapper"
+        hideLastModifiedColumn
         :emptyBlock="{
           title: 'No user has been created',
           description: ' Click the button below to create your first user.',

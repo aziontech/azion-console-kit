@@ -59,16 +59,6 @@
         field: 'functionInstanced',
         header: 'Function',
         disableSort: true
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor'
-      },
-      {
-        field: 'lastModified',
-        sortField: 'last_modified',
-        header: 'Last Modified'
       }
     ]
   })

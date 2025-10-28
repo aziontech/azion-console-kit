@@ -121,14 +121,6 @@
       header: 'Initiator Type'
     },
     {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified'
-    },
-    {
       field: 'status',
       header: 'Status',
       sortField: 'status.content',

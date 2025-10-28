@@ -29,7 +29,7 @@
       <PrimeButton
         v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
         size="small"
-        icon="pi pi-ellipsis-h"
+        icon="pi pi-ellipsis-v"
         outlined
         @click="handleMenuToggle"
         class="cursor-pointer table-button"

@@ -430,6 +430,7 @@
               :apiFields="EDGE_DNS_RECORDS_FIELDS"
               exportFileName="Edge DNS Records"
               @on-before-go-to-edit="handleTrackEventGoToEdit"
+              hideLastModifiedColumn
               :emptyBlock="{
                 title: 'No record has been created',
                 description: 'Click the button below to create your first record.',
