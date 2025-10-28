@@ -18,6 +18,44 @@ const getDatabaseStatusSeverity = (status) => {
   return statusMap[status] || 'info'
 }
 
+const buildSetClause = (newData, tableSchema) => {
+  return Object.keys(newData)
+    .map((columnName) => {
+      const formattedValue = formatSqlValue(newData[columnName], columnName, tableSchema)
+      return `"${columnName}" = ${formattedValue}`
+    })
+    .join(', ')
+}
+
+const buildWhereClause = (whereData, tableSchema) => {
+  const hasIdColumn = Array.isArray(tableSchema)
+    ? tableSchema.some((col) => col?.name === 'id' || col?.name === 'ID')
+    : false
+
+  if (hasIdColumn && (whereData?.id !== undefined || whereData?.ID !== undefined)) {
+    const key = whereData.id !== undefined ? 'id' : 'ID'
+    const originalValue = whereData[key]
+    if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+      return `"${key}" IS NULL`
+    }
+    const formattedValue = formatSqlValue(originalValue, key, tableSchema)
+    return `"${key}" = ${formattedValue}`
+  }
+
+  return Object.keys(whereData)
+    .map((columnName) => {
+      const originalValue = whereData[columnName]
+
+      if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+        return `"${columnName}" IS NULL`
+      }
+
+      const formattedValue = formatSqlValue(originalValue, columnName, tableSchema)
+      return `"${columnName}" = ${formattedValue}`
+    })
+    .join(' AND ')
+}
+
 const formatSqlValue = (value, fieldName, schema) => {
   const column = schema.find((col) => col.name === fieldName)
   const columnType = column ? column.type.toUpperCase() : 'TEXT'
@@ -376,32 +414,8 @@ export const EdgeSQLAdapter = {
   },
 
   adaptUpdateRow({ tableName, newData, whereData, tableSchema }) {
-    const buildSetClause = () => {
-      return Object.keys(newData)
-        .map((columnName) => {
-          const formattedValue = formatSqlValue(newData[columnName], columnName, tableSchema)
-          return `"${columnName}" = ${formattedValue}`
-        })
-        .join(', ')
-    }
-
-    const buildWhereClause = () => {
-      return Object.keys(whereData)
-        .map((columnName) => {
-          const originalValue = whereData[columnName]
-
-          if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
-            return `"${columnName}" IS NULL`
-          }
-
-          const formattedValue = formatSqlValue(originalValue, columnName, tableSchema)
-          return `"${columnName}" = ${formattedValue}`
-        })
-        .join(' AND ')
-    }
-
-    const setClause = buildSetClause()
-    const whereClause = buildWhereClause()
+    const setClause = buildSetClause(newData, tableSchema)
+    const whereClause = buildWhereClause(whereData, tableSchema)
     const updateQuery = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause};`
 
     return {

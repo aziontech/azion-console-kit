@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-150px)]">
+  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-150px)] overflow-hidden">
     <div class="flex flex-col !w-64 h-full">
       <div class="flex flex-col w-full gap-4 min-h-0">
         <h3 class="text-lg font-medium text-color-primary">Query History</h3>
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-1 min-h-0 h-full">
+    <div class="flex-1 min-h-0 h-full min-w-0 overflow-hidden">
       <Menu
         ref="historyMenu"
         :model="historyMenuItems"
@@ -79,7 +79,7 @@
         @resizeend="onResizeEnd"
       >
         <template #panel-a>
-          <div class="flex flex-col h-full min-h-0">
+          <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
             <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
               <Button
                 :label="labelRunQuery"
@@ -90,9 +90,7 @@
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
                   pt: {
-                    arrow: {
-                      class: 'bg-primary text-white'
-                    }
+                    arrow: { class: 'bg-primary text-white' }
                   }
                 }"
               />
@@ -116,7 +114,7 @@
                 />
               </div>
             </div>
-            <div class="flex-1 min-h-0">
+            <div class="flex-1 min-h-0 min-w-0">
               <vue-monaco-editor
                 :key="`editor-${panelSizes[0]}`"
                 v-model:value="sqlQueryCommand"
@@ -130,7 +128,7 @@
         </template>
 
         <template #panel-b>
-          <div class="flex flex-col h-full min-h-0 overflow-hidden">
+          <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
             <SqlDatabaseList
               class="flex-1 min-h-0 overflow-auto"
               :data="dataFiltered"
@@ -138,6 +136,7 @@
               :columns="columns"
               data-testid="table-list"
               :monacoTheme="monacoTheme"
+              :delete-service="deleteService"
               @row-click="onRowClick"
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
@@ -174,6 +173,12 @@
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
   import ResizableSplitter from '@/components/ResizableSplitter.vue'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
+  import {
+    createDeleteService,
+    createInsertRowService,
+    createUpdateRowService
+  } from './utils/row-actions'
+  import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 
   defineOptions({ name: 'CodeEditor' })
   const props = defineProps({
@@ -200,7 +205,9 @@
   const selectedText = ref('')
   const viewChange = ref('table')
   const columns = ref([])
+  const tableName = ref('')
   const dataTable = ref([])
+  const tableSchema = ref([])
   const options = ref([
     {
       label: 'Table',
@@ -215,8 +222,14 @@
   ])
 
   const { formatSql } = useSqlFormatter()
-  const { queryResults, isLoading, executeQuery, updateListHistory, removeQueryFromHistory } =
-    useEdgeSQL()
+  const {
+    queryResults,
+    isLoading,
+    executeQuery,
+    updateListHistory,
+    removeQueryFromHistory,
+    currentDatabase
+  } = useEdgeSQL()
   const route = useRoute()
   const monacoTheme = 'vs-dark'
   const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
@@ -231,6 +244,29 @@
       return label.includes(term) || original.includes(term)
     })
   })
+
+  const deleteService = createDeleteService(
+    (stmts) => executeQuery(stmts),
+    () => tableName.value,
+    () => tableSchema.value,
+    () => reloadData()
+  )
+
+  const insertRowService = createInsertRowService(
+    (databaseId, payload) => edgeSQLService.insertRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => tableName.value,
+    () => tableSchema.value,
+    () => reloadData()
+  )
+
+  const updateRowService = createUpdateRowService(
+    (databaseId, payload) => edgeSQLService.updatedRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => tableName.value,
+    () => tableSchema.value,
+    () => reloadData()
+  )
 
   const labelRunQuery = computed(() => {
     return selectedText.value ? 'Run Selected' : 'Run Query'
@@ -261,6 +297,18 @@
     selectedQueryId.value = query.id
     sqlQueryCommand.value = query.originalQuery
   }
+
+  const handleActionRowTable = async (action) => {
+    if (!action) return
+    const { newData, oldData } = action
+    if (newData?._isNew) {
+      await insertRowService(newData)
+    } else {
+      await updateRowService(newData, oldData)
+    }
+  }
+
+  const onRowEditCancel = () => {}
 
   const isRunShortcut = (event) => event.key === 'Enter' && (event.metaKey || event.ctrlKey)
 
@@ -350,20 +398,30 @@
   const runQuery = async () => {
     const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
     if (!contentToRun || isExecutingQuery.value) return
+
     isExecutingQuery.value = true
     try {
-      const result = await executeQuery(contentToRun)
-      columns.value = result[1].rows.map((column) => ({
+      const { results, tableNameExecuted } = await executeQuery(contentToRun)
+      columns.value = results[results.length - 1].rows.map((column) => ({
         field: column.name,
         tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
         header: column.name,
         sortable: true
       }))
-      dataTable.value = result[0].rows
+      tableSchema.value = results[results.length - 1].rows
+      dataTable.value = results[0].rows
+      tableName.value = tableNameExecuted
       updateListHistory()
     } finally {
       isExecutingQuery.value = false
     }
+  }
+
+  const reloadData = async () => {
+    const query = `SELECT * FROM "${tableName.value}"; PRAGMA table_info("${tableName.value}");`
+    selectedText.value = query
+    await runQuery()
+    selectedText.value = ''
   }
 
   const runHistoryQuery = async () => {
