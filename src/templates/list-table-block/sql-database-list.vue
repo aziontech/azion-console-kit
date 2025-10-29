@@ -284,6 +284,7 @@
     disabledAction: { type: Boolean, default: false },
     monacoTheme: { type: String, default: 'vs-dark' },
     deleteService: { type: Function },
+    isLoading: { type: Boolean, default: false },
     options: {
       type: Array,
       default: () => [
@@ -378,7 +379,6 @@
     filters,
     sortFieldValue,
     sortOrderValue,
-    isLoading,
     filterBy,
     minimumOfItemsPerPage,
     firstItemIndex,
