@@ -6,6 +6,11 @@
       :tables="selectedTables"
       @load-tables="emit('load-tables')"
     />
+    <AlterColumn
+      v-model:visible="alterColumnVisible"
+      :query="alterColumnQuery"
+      @load-tables="selectTable(selectedTable)"
+    />
     <Menu
       ref="tableMenuRef"
       id="table_menu"
@@ -202,11 +207,13 @@
   import Checkbox from 'primevue/checkbox'
   import ConfirmDialog from 'primevue/confirmdialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
+  import AlterColumn from './Dialog/AlterColumn.vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import Menu from 'primevue/menu'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
+  import { SQLITE_QUERIES } from './constants/queries'
   import {
     createDeleteService,
     createInsertRowService,
@@ -237,6 +244,8 @@
   const tableMenuRef = ref(null)
   const selectedTable = ref(null)
   const truncateTableVisible = ref(false)
+  const alterColumnVisible = ref(false)
+  const alterColumnQuery = ref('')
   const columns = ref([])
   const dataTable = ref([])
   const tableColumns = computed(() => {
@@ -315,18 +324,20 @@
     if (action.newData._isNew) {
       insertColumnService(action.newData)
     } else {
-      updateColumnService(action.newData, action.oldData)
+      openAlterColumnDialog(action.newData, action.oldData)
     }
   }
 
-  const updateColumnService = async (newData, oldData) => {
-    await edgeSQLService.updateColumn(currentDatabase.value.id, {
-      tableName: selectedTable.value.name,
-      columnData: newData,
-      oldColumnData: oldData
-    })
-
-    await selectTable(selectedTable.value)
+  const openAlterColumnDialog = (newData, oldData) => {
+    if (!selectedTable.value?.name) return
+    const sql = SQLITE_QUERIES.ALTER_COLUMN(
+      selectedTable.value.name,
+      tableSchema.value,
+      oldData,
+      newData
+    )
+    alterColumnQuery.value = sql
+    alterColumnVisible.value = true
   }
 
   const handleActionRowTable = (action) => {
