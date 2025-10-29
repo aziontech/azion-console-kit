@@ -514,6 +514,7 @@
     celllQuickActionsItens: {
       type: Array,
       default: () => []
+    },
     isPaginationLoading: {
       type: Boolean,
       default: false
