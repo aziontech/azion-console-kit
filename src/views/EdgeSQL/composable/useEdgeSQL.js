@@ -338,8 +338,17 @@ export function useEdgeSQL() {
 
     const databaseId = currentDatabase.value?.id || route.params.id
     const statements = Array.isArray(query) ? [...query] : [query]
-    const firstNonEmpty = statements.find((stmt) => typeof stmt === 'string' && stmt.trim()) || ''
-    const isSelectQuery = firstNonEmpty.trim().toLowerCase().startsWith('select')
+    const splitIntoStatements = (query) =>
+      String(query)
+        .split(';')
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0)
+
+    const flatStatements = statements.flatMap((stmt) =>
+      typeof stmt === 'string' ? splitIntoStatements(stmt) : []
+    )
+
+    const isSelectQuery = flatStatements.some((stmt) => stmt.toLowerCase().startsWith('select'))
     let queryResults = []
     let tableName = selectedTable.value?.name || null
 
@@ -347,8 +356,11 @@ export function useEdgeSQL() {
       const startTime = Date.now()
       if (isSelectQuery) {
         if (!tableName) {
-          const match = firstNonEmpty.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
-          if (match && match[1]) tableName = match[1]
+          const firstSelect = flatStatements.find((stmt) => stmt.toLowerCase().startsWith('select'))
+          if (firstSelect) {
+            const match = firstSelect.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
+            if (match && match[1]) tableName = match[1]
+          }
         }
 
         if (tableName) {

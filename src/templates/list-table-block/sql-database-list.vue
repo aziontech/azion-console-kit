@@ -85,7 +85,7 @@
                 </SelectButton>
                 <PrimeButton
                   icon="pi pi-refresh"
-                  @click="reload"
+                  @click="reloadTable"
                   outlined
                   iconOnly
                   v-tooltip="{
@@ -257,7 +257,7 @@
 </template>
 
 <script setup>
-  import { ref, toRefs, watch, computed } from 'vue'
+  import { ref, toRefs, watch, computed, nextTick } from 'vue'
   import Column from 'primevue/column'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
@@ -321,6 +321,11 @@
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
+
+  const reloadTable = () => {
+    emit('reload-table')
+  }
+
   const jsonPreview = computed(() => {
     try {
       return JSON.stringify(editableData.value ?? [], null, 2)
@@ -494,8 +499,8 @@
     return base
   })
 
-  const onViewChange = (event) => {
-    emit('view-change', event)
+  const onViewChange = ({ value }) => {
+    emit('view-change', value)
   }
 
   const onPage = (event) => {
@@ -509,14 +514,36 @@
     {
       icon: 'ai ai-column',
       label: 'Insert Column',
-      command: () => {}
+      command: () => insertColumnSplitEvent()
     },
     {
       icon: 'pi pi-minus',
       label: 'Insert Row',
-      command: () => {}
+      command: () => insertRowSplitEvent()
     }
   ]
+
+  const insertColumnSplitEvent = async () => {
+    selectedView.value = {
+      label: 'Schema',
+      value: 'schema',
+      icon: 'ai ai-column'
+    }
+    emit('view-change', selectedView.value)
+    await nextTick()
+    insertRow()
+  }
+
+  const insertRowSplitEvent = async () => {
+    selectedView.value = {
+      label: 'Table',
+      value: 'table',
+      icon: 'pi pi-table'
+    }
+    emit('view-change', selectedView.value)
+    await nextTick()
+    insertRow()
+  }
 
   const generateUniqueKey = () => {
     const prefix = 'new-'
