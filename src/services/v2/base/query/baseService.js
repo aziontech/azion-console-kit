@@ -24,19 +24,10 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  serializeQueryKey(queryKey) {
-    try {
-      return JSON.stringify(queryKey)
-    } catch {
-      return String(queryKey)
-    }
-  }
-
   useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
-    const serializedKey = this.serializeQueryKey(queryKey)
-    const coalescedQueryFn = coalesceRequest(serializedKey, queryFn)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return useQuery({
       queryKey,
@@ -54,8 +45,7 @@ export class BaseService {
 
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
-    const serializedKey = this.serializeQueryKey(queryKey)
-    const coalescedQueryFn = coalesceRequest(serializedKey, queryFn)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return this.queryClient.ensureQueryData({
       queryKey,

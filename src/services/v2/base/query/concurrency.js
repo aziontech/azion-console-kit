@@ -44,25 +44,33 @@ export function getMutex(key) {
 
 const pendingRequests = new Map()
 
-export function coalesceRequest(endpoint, fetcher) {
+function serializeQueryKey(queryKey) {
+  try {
+    return JSON.stringify(queryKey)
+  } catch {
+    return String(queryKey)
+  }
+}
+
+export function coalesceRequest(queryKey, fetcher) {
   return async (params = {}) => {
-    // Usa apenas o endpoint (queryKey serializada) como chave
-    // Todos os parâmetros relevantes já estão na queryKey
-    if (pendingRequests.has(endpoint)) {
-      return pendingRequests.get(endpoint)
+    const key = serializeQueryKey(queryKey)
+
+    if (pendingRequests.has(key)) {
+      return pendingRequests.get(key)
     }
 
     const promise = fetcher(params)
       .then((result) => {
-        pendingRequests.delete(endpoint)
+        pendingRequests.delete(key)
         return result
       })
       .catch((error) => {
-        pendingRequests.delete(endpoint)
+        pendingRequests.delete(key)
         throw error
       })
 
-    pendingRequests.set(endpoint, promise)
+    pendingRequests.set(key, promise)
     return promise
   }
 }
