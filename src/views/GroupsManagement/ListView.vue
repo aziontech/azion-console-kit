@@ -19,6 +19,14 @@
     }
   })
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      company: rowData.company,
+      status: rowData.data?.content
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -64,6 +72,8 @@
         editPagePath="management/edit"
         emptyListMessage="No groups found."
         :frozen-columns="['name']"
+        exportFileName="Group Management"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No groups have been created',
           description: 'Click the button below to create your first group account.',

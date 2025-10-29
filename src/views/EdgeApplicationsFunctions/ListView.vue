@@ -159,6 +159,7 @@
     isTabs
     :defaultOrderingFieldName="'name'"
     :apiFields="FUNCTIONS_API_FIELDS"
+    exportFileName="Function Instances"
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',

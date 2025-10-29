@@ -241,6 +241,7 @@
     isTabs
     :actions="actions"
     :default-ordering-field-name="'id'"
+    exportFileName="WAF Rules Allowed"
     :emptyBlock="{
       title: 'No allowed rule has been created.',
       description:

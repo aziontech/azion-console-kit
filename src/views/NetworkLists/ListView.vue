@@ -41,6 +41,16 @@
     })
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      listType: rowData.listType,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -97,6 +107,8 @@
         :actions="actions"
         :apiFields="NETWORK_LIST_API_FIELDS"
         :frozen-columns="['name']"
+        exportFileName="Network Lists"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No network lists have been added',
           description:

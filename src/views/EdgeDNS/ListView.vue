@@ -41,6 +41,15 @@
     })
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      domain: rowData.data?.content || rowData.domain,
+      active: rowData.data?.content || rowData.active
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -113,6 +122,8 @@
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
+        exportFileName="Edge DNS"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No zone has been added',
           description: 'Click the button below to add your first zone.',

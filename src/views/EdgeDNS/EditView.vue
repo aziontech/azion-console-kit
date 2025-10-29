@@ -428,6 +428,7 @@
               :actions="actions"
               isTabs
               :apiFields="EDGE_DNS_RECORDS_FIELDS"
+              exportFileName="Edge DNS Records"
               @on-before-go-to-edit="handleTrackEventGoToEdit"
               :emptyBlock="{
                 title: 'No record has been created',

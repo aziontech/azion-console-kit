@@ -340,8 +340,8 @@ export function useDataTable(props, emit) {
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 
-  const handleExportTableDataToCSV = () => {
-    dataTableRef.value?.exportCSV()
+  const handleExportTableDataToCSV = (event) => {
+    dataTableRef.value?.exportCSV(event)
   }
 
   // Utility functions

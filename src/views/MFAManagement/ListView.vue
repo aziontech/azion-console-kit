@@ -23,6 +23,13 @@
     }
   ]
 
+  const csvMapper = (rowData) => {
+    return {
+      email: rowData.email,
+      confirmed: rowData.data?.content || rowData.confirmed
+    }
+  }
+
   const getColumns = computed(() => [
     {
       field: 'email',
@@ -58,6 +65,8 @@
         :actions="actions"
         :apiFields="MFA_USERS_API_FIELDS"
         :enableEditClick="false"
+        exportFileName="Multi-Factor Authentication Management"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No MFA Management found.',
           description: '',

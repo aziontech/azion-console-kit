@@ -1,5 +1,7 @@
 <script setup>
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
@@ -44,6 +46,21 @@
     tracker.product.clickToEdit({
       productName: 'Edge Functions'
     })
+  }
+
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.data?.text || rowData.name,
+      id: rowData.id,
+      version: rowData.version,
+      referenceCount: rowData.referenceCount,
+      vendor: rowData.data?.vendor,
+      runtime: rowData.data?.content,
+      executionEnvironment: rowData.data?.executionEnvironment,
+      lastEditor: rowData.data?.lastEditor,
+      lastModified: rowData.data?.lastModified,
+      status: rowData.data?.content
+    }
   }
 
   const getColumns = computed(() => [
@@ -146,6 +163,8 @@
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
+        exportFileName="Functions"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No Functions have been created',
           description: 'Click the button below to create your first Function.',

@@ -18,6 +18,14 @@
     }
   })
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      company: rowData.company,
+      status: rowData.data?.content
+    }
+  }
+
   const getColumns = computed(() => {
     return [
       {
@@ -64,6 +72,8 @@
         editPagePath="management/edit"
         enableEditClick
         :frozen-columns="['name']"
+        exportFileName="Reseller Management"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No resellers have been created',
           description: 'Click the button below to create your first reseller account.',

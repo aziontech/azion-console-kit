@@ -103,6 +103,15 @@
     router.push(`/sql-database/database/${database.id}`)
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      status: rowData.data?.content
+    }
+  }
+
   const getColumns = computed(() => [
     { field: 'name', header: 'Name' },
     { field: 'lastEditor', header: 'Last Editor' },
@@ -197,6 +206,8 @@
         :actions="actions"
         :defaultOrderingFieldName="'name'"
         :frozen-columns="['name']"
+        exportFileName="SQL Database"
+        :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No Databases have been created',
           description: 'Create your first SQL Database to store and query your data at the edge.',
