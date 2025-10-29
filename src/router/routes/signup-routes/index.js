@@ -28,7 +28,6 @@ export const signupRoutes = {
       name: 'additional-data',
       component: () => import('@views/Signup/AdditionalDataView.vue'),
       props: {
-        listAdditionalDataInfoService: SignupService.listAdditionalDataInfoService,
         postAdditionalDataService: SignupService.postAdditionalDataService,
         patchFullnameService: SignupService.patchFullnameService,
         updateAccountInfoService: SignupService.updateAccountInfoService

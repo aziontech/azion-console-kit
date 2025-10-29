@@ -12,7 +12,7 @@ const getConfig = () => {
   const IS_SENTRY_UPLOAD = env.VITE_SENTRY_UPLOAD === 'true'
   const IS_PROD = env.VITE_ENVIRONMENT === 'production'
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
-  const DomainSuffix = IS_PROD ? 'com' : 'net'
+  const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
@@ -47,8 +47,7 @@ const getConfig = () => {
       istanbul({
         nycrcPath: '.nycrc'
       }),
-      ...(
-        IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
+      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
             sentryVitePlugin({
               org: 'azion-technologies',
@@ -57,8 +56,7 @@ const getConfig = () => {
               sourcemaps: { assets: './dist/assets/**' }
             })
           ]
-        : []
-      )
+        : [])
     ],
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
@@ -101,7 +99,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
         }),
         '^/api/script-runner': createProxyConfig({
-          target: `${URLStartPrefix}script-runner.azion.com/`,
+          target: `${URLStartPrefix}script-runner.azion.${DomainSuffix}/`,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '/script-runner/api')
         }),
         '^/api/template-engine': createProxyConfig({

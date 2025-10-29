@@ -3,7 +3,8 @@ import process from 'node:process'
 
 const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
-const environment = VITE_ENVIRONMENT || 'stage'
+const environment = VITE_ENVIRONMENT || 'production'
+const domainSuffix = environment === 'production' ? 'net' : 'com'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
@@ -107,8 +108,8 @@ const config = {
       {
         name: 'origin-script-runner',
         type: 'single_origin',
-        hostHeader: `script-runner.azion.net`,
-        addresses: [`script-runner.azion.net`]
+        hostHeader: `script-runner.azion.${domainSuffix}`,
+        addresses: [`script-runner.azion.${domainSuffix}`]
       },
       {
         name: 'origin-template-engine',

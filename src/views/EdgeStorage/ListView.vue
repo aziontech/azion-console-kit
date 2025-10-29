@@ -130,16 +130,19 @@
                 :selected-bucket="selectedBucket"
                 v-model:selectedItensData="selectedFiles"
                 hiddenHeader
-                :paginator="false"
+                paginator
                 enableEditClickFolder
                 :actions="fileActions"
                 :isDownloading="isDownloading"
                 :searchFilter="fileSearchTerm"
+                :isPaginationLoading="isPaginationLoading"
+                :currentPage="currentPage"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
+                @page="handlePaginationChange"
                 class="w-full"
               />
 
@@ -250,11 +253,13 @@
   const fileSearchTerm = ref('')
   const listServiceFilesRef = ref(null)
   const isDragOver = ref(false)
+  const isPaginationLoading = ref(false)
   const headerContainer = ref(null)
   const buttonsContainer = ref(null)
   const containerWidth = ref(0)
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
+  const currentPage = ref(1)
 
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
@@ -388,6 +393,7 @@
     showDragAndDrop.value = false
     selectedBucket.value = bucket
     folderPath.value = ''
+    currentPage.value = 1
     selectedFiles.value = []
     listServiceFilesRef.value?.reload()
   }
@@ -401,6 +407,7 @@
       folderPath.value = `${pathToFolder}/`
     }
 
+    currentPage.value = 1
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
@@ -448,6 +455,7 @@
     } else if (item.isFolder) {
       folderPath.value += item.name
       router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
+      currentPage.value = 1
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
@@ -458,6 +466,7 @@
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
+    currentPage.value = 1
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
@@ -483,22 +492,29 @@
 
   const listEdgeStorageBucketFiles = async () => {
     if (needFetchToAPI.value) {
-      selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
+      const { files, continuation_token } = await edgeStorageService.listEdgeStorageBucketFiles(
         selectedBucket.value.name,
         false,
-        folderPath.value
+        folderPath.value,
+        { continuation_token: selectedBucket.value.continuation_token }
       )
-      selectedBucket.value.files = selectedBucket.value.files.map((file) => ({
+      selectedBucket.value.continuation_token = continuation_token
+      const filterFiles = files.map((file) => ({
         ...file,
         name: file.name.replace(folderPath.value, '')
       }))
-      if (folderPath.value) {
-        selectedBucket.value.files.unshift({
+      if (folderPath.value && !isPaginationLoading.value) {
+        filterFiles.unshift({
           id: '..',
           name: '..',
           isParentNav: true,
           isFolder: true
         })
+      }
+      if (isPaginationLoading.value) {
+        selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
+      } else {
+        selectedBucket.value.files = filterFiles
       }
       filesTableNeedRefresh.value = false
     }
@@ -508,6 +524,22 @@
 
   const handleDrag = (value) => {
     isDragOver.value = value
+  }
+
+  const handlePaginationChange = async (event) => {
+    const { page, pageCount } = event
+    const isLastPage = page >= pageCount - 1
+    currentPage.value = page + 1
+
+    if (isLastPage && selectedBucket.value?.continuation_token) {
+      try {
+        isPaginationLoading.value = true
+        filesTableNeedRefresh.value = true
+        await listServiceFilesRef.value?.loadData({ page: page + 1, keepCurrentPage: true })
+      } finally {
+        isPaginationLoading.value = false
+      }
+    }
   }
 
   const handleDragDropUpload = async (event) => {
@@ -609,7 +641,6 @@
   onUnmounted(() => {
     window.removeEventListener('resize', updateContainerWidth)
     removeDocumentDragEvents()
-    selectedBucket.value = null
     folderPath.value = ''
     selectedFiles.value = []
   })
