@@ -32,9 +32,6 @@ export class BaseService {
     return useQuery({
       queryKey,
       queryFn: coalescedQueryFn,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1,
       ...options,
       ...overrides
     })
@@ -50,9 +47,6 @@ export class BaseService {
     return this.queryClient.ensureQueryData({
       queryKey,
       queryFn: coalescedQueryFn,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1,
       ...options,
       ...overrides
     })
