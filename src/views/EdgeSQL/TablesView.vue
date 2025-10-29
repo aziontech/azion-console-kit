@@ -135,16 +135,18 @@
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <i
-                  class="ai ai-datasheet group-hover:hidden"
-                  @click.stop="showCheckboxAndSelectTable(table)"
-                  v-show="!showCheckbox"
-                />
-                <Checkbox
-                  v-model="selectedTables"
-                  :value="table.name"
-                  :class="showCheckbox ? 'inline-flex' : 'hidden group-hover:inline-flex'"
-                />
+                <span class="inline-flex items-center group">
+                  <i
+                    class="ai ai-datasheet group-hover:hidden"
+                    @click.stop="showCheckboxAndSelectTable(table)"
+                    v-show="!showCheckbox"
+                  />
+                  <Checkbox
+                    v-model="selectedTables"
+                    :value="table.name"
+                    :class="showCheckbox ? 'inline-flex' : 'hidden group-hover:inline-flex'"
+                  />
+                </span>
                 <span class="text-sm font-medium text-color-primary truncate">{{
                   table.name
                 }}</span>
@@ -181,6 +183,7 @@
         @row-click="onRowClick"
         @row-edit-saved="handleActionRowTable"
         @row-edit-cancel="onRowEditCancel"
+        @reload-table="selectTable(selectedTable)"
         :disabled-action="isLoadChanges"
         @view-change="onViewChange"
       >
@@ -257,7 +260,7 @@
   const viewChange = ref('table')
 
   const onViewChange = (event) => {
-    viewChange.value = event.value.value
+    viewChange.value = event.value
   }
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
@@ -386,17 +389,22 @@
   const onRowEditCancel = () => {}
 
   const selectTable = async (table) => {
+    isLoadChanges.value = true
     selectedTable.value = table
-    const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
-    columns.value = result.body.columns.map(({ columns }) => ({
-      field: columns.name,
-      tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
-      header: columns.name,
-      sortable: true
-    }))
+    try {
+      const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
+      columns.value = result.body.columns.map(({ columns }) => ({
+        field: columns.name,
+        tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
+        header: columns.name,
+        sortable: true
+      }))
 
-    dataTable.value = result.body.rows
-    tableSchema.value = result.body.tableSchema
+      dataTable.value = result.body.rows
+      tableSchema.value = result.body.tableSchema
+    } finally {
+      isLoadChanges.value = false
+    }
   }
 
   const tableName = computed(() => selectedTable.value?.name)

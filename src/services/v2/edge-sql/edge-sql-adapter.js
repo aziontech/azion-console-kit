@@ -124,11 +124,18 @@ const formatCellValue = (value) => {
 }
 
 const mapRowsToObjects = (columns, rows) => {
-  return rows.map((row) => {
+  const hasIdColumn = Array.isArray(columns)
+    ? columns.some((name) => String(name).toLowerCase() === 'id')
+    : false
+
+  return rows.map((row, rowIndex) => {
     const rowObject = {}
-    columns.forEach((columnName, index) => {
-      rowObject[columnName] = row[index]
+    columns.forEach((columnName, colIndex) => {
+      rowObject[columnName] = row[colIndex]
     })
+    if (!hasIdColumn) {
+      rowObject.id = rowIndex + 1
+    }
     return rowObject
   })
 }
@@ -342,9 +349,11 @@ export const EdgeSQLAdapter = {
       result.rows = mapRowsToObjects(result.columns, result.rows)
     })
 
+    const prioritizedResults = this.prioritizeSelectResults(processedResults)
+
     return {
       state: data?.state || 'executed',
-      results: processedResults,
+      results: prioritizedResults,
       affected: this.calculateAffectedRows({ data })
     }
   },
