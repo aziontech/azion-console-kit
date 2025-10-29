@@ -75,8 +75,8 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: props.showTieredCache ?? true,
-    tieredCacheRegion: 'near-edge',
+    tieredCache: false,
+    tieredCacheRegion: 'nearest-region',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
     largeFileCacheOffset: 1024
@@ -102,14 +102,6 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
-    tieredCacheRegion: yup
-      .string()
-      .required()
-      .label('Tiered Cache Region')
-      .oneOf(
-        ['near-edge', 'br-east-1', 'us-east-1'],
-        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "us-east-1"'
-      ),
     browserCacheSettingsMaximumTtl: yup
       .number()
       .label('Maximum TTL')
@@ -136,6 +128,14 @@
       .min(minimumAcceptableValue.value)
       .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
       .required(),
+    tieredCacheRegion: yup
+      .string()
+      .required()
+      .label('Tiered Cache Region')
+      .oneOf(
+        ['nearest-region', 'br-east-1', 'us-east-1'],
+        'Tiered Cache Region must be either "nearest-region" or "br-east-1" or "us-east-1"'
+      ),
     enableLargeFileCache: yup.boolean().required(),
     largeFileCacheOffset: yup
       .number()

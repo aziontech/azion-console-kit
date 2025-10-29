@@ -7,6 +7,7 @@ export const AZION_CONTACT_SUPPORT =
 export const GOOGLE_AUTHENTICATOR_DOCUMENTATION =
   'https://support.google.com/accounts/answer/1066447'
 export const AZION_SITE = 'https://www.azion.com/'
+export const AZION_SITE_ABOUTUS = 'https://www.azion.com/en/about-us/'
 export const AZION_LAUNCH_WEEK = 'https://www.azion.com/en/launch-week/'
 export const AZION_BLOG = 'https://www.azion.com/en/blog/'
 export const AZION_DISCORD = 'https://discord.com/invite/Yp9N7RMVZy'
@@ -19,6 +20,10 @@ export const AZION_FORMJSON_DOCUMENTATION = 'https://jsonforms.io/docs/integrati
 
 export const openAzionSite = () => {
   window.open(AZION_SITE, '_blank')
+}
+
+export const openAzionSiteAboutUs = () => {
+  window.open(AZION_SITE_ABOUTUS, '_blank')
 }
 
 export const azionJsonFormWindowOpener = () => {

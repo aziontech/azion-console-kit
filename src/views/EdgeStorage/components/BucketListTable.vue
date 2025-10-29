@@ -26,6 +26,7 @@
     exportFileName="buckets"
     class="w-full"
     :isLoading="isLoading"
+    @force-update="bucketTableNeedRefresh = true"
   />
 </template>
 
@@ -37,13 +38,14 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, bucketTableNeedRefresh } = useEdgeStorage()
-  const fields = ['name', 'size', 'last_editor', 'last_modified']
+  const route = useRoute()
+  const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
+  const fields = ['name', 'size', 'last_editor', 'last_modified', 'edge_access']
   const columns = [
     {
       field: 'name',
@@ -99,24 +101,33 @@
     }
   ]
 
-  const loadBuckets = async () => {
+  const loadBuckets = async (params) => {
     try {
       isLoading.value = true
+      let bucketCount = 0
       if (!buckets.value.length || bucketTableNeedRefresh.value) {
         const [listBucketsResponse, metricsResponse] = await Promise.all([
-          edgeStorageService.listEdgeStorageBuckets(),
+          edgeStorageService.listEdgeStorageBuckets(params),
           edgeStorageService.getEdgeStorageMetrics()
         ])
+
         buckets.value = listBucketsResponse.body
+        bucketCount = listBucketsResponse.count
         buckets.value.forEach((bucket) => {
           const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
           bucket.size = size ? `${size} GB` : '-'
         })
         bucketTableNeedRefresh.value = false
+        if (route.params?.id) {
+          const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
+          if (bucketName) {
+            selectedBucket.value = bucketName
+          }
+        }
       }
       return {
         body: buckets.value,
-        count: buckets.value.length
+        count: bucketCount || buckets.value.length
       }
     } finally {
       isLoading.value = false

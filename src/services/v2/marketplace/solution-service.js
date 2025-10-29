@@ -23,11 +23,24 @@ export class SolutionService extends BaseService {
   }
 
   useListSolutions({ group, type }, options = {}) {
-    return this.query({
+    return this.useQuery({
       key: ['solutions', 'list', group, type],
       queryFn: () => this.getListSolutions({ group, type }),
       cache: this.cacheType.GLOBAL,
-      overrides: { refetchInterval: this.cacheTime.TWENTY_FOUR_HOURS, ...options }
+      overrides: {
+        staleTime: this.cacheTime.THIRTY_DAYS,
+        refetchInterval: false,
+        ...options
+      }
+    })
+  }
+
+  async invalidateSolutionsCache() {
+    await this.queryClient.invalidateQueries({
+      predicate: (query) =>
+        query.queryKey[0] === this.cacheType.GLOBAL &&
+        query.queryKey.includes('solutions') &&
+        query.queryKey.includes('list')
     })
   }
 

@@ -11,6 +11,7 @@
 
     <ForgotPassword
       v-if="showForgotPasswordStep"
+      @goToSignIn="showForgotPasswordStep = false"
       :sendResetPasswordEmailService="props.sendResetPasswordEmailService"
     />
   </div>

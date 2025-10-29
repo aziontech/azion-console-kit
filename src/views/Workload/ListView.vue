@@ -14,7 +14,7 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${handleTextDomainWorkload.singularLabel} found.`"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
@@ -79,8 +79,9 @@
   const actions = [
     {
       type: 'delete',
-      title: `${handleTextDomainWorkload.singularLabel}`,
+      title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
+      tooltip: 'Delete',
       service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
     }
   ]
@@ -149,7 +150,10 @@
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'expand-column'
+            columnAppearance: 'expand-column',
+            dependencies: {
+              showCopy: true
+            }
           })
         }
       },
@@ -176,6 +180,18 @@
         sortField: 'infrastructure'
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        filterPath: 'lastEditor',
+        sortField: 'lastEditor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        filterPath: 'lastModified',
+        sortField: 'lastModified'
+      },
+      {
         field: 'active',
         sortField: 'active',
         header: 'Status',
@@ -186,18 +202,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        filterPath: 'lastModified',
-        sortField: 'lastModified'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        filterPath: 'lastEditor',
-        sortField: 'lastEditor'
       }
     ]
   })
@@ -207,9 +211,9 @@
   }
 
   const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.singularLabel} have been created`
+    () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
   const descriptionEmptyPage = computed(
-    () => `Click the button below to create your first ${handleTextDomainWorkload.singularLabel}.`
+    () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
   )
 </script>

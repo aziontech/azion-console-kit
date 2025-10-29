@@ -5,12 +5,15 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, loadEnv } from 'vite'
 import istanbul from 'vite-plugin-istanbul'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
-  const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
-  const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
-  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && env.VITE_ENVIRONMENT !== 'production'
+  const IS_SENTRY_UPLOAD = env.VITE_SENTRY_UPLOAD === 'true'
+  const IS_PROD = env.VITE_ENVIRONMENT === 'production'
+  const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
+  const DomainSuffix = IS_PROD ? 'net' : 'com'
+  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -32,12 +35,28 @@ const getConfig = () => {
   })
 
   return {
+    build: {
+      sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
+    },
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+    },
     plugins: [
       vue(),
       vueJsx(),
       istanbul({
         nycrcPath: '.nycrc'
-      })
+      }),
+      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
+        ? [
+            sentryVitePlugin({
+              org: 'azion-technologies',
+              project: IS_PROD ? 'console' : 'console-stage',
+              authToken: env.VITE_SENTRY_AUTH_TOKEN,
+              sourcemaps: { assets: './dist/assets/**' }
+            })
+          ]
+        : [])
     ],
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
@@ -60,7 +79,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
         }),
         '^/api/script-runner': createProxyConfig({
-          target: `${URLStartPrefix}script-runner.azion.com/`,
+          target: `${URLStartPrefix}script-runner.azion.${DomainSuffix}/`,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '/script-runner/api')
         }),
         '^/api/template-engine': createProxyConfig({

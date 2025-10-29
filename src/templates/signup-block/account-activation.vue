@@ -4,14 +4,15 @@
   >
     <section class="w-full flex flex-col gap-3">
       <h2 class="text-start text-xl font-medium">Check your inbox</h2>
-      <p class="text-start text-color-secondary">
+      <p class="text-sm text-start text-color-secondary">
         We've sent you an email with instructions to verify your account. Check your inbox or spam
         folder and follow the instructions.
       </p>
     </section>
     <section class="w-full flex flex-wrap gap-2">
-      <p class="text-start">Didn't receive the email?</p>
+      <p class="text-start text-sm">Didn't receive the email?</p>
       <PrimeButton
+        size="small"
         label="Resend Email"
         class="p-0"
         link

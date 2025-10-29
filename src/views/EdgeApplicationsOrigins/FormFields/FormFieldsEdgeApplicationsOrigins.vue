@@ -4,7 +4,7 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import InputNumber from 'primevue/inputnumber'
+  import InputNumber from '@/templates/form-fields-inputs/fieldNumber'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InlineMessage from 'primevue/inlinemessage'
@@ -405,23 +405,19 @@
           />
         </div>
         <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
-          <label
-            :for="`${address.key}-weight`"
-            class="text-color text-sm font-medium leading-5"
-            >Weights</label
-          >
           <InputNumber
-            v-model="address.value.weight"
+            label="Weight"
+            :value="addresses[index].value.weight"
+            :name="`addresses[${index}].weight`"
             :inputId="`${address.key}-weight`"
+            :data-testid="`origin-form__weight-${index}`"
             mode="decimal"
             showButtons
-            :min="0"
+            :min="1"
             :max="10"
+            :required="isLoadBalancerOriginType"
+            description="Assign a number from 1 to 10 to determine how much traffic this origin server can handle."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Assign a number from 0 to 10 to determine how much traffic this origin server can
-            handle.
-          </small>
         </div>
         <div v-if="!isIpHashMethod">
           <FieldGroupRadio
@@ -492,6 +488,7 @@
             name="hmacAccessKey"
             :value="hmacAccessKey"
             description="Enter the Access Key provided by the object storage provider."
+            sensitive
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -501,6 +498,7 @@
             name="hmacSecretKey"
             :value="hmacSecretKey"
             description="Enter the Secret Key provided by the object storage provider."
+            sensitive
           />
         </div>
       </div>

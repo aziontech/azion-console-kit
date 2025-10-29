@@ -66,6 +66,7 @@
                 :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -183,6 +184,7 @@
           >
             <PrimeButton
               size="small"
+              v-if="actionOptions(rowData).length"
               outlined
               v-bind="optionsOneAction(rowData)"
               v-tooltip.top="getTooltipConfig(rowData)"
@@ -277,6 +279,7 @@
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
+                size="small"
                 v-if="addButtonLabel"
                 data-testid="data-table-skeleton-add-button"
               />

@@ -10,11 +10,14 @@
       :lazy="props.lazy"
       :rowHover="!disabledList"
       ref="dataTableRef"
-      class="overflow-clip rounded-md"
       dataKey="id"
       data-testid="data-table"
       v-if="!isLoading"
       :pt="props.pt"
+      :class="[
+        'overflow-clip rounded-md table-with-orange-borders',
+        { 'outline-visible': cellQuickActions.visible }
+      ]"
       :value="data"
       v-model:filters="filtersDynamically"
       v-model:sortField="sortFieldValue"
@@ -33,6 +36,7 @@
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
       :first="firstItemIndex"
+      :rowClass="getRowClass"
     >
       <template
         #header
@@ -59,7 +63,10 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
-              <div class="ml-3">
+              <div
+                v-if="$slots['select-buttons']"
+                class="ml-3"
+              >
                 <slot name="select-buttons" />
               </div>
             </span>
@@ -70,6 +77,7 @@
               outlined
               class="max-sm:w-full ml-auto"
               icon="pi pi-download"
+              size="small"
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
@@ -85,6 +93,7 @@
                 :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
+                size="small"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -106,30 +115,43 @@
         selectionMode="multiple"
         headerStyle="width: 3rem"
       />
-
       <Column
-        :sortable="!col.disableSort"
         v-for="col of selectedColumns"
         :key="col.field"
+        :sortable="!col.disableSort"
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
         :class="{ 'hover:cursor-pointer': !col.disableSort || !disabledList }"
         data-testid="data-table-column"
+        :style="col.style"
       >
         <template #body="{ data: rowData }">
-          <template v-if="col.type !== 'component'">
-            <div
-              v-html="rowData[col.field]"
-              :data-testid="`list-table-block__column__${col.field}__row`"
+          <div class="flex items-center gap-2">
+            <template v-if="col.type !== 'component'">
+              <div
+                v-html="rowData[col.field]"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+                class="overflow-hidden whitespace-nowrap text-ellipsis"
+              />
+            </template>
+            <template v-else>
+              <component
+                :is="col.component(extractFieldValue(rowData, col.field), rowData)"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+                class="overflow-hidden whitespace-nowrap text-ellipsis"
+              />
+            </template>
+            <PrimeTag
+              v-if="
+                selectedColumns.indexOf(col) === 0 &&
+                rowData.active !== undefined &&
+                rowData.active.content !== 'Active' &&
+                col.showInactiveTag
+              "
+              :value="rowData.active.content"
             />
-          </template>
-          <template v-else>
-            <component
-              :is="col.component(extractFieldValue(rowData, col.field))"
-              :data-testid="`list-table-block__column__${col.field}__row`"
-            />
-          </template>
+          </div>
         </template>
       </Column>
 
@@ -142,13 +164,33 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex items-center gap-2 justify-end w-full"
             data-testid="data-table-actions-column-header"
           >
+            <span
+              @click="sortByLastModified"
+              v-if="showLastModified"
+              class="cursor-pointer select-none flex items-center gap-2 group"
+              data-testid="last-modified-header-sort"
+            >
+              <i
+                v-if="sortFieldValue === 'lastModified'"
+                :class="{
+                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
+                  'pi pi-sort-amount-down': sortOrderValue === -1
+                }"
+              />
+              <i
+                v-else
+                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+              Last Modified
+            </span>
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
+              size="small"
               @click="toggleColumnSelector"
               v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
@@ -182,46 +224,68 @@
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
-          <div
-            class="flex justify-end"
-            v-if="isRenderOneOption"
-            data-testid="data-table-actions-column-body-action"
-          >
-            <PrimeButton
-              size="small"
-              outlined
-              v-bind="optionsOneAction(rowData)"
-              @click="executeCommand(rowData)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-action-button"
-            />
-          </div>
-          <div
-            class="flex justify-end"
-            v-else
-            data-testid="data-table-actions-column-body-actions"
-          >
-            <PrimeMenu
-              :ref="setMenuRefForRow(rowData.id)"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-              data-testid="data-table-actions-column-body-actions-menu"
-              :pt="{
-                menuitem: ({ context }) => ({
-                  'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
-                })
-              }"
-            />
-            <PrimeButton
-              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-              size="small"
-              icon="pi pi-ellipsis-h"
-              outlined
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-actions-menu-button"
-            />
+          <div class="flex items-center gap-2 justify-end">
+            <div
+              v-if="showLastModified"
+              :data-testid="`list-table-block__column__lastModify__row`"
+              class="cursor-pointer"
+              @click.stop="toggleLastModifiedDisplay"
+            >
+              <div
+                v-if="!lastModifiedToggled"
+                v-html="rowData.lastModify || rowData.lastModified"
+                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
+              />
+              <div
+                v-else
+                v-html="rowData.lastModified"
+                v-tooltip.top="{
+                  value: rowData.lastModify || rowData.lastModified,
+                  showDelay: 300
+                }"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-if="isRenderOneOption"
+              data-testid="data-table-actions-column-body-action"
+            >
+              <PrimeButton
+                size="small"
+                outlined
+                v-bind="optionsOneAction(rowData)"
+                @click="executeCommand(rowData)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-action-button"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-else
+              data-testid="data-table-actions-column-body-actions"
+            >
+              <PrimeMenu
+                :ref="setMenuRefForRow(rowData.id)"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+                data-testid="data-table-actions-column-body-actions-menu"
+                :pt="{
+                  menuitem: ({ context }) => ({
+                    'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
+                  })
+                }"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                outlined
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-actions-menu-button"
+              />
+            </div>
           </div>
         </template>
       </Column>
@@ -279,6 +343,7 @@
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
                 :disabled="disabledAddButton"
+                size="small"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -300,6 +365,30 @@
         </template>
       </Column>
     </DataTable>
+    <div
+      :style="{
+        position: 'fixed',
+        top: cellQuickActions.posY + 'px',
+        left: cellQuickActions.posX + 'px',
+        zIndex: 10
+      }"
+      class="popup-container"
+      @mouseenter="onPopupMouseEnter"
+      @mouseleave="onPopupMouseLeave"
+      :class="{
+        visible: cellQuickActions.visible
+      }"
+    >
+      <button
+        v-for="item in quickActions"
+        :key="item"
+        @click="item.action(cellQuickActions.rowData)"
+        :title="item.title"
+        class="px-2"
+      >
+        <i :class="item.icon"></i>
+      </button>
+    </div>
   </div>
 </template>
 <script setup>
@@ -311,8 +400,9 @@
   import Listbox from 'primevue/listbox'
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
+  import PrimeTag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
@@ -327,7 +417,8 @@
     'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
-    'update:selectedItensData'
+    'update:selectedItensData',
+    'force-update'
   ])
 
   const props = defineProps({
@@ -431,6 +522,18 @@
     lazy: {
       type: Boolean,
       default: true
+    },
+    showLastModified: {
+      type: Boolean,
+      default: false
+    },
+    showContrastInactiveLine: {
+      type: Boolean,
+      default: false
+    },
+    cellQuickActionsItens: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -468,6 +571,20 @@
   const toast = useToast()
   const firstLoadData = ref(true)
 
+  const cellQuickActions = ref({
+    visible: false,
+    text: '',
+    posX: 0,
+    posY: 0,
+    rowData: null
+  })
+
+  const lastModifiedToggled = ref(false)
+  const hoverTimeout = ref(null)
+  const hideTimeout = ref(null)
+  const activeCellElement = ref(null)
+  const pendingCellElement = ref(null)
+
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
 
@@ -489,6 +606,13 @@
     }
   })
 
+  const getRowClass = computed(() => {
+    return (rowData) => {
+      return props.showContrastInactiveLine && rowData?.active?.content === 'Inactive'
+        ? 'opacity-50'
+        : ''
+    }
+  })
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -506,6 +630,23 @@
 
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
+  }
+
+  const sortByLastModified = () => {
+    const currentField = sortFieldValue.value
+    const currentOrder = sortOrderValue.value
+
+    if (currentField === 'lastModified') {
+      sortOrderValue.value = currentOrder === 1 ? -1 : 1
+    } else {
+      sortFieldValue.value = 'lastModified'
+      sortOrderValue.value = 1
+    }
+
+    fetchOnSort({
+      sortField: sortFieldValue.value,
+      sortOrder: sortOrderValue.value
+    })
   }
 
   /**
@@ -653,7 +794,8 @@
     const [firstAction] = actionOptions(rowData)
     return {
       icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+      disabled: firstAction?.disabled,
+      tooltip: firstAction?.tooltip
     }
   }
 
@@ -694,6 +836,7 @@
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
     firstItemIndex.value = event.first
+    emit('force-update', true)
     reload({ page: event.page + 1 })
   }
 
@@ -718,7 +861,7 @@
 
   const fetchOnSearch = () => {
     if (!props.lazy) return
-
+    emit('force-update', true)
     const firstPage = 1
     firstItemIndex.value = firstPage
     reload()
@@ -734,6 +877,22 @@
     savedSearch.value = search
   }
 
+  const loadLastModifiedToggleState = () => {
+    const saved = localStorage.getItem('lastModifiedToggled')
+    if (saved !== null) {
+      lastModifiedToggled.value = JSON.parse(saved)
+    }
+  }
+
+  const saveLastModifiedToggleState = () => {
+    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
+  }
+
+  const toggleLastModifiedDisplay = () => {
+    lastModifiedToggled.value = !lastModifiedToggled.value
+    saveLastModifiedToggleState()
+  }
+
   onMounted(() => {
     if (!props.loadDisabled) {
       loadData({
@@ -746,7 +905,60 @@
     selectedColumns.value = props.columns.filter(
       (col) => !props.hiddenByDefault?.includes(col.field)
     )
+
+    loadLastModifiedToggleState()
+
+    window.addEventListener('scroll', onScroll, { passive: true })
   })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', onScroll)
+  })
+
+  const setupCellEventHandlers = () => {
+    setTimeout(() => {
+      const columnsWithQuickActions = props.columns
+        .map((col, index) => ({ ...col, index }))
+        .filter((col) => col.quickActions === true)
+
+      if (columnsWithQuickActions.length === 0) {
+        return
+      }
+
+      let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('.p-datatable-tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('table tbody tr')
+      }
+
+      rows.forEach((row, rowIndex) => {
+        columnsWithQuickActions.forEach((column) => {
+          const cell = row.children[column.index]
+          if (cell && !cell.classList.contains('p-frozen-column')) {
+            cell.addEventListener('mouseenter', onCellMouseEnter)
+            cell.addEventListener('mouseleave', onCellMouseLeave)
+            cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', rowIndex)
+          }
+        })
+      })
+    }, 500)
+  }
+
+  watch(
+    () => data.value,
+    (newData) => {
+      if (newData && newData.length > 0) {
+        setupCellEventHandlers()
+      }
+    },
+    { deep: true }
+  )
 
   watch(
     () => props.columns,
@@ -756,5 +968,192 @@
     { deep: true }
   )
 
+  const onScroll = () => {
+    if (cellQuickActions.value.visible) {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+
+      if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
+      }
+
+      if (hideTimeout.value) {
+        clearTimeout(hideTimeout.value)
+      }
+
+      pendingCellElement.value = null
+    }
+  }
+
+  const onCellMouseEnter = (event) => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+    }
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    const cellElement = event.currentTarget
+
+    if (cellElement.classList.contains('p-frozen-column')) {
+      return
+    }
+
+    // Clear any existing active cell and popup
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+    }
+    cellQuickActions.value.visible = false
+
+    pendingCellElement.value = cellElement
+
+    hoverTimeout.value = setTimeout(() => {
+      if (pendingCellElement.value === cellElement) {
+        activeCellElement.value = cellElement
+
+        const rect = cellElement.getBoundingClientRect()
+        const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = parseInt(cellElement.getAttribute('data-row-index') || '0')
+        const currentRowData = data.value[rowIndex] || null
+
+        cellQuickActions.value = {
+          visible: true,
+          text: cellText,
+          posX: rect.left,
+          posY: rect.top - 28,
+          rowData: currentRowData
+        }
+
+        cellElement.classList.add('cell-active-hover')
+      }
+    }, 1000)
+  }
+
+  const onCellMouseLeave = () => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+      hoverTimeout.value = null
+    }
+
+    pendingCellElement.value = null
+
+    hideTimeout.value = setTimeout(() => {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+    }, 150)
+  }
+
+  const onPopupMouseEnter = () => {
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.add('cell-active-hover')
+    }
+  }
+
+  const onPopupMouseLeave = () => {
+    cellQuickActions.value.visible = false
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+      activeCellElement.value = null
+    }
+  }
+
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(cellQuickActions.value.text)
+      .then(() => {
+        toast.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: 'Text copied to clipboard',
+          life: 3000
+        })
+        cellQuickActions.value.visible = false
+      })
+      .catch(() => {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to copy text',
+          life: 3000
+        })
+      })
+  }
+
+  const searchText = () => {
+    savedSearch.value = cellQuickActions.value.text
+    filters.value.global.value = cellQuickActions.value.text
+    cellQuickActions.value.visible = false
+    toast.add({
+      severity: 'info',
+      summary: 'Search applied',
+      detail: `Searching for: "${cellQuickActions.value.text}"`,
+      life: 3000
+    })
+
+    fetchOnSearch()
+  }
+  const quickActions = [
+    {
+      title: 'Copy to clipboard',
+      icon: 'pi pi-copy',
+      action: copyToClipboard
+    },
+    {
+      title: 'Search text',
+      icon: 'pi pi-search',
+      action: searchText
+    },
+    ...(props.cellQuickActionsItens || [])
+  ]
+
   defineExpose({ reload, handleExportTableDataToCSV })
 </script>
+<style scoped lang="scss">
+  .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
+    transition: color 0.2s ease;
+  }
+
+  .table-with-orange-borders.outline-visible
+    :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
+  .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
+    outline: 2px dashed #f97316 !important;
+    outline-offset: -2px;
+    transition-delay: 0.3s;
+    border-radius: 0 6px 6px 6px;
+  }
+  .popup-container {
+    background-color: #f97316;
+    color: white;
+    padding: 4px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    opacity: 0;
+    height: 30px;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease;
+    &.visible {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+</style>

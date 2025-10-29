@@ -3,6 +3,7 @@
     title="Connection Options"
     :description="getDescriptionByType"
     data-testid="edge-connectors-form__section__connection-options"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <DrawerEdgeStorage
@@ -187,6 +188,13 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
 
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const { value: host } = useField('connectionOptions.host')
   const { value: path } = useField('connectionOptions.path')
   const { value: realIpHeader } = useField('connectionOptions.realIpHeader')
@@ -202,8 +210,7 @@
   const { value: type } = useField('type')
 
   const dnsResolutionList = [
-    { label: 'Preserve', value: 'preserve' },
-    { label: 'Force IPv6', value: 'force_ipv6' },
+    { label: 'IPv4 and IPv6', value: 'both' },
     { label: 'Force IPv4', value: 'force_ipv4' }
   ]
   const transportPolicyList = [

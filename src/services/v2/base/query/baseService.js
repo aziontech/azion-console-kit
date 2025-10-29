@@ -1,8 +1,16 @@
-import { onUnmounted } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
-import { globalKey, sensitiveKey } from '@/services/v2/base/query/keys'
+import {
+  queryClient,
+  getCacheOptions,
+  createQueryKey,
+  clearCacheByType,
+  clearCacheSensitive,
+  clearAllCache
+} from '@/services/v2/base/query/queryClient'
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
-import { queryClient } from '@/services/v2/base/query/queryClient'
+import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
 
 export class BaseService {
   constructor() {
@@ -16,67 +24,69 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  query({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    const result = this.queryClient.query({
+  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
+
+    return useQuery({
       queryKey,
-      queryFn,
-      ...baseOptions,
+      queryFn: coalescedQueryFn,
+      ...options,
       ...overrides
     })
-
-    onUnmounted(() => {
-      this.queryClient.unregister(queryKey, result)
-    })
-
-    return result
   }
 
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const { queryKey, baseOptions } = this.#resolveOptions({ key, cache })
-    return this.queryClient.queryAsync({
+    await waitForPersistenceRestore()
+
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
+
+    return this.queryClient.ensureQueryData({
       queryKey,
-      queryFn,
-      ...baseOptions,
+      queryFn: coalescedQueryFn,
+      ...options,
       ...overrides
     })
   }
 
-  async invalidate({ key, cache = this.cacheType.GLOBAL }) {
-    const { queryKey } = this.#resolveOptions({ key, cache })
-    return this.queryClient.invalidate(queryKey)
+  withMutex(key, mutationFn) {
+    const mutex = getMutex(key)
+    return (variables) => mutex.run(() => mutationFn(variables))
   }
 
-  async invalidateByType(cache = this.cacheType.GLOBAL) {
-    return this.queryClient.clearByPrefix(cache)
+  async clearByType(cache = this.cacheType.GLOBAL) {
+    return clearCacheByType(cache)
   }
 
-  #resolveOptions({ key, cache }) {
-    switch (cache) {
-      case this.cacheType.SENSITIVE:
-        return {
-          queryKey: sensitiveKey(key),
-          baseOptions: {
-            staleTime: this.cacheTime.ONE_MINUTE,
-            gcTime: this.cacheTime.ONE_MINUTE,
-            encrypted: true
-          }
-        }
-      case this.cacheType.GLOBAL:
-        return {
-          queryKey: globalKey(key),
-          baseOptions: {
-            staleTime: this.cacheTime.FIVE_MINUTES,
-            gcTime: this.cacheTime.FIVE_MINUTES,
-            encrypted: false
-          }
-        }
-      case this.cacheType.NONE:
-      default:
-        return {
-          queryKey: key.join(':'),
-          baseOptions: { staleTime: 0, gcTime: 0, encrypted: false }
-        }
-    }
+  async clearSensitive() {
+    return clearCacheSensitive()
+  }
+
+  async clearAll() {
+    return clearAllCache()
+  }
+
+  hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    const options = getCacheOptions(cache)
+
+    const cachedData = this.queryClient.getQueryData(queryKey)
+    if (cachedData === undefined) return false
+
+    const query = this.queryClient.getQueryState(queryKey)
+    if (!query || !query.dataUpdatedAt) return false
+
+    const staleTime = options.staleTime || 0
+    const isStale = Date.now() - query.dataUpdatedAt > staleTime
+
+    return !isStale
+  }
+
+  getCachedData({ key, cache = this.cacheType.GLOBAL }) {
+    const queryKey = createQueryKey(key, cache)
+    return this.queryClient.getQueryData(queryKey)
   }
 }

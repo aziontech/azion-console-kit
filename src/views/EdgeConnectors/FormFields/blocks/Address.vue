@@ -1,8 +1,9 @@
 <template>
   <FormHorizontal
     title="Address Management"
-    description="Add addresses to your Edge Connector. By default, it supports a single origin address. If the Load Balancer module is enabled, you can manage up to 15 addresses for advanced traffic distribution."
+    description="Add addresses to your Connector. By default, it supports a single origin address. If the Load Balancer module is enabled, you can manage up to 15 addresses for advanced traffic distribution."
     data-testid="edge-connectors-form__section__address-management"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div v-show="isLoadBalancerEnabled">
@@ -239,6 +240,13 @@
   import { computed, watch, ref } from 'vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsAddress' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { fields: addresses, push: pushAddress, remove: removeAddress } = useFieldArray('addresses')
 

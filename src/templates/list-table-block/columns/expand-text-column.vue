@@ -7,7 +7,7 @@
       {{ textToShow }}
     </li>
     <li
-      v-if="displayShowMore"
+      v-if="showMoreText && displayShowMore"
       @click.stop="showAll"
       class="underline cursor-pointer"
       data-testid="table-column-expand-text-column__show-more__toggle"
@@ -28,6 +28,10 @@
     sliceValue: {
       type: Number,
       default: 25
+    },
+    showMoreText: {
+      type: Boolean,
+      default: true
     }
   })
 

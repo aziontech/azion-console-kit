@@ -59,7 +59,7 @@ export class EdgeConnectorsService extends BaseService {
       body
     })
 
-    return 'Edge Connector has been updated'
+    return 'Connector has been updated'
   }
 
   loadEdgeConnectorsService = async ({ id }) => {

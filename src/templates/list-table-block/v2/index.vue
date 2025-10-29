@@ -33,6 +33,10 @@
           class: 'cursor-pointer'
         })
       }"
+      :class="[
+        'overflow-clip rounded-md table-with-orange-borders',
+        { 'outline-visible': cellQuickActions.visible }
+      ]"
     >
       <template
         #header
@@ -53,6 +57,8 @@
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"
+                @keyup.enter="fetchOnSearch"
+                @input="handleSearchValue(false)"
               />
             </span>
 
@@ -67,6 +73,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                size="small"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
                 :label="addButtonLabel"
@@ -145,17 +152,27 @@
         class="lg:break-words lg:whitespace-normal"
       >
         <template #body="{ data: rowData }">
-          <template v-if="col.type !== 'component'">
-            <div :data-testid="`list-table-block__column__${col.field}__row`">
-              {{ rowData[col.field] }}
-            </div>
-          </template>
-          <template v-else>
-            <component
-              :is="col.component(extractFieldValue(rowData, col.field))"
-              :data-testid="`list-table-block__column__${col.field}__row`"
+          <div class="flex items-center gap-2">
+            <template v-if="col.type !== 'component'">
+              <div :data-testid="`list-table-block__column__${col.field}__row`">
+                {{ rowData[col.field] }}
+              </div>
+            </template>
+            <template v-else>
+              <component
+                :is="col.component(extractFieldValue(rowData, col.field))"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+              />
+            </template>
+            <PrimeTag
+              v-if="
+                rowData.status !== undefined &&
+                rowData.status.content !== 'Active' &&
+                col.showInactiveTag
+              "
+              :value="rowData.status.content"
             />
-          </template>
+          </div>
         </template>
       </Column>
 
@@ -168,9 +185,17 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex justify-end w-full gap-2"
             data-testid="data-table-actions-column-header"
           >
+            <span
+              @click="sortByLastModified"
+              v-if="showLastModified"
+              class="cursor-pointer select-none flex items-center gap-2 group"
+              data-testid="last-modified-header-sort"
+            >
+              Last Modified
+            </span>
             <PrimeButton
               outlined
               icon="ai ai-column"
@@ -208,7 +233,30 @@
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
-          <div v-if="rowData.phase?.content !== 'Default'">
+          <div
+            v-if="rowData.phase?.content !== 'Default'"
+            class="flex items-center gap-2 justify-end"
+          >
+            <div
+              v-if="showLastModified"
+              :data-testid="`list-table-block__column__lastModify__row`"
+              class="cursor-pointer"
+              @click.stop="toggleLastModifiedDisplay"
+            >
+              <div
+                v-if="!lastModifiedToggled"
+                v-html="rowData.lastModify || rowData.lastModified"
+                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
+              />
+              <div
+                v-else
+                v-html="rowData.lastModified"
+                v-tooltip.top="{
+                  value: rowData.lastModify || rowData.lastModified,
+                  showDelay: 300
+                }"
+              />
+            </div>
             <div
               class="flex justify-end"
               v-if="isRenderOneOption"
@@ -306,6 +354,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                size="small"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -337,11 +386,36 @@
         </template>
       </Column>
     </DataTable>
+    <div
+      :style="{
+        position: 'fixed',
+        top: cellQuickActions.posY + 'px',
+        left: cellQuickActions.posX + 'px',
+        zIndex: 10
+      }"
+      class="popup-container"
+      @mouseenter="onPopupMouseEnter"
+      @mouseleave="onPopupMouseLeave"
+      :class="{
+        visible: cellQuickActions.visible
+      }"
+    >
+      <button
+        v-for="item in quickActions"
+        :key="item"
+        @click="item.action(cellQuickActions.rowData)"
+        :title="item.title"
+        class="px-2"
+      >
+        <i :class="item.icon"></i>
+      </button>
+    </div>
   </div>
 </template>
 <script setup>
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
   import Column from 'primevue/column'
   import DataTable from 'primevue/datatable'
   import InputText from 'primevue/inputtext'
@@ -349,7 +423,7 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
@@ -451,6 +525,18 @@
     isEdgeApplicationRulesEngine: {
       type: Boolean,
       default: false
+    },
+    showLastModified: {
+      type: Boolean,
+      default: false
+    },
+    showContrastInactiveLine: {
+      type: Boolean,
+      default: false
+    },
+    celllQuickActionsItens: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -470,6 +556,7 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const valueInputedUser = ref(0)
+  const lastModifiedToggled = ref(false)
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
@@ -480,6 +567,18 @@
   const savedSearch = ref('')
 
   const firstLoadData = ref(true)
+
+  const hoverTimeout = ref(null)
+  const hideTimeout = ref(null)
+  const activeCellElement = ref(null)
+  const pendingCellElement = ref(null)
+  const cellQuickActions = ref({
+    visible: false,
+    text: '',
+    posX: 0,
+    posY: 0,
+    rowData: null
+  })
 
   const selectedItems = computed({
     get: () => {
@@ -594,6 +693,9 @@
   const stateClassRules = (rule) => {
     if (rule.position.altered) {
       return 'bg-altered'
+    }
+    if (props.showContrastInactiveLine && rule.status.content === 'Inactive') {
+      return 'opacity-50'
     }
   }
 
@@ -822,6 +924,225 @@
     }
   }
 
+  const loadLastModifiedToggleState = () => {
+    const saved = localStorage.getItem('lastModifiedToggled')
+    if (saved !== null) {
+      lastModifiedToggled.value = JSON.parse(saved)
+    }
+  }
+
+  const saveLastModifiedToggleState = () => {
+    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
+  }
+
+  const toggleLastModifiedDisplay = () => {
+    lastModifiedToggled.value = !lastModifiedToggled.value
+    saveLastModifiedToggleState()
+  }
+
+  const setupCellEventHandlers = () => {
+    setTimeout(() => {
+      const columnsWithQuickActions = props.columns
+        .map((col, index) => ({ ...col, index }))
+        .filter((col) => col.quickActions === true)
+
+      if (columnsWithQuickActions.length === 0) {
+        return
+      }
+
+      let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('.p-datatable-tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('table tbody tr')
+      }
+
+      rows.forEach((row, index) => {
+        columnsWithQuickActions.forEach((column) => {
+          const cell = row.children[column.index]
+          if (cell && !cell.classList.contains('p-frozen-column')) {
+            cell.addEventListener('mouseenter', onCellMouseEnter)
+            cell.addEventListener('mouseleave', onCellMouseLeave)
+            cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', index)
+          }
+        })
+      })
+    }, 500)
+  }
+
+  const onScroll = () => {
+    if (cellQuickActions.value.visible) {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+
+      if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
+      }
+
+      if (hideTimeout.value) {
+        clearTimeout(hideTimeout.value)
+      }
+
+      pendingCellElement.value = null
+    }
+  }
+
+  const onCellMouseEnter = (event) => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+    }
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    const cellElement = event.currentTarget
+
+    if (cellElement.classList.contains('p-frozen-column')) {
+      return
+    }
+
+    // Clear any existing active cell and popup
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+    }
+    cellQuickActions.value.visible = false
+
+    pendingCellElement.value = cellElement
+
+    hoverTimeout.value = setTimeout(() => {
+      if (pendingCellElement.value === cellElement) {
+        activeCellElement.value = cellElement
+
+        const rect = cellElement.getBoundingClientRect()
+        const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = cellElement.getAttribute('data-row-index')
+        const currentRowData = data.value[rowIndex]
+
+        cellQuickActions.value = {
+          visible: true,
+          text: cellText,
+          posX: rect.left,
+          posY: rect.top - 28,
+          rowData: currentRowData
+        }
+
+        cellElement.classList.add('cell-active-hover')
+      }
+    }, 1000)
+  }
+
+  const onCellMouseLeave = () => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+      hoverTimeout.value = null
+    }
+
+    pendingCellElement.value = null
+
+    hideTimeout.value = setTimeout(() => {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+    }, 150)
+  }
+
+  const onPopupMouseEnter = () => {
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.add('cell-active-hover')
+    }
+  }
+
+  const onPopupMouseLeave = () => {
+    cellQuickActions.value.visible = false
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+      activeCellElement.value = null
+    }
+  }
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(cellQuickActions.value.text)
+      .then(() => {
+        toast.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: 'Text copied to clipboard',
+          life: 3000
+        })
+        cellQuickActions.value.visible = false
+      })
+      .catch(() => {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to copy text',
+          life: 3000
+        })
+      })
+  }
+  const fetchOnSearch = () => {
+    if (!props.lazy) return
+    reload()
+  }
+
+  const handleSearchValue = () => {
+    const search = filters.value.global.value
+    savedSearch.value = search
+  }
+
+  const searchText = () => {
+    savedSearch.value = cellQuickActions.value.text
+    filters.value.global.value = cellQuickActions.value.text
+    cellQuickActions.value.visible = false
+    toast.add({
+      severity: 'info',
+      summary: 'Search applied',
+      detail: `Searching for: "${cellQuickActions.value.text}"`,
+      life: 3000
+    })
+
+    fetchOnSearch()
+  }
+  const quickActions = [
+    {
+      title: 'Copy to clipboard',
+      icon: 'pi pi-copy',
+      action: copyToClipboard
+    },
+    {
+      title: 'Search text',
+      icon: 'pi pi-search',
+      action: searchText
+    },
+    ...(props.cellQuickActionsItens || [])
+  ]
+  watch(
+    () => data.value,
+    (newData) => {
+      if (newData && newData.length > 0) {
+        setupCellEventHandlers()
+      }
+    },
+    { deep: true }
+  )
   onMounted(() => {
     loadData({
       fields: props.apiFields,
@@ -829,6 +1150,12 @@
     })
     selectedColumns.value = props.columns
     optionsColumns.value = props.columns.filter((col) => !col.hidden)
+    loadLastModifiedToggleState()
+    window.addEventListener('scroll', onScroll, { passive: true })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', onScroll)
   })
 
   defineExpose({ reload })
@@ -838,6 +1165,16 @@
   .p-datatable {
     .p-datatable-tbody {
       > tr {
+        > td {
+          transition: color 0.2s ease;
+
+          &.cell-active-hover {
+            outline: 2px dashed #f97316 !important;
+            outline-offset: -2px;
+            transition-delay: 0.3s;
+            border-radius: 0 6px 6px 6px;
+          }
+        }
         &.p-datatable-dragpoint-top > td {
           box-shadow: inset 0 2px 0 0 var(--text-color);
         }
@@ -860,5 +1197,27 @@
 
   .no-before::before {
     content: none !important;
+  }
+
+  .popup-container {
+    background-color: #f97316;
+    color: white;
+    padding: 4px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    opacity: 0;
+    height: 30px;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease;
+    &.visible {
+      opacity: 1;
+      transform: scaleY(1);
+    }
   }
 </style>
