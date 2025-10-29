@@ -98,6 +98,7 @@
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"
         :csvMapper="csvMapper"
+        hideLastModifiedColumn
         :emptyBlock="{
           title: 'No teams have been created',
           description: 'Click the button below to create your first team and add permissions.',

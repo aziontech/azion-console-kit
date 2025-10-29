@@ -67,6 +67,7 @@
         :enableEditClick="false"
         exportFileName="Multi-Factor Authentication Management"
         :csvMapper="csvMapper"
+        hideLastModifiedColumn
         :emptyBlock="{
           title: 'No MFA Management found.',
           description: '',

@@ -5,6 +5,7 @@ import DataTableSearchComponent from './DataTableSearch.vue'
 import DataTableExportComponent from './DataTableExport.vue'
 import DataTableAddButtonComponent from './DataTableAddButton.vue'
 import DataTableRowActionsComponent from './DataTableRowActions.vue'
+import LastModifiedPopup from './LastModifiedPopup.vue'
 import Column from 'primevue/column'
 const DataTable = DataTableComponent
 
@@ -14,6 +15,7 @@ DataTable.Search = DataTableSearchComponent
 DataTable.Export = DataTableExportComponent
 DataTable.AddButton = DataTableAddButtonComponent
 DataTable.RowActions = DataTableRowActionsComponent
+DataTable.LastModifiedPopup = LastModifiedPopup
 DataTable.Column = Column
 
 DataTable.install = (app) => {
@@ -24,6 +26,7 @@ DataTable.install = (app) => {
   app.component('DataTableExport', DataTableExportComponent)
   app.component('DataTableAddButton', DataTableAddButtonComponent)
   app.component('DataTableRowActions', DataTableRowActionsComponent)
+  app.component('DataTableLastModifiedPopup', LastModifiedPopup)
   app.component('DataTableColumn', Column)
 }
 
@@ -37,5 +40,6 @@ export {
   DataTableExportComponent as DataTableExport,
   DataTableAddButtonComponent as DataTableAddButton,
   DataTableRowActionsComponent as DataTableRowActions,
+  LastModifiedPopup as DataTableLastModifiedPopup,
   Column as DataTableColumn
 }

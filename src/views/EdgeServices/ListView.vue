@@ -51,15 +51,7 @@
       sortField: 'id',
       filterPath: 'id'
     },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      sortField: 'lastModifiedDate',
-      header: 'Last Modified'
-    },
+
     {
       field: 'lastEditor',
       header: 'Last Editor'

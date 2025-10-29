@@ -73,16 +73,6 @@
         header: 'Function',
         sortField: 'edge_function',
         disableSort: true
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor'
-      },
-      {
-        field: 'modified',
-        header: 'Last Modified',
-        sortField: 'last_modified'
       }
     ]
   })

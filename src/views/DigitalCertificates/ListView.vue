@@ -152,22 +152,6 @@
           sortField: 'issuer'
         },
         {
-          field: 'lastEditor',
-          header: 'Last Editor',
-          sortField: 'last_editor',
-          type: 'component',
-          component: (columnData) =>
-            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-        },
-        {
-          field: 'lastModified',
-          header: 'Last Modified',
-          sortField: 'last_modified',
-          type: 'component',
-          component: (columnData) =>
-            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-        },
-        {
           field: 'status',
           header: 'Status',
           sortField: 'status',
@@ -217,22 +201,6 @@
         field: 'validity',
         header: 'Expiration Date',
         sortField: 'validity',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })

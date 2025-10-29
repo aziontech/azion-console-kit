@@ -99,14 +99,6 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
         field: 'active',
         header: 'Status',
         type: 'component',

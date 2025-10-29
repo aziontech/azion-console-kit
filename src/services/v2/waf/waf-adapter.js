@@ -3,7 +3,7 @@ import {
   transformSnakeToCamel
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { defaultConditions } from '@/views/WafRules/Config'
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -41,7 +41,8 @@ const transformMap = {
   active: (value) => parseStatusData(value.active),
   name: (value) => value.name,
   lastEditor: (value) => value.last_editor,
-  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
+  lastModified: (value) => value.last_modified,
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
@@ -190,7 +191,8 @@ export const WafAdapter = {
       ? data.results.map((waf) => ({
           id: waf.id,
           lastEditor: waf.last_editor,
-          lastModified: formatDateToDayMonthYearHour(waf.last_modified),
+          lastModified: waf.last_modified,
+          lastModify: convertToRelativeTime(waf.last_modified),
           conditions: waf.conditions.map(
             (condition) => defaultConditions.find((match) => match.value === condition.match)?.title
           ),

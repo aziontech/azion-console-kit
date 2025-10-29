@@ -74,6 +74,7 @@
         :frozen-columns="['name']"
         exportFileName="Reseller Management"
         :csvMapper="csvMapper"
+        hideLastModifiedColumn
         :emptyBlock="{
           title: 'No resellers have been created',
           description: 'Click the button below to create your first reseller account.',

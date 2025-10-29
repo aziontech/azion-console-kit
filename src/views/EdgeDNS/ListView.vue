@@ -123,6 +123,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Edge DNS"
+        hideLastModifiedColumn
         :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No zone has been added',

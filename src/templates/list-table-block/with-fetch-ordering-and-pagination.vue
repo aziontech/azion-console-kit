@@ -147,6 +147,10 @@
     emptyBlock: {
       type: Object,
       default: () => ({})
+    },
+    hideLastModifiedColumn: {
+      type: Boolean,
+      default: false
     }
   })
   // Use the composable for all data table functionality
@@ -164,7 +168,6 @@
     itemsByPage,
     sortFieldValue,
     sortOrderValue,
-    lastModifiedToggled,
     selectedItems,
 
     // Computed properties
@@ -188,12 +191,17 @@
     sortByLastModified,
     fetchOnSearch,
     handleSearchValue,
-    toggleLastModifiedDisplay,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     extractFieldValue,
     onRowReorder
   } = useDataTable(props, emit)
+
+  // Last Modified Popup state
+  const showPopup = ref(false)
+  const popupPosition = ref({ posX: 0, posY: 0 })
+  const popupData = ref({ lastEditor: '', lastModified: '' })
+  const hoverTimeout = ref(null)
 
   // Additional computed properties specific to this component
   const havePagination = ref(true)
@@ -204,6 +212,31 @@
   )
   const dataKey = ref('id')
   const columns = computed(() => props.columns)
+
+  // Last Modified Popup functions
+  const handleMouseEnter = (event, rowData) => {
+    clearTimeout(hoverTimeout.value)
+
+    hoverTimeout.value = setTimeout(() => {
+      const rect = event.target.getBoundingClientRect()
+      popupPosition.value = {
+        posX: rect.right,
+        posY: rect.top - 30
+      }
+
+      popupData.value = {
+        lastEditor: rowData.lastEditor,
+        lastModified: rowData.lastModified || rowData.lastModify
+      }
+
+      showPopup.value = true
+    }, 1000)
+  }
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimeout.value)
+    showPopup.value = false
+  }
 
   defineExpose({ reload, handleExportTableDataToCSV })
 
@@ -444,15 +477,17 @@
         :bodyStyle="classActions"
         data-testid="data-table-actions-column"
         :reorderableColumn="false"
+        style="width: 200px"
       >
         <template #header>
           <div
-            class="flex items-center gap-2 justify-end w-full"
+            v-if="!hideLastModifiedColumn"
+            class="flex items-center gap-2 justify-start w-full"
             data-testid="data-table-actions-column-header"
           >
+            Last Modified
             <span
               @click="sortByLastModified"
-              v-if="showLastModified"
               class="cursor-pointer select-none flex items-center gap-2 group"
               data-testid="last-modified-header-sort"
             >
@@ -467,7 +502,6 @@
                 v-else
                 class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
               />
-              Last Modified
             </span>
           </div>
         </template>
@@ -477,24 +511,21 @@
         >
           <div class="flex items-center gap-2 justify-end">
             <div
-              v-if="showLastModified"
+              v-if="!hideLastModifiedColumn"
               :data-testid="`list-table-block__column__lastModify__row`"
-              class="cursor-pointer"
-              @click.stop="toggleLastModifiedDisplay"
+              class="cursor-pointer flex items-center max-w-[234px] overflow-hidden"
+              @mouseenter="(event) => handleMouseEnter(event, rowData)"
+              @mouseleave="handleMouseLeave"
             >
-              <div
-                v-if="!lastModifiedToggled"
-                v-html="rowData.lastModify || rowData.lastModified"
-                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
-              />
-              <div
-                v-else
-                v-html="rowData.lastModified"
-                v-tooltip.top="{
-                  value: rowData.lastModify || rowData.lastModified,
-                  showDelay: 300
-                }"
-              />
+              <div class="text-ellipsis whitespace-nowrap overflow-hidden block">
+                <span>{{ rowData.lastModify || rowData.lastModified }}</span>
+                <span
+                  v-if="rowData.lastEditor"
+                  class="text-xs"
+                >
+                  by {{ rowData.lastEditor }}</span
+                >
+              </div>
             </div>
             <DataTable.RowActions
               :rowData="rowData"
@@ -511,6 +542,14 @@
         <slot name="emptyBlockButton" />
       </template>
     </DataTable>
+
+    <!-- Last Modified Popup -->
+    <DataTable.LastModifiedPopup
+      :visible="showPopup"
+      :last-editor="popupData.lastEditor"
+      :last-modified="popupData.lastModified"
+      :position="popupPosition"
+    />
   </div>
 </template>
 

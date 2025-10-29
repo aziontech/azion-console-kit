@@ -73,15 +73,6 @@
       filterPath: 'id'
     },
     {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModify',
-      sortField: 'last_modified',
-      header: 'Last Modified'
-    },
-    {
       field: 'active',
       header: 'Status',
       sortField: 'active',

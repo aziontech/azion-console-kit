@@ -47,16 +47,6 @@
       field: 'size',
       header: 'Size',
       sortable: true
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor',
-      sortable: true
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified',
-      sortable: true
     }
   ]
 

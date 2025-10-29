@@ -74,6 +74,7 @@
         :frozen-columns="['name']"
         exportFileName="Group Management"
         :csvMapper="csvMapper"
+        hideLastModifiedColumn
         :emptyBlock="{
           title: 'No groups have been created',
           description: 'Click the button below to create your first group account.',
