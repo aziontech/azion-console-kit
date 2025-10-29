@@ -130,6 +130,10 @@
         columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
       field: 'lastModified',
       header: 'Last Modified'
     },
@@ -238,6 +242,7 @@
     emptyListMessage="No allowed rules found."
     isTabs
     :actions="actions"
+    :default-ordering-field-name="'id'"
   >
     <template #addButton>
       <PrimeButton

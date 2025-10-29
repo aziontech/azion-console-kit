@@ -4,7 +4,7 @@ import {
   parseBehaviorsLoad,
   parseCriteriaLoad
 } from '../utils/adapter/rule-engine-utils'
-
+import { convertToRelativeTime } from '@/helpers/convert-date'
 import { getCurrentTimezone } from '@/helpers'
 
 const STATUS_AS_TAG = {
@@ -27,6 +27,7 @@ export const EdgeFirewallRulesEngineAdapter = {
           name: rules.name,
           description: rules.description || '',
           lastModified: getCurrentTimezone(rules.last_modified),
+          lastModify: convertToRelativeTime(rules.last_modified),
           lastEditor: rules.last_editor,
           status: STATUS_AS_TAG[rules.active],
           position: {

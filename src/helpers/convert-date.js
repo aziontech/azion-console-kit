@@ -1,3 +1,5 @@
+import { useAccountStore } from '@stores/account'
+
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
 
@@ -150,7 +152,7 @@ const getCurrentMonthStartEnd = () => {
 }
 
 const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
-  return new Intl.DateTimeFormat('us', {
+  return new Intl.DateTimeFormat('en-US', {
     dateStyle,
     timeStyle,
     timeZone: 'UTC'
@@ -166,13 +168,31 @@ const formatDateToMonthYear = (date) => {
   return []
 }
 
-const formatDateToDayMonthYearHour = (date) => {
+const formatDateToDayMonthYearHour = (date, timezone) => {
   if (!date) return null
 
-  return new Intl.DateTimeFormat('us', {
-    dateStyle: 'full',
-    timeStyle: 'medium'
-  }).format(new Date(date))
+  let userTimezone = timezone || 'UTC'
+
+  if (!timezone) {
+    try {
+      const accountStore = useAccountStore()
+      userTimezone = accountStore.accountData?.timezone || 'UTC'
+    } catch (error) {
+      userTimezone = 'UTC'
+    }
+  }
+
+  return new Date(date).toLocaleString('en-US', {
+    timeZone: userTimezone,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  })
 }
 
 const getCurrentDateTimeIntl = () => {
@@ -223,6 +243,80 @@ function getRemainingDays(dateStr) {
   return Math.floor(days)
 }
 
+const convertToRelativeTime = (date) => {
+  const now = new Date()
+  const targetDate = new Date(date)
+  const diffMs = now.getTime() - targetDate.getTime()
+  const diffMinutes = Math.floor(diffMs / MINUTE_IN_MILLISECONDS)
+  const diffHours = Math.floor(diffMs / HOUR_IN_MILLISECONDS)
+  const diffDays = Math.floor(diffMs / (24 * HOUR_IN_MILLISECONDS))
+
+  if (diffMinutes < 1) {
+    return 'Just now'
+  }
+
+  if (diffMinutes === 1) {
+    return '1 minute ago'
+  }
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes} minutes ago`
+  }
+
+  if (diffHours === 1) {
+    return '1 hour ago'
+  }
+
+  if (diffHours < 24) {
+    return `${diffHours} hours ago`
+  }
+
+  if (diffDays === 1) {
+    return 'Yesterday'
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays} days ago`
+  }
+
+  if (diffDays < 14) {
+    return 'Last week'
+  }
+
+  const targetMonth = targetDate.getMonth()
+  const targetYear = targetDate.getFullYear()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  if (targetYear === currentYear) {
+    if (currentMonth - targetMonth === 1) {
+      return 'Last month'
+    }
+
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+    return `On ${monthNames[targetMonth]}`
+  }
+
+  if (currentYear - targetYear === 1) {
+    return 'Last year'
+  }
+
+  return `${currentYear - targetYear} years ago`
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -235,5 +329,6 @@ export {
   convertValueToDateByUserTimezone,
   formatDateToDayMonthYearHour,
   getRemainingDays,
-  getCurrentDateTimeIntl
+  getCurrentDateTimeIntl,
+  convertToRelativeTime
 }
