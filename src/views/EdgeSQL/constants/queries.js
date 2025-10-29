@@ -134,6 +134,99 @@ export const SQLITE_QUERIES = {
 
   TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
 
+  ALTER_COLUMN: (tableName, tableSchema, currentColumn, newColumn) => {
+    const quote = (id) => `"${String(id).replace(/"/g, '"')}"`
+
+    const isSqlKeywordDefault = (val) =>
+      typeof val === 'string' && /^CURRENT_|^NOW\(\)$|^DATE\(|^DATETIME\(/i.test(val)
+
+    const formatDefault = (val) => {
+      if (val === undefined || val === null || val === '') return ''
+      if (typeof val === 'number' || typeof val === 'boolean') return ` DEFAULT ${val}`
+      if (isSqlKeywordDefault(val)) return ` DEFAULT ${val}`
+      return ` DEFAULT '${String(val).replace(/'/g, "''")}'`
+    }
+
+    const formatColDef = (column) => {
+      const pk = column.primaryKey ? ' PRIMARY KEY' : ''
+      const nn = column.notNull ? ' NOT NULL' : ''
+      const def = formatDefault(column.default)
+      const type = column.type ? ` ${String(column.type).toUpperCase()}` : ''
+      return `${quote(column.name)}${type}${nn}${def}${pk}`
+    }
+
+    // 1) Fast-path: only renaming the column
+    const isOnlyRename =
+      newColumn?.name &&
+      newColumn.name !== currentColumn?.name &&
+      (newColumn.type ?? currentColumn?.type) === currentColumn?.type &&
+      (newColumn.notNull ?? currentColumn?.notNull) === currentColumn?.notNull &&
+      (newColumn.default ?? currentColumn?.default) === currentColumn?.default &&
+      (newColumn.primaryKey ?? currentColumn?.primaryKey) === currentColumn?.primaryKey
+
+    if (isOnlyRename) {
+      return `ALTER TABLE ${quote(tableName)} RENAME COLUMN ${quote(currentColumn.name)} TO ${quote(
+        newColumn.name
+      )}`
+    }
+
+    const colNameTarget = currentColumn?.name
+    const newDefMap = {}
+    if (colNameTarget) {
+      newDefMap[colNameTarget] = {
+        name: colNameTarget,
+        type: newColumn?.type ?? currentColumn?.type,
+        notNull: newColumn?.notNull ?? currentColumn?.notNull,
+        default: newColumn?.default ?? currentColumn?.default,
+        primaryKey:
+          newColumn?.primaryKey !== undefined ? newColumn.primaryKey : currentColumn?.primaryKey
+      }
+    }
+
+    const newTableName = `${tableName}__new`
+
+    const newSchema = (tableSchema || []).map((column) => {
+      if (column?.name === colNameTarget) {
+        return {
+          ...column,
+          ...newDefMap[colNameTarget]
+        }
+      }
+      return column
+    })
+
+    const columnDefs = newSchema.map((column) => formatColDef(column)).join(',\n  ')
+    const columnNames = newSchema.map((column) => quote(column.name)).join(', ')
+
+    const targetNew = newSchema.find((column) => column.name === colNameTarget)
+    const selectList = (tableSchema || [])
+      .map((column) => {
+        if (column.name !== colNameTarget) return quote(column.name)
+        // If becoming NOT NULL, coalesce with default when provided
+        if (targetNew?.notNull && targetNew?.default !== undefined && targetNew?.default !== null) {
+          const defRaw = isSqlKeywordDefault(targetNew.default)
+            ? targetNew.default
+            : `'${String(targetNew.default).replace(/'/g, "''")}'`
+          return `COALESCE(${quote(column.name)}, ${defRaw}) AS ${quote(column.name)}`
+        }
+        return quote(column.name)
+      })
+      .join(', ')
+
+    const statements = [
+      'BEGIN TRANSACTION;',
+      'PRAGMA foreign_keys = OFF;',
+      `CREATE TABLE ${newTableName} (\n  ${columnDefs}\n);`,
+      `INSERT INTO ${newTableName} (${columnNames})\nSELECT ${selectList}\nFROM ${tableName};`,
+      `DROP TABLE ${tableName};`,
+      `ALTER TABLE ${newTableName} RENAME TO ${tableName};`,
+      'PRAGMA foreign_keys = ON;',
+      'COMMIT;'
+    ]
+
+    return statements
+  },
+
   DATABASE_SIZE: () => `SELECT 
     (page_count * page_size) AS size_bytes,
     ROUND((page_count * page_size) / 1024.0, 2) AS size_kb,

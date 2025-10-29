@@ -128,9 +128,13 @@
         </template>
 
         <template #panel-b>
-          <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
+          <div
+            class="flex flex-col h-full min-h-0 min-w-0"
+            :class="{ 'overflow-hidden': tableView !== 'json' }"
+          >
             <SqlDatabaseList
-              class="flex-1 min-h-0 overflow-auto"
+              class="flex-1 min-h-0"
+              :class="{ 'overflow-auto': tableView !== 'json' }"
               :data="dataFiltered"
               title="Results"
               :columns="columns"
@@ -208,6 +212,7 @@
   const tableName = ref('')
   const dataTable = ref([])
   const tableSchema = ref([])
+  const tableView = ref('table')
   const options = ref([
     {
       label: 'Table',
@@ -279,6 +284,10 @@
       return JSON.stringify(dataTable.value)
     }
   })
+
+  const onViewChange = (view) => {
+    tableView.value = view.value
+  }
 
   const historyMenuItems = computed(() => [
     {
