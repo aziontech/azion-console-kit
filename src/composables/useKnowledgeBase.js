@@ -1,8 +1,5 @@
 import { ref } from 'vue'
-import {
-  createDocumentService,
-  deleteDocumentService
-} from '@/services/knowledge-base-services/document-service'
+import { knowledgeBaseService } from '@/services/v2/knowledge-base/knowledge-base-service'
 import { useToast } from 'primevue/usetoast'
 
 const selectedKnowledgeBase = ref(null)
@@ -30,7 +27,7 @@ export const useKnowledgeBase = () => {
     })
   }
 
-  const uploadDocuments = async (fileList, kbId) => {
+  const uploadDocuments = async (fileList, kbId, onComplete = null) => {
     if (!kbId) {
       handleToast('error', 'Error', 'Knowledge Base ID is required')
       return
@@ -102,7 +99,7 @@ export const useKnowledgeBase = () => {
         uploadStatus.value.current = { name: file.name }
 
         try {
-          await createDocumentService(kbId, file)
+          await knowledgeBaseService.uploadDocument(kbId, file)
           uploadedDocuments.value.push(file)
           uploadStatus.value.uploaded = index + 1
           uploadStatus.value.progress = Math.round(((index + 1) / validFiles.length) * 100)
@@ -138,6 +135,11 @@ export const useKnowledgeBase = () => {
           `All ${failureCount} document${failureCount > 1 ? 's' : ''} failed to upload`
         )
       }
+
+      // Call completion callback if provided
+      if (onComplete && typeof onComplete === 'function') {
+        onComplete({ successCount, failureCount })
+      }
     } catch (error) {
       isUploading.value = false
       handleToast(
@@ -150,7 +152,7 @@ export const useKnowledgeBase = () => {
 
   const removeDocuments = async (kbId, documentIds) => {
     for (const documentId of documentIds) {
-      await deleteDocumentService(kbId, documentId)
+      await knowledgeBaseService.deleteDocument(kbId, documentId)
     }
   }
 

@@ -3,9 +3,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-
   import { useField } from 'vee-validate'
-  import { onMounted, nextTick } from 'vue'
+
   defineOptions({ name: 'form-fields-knowledge-base' })
 
   const props = defineProps({
@@ -15,52 +14,11 @@
     }
   })
 
-  const { setValue: setName } = useField('name')
-  const { setValue: setDescription } = useField('description')
-  const { value: embedding_model, setValue: setEmbeddingModel } = useField('embedding_model')
-
-  // Set default embedding model on mount if not in edit mode
-  onMounted(() => {
-    if (!props.isEditMode && !embedding_model.value) {
-      setEmbeddingModel('text-embedding-3-small')
-    }
-  })
-
-  // Listen for form data changes from parent and manually set field values
-  const handleExternalDataUpdate = (data) => {
-    if (data && props.isEditMode) {
-      nextTick(() => {
-        if (data.name) {
-          setName(data.name)
-        }
-        if (data.description) {
-          setDescription(data.description)
-        }
-        if (data.embedding_model) {
-          setEmbeddingModel(data.embedding_model)
-        }
-      })
-    }
-  }
-
-  // For development - expose function to window for manual testing
-  if (typeof window !== 'undefined') {
-    window.testFormUpdate = (data) => {
-      handleExternalDataUpdate(data)
-    }
-  }
-
-  // Expose function to parent component
-  defineExpose({
-    handleExternalDataUpdate
-  })
+  const { value: embeddingModel } = useField('embedding_model')
 
   const embeddingModelOptions = [
     { label: 'text-embedding-3-small (Default)', value: 'text-embedding-3-small' }
   ]
-
-  // Note: Default values should be handled by the form initialization in create mode
-  // or by the loaded data in edit mode - not manually set here
 </script>
 
 <template>
@@ -101,6 +59,7 @@
         <FieldDropdown
           label="Embedding Model"
           name="embedding_model"
+          :value="embeddingModel"
           :options="embeddingModelOptions"
           optionLabel="label"
           optionValue="value"

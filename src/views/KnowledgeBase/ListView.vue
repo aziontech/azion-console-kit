@@ -12,9 +12,9 @@
         addButtonLabel="Knowledge Base"
         createPagePath="/ai/knowledge-base/create"
         exportFileName="knowledge-base"
-        :enableEditClick="false"
+        enableEditClick
+        editPagePath="/ai/knowledge-base"
         @on-before-go-to-add-page="handleCreateTrackEvent"
-        @on-row-click="handleRowClick"
         emptyListMessage="No Knowledge Base entries found."
         class="w-full"
       />
@@ -26,6 +26,7 @@
   import ContentBlock from '@/templates/content-block'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { knowledgeBaseService } from '@/services/v2/knowledge-base/knowledge-base-service'
   import { useRouter } from 'vue-router'
   import { computed, ref, inject } from 'vue'
 
@@ -35,37 +36,10 @@
 
   defineOptions({ name: 'knowledge-base-view' })
 
-  const props = defineProps({
-    listKnowledgeBaseService: {
-      required: true,
-      type: Function
-    },
-    deleteKnowledgeBaseService: {
-      required: true,
-      type: Function
-    }
-  })
-
   const listServiceRef = ref(null)
 
-  const handleRowClick = (item) => {
-    if (!item || !item.id) {
-      return
-    }
-
-    // Track analytics if available
-    try {
-      if (tracker && tracker.product && typeof tracker.product.clickToView === 'function') {
-        tracker.product.clickToView({
-          productName: 'Knowledge Base'
-        })
-      }
-    } catch (error) {
-      // Silently fail on analytics errors
-    }
-
-    router.push(`/ai/knowledge-base/${item.id}`)
-  }
+  const listKnowledgeBaseService = knowledgeBaseService.listKnowledgeBases
+  const deleteKnowledgeBaseService = knowledgeBaseService.deleteKnowledgeBase
 
   const handleEdit = (item) => {
     // Track analytics if available
@@ -78,7 +52,7 @@
     } catch (error) {
       // Silently fail on analytics errors
     }
-    router.push(`/ai/knowledge-base/edit/${item.id}`)
+    router.push(`/ai/knowledge-base/edit/${item.kbId}`)
   }
 
   const actions = [
@@ -93,7 +67,7 @@
       title: 'knowledge base',
       label: 'Delete',
       icon: 'pi pi-trash',
-      service: props.deleteKnowledgeBaseService
+      service: deleteKnowledgeBaseService
     }
   ]
 
@@ -105,11 +79,32 @@
 
   const getColumns = computed(() => [
     {
+      field: 'kbId',
+      header: 'ID',
+      sortable: true,
+      filterPath: 'kbId',
+      sortField: 'kbId'
+    },
+    {
       field: 'name',
       header: 'Name',
       sortable: true,
       filterPath: 'name',
       sortField: 'name'
+    },
+    {
+      field: 'storage',
+      header: 'Storage',
+      sortable: true,
+      filterPath: 'storage',
+      sortField: 'storage'
+    },
+    {
+      field: 'sqlDbName',
+      header: 'SQL',
+      sortable: true,
+      filterPath: 'sqlDbName',
+      sortField: 'sqlDbName'
     },
     {
       field: 'lastEditor',
@@ -119,11 +114,11 @@
       sortField: 'lastEditor'
     },
     {
-      field: 'updatedAt',
+      field: 'lastModified',
       header: 'Last Modified',
       sortable: true,
-      filterPath: 'updatedAtDate',
-      sortField: 'updatedAtDate'
+      filterPath: 'lastModified',
+      sortField: 'lastModified'
     }
   ])
 </script>

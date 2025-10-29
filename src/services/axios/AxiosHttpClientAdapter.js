@@ -40,7 +40,7 @@ export const parseHttpResponse = (httpResponse) => {
 export class AxiosHttpClientAdapter {
   static async request(
     { url, method, headers, body, signal, baseURL },
-    axios = defaultApi() // Remove personal token to use cookies instead
+    axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)
   ) {
     let axiosResponse
 

@@ -64,7 +64,6 @@
             <DragAndDrop
               v-if="showDragAndDrop"
               :kbId="route.params.id"
-              @reload="handleRefresh"
             />
             <div
               v-else
@@ -150,11 +149,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import {
-    listDocumentsService,
-    deleteDocumentService
-  } from '@/services/knowledge-base-services/document-service'
-  import { loadKnowledgeBaseService } from '@/services/knowledge-base-services/load-knowledge-base-service'
+  import { knowledgeBaseService } from '@/services/v2/knowledge-base/knowledge-base-service'
   import { useKnowledgeBase } from '@/composables/useKnowledgeBase'
   import UploadCard from './components/UploadCard.vue'
   import DragAndDrop from './components/DragAndDrop.vue'
@@ -167,7 +162,7 @@
   const router = useRouter()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
-  const { uploadDocuments, removeDocuments, handleToast, selectedDocuments } = useKnowledgeBase()
+  const { uploadDocuments, removeDocuments, handleToast, selectedDocuments, isUploading } = useKnowledgeBase()
 
   const knowledgeBase = ref(null)
   const documentSearchTerm = ref('')
@@ -199,16 +194,16 @@
       header: 'Type'
     },
     {
-      field: 'size',
-      header: 'Size'
-    },
-    {
-      field: 'createdAt',
-      header: 'Created At'
-    },
-    {
       field: 'status',
       header: 'Status'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
     }
   ]
 
@@ -226,21 +221,17 @@
     if (!route.params.id) return []
 
     try {
-      const documents = await listDocumentsService(route.params.id)
-      const mappedDocuments = Array.isArray(documents)
-        ? documents.map((documentRecord) => {
-            const mappedDoc = {
-              id: documentRecord.document_id || documentRecord.id,
-              document_id: documentRecord.document_id || documentRecord.id, // Keep both for compatibility
-              name: documentRecord.name,
-              type: documentRecord.type?.toUpperCase() || 'UNKNOWN',
-              size: documentRecord.size ? formatFileSize(documentRecord.size) : '-',
-              createdAt: documentRecord.created_at ? formatDate(documentRecord.created_at) : '-',
-              status: documentRecord.status || 'Processing'
-            }
-            return mappedDoc
-          })
-        : []
+      const response = await knowledgeBaseService.listDocuments(route.params.id)
+      const documents = response?.body || []
+
+      const mappedDocuments = documents.map((documentRecord) => ({
+        documentId: documentRecord.documentId,
+        name: documentRecord.name,
+        type: documentRecord.type?.toUpperCase(),
+        status: documentRecord.status,
+        lastEditor: documentRecord.lastEditor,
+        lastModified: documentRecord.lastModified
+      }))
 
       showDragAndDrop.value = !mappedDocuments?.length
       return mappedDocuments
@@ -250,34 +241,11 @@
     }
   }
 
-  const formatFileSize = (bytes) => {
-    if (!bytes) return '0 B'
-    const kilobyte = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB']
-    const sizeIndex = Math.floor(Math.log(bytes) / Math.log(kilobyte))
-    return parseFloat((bytes / Math.pow(kilobyte, sizeIndex)).toFixed(2)) + ' ' + sizes[sizeIndex]
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '-'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch {
-      return 'Invalid Date'
-    }
-  }
-
   const loadKnowledgeBase = async () => {
     if (!route.params.id) return
 
     try {
-      const kbData = await loadKnowledgeBaseService({ id: route.params.id })
+      const kbData = await knowledgeBaseService.loadKnowledgeBase(route.params.id)
       knowledgeBase.value = kbData
     } catch (error) {
       handleToast('error', 'Error', 'Failed to load knowledge base details')
@@ -315,7 +283,6 @@
       const files = event.target.files
       if (files.length) {
         await uploadDocuments(files, route.params.id)
-        await listDocumentsRef.value?.reload()
       }
       document.body.removeChild(input)
     }
@@ -341,20 +308,12 @@
     const files = event.dataTransfer.files
     if (files.length > 0) {
       await uploadDocuments(files, route.params.id)
-      await listDocumentsRef.value?.reload()
     }
   }
 
   const handleDeleteDocument = async (item) => {
-    const documentId = item.document_id || item.id
-
-    if (!documentId) {
-      handleToast('error', 'Error', 'Document ID is missing')
-      return
-    }
-
     try {
-      await deleteDocumentService(route.params.id, documentId)
+      await knowledgeBaseService.deleteDocument(route.params.id, item.documentId)
       await listDocumentsRef.value?.reload()
     } catch (error) {
       handleToast('error', 'Error', 'Failed to delete document')
@@ -375,7 +334,7 @@
       deleteService: () =>
         removeDocuments(
           route.params.id,
-          selectedDocuments.value.map((doc) => doc.id)
+          selectedDocuments.value.map((doc) => doc.documentId)
         ),
       successCallback: async () => {
         await listDocumentsRef.value?.reload()
@@ -391,6 +350,17 @@
     if (route.params.id) {
       loadKnowledgeBase()
       listDocumentsRef.value?.reload()
+    }
+  })
+
+  // Watch for upload completion and refresh the list
+  watch(isUploading, (newValue, oldValue) => {
+    if (oldValue === true && newValue === false) {
+      // Upload just completed, wait for API to process then reload
+      // Longer delay to ensure backend processing completes
+      setTimeout(() => {
+        listDocumentsRef.value?.reload()
+      }, 1000)
     }
   })
 

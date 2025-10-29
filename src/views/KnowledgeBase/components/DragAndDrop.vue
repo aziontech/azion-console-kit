@@ -54,7 +54,6 @@
     }
   })
 
-  const emit = defineEmits(['reload'])
   const { uploadDocuments } = useKnowledgeBase()
   const fileInput = ref(null)
 
@@ -66,7 +65,7 @@
     const files = event.target.files
     if (files.length) {
       await uploadDocuments(files, props.kbId)
-      emit('reload')
+      // Reload handled by watcher in parent component
     }
   }
 
@@ -75,7 +74,7 @@
     const files = event.dataTransfer.files
     if (files.length) {
       await uploadDocuments(files, props.kbId)
-      emit('reload')
+      // Reload handled by watcher in parent component
     }
   }
 </script>

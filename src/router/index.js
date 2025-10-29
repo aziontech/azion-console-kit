@@ -1,8 +1,8 @@
 import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
-import { azionAiRoutes } from '@routes/azion-ai-routes'
-
+import { knowledgeBaseRoutes } from '@routes/knowledge-base-routes'
+import { copilotRoutes } from '@routes/copilot-routes'
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
 import { compareWithAzionRoutes } from '@routes/compare-with-azion'
@@ -94,7 +94,8 @@ const router = createRouter({
     githubRoutes,
     billingRoutes,
     importGithubRoutes,
-    ...azionAiRoutes,
+    knowledgeBaseRoutes,
+    copilotRoutes,
     compareWithAzionRoutes,
     resellerManagementRoutes,
     groupsManagementRoutes,
