@@ -441,7 +441,7 @@
           :style="col.style"
           :frozen="frozenColumns.includes(col.field)"
           :alignFrozen="'left'"
-          :headerStyle="frozenColumns.includes(col.field) ? 'width: 10px' : ''"
+          :headerStyle="frozenColumns.includes(col.field) ? 'width: 240px' : ''"
         >
           <template #body="{ data: rowData }">
             <div

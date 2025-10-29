@@ -18,6 +18,7 @@ import LogBody from './log-body.vue'
 import TextWithIcon from './text-with-icon.vue'
 import TextFormatColumn from './text-format.vue'
 import IconWithTooltip from './icon-with-tooltip.vue'
+import TextFormatWithPopupColumn from './text-format-with-popup.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
@@ -34,6 +35,10 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
     case 'text-format':
       return h(TextFormatColumn, {
+        text: data.text
+      })
+    case 'text-format-with-popup':
+      return h(TextFormatWithPopupColumn, {
         text: data.text
       })
     case 'expand-column':
