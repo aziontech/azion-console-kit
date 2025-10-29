@@ -182,6 +182,7 @@
       <SqlDatabaseList
         :data="dataFiltered"
         :title="tableName"
+        :isLoading="isLoadingQuery"
         :columns="tableColumns"
         :delete-service="deleteService"
         data-testid="table-list"
@@ -248,6 +249,7 @@
   const alterColumnQuery = ref('')
   const columns = ref([])
   const dataTable = ref([])
+  const isLoadingQuery = ref(true)
   const tableColumns = computed(() => {
     if (viewChange.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
@@ -400,7 +402,7 @@
   const onRowEditCancel = () => {}
 
   const selectTable = async (table) => {
-    isLoadChanges.value = true
+    isLoadingQuery.value = true
     selectedTable.value = table
     try {
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
@@ -414,7 +416,7 @@
       dataTable.value = result.body.rows
       tableSchema.value = result.body.tableSchema
     } finally {
-      isLoadChanges.value = false
+      isLoadingQuery.value = false
     }
   }
 

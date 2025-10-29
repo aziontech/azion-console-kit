@@ -141,6 +141,7 @@
               data-testid="table-list"
               :monacoTheme="monacoTheme"
               :delete-service="deleteService"
+              :isLoading="isLoadingQuery"
               @row-click="onRowClick"
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
@@ -213,6 +214,7 @@
   const dataTable = ref([])
   const tableSchema = ref([])
   const tableView = ref('table')
+  const isLoadingQuery = ref(false)
   const options = ref([
     {
       label: 'Table',
@@ -405,6 +407,7 @@
   )
 
   const runQuery = async () => {
+    isLoadingQuery.value = true
     const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
     if (!contentToRun || isExecutingQuery.value) return
 
@@ -423,6 +426,7 @@
       updateListHistory()
     } finally {
       isExecutingQuery.value = false
+      isLoadingQuery.value = false
     }
   }
 
