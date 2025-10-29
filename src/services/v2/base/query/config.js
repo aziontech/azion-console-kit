@@ -16,28 +16,46 @@ export const CACHE_TYPE = {
   SENSITIVE: 'SENSITIVE'
 }
 
+/**
+ * Default query options - Base configuration for all query types
+ * These options are common across all cache strategies
+ */
+export const DEFAULT_OPTIONS = {
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  refetchOnMount: false,
+  retry: 1
+}
+
+/**
+ * Global cache options - For data that changes infrequently
+ * Examples: system configurations, static lists, marketplace solutions
+ */
 export const GLOBAL_OPTIONS = {
+  ...DEFAULT_OPTIONS,
   staleTime: CACHE_TIME.THIRTY_MINUTES,
   gcTime: CACHE_TIME.TWENTY_FOUR_HOURS,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
   retry: 3
 }
 
+/**
+ * Sensitive cache options - For user-specific or frequently changing data
+ * Examples: account info, user settings, billing information
+ */
 export const SENSITIVE_OPTIONS = {
+  ...DEFAULT_OPTIONS,
   staleTime: CACHE_TIME.FIVE_MINUTES,
-  gcTime: CACHE_TIME.FIVE_MINUTES,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-  retry: 1
+  gcTime: CACHE_TIME.FIVE_MINUTES
 }
 
+/**
+ * No cache options - For real-time or always-fresh data
+ * Examples: live metrics, current status, real-time updates
+ */
 export const NO_CACHE_OPTIONS = {
+  ...DEFAULT_OPTIONS,
   staleTime: 0,
-  gcTime: 0,
-  refetchOnWindowFocus: false,
-  refetchOnMount: true,
-  retry: 1
+  gcTime: 0
 }
 
 export const PERSISTENCE_CONFIG = {

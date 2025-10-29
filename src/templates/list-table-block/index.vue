@@ -186,6 +186,7 @@
           >
             <PrimeButton
               size="small"
+              v-if="actionOptions(rowData).length"
               outlined
               v-bind="optionsOneAction(rowData)"
               v-tooltip.top="getTooltipConfig(rowData)"

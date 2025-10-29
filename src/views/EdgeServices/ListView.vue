@@ -53,6 +53,15 @@
     },
 
     {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      sortField: 'lastModifiedDate',
+      header: 'Last Modified'
+    },
+    {
       field: 'labelActive',
       header: 'Status',
       filterPath: 'labelActive.content',

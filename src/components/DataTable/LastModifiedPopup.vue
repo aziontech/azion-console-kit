@@ -1,11 +1,11 @@
 <template>
   <div
     v-if="visible"
-    class="absolute z-50 bg-[var(--menu-bg)] border border-[var(--surface-border)] rounded-md px-3 py-2 max-w-[320px]"
+    class="absolute z-50 bg-[var(--menu-bg)] border border-[var(--surface-border)] rounded-md px-3 py-2 max-w-xs"
     :style="popupStyle"
   >
     <div class="flex flex-col text-xs space-y-1">
-      <span v-if="lastEditor">last edited by {{ lastEditor }}</span>
+      <span v-if="lastEditor">Last edited by {{ lastEditor }}</span>
       <div class="flex items-center gap-1">
         <span class="px-2 py-1 rounded-sm bg-[var(--surface-border)]">UTC</span>
         <span>{{ formatDateToDayMonthYearHour(lastModified, 'UTC') }}</span>

@@ -19,7 +19,7 @@
     }
   })
 
-  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active']
+  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active', 'last_modified']
   const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
   const actions = [
     {

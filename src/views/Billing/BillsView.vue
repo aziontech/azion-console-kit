@@ -254,7 +254,7 @@
   const emit = defineEmits(['changeTab'])
   const accountStore = useAccountStore()
 
-  const { accountData, accountIsNotRegular } = storeToRefs(accountStore)
+  const { accountData, accountIsNotRegular, showExportBilling } = storeToRefs(accountStore)
 
   const user = accountData
 
@@ -353,6 +353,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
+      visibleAction: () => showExportBilling.value,
       disabled: (item) => item.disabled,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
