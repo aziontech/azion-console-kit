@@ -26,150 +26,19 @@
         })
       }"
     />
-    <div class="sm:w-64 w-full">
-      <div
-        class="flex justify-between items-center w-64"
-        v-if="!showCheckbox"
-      >
-        <h3 class="text-lg font-normal text-color-primary">Tables</h3>
-
-        <div class="flex gap-2">
-          <PrimeButton
-            icon="pi pi-refresh"
-            size="small"
-            outlined
-            @click="reloadTables"
-            data-testid="reload-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <PrimeButton
-            icon="pi pi-plus"
-            size="small"
-            outlined
-            @click="createTable"
-            data-testid="create-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-        </div>
-      </div>
-      <div
-        class="flex justify-between items-center w-64"
-        v-else
-      >
-        <div class="flex gap-2 items-center">
-          <PrimeButton
-            icon="pi pi-times"
-            size="small"
-            outlined
-            v-tooltip.top="{
-              value: 'Cancel'
-            }"
-            @click="closeCheckbox"
-            data-testid="cancel-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <span class="text-color-secondary">{{ selectedTables.length }} itens selected</span>
-        </div>
-        <div class="flex gap-2">
-          <PrimeButton
-            icon="ai ai-scizors"
-            size="small"
-            outlined
-            v-tooltip.top="{
-              value: 'Truncate'
-            }"
-            @click="openConfirmTruncate"
-            data-testid="truncate-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <PrimeButton
-            icon="pi pi-trash"
-            size="small"
-            v-tooltip.top="{
-              value: 'Delete'
-            }"
-            @click="openConfirmDelete"
-            severity="danger"
-            data-testid="delete-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-        </div>
-      </div>
-
-      <div class="p-input-icon-left w-full mt-4">
-        <i class="pi pi-search" />
-        <InputText
-          v-model="searchTerm"
-          placeholder="Search tables"
-          class="w-full"
-        />
-      </div>
-
-      <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
-        <div
-          v-if="isLoading"
-          class="flex flex-col gap-3"
-        >
-          <div
-            v-for="index in 3"
-            :key="index"
-            class="py-2 rounded"
-          >
-            <div class="flex items-center justify-between">
-              <Skeleton class="h-8 w-full" />
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="!filteredTables.length"
-          class="text-left py-2"
-        >
-          <div class="text-color-secondary text-sm">
-            {{ searchTerm ? 'No tables found.' : 'No tables created yet.' }}
-          </div>
-        </div>
-        <div
-          v-else
-          class="mt-4"
-        >
-          <div
-            v-for="table in filteredTables"
-            :key="table.id"
-            class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
-            @click="selectTable(table)"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="inline-flex items-center group">
-                  <i
-                    class="ai ai-datasheet group-hover:hidden"
-                    @click.stop="showCheckboxAndSelectTable(table)"
-                    v-show="!showCheckbox"
-                  />
-                  <Checkbox
-                    v-model="selectedTables"
-                    :value="table.name"
-                    :class="showCheckbox ? 'inline-flex' : 'hidden group-hover:inline-flex'"
-                  />
-                </span>
-                <span class="text-sm font-medium text-color-primary truncate">{{
-                  table.name
-                }}</span>
-              </div>
-
-              <PrimeButton
-                icon="pi pi-ellipsis-h"
-                size="small"
-                outlined
-                @click.stop="showTableMenu($event, table)"
-                data-testid="table-menu-button"
-                class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ListTables
+      class="sm:w-64 w-full"
+      :listTables="props.listTables"
+      :isLoading="props.isLoadTables"
+      v-model:selectedTables="selectedTables"
+      v-model:showCheckbox="showCheckbox"
+      @reload-tables="reloadTables"
+      @create-table="createTable"
+      @select-table="selectTable"
+      @show-table-menu="showTableMenu"
+      @open-confirm-truncate="openConfirmTruncate"
+      @open-confirm-delete="openConfirmDelete"
+    />
     <div class="w-full flex flex-col gap-4 overflow-hidden">
       <InlineMessage
         v-if="isLoadChanges"
@@ -206,12 +75,8 @@
 <script setup>
   defineOptions({ name: 'tables-view' })
   import { ref, computed, nextTick, watch } from 'vue'
-  import Skeleton from 'primevue/skeleton'
-  import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import InlineMessage from 'primevue/inlinemessage'
-  import Checkbox from 'primevue/checkbox'
   import ConfirmDialog from 'primevue/confirmdialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
   import AlterColumn from './Dialog/AlterColumn.vue'
@@ -221,6 +86,7 @@
   import { TableActionManager } from './utils/table-actions'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
   import { SQLITE_QUERIES } from './constants/queries'
+  import ListTables from './components/ListTables.vue'
   import {
     createDeleteService,
     createInsertRowService,
@@ -507,16 +373,6 @@
     return tableActionManager.generateMenuItems(menuTableName)
   })
 
-  const showCheckboxAndSelectTable = (table) => {
-    showCheckbox.value = true
-    selectedTables.value.push(table.name)
-  }
-
-  const closeCheckbox = () => {
-    showCheckbox.value = false
-    selectedTables.value = []
-  }
-
   const openConfirmDelete = () => {
     if (!selectedTables.value.length) return
     openDeleteDialogComposable({
@@ -530,20 +386,8 @@
     })
   }
 
-  const searchTerm = ref('')
-  const isLoading = computed(() => props.isLoadTables)
   const onRowClick = (event) => {
     const row = event?.data || event
     if (row) selectTable(row)
   }
-  const filteredTables = computed(() => {
-    const list = Array.isArray(props.listTables) ? props.listTables : []
-    const term = (searchTerm.value || '').toString().toLowerCase()
-    if (!term) return list
-    return list.filter((table) => {
-      const raw = table?.name ?? ''
-      const label = raw != null ? raw.toString().toLowerCase() : ''
-      return label.includes(term)
-    })
-  })
 </script>
