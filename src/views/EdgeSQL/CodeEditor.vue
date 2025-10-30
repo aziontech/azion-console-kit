@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-150px)] overflow-hidden">
+  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-9.375rem)] overflow-hidden">
     <div class="flex flex-col !w-64 h-full">
       <div class="flex flex-col w-full gap-4 min-h-0">
         <h3 class="text-lg font-medium text-color-primary">Query History</h3>

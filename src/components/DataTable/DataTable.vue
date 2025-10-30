@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="notShowEmptyBlockComputed"
+      v-if="shouldRenderTable"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -292,7 +292,7 @@
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
 
-  const notShowEmptyBlockComputed = computed(() => {
+  const shouldRenderTable = computed(() => {
     if (props.notShowEmptyBlock) {
       return true
     }
@@ -324,7 +324,6 @@
     set: (value) => emit('update:editingRows', value)
   })
 
-  // const hasHeaderSlot = computed(() => !!slots.header)
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {
