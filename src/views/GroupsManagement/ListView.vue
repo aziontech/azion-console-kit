@@ -31,12 +31,28 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        style: 'max-width: 240px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         sortField: 'company_name',
         field: 'company',
-        header: 'Company Name'
+        header: 'Company Name',
+        type: 'component',
+        style: 'max-width: 240px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         disableSort: true,

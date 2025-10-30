@@ -69,10 +69,11 @@
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
+      style: 'max-width: 240px',
       component: (columnData) => {
         return columnBuilder({
-          data: { value: columnData.text, showMoreText: false },
-          columnAppearance: 'expand-text-column'
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
         })
       }
     },

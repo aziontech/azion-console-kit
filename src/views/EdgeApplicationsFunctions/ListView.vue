@@ -48,10 +48,11 @@
         header: 'Name',
         type: 'component',
         filterPath: 'name.text',
+        style: 'max-width: 240px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'text-with-tag'
+            columnAppearance: 'text-format-with-popup'
           })
         }
       },

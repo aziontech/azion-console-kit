@@ -39,7 +39,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'text-format-with-popup':
       return h(TextFormatWithPopupColumn, {
-        text: data.text
+        text: data.text || data
       })
     case 'expand-column':
       return h(ExpandColumn, {

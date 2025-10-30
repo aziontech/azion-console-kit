@@ -111,8 +111,13 @@
       field: 'name',
       header: 'Description',
       type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      style: 'max-width: 240px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
 
     {

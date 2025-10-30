@@ -4,7 +4,7 @@
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
-
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -69,7 +69,15 @@
     return [
       {
         field: 'name',
-        header: 'Origin Name'
+        header: 'Origin Name',
+        type: 'component',
+        style: 'max-width: 240px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         field: 'id',

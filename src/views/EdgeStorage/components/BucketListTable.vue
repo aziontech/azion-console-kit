@@ -31,6 +31,7 @@
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
   import { useRouter, useRoute } from 'vue-router'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const router = useRouter()
@@ -41,7 +42,15 @@
     {
       field: 'name',
       header: 'Name',
-      sortable: true
+      sortable: true,
+      type: 'component',
+      style: 'max-width: 240px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
       field: 'size',
