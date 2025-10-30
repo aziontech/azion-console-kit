@@ -11,6 +11,7 @@
       :lazy="lazy"
       :rowHover="rowHover"
       :dataKey="dataKey"
+      :showGridlines="showGridlines"
       :pt="pt"
       :class="[
         tableClass,
@@ -127,6 +128,10 @@
     data: {
       type: Array,
       default: () => []
+    },
+    showGridlines: {
+      type: Boolean,
+      default: false
     },
     lazy: {
       type: Boolean,
