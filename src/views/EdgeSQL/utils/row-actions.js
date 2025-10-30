@@ -28,16 +28,29 @@ export const onRowEditSave = async (updatedRowFn, databaseId, tableName, row, sc
   })
 }
 
-export const createDeleteService = (executeQuery, getTableName, getTableSchema, reloadFn) => {
+export const createDeleteService = (
+  executeQuery,
+  getTableName,
+  getTableSchema,
+  reloadFn,
+  getDeleteType = 'row'
+) => {
   return async (id, row) => {
     const tableName = typeof getTableName === 'function' ? getTableName() : getTableName
     const schema = typeof getTableSchema === 'function' ? getTableSchema() : getTableSchema
-
     if (!tableName || !row) return
+    const deleteType = typeof getDeleteType === 'function' ? getDeleteType() : getDeleteType
 
-    const filteredRowData = filterRowBySchema(row, schema)
-    const deleteQuery = TABLE_QUERIES.DELETE_DATA(tableName, filteredRowData, schema)
-    await executeQuery([deleteQuery])
+    if (deleteType === 'column') {
+      const columnName = row?.name
+      if (!columnName) return
+      const deleteColumnQuery = TABLE_QUERIES.DELETE_COLUMN(tableName, columnName)
+      await executeQuery([deleteColumnQuery])
+    } else {
+      const filteredRowData = filterRowBySchema(row, schema)
+      const deleteQuery = TABLE_QUERIES.DELETE_DATA(tableName, filteredRowData, schema)
+      await executeQuery([deleteQuery])
+    }
 
     if (typeof reloadFn === 'function') {
       await reloadFn()

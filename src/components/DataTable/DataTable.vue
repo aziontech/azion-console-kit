@@ -104,6 +104,7 @@
       :createButtonLabel="emptyBlock.createButtonLabel"
       :createPagePath="emptyBlock.createPagePath"
       :documentationService="emptyBlock.documentationService"
+      @click-to-create="emit('click-to-create')"
       data-testid="edge-applications-empty-results-block"
     >
       <template #illustration>
@@ -278,7 +279,8 @@
     'update:expandedRowGroups',
     'update:editingRows',
     'rowEditSave',
-    'rowEditCancel'
+    'rowEditCancel',
+    'click-to-create'
   ])
 
   const slots = useSlots()

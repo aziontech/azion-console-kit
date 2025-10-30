@@ -5,6 +5,7 @@
       :data="displayDataForView"
       :columns="props.columns"
       :loading="isLoading"
+      :empty-block="emptyBlock"
       v-model:filters="filters"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
@@ -22,6 +23,7 @@
       removableSort
       scrollable
       scrollHeight="flex"
+      @click-to-create="emit('click-to-create')"
       :pt="{
         header: {
           class: 'bg-gray-50 text-gray-900'
@@ -287,6 +289,16 @@
     monacoTheme: { type: String, default: 'vs-dark' },
     deleteService: { type: Function },
     isLoading: { type: Boolean, default: false },
+    emptyBlock: {
+      type: Object,
+      default: () => ({
+        title: 'No data has been created',
+        description: 'No data has been created.',
+        createButtonLabel: 'Create',
+        createPagePath: null,
+        documentationService: null
+      })
+    },
     options: {
       type: Array,
       default: () => [
@@ -353,7 +365,8 @@
     'other-actions',
     'toggle-filter',
     'row-edit-saved',
-    'row-edit-cancel'
+    'row-edit-cancel',
+    'click-to-create'
   ])
 
   const tableProps = { ...toRefs(props), loadDisabled: true }

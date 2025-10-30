@@ -102,6 +102,8 @@ export const SQLITE_QUERIES = {
 
   DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
 
+  DELETE_COLUMN: (tableName, columnName) => `ALTER TABLE ${tableName} DROP COLUMN ${columnName};`,
+
   DELETE_DATA: (tableName, rowData, columns) => {
     const hasIdColumn = columns.some((col) => col.name === 'id' || col.name === 'ID')
 
