@@ -192,6 +192,12 @@
         @reload-table="selectTable(selectedTable)"
         :disabled-action="isLoadChanges"
         @view-change="onViewChange"
+        @click-to-create="createTable"
+        :empty-block="{
+          title: 'No tables have been created',
+          description: 'Create your first table to store your data at the edge.',
+          createButtonLabel: 'Table'
+        }"
       >
       </SqlDatabaseList>
     </div>
@@ -249,7 +255,7 @@
   const alterColumnQuery = ref('')
   const columns = ref([])
   const dataTable = ref([])
-  const isLoadingQuery = ref(true)
+  const isLoadingQuery = ref(false)
   const tableColumns = computed(() => {
     if (viewChange.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
@@ -273,6 +279,8 @@
   const onViewChange = (event) => {
     viewChange.value = event.value
   }
+
+  const isColumnView = computed(() => viewChange.value === 'schema')
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -362,7 +370,8 @@
     (stmts) => executeQuery(stmts),
     () => selectedTable.value.name,
     () => tableSchema.value,
-    () => selectTable(selectedTable.value)
+    () => selectTable(selectedTable.value),
+    () => (isColumnView.value ? 'column' : 'row')
   )
 
   const insertRowService = createInsertRowService(

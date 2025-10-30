@@ -148,6 +148,10 @@
               :disabled-action="isLoadChanges"
               @view-change="onViewChange"
               :options="options"
+              :empty-block="{
+                title: 'Ready to execute',
+                description: 'Execute a query to see the results here'
+              }"
             />
           </div>
         </template>
