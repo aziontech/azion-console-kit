@@ -136,7 +136,7 @@
       <template #empty>
         <div class="w-full h-full min-h-0 flex-1">
           <vue-monaco-editor
-            v-if="selectedView?.value === 'json'"
+            v-if="selectedView?.value === 'json' && displayDataForView.length === 0"
             :value="jsonPreview"
             language="json"
             :options="monacoOptions"
@@ -145,8 +145,10 @@
           />
           <div
             v-else
-            class="w-full h-full"
-          ></div>
+            class="w-full h-full flex items-center justify-center text-color-secondary text-sm"
+          >
+            No data to display.
+          </div>
         </div>
       </template>
       <template v-if="selectedView?.value !== 'json'">
