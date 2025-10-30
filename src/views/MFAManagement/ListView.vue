@@ -34,7 +34,15 @@
     {
       field: 'email',
       header: 'Email',
-      sortField: 'name'
+      sortField: 'name',
+      type: 'component',
+      style: 'max-width: 240px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
       field: 'confirmed',

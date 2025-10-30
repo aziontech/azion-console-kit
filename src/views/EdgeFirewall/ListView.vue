@@ -59,10 +59,11 @@
       field: 'name',
       header: 'Name',
       type: 'component',
+      style: 'max-width: 240px',
       component: (columnData) => {
         return columnBuilder({
-          data: { value: columnData, showMoreText: false },
-          columnAppearance: 'expand-text-column'
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
         })
       }
     },

@@ -38,10 +38,11 @@
         field: 'name',
         header: 'Name',
         type: 'component',
+        style: 'max-width: 240px',
         component: (columnData) => {
           return columnBuilder({
-            data: { value: columnData },
-            columnAppearance: 'expand-text-column'
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
           })
         }
       },
@@ -63,7 +64,15 @@
       },
       {
         field: 'userAgent',
-        header: 'User Agent'
+        header: 'User Agent',
+        type: 'component',
+        style: 'max-width: 240px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       }
     ]
   })

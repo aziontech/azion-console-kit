@@ -5,6 +5,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -60,7 +61,15 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        style: 'max-width: 240px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         field: 'id',

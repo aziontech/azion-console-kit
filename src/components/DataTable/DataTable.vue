@@ -66,6 +66,20 @@
             <Skeleton class="h-[12px]" />
           </template>
         </Column>
+
+        <Column
+          :frozen="true"
+          :alignFrozen="'right'"
+          :bodyStyle="classActions"
+          data-testid="data-table-actions-column"
+          :reorderableColumn="false"
+          style="width: 200px"
+        >
+          <template #header> Last Modified </template>
+          <template #body>
+            <Skeleton class="h-[12px]" />
+          </template>
+        </Column>
       </template>
       <slot v-else />
 
