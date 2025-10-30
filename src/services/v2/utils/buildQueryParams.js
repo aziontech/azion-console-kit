@@ -28,7 +28,11 @@ export const buildQueryParams = ({
   type,
   active,
   isDefault,
-  group
+  group,
+  max_object_count,
+  prefix,
+  all_levels,
+  continuation_token
 }) => {
   const params = new URLSearchParams()
   const paramsMap = {
@@ -40,7 +44,11 @@ export const buildQueryParams = ({
     ...(active && { active }),
     ...(isDefault && { is_default: isDefault }),
     ...(fields && { fields }),
-    ...(group && { group })
+    ...(group && { group }),
+    ...(all_levels !== undefined && { all_levels: all_levels }),
+    ...(max_object_count && { max_object_count: max_object_count?.toString() }),
+    ...(prefix && { prefix }),
+    ...(continuation_token && { continuation_token })
   }
 
   Object.entries(paramsMap)

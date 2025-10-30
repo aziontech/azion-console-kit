@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length || loading || hasHeaderSlot"
+      v-if="notShowEmptyBlockComputed"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -256,6 +256,16 @@
       default: () => []
     },
     emptyBlock: {
+      type: Object,
+      default: () => ({
+        title: 'No data has been created',
+        description: 'No data has been created.',
+        createButtonLabel: 'Create',
+        createPagePath: null,
+        documentationService: null
+      })
+    },
+    notShowEmptyBlock: {
       type: Boolean,
       default: false
     }
@@ -279,6 +289,13 @@
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
+
+  const notShowEmptyBlockComputed = computed(() => {
+    if (props.notShowEmptyBlock) {
+      return true
+    }
+    return props.data.length || props.loading
+  })
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -305,7 +322,7 @@
     set: (value) => emit('update:editingRows', value)
   })
 
-  const hasHeaderSlot = computed(() => !!slots.header)
+  // const hasHeaderSlot = computed(() => !!slots.header)
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {

@@ -15,6 +15,7 @@
       :paginator="paginator"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="minimumOfItemsPerPage"
+      :first="(currentPage - 1) * minimumOfItemsPerPage"
       v-model:selection="selectedItems"
       @page="changeNumberOfLinesPerPage"
       :globalFilterFields="filterBy"
@@ -429,7 +430,8 @@
     'on-before-go-to-edit',
     'update:selectedItensData',
     'on-row-click-edit-folder',
-    'delete-selected-items'
+    'delete-selected-items',
+    'page'
   ])
 
   const props = defineProps({
@@ -512,6 +514,14 @@
     celllQuickActionsItens: {
       type: Array,
       default: () => []
+    },
+    isPaginationLoading: {
+      type: Boolean,
+      default: false
+    },
+    currentPage: {
+      type: Number,
+      default: 1
     }
   })
 
@@ -569,6 +579,13 @@
     })
   })
 
+  onMounted(() => {
+    if (!props.lazyLoad) {
+      loadData()
+    }
+    selectedColumns.value = props.columns
+  })
+
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
   }
@@ -576,8 +593,8 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const reload = (query = {}) => {
-    loadData({ page: 1, ...query })
+  const reload = () => {
+    loadData()
   }
 
   const openDialog = (dialogComponent, body) => {
@@ -657,6 +674,8 @@
   }
 
   const editItemSelected = (item) => {
+    if (item.isSkeletonRow) return
+
     emit('on-before-go-to-edit', item)
 
     if (props.editInDrawer) {
@@ -667,6 +686,8 @@
   }
 
   const toggleRowSelection = (rowData) => {
+    if (rowData.isSkeletonRow) return
+
     const isSelected = selectedItems.value.includes(rowData)
     if (isSelected) {
       selectedItems.value = selectedItems.value.filter((item) => item !== rowData)
@@ -711,7 +732,7 @@
     return ''
   }
 
-  defineExpose({ reload, data, handleExportTableDataToCSV })
+  defineExpose({ reload, loadData, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -729,6 +750,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
+    emit('page', event)
   }
 
   const filterBy = computed(() => {

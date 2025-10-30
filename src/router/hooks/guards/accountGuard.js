@@ -1,6 +1,7 @@
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
 import { clearCacheSensitive } from '@/services/v2/base/query/queryClient'
+import { cleanupLegacyDatabases } from '@/services/v2/base/query/indexedDbCleanup'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function accountGuard({ to, accountStore, tracker }) {
@@ -11,6 +12,9 @@ export async function accountGuard({ to, accountStore, tracker }) {
     if (isPrivateRoute) {
       try {
         await loadUserAndAccountInfo()
+
+        cleanupLegacyDatabases()
+
         if (to.meta.isPublic) {
           return '/'
         }
