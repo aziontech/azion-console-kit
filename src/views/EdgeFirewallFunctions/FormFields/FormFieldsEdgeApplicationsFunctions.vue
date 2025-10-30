@@ -272,7 +272,7 @@
           </template>
         </FieldDropdownLazyLoader>
       </div>
-      
+
       <div
         v-if="isDropdownLoaded"
         class="flex flex-col gap-2 w-full"
