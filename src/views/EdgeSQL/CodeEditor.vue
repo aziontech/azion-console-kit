@@ -66,7 +66,7 @@
             <div class="flex-1 min-h-0 min-w-0 border-1 surface-border">
               <vue-monaco-editor
                 :key="`editor-${panelSizes[0]}`"
-                v-model:value="sqlQueryCommand"
+                v-model:value="sqlQueryText"
                 language="sql"
                 :theme="monacoTheme"
                 :options="{ ...monacoOptions, readOnly: isExecutingQuery }"
@@ -79,14 +79,14 @@
         <template #panel-b>
           <div
             class="flex flex-col h-full min-h-0 min-w-0"
-            :class="{ 'overflow-hidden': tableView !== 'json' }"
+            :class="{ 'overflow-hidden': resultsView !== 'json' }"
           >
             <SqlDatabaseList
               class="flex-1 min-h-0"
-              :class="{ 'overflow-auto': tableView !== 'json' }"
+              :class="{ 'overflow-auto': resultsView !== 'json' }"
               :data="dataFiltered"
               title="Results"
-              :columns="columns"
+              :columns="resultColumns"
               data-testid="table-list"
               showGridlines
               :monacoTheme="monacoTheme"
@@ -96,9 +96,9 @@
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
               @reload-table="reloadData"
-              :disabled-action="isLoadChanges"
-              @view-change="onViewChange"
-              :options="options"
+              :disabled-action="isExecutingQuery || isLoadingQuery"
+              @view-change="handleViewChange"
+              :options="resultsViewOptions"
               :empty-block="{
                 title: 'Ready to execute',
                 description: 'Execute a query to see the results here'
@@ -154,7 +154,7 @@
   const emit = defineEmits(['update:show-snippets-create-table'])
 
   const showTemplatesModal = ref(false)
-  const sqlQueryCommand = ref('')
+  const sqlQueryText = ref('')
   const searchTerm = ref('')
   const isExecutingQuery = ref(false)
   const editorPanelSize = ref(70)
@@ -162,15 +162,14 @@
   const selectedQueryId = ref(null)
   const historyMenu = ref(null)
   const currentMenuQuery = ref(null)
-  const selectedText = ref('')
-  const viewChange = ref('table')
-  const columns = ref([])
-  const tableName = ref('')
-  const dataTable = ref([])
-  const tableSchema = ref([])
-  const tableView = ref('table')
+  const selectedSqlText = ref('')
+  const resultColumns = ref([])
+  const activeTableName = ref('')
+  const resultRows = ref([])
+  const resultSchema = ref([])
+  const resultsView = ref('table')
   const isLoadingQuery = ref(false)
-  const options = ref([
+  const resultsViewOptions = ref([
     {
       label: 'Table',
       value: 'table',
@@ -214,41 +213,41 @@
 
   const deleteService = createDeleteService(
     (stmts) => executeQuery(stmts),
-    () => tableName.value,
-    () => tableSchema.value,
+    () => activeTableName.value,
+    () => resultSchema.value,
     () => reloadData()
   )
 
   const insertRowService = createInsertRowService(
     (databaseId, payload) => edgeSQLService.insertRow(databaseId, payload),
     () => currentDatabase.value.id,
-    () => tableName.value,
-    () => tableSchema.value,
+    () => activeTableName.value,
+    () => resultSchema.value,
     () => reloadData()
   )
 
   const updateRowService = createUpdateRowService(
     (databaseId, payload) => edgeSQLService.updatedRow(databaseId, payload),
     () => currentDatabase.value.id,
-    () => tableName.value,
-    () => tableSchema.value,
+    () => activeTableName.value,
+    () => resultSchema.value,
     () => reloadData()
   )
 
   const labelRunQuery = computed(() => {
-    return selectedText.value ? 'Run Selected' : 'Run Query'
+    return selectedSqlText.value ? 'Run Selected' : 'Run Query'
   })
 
   const dataFiltered = computed(() => {
-    if (viewChange.value === 'table') {
-      return dataTable.value
+    if (resultsView.value === 'table') {
+      return resultRows.value
     } else {
-      return JSON.stringify(dataTable.value)
+      return JSON.stringify(resultRows.value)
     }
   })
 
-  const onViewChange = (view) => {
-    tableView.value = view.value
+  const handleViewChange = (view) => {
+    resultsView.value = view.value
   }
 
   const historyMenuItems = computed(() => [
@@ -266,7 +265,7 @@
 
   const selectQuery = (query) => {
     selectedQueryId.value = query.id
-    sqlQueryCommand.value = query.originalQuery
+    sqlQueryText.value = query.originalQuery
   }
 
   const handleActionRowTable = async (action) => {
@@ -297,7 +296,7 @@
     } else if (typeof document.selection != 'undefined' && document.selection.type == 'Text') {
       sel = document.selection.createRange().text
     }
-    selectedText.value = sel
+    selectedSqlText.value = sel
   }
 
   const openHistoryMenu = (event, query) => {
@@ -368,21 +367,21 @@
 
   const runQuery = async (addToHistory = true) => {
     isLoadingQuery.value = true
-    const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
+    const contentToRun = selectedSqlText.value?.trim() ? selectedSqlText.value : sqlQueryText.value
     if (!contentToRun || isExecutingQuery.value) return
 
     isExecutingQuery.value = true
     try {
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
-      columns.value = results[results.length - 1].rows.map((column) => ({
+      resultColumns.value = results[results.length - 1].rows.map((column) => ({
         field: column.name,
         tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
         header: column.name,
         sortable: true
       }))
-      tableSchema.value = results[results.length - 1].rows
-      dataTable.value = results[0].rows
-      tableName.value = tableNameExecuted
+      resultSchema.value = results[results.length - 1].rows
+      resultRows.value = results[0].rows
+      activeTableName.value = tableNameExecuted
       updateListHistory()
     } finally {
       isExecutingQuery.value = false
@@ -391,10 +390,10 @@
   }
 
   const reloadData = async () => {
-    const query = `SELECT * FROM "${tableName.value}"; PRAGMA table_info("${tableName.value}");`
-    selectedText.value = query
+    const query = `SELECT * FROM "${activeTableName.value}"; PRAGMA table_info("${activeTableName.value}");`
+    selectedSqlText.value = query
     await runQuery(false)
-    selectedText.value = ''
+    selectedSqlText.value = ''
   }
 
   const runHistoryQuery = async () => {
@@ -402,7 +401,7 @@
     if (!query || isExecutingQuery.value) return
     isExecutingQuery.value = true
     try {
-      sqlQueryCommand.value = query.originalQuery
+      sqlQueryText.value = query.originalQuery
       await executeQuery(query.originalQuery)
       updateListHistory()
     } finally {
@@ -420,7 +419,7 @@
   }
 
   const handleUseTemplate = (template) => {
-    sqlQueryCommand.value = template.query
+    sqlQueryText.value = template.query
     showTemplatesModal.value = false
   }
 
@@ -439,9 +438,9 @@
   })
 
   const prettifyCode = () => {
-    const content = sqlQueryCommand.value || ''
+    const content = sqlQueryText.value || ''
     if (!content.trim()) return
-    sqlQueryCommand.value = formatSql(content)
+    sqlQueryText.value = formatSql(content)
   }
 
   watch(
@@ -469,7 +468,7 @@
     () => props.showSnippetsCreateTable,
     async (newVal) => {
       if (newVal) {
-        sqlQueryCommand.value = QUICK_TEMPLATES[0].query
+        sqlQueryText.value = QUICK_TEMPLATES[0].query
         await nextTick()
         emit('update:show-snippets-create-table', false)
       }
@@ -477,7 +476,7 @@
   )
 
   defineExpose({
-    setSql: (query) => (sqlQueryCommand.value = query),
+    setSql: (query) => (sqlQueryText.value = query),
     run: runQuery
   })
 </script>
