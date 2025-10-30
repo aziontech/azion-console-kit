@@ -13,11 +13,13 @@
 
     <div
       ref="handle"
-      class="handle w-full h-4 py-2 cursor-row-resize flex items-center justify-center"
+      class="handle w-full h-6 cursor-row-resize flex items-center justify-center"
       @mousedown.prevent="onPointerDown"
       @touchstart.passive="onPointerDown"
     >
-      <div class="w-full h-full bg-black-500"></div>
+      <div class="w-full !h-1 bg-[var(--surface-400)] flex justify-center">
+        <span class="w-6 h-full bg-[var(--surface-800)]"></span>
+      </div>
     </div>
 
     <div

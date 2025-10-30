@@ -333,7 +333,7 @@ export function useEdgeSQL() {
     return false
   }
 
-  const executeQuery = async (query) => {
+  const executeQuery = async (query, { addToHistory = true } = {}) => {
     isLoading.value = true
 
     const databaseId = currentDatabase.value?.id || route.params.id
@@ -378,12 +378,14 @@ export function useEdgeSQL() {
         queryResults = results
       }
 
-      addQueryResult({
-        query,
-        results: queryResults,
-        timestamp: new Date().toISOString(),
-        executionTime: Date.now() - startTime
-      })
+      if (addToHistory) {
+        addQueryResult({
+          query,
+          results: queryResults,
+          timestamp: new Date().toISOString(),
+          executionTime: Date.now() - startTime
+        })
+      }
 
       if (!isSelectQuery) {
         toast.add({

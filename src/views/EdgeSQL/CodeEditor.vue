@@ -114,7 +114,7 @@
                 />
               </div>
             </div>
-            <div class="flex-1 min-h-0 min-w-0">
+            <div class="flex-1 min-h-0 min-w-0 border-1 surface-border">
               <vue-monaco-editor
                 :key="`editor-${panelSizes[0]}`"
                 v-model:value="sqlQueryCommand"
@@ -139,12 +139,14 @@
               title="Results"
               :columns="columns"
               data-testid="table-list"
+              showGridlines
               :monacoTheme="monacoTheme"
               :delete-service="deleteService"
               :isLoading="isLoadingQuery"
               @row-click="onRowClick"
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
+              @reload-table="reloadData"
               :disabled-action="isLoadChanges"
               @view-change="onViewChange"
               :options="options"
@@ -174,6 +176,7 @@
   import InputText from 'primevue/inputtext'
   import Menu from 'primevue/menu'
   import Skeleton from 'primevue/skeleton'
+  import { useAccountStore } from '@/stores/account'
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
@@ -242,7 +245,12 @@
     currentDatabase
   } = useEdgeSQL()
   const route = useRoute()
-  const monacoTheme = 'vs-dark'
+
+  const accountStore = useAccountStore()
+
+  const monacoTheme = computed(() => {
+    return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
   const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
     useMonacoEditor()
 
@@ -410,14 +418,14 @@
     { deep: true }
   )
 
-  const runQuery = async () => {
+  const runQuery = async (addToHistory = true) => {
     isLoadingQuery.value = true
     const contentToRun = selectedText.value?.trim() ? selectedText.value : sqlQueryCommand.value
     if (!contentToRun || isExecutingQuery.value) return
 
     isExecutingQuery.value = true
     try {
-      const { results, tableNameExecuted } = await executeQuery(contentToRun)
+      const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       columns.value = results[results.length - 1].rows.map((column) => ({
         field: column.name,
         tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
@@ -437,7 +445,7 @@
   const reloadData = async () => {
     const query = `SELECT * FROM "${tableName.value}"; PRAGMA table_info("${tableName.value}");`
     selectedText.value = query
-    await runQuery()
+    await runQuery(false)
     selectedText.value = ''
   }
 

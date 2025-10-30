@@ -24,10 +24,8 @@
       scrollable
       scrollHeight="flex"
       @click-to-create="emit('click-to-create')"
+      :showGridlines="showGridlines"
       :pt="{
-        header: {
-          class: 'bg-gray-50 text-gray-900'
-        },
         headerContent: {
           class: 'flex items-center gap-2'
         },
@@ -280,6 +278,7 @@
   defineOptions({ name: 'sql-database-list' })
 
   const props = defineProps({
+    showGridlines: { type: Boolean, default: false },
     data: { type: Array, required: true },
     columns: { type: Array, required: true },
     addButtonLabel: { type: String, default: '' },

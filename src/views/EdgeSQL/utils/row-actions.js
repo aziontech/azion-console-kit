@@ -45,11 +45,11 @@ export const createDeleteService = (
       const columnName = row?.name
       if (!columnName) return
       const deleteColumnQuery = TABLE_QUERIES.DELETE_COLUMN(tableName, columnName)
-      await executeQuery([deleteColumnQuery])
+      await executeQuery([deleteColumnQuery], { addToHistory: false })
     } else {
       const filteredRowData = filterRowBySchema(row, schema)
       const deleteQuery = TABLE_QUERIES.DELETE_DATA(tableName, filteredRowData, schema)
-      await executeQuery([deleteQuery])
+      await executeQuery([deleteQuery], { addToHistory: false })
     }
 
     if (typeof reloadFn === 'function') {
