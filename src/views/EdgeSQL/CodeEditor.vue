@@ -1,65 +1,14 @@
 <template>
   <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-9.375rem)] overflow-hidden">
     <div class="flex flex-col !w-64 h-full">
-      <div class="flex flex-col w-full gap-4 min-h-0">
-        <h3 class="text-lg font-medium text-color-primary">Query History</h3>
-        <div class="p-input-icon-left">
-          <i class="pi pi-search" />
-          <InputText
-            v-model="searchTerm"
-            placeholder="Search queries"
-            class="w-full"
-          />
-        </div>
-
-        <div class="flex-1 min-h-0 overflow-y-auto !w-64">
-          <div
-            v-if="isLoading"
-            class="flex flex-col gap-3"
-          >
-            <div
-              v-for="index in 3"
-              :key="index"
-              class="py-2 rounded"
-            >
-              <div class="flex items-center justify-between">
-                <Skeleton class="h-8 w-full" />
-              </div>
-            </div>
-          </div>
-          <div
-            v-else-if="!filteredHistory.length"
-            class="text-left py-2"
-          >
-            <div class="text-color-secondary text-sm">
-              {{ searchTerm ? 'No queries found.' : 'No queries created yet.' }}
-            </div>
-          </div>
-          <div v-else>
-            <div
-              v-for="query in filteredHistory"
-              :key="query.id"
-              class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
-              :class="{ 'bg-[--table-bg-color]': selectedQueryId === query.id }"
-              @click="selectQuery(query)"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-color-primary truncate">
-                  {{ query.originalQuery }}
-                </span>
-                <Button
-                  icon="pi pi-ellipsis-h"
-                  size="small"
-                  outlined
-                  @click.stop="openHistoryMenu($event, query)"
-                  data-testid="table-menu-button"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <QueryHistoryList
+        v-model:searchTerm="searchTerm"
+        :isLoading="isLoading"
+        :history="filteredHistory"
+        :selectedQueryId="selectedQueryId"
+        @select="selectQuery"
+        @open-menu="openHistoryMenu"
+      />
     </div>
     <div class="flex-1 min-h-0 h-full min-w-0 overflow-hidden">
       <Menu
@@ -173,9 +122,7 @@
   import { useRoute } from 'vue-router'
 
   import Button from 'primevue/button'
-  import InputText from 'primevue/inputtext'
   import Menu from 'primevue/menu'
-  import Skeleton from 'primevue/skeleton'
   import { useAccountStore } from '@/stores/account'
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
@@ -185,6 +132,7 @@
   import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
   import ResizableSplitter from '@/components/ResizableSplitter.vue'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
+  import QueryHistoryList from './components/QueryHistoryList.vue'
   import {
     createDeleteService,
     createInsertRowService,
