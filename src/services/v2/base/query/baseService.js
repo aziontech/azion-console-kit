@@ -4,12 +4,13 @@ import {
   queryClient,
   getCacheOptions,
   createQueryKey,
-  waitForPersistence,
   clearCacheByType,
   clearCacheSensitive,
   clearAllCache
 } from '@/services/v2/base/query/queryClient'
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
+import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
 
 export class BaseService {
   constructor() {
@@ -26,42 +27,34 @@ export class BaseService {
   useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return useQuery({
       queryKey,
-      queryFn,
+      queryFn: coalescedQueryFn,
       ...options,
       ...overrides
     })
   }
 
   async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    await waitForPersistence()
+    await waitForPersistenceRestore()
 
     const queryKey = createQueryKey(key, cache)
     const options = getCacheOptions(cache)
+    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
-    const cachedData = this.queryClient.getQueryData(queryKey)
-
-    if (cachedData !== undefined) {
-      const query = this.queryClient.getQueryState(queryKey)
-
-      if (query && query.dataUpdatedAt) {
-        const staleTime = options.staleTime || 0
-        const isStale = Date.now() - query.dataUpdatedAt > staleTime
-
-        if (!isStale) {
-          return Promise.resolve(cachedData)
-        }
-      }
-    }
-
-    return this.queryClient.fetchQuery({
+    return this.queryClient.ensureQueryData({
       queryKey,
-      queryFn,
+      queryFn: coalescedQueryFn,
       ...options,
       ...overrides
     })
+  }
+
+  withMutex(key, mutationFn) {
+    const mutex = getMutex(key)
+    return (variables) => mutex.run(() => mutationFn(variables))
   }
 
   async clearByType(cache = this.cacheType.GLOBAL) {
