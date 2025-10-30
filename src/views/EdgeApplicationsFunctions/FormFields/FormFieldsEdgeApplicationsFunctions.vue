@@ -276,8 +276,8 @@
       </div>
 
       <div
-        class="flex flex-col gap-2 w-full"
         v-if="isDropdownLoaded"
+        class="flex flex-col gap-2 w-full"
       >
         <div v-if="hasFormBuilder">
           <SelectPanel
