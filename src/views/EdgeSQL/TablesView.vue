@@ -30,8 +30,8 @@
       class="sm:w-64 w-full"
       :listTables="props.listTables"
       :isLoading="props.isLoadTables"
-      v-model:selectedTables="selectedTables"
-      v-model:showCheckbox="showCheckbox"
+      v-model:selectedTables="selectedTableNames"
+      v-model:showCheckbox="isSelectionMode"
       @reload-tables="reloadTables"
       @create-table="createTable"
       @select-table="selectTable"
@@ -41,7 +41,7 @@
     />
     <div class="w-full flex flex-col gap-4 overflow-hidden">
       <InlineMessage
-        v-if="isLoadChanges"
+        v-if="isApplyingChanges"
         severity="info"
         icon="pi pi-spin pi-spinner"
         data-testid="table-loading-message"
@@ -59,8 +59,8 @@
         @row-edit-saved="handleActionRowTable"
         @row-edit-cancel="onRowEditCancel"
         @reload-table="selectTable(selectedTable)"
-        :disabled-action="isLoadChanges"
-        @view-change="onViewChange"
+        :disabled-action="isApplyingChanges"
+        @view-change="handleViewChange"
         @click-to-create="createTable"
         :empty-block="{
           title: 'No tables have been created',
@@ -112,18 +112,18 @@
   })
 
   const { currentDatabase, executeQuery } = useEdgeSQL()
-  const showCheckbox = ref(false)
-  const selectedTables = ref([])
+  const isSelectionMode = ref(false)
+  const selectedTableNames = ref([])
   const tableMenuRef = ref(null)
   const selectedTable = ref(null)
   const truncateTableVisible = ref(false)
   const alterColumnVisible = ref(false)
   const alterColumnQuery = ref('')
   const columns = ref([])
-  const dataTable = ref([])
+  const tableRows = ref([])
   const isLoadingQuery = ref(false)
   const tableColumns = computed(() => {
-    if (viewChange.value === 'table') {
+    if (activeView.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
     } else {
       return columnsSchema.value
@@ -131,22 +131,22 @@
   })
 
   const dataFiltered = computed(() => {
-    if (viewChange.value === 'table') {
-      return dataTable.value
+    if (activeView.value === 'table') {
+      return tableRows.value
     } else {
       return tableSchema.value
     }
   })
   const tableSchema = ref([])
-  const isLoadChanges = ref(false)
+  const isApplyingChanges = ref(false)
 
-  const viewChange = ref('table')
+  const activeView = ref('table')
 
-  const onViewChange = (event) => {
-    viewChange.value = event.value
+  const handleViewChange = (event) => {
+    activeView.value = event.value
   }
 
-  const isColumnView = computed(() => viewChange.value === 'schema')
+  const isColumnView = computed(() => activeView.value === 'schema')
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -156,11 +156,11 @@
 
   const deleteTableService = async () => {
     await edgeSQLService.executeDatabase(currentDatabase.value.id, {
-      statements: selectedTables.value.map((tableName) => `DROP TABLE ${tableName};`)
+      statements: selectedTableNames.value.map((tableName) => `DROP TABLE ${tableName};`)
     })
 
-    const namesTablesDeleted = selectedTables.value.join(', ')
-    selectedTables.value = []
+    const namesTablesDeleted = selectedTableNames.value.join(', ')
+    selectedTableNames.value = []
     emit('load-tables')
     return `Table "${namesTablesDeleted}" deleted successfully`
   }
@@ -217,7 +217,7 @@
   }
 
   const handleActionRowTable = (action) => {
-    if (viewChange.value === 'table') {
+    if (activeView.value === 'table') {
       handleActionRow(action)
     } else {
       handleActionRowSchema(action)
@@ -250,10 +250,10 @@
 
   const onRowInsert = async (row) => {
     try {
-      isLoadChanges.value = true
+      isApplyingChanges.value = true
       await insertRowService(row)
     } finally {
-      isLoadChanges.value = false
+      isApplyingChanges.value = false
     }
   }
 
@@ -266,11 +266,11 @@
   )
 
   const onRowEditSave = async (newData, whereData) => {
-    isLoadChanges.value = true
+    isApplyingChanges.value = true
     try {
       await updateRowService(newData, whereData)
     } finally {
-      isLoadChanges.value = false
+      isApplyingChanges.value = false
     }
   }
 
@@ -288,7 +288,7 @@
         sortable: true
       }))
 
-      dataTable.value = result.body.rows
+      tableRows.value = result.body.rows
       tableSchema.value = result.body.tableSchema
     } finally {
       isLoadingQuery.value = false
@@ -315,10 +315,10 @@
 
   // When any checkbox is selected via hover state, enter selection mode permanently
   watch(
-    selectedTables,
+    selectedTableNames,
     (list) => {
       if (Array.isArray(list)) {
-        showCheckbox.value = !!list.length
+        isSelectionMode.value = !!list.length
       }
     },
     { deep: true }
@@ -338,7 +338,7 @@
 
   const deleteDialogFn = (tableName) => {
     // Use the same delete dialog flow as the bulk action
-    selectedTables.value = [tableName]
+    selectedTableNames.value = [tableName]
     openDeleteDialogComposable({
       title: 'Table',
       message: `Delete 1 selected table(s)?`,
@@ -352,7 +352,7 @@
 
   const truncateDialogFn = (tableName) => {
     // Reuse the same truncate modal flow used in the toolbar
-    selectedTables.value = [tableName]
+    selectedTableNames.value = [tableName]
     truncateTableVisible.value = true
   }
 
@@ -374,10 +374,10 @@
   })
 
   const openConfirmDelete = () => {
-    if (!selectedTables.value.length) return
+    if (!selectedTableNames.value.length) return
     openDeleteDialogComposable({
-      title: `${selectedTables.value.length === 1 ? 'Table' : 'Tables'}`,
-      message: `Delete ${selectedTables.value.length} selected table(s)?`,
+      title: `${selectedTableNames.value.length === 1 ? 'Table' : 'Tables'}`,
+      message: `Delete ${selectedTableNames.value.length} selected table(s)?`,
       icon: 'pi pi-exclamation-triangle',
       rejectLabel: 'Cancel',
       acceptLabel: 'Delete',
