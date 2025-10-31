@@ -333,35 +333,83 @@ export function useEdgeSQL() {
     return false
   }
 
-  const executeQuery = async (query) => {
+  const executeQuery = async (query, { addToHistory = true } = {}) => {
     isLoading.value = true
 
     const databaseId = currentDatabase.value?.id || route.params.id
-    const isSelectQuery = Array.isArray(query)
-      ? query[0].trim().toLowerCase().startsWith('select')
-      : query.trim().toLowerCase().startsWith('select')
+    const statements = Array.isArray(query) ? [...query] : [query]
+    const splitIntoStatements = (query) =>
+      String(query)
+        .split(';')
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0)
+
+    const flatStatements = statements.flatMap((stmt) =>
+      typeof stmt === 'string' ? splitIntoStatements(stmt) : []
+    )
+
+    const isSelectQuery = flatStatements.some((stmt) => stmt.toLowerCase().startsWith('select'))
     let queryResults = []
+    let tableName = selectedTable.value?.name || null
 
     try {
       const startTime = Date.now()
       if (isSelectQuery) {
+        if (!tableName) {
+          const firstSelect = flatStatements.find((stmt) => stmt.toLowerCase().startsWith('select'))
+          if (firstSelect) {
+            const match = firstSelect.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
+            if (match && match[1]) tableName = match[1]
+          }
+        }
+
+        if (tableName) {
+          statements.push(`; PRAGMA table_info(${tableName});`)
+        }
+
         const { results } = await edgeSQLService.queryDatabase(databaseId, {
-          statements: query
+          statements
         })
-        queryResults = results
+        // Centralize post-processing for SELECT queries
+        if (Array.isArray(results) && results.length > 0) {
+          const dataResult = results[0]
+          const schemaResult = results[results.length - 1]
+          const dataRows = Array.isArray(dataResult?.rows) ? dataResult.rows : []
+          const schemaRows = Array.isArray(schemaResult?.rows) ? schemaResult.rows : []
+
+          // Build a union of keys across all rows to detect actually returned columns
+          const presentFields = new Set()
+          for (const row of dataRows) {
+            Object.keys(row || {}).forEach((keyName) => presentFields.add(keyName))
+          }
+
+          // If we have present fields, filter the schema accordingly
+          const filteredSchemaRows = presentFields.size
+            ? schemaRows.filter((col) => presentFields.has(col?.name))
+            : schemaRows
+
+          // Rebuild results array with filtered schema
+          const nextResults = results.slice()
+          nextResults[results.length - 1] = { ...schemaResult, rows: filteredSchemaRows }
+          queryResults = nextResults
+        } else {
+          queryResults = results
+        }
       } else {
         const { results } = await edgeSQLService.executeDatabase(databaseId, {
-          statements: query
+          statements
         })
         queryResults = results
       }
 
-      addQueryResult({
-        query,
-        results: queryResults,
-        timestamp: new Date().toISOString(),
-        executionTime: Date.now() - startTime
-      })
+      if (addToHistory) {
+        addQueryResult({
+          query,
+          results: queryResults,
+          timestamp: new Date().toISOString(),
+          executionTime: Date.now() - startTime
+        })
+      }
 
       if (!isSelectQuery) {
         toast.add({
@@ -372,7 +420,10 @@ export function useEdgeSQL() {
         })
       }
 
-      return queryResults
+      return {
+        results: queryResults,
+        tableNameExecuted: tableName
+      }
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)

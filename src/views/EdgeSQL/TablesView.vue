@@ -3,8 +3,13 @@
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
-      :tables="selectedTables"
+      :tables="selectedTableNames"
       @load-tables="emit('load-tables')"
+    />
+    <AlterColumn
+      v-model:visible="alterColumnVisible"
+      :query="alterColumnQuery"
+      @load-tables="selectTable(selectedTable)"
     />
     <Menu
       ref="tableMenuRef"
@@ -21,180 +26,71 @@
         })
       }"
     />
-    <div class="sm:w-64 w-full">
-      <div
-        class="flex justify-between items-center w-64"
-        v-if="!showCheckbox"
+    <ListTables
+      class="sm:w-64 w-full"
+      :listTables="props.listTables"
+      :isLoading="props.isLoadTables"
+      v-model:selectedTables="selectedTableNames"
+      v-model:showCheckbox="isSelectionMode"
+      @reload-tables="reloadTables"
+      @create-table="createTable"
+      @select-table="selectTable"
+      @show-table-menu="showTableMenu"
+      @open-confirm-truncate="openConfirmTruncate"
+      @open-confirm-delete="openConfirmDelete"
+    />
+    <div class="w-full flex flex-col gap-4 overflow-hidden">
+      <InlineMessage
+        v-if="isApplyingChanges"
+        severity="info"
+        icon="pi pi-spin pi-spinner"
+        data-testid="table-loading-message"
       >
-        <h3 class="text-lg font-normal text-color-primary">Tables</h3>
-
-        <div class="flex gap-2">
-          <PrimeButton
-            icon="pi pi-refresh"
-            size="small"
-            outlined
-            @click="reloadTables"
-            data-testid="reload-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <PrimeButton
-            icon="pi pi-plus"
-            size="small"
-            outlined
-            @click="createTable"
-            data-testid="create-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-        </div>
-      </div>
-      <div
-        class="flex justify-between items-center w-64"
-        v-else
-      >
-        <div class="flex gap-2 items-center">
-          <PrimeButton
-            icon="pi pi-times"
-            size="small"
-            outlined
-            v-tooltip.top="{
-              value: 'Cancel'
-            }"
-            @click="closeCheckbox"
-            data-testid="cancel-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <span class="text-color-secondary">{{ selectedTables.length }} itens selected</span>
-        </div>
-        <div class="flex gap-2">
-          <PrimeButton
-            icon="ai ai-scizors"
-            size="small"
-            outlined
-            v-tooltip.top="{
-              value: 'Truncate'
-            }"
-            @click="openConfirmTruncate"
-            data-testid="truncate-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-          <PrimeButton
-            icon="pi pi-trash"
-            size="small"
-            v-tooltip.top="{
-              value: 'Delete'
-            }"
-            @click="openConfirmDelete"
-            severity="danger"
-            data-testid="delete-table-button"
-            class="w-8 h-8 p-0 flex items-center justify-center"
-          />
-        </div>
-      </div>
-
-      <div class="p-input-icon-left w-full mt-4">
-        <i class="pi pi-search" />
-        <InputText
-          v-model="searchTerm"
-          placeholder="Search tables"
-          class="w-full"
-        />
-      </div>
-
-      <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
-        <div
-          v-if="isLoading"
-          class="flex flex-col gap-3"
-        >
-          <div
-            v-for="index in 3"
-            :key="index"
-            class="py-2 rounded"
-          >
-            <div class="flex items-center justify-between">
-              <Skeleton class="h-8 w-full" />
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="!filteredTables.length"
-          class="text-left py-2"
-        >
-          <div class="text-color-secondary text-sm">
-            {{ searchTerm ? 'No tables found.' : 'No tables created yet.' }}
-          </div>
-        </div>
-        <div
-          v-else
-          class="mt-4"
-        >
-          <div
-            v-for="table in filteredTables"
-            :key="table.id"
-            class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
-            @click="selectTable(table)"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <i
-                  class="ai ai-datasheet group-hover:hidden"
-                  @click.stop="showCheckboxAndSelectTable(table)"
-                  v-show="!showCheckbox"
-                />
-                <Checkbox
-                  v-model="selectedTables"
-                  :value="table.name"
-                  :class="showCheckbox ? 'inline-flex' : 'hidden group-hover:inline-flex'"
-                />
-                <span class="text-sm font-medium text-color-primary truncate">{{
-                  table.name
-                }}</span>
-              </div>
-
-              <PrimeButton
-                icon="pi pi-ellipsis-h"
-                size="small"
-                outlined
-                @click.stop="showTableMenu($event, table)"
-                data-testid="table-menu-button"
-                class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="w-full flex flex-col">
-      <EmptyResultsBlock
-        title="No tables have been created"
-        description="Click the button below to create your first table."
-        createButtonLabel="Table"
-        createPagePath=""
+        SQL requests are queued. The table will update automatically once processing is complete.
+      </InlineMessage>
+      <SqlDatabaseList
+        :data="dataFiltered"
+        :title="tableName"
+        :isLoading="isLoadingQuery"
+        :columns="tableColumns"
+        :delete-service="deleteService"
+        data-testid="table-list"
+        @row-edit-saved="handleActionRowTable"
+        @row-edit-cancel="onRowEditCancel"
+        @reload-table="selectTable(selectedTable)"
+        :disabled-action="isApplyingChanges"
+        @view-change="handleViewChange"
         @click-to-create="createTable"
+        :empty-block="{
+          title: 'No tables have been created',
+          description: 'Create your first table to store your data at the edge.',
+          createButtonLabel: 'Table'
+        }"
       >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
+      </SqlDatabaseList>
     </div>
   </div>
 </template>
 <script setup>
   defineOptions({ name: 'tables-view' })
   import { ref, computed, nextTick, watch } from 'vue'
-  import Skeleton from 'primevue/skeleton'
-  import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
   import { useEdgeSQL } from './composable/useEdgeSQL'
-  import Checkbox from 'primevue/checkbox'
+  import InlineMessage from 'primevue/inlinemessage'
   import ConfirmDialog from 'primevue/confirmdialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
+  import AlterColumn from './Dialog/AlterColumn.vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import Menu from 'primevue/menu'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-
+  import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
+  import { SQLITE_QUERIES } from './constants/queries'
+  import ListTables from './components/ListTables.vue'
+  import {
+    createDeleteService,
+    createInsertRowService,
+    createUpdateRowService
+  } from './utils/row-actions'
   const emit = defineEmits([
     'go-editor',
     'load-tables',
@@ -214,12 +110,42 @@
     }
   })
 
-  const { currentDatabase } = useEdgeSQL()
-  const showCheckbox = ref(false)
-  const selectedTables = ref([])
+  const { currentDatabase, executeQuery } = useEdgeSQL()
+  const isSelectionMode = ref(false)
+  const selectedTableNames = ref([])
   const tableMenuRef = ref(null)
   const selectedTable = ref(null)
   const truncateTableVisible = ref(false)
+  const alterColumnVisible = ref(false)
+  const alterColumnQuery = ref('')
+  const columns = ref([])
+  const tableRows = ref([])
+  const isLoadingQuery = ref(false)
+  const tableColumns = computed(() => {
+    if (activeView.value === 'table') {
+      return Array.isArray(columns.value) ? columns.value : []
+    } else {
+      return columnsSchema.value
+    }
+  })
+
+  const dataFiltered = computed(() => {
+    if (activeView.value === 'table') {
+      return tableRows.value
+    } else {
+      return tableSchema.value
+    }
+  })
+  const tableSchema = ref([])
+  const isApplyingChanges = ref(false)
+
+  const activeView = ref('table')
+
+  const handleViewChange = (event) => {
+    activeView.value = event.value
+  }
+
+  const isColumnView = computed(() => activeView.value === 'schema')
 
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
@@ -229,11 +155,11 @@
 
   const deleteTableService = async () => {
     await edgeSQLService.executeDatabase(currentDatabase.value.id, {
-      statements: selectedTables.value.map((tableName) => `DROP TABLE ${tableName};`)
+      statements: selectedTableNames.value.map((tableName) => `DROP TABLE ${tableName};`)
     })
 
-    const namesTablesDeleted = selectedTables.value.join(', ')
-    selectedTables.value = []
+    const namesTablesDeleted = selectedTableNames.value.join(', ')
+    selectedTableNames.value = []
     emit('load-tables')
     return `Table "${namesTablesDeleted}" deleted successfully`
   }
@@ -242,12 +168,133 @@
     emit('go-editor')
   }
 
-  const selectTable = async (table) => {
-    selectedTable.value = table
-    const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
-    // eslint-disable-next-line no-console
-    console.log(result)
+  const columnsSchema = ref([
+    {
+      field: 'name',
+      header: 'Column Name'
+    },
+    {
+      field: 'type',
+      header: 'Data Type'
+    },
+    {
+      field: 'default',
+      header: 'Default'
+    },
+    {
+      field: 'notNull',
+      header: 'Nullable'
+    }
+  ])
+
+  const insertColumnService = async (columnData) => {
+    await edgeSQLService.insertColumn(currentDatabase.value.id, {
+      tableName: selectedTable.value.name,
+      columnData
+    })
+    await selectTable(selectedTable.value)
   }
+
+  const handleActionRowSchema = (action) => {
+    if (action.newData._isNew) {
+      insertColumnService(action.newData)
+    } else {
+      openAlterColumnDialog(action.newData, action.oldData)
+    }
+  }
+
+  const openAlterColumnDialog = (newData, oldData) => {
+    if (!selectedTable.value?.name) return
+    const sql = SQLITE_QUERIES.ALTER_COLUMN(
+      selectedTable.value.name,
+      tableSchema.value,
+      oldData,
+      newData
+    )
+    alterColumnQuery.value = sql
+    alterColumnVisible.value = true
+  }
+
+  const handleActionRowTable = (action) => {
+    if (activeView.value === 'table') {
+      handleActionRow(action)
+    } else {
+      handleActionRowSchema(action)
+    }
+  }
+
+  const handleActionRow = async (row) => {
+    if (row.newData._isNew) {
+      await onRowInsert(row.newData)
+    } else {
+      await onRowEditSave(row.newData, row.oldData)
+    }
+  }
+
+  const deleteService = createDeleteService(
+    (stmts) => executeQuery(stmts),
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value),
+    () => (isColumnView.value ? 'column' : 'row')
+  )
+
+  const insertRowService = createInsertRowService(
+    (databaseId, payload) => edgeSQLService.insertRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value)
+  )
+
+  const onRowInsert = async (row) => {
+    try {
+      isApplyingChanges.value = true
+      await insertRowService(row)
+    } finally {
+      isApplyingChanges.value = false
+    }
+  }
+
+  const updateRowService = createUpdateRowService(
+    (databaseId, payload) => edgeSQLService.updatedRow(databaseId, payload),
+    () => currentDatabase.value.id,
+    () => selectedTable.value.name,
+    () => tableSchema.value,
+    () => selectTable(selectedTable.value)
+  )
+
+  const onRowEditSave = async (newData, whereData) => {
+    isApplyingChanges.value = true
+    try {
+      await updateRowService(newData, whereData)
+    } finally {
+      isApplyingChanges.value = false
+    }
+  }
+
+  const onRowEditCancel = () => {}
+
+  const selectTable = async (table) => {
+    isLoadingQuery.value = true
+    selectedTable.value = table
+    try {
+      const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
+      columns.value = result.body.columns.map(({ columns }) => ({
+        field: columns.name,
+        tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
+        header: columns.name,
+        sortable: true
+      }))
+
+      tableRows.value = result.body.rows
+      tableSchema.value = result.body.tableSchema
+    } finally {
+      isLoadingQuery.value = false
+    }
+  }
+
+  const tableName = computed(() => selectedTable.value?.name)
 
   const reloadTables = () => {
     emit('load-tables')
@@ -267,10 +314,10 @@
 
   // When any checkbox is selected via hover state, enter selection mode permanently
   watch(
-    selectedTables,
+    selectedTableNames,
     (list) => {
       if (Array.isArray(list)) {
-        showCheckbox.value = !!list.length
+        isSelectionMode.value = !!list.length
       }
     },
     { deep: true }
@@ -290,7 +337,7 @@
 
   const deleteDialogFn = (tableName) => {
     // Use the same delete dialog flow as the bulk action
-    selectedTables.value = [tableName]
+    selectedTableNames.value = [tableName]
     openDeleteDialogComposable({
       title: 'Table',
       message: `Delete 1 selected table(s)?`,
@@ -304,7 +351,7 @@
 
   const truncateDialogFn = (tableName) => {
     // Reuse the same truncate modal flow used in the toolbar
-    selectedTables.value = [tableName]
+    selectedTableNames.value = [tableName]
     truncateTableVisible.value = true
   }
 
@@ -320,26 +367,16 @@
 
   const tableMenuItems = computed(() => {
     if (!selectedTable.value) return []
-    const tableName =
+    const menuTableName =
       selectedTable.value?.name || selectedTable.value?.label || selectedTable.value?.key
-    return tableActionManager.generateMenuItems(tableName)
+    return tableActionManager.generateMenuItems(menuTableName)
   })
 
-  const showCheckboxAndSelectTable = (table) => {
-    showCheckbox.value = true
-    selectedTables.value.push(table.name)
-  }
-
-  const closeCheckbox = () => {
-    showCheckbox.value = false
-    selectedTables.value = []
-  }
-
   const openConfirmDelete = () => {
-    if (!selectedTables.value.length) return
+    if (!selectedTableNames.value.length) return
     openDeleteDialogComposable({
-      title: `${selectedTables.value.length === 1 ? 'Table' : 'Tables'}`,
-      message: `Delete ${selectedTables.value.length} selected table(s)?`,
+      title: `${selectedTableNames.value.length === 1 ? 'Table' : 'Tables'}`,
+      message: `Delete ${selectedTableNames.value.length} selected table(s)?`,
       icon: 'pi pi-exclamation-triangle',
       rejectLabel: 'Cancel',
       acceptLabel: 'Delete',
@@ -347,17 +384,4 @@
       deleteService: deleteTableService
     })
   }
-
-  const searchTerm = ref('')
-  const isLoading = computed(() => props.isLoadTables)
-  const filteredTables = computed(() => {
-    const list = Array.isArray(props.listTables) ? props.listTables : []
-    const term = (searchTerm.value || '').toString().toLowerCase()
-    if (!term) return list
-    return list.filter((table) => {
-      const raw = table?.name ?? ''
-      const label = raw != null ? raw.toString().toLowerCase() : ''
-      return label.includes(term)
-    })
-  })
 </script>

@@ -18,6 +18,44 @@ const getDatabaseStatusSeverity = (status) => {
   return statusMap[status] || 'info'
 }
 
+const buildSetClause = (newData, tableSchema) => {
+  return Object.keys(newData)
+    .map((columnName) => {
+      const formattedValue = formatSqlValue(newData[columnName], columnName, tableSchema)
+      return `"${columnName}" = ${formattedValue}`
+    })
+    .join(', ')
+}
+
+const buildWhereClause = (whereData, tableSchema) => {
+  const hasIdColumn = Array.isArray(tableSchema)
+    ? tableSchema.some((col) => col?.name === 'id' || col?.name === 'ID')
+    : false
+
+  if (hasIdColumn && (whereData?.id !== undefined || whereData?.ID !== undefined)) {
+    const key = whereData.id !== undefined ? 'id' : 'ID'
+    const originalValue = whereData[key]
+    if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+      return `"${key}" IS NULL`
+    }
+    const formattedValue = formatSqlValue(originalValue, key, tableSchema)
+    return `"${key}" = ${formattedValue}`
+  }
+
+  return Object.keys(whereData)
+    .map((columnName) => {
+      const originalValue = whereData[columnName]
+
+      if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+        return `"${columnName}" IS NULL`
+      }
+
+      const formattedValue = formatSqlValue(originalValue, columnName, tableSchema)
+      return `"${columnName}" = ${formattedValue}`
+    })
+    .join(' AND ')
+}
+
 const formatSqlValue = (value, fieldName, schema) => {
   const column = schema.find((col) => col.name === fieldName)
   const columnType = column ? column.type.toUpperCase() : 'TEXT'
@@ -62,6 +100,10 @@ const cellValueFormatters = {
   }
 }
 
+const formatRowsForDisplay = (rows) => {
+  return rows.map((row) => row.map(formatCellValue))
+}
+
 const formatCellValue = (value) => {
   const nullValues = {
     null: 'NULL',
@@ -82,13 +124,49 @@ const formatCellValue = (value) => {
 }
 
 const mapRowsToObjects = (columns, rows) => {
-  return rows.map((row) => {
+  const hasIdColumn = Array.isArray(columns)
+    ? columns.some((name) => String(name).toLowerCase() === 'id')
+    : false
+
+  return rows.map((row, rowIndex) => {
     const rowObject = {}
-    columns.forEach((columnName, index) => {
-      rowObject[columnName] = row[index]
+    columns.forEach((columnName, colIndex) => {
+      rowObject[columnName] = row[colIndex]
     })
+    if (!hasIdColumn) {
+      rowObject.index = rowIndex + 1
+    }
     return rowObject
   })
+}
+
+const formatDefaultClause = (value, colType) => {
+  if (value === undefined || value === null) return ''
+
+  const colTypeUpper = String(colType || '').toUpperCase()
+
+  const isSqlKeywordDefault = typeof value === 'string' && /^CURRENT_|^NOW\(\)$/.test(value)
+  if (isSqlKeywordDefault) return `DEFAULT ${value}`
+
+  const numericTypes = ['INTEGER', 'INT', 'REAL', 'NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE']
+  const booleanTypes = ['BOOLEAN', 'BOOL', 'TINYINT(1)']
+
+  if (numericTypes.includes(colTypeUpper)) {
+    const num = Number(value)
+    return isNaN(num) ? `DEFAULT '${String(value).replace(/'/g, "''")}'` : `DEFAULT ${num}`
+  }
+
+  if (booleanTypes.includes(colTypeUpper) || colTypeUpper.includes('BOOL')) {
+    const boolNum =
+      value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true'
+        ? 1
+        : 0
+    return `DEFAULT ${boolNum}`
+  }
+
+  // Text-like: quote and escape
+  const stringVal = String(value).replace(/'/g, "''")
+  return `DEFAULT '${stringVal}'`
 }
 
 export const EdgeSQLAdapter = {
@@ -172,18 +250,71 @@ export const EdgeSQLAdapter = {
   },
 
   adaptTableInfo({ data }) {
-    const queryResult = data[0]
-    if (!queryResult?.results?.rows?.length) return []
+    const tableInfo = data[0]
+    const tableData = data[1]
 
-    return queryResult.results.rows.map((row) => ({
+    const columns = tableInfo.results.rows.map((row) => ({
       columns: {
         name: row[1],
         type: row[2]
-      },
-      defaultValue: row[4],
+      }
+    }))
+
+    const tableSchema = tableInfo.results.rows.map((row, index) => ({
+      id: index,
+      name: row[1],
+      type: row[2],
       notNull: row[3],
+      default: row[4],
       primaryKey: row[5]
     }))
+
+    const rows = formatRowsForDisplay(tableData.results?.rows || [])
+    const columnNames = columns.map((col) => col.columns.name)
+    const mappedRows = mapRowsToObjects(columnNames, rows)
+
+    return {
+      columns,
+      rows: mappedRows,
+      tableSchema
+    }
+  },
+
+  adaptInsertColumn({ tableName, columnData }) {
+    const { name, type, default: defaultValue, notNull } = columnData || {}
+
+    const parts = []
+    parts.push(`"${name}"`)
+    if (type) parts.push(type)
+    if (notNull) parts.push('NOT NULL')
+
+    const defaultClause = formatDefaultClause(defaultValue, type)
+    if (defaultClause) parts.push(defaultClause)
+
+    const query = `ALTER TABLE "${tableName}" ADD COLUMN ${parts.join(' ')};`
+
+    return {
+      statements: [query]
+    }
+  },
+
+  adaptUpdateColumn({ tableName, columnData, oldColumnData }) {
+    const { name, type, default: defaultValue, notNull } = columnData || {}
+    const oldName = oldColumnData?.name || columnData?.oldName || name
+
+    const constraintParts = []
+    if (notNull) constraintParts.push('NOT NULL')
+    const defaultClause = formatDefaultClause(defaultValue, type)
+    if (defaultClause) constraintParts.push(defaultClause)
+
+    const typePart = type ? ` ${type}` : ''
+    const constraintsPart = constraintParts.length ? ` ${constraintParts.join(' ')}` : ''
+
+    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${oldName}\`  \`${name}\`${typePart}${constraintsPart};`
+
+    return {
+      statements: [query]
+    }
   },
 
   adaptTablesFromExecute({ data }) {
@@ -205,10 +336,6 @@ export const EdgeSQLAdapter = {
   },
 
   adaptQueryResult({ data }) {
-    const formatRowsForDisplay = (rows) => {
-      return rows.map((row) => row.map(formatCellValue))
-    }
-
     const processedResults = data.map((item) => ({
       columns: item.results?.columns || [],
       rows: formatRowsForDisplay(item.results?.rows || []),
@@ -222,9 +349,11 @@ export const EdgeSQLAdapter = {
       result.rows = mapRowsToObjects(result.columns, result.rows)
     })
 
+    const prioritizedResults = this.prioritizeSelectResults(processedResults)
+
     return {
       state: data?.state || 'executed',
-      results: processedResults,
+      results: prioritizedResults,
       affected: this.calculateAffectedRows({ data })
     }
   },
@@ -294,32 +423,8 @@ export const EdgeSQLAdapter = {
   },
 
   adaptUpdateRow({ tableName, newData, whereData, tableSchema }) {
-    const buildSetClause = () => {
-      return Object.keys(newData)
-        .map((columnName) => {
-          const formattedValue = formatSqlValue(newData[columnName], columnName, tableSchema)
-          return `"${columnName}" = ${formattedValue}`
-        })
-        .join(', ')
-    }
-
-    const buildWhereClause = () => {
-      return Object.keys(whereData)
-        .map((columnName) => {
-          const originalValue = whereData[columnName]
-
-          if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
-            return `"${columnName}" IS NULL`
-          }
-
-          const formattedValue = formatSqlValue(originalValue, columnName, tableSchema)
-          return `"${columnName}" = ${formattedValue}`
-        })
-        .join(' AND ')
-    }
-
-    const setClause = buildSetClause()
-    const whereClause = buildWhereClause()
+    const setClause = buildSetClause(newData, tableSchema)
+    const whereClause = buildWhereClause(whereData, tableSchema)
     const updateQuery = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause};`
 
     return {

@@ -116,13 +116,13 @@ export class EdgeSQLService extends BaseService {
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body: {
-        statements: [`PRAGMA table_info(${tableName});`]
+        statements: [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
       }
     })
 
     const adaptedData = this.adapter?.adaptTableInfo?.(data)
     return {
-      count: 3,
+      count: adaptedData?.rows?.length,
       body: adaptedData
     }
   }
@@ -170,6 +170,28 @@ export class EdgeSQLService extends BaseService {
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body
+    })
+
+    return this.adapter?.adaptExecuteResult?.(data)
+  }
+
+  insertColumn = async (databaseId, { tableName, columnData }) => {
+    const body = this.adapter?.adaptInsertColumn?.({ tableName, columnData })
+
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body
+    })
+
+    return this.adapter?.adaptExecuteResult?.(data)
+  }
+
+  updateColumn = async (databaseId, { statements }) => {
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${databaseId}/query`,
+      method: 'POST',
+      body: { statements }
     })
 
     return this.adapter?.adaptExecuteResult?.(data)
