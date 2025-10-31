@@ -97,7 +97,7 @@
         filterPath: 'threats_configuration',
         disableSort: true,
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
       {
         field: 'active',

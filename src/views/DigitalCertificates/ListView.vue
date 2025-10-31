@@ -194,8 +194,9 @@
         header: 'Subject Names',
         sortField: 'subject_name',
         type: 'component',
+        style: 'max-width: 240px',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
       {
         field: 'issuer',
@@ -212,8 +213,9 @@
         header: 'Expiration Date',
         sortField: 'validity',
         type: 'component',
+        style: 'max-width: 240px',
         component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
       },
       {
         field: 'status',

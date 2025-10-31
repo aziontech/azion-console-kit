@@ -293,6 +293,7 @@
       @rowReorder="onRowReorder"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
+      :showLastModifiedColumn="!hideLastModifiedColumn"
       :emptyBlock="emptyBlock"
     >
       <template
@@ -520,7 +521,7 @@
               <div class="text-ellipsis whitespace-nowrap overflow-hidden block">
                 <span>{{ rowData.lastModify || rowData.lastModified }}</span>
                 <span
-                  v-if="rowData.lastEditor"
+                  v-if="rowData.lastEditor && rowData.lastEditor !== '-'"
                   class="text-xs"
                 >
                   by {{ rowData.lastEditor }}</span
