@@ -3,7 +3,7 @@
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
-      :tables="selectedTables"
+      :tables="selectedTableNames"
       @load-tables="emit('load-tables')"
     />
     <AlterColumn
@@ -55,7 +55,6 @@
         :columns="tableColumns"
         :delete-service="deleteService"
         data-testid="table-list"
-        @row-click="onRowClick"
         @row-edit-saved="handleActionRowTable"
         @row-edit-cancel="onRowEditCancel"
         @reload-table="selectTable(selectedTable)"
@@ -384,10 +383,5 @@
       acceptClass: 'p-button-danger',
       deleteService: deleteTableService
     })
-  }
-
-  const onRowClick = (event) => {
-    const row = event?.data || event
-    if (row) selectTable(row)
   }
 </script>
