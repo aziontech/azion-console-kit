@@ -92,7 +92,6 @@
               :monacoTheme="monacoTheme"
               :delete-service="deleteService"
               :isLoading="isLoadingQuery"
-              @row-click="onRowClick"
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
               @reload-table="reloadData"
