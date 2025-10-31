@@ -376,6 +376,8 @@
   const selectedRowData = ref(null)
   const isLoadingEditRow = ref(false)
   const { openDeleteDialog } = useDeleteDialog()
+  const getRowKey = (row) =>
+    row?.id != null ? row.id : row?.index != null ? row.index : row?._tempKey
   watch(
     () => props.data,
     (val) => {
@@ -406,36 +408,36 @@
   } = useDataTable(tableProps, emit)
 
   const editRow = (row) => {
-    const id = row?.id
-    if (id == null) return
-    backups.value.set(id, { ...row })
-    if (!editingRows.value.some((editing) => editing?.id === id)) {
+    const key = getRowKey(row)
+    if (key == null) return
+    backups.value.set(key, { ...row })
+    if (!editingRows.value.some((editing) => getRowKey(editing) === key)) {
       editingRows.value = [...editingRows.value, row]
     }
   }
 
   const onRowEditSave = (event) => {
     const { newData, data } = event || {}
-    const id = newData?.id ?? data?.id
-    if (id == null) return
-    const index = editableData.value.findIndex((item) => item.id === id)
-    const oldData = backups.value.get(id)
+    const key = getRowKey(newData) ?? getRowKey(data)
+    if (key == null) return
+    const index = editableData.value.findIndex((item) => getRowKey(item) === key)
+    const oldData = backups.value.get(key)
     if (index !== -1) {
-      emit('row-edit-saved', { id, oldData, newData, index })
+      emit('row-edit-saved', { id: key, oldData, newData, index })
     }
-    backups.value.delete(id)
-    editingRows.value = editingRows.value.filter((row) => row?.id !== id)
+    backups.value.delete(key)
+    editingRows.value = editingRows.value.filter((row) => getRowKey(row) !== key)
   }
 
   const onRowEditCancel = (event) => {
     const { data } = event || {}
-    const id = data?.id
+    const key = getRowKey(data)
     const isNew = data?._isNew === true
     if (isNew) {
-      if (id != null) {
-        editableData.value = editableData.value.filter((item) => item.id !== id)
-        backups.value.delete(id)
-        editingRows.value = editingRows.value.filter((row) => row?.id !== id)
+      if (key != null) {
+        editableData.value = editableData.value.filter((item) => getRowKey(item) !== key)
+        backups.value.delete(key)
+        editingRows.value = editingRows.value.filter((row) => getRowKey(row) !== key)
       } else if (data?._tempKey) {
         editableData.value = editableData.value.filter((item) => item?._tempKey !== data._tempKey)
         editingRows.value = editingRows.value.filter((row) => row !== data)
@@ -443,26 +445,27 @@
         editableData.value = editableData.value.filter((item) => item !== data)
         editingRows.value = editingRows.value.filter((row) => row !== data)
       }
-      emit('row-edit-cancel', { id, removed: true })
+      emit('row-edit-cancel', { id: key, removed: true })
       return
     }
-    if (id == null) return
-    const original = backups.value.get(id)
+    if (key == null) return
+    const original = backups.value.get(key)
     if (original) {
-      const index = editableData.value.findIndex((item) => item.id === id)
+      const index = editableData.value.findIndex((item) => getRowKey(item) === key)
       if (index !== -1) {
         editableData.value[index] = { ...original }
       }
     }
-    backups.value.delete(id)
-    editingRows.value = editingRows.value.filter((row) => row?.id !== id)
-    emit('row-edit-cancel', { id, original })
+    backups.value.delete(key)
+    editingRows.value = editingRows.value.filter((row) => getRowKey(row) !== key)
+    emit('row-edit-cancel', { id: key, original })
   }
 
   const isRowEditing = (rowIndex) => {
     const row = editableData.value[rowIndex]
     if (!row) return false
-    if (row?.id != null) return editingRows.value.some((editing) => editing?.id === row.id)
+    const key = getRowKey(row)
+    if (key != null) return editingRows.value.some((editing) => getRowKey(editing) === key)
     return editingRows.value.includes(row)
   }
 

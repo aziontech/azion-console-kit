@@ -370,7 +370,31 @@ export function useEdgeSQL() {
         const { results } = await edgeSQLService.queryDatabase(databaseId, {
           statements
         })
-        queryResults = results
+        // Centralize post-processing for SELECT queries
+        if (Array.isArray(results) && results.length > 0) {
+          const dataResult = results[0]
+          const schemaResult = results[results.length - 1]
+          const dataRows = Array.isArray(dataResult?.rows) ? dataResult.rows : []
+          const schemaRows = Array.isArray(schemaResult?.rows) ? schemaResult.rows : []
+
+          // Build a union of keys across all rows to detect actually returned columns
+          const presentFields = new Set()
+          for (const row of dataRows) {
+            Object.keys(row || {}).forEach((keyName) => presentFields.add(keyName))
+          }
+
+          // If we have present fields, filter the schema accordingly
+          const filteredSchemaRows = presentFields.size
+            ? schemaRows.filter((col) => presentFields.has(col?.name))
+            : schemaRows
+
+          // Rebuild results array with filtered schema
+          const nextResults = results.slice()
+          nextResults[results.length - 1] = { ...schemaResult, rows: filteredSchemaRows }
+          queryResults = nextResults
+        } else {
+          queryResults = results
+        }
       } else {
         const { results } = await edgeSQLService.executeDatabase(databaseId, {
           statements

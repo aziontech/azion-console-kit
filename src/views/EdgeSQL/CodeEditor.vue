@@ -373,14 +373,16 @@
     isExecutingQuery.value = true
     try {
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
-      resultColumns.value = results[results.length - 1].rows.map((column) => ({
+      // Adapter already filters schema based on returned rows
+      resultRows.value = results[0].rows
+      const schemaRows = results[results.length - 1].rows
+      resultColumns.value = schemaRows.map((column) => ({
         field: column.name,
         tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
         header: column.name,
         sortable: true
       }))
-      resultSchema.value = results[results.length - 1].rows
-      resultRows.value = results[0].rows
+      resultSchema.value = schemaRows
       activeTableName.value = tableNameExecuted
       updateListHistory()
     } finally {
