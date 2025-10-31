@@ -167,8 +167,8 @@
 
 <script setup>
   import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
-  import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
+  import { authService } from '@/services/v2/auth'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
@@ -298,7 +298,6 @@
       await props.refreshLoginService()
     }
   }
-
   const switchClientAccount = async ({ account_id }) => {
     try {
       const redirect = await props.accountHandler.switchAndReturnAccountPage(account_id)
@@ -312,7 +311,7 @@
   const checkLoginMethod = async () => {
     if (errors.value.email || !email.value) return
     try {
-      const res = await verifyLoginMethodService(email.value)
+      const res = await authService.verifyEmailLoginMethod(email.value)
       if (res.loginMethod === 'federated') {
         const encodedEmail = encodeURIComponent(email.value)
         const redirectUrl = `${res.loginUrl}?email=${encodedEmail}&console=true`

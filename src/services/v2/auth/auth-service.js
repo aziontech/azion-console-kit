@@ -9,7 +9,8 @@ export class AuthService extends BaseService {
   verifyAuthenticationService = async () => {
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/verify`
+      url: `${this.baseURL}/verify`,
+      config: { baseURL: '/api' }
     })
     return data
   }
@@ -17,7 +18,17 @@ export class AuthService extends BaseService {
   refreshAuthenticationService = async () => {
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/refresh`
+      url: `${this.baseURL}/refresh`,
+      config: { baseURL: '/api' }
+    })
+    return data
+  }
+  verifyEmailLoginMethod = async (email) => {
+    const emailEncoded = encodeURIComponent(email)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `auth/login_method?email=${emailEncoded}`,
+      config: { baseURL: '/api' }
     })
     return data
   }
