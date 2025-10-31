@@ -198,6 +198,18 @@
               class="w-full"
               filter
             />
+            <Dropdown
+              v-else-if="isSchemaView && field === 'notNull'"
+              v-model="data[field]"
+              :options="[
+                { label: 'True', value: 1 },
+                { label: 'False', value: 0 }
+              ]"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+            />
+
             <InputText
               v-else
               v-model="data[field]"
