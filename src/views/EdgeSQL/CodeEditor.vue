@@ -95,7 +95,7 @@
               @row-edit-saved="handleActionRowTable"
               @row-edit-cancel="onRowEditCancel"
               @reload-table="reloadData"
-              :disabled-action="isExecutingQuery || isLoadingQuery"
+              :disabled-action="isExecutingQuery || isLoadingQuery || shouldNotEditRow"
               @view-change="handleViewChange"
               :options="resultsViewOptions"
               :empty-block="{
@@ -188,11 +188,13 @@
     executeQuery,
     updateListHistory,
     removeQueryFromHistory,
-    currentDatabase
+    currentDatabase,
+    isNonEditableQuery
   } = useEdgeSQL()
   const route = useRoute()
 
   const accountStore = useAccountStore()
+  const shouldNotEditRow = ref(false)
 
   const monacoTheme = computed(() => {
     return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
@@ -367,6 +369,7 @@
 
     isExecutingQuery.value = true
     try {
+      shouldNotEditRow.value = isNonEditableQuery(contentToRun)
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       // Adapter already filters schema based on returned rows
       resultRows.value = results[0].rows
