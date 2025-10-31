@@ -239,11 +239,7 @@
   })
 
   const dataFiltered = computed(() => {
-    if (resultsView.value === 'table') {
-      return resultRows.value
-    } else {
-      return JSON.stringify(resultRows.value)
-    }
+    return Array.isArray(resultRows.value) ? resultRows.value : []
   })
 
   const handleViewChange = (view) => {
