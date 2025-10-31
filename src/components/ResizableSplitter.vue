@@ -13,12 +13,16 @@
 
     <div
       ref="handle"
-      class="handle w-full h-6 cursor-row-resize flex items-center justify-center"
+      class="handle w-full h-6 cursor-row-resize flex items-center justify-center group"
       @mousedown.prevent="onPointerDown"
       @touchstart.passive="onPointerDown"
     >
-      <div class="w-full !h-1 bg-[var(--surface-400)] flex justify-center">
-        <span class="w-6 h-full bg-[var(--surface-800)]"></span>
+      <div
+        class="w-full h-0.5 group-hover:h-1 bg-[var(--surface-300)] flex justify-center transition-all duration-200 ease-in-out"
+      >
+        <span
+          class="w-6 h-full bg-[var(--surface-500)] transition-colors duration-200 ease-in-out"
+        ></span>
       </div>
     </div>
 

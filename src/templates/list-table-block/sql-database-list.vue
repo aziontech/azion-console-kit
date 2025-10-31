@@ -46,6 +46,8 @@
 
               <SplitButton
                 icon="pi pi-plus"
+                size="small"
+                severity="secondary"
                 label="Insert"
                 @click="insertRow"
                 :model="items"
@@ -59,13 +61,6 @@
                   placeholder="Search..."
                   @input="handleSearchValue"
                   @search="fetchOnSearch"
-                />
-                <PrimeButton
-                  label="Filter"
-                  icon="pi pi-filter"
-                  @click="toggleFilter"
-                  outlined
-                  size="small"
                 />
               </div>
               <DataTable.Actions>
@@ -376,7 +371,6 @@
     'navigate-other-link',
     'navigate-get-help',
     'other-actions',
-    'toggle-filter',
     'row-edit-saved',
     'row-edit-cancel',
     'click-to-create'
@@ -539,17 +533,16 @@
     emit('page', event)
   }
 
-  const toggleFilter = () => emit('toggle-filter')
-
   const items = [
     {
       icon: 'ai ai-column',
       label: 'Insert Column',
-      command: () => insertColumnSplitEvent()
+      command: () => insertColumnSplitEvent(),
+      visible: () => selectedView.value.value === 'table'
     },
     {
       icon: 'pi pi-minus',
-      label: 'Insert Row',
+      label: 'Insert Data',
       command: () => insertRowSplitEvent()
     }
   ]

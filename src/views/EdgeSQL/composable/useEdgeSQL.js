@@ -141,6 +141,74 @@ const adaptHistory = (histories) => {
   })
 }
 
+const detectSelectTableNames = (stmts) => {
+  const tableNames = new Set()
+  for (const stmtCandidate of stmts) {
+    const lower = String(stmtCandidate).toLowerCase().trim()
+    if (!lower.startsWith('select')) continue
+    const regex = /(from|join)\s+[`"']?([A-Za-z0-9_.-]+)[`"']?/gi
+    let matchResult
+    while ((matchResult = regex.exec(stmtCandidate)) !== null) {
+      const name = matchResult[2]
+      if (name) tableNames.add(name)
+    }
+  }
+  if (tableNames.size === 0) {
+    const firstSelect = stmts.find((stmtCandidate) =>
+      String(stmtCandidate).toLowerCase().startsWith('select')
+    )
+    if (firstSelect) {
+      const match = String(firstSelect).match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
+      if (match && match[1]) tableNames.add(match[1])
+    }
+  }
+  return tableNames
+}
+
+const appendPragmasForTables = (stmts, tableNames) => {
+  if (tableNames.size > 0) {
+    for (const name of tableNames) {
+      stmts.push(`; PRAGMA table_info("${name}");`)
+    }
+  }
+}
+
+const postprocessSelectResults = (results, tableNames) => {
+  if (!Array.isArray(results) || results.length === 0) return results
+
+  const dataResult = results[0]
+  const dataRows = Array.isArray(dataResult?.rows) ? dataResult.rows : []
+
+  // Build a union of keys across all rows to detect actually returned columns
+  const presentFields = new Set()
+  for (const row of dataRows) {
+    Object.keys(row || {}).forEach((keyName) => presentFields.add(keyName))
+  }
+
+  let nextResults = results.slice()
+  if (tableNames.size > 0 && results.length >= 1 + tableNames.size) {
+    const schemaResults = results.slice(results.length - tableNames.size)
+    const mergedSchemaRows = schemaResults.flatMap((schemaRes) =>
+      Array.isArray(schemaRes?.rows) ? schemaRes.rows : []
+    )
+    const filteredMerged = presentFields.size
+      ? mergedSchemaRows.filter((col) => presentFields.has(col?.name))
+      : mergedSchemaRows
+    nextResults = results.slice(0, results.length - tableNames.size)
+    const baseSchema = schemaResults[schemaResults.length - 1] || {}
+    nextResults.push({ ...baseSchema, rows: filteredMerged })
+  } else if (results.length >= 2) {
+    // Single schema case (backward compatible)
+    const schemaResult = results[results.length - 1]
+    const schemaRows = Array.isArray(schemaResult?.rows) ? schemaResult.rows : []
+    const filteredSchemaRows = presentFields.size
+      ? schemaRows.filter((col) => presentFields.has(col?.name))
+      : schemaRows
+    nextResults[results.length - 1] = { ...schemaResult, rows: filteredSchemaRows }
+  }
+  return nextResults
+}
+
 export function useEdgeSQL() {
   // Return existing global state if it exists
   if (globalState) {
@@ -350,51 +418,16 @@ export function useEdgeSQL() {
 
     const isSelectQuery = flatStatements.some((stmt) => stmt.toLowerCase().startsWith('select'))
     let queryResults = []
-    let tableName = selectedTable.value?.name || null
+
+    // helpers are defined at module scope
 
     try {
       const startTime = Date.now()
       if (isSelectQuery) {
-        if (!tableName) {
-          const firstSelect = flatStatements.find((stmt) => stmt.toLowerCase().startsWith('select'))
-          if (firstSelect) {
-            const match = firstSelect.match(/from\s+["`]?([A-Za-z0-9_.-]+)["`]?/i)
-            if (match && match[1]) tableName = match[1]
-          }
-        }
-
-        if (tableName) {
-          statements.push(`; PRAGMA table_info(${tableName});`)
-        }
-
-        const { results } = await edgeSQLService.queryDatabase(databaseId, {
-          statements
-        })
-        // Centralize post-processing for SELECT queries
-        if (Array.isArray(results) && results.length > 0) {
-          const dataResult = results[0]
-          const schemaResult = results[results.length - 1]
-          const dataRows = Array.isArray(dataResult?.rows) ? dataResult.rows : []
-          const schemaRows = Array.isArray(schemaResult?.rows) ? schemaResult.rows : []
-
-          // Build a union of keys across all rows to detect actually returned columns
-          const presentFields = new Set()
-          for (const row of dataRows) {
-            Object.keys(row || {}).forEach((keyName) => presentFields.add(keyName))
-          }
-
-          // If we have present fields, filter the schema accordingly
-          const filteredSchemaRows = presentFields.size
-            ? schemaRows.filter((col) => presentFields.has(col?.name))
-            : schemaRows
-
-          // Rebuild results array with filtered schema
-          const nextResults = results.slice()
-          nextResults[results.length - 1] = { ...schemaResult, rows: filteredSchemaRows }
-          queryResults = nextResults
-        } else {
-          queryResults = results
-        }
+        const tableNames = detectSelectTableNames(flatStatements)
+        appendPragmasForTables(statements, tableNames)
+        const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
+        queryResults = postprocessSelectResults(results, tableNames)
       } else {
         const { results } = await edgeSQLService.executeDatabase(databaseId, {
           statements
@@ -421,8 +454,7 @@ export function useEdgeSQL() {
       }
 
       return {
-        results: queryResults,
-        tableNameExecuted: tableName
+        results: queryResults
       }
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
