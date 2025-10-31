@@ -134,7 +134,7 @@ const mapRowsToObjects = (columns, rows) => {
       rowObject[columnName] = row[colIndex]
     })
     if (!hasIdColumn) {
-      rowObject.id = rowIndex + 1
+      rowObject.index = rowIndex + 1
     }
     return rowObject
   })
