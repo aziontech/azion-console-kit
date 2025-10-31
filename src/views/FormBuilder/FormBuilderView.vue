@@ -1,0 +1,433 @@
+<script setup>
+  import { useAccountStore } from '@/stores/account'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import ContentBlock from '@/templates/content-block'
+  import { computed, inject, onMounted, ref, markRaw } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import * as yup from 'yup'
+  import FormFieldsFormBuilder from './FormFields/FormFieldsFormBuilder.vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
+  import { removeHtmlTagFromText } from '@/helpers'
+  import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import { useLayout } from '@/composables/use-layout'
+
+  // JSON FORM //
+  import { JsonForms } from '@jsonforms/vue'
+  import { vanillaRenderers } from '@jsonforms/vue-vanilla'
+
+  import { inputTextControlTester } from '@/templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlTester'
+  import inputTextControlRenderer from '@/templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
+
+  import { inputNumberControlTester } from '@/templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlTester'
+  import inputNumberControlRenderer from '@/templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlRenderer.vue'
+
+  const data = ref({})
+  const schema = ref({
+    type: 'object',
+    properties: {
+      name_full: {
+        type: 'string',
+        title: 'Full Name',
+        placeholder: 'John Doe',
+        description: 'Complete with your full name',
+        default: '',
+        minLength: 1
+      },
+      email: {
+        type: 'string',
+        title: 'E-mail',
+        placeholder: 'email@example.com',
+        description: 'Enter your best e-mail',
+        default: '',
+        minLength: 1,
+        maxLength: 256
+      }
+      // "input_number": {
+      //   "type": "integer",
+      //   "title": "Input Number",
+      //   "description": "Description input number",
+      //   "default": "",
+      //   "minLength": 1
+      // }
+    },
+    required: ['name_full', 'email']
+  })
+  const customRenderers = [
+    {
+      tester: inputTextControlTester,
+      renderer: inputTextControlRenderer
+    },
+    {
+      tester: inputNumberControlTester,
+      renderer: inputNumberControlRenderer
+    }
+  ]
+
+  const renderers = markRaw([...vanillaRenderers, ...customRenderers])
+
+  const onChange = (event) => {
+    data.value = event.data
+  }
+  // END JSON FORM //
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  defineOptions({ name: 'home-view' })
+
+  const props = defineProps({
+    listTeamsService: {
+      type: Function,
+      required: true
+    },
+    inviteYourTeamService: {
+      type: Function,
+      required: true
+    },
+    inviteSession: {
+      type: Function,
+      required: true
+    },
+    windowManager: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const router = useRouter()
+  const route = useRoute()
+  const dialog = useDialog()
+  const { accountData } = useAccountStore()
+  const user = accountData
+
+  const teams = ref([])
+  const showInviteSession = ref(props.inviteSession.show())
+  const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
+
+  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
+  const disclaimer = computed(() => {
+    return removeHtmlTagFromText(user.disclaimer, 'a')
+  })
+
+  const showExperimental = computed(() => {
+    return user.disclaimer
+  })
+
+  const navigateToEdgeApplications = () => {
+    router.push({ name: 'list-applications' })
+  }
+
+  const navigateToPayment = () => {
+    router.push({ name: 'billing-tabs' })
+  }
+
+  const navigateToRealTimeMetrics = () => {
+    router.push({ name: 'real-time-metrics' })
+  }
+
+  const openDocsEdgeApplication = () => {
+    props.windowManager.documentationGuideProducts.edgeApplication()
+  }
+
+  const openDocsRealTimeMetrics = () => {
+    props.windowManager.documentationGuideProducts.realTimeMetrics()
+  }
+
+  const openProductDocumentation = () => {
+    props.windowManager.openDocumentation()
+  }
+
+  const openAPIDocumentation = () => {
+    props.windowManager.openAPIDocumentation()
+  }
+
+  const validationSchema = yup.object({
+    name: yup
+      .string()
+      .required('Full Name is a required field')
+      .test('non-numeric', 'Full Name must include first and last name', (value) => {
+        const alphaRegex = /[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/
+        return alphaRegex.test(value)
+      }),
+    email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
+    team: yup.string().required()
+  })
+
+  const closeInviteSession = () => {
+    props.inviteSession.closeInviteBlock()
+    showInviteSession.value = false
+  }
+
+  const createModalStore = useCreateModalStore()
+
+  const openModalCreate = () => {
+    tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+    createModalStore.toggle()
+  }
+
+  const showOnboardingSchedulingDialog = () => {
+    if (route.query.onboardingSession) {
+      dialog.open(DialogOnboardingScheduling)
+    }
+  }
+
+  onMounted(async () => {
+    teams.value = await props.listTeamsService()
+    showOnboardingSchedulingDialog()
+    if (props.inviteSession.sessionIsExpired()) {
+      props.inviteSession.turnInviteBlockVisable()
+    }
+  })
+</script>
+
+<template>
+  <ContentBlock>
+    <template #content>
+      <section class="w-full flex flex-col gap-4 md:gap-6">
+        <div
+          v-if="showExperimental"
+          class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
+        >
+          <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl">
+            {{ disclaimer }}
+          </p>
+          <PrimeButton
+            type="button"
+            label="Add payment method"
+            outlined
+            class="w-full sm:min-w-[10rem] sm:max-w-[10rem]"
+            size="small"
+            @click="navigateToPayment"
+          />
+        </div>
+
+        <JsonForms
+          :data="data"
+          :schema="schema"
+          :renderers="renderers"
+          @change="onChange"
+        />
+
+        <div>
+          {{ data }}
+        </div>
+
+        <div
+          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-4 md:gap-6 justify-between"
+        >
+          <div class="flex flex-col gap-2 max-w-4xl">
+            <h1 class="text-color text-xl md:text-2xl font-medium">Get Started</h1>
+            <h2 class="text-sm md:text-base text-color-secondary font-normal">
+              Welcome aboard! Feel free to explore or get a head start below.
+            </h2>
+          </div>
+          <div>
+            <PrimeButton
+              icon="pi pi-plus"
+              class="w-full md:w-auto md:pr-3.5"
+              label="Create"
+              type="button"
+              size="small"
+              @click="openModalCreate"
+            />
+          </div>
+        </div>
+
+        <div
+          class="flex gap-6 flex-col"
+          :class="{ 'xl:flex-row': !showSidebar }"
+        >
+          <!-- Manage Applications -->
+          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+            <div class="flex flex-row justify-start gap-3">
+              <div
+                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+              >
+                <span class="ai ai-edge-application"></span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="text-lg sm:text-xl font-medium">Manage Applications</div>
+                <div class="text-xs sm:text-sm text-color-secondary">
+                  Add and manage your applications' main settings, modules, and features.
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+              <PrimeButton
+                type="button"
+                label="Manage Applications"
+                outlined
+                class="w-full sm:w-auto"
+                size="small"
+                @click="navigateToEdgeApplications"
+              />
+              <PrimeButton
+                type="button"
+                label="How to build"
+                link
+                class="w-full sm:w-auto"
+                icon="pi pi-external-link"
+                iconPos="right"
+                size="small"
+                @click="openDocsEdgeApplication"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
+              />
+            </div>
+          </div>
+          <!-- View Analytics -->
+          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+            <div class="flex flex-row justify-start gap-3">
+              <div
+                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+              >
+                <span class="ai ai-real-time-metrics"></span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="text-lg sm:text-xl font-medium">View Analytics</div>
+                <div class="text-xs sm:text-sm text-color-secondary">
+                  Get powerful insights into applications performance, availability, and security.
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+              <PrimeButton
+                type="button"
+                class="sm:w-auto w-full"
+                label="View Real-Time Metrics"
+                outlined
+                size="small"
+                @click="navigateToRealTimeMetrics"
+              />
+              <PrimeButton
+                type="button"
+                label="How to use"
+                link
+                class="w-full sm:w-auto"
+                icon="pi pi-external-link"
+                iconPos="right"
+                size="small"
+                @click="openDocsRealTimeMetrics"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
+              />
+            </div>
+          </div>
+          <!-- Ask Azion Copilot -->
+          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+            <div class="flex flex-row justify-start gap-3">
+              <div
+                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+              >
+                <span class="ai ai-ask-azion"></span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="text-lg sm:text-xl font-medium">Ask Azion Copilot</div>
+                <div class="text-xs sm:text-sm text-color-secondary">
+                  Ask your questions to Azion Copilot, an AI with deep edge computing expertise.
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+              <PrimeButton
+                type="button"
+                class="sm:w-auto w-full"
+                label="Open Azion Copilot"
+                outlined
+                size="small"
+                @click="OpenSidebarComponent('copilot')"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="w-full p-3 sm:p-6 surface-border border rounded-md flex flex-col gap-6 justify-between relative"
+          v-if="showInviteSession"
+        >
+          <PrimeButton
+            icon="pi pi-times"
+            outlined
+            class="absolute right-3 top-3 sm:right-6 sm:top-6"
+            size="small"
+            type="button"
+            aria-label="Close invite session"
+            @click="closeInviteSession"
+          />
+          <div class="flex flex-col gap-2">
+            <div class="text-lg sm:text-xl font-medium">Invite your Team</div>
+            <div class="text-xs sm:text-sm text-color-secondary">
+              All Azion plans include unlimited team seats. Invite your colleagues to start building
+              together.
+            </div>
+          </div>
+          <CreateFormBlock
+            :createService="props.inviteYourTeamService"
+            :schema="validationSchema"
+            disabledCallback
+            class="flex flex-col lg:flex-row w-full items-end gap-2"
+            :unSaved="false"
+          >
+            <template #form>
+              <FormFieldsFormBuilder :teams="teams"></FormFieldsFormBuilder>
+            </template>
+            <template #action-bar="{ onSubmit, loading }">
+              <PrimeButton
+                severity="secondary"
+                type="submit"
+                label="Invite"
+                size="small"
+                @click="onSubmit"
+                :loading="loading"
+                :disabled="loading"
+                class="w-full lg:w-auto lg:min-w-[5rem]"
+              />
+            </template>
+          </CreateFormBlock>
+        </div>
+
+        <div class="flex flex-col xl:flex-row gap-4 md:gap-6">
+          <!-- Product -->
+          <button
+            type="button"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            @click="openProductDocumentation"
+          >
+            <div class="text-lg font-medium">Product Documentation</div>
+            <div class="text-sm text-color-secondary">
+              Understand how to configure all your Azion products and their features.
+            </div>
+          </button>
+          <!-- API -->
+          <button
+            type="button"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            @click="openAPIDocumentation"
+          >
+            <div class="text-lg font-medium">API Documentation</div>
+            <div class="text-sm text-color-secondary">
+              Use the Azion API to interact with your Azion products through HTTPS requests.
+            </div>
+          </button>
+          <!-- Contact -->
+          <button
+            type="button"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            @click="OpenSidebarComponent('copilot', { clearChat: true })"
+          >
+            <div class="text-lg font-medium">Get Assistance</div>
+            <div class="text-sm text-color-secondary">
+              Access personalized support for all your queries, suggestions, or incident reports
+            </div>
+          </button>
+        </div>
+      </section>
+    </template>
+  </ContentBlock>
+</template>

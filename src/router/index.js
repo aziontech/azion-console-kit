@@ -18,6 +18,7 @@ import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { homeRoutes } from '@routes/home-routes'
+import { formbuilderRoutes } from '@routes/formbuilder-routes'
 import { edgeDnsRoutes } from '@/router/routes/edge-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
@@ -69,6 +70,7 @@ const router = createRouter({
     edgePulseRoutes,
     edgeServicesRoutes,
     homeRoutes,
+    formbuilderRoutes,
     edgeDnsRoutes,
     loginRoutes,
     networkListsRoutes,

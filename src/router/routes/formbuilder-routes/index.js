@@ -8,10 +8,10 @@ import {
 } from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const homeRoutes = {
+export const formbuilderRoutes = {
   path: '/formbuilder',
   name: 'formbuilder',
-  component: () => import('@views/Home/HomeView.vue'),
+  component: () => import('@views/FormBuilder/FormBuilderView.vue'),
   props: {
     listTeamsService: UsersService.listTeamsService,
     inviteYourTeamService: UsersService.inviteYourTeamService,
