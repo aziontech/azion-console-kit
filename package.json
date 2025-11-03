@@ -44,7 +44,7 @@
     "@stripe/stripe-js": "^4.1.0",
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.3",
-    "@vee-validate/yup": "^4.11.1",
+    "@vee-validate/yup": "^4.15.1",
     "@vueuse/core": "^10.7.0",
     "analytics": "^0.8.11",
     "axios": "^1.12.0",
