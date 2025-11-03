@@ -201,7 +201,7 @@
               filter
             />
             <Dropdown
-              v-else-if="isSchemaView && field === 'notNull'"
+              v-else-if="isSchemaView && (field === 'notNull' || field === 'primaryKey')"
               v-model="data[field]"
               :options="[
                 { label: 'True', value: 1 },
