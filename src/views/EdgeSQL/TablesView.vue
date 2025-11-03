@@ -184,6 +184,10 @@
     {
       field: 'notNull',
       header: 'Nullable'
+    },
+    {
+      field: 'primaryKey',
+      header: 'Primary Key'
     }
   ])
 
