@@ -15,7 +15,7 @@ export default {
     },
     extend: {
       colors: {
-        header: '#171717',
+        header: '#111111',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': '#f5f5f516',
         'header-avatar': '#363636',
