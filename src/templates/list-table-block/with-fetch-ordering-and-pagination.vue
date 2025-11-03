@@ -305,14 +305,6 @@
             <DataTable.Header>
               <template #actions>
                 <div class="flex justify-between gap-2 w-full">
-                  <DataTable.Search
-                    v-model="filters.global.value"
-                    @search="fetchOnSearch"
-                    @input="handleSearchValue"
-                  >
-                    <slot name="select-buttons" />
-                  </DataTable.Search>
-
                   <DataTable.Actions>
                     <div class="flex gap-2">
                       <PrimeButton
@@ -359,7 +351,7 @@
               </template>
 
               <template #filters>
-                <div class="flex flex-wrap justify-end gap-2 w-full">
+                <div class="flex flex-wrap justify-between gap-2 w-full">
                   <!-- We dont have this fun yet, but we will add -in the future -->
                   <!-- So comment the component for now, in the future change the justify to justify-between  -->
                   <!-- <PrimeButton
@@ -370,6 +362,13 @@
                     @click="toggleFilter"
                     data-testid="data-table-actions-column-header-toggle-filter"
                   /> -->
+                  <DataTable.Search
+                    v-model="filters.global.value"
+                    @search="fetchOnSearch"
+                    @input="handleSearchValue"
+                  >
+                    <slot name="select-buttons" />
+                  </DataTable.Search>
                   <div class="flex gap-2">
                     <PrimeButton
                       outlined
