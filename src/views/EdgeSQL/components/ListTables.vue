@@ -126,7 +126,7 @@
             </div>
 
             <PrimeButton
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-ellipsis-v"
               size="small"
               outlined
               @click.stop="$emit('show-table-menu', $event, table)"
