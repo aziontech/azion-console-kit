@@ -77,10 +77,10 @@
         filterPath: 'domain.content',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
+            data: columnData.content,
+            columnAppearance: 'text-format-with-popup',
             dependencies: {
-              copyContentService: props.clipboardWrite
+              showCopy: () => props.clipboardWrite(columnData.content)
             }
           })
         }

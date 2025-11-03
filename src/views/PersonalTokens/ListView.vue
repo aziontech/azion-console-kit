@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <ListTableBlock
-        v-if="hasContentToList"
         :listService="listPersonalTokensService"
         :columns="getColumns"
         addButtonLabel="Personal Token"
@@ -13,31 +12,23 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         :enableEditClick="false"
-        emptyListMessage="No personal tokens found."
         :actions="actions"
+        :emptyBlock="{
+          title: 'No personal tokens have been generated',
+          description: 'Click the button below to generate your first personal token.',
+          createButtonLabel: 'Personal Token',
+          createPagePath: 'personal-tokens/create',
+          documentationService: props.documentationService,
+          emptyListMessage: 'No personal tokens found.'
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No personal tokens have been generated"
-        description="Click the button below to generate your first personal token."
-        createButtonLabel="Personal Token"
-        createPagePath="personal-tokens/create"
-        @click-to-create="handleTrackEvent"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { ref, inject } from 'vue'
@@ -60,7 +51,6 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const actions = [
     {
       type: 'delete',
@@ -79,17 +69,13 @@
       field: 'description',
       header: 'Description',
       type: 'component',
+      style: 'max-width: 250px',
       component: (columnData) =>
-        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
     },
     {
       field: 'scope',
       header: 'Scope'
-    },
-    {
-      field: 'created',
-      sortField: 'createdDate',
-      header: 'Last Modified'
     },
     {
       field: 'expiresAt',
@@ -97,10 +83,6 @@
       header: 'Expiration Date'
     }
   ])
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({

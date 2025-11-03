@@ -5,7 +5,7 @@
     :style="popupStyle"
   >
     <div class="flex flex-col text-xs space-y-1">
-      <span v-if="lastEditor">Last edited by {{ lastEditor }}</span>
+      <span v-if="lastEditor && lastEditor !== '-'">Last edited by {{ lastEditor }}</span>
       <div class="flex items-center gap-1">
         <span class="px-2 py-1 rounded-sm bg-[var(--surface-border)]">UTC</span>
         <span>{{ formatDateToDayMonthYearHour(lastModified, 'UTC') }}</span>

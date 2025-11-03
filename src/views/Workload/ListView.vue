@@ -106,12 +106,13 @@
         filterPath: 'domains',
         disableSort: true,
         type: 'component',
+        style: 'max-width: 240px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'expand-column',
+            data: Array.isArray(columnData) ? columnData : columnData.content,
+            columnAppearance: 'text-array-with-popup',
             dependencies: {
-              showCopy: true
+              showCopy: Helpers.clipboardWrite
             }
           })
         }
@@ -122,12 +123,14 @@
         filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
+        style: 'max-width: 150px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
+            data: columnData.content,
+            columnAppearance: 'text-format-with-popup',
             dependencies: {
-              copyContentService: Helpers.clipboardWrite
+              copyContentService: Helpers.clipboardWrite,
+              showCopy: Helpers.clipboardWrite
             }
           })
         }
@@ -181,7 +184,7 @@
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
-        :frozenColoumns="['name']"
+        :frozenColumns="['name']"
         exportFileName="Workload"
         :emptyBlock="{
           title: titleEmptyPage,

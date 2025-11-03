@@ -68,6 +68,7 @@
         </Column>
 
         <Column
+          v-if="showLastModifiedColumn"
           :frozen="true"
           :alignFrozen="'right'"
           :bodyStyle="classActions"
@@ -283,6 +284,10 @@
     scrollHeight: {
       type: String,
       default: 'calc(100vh - 400px)'
+    },
+    showLastModifiedColumn: {
+      type: Boolean,
+      default: true
     }
   })
 

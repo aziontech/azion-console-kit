@@ -73,7 +73,11 @@
       filterPath: 'value.content',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup',
+          dependencies: { showCopy: props.clipboardWrite }
+        })
     },
     {
       field: 'ttl',
