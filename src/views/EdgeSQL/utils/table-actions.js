@@ -4,21 +4,6 @@ export const TABLE_QUERIES = SQLITE_QUERIES
 
 export const TABLE_MENU_ACTIONS = [
   {
-    label: 'Table Info',
-    icon: 'pi pi-info-circle',
-    type: 'drawer',
-    action: 'showTableInfo'
-  },
-  {
-    label: 'View Definition',
-    icon: 'pi pi-code',
-    type: 'drawer',
-    action: 'showDefinition'
-  },
-  {
-    separator: true
-  },
-  {
     label: 'Count Records',
     icon: 'pi pi-calculator',
     type: 'query',
