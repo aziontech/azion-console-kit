@@ -35,7 +35,7 @@ export const edgeSQLRoutes = {
     },
     {
       path: 'database/:id/:tab?',
-      name: 'sql-database',
+      name: 'database-sql-database',
       component: () => import('@views/EdgeSQL/DatabaseView.vue'),
       meta: {
         breadCrumbs: [
