@@ -3,8 +3,7 @@ export const edgeStorageRoutes = {
   path: '/object-storage',
   name: 'object-storage',
   meta: {
-    title: 'Object Storage',
-    flag: 'only_azion_email'
+    title: 'Object Storage'
   },
   children: [
     {
