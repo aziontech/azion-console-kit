@@ -11,6 +11,7 @@ import {
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
+import { unref } from 'vue'
 
 export class BaseService {
   constructor() {
@@ -88,5 +89,21 @@ export class BaseService {
   getCachedData({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     return this.queryClient.getQueryData(queryKey)
+  }
+}
+
+export function createReactiveQueryKey(baseKey, params, keyParams = []) {
+  return () => {
+    const paramValues = unref(params) || {}
+    const keyParts = [...baseKey]
+
+    keyParams.forEach((paramName) => {
+      const value = paramValues[paramName]
+      if (value !== undefined && value !== null && value !== '') {
+        keyParts.push(`${paramName}=${value}`)
+      }
+    })
+
+    return keyParts
   }
 }
