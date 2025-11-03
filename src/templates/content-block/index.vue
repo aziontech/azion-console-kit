@@ -29,7 +29,7 @@
     }
   })
 
-  const classPadding = props.disablePadding ? '' : 'px-8 pt-4 pb-8'
+  const classPadding = props.disablePadding ? '' : 'px-4 md:px-8 pt-3 md:pt-4 pb-4 md:pb-8'
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
   const hasHeadingSlot = computed(() => !!slots.heading)
