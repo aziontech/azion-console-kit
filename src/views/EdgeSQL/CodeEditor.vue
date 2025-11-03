@@ -371,7 +371,7 @@
 
     isExecutingQuery.value = true
     try {
-      shouldNotEditRow.value = isNonEditableQuery(contentToRun)
+      shouldNotEditRow.value = addToHistory ? isNonEditableQuery(contentToRun) : false
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       // Adapter already filters schema based on returned rows
       resultRows.value = results[0]?.rows
@@ -384,6 +384,7 @@
           sortable: true
         }))
       }
+
       resultSchema.value = schemaRows
       activeTableName.value = tableNameExecuted
       updateListHistory()

@@ -101,8 +101,11 @@
       >
         <div
           v-for="table in filteredTables"
-          :key="table.id || table.name"
-          class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
+          :key="table.name"
+          :class="[
+            'group p-2 rounded cursor-pointer transition-colors',
+            isTableSelected(table) ? 'bg-[--table-bg-color]' : 'hover:bg-[--table-bg-color]'
+          ]"
           @click="$emit('select-table', table)"
         >
           <div class="flex items-center justify-between">
@@ -195,6 +198,12 @@
   const closeCheckbox = () => {
     showCheckbox.value = false
     localSelectedTables.value = []
+  }
+
+  const isTableSelected = (table) => {
+    const list = Array.isArray(props.selectedTables) ? props.selectedTables : []
+    const name = table?.name
+    return name != null && list.includes(name)
   }
 
   watch(

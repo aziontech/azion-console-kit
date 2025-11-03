@@ -441,6 +441,7 @@ export function useEdgeSQL() {
       hasAnySelect && selectStatements.every((stmt) => countOnlyRegex.test(stmt))
     const shouldFetchMetadata = hasAnySelect && !allSelectsAreCountOnly
     let queryResults = []
+    let tableNameExecuted
 
     // helpers are defined at module scope
 
@@ -449,6 +450,7 @@ export function useEdgeSQL() {
       if (hasAnySelect) {
         if (shouldFetchMetadata) {
           const tableNames = detectSelectTableNames(flatStatements)
+          tableNameExecuted = Array.from(tableNames)[0]
           appendPragmasForTables(statements, tableNames)
           const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
           queryResults = postprocessSelectResults(results, tableNames)
@@ -456,6 +458,8 @@ export function useEdgeSQL() {
           // SELECT-only (e.g., COUNT(*)) without metadata: still use queryDatabase but skip PRAGMA and postprocess
           const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
           queryResults = results
+          const tableNames = detectSelectTableNames(flatStatements)
+          tableNameExecuted = Array.from(tableNames)[0]
         }
       } else {
         const { results } = await edgeSQLService.executeDatabase(databaseId, { statements })
@@ -481,7 +485,8 @@ export function useEdgeSQL() {
       }
 
       return {
-        results: queryResults
+        results: queryResults,
+        tableNameExecuted
       }
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
