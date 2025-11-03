@@ -52,6 +52,7 @@
                 severity="secondary"
                 label="Insert"
                 @click="insertRow"
+                :disabled="disabledActionsJsonView"
                 :model="items"
               />
             </div>
@@ -63,6 +64,7 @@
                   placeholder="Search..."
                   @input="handleSearchValue"
                   @search="fetchOnSearch"
+                  :disabled="disabledActionsJsonView"
                 />
               </div>
               <DataTable.Actions>
@@ -97,6 +99,7 @@
                   icon="ai ai-column"
                   outlined
                   iconOnly
+                  :disabled="disabledActionsJsonView"
                   @click="toggleColumnSelector"
                   v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
                   data-testid="data-table-actions-column-header-toggle-columns"
@@ -346,6 +349,8 @@
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
+
+  const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 
   const reloadTable = () => {
     emit('reload-table')
@@ -649,9 +654,6 @@
 </script>
 
 <style scoped>
-  :deep(.azion .p-datatable.p-datatable-gridlines .p-paginator-bottom) {
-    border-width: 0px !important;
-  }
   :deep(.p-column-title) {
     display: none !important;
   }

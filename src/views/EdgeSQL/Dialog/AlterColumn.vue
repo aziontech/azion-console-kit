@@ -3,7 +3,7 @@
     :visible="visible"
     @update:visible="(v) => emit('update:visible', v)"
     modal
-    header="Confirm Data Type Change"
+    header="Confirm Change"
     :style="{ width: '36rem' }"
     :pt="{ header: { class: 'text-color-primary' } }"
   >
@@ -16,9 +16,11 @@
         your requirements.
       </p>
       <div
+        v-for="(query, index) in formattedQuery"
+        :key="index"
         class="flex flex-col gap-2 self-stretch p-3.5 bg-[var(--surface-300)] rounded-md border surface-border justify-start items-start overflow-auto max-h-80"
       >
-        <pre class="w-full whitespace-pre-wrap break-words overflow-auto">{{ formattedQuery }}</pre>
+        <pre class="w-full whitespace-pre-wrap break-words overflow-auto">{{ query }}</pre>
       </div>
 
       <div class="flex justify-end gap-2 mt-2">
@@ -73,9 +75,13 @@
   }
 
   const formattedQuery = computed(() => {
-    return formatSql(props.query)
+    const formatted = formatSql(props.query) || ''
+    return formatted
+      .split(';')
+      .map((segment) => segment.trim())
+      .map((segment) => segment.replace(/^\s*,\s*/, ''))
+      .filter((segment) => segment.length > 0)
   })
-
   const emit = defineEmits(['update:visible', 'load-tables'])
 
   const alterColumn = async () => {

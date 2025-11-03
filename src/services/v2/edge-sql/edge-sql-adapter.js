@@ -283,9 +283,13 @@ export const EdgeSQLAdapter = {
   adaptInsertColumn({ tableName, columnData }) {
     const { name, type, default: defaultValue, notNull } = columnData || {}
 
+    const safeName = String(name ?? '').trim()
+    const safeType = type ? String(type).trim() : ''
+    if (!safeName) throw new Error('Column name is required')
+
     const parts = []
-    parts.push(`"${name}"`)
-    if (type) parts.push(type)
+    parts.push(`"${safeName}"`)
+    if (safeType) parts.push(safeType)
     if (notNull) parts.push('NOT NULL')
 
     const defaultClause = formatDefaultClause(defaultValue, type)
