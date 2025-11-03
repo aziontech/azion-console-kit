@@ -35,10 +35,11 @@ const buildWhereClause = (whereData, tableSchema) => {
   if (hasIdColumn && (whereData?.id !== undefined || whereData?.ID !== undefined)) {
     const key = whereData.id !== undefined ? 'id' : 'ID'
     const originalValue = whereData[key]
-    if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+    const normalizedValue = typeof originalValue === 'string' ? originalValue.trim() : originalValue
+    if (normalizedValue === null || String(normalizedValue).toUpperCase() === 'NULL') {
       return `"${key}" IS NULL`
     }
-    const formattedValue = formatSqlValue(originalValue, key, tableSchema)
+    const formattedValue = formatSqlValue(normalizedValue, key, tableSchema)
     return `"${key}" = ${formattedValue}`
   }
 
@@ -66,11 +67,12 @@ const formatSqlValue = (value, fieldName, schema) => {
 
   const numericTypes = ['INTEGER', 'REAL', 'NUMERIC']
   if (numericTypes.includes(columnType)) {
-    const numericValue = Number(value)
+    const source = typeof value === 'string' ? value.trim() : value
+    const numericValue = Number(source)
     return isNaN(numericValue) ? 'NULL' : numericValue
   }
 
-  const stringValue = String(value)
+  const stringValue = typeof value === 'string' ? value.trim() : String(value)
   return `'${stringValue.replace(/'/g, "''")}'`
 }
 
@@ -304,17 +306,22 @@ export const EdgeSQLAdapter = {
 
   adaptUpdateColumn({ tableName, columnData, oldColumnData }) {
     const { name, type, default: defaultValue, notNull } = columnData || {}
-    const oldName = oldColumnData?.name || columnData?.oldName || name
+    const rawOldName = oldColumnData?.name || columnData?.oldName || name
+
+    const safeNewName = String(name ?? '').trim()
+    const safeOldName = String(rawOldName ?? '').trim()
+    const safeType = type ? String(type).trim() : ''
+    if (!safeNewName) throw new Error('Column name is required')
 
     const constraintParts = []
     if (notNull) constraintParts.push('NOT NULL')
-    const defaultClause = formatDefaultClause(defaultValue, type)
+    const defaultClause = formatDefaultClause(defaultValue, safeType)
     if (defaultClause) constraintParts.push(defaultClause)
 
-    const typePart = type ? ` ${type}` : ''
+    const typePart = safeType ? ` ${safeType}` : ''
     const constraintsPart = constraintParts.length ? ` ${constraintParts.join(' ')}` : ''
 
-    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${oldName}\`  \`${name}\`${typePart}${constraintsPart};`
+    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${safeOldName}\`  \`${safeNewName}\`${typePart}${constraintsPart};`
 
     return {
       statements: [query]
@@ -362,7 +369,7 @@ export const EdgeSQLAdapter = {
       if (prioritizedResults.length === 1) {
         prioritizedResults.push({
           columns: ['name', 'type'],
-          rows: [{ name: 'COUNT(*)', type: 'INTERGE' }],
+          rows: [{ name: 'COUNT(*)', type: 'INTEGER' }],
           statement: '-- synthetic: COUNT column schema',
           queryDurationMs: 0,
           rowsRead: 0,
@@ -462,7 +469,8 @@ export const EdgeSQLAdapter = {
     const valuesClause = columnNames
       .map((columnName) => {
         const value = dataToInsert[columnName]
-        return formatSqlValue(value, columnName, tableSchema)
+        const normalizedValue = typeof value === 'string' ? value.trim() : value
+        return formatSqlValue(normalizedValue, columnName, tableSchema)
       })
       .join(', ')
 
