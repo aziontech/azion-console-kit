@@ -166,10 +166,23 @@ const detectSelectTableNames = (stmts) => {
 }
 
 const appendPragmasForTables = (stmts, tableNames) => {
-  if (tableNames.size > 0) {
-    for (const name of tableNames) {
-      stmts.push(`; PRAGMA table_info("${name}");`)
-    }
+  if (tableNames.size === 0) return
+  // Determine if there is any non-COUNT SELECT among provided statements
+  const strStatements = Array.isArray(stmts)
+    ? stmts.filter((query) => typeof query === 'string')
+    : []
+  const hasAnySelect = strStatements.some((query) => /^\s*select\b/i.test(query))
+  const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
+  const allSelectsAreCountOnly =
+    hasAnySelect &&
+    strStatements
+      .filter((query) => /^\s*select\b/i.test(query))
+      .every((query) => countOnlyRegex.test(query))
+
+  if (!hasAnySelect || allSelectsAreCountOnly) return
+
+  for (const name of tableNames) {
+    stmts.push(`; PRAGMA table_info("${name}");`)
   }
 }
 
@@ -416,22 +429,36 @@ export function useEdgeSQL() {
       typeof stmt === 'string' ? splitIntoStatements(stmt) : []
     )
 
-    const isSelectQuery = flatStatements.some((stmt) => stmt.toLowerCase().startsWith('select'))
+    // Determine whether we should fetch metadata for SELECT queries
+    // Rule: If ALL SELECT statements are COUNT-only (e.g., SELECT COUNT(*) FROM ...), skip metadata.
+    // If there is at least one regular SELECT (columns or *), fetch metadata.
+    const selectStatements = flatStatements.filter((stmt) =>
+      String(stmt).trim().toLowerCase().startsWith('select')
+    )
+    const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
+    const hasAnySelect = selectStatements.length > 0
+    const allSelectsAreCountOnly =
+      hasAnySelect && selectStatements.every((stmt) => countOnlyRegex.test(stmt))
+    const shouldFetchMetadata = hasAnySelect && !allSelectsAreCountOnly
     let queryResults = []
 
     // helpers are defined at module scope
 
     try {
       const startTime = Date.now()
-      if (isSelectQuery) {
-        const tableNames = detectSelectTableNames(flatStatements)
-        appendPragmasForTables(statements, tableNames)
-        const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
-        queryResults = postprocessSelectResults(results, tableNames)
+      if (hasAnySelect) {
+        if (shouldFetchMetadata) {
+          const tableNames = detectSelectTableNames(flatStatements)
+          appendPragmasForTables(statements, tableNames)
+          const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
+          queryResults = postprocessSelectResults(results, tableNames)
+        } else {
+          // SELECT-only (e.g., COUNT(*)) without metadata: still use queryDatabase but skip PRAGMA and postprocess
+          const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
+          queryResults = results
+        }
       } else {
-        const { results } = await edgeSQLService.executeDatabase(databaseId, {
-          statements
-        })
+        const { results } = await edgeSQLService.executeDatabase(databaseId, { statements })
         queryResults = results
       }
 
@@ -444,7 +471,7 @@ export function useEdgeSQL() {
         })
       }
 
-      if (!isSelectQuery) {
+      if (!hasAnySelect) {
         toast.add({
           severity: 'success',
           summary: 'Success',

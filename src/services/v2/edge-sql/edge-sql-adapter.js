@@ -335,7 +335,7 @@ export const EdgeSQLAdapter = {
     }
   },
 
-  adaptQueryResult({ data }) {
+  adaptQueryResult({ data }, isCountSelect) {
     const processedResults = data.map((item) => ({
       columns: item.results?.columns || [],
       rows: formatRowsForDisplay(item.results?.rows || []),
@@ -346,10 +346,26 @@ export const EdgeSQLAdapter = {
     }))
 
     processedResults.forEach((result) => {
-      result.rows = mapRowsToObjects(result.columns, result.rows)
+      const columnNames = Array.isArray(result.columns)
+        ? result.columns.map((col) => (typeof col === 'string' ? col : col?.name))
+        : []
+      result.rows = mapRowsToObjects(columnNames, result.rows)
     })
 
     const prioritizedResults = this.prioritizeSelectResults(processedResults)
+
+    if (isCountSelect) {
+      if (prioritizedResults.length === 1) {
+        prioritizedResults.push({
+          columns: ['name', 'type'],
+          rows: [{ name: 'COUNT(*)', type: 'INTERGE' }],
+          statement: '-- synthetic: COUNT column schema',
+          queryDurationMs: 0,
+          rowsRead: 0,
+          rowsWritten: 0
+        })
+      }
+    }
 
     return {
       state: data?.state || 'executed',
@@ -368,6 +384,8 @@ export const EdgeSQLAdapter = {
         rowsRead: item.results?.rows_read,
         rowsWritten: item.results?.rows_written
       })) || []
+
+    // For COUNT-only queries, append a synthetic schema result for the view
 
     const prioritizedResults = this.prioritizeSelectResults(processedResults)
 

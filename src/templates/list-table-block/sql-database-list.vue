@@ -34,6 +34,9 @@
         },
         emptyMessage: {
           class: 'p-0 h-full'
+        },
+        footer: {
+          class: 'p-0 h-full'
         }
       }"
     >
@@ -288,6 +291,7 @@
     showGridlines: { type: Boolean, default: false },
     data: { type: Array, required: true },
     columns: { type: Array, required: true },
+    showInsertColumn: { type: Boolean, default: true },
     addButtonLabel: { type: String, default: '' },
     disabledAddButton: { type: Boolean, default: false },
     title: { type: String, required: true },
@@ -531,19 +535,23 @@
     emit('page', event)
   }
 
-  const items = [
-    {
-      icon: 'ai ai-column',
-      label: 'Insert Column',
-      command: () => insertColumnSplitEvent(),
-      visible: () => selectedView.value.value === 'table'
-    },
-    {
-      icon: 'pi pi-minus',
-      label: 'Insert Data',
-      command: () => insertRowSplitEvent()
+  const items = computed(() => {
+    const list = [
+      {
+        icon: 'pi pi-minus',
+        label: 'Insert Data',
+        command: () => insertRowSplitEvent()
+      }
+    ]
+    if (props.showInsertColumn) {
+      list.unshift({
+        icon: 'ai ai-column',
+        label: 'Insert Column',
+        command: () => insertColumnSplitEvent()
+      })
     }
-  ]
+    return list
+  })
 
   const insertColumnSplitEvent = async () => {
     selectedView.value = {
@@ -641,6 +649,9 @@
 </script>
 
 <style scoped>
+  :deep(.azion .p-datatable.p-datatable-gridlines .p-paginator-bottom) {
+    border-width: 0px !important;
+  }
   :deep(.p-column-title) {
     display: none !important;
   }

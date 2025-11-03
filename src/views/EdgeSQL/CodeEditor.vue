@@ -35,6 +35,7 @@
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
+                :loading="isExecutingQuery || isLoadingQuery"
                 @click="runQuery"
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
@@ -89,6 +90,7 @@
               :columns="resultColumns"
               data-testid="table-list"
               showGridlines
+              :showInsertColumn="false"
               :monacoTheme="monacoTheme"
               :delete-service="deleteService"
               :isLoading="isLoadingQuery"
@@ -372,14 +374,16 @@
       shouldNotEditRow.value = isNonEditableQuery(contentToRun)
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       // Adapter already filters schema based on returned rows
-      resultRows.value = results[0].rows
-      const schemaRows = results[results.length - 1].rows
-      resultColumns.value = schemaRows.map((column) => ({
-        field: column.name,
-        tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
-        header: column.name,
-        sortable: true
-      }))
+      resultRows.value = results[0]?.rows
+      const schemaRows = results[results.length - 1]?.rows
+      if (schemaRows) {
+        resultColumns.value = schemaRows.map((column) => ({
+          field: column.name,
+          tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
+          header: column.name,
+          sortable: true
+        }))
+      }
       resultSchema.value = schemaRows
       activeTableName.value = tableNameExecuted
       updateListHistory()

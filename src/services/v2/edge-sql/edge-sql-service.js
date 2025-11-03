@@ -136,7 +136,12 @@ export class EdgeSQLService extends BaseService {
       body
     })
 
-    return this.adapter?.adaptQueryResult?.(data)
+    const list = Array.isArray(statements) ? statements : [statements]
+    const isCountSelect = list
+      .filter((query) => typeof query === 'string')
+      .some((query) => /^\s*select\s+count\s*\(/i.test(query))
+
+    return this.adapter?.adaptQueryResult?.(data, isCountSelect)
   }
 
   executeDatabase = async (databaseId, { statements }) => {
@@ -148,7 +153,16 @@ export class EdgeSQLService extends BaseService {
       body
     })
 
-    return this.adapter?.adaptExecuteResult?.(data)
+    // Detect COUNT-only SELECT pattern to adjust columns naming
+    const list = Array.isArray(statements) ? statements : [statements]
+    const onlySelects = list.filter(
+      (query) => typeof query === 'string' && /^\s*select\b/i.test(query)
+    )
+    const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)/i
+    const isCountSelect =
+      onlySelects.length > 0 && onlySelects.every((query) => countOnlyRegex.test(query))
+
+    return this.adapter?.adaptExecuteResult?.(data, isCountSelect)
   }
 
   updatedRow = async (databaseId, { tableName, newData, whereData, tableSchema }) => {
