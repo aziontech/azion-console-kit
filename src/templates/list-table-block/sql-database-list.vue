@@ -94,7 +94,20 @@
                   }"
                   size="small"
                 />
-                <DataTable.Export />
+                <PrimeButton
+                  icon="pi pi-download"
+                  outlined
+                  iconOnly
+                  @click="toggleExportMenu($event)"
+                  v-tooltip.left="{ value: 'Export', showDelay: 200 }"
+                  size="small"
+                />
+                <Menu
+                  ref="exportMenuRef"
+                  :popup="true"
+                  :model="exportMenuItems"
+                />
+
                 <PrimeButton
                   icon="ai ai-column"
                   outlined
@@ -530,6 +543,64 @@
     })
     return base
   })
+
+  // Export dropdown logic
+  const exportMenuRef = ref(null)
+  const toggleExportMenu = (event) => {
+    if (exportMenuRef.value) exportMenuRef.value.toggle(event)
+  }
+
+  const getExportRows = () => editableData.value || []
+  const getExportFields = () =>
+    (props.columns || [])
+      .filter((column) => column?.field && column.field !== 'actions')
+      .map((column) => column.field)
+
+  const toCsv = (rows, fields) => {
+    const escapeCsv = (val) => {
+      if (val == null) return ''
+      const str = String(val)
+      if (/[,"\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"'
+      return str
+    }
+    const header = fields.map(escapeCsv).join(',')
+    const body = rows
+      .map((row) => fields.map((fieldName) => escapeCsv(row[fieldName])).join(','))
+      .join('\n')
+    return header + '\n' + body
+  }
+
+  const triggerDownload = (content, mime, filename) => {
+    const blob = new Blob([content], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const anchorEl = document.createElement('a')
+    anchorEl.href = url
+    anchorEl.download = filename
+    document.body.appendChild(anchorEl)
+    anchorEl.click()
+    document.body.removeChild(anchorEl)
+    URL.revokeObjectURL(url)
+  }
+
+  const exportAsCSV = () => {
+    const rows = getExportRows()
+    const fields = getExportFields()
+    const csv = toCsv(rows, fields)
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.csv`
+    triggerDownload(csv, 'text/csv;charset=utf-8;', filename)
+  }
+
+  const exportAsJSON = () => {
+    const rows = getExportRows()
+    const json = JSON.stringify(rows ?? [], null, 2)
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.json`
+    triggerDownload(json, 'application/json;charset=utf-8;', filename)
+  }
+
+  const exportMenuItems = computed(() => [
+    { label: 'Export all to .csv', icon: 'pi pi-file', command: exportAsCSV },
+    { label: 'Export all to .json', icon: 'pi pi-code', command: exportAsJSON }
+  ])
 
   const onViewChange = ({ value }) => {
     if (!value) return
