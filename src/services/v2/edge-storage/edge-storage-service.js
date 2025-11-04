@@ -17,7 +17,7 @@ export class EdgeStorageService extends BaseService {
         fields: '',
         ordering: 'name',
         page: 1,
-        pageSize: 100,
+        pageSize: 10,
         ...params
       }
     })
@@ -38,7 +38,12 @@ export class EdgeStorageService extends BaseService {
   listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects?all_levels=${all_levels}&prefix=${prefix}&max_object_count=100`
+      url: `${this.baseURL}/${bucketName}/objects`,
+      params: {
+        all_levels,
+        prefix,
+        max_object_count: 110
+      }
     })
 
     return this.adapter?.transformListEdgeStorageFiles?.(data)

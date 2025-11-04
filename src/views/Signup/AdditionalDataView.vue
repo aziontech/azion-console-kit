@@ -33,7 +33,6 @@
           class="card w-full surface-border border rounded-md surface-section p-6 flex flex-col gap-8 xl:p-8"
         >
           <AdditionalDataFormBlock
-            :listAdditionalDataInfoService="listAdditionalDataInfoService"
             :postAdditionalDataService="postAdditionalDataService"
             :patchFullnameService="patchFullnameService"
             :updateAccountInfoService="updateAccountInfoService"
@@ -95,10 +94,6 @@
   }
 
   defineProps({
-    listAdditionalDataInfoService: {
-      type: Function,
-      required: true
-    },
     postAdditionalDataService: {
       type: Function,
       required: true
