@@ -142,6 +142,7 @@
   const activeView = ref('table')
 
   const handleViewChange = (event) => {
+    if (!event) return
     activeView.value = event.value
   }
 
@@ -284,10 +285,10 @@
     selectedTable.value = table
     try {
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
-      columns.value = result.body.columns.map(({ columns }) => ({
-        field: columns.name,
-        tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
-        header: columns.name,
+      columns.value = result.body.tableSchema.map(({ name, type }) => ({
+        field: name,
+        tagType: type?.toLowerCase?.() ?? String(type || ''),
+        header: name,
         sortable: true
       }))
 
