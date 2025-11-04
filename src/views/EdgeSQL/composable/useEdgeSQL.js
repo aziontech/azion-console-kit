@@ -3,15 +3,44 @@ import { convertValueToDate } from '@/helpers/convert-date'
 import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 import { useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { getSchemaCache } from '@/services/v2/edge-sql/utils/schema-helpers'
+
+// EdgeSQL composable: Single source of UI-facing state and actions for running queries
+// and presenting results. Keeps responsibilities clear and small, delegates schema
+// concerns to helpers and service.
 
 // Global state to share between components
 let globalState = null
 
+// LocalStorage keys used by this feature
 const STORAGE_KEYS = {
   QUERY_HISTORY: 'edge_sql_query_history',
   CURRENT_DATABASE: 'edge_sql_current_database'
 }
 
+// SQL parsing helpers and constants
+const JOIN_KEYWORDS = [
+  'INNER JOIN',
+  'LEFT JOIN',
+  'RIGHT JOIN',
+  'FULL JOIN',
+  'FULL OUTER JOIN',
+  'LEFT OUTER JOIN',
+  'RIGHT OUTER JOIN',
+  'CROSS JOIN',
+  'NATURAL JOIN',
+  'JOIN'
+]
+
+const NON_EDITABLE_KEYWORDS = ['PRAGMA', 'COUNT(', 'ROUND(']
+
+const normalizeSql = (query) =>
+  String(query || '')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+
+// Storage helpers
 const getDatabaseSpecificKey = (baseKey, databaseName) => {
   return databaseName ? `${baseKey}_${databaseName}` : baseKey
 }
@@ -40,84 +69,12 @@ const loadHistoryFromStorage = (databaseName = null) => {
   return adaptHistory(rawHistory)
 }
 
-const detectQueryType = (query) => {
-  if (!query || typeof query !== 'string') return 'execute'
-
-  const normalizedQuery = Array.isArray(query)
-    ? query[0].trim().toUpperCase()
-    : query.trim().toUpperCase()
-
-  if (normalizedQuery.startsWith('SELECT')) return 'query'
-  if (normalizedQuery.startsWith('INSERT')) return 'insert'
-  if (normalizedQuery.startsWith('UPDATE')) return 'update'
-  if (normalizedQuery.startsWith('DELETE')) return 'delete'
-  if (normalizedQuery.startsWith('CREATE')) return 'create'
-  if (normalizedQuery.startsWith('ALTER')) return 'alter'
-  if (normalizedQuery.startsWith('DROP')) return 'drop'
-  if (normalizedQuery.startsWith('PRAGMA')) return 'pragma'
-  return 'execute'
-}
-
-const handleType = (type) => {
-  switch (type) {
-    case 'query':
-      return {
-        content: 'SELECT',
-        severity: 'info'
-      }
-    case 'insert':
-      return {
-        content: 'INSERT',
-        severity: 'success'
-      }
-    case 'update':
-      return {
-        content: 'UPDATE',
-        severity: 'warn'
-      }
-    case 'delete':
-      return {
-        content: 'DELETE',
-        severity: 'danger'
-      }
-    case 'create':
-      return {
-        content: 'CREATE',
-        severity: 'success'
-      }
-    case 'alter':
-      return {
-        content: 'ALTER',
-        severity: 'warn'
-      }
-    case 'drop':
-      return {
-        content: 'DROP',
-        severity: 'danger'
-      }
-    case 'pragma':
-      return {
-        content: 'PRAGMA',
-        severity: 'info'
-      }
-    case 'execute':
-      return {
-        content: 'EXECUTE',
-        severity: 'success'
-      }
-    default:
-      return {
-        content: 'UNKNOWN',
-        severity: 'secondary'
-      }
-  }
-}
-
 const truncateQuery = (query, maxLength = 100) => {
   if (query.length <= maxLength) return query
   return query.substring(0, maxLength) + '...'
 }
 
+// Normalizes history items for display
 const adaptHistory = (histories) => {
   if (!Array.isArray(histories)) return []
 
@@ -135,12 +92,12 @@ const adaptHistory = (histories) => {
       executionTime: `${history.executionTime} ms`,
       query: truncateQuery(history.originalQuery || history.query),
       originalQuery: history.originalQuery || history.query,
-      timestamp: convertValueToDate(history.timestamp),
-      type: handleType(history.type)
+      timestamp: convertValueToDate(history.timestamp)
     }
   })
 }
 
+// Extracts table names referenced in SELECT statements
 const detectSelectTableNames = (stmts) => {
   const tableNames = new Set()
   for (const stmtCandidate of stmts) {
@@ -165,28 +122,13 @@ const detectSelectTableNames = (stmts) => {
   return tableNames
 }
 
-const appendPragmasForTables = (stmts, tableNames) => {
-  if (tableNames.size === 0) return
-  // Determine if there is any non-COUNT SELECT among provided statements
-  const strStatements = Array.isArray(stmts)
-    ? stmts.filter((query) => typeof query === 'string')
-    : []
-  const hasAnySelect = strStatements.some((query) => /^\s*select\b/i.test(query))
-  const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
-  const allSelectsAreCountOnly =
-    hasAnySelect &&
-    strStatements
-      .filter((query) => /^\s*select\b/i.test(query))
-      .every((query) => countOnlyRegex.test(query))
-
-  if (!hasAnySelect || allSelectsAreCountOnly) return
-
-  for (const name of tableNames) {
-    stmts.push(`; PRAGMA table_info("${name}");`)
-  }
-}
-
-const postprocessSelectResults = (results, tableNames) => {
+// Appends a schema item to results. Uses API columns for aliased/COUNT,
+// otherwise merges cached schema filtered by present fields.
+const postprocessSelectResults = (
+  results,
+  tableNames,
+  { databaseId, queryHasAlias, isCountSelect }
+) => {
   if (!Array.isArray(results) || results.length === 0) return results
 
   const dataResult = results[0]
@@ -198,29 +140,89 @@ const postprocessSelectResults = (results, tableNames) => {
     Object.keys(row || {}).forEach((keyName) => presentFields.add(keyName))
   }
 
-  let nextResults = results.slice()
-  if (tableNames.size > 0 && results.length >= 1 + tableNames.size) {
-    const schemaResults = results.slice(results.length - tableNames.size)
-    const mergedSchemaRows = schemaResults.flatMap((schemaRes) =>
-      Array.isArray(schemaRes?.rows) ? schemaRes.rows : []
-    )
-    const filteredMerged = presentFields.size
-      ? mergedSchemaRows.filter((col) => presentFields.has(col?.name))
-      : mergedSchemaRows
-    nextResults = results.slice(0, results.length - tableNames.size)
-    const baseSchema = schemaResults[schemaResults.length - 1] || {}
-    nextResults.push({ ...baseSchema, rows: filteredMerged })
-  } else if (results.length >= 2) {
-    // Single schema case (backward compatible)
-    const schemaResult = results[results.length - 1]
-    const schemaRows = Array.isArray(schemaResult?.rows) ? schemaResult.rows : []
-    const filteredSchemaRows = presentFields.size
-      ? schemaRows.filter((col) => presentFields.has(col?.name))
-      : schemaRows
-    nextResults[results.length - 1] = { ...schemaResult, rows: filteredSchemaRows }
+  // If aliased or count-only, generate schema from API-returned columns
+  if (queryHasAlias || isCountSelect) {
+    return buildSchemaFromApiColumns(results)
   }
-  return nextResults
+
+  // Merge cached schema for detected tables
+  let mergedSchemaRows = []
+  if (tableNames && tableNames.size > 0 && databaseId) {
+    for (const name of tableNames) {
+      const cached = getSchemaCache(databaseId, name) || []
+      mergedSchemaRows = mergedSchemaRows.concat(cached)
+    }
+  }
+
+  const filteredMerged = presentFields.size
+    ? mergedSchemaRows.filter((col) => presentFields.has(col?.name))
+    : mergedSchemaRows
+
+  const schemaResult = {
+    columns: ['name', 'type'],
+    rows: filteredMerged,
+    statement: '-- cached: table schema',
+    queryDurationMs: 0,
+    rowsRead: 0,
+    rowsWritten: 0
+  }
+
+  return [...results, schemaResult]
 }
+
+// Derive column names from object-shaped rows
+const deriveNamesFromRows = (rows) => {
+  const present = new Set()
+  for (const row of rows) Object.keys(row || {}).forEach((keyName) => present.add(keyName))
+  return Array.from(present)
+}
+
+// Build a standardized schema result item from a list of names
+const buildSchemaItem = (names) => ({
+  columns: ['name', 'type'],
+  rows: names.map((colName) => ({ name: colName, type: null })),
+  statement: '-- generated: api columns',
+  queryDurationMs: 0,
+  rowsRead: 0,
+  rowsWritten: 0
+})
+
+// Convert array-of-values rows into object rows using provided column names
+const zipRowsWithColumns = (columns, rows) =>
+  rows.map((rowArray) => {
+    const obj = {}
+    for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+      obj[columns[columnIndex]] = rowArray[columnIndex]
+    }
+    return obj
+  })
+
+// From API result, return normalized data + a schema item.
+// If rows are arrays, zip with columns; else infer names and append schema.
+const buildSchemaFromApiColumns = (results) => {
+  if (!Array.isArray(results) || results.length === 0) return results
+  const dataResult = results[0]
+  const columns = Array.isArray(dataResult?.columns) ? dataResult.columns : null
+  const rows = Array.isArray(dataResult?.rows) ? dataResult.rows : []
+
+  if (columns && columns.length && Array.isArray(rows[0])) {
+    const normalizedRows = zipRowsWithColumns(columns, rows)
+    const dataFixed = { ...dataResult, columns, rows: normalizedRows }
+    const schemaItem = buildSchemaItem(columns)
+    return [dataFixed, schemaItem]
+  }
+
+  const names = columns && columns.length ? columns : deriveNamesFromRows(rows)
+  const schemaItem = buildSchemaItem(names)
+  return [...results, schemaItem]
+}
+
+// Split raw SQL text into executable statements
+const splitIntoStatements = (query) =>
+  String(query)
+    .split(';')
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0)
 
 export function useEdgeSQL() {
   // Return existing global state if it exists
@@ -245,43 +247,20 @@ export function useEdgeSQL() {
   const currentDatabaseName = computed(() => currentDatabase.value?.name || '')
   const tablesCount = computed(() => currentTables.value.length)
 
-  // Function to detect non-editable queries (JOIN operations, PRAGMA, COUNT, etc.)
+  // Detects non-editable queries (JOIN operations, PRAGMA, COUNT, etc.)
   const isNonEditableQuery = (query) => {
     if (!query || typeof query !== 'string') return false
 
-    const joinKeywords = [
-      'INNER JOIN',
-      'LEFT JOIN',
-      'RIGHT JOIN',
-      'FULL JOIN',
-      'FULL OUTER JOIN',
-      'LEFT OUTER JOIN',
-      'RIGHT OUTER JOIN',
-      'CROSS JOIN',
-      'NATURAL JOIN',
-      'JOIN' // Generic JOIN
-    ]
-
-    const nonEditableKeywords = ['PRAGMA', 'COUNT(', 'ROUND(']
-
-    const normalizedQuery = query.toUpperCase().replace(/\s+/g, ' ').trim()
-
-    // Check for JOIN operations
-    const hasJoin = joinKeywords.some((keyword) => normalizedQuery.includes(keyword))
-
-    // Check for non-editable query types
-    const hasNonEditableQuery = nonEditableKeywords.some((keyword) =>
+    const normalizedQuery = normalizeSql(query)
+    const hasJoin = JOIN_KEYWORDS.some((keyword) => normalizedQuery.includes(keyword))
+    const hasNonEditableQuery = NON_EDITABLE_KEYWORDS.some((keyword) =>
       normalizedQuery.includes(keyword)
     )
-
     return hasJoin || hasNonEditableQuery
   }
 
   // Check if current query is non-editable
-  const isNonEditableQueryResult = computed(() => {
-    const result = isNonEditableQuery(currentQueryText.value)
-    return result
-  })
+  const isNonEditableQueryResult = computed(() => isNonEditableQuery(currentQueryText.value))
 
   const setDatabases = (newDatabases) => {
     databases.value = newDatabases
@@ -338,8 +317,7 @@ export function useEdgeSQL() {
       id: Date.now() + Math.random(),
       databaseId: currentDatabase.value?.id,
       databaseName: currentDatabase.value?.name,
-      originalQuery: result.query,
-      type: detectQueryType(result.query)
+      originalQuery: result.query
     }
 
     // Save raw data to localStorage with database-specific key
@@ -419,51 +397,37 @@ export function useEdgeSQL() {
 
     const databaseId = currentDatabase.value?.id || route.params.id
     const statements = Array.isArray(query) ? [...query] : [query]
-    const splitIntoStatements = (query) =>
-      String(query)
-        .split(';')
-        .map((part) => part.trim())
-        .filter((part) => part.length > 0)
-
     const flatStatements = statements.flatMap((stmt) =>
       typeof stmt === 'string' ? splitIntoStatements(stmt) : []
     )
 
     // Determine whether we should fetch metadata for SELECT queries
     // Rule: If ALL SELECT statements are COUNT-only (e.g., SELECT COUNT(*) FROM ...), skip metadata.
-    // If there is at least one regular SELECT (columns or *), fetch metadata.
     const selectStatements = flatStatements.filter((stmt) =>
       String(stmt).trim().toLowerCase().startsWith('select')
     )
-    const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
     const hasAnySelect = selectStatements.length > 0
-    const allSelectsAreCountOnly =
-      hasAnySelect && selectStatements.every((stmt) => countOnlyRegex.test(stmt))
-    const shouldFetchMetadata = hasAnySelect && !allSelectsAreCountOnly
     let queryResults = []
     let tableNameExecuted
-
-    // helpers are defined at module scope
 
     try {
       const startTime = Date.now()
       if (hasAnySelect) {
-        if (shouldFetchMetadata) {
-          const tableNames = detectSelectTableNames(flatStatements)
-          tableNameExecuted = Array.from(tableNames)[0]
-          appendPragmasForTables(statements, tableNames)
-          const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
-          queryResults = postprocessSelectResults(results, tableNames)
-        } else {
-          // SELECT-only (e.g., COUNT(*)) without metadata: still use queryDatabase but skip PRAGMA and postprocess
-          const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
-          queryResults = results
-          const tableNames = detectSelectTableNames(flatStatements)
-          tableNameExecuted = Array.from(tableNames)[0]
-        }
+        const tableNames = detectSelectTableNames(flatStatements)
+        tableNameExecuted = Array.from(tableNames)[0]
+        const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
+        const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
+        const isCountSelect =
+          selectStatements.length > 0 && selectStatements.every((stmt) => countOnlyRegex.test(stmt))
+        const queryHasAlias = flatStatements.some((stmt) => /\bas\s+\w+/i.test(String(stmt)))
+        queryResults = postprocessSelectResults(results, tableNames, {
+          databaseId,
+          queryHasAlias,
+          isCountSelect
+        })
       } else {
         const { results } = await edgeSQLService.executeDatabase(databaseId, { statements })
-        queryResults = results
+        queryResults = buildSchemaFromApiColumns(results)
       }
 
       if (addToHistory) {

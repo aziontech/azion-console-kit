@@ -2,6 +2,14 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeSQLAdapter } from './edge-sql-adapter'
 import { extractAffectedTableNames } from '../utils/statement-utils'
+import {
+  getSchemaCache,
+  invalidateSchemaCache,
+  refreshAllSchemasCache,
+  refreshSchemaCache,
+  adaptTableInfoWithCache,
+  adaptTableInfoFromCache
+} from './utils/schema-helpers'
 
 export class EdgeSQLService extends BaseService {
   constructor() {
@@ -117,7 +125,14 @@ export class EdgeSQLService extends BaseService {
       if (onlyTables.length) {
         Promise.resolve().then(async () => {
           try {
-            await this._refreshAllSchemasCache(databaseId, onlyTables)
+            await refreshAllSchemasCache(
+              this.http,
+              this.baseURL,
+              databaseId,
+              onlyTables,
+              this.adapter,
+              this.SCHEMA_CACHE_TTL_MS
+            )
           } catch {
             console.error('Failed to refresh schema cache')
           }
@@ -134,7 +149,7 @@ export class EdgeSQLService extends BaseService {
   }
 
   getTableInfo = async (databaseId, tableName) => {
-    const cachedSchema = this._getSchemaCache(databaseId, tableName)
+    const cachedSchema = getSchemaCache(databaseId, tableName)
     const needSchema = cachedSchema == null
     const statements = this.adapter?.buildTableInfoStatements?.(tableName, needSchema)
 
@@ -145,11 +160,17 @@ export class EdgeSQLService extends BaseService {
     })
 
     if (needSchema) {
-      const adapted = await this._adaptTableInfoWithCache(databaseId, tableName, data)
+      const adapted = await adaptTableInfoWithCache(
+        databaseId,
+        tableName,
+        data,
+        this.adapter,
+        this.SCHEMA_CACHE_TTL_MS
+      )
       return { count: adapted?.rows?.length, body: adapted }
     }
 
-    const adapted = this._adaptTableInfoFromCache(cachedSchema, data)
+    const adapted = adaptTableInfoFromCache(cachedSchema, data, this.adapter)
     return { count: adapted?.rows?.length, body: adapted }
   }
 
@@ -173,9 +194,16 @@ export class EdgeSQLService extends BaseService {
       const affected = extractAffectedTableNames(statements)
       for (const item of affected) {
         if (item.action === 'drop') {
-          this._invalidateSchemaCache(databaseId, item.table)
+          invalidateSchemaCache(databaseId, item.table)
         } else {
-          await this._refreshSchemaCache(databaseId, item.table)
+          await refreshSchemaCache(
+            this.http,
+            this.baseURL,
+            databaseId,
+            item.table,
+            this.adapter,
+            this.SCHEMA_CACHE_TTL_MS
+          )
         }
       }
     } catch {
@@ -206,12 +234,19 @@ export class EdgeSQLService extends BaseService {
     const result = this.adapter?.adaptExecuteResult?.(data, isCountSelect)
     // Detect schema mutations and refresh cache
     try {
-      const affected = this._extractAffectedTableNames(statements)
+      const affected = extractAffectedTableNames(statements)
       for (const item of affected) {
         if (item.action === 'drop') {
-          this._invalidateSchemaCache(databaseId, item.table)
+          invalidateSchemaCache(databaseId, item.table)
         } else {
-          await this._refreshSchemaCache(databaseId, item.table)
+          await refreshSchemaCache(
+            this.http,
+            this.baseURL,
+            databaseId,
+            item.table,
+            this.adapter,
+            this.SCHEMA_CACHE_TTL_MS
+          )
         }
       }
     } catch {
@@ -255,7 +290,14 @@ export class EdgeSQLService extends BaseService {
 
     const adapted = this.adapter?.adaptExecuteResult?.(data)
     try {
-      await this._refreshSchemaCache(databaseId, tableName)
+      await refreshSchemaCache(
+        this.http,
+        this.baseURL,
+        databaseId,
+        tableName,
+        this.adapter,
+        this.SCHEMA_CACHE_TTL_MS
+      )
     } catch {
       console.error('Failed to refresh schema cache')
     }
@@ -273,99 +315,21 @@ export class EdgeSQLService extends BaseService {
     try {
       const affected = extractAffectedTableNames(statements)
       for (const item of affected) {
-        if (item.action === 'drop') this._invalidateSchemaCache(databaseId, item.table)
-        else await this._refreshSchemaCache(databaseId, item.table)
+        if (item.action === 'drop') invalidateSchemaCache(databaseId, item.table)
+        else
+          await refreshSchemaCache(
+            this.http,
+            this.baseURL,
+            databaseId,
+            item.table,
+            this.adapter,
+            this.SCHEMA_CACHE_TTL_MS
+          )
       }
     } catch {
       console.error('Failed to refresh schema cache')
     }
     return adapted
-  }
-
-  // ===== Schema cache helpers =====
-  _schemaCacheKey(databaseId, tableName) {
-    return `edgeSql:schema:${databaseId}:${tableName}`
-  }
-  _getSchemaCache(databaseId, tableName) {
-    try {
-      const key = this._schemaCacheKey(databaseId, tableName)
-      const raw = localStorage.getItem(key)
-      if (!raw) return null
-      const parsed = JSON.parse(raw)
-      if (!parsed || typeof parsed !== 'object') return null
-      const now = Date.now()
-      if (parsed.expiresAt && now < parsed.expiresAt) {
-        return parsed.schema || null
-      }
-      localStorage.removeItem(key)
-      return null
-    } catch {
-      return null
-    }
-  }
-  async _setSchemaCache(databaseId, tableName, schema) {
-    try {
-      const key = this._schemaCacheKey(databaseId, tableName)
-      const payload = {
-        schema,
-        expiresAt: Date.now() + this.SCHEMA_CACHE_TTL_MS
-      }
-      localStorage.setItem(key, JSON.stringify(payload))
-    } catch {
-      console.error('Failed to set schema cache')
-    }
-  }
-  _invalidateSchemaCache(databaseId, tableName) {
-    try {
-      const key = this._schemaCacheKey(databaseId, tableName)
-      localStorage.removeItem(key)
-    } catch {
-      console.error('Failed to invalidate schema cache')
-    }
-  }
-  async _refreshSchemaCache(databaseId, tableName) {
-    // Fetch latest table schema for a single table using PRAGMA and cache
-    await this._refreshAllSchemasCache(databaseId, [tableName])
-    return this._getSchemaCache(databaseId, tableName) || []
-  }
-  async _refreshAllSchemasCache(databaseId, tableNames) {
-    try {
-      const safeNames = Array.isArray(tableNames) ? tableNames.filter(Boolean) : []
-      if (!safeNames.length) return
-      const statements = safeNames.map((name) => `PRAGMA table_info("${name}");`)
-      const { data } = await this.http.request({
-        url: `${this.baseURL}/${databaseId}/query`,
-        method: 'POST',
-        body: { statements }
-      })
-      // data is an array aligned with statements order
-      for (let index = 0; index < safeNames.length; index++) {
-        const name = safeNames[index]
-        const res = data.data[index].results
-        const rows = res.rows || []
-        const tableSchema = this.adapter?.adaptTableSchemaFromPragmaRows?.(rows) || []
-        await this._setSchemaCache(databaseId, name, tableSchema)
-      }
-    } catch {
-      console.error('Failed to refresh schema cache')
-    }
-  }
-  getCachedTableSchema(databaseId, tableName) {
-    return this._getSchemaCache(databaseId, tableName)
-  }
-
-  async _adaptTableInfoWithCache(databaseId, tableName, data) {
-    const adapted = this.adapter?.adaptTableInfo?.(data)
-    try {
-      await this._setSchemaCache(databaseId, tableName, adapted?.tableSchema || [])
-    } catch {
-      console.error('Failed to set schema cache')
-    }
-    return adapted
-  }
-
-  _adaptTableInfoFromCache(schema, data) {
-    return this.adapter?.adaptTableInfo?.(data, schema)
   }
 }
 
