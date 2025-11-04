@@ -154,13 +154,31 @@ const postprocessSelectResults = (
     }
   }
 
+  const apiColumns = Array.isArray(dataResult?.columns) ? dataResult.columns : null
   const filteredMerged = presentFields.size
     ? mergedSchemaRows.filter((col) => presentFields.has(col?.name))
     : mergedSchemaRows
 
+  // If API provided columns, use them as source of truth for multiplicity and order
+  let finalSchemaRows
+  if (apiColumns && apiColumns.length) {
+    // Fast index by name for cache lookups (first match wins)
+    const byName = new Map()
+    for (const col of filteredMerged) {
+      if (!col?.name || byName.has(col.name)) continue
+      byName.set(col.name, col)
+    }
+    finalSchemaRows = apiColumns.map(
+      (colName) => byName.get(colName) || { name: colName, type: null }
+    )
+  } else {
+    // Fallback: no columns array; keep filtered cache result
+    finalSchemaRows = filteredMerged
+  }
+
   const schemaResult = {
     columns: ['name', 'type'],
-    rows: filteredMerged,
+    rows: finalSchemaRows,
     statement: '-- cached: table schema',
     queryDurationMs: 0,
     rowsRead: 0,
