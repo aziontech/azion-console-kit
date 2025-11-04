@@ -1,11 +1,14 @@
+/* eslint-disable no-console */
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeSQLAdapter } from './edge-sql-adapter'
+import { extractAffectedTableNames } from '../utils/statement-utils'
 
 export class EdgeSQLService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeSQLAdapter
     this.baseURL = 'v4/edge_sql/databases'
+    this.SCHEMA_CACHE_TTL_MS = 5 * 60 * 60 * 1000 // 5 hours
   }
 
   _formatSuccessResponse(data, feedback = null, additionalData = {}) {
@@ -104,6 +107,25 @@ export class EdgeSQLService extends BaseService {
     })
 
     const adaptedData = this.adapter?.adaptTablesFromQuery?.(data)
+    // Warm schema cache for all tables in a single batched request (best-effort, non-blocking)
+    try {
+      const tables = Array.isArray(adaptedData) ? adaptedData : []
+      const onlyTables = tables
+        .filter((table) => (table?.type || 'table').toLowerCase() === 'table')
+        .map((table) => table?.name)
+        .filter(Boolean)
+      if (onlyTables.length) {
+        Promise.resolve().then(async () => {
+          try {
+            await this._refreshAllSchemasCache(databaseId, onlyTables)
+          } catch {
+            console.error('Failed to refresh schema cache')
+          }
+        })
+      }
+    } catch {
+      console.error('Failed to refresh schema cache')
+    }
     return {
       body: {
         tables: adaptedData
@@ -112,19 +134,23 @@ export class EdgeSQLService extends BaseService {
   }
 
   getTableInfo = async (databaseId, tableName) => {
+    const cachedSchema = this._getSchemaCache(databaseId, tableName)
+    const needSchema = cachedSchema == null
+    const statements = this.adapter?.buildTableInfoStatements?.(tableName, needSchema)
+
     const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
-      body: {
-        statements: [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
-      }
+      body: { statements }
     })
 
-    const adaptedData = this.adapter?.adaptTableInfo?.(data)
-    return {
-      count: adaptedData?.rows?.length,
-      body: adaptedData
+    if (needSchema) {
+      const adapted = await this._adaptTableInfoWithCache(databaseId, tableName, data)
+      return { count: adapted?.rows?.length, body: adapted }
     }
+
+    const adapted = this._adaptTableInfoFromCache(cachedSchema, data)
+    return { count: adapted?.rows?.length, body: adapted }
   }
 
   queryDatabase = async (databaseId, { statements }) => {
@@ -141,7 +167,22 @@ export class EdgeSQLService extends BaseService {
       .filter((query) => typeof query === 'string')
       .some((query) => /^\s*select\s+count\s*\(/i.test(query))
 
-    return this.adapter?.adaptQueryResult?.(data, isCountSelect)
+    const result = this.adapter?.adaptQueryResult?.(data, isCountSelect)
+    // Detect schema mutations and refresh cache
+    try {
+      const affected = extractAffectedTableNames(statements)
+      for (const item of affected) {
+        if (item.action === 'drop') {
+          this._invalidateSchemaCache(databaseId, item.table)
+        } else {
+          await this._refreshSchemaCache(databaseId, item.table)
+        }
+      }
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error('Failed to refresh schema cache')
+    }
+    return result
   }
 
   executeDatabase = async (databaseId, { statements }) => {
@@ -162,7 +203,21 @@ export class EdgeSQLService extends BaseService {
     const isCountSelect =
       onlySelects.length > 0 && onlySelects.every((query) => countOnlyRegex.test(query))
 
-    return this.adapter?.adaptExecuteResult?.(data, isCountSelect)
+    const result = this.adapter?.adaptExecuteResult?.(data, isCountSelect)
+    // Detect schema mutations and refresh cache
+    try {
+      const affected = this._extractAffectedTableNames(statements)
+      for (const item of affected) {
+        if (item.action === 'drop') {
+          this._invalidateSchemaCache(databaseId, item.table)
+        } else {
+          await this._refreshSchemaCache(databaseId, item.table)
+        }
+      }
+    } catch {
+      console.error('Failed to refresh schema cache')
+    }
+    return result
   }
 
   updatedRow = async (databaseId, { tableName, newData, whereData, tableSchema }) => {
@@ -198,7 +253,13 @@ export class EdgeSQLService extends BaseService {
       body
     })
 
-    return this.adapter?.adaptExecuteResult?.(data)
+    const adapted = this.adapter?.adaptExecuteResult?.(data)
+    try {
+      await this._refreshSchemaCache(databaseId, tableName)
+    } catch {
+      console.error('Failed to refresh schema cache')
+    }
+    return adapted
   }
 
   updateColumn = async (databaseId, { statements }) => {
@@ -208,7 +269,103 @@ export class EdgeSQLService extends BaseService {
       body: { statements }
     })
 
-    return this.adapter?.adaptExecuteResult?.(data)
+    const adapted = this.adapter?.adaptExecuteResult?.(data)
+    try {
+      const affected = extractAffectedTableNames(statements)
+      for (const item of affected) {
+        if (item.action === 'drop') this._invalidateSchemaCache(databaseId, item.table)
+        else await this._refreshSchemaCache(databaseId, item.table)
+      }
+    } catch {
+      console.error('Failed to refresh schema cache')
+    }
+    return adapted
+  }
+
+  // ===== Schema cache helpers =====
+  _schemaCacheKey(databaseId, tableName) {
+    return `edgeSql:schema:${databaseId}:${tableName}`
+  }
+  _getSchemaCache(databaseId, tableName) {
+    try {
+      const key = this._schemaCacheKey(databaseId, tableName)
+      const raw = localStorage.getItem(key)
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object') return null
+      const now = Date.now()
+      if (parsed.expiresAt && now < parsed.expiresAt) {
+        return parsed.schema || null
+      }
+      localStorage.removeItem(key)
+      return null
+    } catch {
+      return null
+    }
+  }
+  async _setSchemaCache(databaseId, tableName, schema) {
+    try {
+      const key = this._schemaCacheKey(databaseId, tableName)
+      const payload = {
+        schema,
+        expiresAt: Date.now() + this.SCHEMA_CACHE_TTL_MS
+      }
+      localStorage.setItem(key, JSON.stringify(payload))
+    } catch {
+      console.error('Failed to set schema cache')
+    }
+  }
+  _invalidateSchemaCache(databaseId, tableName) {
+    try {
+      const key = this._schemaCacheKey(databaseId, tableName)
+      localStorage.removeItem(key)
+    } catch {
+      console.error('Failed to invalidate schema cache')
+    }
+  }
+  async _refreshSchemaCache(databaseId, tableName) {
+    // Fetch latest table schema for a single table using PRAGMA and cache
+    await this._refreshAllSchemasCache(databaseId, [tableName])
+    return this._getSchemaCache(databaseId, tableName) || []
+  }
+  async _refreshAllSchemasCache(databaseId, tableNames) {
+    try {
+      const safeNames = Array.isArray(tableNames) ? tableNames.filter(Boolean) : []
+      if (!safeNames.length) return
+      const statements = safeNames.map((name) => `PRAGMA table_info("${name}");`)
+      const { data } = await this.http.request({
+        url: `${this.baseURL}/${databaseId}/query`,
+        method: 'POST',
+        body: { statements }
+      })
+      // data is an array aligned with statements order
+      for (let index = 0; index < safeNames.length; index++) {
+        const name = safeNames[index]
+        const res = data.data[index].results
+        const rows = res.rows || []
+        const tableSchema = this.adapter?.adaptTableSchemaFromPragmaRows?.(rows) || []
+        await this._setSchemaCache(databaseId, name, tableSchema)
+      }
+    } catch {
+      console.error('Failed to refresh schema cache')
+    }
+  }
+  getCachedTableSchema(databaseId, tableName) {
+    return this._getSchemaCache(databaseId, tableName)
+  }
+
+  async _adaptTableInfoWithCache(databaseId, tableName, data) {
+    const adapted = this.adapter?.adaptTableInfo?.(data)
+    try {
+      await this._setSchemaCache(databaseId, tableName, adapted?.tableSchema || [])
+    } catch {
+      console.error('Failed to set schema cache')
+    }
+    return adapted
+  }
+
+  _adaptTableInfoFromCache(schema, data) {
+    return this.adapter?.adaptTableInfo?.(data, schema)
   }
 }
 

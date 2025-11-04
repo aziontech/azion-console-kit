@@ -532,6 +532,7 @@
   })
 
   const onViewChange = ({ value }) => {
+    if (!value) return
     emit('view-change', value)
   }
 

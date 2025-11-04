@@ -251,35 +251,28 @@ export const EdgeSQLAdapter = {
     }))
   },
 
-  adaptTableInfo({ data }) {
+  adaptTableInfo({ data }, tableSchema) {
     const tableInfo = data[0]
-    const tableData = data[1]
-
-    const columns = tableInfo.results.rows.map((row) => ({
-      columns: {
-        name: row[1],
-        type: row[2]
-      }
-    }))
-
-    const tableSchema = tableInfo.results.rows.map((row, index) => ({
-      id: index,
-      name: row[1],
-      type: row[2],
-      notNull: row[3],
-      default: row[4],
-      primaryKey: row[5]
-    }))
-
-    const rows = formatRowsForDisplay(tableData.results?.rows || [])
-    const columnNames = columns.map((col) => col.columns.name)
+    const rows = formatRowsForDisplay(tableInfo.results?.rows || [])
+    const columnNames = tableSchema.map((col) => col.name)
     const mappedRows = mapRowsToObjects(columnNames, rows)
 
     return {
-      columns,
       rows: mappedRows,
       tableSchema
     }
+  },
+
+  adaptTableSchemaFromPragmaRows(rows) {
+    const safeRows = Array.isArray(rows) ? rows : []
+    return safeRows.map((row, index) => ({
+      id: index,
+      name: row?.[1],
+      type: row?.[2],
+      notNull: row?.[3],
+      default: row?.[4],
+      primaryKey: row?.[5]
+    }))
   },
 
   adaptInsertColumn({ tableName, columnData }) {
@@ -344,6 +337,13 @@ export const EdgeSQLAdapter = {
     return {
       statements: processedStatements
     }
+  },
+
+  buildTableInfoStatements(tableName, needSchema) {
+    if (needSchema) {
+      return [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
+    }
+    return [`SELECT * FROM ${tableName} LIMIT 100;`]
   },
 
   adaptQueryResult({ data }, isCountSelect) {
