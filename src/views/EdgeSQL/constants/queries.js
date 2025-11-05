@@ -137,7 +137,7 @@ export const SQLITE_QUERIES = {
   TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
 
   ALTER_COLUMN: (tableName, tableSchema, currentColumn, newColumn) => {
-    const quote = (id) => `"${String(id).replace(/"/g, '"')}"`
+    const quote = (id) => `"${String(id).replace(/"/g, '""')}"`
 
     const isSqlKeywordDefault = (val) =>
       typeof val === 'string' && /^CURRENT_|^NOW\(\)$|^DATE\(|^DATETIME\(/i.test(val)

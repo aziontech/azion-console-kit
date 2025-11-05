@@ -79,7 +79,8 @@
 
   const props = defineProps({
     visible: { type: Boolean, default: false },
-    query: { type: String, default: '' }
+    query: { type: String, default: '' },
+    tableName: { type: String, default: '' }
   })
 
   const { currentDatabase } = useEdgeSQL()
@@ -150,7 +151,10 @@
   const alterColumn = async () => {
     try {
       const statements = props.query
-      await edgeSQLService.updateColumn(currentDatabase.value.id, { statements })
+      await edgeSQLService.updateColumn(currentDatabase.value.id, {
+        statements,
+        tableName: props.tableName
+      })
       showToast('success', `Altered column.`)
       emit('load-tables')
     } catch (error) {

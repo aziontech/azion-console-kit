@@ -305,7 +305,7 @@ export class EdgeSQLService extends BaseService {
     return adapted
   }
 
-  updateColumn = async (databaseId, { statements }) => {
+  updateColumn = async (databaseId, { statements, tableName }) => {
     const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
@@ -314,19 +314,14 @@ export class EdgeSQLService extends BaseService {
 
     const adapted = this.adapter?.adaptExecuteResult?.(data)
     try {
-      const affected = extractAffectedTableNames(statements)
-      for (const item of affected) {
-        if (item.action === 'drop') invalidateSchemaCache(databaseId, item.table)
-        else
-          await refreshSchemaCache(
-            this.http,
-            this.baseURL,
-            databaseId,
-            item.table,
-            this.adapter,
-            this.SCHEMA_CACHE_TTL_MS
-          )
-      }
+      await refreshSchemaCache(
+        this.http,
+        this.baseURL,
+        databaseId,
+        tableName,
+        this.adapter,
+        this.SCHEMA_CACHE_TTL_MS
+      )
     } catch {
       console.error('Failed to refresh schema cache')
     }

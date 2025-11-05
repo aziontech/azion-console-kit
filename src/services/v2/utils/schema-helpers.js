@@ -53,7 +53,7 @@ export const refreshAllSchemasCache = async (
   try {
     const safeNames = Array.isArray(tableNames) ? tableNames.filter(Boolean) : []
     if (!safeNames.length) return
-    const statements = safeNames.map((name) => `PRAGMA table_info("${name}");`)
+    const statements = safeNames.map((name) => `PRAGMA table_info(${name});`)
     const { data } = await http.request({
       url: `${baseURL}/${databaseId}/query`,
       method: 'POST',

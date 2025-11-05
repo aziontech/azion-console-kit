@@ -25,7 +25,7 @@
         :panelSizes="panelSizes"
         :minSize="[20, 5]"
         :maxSize="[80, 95]"
-        :initialA="50"
+        :initialTopPanelPercent="50"
         @update:panelSizes="onUpdatePanelSizes"
         @resizeend="onResizeEnd"
       >

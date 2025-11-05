@@ -9,6 +9,7 @@
     <AlterColumn
       v-model:visible="alterColumnVisible"
       :query="alterColumnQuery"
+      :tableName="selectedTable?.name"
       @load-tables="selectTable(selectedTable)"
     />
     <Menu
