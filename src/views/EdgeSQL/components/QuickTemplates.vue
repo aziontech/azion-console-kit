@@ -47,7 +47,7 @@
   import { ref, computed } from 'vue'
   import Dialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
-  import { QUICK_TEMPLATES } from '../../constants'
+  import { QUICK_TEMPLATES } from '../constants/queries'
 
   const emit = defineEmits(['use-template', 'update:showTemplatesModal'])
   const props = defineProps({

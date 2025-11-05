@@ -102,6 +102,7 @@
               :disabled-action="isExecutingQuery || isLoadingQuery || shouldNotEditRow"
               @view-change="handleViewChange"
               :options="resultsViewOptions"
+              :title-delete-dialog="'Data'"
               :empty-block="{
                 title: 'Ready to execute',
                 description: 'Execute a query to see the results here'
@@ -132,7 +133,7 @@
   import { useSqlFormatter } from './composable/useSqlFormatter'
   import { useMonacoEditor } from './composable/useMonacoEditor'
   import { QUICK_TEMPLATES } from './constants/queries'
-  import QuickTemplates from './FormFields/blocks/QuickTemplates.vue'
+  import QuickTemplates from './components/QuickTemplates.vue'
   import ResizableSplitter from '@/components/ResizableSplitter.vue'
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
   import QueryHistoryList from './components/QueryHistoryList.vue'

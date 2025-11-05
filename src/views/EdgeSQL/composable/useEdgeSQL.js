@@ -3,7 +3,7 @@ import { convertValueToDate } from '@/helpers/convert-date'
 import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 import { useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
-import { getSchemaCache } from '@/services/v2/edge-sql/utils/schema-helpers'
+import { getSchemaCache } from '@/services/v2/utils/schema-helpers'
 
 // EdgeSQL composable: Single source of UI-facing state and actions for running queries
 // and presenting results. Keeps responsibilities clear and small, delegates schema
