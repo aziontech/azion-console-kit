@@ -159,18 +159,19 @@ export class EdgeSQLService extends BaseService {
       body: { statements }
     })
 
+    let adapted
     if (needSchema) {
-      const adapted = await adaptTableInfoWithCache(
+      adapted = await adaptTableInfoWithCache(
         databaseId,
         tableName,
         data,
         this.adapter,
         this.SCHEMA_CACHE_TTL_MS
       )
-      return { count: adapted?.rows?.length, body: adapted }
+    } else {
+      adapted = adaptTableInfoFromCache(cachedSchema, data, this.adapter)
     }
 
-    const adapted = adaptTableInfoFromCache(cachedSchema, data, this.adapter)
     return { count: adapted?.rows?.length, body: adapted }
   }
 
