@@ -36,6 +36,21 @@ export function useTableQuery(options = {}) {
   const serviceData = ref([])
   const serviceTotalRecords = ref(0)
 
+  const buildQueryParams = (overrides = {}) => {
+    const baseParams = {
+      page: 1,
+      pageSize: itemsByPage.value,
+      fields: apiFields,
+      ordering: savedOrdering.value || defaultOrderingFieldName
+    }
+
+    if (lazy && savedSearch.value) {
+      baseParams.search = savedSearch.value
+    }
+
+    return { ...baseParams, ...overrides }
+  }
+
   const isLoading = computed(() => {
     if (isUsingQuery.value && queryResult) {
       return queryResult.isPending?.value ?? queryResult.isLoading?.value ?? false
@@ -113,22 +128,12 @@ export function useTableQuery(options = {}) {
       savedOrdering.value = defaultOrderingFieldName
     }
 
-    const commonParams = {
-      page: 1,
-      pageSize: itemsByPage.value,
-      fields: apiFields,
-      ordering: savedOrdering.value,
-      ...additionalParams
-    }
-
-    if (lazy) {
-      commonParams.search = savedSearch.value
-    }
+    const params = buildQueryParams(additionalParams)
 
     if (isUsingQuery.value) {
-      queryParams.value = { ...commonParams }
+      queryParams.value = { ...params }
     } else {
-      await loadData(commonParams, customService)
+      await loadData(params, customService)
     }
   }
 
@@ -144,16 +149,7 @@ export function useTableQuery(options = {}) {
   const updatePagination = async (page, pageSize) => {
     itemsByPage.value = pageSize
 
-    const params = {
-      page,
-      pageSize,
-      fields: apiFields,
-      ordering: savedOrdering.value || defaultOrderingFieldName
-    }
-
-    if (lazy && savedSearch.value) {
-      params.search = savedSearch.value
-    }
+    const params = buildQueryParams({ page, pageSize })
 
     if (isUsingQuery.value) {
       queryParams.value = { ...params }
@@ -162,20 +158,10 @@ export function useTableQuery(options = {}) {
     }
   }
 
-  /**
-   * Atualiza a busca
-   * @param {String} searchValue - Valor da busca
-   */
   const updateSearch = async (searchValue) => {
     savedSearch.value = searchValue
 
-    const params = {
-      page: 1,
-      pageSize: itemsByPage.value,
-      fields: apiFields,
-      ordering: savedOrdering.value || defaultOrderingFieldName,
-      search: searchValue
-    }
+    const params = buildQueryParams({ search: searchValue })
 
     if (isUsingQuery.value) {
       queryParams.value = { ...params }
