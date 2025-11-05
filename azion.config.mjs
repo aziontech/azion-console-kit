@@ -212,6 +212,16 @@ const config = {
         }
       },
       {
+        name: 'Set Cache for Static Assets',
+        description:
+          'Sets the cache for all requests using the default object storage.',
+        match:
+          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
+        behavior: {
+          setCache: 'Statics - Cache'
+        }
+      },
+      {
         name: 'Set Storage Origin for All Requests',
         description: 'Sets the default object storage as the origin for all requests.',
         match: '^\\/',
@@ -220,16 +230,6 @@ const config = {
             name: 'origin-storage-default',
             type: 'object_storage'
           }
-        }
-      },
-      {
-        name: 'Set Cache for Static Assets',
-        description:
-          'Sets the cache for all requests using the default object storage.',
-        match:
-          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
-        behavior: {
-          setCache: 'Statics - Cache'
         }
       },
       {
