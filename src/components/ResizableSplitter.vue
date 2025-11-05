@@ -51,13 +51,13 @@
       type: Array,
       default: () => [95, 95] // percentages
     },
-    // Optional initial height for panel-a
-    // If both are provided, initialAPx has priority over initialA
-    initialA: {
+    // Optional initial height for the top panel (panel-a)
+    // If both are provided, initialTopPanelPixels has priority over initialTopPanelPercent
+    initialTopPanelPercent: {
       type: Number,
       default: null // percent
     },
-    initialAPx: {
+    initialTopPanelPixels: {
       type: Number,
       default: null // pixels
     }
@@ -154,10 +154,10 @@
   onMounted(() => {
     let desiredA = currentSizes.value[0]
     const rect = root.value?.getBoundingClientRect()
-    if (props.initialAPx != null && rect?.height > 0) {
-      desiredA = (props.initialAPx / rect.height) * 100
-    } else if (props.initialA != null) {
-      desiredA = props.initialA
+    if (props.initialTopPanelPixels != null && rect?.height > 0) {
+      desiredA = (props.initialTopPanelPixels / rect.height) * 100
+    } else if (props.initialTopPanelPercent != null) {
+      desiredA = props.initialTopPanelPercent
     }
     const [sizeA, sizeB] = clampPair(desiredA)
     currentSizes.value = [sizeA, sizeB]
