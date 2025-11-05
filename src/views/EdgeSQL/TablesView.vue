@@ -60,6 +60,7 @@
         @reload-table="selectTable(selectedTable)"
         :disabled-action="isApplyingChanges"
         @view-change="handleViewChange"
+        :title-delete-dialog="titleDeleteDialog"
         @click-to-create="createTable"
         :empty-block="{
           title: 'No tables have been created',
@@ -126,6 +127,14 @@
       return Array.isArray(columns.value) ? columns.value : []
     } else {
       return columnsSchema.value
+    }
+  })
+
+  const titleDeleteDialog = computed(() => {
+    if (activeView.value === 'table') {
+      return 'Table'
+    } else {
+      return 'Column'
     }
   })
 
@@ -237,7 +246,7 @@
   }
 
   const deleteService = createDeleteService(
-    (stmts) => executeQuery(stmts),
+    (stmts) => executeQuery(stmts, { addToHistory: false }),
     () => selectedTable.value.name,
     () => tableSchema.value,
     () => selectTable(selectedTable.value),

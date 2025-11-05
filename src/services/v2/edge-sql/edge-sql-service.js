@@ -9,7 +9,7 @@ import {
   refreshSchemaCache,
   adaptTableInfoWithCache,
   adaptTableInfoFromCache
-} from './utils/schema-helpers'
+} from '../utils/schema-helpers'
 
 export class EdgeSQLService extends BaseService {
   constructor() {

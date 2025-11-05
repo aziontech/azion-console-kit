@@ -314,6 +314,7 @@
     disabledAction: { type: Boolean, default: false },
     monacoTheme: { type: String, default: 'vs-dark' },
     deleteService: { type: Function },
+    titleDeleteDialog: { type: String, required: true },
     isLoading: { type: Boolean, default: false },
     emptyBlock: {
       type: Object,
@@ -534,6 +535,7 @@
         openDeleteDialog({
           id: row.id,
           data: row,
+          title: props.titleDeleteDialog,
           deleteService: props.deleteService,
           closeCallback: (opt) => {
             if (opt?.data?.updated) reload()
