@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="mafService.listMfaService"
+        :listService="mfaService.listMfaService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No MFA users found."

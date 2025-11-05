@@ -376,7 +376,7 @@
       shouldNotEditRow.value = addToHistory ? isNonEditableQuery(contentToRun) : false
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       // Adapter already filters schema based on returned rows
-      resultRows.value = results[0]?.rows
+      resultRows.value = Array.isArray(results?.[0]?.rows) ? results[0].rows : []
       const schemaRows = results[results.length - 1]?.rows
       if (schemaRows) {
         resultColumns.value = schemaRows.map((column) => ({

@@ -209,8 +209,10 @@ const buildSchemaItem = (names) => ({
 const zipRowsWithColumns = (columns, rows) =>
   rows.map((rowArray) => {
     const obj = {}
-    for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-      obj[columns[columnIndex]] = rowArray[columnIndex]
+    const values = Array.isArray(rowArray) ? rowArray : []
+    const limit = Math.min(columns.length, values.length)
+    for (let columnIndex = 0; columnIndex < limit; columnIndex++) {
+      obj[columns[columnIndex]] = values[columnIndex]
     }
     return obj
   })
@@ -426,7 +428,7 @@ export function useEdgeSQL() {
     )
     const hasAnySelect = selectStatements.length > 0
     let queryResults = []
-    let tableNameExecuted
+    let tableNameExecuted = null
 
     try {
       const startTime = Date.now()
