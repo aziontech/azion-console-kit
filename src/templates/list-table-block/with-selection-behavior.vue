@@ -5,23 +5,20 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="!isLoading"
       ref="dataTableRef"
-      :pt="parsedDatatablePt"
-      class="overflow-clip rounded-md"
-      scrollable
-      removableSort
-      :value="data"
+      :data="data"
+      :columns="columns"
+      :loading="isLoading"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="minimumOfItemsPerPage"
       v-model:selection="selectedItems"
       @page="changeNumberOfLinesPerPage"
       :globalFilterFields="filterBy"
-      :loading="isLoading"
+      :pt="parsedDatatablePt"
+      :emptyListMessage="emptyListMessage"
+      dataKey="id"
       data-testid="data-table"
-      paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     >
       <template
         #header
@@ -31,42 +28,35 @@
           name="header"
           :exportTableCSV="handleExportTableDataToCSV"
         >
-          <div
-            class="flex flex-wrap justify-between gap-2 w-full"
-            data-testid="data-table-header"
-          >
-            <span
-              class="flex flex-row p-input-icon-left items-center max-sm:w-full"
-              data-testid="data-table-search"
-            >
-              <i class="pi pi-search" />
-              <InputText
-                class="h-8 w-full md:min-w-[20rem]"
-                v-model.trim="filters.global.value"
-                data-testid="data-table-search-input"
-                placeholder="Search"
-              />
-            </span>
+          <DataTable.Header>
+            <template #actions>
+              <div class="flex flex-wrap justify-between gap-2 w-full">
+                <DataTable.Search
+                  v-model="filters.global.value"
+                  placeholder="Search"
+                  data-testid="data-table-search-input"
+                />
 
-            <slot
-              name="addButton"
-              data-testid="data-table-add-button"
-            >
-              <PrimeButton
-                class="max-sm:w-full"
-                :disabled="disabledList"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                size="small"
-                :data-testid="`create_${addButtonLabel}_button`"
-                :label="addButtonLabel"
-                v-if="addButtonLabel"
-              />
-            </slot>
-          </div>
+                <DataTable.Actions>
+                  <slot
+                    name="addButton"
+                    data-testid="data-table-add-button"
+                  >
+                    <DataTable.AddButton
+                      v-if="addButtonLabel"
+                      :label="addButtonLabel"
+                      :disabled="disabledList"
+                      @click="navigateToAddPage"
+                      :data-testid="`create_${addButtonLabel}_button`"
+                    />
+                  </slot>
+                </DataTable.Actions>
+              </div>
+            </template>
+          </DataTable.Header>
         </slot>
       </template>
-      <Column
+      <DataTable.Column
         :class="{ '!hover:cursor-pointer': !disabledList }"
         selectionMode="multiple"
         :pt="{
@@ -74,7 +64,7 @@
         }"
         headerStyle="width: 3rem"
       />
-      <Column
+      <DataTable.Column
         :sortable="!col.disableSort"
         v-for="col of selectedColumns"
         :key="col.field"
@@ -101,11 +91,8 @@
             />
           </template>
         </template>
-      </Column>
-      <template #paginatorstart>
-        <div class="flex-1"></div>
-      </template>
-      <Column
+      </DataTable.Column>
+      <DataTable.Column
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
@@ -113,90 +100,25 @@
         data-testid="data-table-actions-column"
       >
         <template #header>
-          <div
-            class="flex justify-end w-full"
-            data-testid="data-table-actions-column-header"
-          >
-            <PrimeButton
-              outlined
-              icon="ai ai-column"
-              class="table-button"
-              @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
-              data-testid="data-table-actions-column-header-toggle-columns"
-            >
-            </PrimeButton>
-            <OverlayPanel
-              ref="columnSelectorPanel"
-              :pt="{
-                content: { class: 'p-0' }
-              }"
-              data-testid="data-table-actions-column-header-toggle-columns-panel"
-            >
-              <Listbox
-                v-model="selectedColumns"
-                multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
-                class="hidden-columns-panel"
-                optionLabel="header"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-              >
-                <template #optiongroup="slotProps">
-                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                </template>
-              </Listbox>
-            </OverlayPanel>
-          </div>
+          <DataTable.ColumnSelector
+            :columns="columns"
+            v-model:selectedColumns="selectedColumns"
+          />
         </template>
         <template
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
-          <div
-            class="flex justify-end"
-            v-if="isRenderOneOption"
-            data-testid="data-table-actions-column-body-action"
-          >
-            <PrimeButton
-              size="small"
-              outlined
-              v-bind="optionsOneAction(rowData)"
-              @click="executeCommand(rowData)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-action-button"
-            />
-          </div>
-          <div
-            class="flex justify-end"
-            v-else
-            data-testid="data-table-actions-column-body-actions"
-          >
-            <PrimeMenu
-              :ref="setMenuRefForRow(rowData.id)"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-              data-testid="data-table-actions-column-body-actions-menu"
-              :pt="{
-                menuitem: ({ context }) => ({
-                  'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
-                })
-              }"
-            />
-            <PrimeButton
-              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-              size="small"
-              icon="pi pi-ellipsis-h"
-              outlined
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-actions-menu-button"
-            />
-          </div>
+          <DataTable.RowActions
+            :rowData="rowData"
+            :actions="actionOptions"
+            :singleAction="isRenderOneOption ? optionsOneAction : null"
+            :onActionExecute="executeCommand"
+            :onMenuToggle="toggleActionsMenu"
+            :menuRefSetter="setMenuRefForRow"
+          />
         </template>
-      </Column>
+      </DataTable.Column>
       <template #empty>
         <slot
           name="noRecordsFound"
@@ -213,83 +135,12 @@
         </slot>
       </template>
     </DataTable>
-    <DataTable
-      v-else
-      :disabled="disabledList"
-      :value="Array(10)"
-      :pt="{
-        header: { class: '!border-t-0' }
-      }"
-      data-testid="data-table-skeleton"
-    >
-      <template
-        #header
-        v-if="!props.hiddenHeader"
-      >
-        <slot name="header">
-          <div
-            class="flex flex-wrap justify-between gap-2 w-full"
-            data-testid="data-table-skeleton-header"
-          >
-            <span
-              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
-              data-testid="data-table-skeleton-search"
-            >
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full h-8 md:min-w-[20rem]"
-                v-model="filters.global.value"
-                placeholder="Search"
-                data-testid="data-table-skeleton-search-input"
-              />
-            </span>
-            <slot
-              name="addButton"
-              data-testid="data-table-add-button"
-            >
-              <PrimeButton
-                class="max-sm:w-full"
-                :disabled="disabledList"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                size="small"
-                :label="addButtonLabel"
-                v-if="addButtonLabel"
-                data-testid="data-table-skeleton-add-button"
-              />
-            </slot>
-          </div>
-        </slot>
-      </template>
-      <Column
-        v-for="col of columns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
-        data-testid="data-table-skeleton-column"
-      >
-        <template #body>
-          <Skeleton />
-        </template>
-      </Column>
-    </DataTable>
   </div>
 </template>
 <script setup>
-  import { FilterMatchMode } from 'primevue/api'
-  import PrimeButton from 'primevue/button'
-  import Column from 'primevue/column'
-  import DataTable from 'primevue/datatable'
-  import InputText from 'primevue/inputtext'
-  import Listbox from 'primevue/listbox'
-  import PrimeMenu from 'primevue/menu'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDialog } from 'primevue/usedialog'
-  import { useToast } from 'primevue/usetoast'
+  import DataTable from '@/components/DataTable'
+  import { useDataTable } from '@/composables/useDataTable'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'list-table-block-new' })
@@ -365,21 +216,23 @@
     ? ''
     : 'background-color: transparent !important; cursor: pointer !important;'
 
-  const selectedId = ref(null)
-  const dataTableRef = ref(null)
-  const filters = ref({
-    global: { value: '', matchMode: FilterMatchMode.CONTAINS }
-  })
-  const isLoading = ref(false)
-  const data = ref([])
-  const selectedColumns = ref([])
-  const columnSelectorPanel = ref(null)
-  const menuRef = ref({})
-  const toast = useToast()
+  const {
+    data,
+    isLoading,
+    filters,
+    selectedColumns,
+    actionOptions,
+    toggleActionsMenu,
+    setMenuRefForRow,
+    executeCommand,
+    optionsOneAction,
+    navigateToAddPage,
+    editItemSelected,
+    handleExportTableDataToCSV,
+    reload
+  } = useDataTable(props, emit)
 
-  const { openDeleteDialog } = useDeleteDialog()
-  const dialog = useDialog()
-  const router = useRouter()
+  const dataTableRef = ref(null)
 
   const selectedItems = computed({
     get: () => {
@@ -397,138 +250,15 @@
 
   onMounted(() => {
     if (!props.lazyLoad) {
-      loadData({ page: 1 })
+      reload({ page: 1 })
     }
     selectedColumns.value = props.columns
   })
-
-  const handleExportTableDataToCSV = () => {
-    dataTableRef.value.exportCSV()
-  }
-  const toggleColumnSelector = (event) => {
-    columnSelectorPanel.value.toggle(event)
-  }
-
-  const reload = (query = {}) => {
-    loadData({ page: 1, ...query })
-  }
-
-  const openDialog = (dialogComponent, body) => {
-    dialog.open(dialogComponent, body)
-  }
-
-  const actionOptions = (rowData) => {
-    const createActionOption = (action) => {
-      return {
-        ...action,
-        disabled: action.disabled && action.disabled(rowData),
-        command: () => {
-          switch (action.type) {
-            case 'dialog':
-              openDialog(action.dialog.component, action.dialog.body(rowData, reload))
-              break
-            case 'delete':
-              openDeleteDialog({
-                title: action.title,
-                id: rowData.id,
-                data: rowData,
-                deleteService: action.service,
-                deleteConfirmationText: undefined,
-                closeCallback: (opt) => {
-                  if (opt.data.updated) {
-                    reload()
-                  }
-                }
-              })
-              break
-            case 'action':
-              action.commandAction(rowData)
-              break
-          }
-        }
-      }
-    }
-
-    const actions = props.actions
-      .filter((action) => !action.visibleAction || action.visibleAction(rowData))
-      .map(createActionOption)
-
-    return actions
-  }
-
-  const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
-      try {
-        isLoading.value = true
-        const response = props.isGraphql
-          ? await props.listService()
-          : await props.listService({ page, ...query })
-        data.value = response
-      } catch (error) {
-        data.value = []
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage
-        })
-      } finally {
-        isLoading.value = false
-      }
-    }
-  }
-
-  const navigateToAddPage = () => {
-    emit('on-before-go-to-add-page')
-    router.push(props.createPagePath)
-  }
-
-  const toggleActionsMenu = (event, selectedID) => {
-    if (!selectedID) {
-      throw new Error('Please provide an id for each data item through the service adapter')
-    }
-    selectedId.value = selectedID
-    menuRef.value[selectedID].toggle(event)
-  }
-
-  const editItemSelected = (item) => {
-    emit('on-before-go-to-edit', item)
-
-    if (props.editInDrawer) {
-      props.editInDrawer(item)
-    } else if (props.enableEditCustomRedirect) {
-      emit('on-row-click-edit-redirect', item)
-    } else if (props.enableEditClick) {
-      router.push({ path: `${props.editPagePath}/${item.id}` })
-    }
-  }
-
-  const executeCommand = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    firstAction?.command()
-  }
-
-  const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    return {
-      icon: firstAction?.icon,
-      disabled: firstAction?.disabled
-    }
-  }
 
   defineExpose({ reload, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
-  }
-
-  const setMenuRefForRow = (rowDataID) => {
-    return (document) => {
-      if (document !== null) {
-        menuRef.value[rowDataID] = document
-      }
-    }
   }
 
   const changeNumberOfLinesPerPage = (event) => {
@@ -539,9 +269,9 @@
 
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
-    const filters = props.columns.map((item) => item.field)
+    const columnFilters = props.columns.map((item) => item.field)
 
-    return [...filters, ...filtersPath]
+    return [...columnFilters, ...filtersPath]
   })
 
   watch(data, (currentState) => {

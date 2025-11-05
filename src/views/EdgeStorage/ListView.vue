@@ -232,10 +232,6 @@
     {
       field: 'size',
       header: 'Size'
-    },
-    {
-      field: 'last_modified',
-      header: 'Last Modified'
     }
   ]
   const uploadMenuItems = [

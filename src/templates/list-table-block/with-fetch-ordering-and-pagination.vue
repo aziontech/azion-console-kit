@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, useSlots } from 'vue'
   import DataTable from '@/components/DataTable'
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
@@ -128,10 +128,6 @@
       type: Boolean,
       default: true
     },
-    showLastModified: {
-      type: Boolean,
-      default: false
-    },
     cellQuickActionsItens: {
       type: Array,
       default: () => []
@@ -196,6 +192,8 @@
     extractFieldValue,
     onRowReorder
   } = useDataTable(props, emit)
+
+  const slots = useSlots()
 
   // Last Modified Popup state
   const showPopup = ref(false)
@@ -295,6 +293,7 @@
       @sort="fetchOnSort"
       :showLastModifiedColumn="!hideLastModifiedColumn"
       :emptyBlock="emptyBlock"
+      :hasEmptyBlockSlot="!!slots.emptyBlock"
     >
       <template
         #header
@@ -538,6 +537,9 @@
           </div>
         </template>
       </DataTable.Column>
+      <template #emptyBlock>
+        <slot name="emptyBlock" />
+      </template>
       <template #emptyBlockButton>
         <slot name="emptyBlockButton" />
       </template>

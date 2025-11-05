@@ -11,6 +11,8 @@
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
   import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -146,11 +148,8 @@
   ])
 
   const reloadWafRulesAllowedList = () => {
-    if (hasContentToList.value) {
-      listAllowedRef.value.reload()
-      return
-    }
     hasContentToList.value = true
+    listAllowedRef.value.reload()
   }
 
   const handleLoadData = (event) => {
@@ -228,7 +227,6 @@
 <template>
   <FetchListTableBlock
     ref="listAllowedRef"
-    v-if="hasContentToList"
     addButtonLabel="Allowed Rule"
     :editInDrawer="openEditDrawerWafRulesAllowed"
     :columns="wafRulesAllowedColumns"
@@ -264,6 +262,37 @@
         @click="openCreateDrawerWafAllowed"
         data-testid="create_Allowed Rule_button"
       />
+    </template>
+    <template #emptyBlock>
+      <EmptyResultsBlock
+        title="No allowed rule has been created."
+        description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
+        createButtonLabel="Allowed Rule"
+        :documentationService="props.documentationServiceAllowed"
+        :inTabs="true"
+      >
+        <template #default>
+          <PrimeButton
+            class="max-md:w-full w-fit"
+            severity="secondary"
+            label="Create from Tuning"
+            outlined
+            @click="goToWafRulesTuning"
+          >
+          </PrimeButton>
+          <PrimeButton
+            class="max-md:w-full w-fit"
+            severity="secondary"
+            icon="pi pi-plus"
+            label="Allowed Rule"
+            @click="openCreateDrawerWafAllowed"
+            data-testid="create_Allowed Rule_button"
+          />
+        </template>
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
   </FetchListTableBlock>
 

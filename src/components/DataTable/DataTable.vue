@@ -24,7 +24,7 @@
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="rows"
       :globalFilterFields="globalFilterFields"
-      :selection="selection"
+      v-model:selection="internalSelection"
       :exportFilename="exportFilename"
       :exportFunction="exportFunction"
       :totalRecords="totalRecords"
@@ -120,22 +120,25 @@
         @quick-actions-visible="(event) => (cellQuickActionsVisible = event)"
       />
     </DataTable>
-    <EmptyResultsBlock
-      v-else
-      :title="emptyBlock.title"
-      :description="emptyBlock.description"
-      :createButtonLabel="emptyBlock.createButtonLabel"
-      :createPagePath="emptyBlock.createPagePath"
-      :documentationService="emptyBlock.documentationService"
-      data-testid="edge-applications-empty-results-block"
-    >
-      <template #illustration>
-        <Illustration />
-      </template>
-      <template #default>
-        <slot name="emptyBlockButton" />
-      </template>
-    </EmptyResultsBlock>
+    <template v-else>
+      <div v-if="hasEmptyBlockSlot"><slot name="emptyBlock" /></div>
+      <EmptyResultsBlock
+        v-else
+        :title="emptyBlock.title"
+        :description="emptyBlock.description"
+        :createButtonLabel="emptyBlock.createButtonLabel"
+        :createPagePath="emptyBlock.createPagePath"
+        :documentationService="emptyBlock.documentationService"
+        data-testid="edge-applications-empty-results-block"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+        <template #default>
+          <slot name="emptyBlockButton" />
+        </template>
+      </EmptyResultsBlock>
+    </template>
   </div>
 </template>
 
@@ -288,6 +291,10 @@
     showLastModifiedColumn: {
       type: Boolean,
       default: true
+    },
+    hasEmptyBlockSlot: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -299,7 +306,8 @@
     'update:filters',
     'update:sortField',
     'update:sortOrder',
-    'update:expandedRowGroups'
+    'update:expandedRowGroups',
+    'update:selection'
   ])
 
   const slots = useSlots()
@@ -325,6 +333,11 @@
   const internalExpandedGroups = computed({
     get: () => props.expandedRowGroups,
     set: (value) => emit('update:expandedRowGroups', value)
+  })
+
+  const internalSelection = computed({
+    get: () => props.selection,
+    set: (value) => emit('update:selection', value)
   })
 
   const hasHeaderSlot = computed(() => !!slots.header)
