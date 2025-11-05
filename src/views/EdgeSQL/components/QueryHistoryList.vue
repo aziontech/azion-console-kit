@@ -11,7 +11,7 @@
       />
     </div>
 
-    <div class="flex-1 min-h-0 overflow-y-auto !w-64">
+    <div class="flex-1 min-h-0 overflow-y-auto sm:!w-64 w-full">
       <div
         v-if="isLoading"
         class="flex flex-col gap-3"

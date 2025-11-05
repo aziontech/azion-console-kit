@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-8 mt-4">
+  <div class="flex sm:flex-row flex-col gap-8 mt-4">
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
@@ -27,7 +27,7 @@
       }"
     />
     <ListTables
-      class="sm:w-64 w-full"
+      class="sm:w-64 w-full sm:max-h-72 max-h-full"
       :listTables="props.listTables"
       :isLoading="props.isLoadTables"
       v-model:selectedTables="selectedTableNames"
