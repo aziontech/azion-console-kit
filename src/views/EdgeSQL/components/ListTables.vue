@@ -1,10 +1,10 @@
 <template>
   <div class="sm:w-64 w-full">
     <div
-      class="flex justify-between items-center w-64"
+      class="flex justify-between items-center sm:w-64 w-full"
       v-if="!showCheckbox"
     >
-      <h3 class="text-lg font-normal text-color-primary">Tables</h3>
+      <h3 class="text-lg font-medium text-color-primary">Tables</h3>
 
       <div class="flex gap-2">
         <PrimeButton
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div
-      class="flex justify-between items-center w-64"
+      class="flex justify-between items-center sm:w-64 w-full"
       v-else
     >
       <div class="flex gap-2 items-center">

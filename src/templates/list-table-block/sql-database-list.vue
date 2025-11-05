@@ -53,7 +53,7 @@
                 severity="secondary"
                 label="Insert"
                 @click="insertRow"
-                :disabled="disabledActionsJsonView"
+                :disabled="disabledActionsJsonView || disabledAction"
                 :model="items"
               />
             </div>
@@ -573,7 +573,7 @@
   }
 
   const triggerDownload = (content, mime, filename) => {
-    const blob = new Blob([content], { type: mime })
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mime })
     const url = URL.createObjectURL(blob)
     const anchorEl = document.createElement('a')
     anchorEl.href = url
@@ -599,9 +599,35 @@
     triggerDownload(json, 'application/json;charset=utf-8;', filename)
   }
 
+  const exportAsXLSX = async () => {
+    const rows = getExportRows()
+    const fields = getExportFields()
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.xlsx`
+    try {
+      const XLSX = (await import('xlsx')).default || (await import('xlsx'))
+      const headerRow = fields
+      const dataRows = rows.map((row) => fields.map((fieldName) => row[fieldName]))
+      const worksheetData = [headerRow, ...dataRows]
+      const workbook = XLSX.utils.book_new()
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+      const arrayBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const blob = new Blob([arrayBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      triggerDownload(blob, blob.type, filename)
+    } catch (err) {
+      // Fallback to CSV if xlsx lib not available
+      const csv = toCsv(rows, fields)
+      const csvName = filename.replace(/\.xlsx$/i, '.csv')
+      triggerDownload(csv, 'text/csv;charset=utf-8;', csvName)
+    }
+  }
+
   const exportMenuItems = computed(() => [
     { label: 'Export all to .csv', icon: 'pi pi-file', command: exportAsCSV },
-    { label: 'Export all to .json', icon: 'pi pi-code', command: exportAsJSON }
+    { label: 'Export all to .json', icon: 'pi pi-code', command: exportAsJSON },
+    { label: 'Export all to .xlsx', icon: 'pi pi-file-excel', command: exportAsXLSX }
   ])
 
   const onViewChange = ({ value }) => {

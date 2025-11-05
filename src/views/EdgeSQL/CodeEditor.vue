@@ -1,6 +1,8 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-9.375rem)] overflow-hidden">
-    <div class="flex flex-col !w-64 h-full">
+  <div
+    class="flex flex-col sm:flex-row mt-4 gap-8 w-full sm:h-[calc(100vh-9.375rem)] overflow-hidden"
+  >
+    <div class="flex flex-col sm:!w-64 sm:h-full max-h-72 sm:max-h-full">
       <QueryHistoryList
         v-model:searchTerm="searchTerm"
         :isLoading="isLoading"
@@ -29,7 +31,7 @@
       >
         <template #panel-a>
           <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
-            <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
+            <div class="flex justify-between border-x border-t surface-border rounded-t-md p-3">
               <Button
                 :label="labelRunQuery"
                 icon="pi pi-play"
