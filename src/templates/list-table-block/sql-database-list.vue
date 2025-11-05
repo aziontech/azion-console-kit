@@ -35,6 +35,9 @@
         },
         emptyMessage: {
           class: 'p-0 h-full'
+        },
+        footer: {
+          class: 'p-0 h-full'
         }
       }"
     >
@@ -50,6 +53,7 @@
                 severity="secondary"
                 label="Insert"
                 @click="insertRow"
+                :disabled="disabledActionsJsonView || disabledAction"
                 :model="items"
               />
             </div>
@@ -61,6 +65,7 @@
                   placeholder="Search..."
                   @input="handleSearchValue"
                   @search="fetchOnSearch"
+                  :disabled="disabledActionsJsonView"
                 />
               </div>
               <DataTable.Actions>
@@ -90,11 +95,25 @@
                   }"
                   size="small"
                 />
-                <DataTable.Export />
+                <PrimeButton
+                  icon="pi pi-download"
+                  outlined
+                  iconOnly
+                  @click="toggleExportMenu($event)"
+                  v-tooltip.left="{ value: 'Export', showDelay: 200 }"
+                  size="small"
+                />
+                <Menu
+                  ref="exportMenuRef"
+                  :popup="true"
+                  :model="exportMenuItems"
+                />
+
                 <PrimeButton
                   icon="ai ai-column"
                   outlined
                   iconOnly
+                  :disabled="disabledActionsJsonView"
                   @click="toggleColumnSelector"
                   v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
                   data-testid="data-table-actions-column-header-toggle-columns"
@@ -195,7 +214,7 @@
               filter
             />
             <Dropdown
-              v-else-if="isSchemaView && field === 'notNull'"
+              v-else-if="isSchemaView && (field === 'notNull' || field === 'primaryKey')"
               v-model="data[field]"
               :options="[
                 { label: 'True', value: 1 },
@@ -289,6 +308,7 @@
     showGridlines: { type: Boolean, default: false },
     data: { type: Array, required: true },
     columns: { type: Array, required: true },
+    showInsertColumn: { type: Boolean, default: true },
     addButtonLabel: { type: String, default: '' },
     disabledAddButton: { type: Boolean, default: false },
     title: { type: String, required: true },
@@ -344,6 +364,8 @@
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
   const notShowEmptyBlock = computed(() => selectedView.value?.value === 'json')
+
+  const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 
   const reloadTable = () => {
     emit('reload-table')
@@ -524,7 +546,92 @@
     return base
   })
 
+  // Export dropdown logic
+  const exportMenuRef = ref(null)
+  const toggleExportMenu = (event) => {
+    if (exportMenuRef.value) exportMenuRef.value.toggle(event)
+  }
+
+  const getExportRows = () => editableData.value || []
+  const getExportFields = () =>
+    (props.columns || [])
+      .filter((column) => column?.field && column.field !== 'actions')
+      .map((column) => column.field)
+
+  const toCsv = (rows, fields) => {
+    const escapeCsv = (val) => {
+      if (val == null) return ''
+      const str = String(val)
+      if (/[,"\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"'
+      return str
+    }
+    const header = fields.map(escapeCsv).join(',')
+    const body = rows
+      .map((row) => fields.map((fieldName) => escapeCsv(row[fieldName])).join(','))
+      .join('\n')
+    return header + '\n' + body
+  }
+
+  const triggerDownload = (content, mime, filename) => {
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const anchorEl = document.createElement('a')
+    anchorEl.href = url
+    anchorEl.download = filename
+    document.body.appendChild(anchorEl)
+    anchorEl.click()
+    document.body.removeChild(anchorEl)
+    URL.revokeObjectURL(url)
+  }
+
+  const exportAsCSV = () => {
+    const rows = getExportRows()
+    const fields = getExportFields()
+    const csv = toCsv(rows, fields)
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.csv`
+    triggerDownload(csv, 'text/csv;charset=utf-8;', filename)
+  }
+
+  const exportAsJSON = () => {
+    const rows = getExportRows()
+    const json = JSON.stringify(rows ?? [], null, 2)
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.json`
+    triggerDownload(json, 'application/json;charset=utf-8;', filename)
+  }
+
+  const exportAsXLSX = async () => {
+    const rows = getExportRows()
+    const fields = getExportFields()
+    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.xlsx`
+    try {
+      const XLSX = (await import('xlsx')).default || (await import('xlsx'))
+      const headerRow = fields
+      const dataRows = rows.map((row) => fields.map((fieldName) => row[fieldName]))
+      const worksheetData = [headerRow, ...dataRows]
+      const workbook = XLSX.utils.book_new()
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+      const arrayBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const blob = new Blob([arrayBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      triggerDownload(blob, blob.type, filename)
+    } catch (err) {
+      // Fallback to CSV if xlsx lib not available
+      const csv = toCsv(rows, fields)
+      const csvName = filename.replace(/\.xlsx$/i, '.csv')
+      triggerDownload(csv, 'text/csv;charset=utf-8;', csvName)
+    }
+  }
+
+  const exportMenuItems = computed(() => [
+    { label: 'Export all to .csv', icon: 'pi pi-file', command: exportAsCSV },
+    { label: 'Export all to .json', icon: 'pi pi-code', command: exportAsJSON },
+    { label: 'Export all to .xlsx', icon: 'pi pi-file-excel', command: exportAsXLSX }
+  ])
+
   const onViewChange = ({ value }) => {
+    if (!value) return
     emit('view-change', value)
   }
 
@@ -533,19 +640,23 @@
     emit('page', event)
   }
 
-  const items = [
-    {
-      icon: 'ai ai-column',
-      label: 'Insert Column',
-      command: () => insertColumnSplitEvent(),
-      visible: () => selectedView.value.value === 'table'
-    },
-    {
-      icon: 'pi pi-minus',
-      label: 'Insert Data',
-      command: () => insertRowSplitEvent()
+  const items = computed(() => {
+    const list = [
+      {
+        icon: 'pi pi-minus',
+        label: 'Insert Data',
+        command: () => insertRowSplitEvent()
+      }
+    ]
+    if (props.showInsertColumn) {
+      list.unshift({
+        icon: 'ai ai-column',
+        label: 'Insert Column',
+        command: () => insertColumnSplitEvent()
+      })
     }
-  ]
+    return list
+  })
 
   const insertColumnSplitEvent = async () => {
     selectedView.value = {

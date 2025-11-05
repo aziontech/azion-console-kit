@@ -142,10 +142,20 @@ export const SQLITE_QUERIES = {
     const isSqlKeywordDefault = (val) =>
       typeof val === 'string' && /^CURRENT_|^NOW\(\)$|^DATE\(|^DATETIME\(/i.test(val)
 
+    const isWrappedInQuotes = (val) => {
+      if (typeof val !== 'string') return false
+      const trimmed = val.trim()
+      return (
+        (trimmed.startsWith("'") && trimmed.endsWith("'")) ||
+        (trimmed.startsWith('"') && trimmed.endsWith('"'))
+      )
+    }
+
     const formatDefault = (val) => {
       if (val === undefined || val === null || val === '') return ''
       if (typeof val === 'number' || typeof val === 'boolean') return ` DEFAULT ${val}`
       if (isSqlKeywordDefault(val)) return ` DEFAULT ${val}`
+      if (isWrappedInQuotes(val)) return ` DEFAULT ${String(val).trim()}`
       return ` DEFAULT '${String(val).replace(/'/g, "''")}'`
     }
 
@@ -206,9 +216,14 @@ export const SQLITE_QUERIES = {
         if (column.name !== colNameTarget) return quote(column.name)
         // If becoming NOT NULL, coalesce with default when provided
         if (targetNew?.notNull && targetNew?.default !== undefined && targetNew?.default !== null) {
-          const defRaw = isSqlKeywordDefault(targetNew.default)
-            ? targetNew.default
-            : `'${String(targetNew.default).replace(/'/g, "''")}'`
+          const defaultVal = targetNew.default
+          const defRaw = isSqlKeywordDefault(defaultVal)
+            ? defaultVal
+            : typeof defaultVal === 'number' || typeof defaultVal === 'boolean'
+            ? String(defaultVal)
+            : isWrappedInQuotes(defaultVal)
+            ? String(defaultVal).trim()
+            : `'${String(defaultVal).replace(/'/g, "''")}'`
           return `COALESCE(${quote(column.name)}, ${defRaw}) AS ${quote(column.name)}`
         }
         return quote(column.name)

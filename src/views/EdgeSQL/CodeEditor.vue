@@ -1,6 +1,8 @@
 <template>
-  <div class="flex flex-col sm:flex-row mt-4 gap-8 w-full h-[calc(100vh-9.375rem)] overflow-hidden">
-    <div class="flex flex-col !w-64 h-full">
+  <div
+    class="flex flex-col sm:flex-row mt-4 gap-8 w-full sm:h-[calc(100vh-9.375rem)] overflow-hidden"
+  >
+    <div class="flex flex-col sm:!w-64 sm:h-full max-h-72 sm:max-h-full">
       <QueryHistoryList
         v-model:searchTerm="searchTerm"
         :isLoading="isLoading"
@@ -29,12 +31,13 @@
       >
         <template #panel-a>
           <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
-            <div class="flex justify-between border-1 border surface-border rounded-t-md p-3">
+            <div class="flex justify-between border-x border-t surface-border rounded-t-md p-3">
               <Button
                 :label="labelRunQuery"
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
+                :loading="isExecutingQuery || isLoadingQuery"
                 @click="runQuery"
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
@@ -89,6 +92,7 @@
               :columns="resultColumns"
               data-testid="table-list"
               showGridlines
+              :showInsertColumn="false"
               :monacoTheme="monacoTheme"
               :delete-service="deleteService"
               :isLoading="isLoadingQuery"
@@ -369,17 +373,20 @@
 
     isExecutingQuery.value = true
     try {
-      shouldNotEditRow.value = isNonEditableQuery(contentToRun)
+      shouldNotEditRow.value = addToHistory ? isNonEditableQuery(contentToRun) : false
       const { results, tableNameExecuted } = await executeQuery(contentToRun, { addToHistory })
       // Adapter already filters schema based on returned rows
-      resultRows.value = results[0].rows
-      const schemaRows = results[results.length - 1].rows
-      resultColumns.value = schemaRows.map((column) => ({
-        field: column.name,
-        tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
-        header: column.name,
-        sortable: true
-      }))
+      resultRows.value = Array.isArray(results?.[0]?.rows) ? results[0].rows : []
+      const schemaRows = results[results.length - 1]?.rows
+      if (schemaRows) {
+        resultColumns.value = schemaRows.map((column) => ({
+          field: column.name,
+          tagType: column.type?.toLowerCase?.() ?? String(column.type || ''),
+          header: column.name,
+          sortable: true
+        }))
+      }
+
       resultSchema.value = schemaRows
       activeTableName.value = tableNameExecuted
       updateListHistory()

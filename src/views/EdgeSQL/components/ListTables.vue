@@ -1,10 +1,10 @@
 <template>
   <div class="sm:w-64 w-full">
     <div
-      class="flex justify-between items-center w-64"
+      class="flex justify-between items-center sm:w-64 w-full"
       v-if="!showCheckbox"
     >
-      <h3 class="text-lg font-normal text-color-primary">Tables</h3>
+      <h3 class="text-lg font-medium text-color-primary">Tables</h3>
 
       <div class="flex gap-2">
         <PrimeButton
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div
-      class="flex justify-between items-center w-64"
+      class="flex justify-between items-center sm:w-64 w-full"
       v-else
     >
       <div class="flex gap-2 items-center">
@@ -101,8 +101,11 @@
       >
         <div
           v-for="table in filteredTables"
-          :key="table.id || table.name"
-          class="group p-2 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
+          :key="table.name"
+          :class="[
+            'group p-2 rounded cursor-pointer transition-colors',
+            isTableSelected(table) ? 'bg-[--table-bg-color]' : 'hover:bg-[--table-bg-color]'
+          ]"
           @click="$emit('select-table', table)"
         >
           <div class="flex items-center justify-between">
@@ -123,7 +126,7 @@
             </div>
 
             <PrimeButton
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-ellipsis-v"
               size="small"
               outlined
               @click.stop="$emit('show-table-menu', $event, table)"
@@ -195,6 +198,12 @@
   const closeCheckbox = () => {
     showCheckbox.value = false
     localSelectedTables.value = []
+  }
+
+  const isTableSelected = (table) => {
+    const list = Array.isArray(props.selectedTables) ? props.selectedTables : []
+    const name = table?.name
+    return name != null && list.includes(name)
   }
 
   watch(

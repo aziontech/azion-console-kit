@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-8 mt-4">
+  <div class="flex sm:flex-row flex-col gap-8 mt-4">
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
@@ -27,7 +27,7 @@
       }"
     />
     <ListTables
-      class="sm:w-64 w-full"
+      class="sm:w-64 w-full sm:max-h-72 max-h-full"
       :listTables="props.listTables"
       :isLoading="props.isLoadTables"
       v-model:selectedTables="selectedTableNames"
@@ -142,6 +142,7 @@
   const activeView = ref('table')
 
   const handleViewChange = (event) => {
+    if (!event) return
     activeView.value = event.value
   }
 
@@ -184,6 +185,10 @@
     {
       field: 'notNull',
       header: 'Nullable'
+    },
+    {
+      field: 'primaryKey',
+      header: 'Primary Key'
     }
   ])
 
@@ -280,10 +285,10 @@
     selectedTable.value = table
     try {
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
-      columns.value = result.body.columns.map(({ columns }) => ({
-        field: columns.name,
-        tagType: columns.type?.toLowerCase?.() ?? String(columns.type || ''),
-        header: columns.name,
+      columns.value = result.body.tableSchema.map(({ name, type }) => ({
+        field: name,
+        tagType: type?.toLowerCase?.() ?? String(type || ''),
+        header: name,
         sortable: true
       }))
 

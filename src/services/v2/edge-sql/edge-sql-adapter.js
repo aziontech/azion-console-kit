@@ -35,10 +35,11 @@ const buildWhereClause = (whereData, tableSchema) => {
   if (hasIdColumn && (whereData?.id !== undefined || whereData?.ID !== undefined)) {
     const key = whereData.id !== undefined ? 'id' : 'ID'
     const originalValue = whereData[key]
-    if (originalValue === null || String(originalValue).toUpperCase() === 'NULL') {
+    const normalizedValue = typeof originalValue === 'string' ? originalValue.trim() : originalValue
+    if (normalizedValue === null || String(normalizedValue).toUpperCase() === 'NULL') {
       return `"${key}" IS NULL`
     }
-    const formattedValue = formatSqlValue(originalValue, key, tableSchema)
+    const formattedValue = formatSqlValue(normalizedValue, key, tableSchema)
     return `"${key}" = ${formattedValue}`
   }
 
@@ -66,11 +67,12 @@ const formatSqlValue = (value, fieldName, schema) => {
 
   const numericTypes = ['INTEGER', 'REAL', 'NUMERIC']
   if (numericTypes.includes(columnType)) {
-    const numericValue = Number(value)
+    const source = typeof value === 'string' ? value.trim() : value
+    const numericValue = Number(source)
     return isNaN(numericValue) ? 'NULL' : numericValue
   }
 
-  const stringValue = String(value)
+  const stringValue = typeof value === 'string' ? value.trim() : String(value)
   return `'${stringValue.replace(/'/g, "''")}'`
 }
 
@@ -249,43 +251,40 @@ export const EdgeSQLAdapter = {
     }))
   },
 
-  adaptTableInfo({ data }) {
+  adaptTableInfo({ data }, tableSchema) {
     const tableInfo = data[0]
-    const tableData = data[1]
-
-    const columns = tableInfo.results.rows.map((row) => ({
-      columns: {
-        name: row[1],
-        type: row[2]
-      }
-    }))
-
-    const tableSchema = tableInfo.results.rows.map((row, index) => ({
-      id: index,
-      name: row[1],
-      type: row[2],
-      notNull: row[3],
-      default: row[4],
-      primaryKey: row[5]
-    }))
-
-    const rows = formatRowsForDisplay(tableData.results?.rows || [])
-    const columnNames = columns.map((col) => col.columns.name)
+    const rows = formatRowsForDisplay(tableInfo.results?.rows || [])
+    const columnNames = tableSchema.map((col) => col.name)
     const mappedRows = mapRowsToObjects(columnNames, rows)
 
     return {
-      columns,
       rows: mappedRows,
       tableSchema
     }
   },
 
+  adaptTableSchemaFromPragmaRows(rows) {
+    const safeRows = Array.isArray(rows) ? rows : []
+    return safeRows.map((row, index) => ({
+      id: index,
+      name: row?.[1],
+      type: row?.[2],
+      notNull: row?.[3],
+      default: row?.[4],
+      primaryKey: row?.[5]
+    }))
+  },
+
   adaptInsertColumn({ tableName, columnData }) {
     const { name, type, default: defaultValue, notNull } = columnData || {}
 
+    const safeName = String(name ?? '').trim()
+    const safeType = type ? String(type).trim() : ''
+    if (!safeName) throw new Error('Column name is required')
+
     const parts = []
-    parts.push(`"${name}"`)
-    if (type) parts.push(type)
+    parts.push(`"${safeName}"`)
+    if (safeType) parts.push(safeType)
     if (notNull) parts.push('NOT NULL')
 
     const defaultClause = formatDefaultClause(defaultValue, type)
@@ -300,17 +299,22 @@ export const EdgeSQLAdapter = {
 
   adaptUpdateColumn({ tableName, columnData, oldColumnData }) {
     const { name, type, default: defaultValue, notNull } = columnData || {}
-    const oldName = oldColumnData?.name || columnData?.oldName || name
+    const rawOldName = oldColumnData?.name || columnData?.oldName || name
+
+    const safeNewName = String(name ?? '').trim()
+    const safeOldName = String(rawOldName ?? '').trim()
+    const safeType = type ? String(type).trim() : ''
+    if (!safeNewName) throw new Error('Column name is required')
 
     const constraintParts = []
     if (notNull) constraintParts.push('NOT NULL')
-    const defaultClause = formatDefaultClause(defaultValue, type)
+    const defaultClause = formatDefaultClause(defaultValue, safeType)
     if (defaultClause) constraintParts.push(defaultClause)
 
-    const typePart = type ? ` ${type}` : ''
+    const typePart = safeType ? ` ${safeType}` : ''
     const constraintsPart = constraintParts.length ? ` ${constraintParts.join(' ')}` : ''
 
-    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${oldName}\`  \`${name}\`${typePart}${constraintsPart};`
+    const query = `ALTER TABLE \`${tableName}\` \nCHANGE COLUMN \`${safeOldName}\`  \`${safeNewName}\`${typePart}${constraintsPart};`
 
     return {
       statements: [query]
@@ -335,7 +339,14 @@ export const EdgeSQLAdapter = {
     }
   },
 
-  adaptQueryResult({ data }) {
+  buildTableInfoStatements(tableName, needSchema) {
+    if (needSchema) {
+      return [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
+    }
+    return [`SELECT * FROM ${tableName} LIMIT 100;`]
+  },
+
+  adaptQueryResult({ data }, isCountSelect) {
     const processedResults = data.map((item) => ({
       columns: item.results?.columns || [],
       rows: formatRowsForDisplay(item.results?.rows || []),
@@ -346,10 +357,26 @@ export const EdgeSQLAdapter = {
     }))
 
     processedResults.forEach((result) => {
-      result.rows = mapRowsToObjects(result.columns, result.rows)
+      const columnNames = Array.isArray(result.columns)
+        ? result.columns.map((col) => (typeof col === 'string' ? col : col?.name))
+        : []
+      result.rows = mapRowsToObjects(columnNames, result.rows)
     })
 
     const prioritizedResults = this.prioritizeSelectResults(processedResults)
+
+    if (isCountSelect) {
+      if (prioritizedResults.length === 1) {
+        prioritizedResults.push({
+          columns: ['name', 'type'],
+          rows: [{ name: 'COUNT(*)', type: 'INTEGER' }],
+          statement: '-- synthetic: COUNT column schema',
+          queryDurationMs: 0,
+          rowsRead: 0,
+          rowsWritten: 0
+        })
+      }
+    }
 
     return {
       state: data?.state || 'executed',
@@ -368,6 +395,8 @@ export const EdgeSQLAdapter = {
         rowsRead: item.results?.rows_read,
         rowsWritten: item.results?.rows_written
       })) || []
+
+    // For COUNT-only queries, append a synthetic schema result for the view
 
     const prioritizedResults = this.prioritizeSelectResults(processedResults)
 
@@ -440,7 +469,8 @@ export const EdgeSQLAdapter = {
     const valuesClause = columnNames
       .map((columnName) => {
         const value = dataToInsert[columnName]
-        return formatSqlValue(value, columnName, tableSchema)
+        const normalizedValue = typeof value === 'string' ? value.trim() : value
+        return formatSqlValue(normalizedValue, columnName, tableSchema)
       })
       .join(', ')
 
