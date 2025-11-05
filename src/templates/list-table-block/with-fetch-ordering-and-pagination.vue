@@ -567,9 +567,10 @@
   // Columns with automatic sync
   const _internalSelectedColumns = ref([])
   const selectedColumns = computed({
-    get: () => _internalSelectedColumns.value.length > 0
-      ? _internalSelectedColumns.value
-      : props.columns.filter((col) => !props.hiddenByDefault?.includes(col.field)),
+    get: () =>
+      _internalSelectedColumns.value.length > 0
+        ? _internalSelectedColumns.value
+        : props.columns.filter((col) => !props.hiddenByDefault?.includes(col.field)),
     set: (value) => {
       _internalSelectedColumns.value = value
     }

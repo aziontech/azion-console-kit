@@ -26,17 +26,16 @@ export class EdgeAppService extends BaseService {
     await this.queryClient.removeQueries({
       predicate: (query) => {
         const queryKey = query.queryKey
-        const shouldRemove = (
+        const shouldRemove =
           queryKey &&
           Array.isArray(queryKey) &&
           queryKey[0] === this.cacheType.GLOBAL &&
           queryKey.some((key) => typeof key === 'string' && key.includes(CONSTANTS.CACHE_KEY))
-        )
         return shouldRemove
       }
     })
 
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
     try {
       await this.queryClient.prefetchQuery({
@@ -47,12 +46,13 @@ export class EdgeAppService extends BaseService {
           `pageSize=${CONSTANTS.DEFAULT_PAGE_SIZE}`,
           'ordering=-last_modified'
         ],
-        queryFn: () => this.listEdgeAppService({
-          page: 1,
-          pageSize: CONSTANTS.DEFAULT_PAGE_SIZE,
-          fields: CONSTANTS.DEFAULT_LIST_FIELDS,
-          ordering: '-last_modified'
-        }),
+        queryFn: () =>
+          this.listEdgeAppService({
+            page: 1,
+            pageSize: CONSTANTS.DEFAULT_PAGE_SIZE,
+            fields: CONSTANTS.DEFAULT_LIST_FIELDS,
+            ordering: '-last_modified'
+          }),
         staleTime: this.cacheTime.THIRTY_MINUTES
       })
     } catch (error) {
