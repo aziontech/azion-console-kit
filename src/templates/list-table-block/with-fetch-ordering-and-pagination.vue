@@ -137,7 +137,7 @@
             </template>
             <template v-else>
               <component
-                :is="col.component(extractFieldValue(rowData, col.field), rowData)"
+                :is="col.component(rowData[col.field], rowData)"
                 :data-testid="`list-table-block__column__${col.field}__row`"
                 class="overflow-hidden whitespace-nowrap text-ellipsis"
               />
@@ -402,13 +402,14 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import PrimeTag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { useTableQuery } from '@/composables/useTableQuery'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -578,57 +579,36 @@
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
 
-  // Validate that at least one service prop is provided
-  if (!props.listService && !props.useQueryFn) {
-    throw new Error('Either listService or useQueryFn prop must be provided')
-  }
-
-  // useQuery support
-  const isUsingQuery = computed(() => !!props.useQueryFn)
-  const queryParams = ref({
-    page: 1,
-    pageSize: itemsByPage.value,
-    fields: props.apiFields,
-    ordering: props.defaultOrderingFieldName
-  })
-
-  // Call useQuery ONCE during setup, passing reactive ref
-  // Vue Query will automatically react to changes in queryParams
-  const queryResult = isUsingQuery.value ? props.useQueryFn(queryParams) : null
-
-  // Traditional service state
-  const serviceIsLoading = ref(false)
-  const serviceData = ref([])
-
-  // Computed properties that work for both modes
-  const isLoading = computed(() => {
-    if (isUsingQuery.value && queryResult) {
-      return queryResult.isPending?.value ?? queryResult.isLoading?.value ?? false
-    }
-    return serviceIsLoading.value
-  })
-
-  const data = computed(() => {
-    if (isUsingQuery.value && queryResult?.data?.value) {
-      return queryResult.data.value.body || []
-    }
-    return serviceData.value
-  })
-
-  const totalRecords = computed(() => {
-    if (isUsingQuery.value && queryResult?.data?.value) {
-      return queryResult.data.value.count || 0
-    }
-    return serviceTotalRecords.value
-  })
-
-  const serviceTotalRecords = ref(0)
-
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
-  const firstLoadData = ref(true)
+
+  const {
+    isLoading,
+    data,
+    totalRecords,
+    itemsByPage: tableItemsByPage,
+    savedSearch,
+    firstLoadData,
+    isUsingQuery,
+    error,
+    loadData,
+    reload: tableReload,
+    updateSort,
+    updatePagination,
+    updateSearch,
+    handleError
+  } = useTableQuery({
+    useQueryFn: props.useQueryFn,
+    listService: props.listService,
+    apiFields: props.apiFields,
+    defaultOrderingFieldName: props.defaultOrderingFieldName,
+    itemsByPage: itemsByPage.value,
+    isGraphql: props.isGraphql,
+    lazy: props.lazy,
+    toast
+  })
 
   const cellQuickActions = ref({
     visible: false,
@@ -646,9 +626,6 @@
 
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
-
-  const savedSearch = ref('')
-  const savedOrdering = ref('')
   const firstItemIndex = ref(0)
 
   const filtersDynamically = computed(() => {
@@ -758,8 +735,8 @@
                 deleteConfirmationText: undefined,
                 closeCallback: (opt) => {
                   if (opt.data.updated) {
+                    firstItemIndex.value = 0
                     reload()
-                    updateDataTablePagination()
                   }
                 }
               })
@@ -779,56 +756,12 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }, service) => {
-    // If using useQuery, update params instead of direct fetch
-    if (isUsingQuery.value) {
-      queryParams.value = {
-        page,
-        ...query,
-        pageSize: itemsByPage.value,
-        fields: props.apiFields
-      }
-      return
-    }
+  const loadDataWithEvents = async (params, service) => {
+    await loadData(params, service)
 
-    // Traditional service approach
-    try {
-      serviceIsLoading.value = true
-      if (service) {
-        const { count = 0, body = [] } = props.isGraphql
-          ? await service()
-          : await service({ page, ...query })
-
-        serviceData.value = body
-        serviceTotalRecords.value = count
-      } else {
-        const { count = 0, body = [] } = props.isGraphql
-          ? await props.listService()
-          : await props.listService({ page, ...query })
-
-        serviceData.value = body
-        serviceTotalRecords.value = count
-      }
-    } catch (error) {
-      // Check if error is an ErrorHandler instance (from v2 services)
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        // Fallback for legacy errors or non-ErrorHandler errors
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage
-        })
-      }
-    } finally {
-      serviceIsLoading.value = false
-      if (firstLoadData.value) {
-        const hasData = serviceData.value?.length > 0
-        emit('on-load-data', !!hasData)
-      }
+    if (firstLoadData.value) {
+      const hasData = data.value?.length > 0
+      emit('on-load-data', !!hasData)
       firstLoadData.value = false
     }
   }
@@ -870,41 +803,13 @@
   }
 
   const reload = async (query = {}, listService = props.listService) => {
-    if (!savedOrdering.value) {
-      savedOrdering.value = props.defaultOrderingFieldName
-    }
+    await tableReload(query, listService)
 
-    const commonParams = {
-      page: 1,
-      pageSize: itemsByPage.value,
-      fields: props.apiFields,
-      ordering: savedOrdering.value,
-      ...query
-    }
-
-    if (props.lazy) {
-      commonParams.search = savedSearch.value
-    }
-
-    // For useQuery, update params directly
-    if (isUsingQuery.value) {
-      queryParams.value = { ...commonParams }
-      // Wait for data and setup handlers
-      setTimeout(() => {
-        if (data.value?.length > 0) {
-          setupCellEventHandlers()
-        }
-      }, 100)
-    } else {
-      await loadData(commonParams, listService)
-      if (serviceData.value?.length > 0) {
+    setTimeout(() => {
+      if (data.value?.length > 0) {
         setupCellEventHandlers()
       }
-    }
-  }
-
-  const extractFieldValue = (rowData, field) => {
-    return rowData[field]
+    }, 100)
   }
 
   const setMenuRefForRow = (rowDataID) => {
@@ -921,32 +826,17 @@
 
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
+    tableItemsByPage.value = numberOfLinesPerPage
     firstItemIndex.value = event.first
     emit('force-update', true)
 
-    if (isUsingQuery.value) {
-      // Update all params to trigger query refetch
-      queryParams.value = {
-        ...queryParams.value,
-        page: newPage,
-        pageSize: numberOfLinesPerPage,
-        fields: props.apiFields,
-        ordering: savedOrdering.value || props.defaultOrderingFieldName
-      }
+    await updatePagination(newPage, numberOfLinesPerPage)
 
-      if (props.lazy && savedSearch.value) {
-        queryParams.value.search = savedSearch.value
+    setTimeout(() => {
+      if (data.value?.length > 0) {
+        setupCellEventHandlers()
       }
-
-      // Wait for data and setup handlers
-      setTimeout(() => {
-        if (data.value?.length > 0) {
-          setupCellEventHandlers()
-        }
-      }, 100)
-    } else {
-      await reload({ page: newPage })
-    }
+    }, 100)
   }
 
   const filterBy = computed(() => {
@@ -958,32 +848,32 @@
 
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
-    let ordering = sortOrder === -1 ? `-${sortField}` : sortField
-    ordering = ordering === null ? props.defaultOrderingFieldName : ordering
 
     // Reset to first page (index 0)
     firstItemIndex.value = 0
 
-    savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
 
-    await reload({ ordering })
+    await updateSort(event)
+
+    // Aguarda dados e configura handlers
+    setTimeout(() => {
+      if (data.value?.length > 0) {
+        setupCellEventHandlers()
+      }
+    }, 100)
   }
 
-  const fetchOnSearch = () => {
+  const fetchOnSearch = async () => {
     if (!props.lazy) return
     emit('force-update', true)
 
     // Reset to first page (index 0)
     firstItemIndex.value = 0
 
-    reload()
-  }
-
-  const updateDataTablePagination = () => {
-    // Reset to first page (index 0 for DataTable)
-    firstItemIndex.value = 0
+    const searchValue = filters.value.global.value
+    await updateSearch(searchValue)
   }
 
   const handleSearchValue = () => {
@@ -1009,14 +899,14 @@
 
   onMounted(async () => {
     if (!props.loadDisabled && !isUsingQuery.value) {
-      await loadData({
+      await loadDataWithEvents({
         page: 1,
         pageSize: itemsByPage.value,
         fields: props.apiFields,
         ordering: props.defaultOrderingFieldName
       })
       // Setup cell handlers after data loads
-      if (serviceData.value?.length > 0) {
+      if (data.value?.length > 0) {
         setupCellEventHandlers()
       }
     }
@@ -1026,6 +916,10 @@
       // Wait for query to load
       const checkLoaded = () => {
         if (!isLoading.value) {
+          if (error.value) {
+            handleError(error.value)
+          }
+
           const hasData = data.value?.length > 0
           emit('on-load-data', !!hasData)
           firstLoadData.value = false
@@ -1084,28 +978,6 @@
       })
     }, 500)
   }
-
-  // Handle query errors reactively using computed
-  const hasQueryError = computed(() => {
-    if (isUsingQuery.value && queryResult?.error?.value) {
-      const error = queryResult.error.value
-
-      // Show error toast
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage
-        })
-      }
-      return true
-    }
-    return false
-  })
 
   const onScroll = () => {
     if (cellQuickActions.value.visible) {

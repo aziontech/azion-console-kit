@@ -56,7 +56,7 @@ export class EdgeAppService extends BaseService {
         staleTime: this.cacheTime.THIRTY_MINUTES
       })
     } catch (error) {
-      console.error('❌ [invalidateListCache] Failed to prefetch page 1:', error)
+      // Failed to prefetch page 1
     }
   }
 
