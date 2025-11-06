@@ -157,6 +157,24 @@ const config = {
   ],
   cache: [
     {
+      name: 'Statics - Cache .html',
+      stale: false,
+      queryStringSort: false,
+      cacheByQueryString: {
+        option: 'ignore'
+      },
+      methods: {
+        post: false,
+        options: false
+      },
+      browser: {
+        maxAgeSeconds: 900
+      },
+      edge: {
+        maxAgeSeconds: 60 * 60 * 24 * 1 // 1 days
+      }
+    },
+    {
       name: 'Statics - Cache',
       stale: false,
       queryStringSort: false,
@@ -252,7 +270,8 @@ const config = {
           'Delivers static assets such as CSS, JS, images, and other files directly from object storage.',
         match: '^\\/',
         behavior: {
-          rewrite: `/index.html`
+          rewrite: `/index.html`,
+          setCache: 'Statics - Cache .html'
         }
       },
       {
