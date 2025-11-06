@@ -1,6 +1,7 @@
 <template>
   <div class="sql-database-list w-full h-full flex flex-col min-h-0">
     <DataTable
+      ref="dataTableRef"
       class="flex-1 min-h-0"
       :data="displayDataForView"
       :columns="props.columns"
@@ -433,7 +434,10 @@
     handleSearchValue,
     selectedColumns,
     toggleColumnSelector,
-    columnSelectorPanel
+    columnSelectorPanel,
+    handleExportTableDataToCSV,
+    exportTableAsJSON,
+    exportTableAsXLSX
   } = useDataTable(tableProps, emit)
 
   const editRow = (row) => {
@@ -552,77 +556,12 @@
     if (exportMenuRef.value) exportMenuRef.value.toggle(event)
   }
 
-  const getExportRows = () => editableData.value || []
-  const getExportFields = () =>
-    (props.columns || [])
-      .filter((column) => column?.field && column.field !== 'actions')
-      .map((column) => column.field)
-
-  const toCsv = (rows, fields) => {
-    const escapeCsv = (val) => {
-      if (val == null) return ''
-      const str = String(val)
-      if (/[,"\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"'
-      return str
-    }
-    const header = fields.map(escapeCsv).join(',')
-    const body = rows
-      .map((row) => fields.map((fieldName) => escapeCsv(row[fieldName])).join(','))
-      .join('\n')
-    return header + '\n' + body
-  }
-
-  const triggerDownload = (content, mime, filename) => {
-    const blob = content instanceof Blob ? content : new Blob([content], { type: mime })
-    const url = URL.createObjectURL(blob)
-    const anchorEl = document.createElement('a')
-    anchorEl.href = url
-    anchorEl.download = filename
-    document.body.appendChild(anchorEl)
-    anchorEl.click()
-    document.body.removeChild(anchorEl)
-    URL.revokeObjectURL(url)
-  }
-
-  const exportAsCSV = () => {
-    const rows = getExportRows()
-    const fields = getExportFields()
-    const csv = toCsv(rows, fields)
-    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.csv`
-    triggerDownload(csv, 'text/csv;charset=utf-8;', filename)
-  }
-
-  const exportAsJSON = () => {
-    const rows = getExportRows()
-    const json = JSON.stringify(rows ?? [], null, 2)
-    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.json`
-    triggerDownload(json, 'application/json;charset=utf-8;', filename)
-  }
-
-  const exportAsXLSX = async () => {
-    const rows = getExportRows()
-    const fields = getExportFields()
-    const filename = `${(props.title || 'data').toString().replace(/\s+/g, '_').toLowerCase()}.xlsx`
-    try {
-      const XLSX = (await import('xlsx')).default || (await import('xlsx'))
-      const headerRow = fields
-      const dataRows = rows.map((row) => fields.map((fieldName) => row[fieldName]))
-      const worksheetData = [headerRow, ...dataRows]
-      const workbook = XLSX.utils.book_new()
-      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-      const arrayBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-      const blob = new Blob([arrayBuffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      })
-      triggerDownload(blob, blob.type, filename)
-    } catch (err) {
-      // Fallback to CSV if xlsx lib not available
-      const csv = toCsv(rows, fields)
-      const csvName = filename.replace(/\.xlsx$/i, '.csv')
-      triggerDownload(csv, 'text/csv;charset=utf-8;', csvName)
-    }
-  }
+  // Use centralized export helpers from useDataTable
+  const exportAsCSV = () => handleExportTableDataToCSV()
+  const exportAsJSON = () =>
+    exportTableAsJSON(props.title, editableData.value, selectedColumns.value)
+  const exportAsXLSX = () =>
+    exportTableAsXLSX(props.title, editableData.value, selectedColumns.value)
 
   const exportMenuItems = computed(() => [
     { label: 'Export all to .csv', icon: 'pi pi-file', command: exportAsCSV },
