@@ -12,7 +12,7 @@
     }
   })
 
-  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id']
+  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id', 'email']
 
   const actions = [
     {
@@ -32,9 +32,14 @@
 
   const getColumns = computed(() => [
     {
+      field: 'name',
+      header: 'Name',
+      sortField: 'name'
+    },
+    {
       field: 'email',
       header: 'Email',
-      sortField: 'name',
+      sortField: 'email',
       type: 'component',
       style: 'max-width: 240px',
       component: (columnData) => {
@@ -67,7 +72,7 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        :listService="mafService.listMfaService"
+        :listService="mfaService.listMfaService"
         :columns="getColumns"
         emptyListMessage="No MFA users found."
         :actions="actions"
