@@ -227,7 +227,7 @@ const config = {
         description:
           'Sets the storage origin and deliver for all requests using the default object storage.',
         match:
-          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
+          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',
