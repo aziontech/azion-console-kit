@@ -2,6 +2,7 @@ import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService, createReactiveQueryKey } from '@/services/v2/base/query/baseService'
 import { useMutation } from '@tanstack/vue-query'
 import { unref } from 'vue'
+import { TABLE_FIRST_PAGE_OPTIONS, TABLE_PAGINATION_OPTIONS } from '@/services/v2/base/query/config'
 
 const CONSTANTS = {
   CACHE_KEY: 'edge-apps-list',
@@ -99,6 +100,7 @@ export class EdgeAppService extends BaseService {
   listEdgeApplicationsService = (params) => {
     const keyParams = ['page', 'pageSize', 'ordering', 'search']
     const queryKey = createReactiveQueryKey([CONSTANTS.CACHE_KEY], params, keyParams)
+    const cacheOptions = this.#getCacheOptions(params)
 
     return this.useQuery({
       key: queryKey,
@@ -111,12 +113,25 @@ export class EdgeAppService extends BaseService {
         }
         return this.listEdgeAppService(finalParams)
       },
-      overrides: {
-        staleTime: this.cacheTime.THIRTY_MINUTES,
-        gcTime: this.cacheTime.ONE_DAY,
-        refetchOnMount: true
-      }
+      ...cacheOptions
     })
+  }
+
+  #getCacheOptions(params) {
+    const paramValues = unref(params) || {}
+    const isFirstPage = paramValues.page === 1 || !paramValues.page
+    const hasSearch = paramValues.search?.trim()
+
+    const baseOptions = isFirstPage ? TABLE_FIRST_PAGE_OPTIONS : TABLE_PAGINATION_OPTIONS
+
+    if (hasSearch) {
+      return {
+        ...baseOptions,
+        meta: { persist: false }
+      }
+    }
+
+    return baseOptions
   }
 
   listEdgeApplicationsServiceDropdown = async (

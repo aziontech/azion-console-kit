@@ -20,7 +20,7 @@ export class UserService extends BaseService {
       key: ['user', 'info'],
       queryFn: () => this.fetchUserInfo(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
+      ...options
     })
   }
 

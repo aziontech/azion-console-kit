@@ -25,31 +25,39 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, ...options }) {
     const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
+    const defaultOptions = getCacheOptions(cache)
     const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return useQuery({
       queryKey,
       queryFn: coalescedQueryFn,
+      ...defaultOptions,
       ...options,
-      ...overrides
+      meta: {
+        ...defaultOptions.meta,
+        ...options.meta
+      }
     })
   }
 
-  async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+  async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, ...options }) {
     await waitForPersistenceRestore()
 
     const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
+    const defaultOptions = getCacheOptions(cache)
     const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return this.queryClient.ensureQueryData({
       queryKey,
       queryFn: coalescedQueryFn,
+      ...defaultOptions,
       ...options,
-      ...overrides
+      meta: {
+        ...defaultOptions.meta,
+        ...options.meta
+      }
     })
   }
 
