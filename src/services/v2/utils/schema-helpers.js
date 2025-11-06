@@ -1,20 +1,13 @@
 /* eslint-disable no-console */
+import { setWithExpiration, getWithExpiration } from '@/helpers/local-storage-manager'
 
 export const schemaCacheKey = (databaseId, tableName) => `edgeSql:schema:${databaseId}:${tableName}`
 
 export const getSchemaCache = (databaseId, tableName) => {
   try {
     const key = schemaCacheKey(databaseId, tableName)
-    const raw = localStorage.getItem(key)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object') return null
-    const now = Date.now()
-    if (parsed.expiresAt && now < parsed.expiresAt) {
-      return parsed.schema || null
-    }
-    localStorage.removeItem(key)
-    return null
+    const value = getWithExpiration(key, { encrypt: false })
+    return Array.isArray(value) ? value : value || null
   } catch {
     return null
   }
@@ -23,11 +16,8 @@ export const getSchemaCache = (databaseId, tableName) => {
 export const setSchemaCache = (databaseId, tableName, schema, ttlMs) => {
   try {
     const key = schemaCacheKey(databaseId, tableName)
-    const payload = {
-      schema,
-      expiresAt: Date.now() + (Number(ttlMs) || 0)
-    }
-    localStorage.setItem(key, JSON.stringify(payload))
+    const minutes = Math.max(1, Math.ceil((Number(ttlMs) || 0) / 60000))
+    setWithExpiration({ key, value: schema, expirationMinutes: minutes, encrypt: false })
   } catch {
     console.error('Failed to set schema cache')
   }
