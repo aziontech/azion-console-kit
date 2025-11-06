@@ -129,7 +129,7 @@
       <section class="w-full flex flex-col gap-4 md:gap-5 pt-1">
         <div
           v-if="showExperimental"
-          class="w-full p-3 surface-border border rounded-md flex flex-col gap-3 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
+          class="w-full surface-section p-3 surface-border border rounded-md flex flex-col gap-3 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
         >
           <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl">
             {{ disclaimer }}
