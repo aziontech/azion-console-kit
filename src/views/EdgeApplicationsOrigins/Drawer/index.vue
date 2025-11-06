@@ -135,11 +135,16 @@
             address: yup.string().label('Address').required(),
             weight: yup
               .number()
+              .nullable()
+              .min(1)
+              .max(10)
               .label('Weight')
-              .when('$originType', {
-                is: 'load_balancer',
-                then: (schema) => schema.required().min(1).max(10),
-                otherwise: (schema) => schema.optional().min(1).max(10)
+              .test('weight-required', 'Weight is a required field', function (value) {
+                const { originType } = this.from[1].value
+                if (originType === 'load_balancer') {
+                  return value != null
+                }
+                return true
               }),
             isActive: yup.boolean().default(true).label('Active')
           })
