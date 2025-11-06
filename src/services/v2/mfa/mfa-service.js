@@ -17,32 +17,11 @@ export class MFAService extends BaseService {
 
     const { results, count } = data
 
-    let parsedMfaUsers = []
-
-    for (const user of results) {
-      if (!user.name) {
-        const { email } = await this.#loadUserService(user.user_id)
-        user.name = email
-      }
-      parsedMfaUsers.push(user)
-    }
-
-    const body = this.adapter?.transformListMfa?.(parsedMfaUsers) ?? parsedMfaUsers
+    const body = this.adapter?.transformListMfa?.(results) ?? results
 
     return {
       count,
       body
-    }
-  }
-
-  #loadUserService = async (id) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.iamEndpoint}/${id}?fields=email`
-    })
-
-    return {
-      email: data.data.email
     }
   }
 
