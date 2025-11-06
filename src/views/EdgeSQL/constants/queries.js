@@ -217,13 +217,16 @@ export const SQLITE_QUERIES = {
         // If becoming NOT NULL, coalesce with default when provided
         if (targetNew?.notNull && targetNew?.default !== undefined && targetNew?.default !== null) {
           const defaultVal = targetNew.default
-          const defRaw = isSqlKeywordDefault(defaultVal)
-            ? defaultVal
-            : typeof defaultVal === 'number' || typeof defaultVal === 'boolean'
-            ? String(defaultVal)
-            : isWrappedInQuotes(defaultVal)
-            ? String(defaultVal).trim()
-            : `'${String(defaultVal).replace(/'/g, "''")}'`
+          let defRaw
+          if (isSqlKeywordDefault(defaultVal)) {
+            defRaw = defaultVal
+          } else if (typeof defaultVal === 'number' || typeof defaultVal === 'boolean') {
+            defRaw = String(defaultVal)
+          } else if (isWrappedInQuotes(defaultVal)) {
+            defRaw = String(defaultVal).trim()
+          } else {
+            defRaw = `'${String(defaultVal).replace(/'/g, "''")}'`
+          }
           return `COALESCE(${quote(column.name)}, ${defRaw}) AS ${quote(column.name)}`
         }
         return quote(column.name)
