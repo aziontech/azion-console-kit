@@ -46,8 +46,6 @@ export class EdgeAppErrorResponseService extends BaseService {
     })
   }
 
-  // ==================== List Methods ====================
-
   listEdgeApplicationsErrorResponseService = async ({ params, edgeApplicationId }) => {
     return this.queryAsync({
       key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
@@ -67,8 +65,6 @@ export class EdgeAppErrorResponseService extends BaseService {
       ...CACHE_OPTIONS
     })
   }
-
-  // ==================== Edit Methods ====================
 
   editEdgeApplicationErrorResponseService = async (payload, edgeApplicationId) => {
     const body = this.adapter?.transformPayloadEditEdgeAppErrorResponse?.(payload) ?? payload

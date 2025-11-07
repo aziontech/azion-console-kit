@@ -38,8 +38,6 @@ export class RulesEngineService extends BaseService {
     })
   }
 
-  // ==================== Create Methods ====================
-
   async createRulesEngine(payload) {
     const { edgeApplicationId, phase } = payload
     const currentPhase = this.getCurrentPhase(phase)
@@ -59,8 +57,6 @@ export class RulesEngineService extends BaseService {
     }
   }
 
-  // ==================== Load Method ====================
-
   async loadRulesEngine({ edgeApplicationId, id, phase = 'request' }) {
     const currentPhase = this.getCurrentPhase(phase)
 
@@ -71,8 +67,6 @@ export class RulesEngineService extends BaseService {
 
     return this.adapter?.transformLoadRulesEngine?.(data, phase) ?? data
   }
-
-  // ==================== Edit Methods ====================
 
   async editRulesEngine({ edgeApplicationId, payload, reorder = false }) {
     const currentPhase = this.getCurrentPhase(payload.phase)
@@ -89,8 +83,6 @@ export class RulesEngineService extends BaseService {
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
 
-  // ==================== Delete Methods ====================
-
   async deleteRulesEngine({ edgeApplicationId, ruleId, phase = 'request' }) {
     const currentPhase = this.getCurrentPhase(phase)
     await this.http.request({
@@ -102,8 +94,6 @@ export class RulesEngineService extends BaseService {
 
     return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
-
-  // ==================== Reorder Methods ====================
 
   async reorderRulesEngine(newOrderData, edgeApplicationId) {
     const adapt = this.adapter?.transformReorderRulesEngine?.(newOrderData)
@@ -128,8 +118,6 @@ export class RulesEngineService extends BaseService {
 
     return CONSTANTS.MESSAGES.REORDER_SUCCESS
   }
-
-  // ==================== List Methods ====================
 
   async _listRulesEngine({
     edgeApplicationId,

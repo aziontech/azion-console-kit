@@ -37,8 +37,6 @@ export class CacheSettingsService extends BaseService {
     })
   }
 
-  // ==================== List Methods ====================
-
   listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100 }) => {
     return this.queryAsync({
       key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
@@ -63,8 +61,6 @@ export class CacheSettingsService extends BaseService {
     })
   }
 
-  // ==================== Load Method ====================
-
   loadCacheSettingsService = async (edgeApplicationId, cacheSettingId) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -73,8 +69,6 @@ export class CacheSettingsService extends BaseService {
 
     return this.adapter?.transformLoadCacheSetting?.(data) ?? data.data
   }
-
-  // ==================== Create Methods ====================
 
   createCacheSettingsService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.requestPayload?.(payload) ?? payload
@@ -93,8 +87,6 @@ export class CacheSettingsService extends BaseService {
     }
   }
 
-  // ==================== Edit Methods ====================
-
   editCacheSettingsService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.requestPayload?.(payload) ?? payload
 
@@ -108,8 +100,6 @@ export class CacheSettingsService extends BaseService {
 
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
-
-  // ==================== Delete Methods ====================
 
   deleteCacheSettingService = async (edgeApplicationId, cacheSettingId) => {
     await this.http.request({

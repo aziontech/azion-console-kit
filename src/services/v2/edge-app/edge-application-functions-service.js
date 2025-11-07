@@ -39,8 +39,6 @@ export class EdgeApplicationFunctionService extends BaseService {
     })
   }
 
-  // ==================== List Methods ====================
-
   listFunctions = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -116,8 +114,6 @@ export class EdgeApplicationFunctionService extends BaseService {
     return { results: data.results, count: data.count }
   }
 
-  // ==================== Load Method ====================
-
   loadEdgeApplicationFunction = async ({ edgeApplicationID, functionID }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -126,8 +122,6 @@ export class EdgeApplicationFunctionService extends BaseService {
 
     return this.adapter?.transformLoadEdgeApplicationFunction(data) ?? data
   }
-
-  // ==================== Create Methods ====================
 
   createEdgeApplicationFunction = async (payload) => {
     const edgeApplicationId = payload.id
@@ -147,8 +141,6 @@ export class EdgeApplicationFunctionService extends BaseService {
     }
   }
 
-  // ==================== Edit Methods ====================
-
   editEdgeApplicationFunction = async (payload) => {
     const body = this.adapter?.transformEditPayload(payload)
 
@@ -162,8 +154,6 @@ export class EdgeApplicationFunctionService extends BaseService {
 
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
-
-  // ==================== Delete Methods ====================
 
   deleteEdgeApplicationFunction = async (functionID, edgeApplicationID) => {
     await this.http.request({

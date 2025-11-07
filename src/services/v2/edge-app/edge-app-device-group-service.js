@@ -38,8 +38,6 @@ export class DeviceGroupService extends BaseService {
     })
   }
 
-  // ==================== Private Helper Methods ====================
-
   #getCacheOptions(params) {
     const paramValues = params || {}
     const isFirstPage = paramValues.page === 1 || !paramValues.page
@@ -53,8 +51,6 @@ export class DeviceGroupService extends BaseService {
       meta: { persist: shouldPersist }
     }
   }
-
-  // ==================== List Methods ====================
 
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: CONSTANTS.DEFAULT_PAGE_SIZE }) => {
     const cacheOptions = this.#getCacheOptions(params)
@@ -81,8 +77,6 @@ export class DeviceGroupService extends BaseService {
     })
   }
 
-  // ==================== Load Method ====================
-
   loadDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -91,8 +85,6 @@ export class DeviceGroupService extends BaseService {
 
     return this.adapter?.transformLoadDeviceGroup?.(data) ?? data.data
   }
-
-  // ==================== Create Methods ====================
 
   createDeviceGroupService = async (payload) => {
     const { edgeApplicationId } = payload
@@ -113,8 +105,6 @@ export class DeviceGroupService extends BaseService {
     }
   }
 
-  // ==================== Edit Methods ====================
-
   editDeviceGroupService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
@@ -128,8 +118,6 @@ export class DeviceGroupService extends BaseService {
 
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
-
-  // ==================== Delete Methods ====================
 
   deleteDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
     await this.http.request({

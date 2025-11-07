@@ -38,7 +38,6 @@ export class EdgeAppService extends BaseService {
   }
 
   async invalidatePreviousLoadCache(currentId) {
-    // Remove todos os caches de load EXCETO o atual
     await this.queryClient.removeQueries({
       predicate: (query) => {
         const queryKey = query.queryKey
@@ -50,8 +49,7 @@ export class EdgeAppService extends BaseService {
           queryKey.includes('load')
         
         if (!isLoadCache) return false
-        
-        // Remove se NÃO for o ID atual
+
         const isCurrentId = queryKey.some(
           (key) => typeof key === 'string' && key === `id=${currentId}`
         )
@@ -61,8 +59,6 @@ export class EdgeAppService extends BaseService {
     })
   }
 
-  // ==================== Private Helper Methods ====================
-
   async #fetchList(params) {
     const { data } = await this.http.request({
       method: 'GET',
@@ -71,8 +67,6 @@ export class EdgeAppService extends BaseService {
     })
     return data
   }
-
-  // ==================== List Methods ====================
 
   listEdgeAppService = async (params = {}) => {
     const { count, results } = await this.#fetchList(params)
@@ -128,8 +122,6 @@ export class EdgeAppService extends BaseService {
     return { body, count }
   }
 
-  // ==================== Load Method ====================
-
   useLoadEdgeApplication(edgeApplicationId, params = {}, options = {}) {
     return useQuery(
       {
@@ -142,10 +134,9 @@ export class EdgeAppService extends BaseService {
         ],
         queryFn: async () => {
           const id = unref(edgeApplicationId)
-          
-          // Invalida cache do item anterior antes de carregar o novo
+
           await this.invalidatePreviousLoadCache(id)
-          
+
           const { data } = await this.http.request({
             method: 'GET',
             url: `${this.baseURL}/${id}`,
@@ -158,7 +149,7 @@ export class EdgeAppService extends BaseService {
         gcTime: this.cacheTime.THIRTY_MINUTES,
         enabled: !!unref(edgeApplicationId),
         meta: {
-          persist: true // Persiste apenas o último item carregado
+          persist: true
         },
         ...options
       },
@@ -184,8 +175,6 @@ export class EdgeAppService extends BaseService {
     })
   }
 
-  // ==================== Create Methods ====================
-
   createEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
@@ -199,8 +188,6 @@ export class EdgeAppService extends BaseService {
 
     return data
   }
-
-  // ==================== Edit Methods ====================
 
   editEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
@@ -216,8 +203,6 @@ export class EdgeAppService extends BaseService {
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
 
-  // ==================== Delete Methods ====================
-
   deleteEdgeApplicationService = async (edgeApplicationId) => {
     await this.http.request({
       method: 'DELETE',
@@ -228,8 +213,6 @@ export class EdgeAppService extends BaseService {
 
     return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
-
-  // ==================== Clone Methods ====================
 
   cloneEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayloadClone?.(payload) ?? payload
