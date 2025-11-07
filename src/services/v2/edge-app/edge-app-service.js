@@ -1,8 +1,8 @@
 import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService, createReactiveQueryKey } from '@/services/v2/base/query/baseService'
-import { useMutation } from '@tanstack/vue-query'
 import { unref } from 'vue'
 import { TABLE_FIRST_PAGE_OPTIONS, TABLE_PAGINATION_OPTIONS } from '@/services/v2/base/query/config'
+import { useQuery } from '@tanstack/vue-query'
 
 const CONSTANTS = {
   CACHE_KEY: 'edge-apps-list',
@@ -35,30 +35,30 @@ export class EdgeAppService extends BaseService {
         return shouldRemove
       }
     })
+  }
 
-    await new Promise((resolve) => setTimeout(resolve, 100))
-
-    try {
-      await this.queryClient.prefetchQuery({
-        queryKey: [
-          this.cacheType.GLOBAL,
-          CONSTANTS.CACHE_KEY,
-          'page=1',
-          `pageSize=${CONSTANTS.DEFAULT_PAGE_SIZE}`,
-          'ordering=-last_modified'
-        ],
-        queryFn: () =>
-          this.listEdgeAppService({
-            page: 1,
-            pageSize: CONSTANTS.DEFAULT_PAGE_SIZE,
-            fields: CONSTANTS.DEFAULT_LIST_FIELDS,
-            ordering: '-last_modified'
-          }),
-        staleTime: this.cacheTime.THIRTY_MINUTES
-      })
-    } catch (error) {
-      // Failed to prefetch page 1
-    }
+  async invalidatePreviousLoadCache(currentId) {
+    // Remove todos os caches de load EXCETO o atual
+    await this.queryClient.removeQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey
+        if (!queryKey || !Array.isArray(queryKey)) return false
+        
+        const isLoadCache = 
+          queryKey[0] === this.cacheType.GLOBAL &&
+          queryKey.includes(CONSTANTS.CACHE_KEY) &&
+          queryKey.includes('load')
+        
+        if (!isLoadCache) return false
+        
+        // Remove se NÃO for o ID atual
+        const isCurrentId = queryKey.some(
+          (key) => typeof key === 'string' && key === `id=${currentId}`
+        )
+        
+        return !isCurrentId
+      }
+    })
   }
 
   // ==================== Private Helper Methods ====================
@@ -70,23 +70,6 @@ export class EdgeAppService extends BaseService {
       params
     })
     return data
-  }
-
-  #createMutationWithCacheInvalidation(mutationFn, options = {}) {
-    return useMutation(
-      {
-        mutationFn,
-        onSuccess: async (data, variables, context) => {
-          await this.invalidateListCache()
-
-          if (options.onSuccess) {
-            await options.onSuccess(data, variables, context)
-          }
-        },
-        ...options
-      },
-      this.queryClient
-    )
   }
 
   // ==================== List Methods ====================
@@ -147,24 +130,61 @@ export class EdgeAppService extends BaseService {
 
   // ==================== Load Method ====================
 
-  loadEdgeApplicationService = async ({ id, params }) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.baseURL}/${id}`,
-      params
-    })
+  useLoadEdgeApplication(edgeApplicationId, params = {}, options = {}) {
+    return useQuery(
+      {
+        queryKey: [
+          this.cacheType.GLOBAL,
+          CONSTANTS.CACHE_KEY,
+          'load',
+          `id=${unref(edgeApplicationId)}`,
+          params
+        ],
+        queryFn: async () => {
+          const id = unref(edgeApplicationId)
+          
+          // Invalida cache do item anterior antes de carregar o novo
+          await this.invalidatePreviousLoadCache(id)
+          
+          const { data } = await this.http.request({
+            method: 'GET',
+            url: `${this.baseURL}/${id}`,
+            params
+          })
 
-    return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
+          return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
+        },
+        staleTime: this.cacheTime.TEN_MINUTES,
+        gcTime: this.cacheTime.THIRTY_MINUTES,
+        enabled: !!unref(edgeApplicationId),
+        meta: {
+          persist: true // Persiste apenas o último item carregado
+        },
+        ...options
+      },
+      this.queryClient
+    )
+  }
+
+  loadEdgeApplicationService = async ({ id, params }) => {
+    return this.queryAsync({
+      key: [CONSTANTS.CACHE_KEY, 'load', `id=${id}`, params || {}],
+      cache: this.cacheType.GLOBAL,
+      queryFn: async () => {
+        const { data } = await this.http.request({
+          method: 'GET',
+          url: `${this.baseURL}/${id}`,
+          params
+        })
+
+        return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
+      },
+      staleTime: this.cacheTime.TEN_MINUTES,
+      gcTime: this.cacheTime.THIRTY_MINUTES
+    })
   }
 
   // ==================== Create Methods ====================
-
-  useCreateEdgeApplication(options = {}) {
-    return this.#createMutationWithCacheInvalidation(
-      (payload) => this.createEdgeApplicationService(payload),
-      options
-    )
-  }
 
   createEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
@@ -175,23 +195,12 @@ export class EdgeAppService extends BaseService {
       body
     })
 
+    await this.invalidateListCache()
+
     return data
   }
 
-  createEdgeApplicationServiceWithInvalidation = async (payload) => {
-    const result = await this.createEdgeApplicationService(payload)
-    await this.invalidateListCache()
-    return result
-  }
-
   // ==================== Edit Methods ====================
-
-  useEditEdgeApplication(options = {}) {
-    return this.#createMutationWithCacheInvalidation(
-      (payload) => this.editEdgeApplicationService(payload),
-      options
-    )
-  }
 
   editEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
@@ -202,23 +211,12 @@ export class EdgeAppService extends BaseService {
       body
     })
 
+    await this.invalidateListCache()
+
     return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
 
-  editEdgeApplicationServiceWithInvalidation = async (payload) => {
-    const result = await this.editEdgeApplicationService(payload)
-    await this.invalidateListCache()
-    return result
-  }
-
   // ==================== Delete Methods ====================
-
-  useDeleteEdgeApplication(options = {}) {
-    return this.#createMutationWithCacheInvalidation(
-      (edgeApplicationId) => this.deleteEdgeApplicationService(edgeApplicationId),
-      options
-    )
-  }
 
   deleteEdgeApplicationService = async (edgeApplicationId) => {
     await this.http.request({
@@ -226,23 +224,12 @@ export class EdgeAppService extends BaseService {
       url: `${this.baseURL}/${edgeApplicationId}`
     })
 
+    await this.invalidateListCache()
+
     return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
 
-  deleteEdgeApplicationServiceWithInvalidation = async (edgeApplicationId) => {
-    const result = await this.deleteEdgeApplicationService(edgeApplicationId)
-    await this.invalidateListCache()
-    return result
-  }
-
   // ==================== Clone Methods ====================
-
-  useCloneEdgeApplication(options = {}) {
-    return this.#createMutationWithCacheInvalidation(
-      (payload) => this.cloneEdgeApplicationService(payload),
-      options
-    )
-  }
 
   cloneEdgeApplicationService = async (payload) => {
     const body = this.adapter?.transformPayloadClone?.(payload) ?? payload
@@ -253,17 +240,13 @@ export class EdgeAppService extends BaseService {
       body
     })
 
+    await this.invalidateListCache()
+
     return {
       feedback: CONSTANTS.MESSAGES.CLONE_SUCCESS,
       urlToEditView: `/applications/edit/${data.data.id}`,
       applicationId: data.data.id
     }
-  }
-
-  cloneEdgeApplicationServiceWithInvalidation = async (payload) => {
-    const result = await this.cloneEdgeApplicationService(payload)
-    await this.invalidateListCache()
-    return result
   }
 }
 

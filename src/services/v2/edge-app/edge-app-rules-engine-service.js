@@ -1,5 +1,17 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
+
+const CONSTANTS = {
+  CACHE_KEY: 'rules-engine-list',
+  DEFAULT_PAGE_SIZE: 100,
+  MESSAGES: {
+    CREATE_SUCCESS: 'Rule successfully created',
+    UPDATE_SUCCESS: 'Rule successfully updated',
+    DELETE_SUCCESS: 'Rule successfully deleted',
+    REORDER_SUCCESS: 'Rules Engine successfully ordered'
+  }
+}
+
 export class RulesEngineService extends BaseService {
   constructor() {
     super()
@@ -10,6 +22,23 @@ export class RulesEngineService extends BaseService {
   getUrl(edgeApplicationId, phase, suffix = '') {
     return `${this.baseURL}/${edgeApplicationId}/${phase}${suffix}`
   }
+
+  async invalidateListCache(edgeApplicationId) {
+    await this.queryClient.removeQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey
+        return (
+          queryKey &&
+          Array.isArray(queryKey) &&
+          queryKey[0] === this.cacheType.GLOBAL &&
+          queryKey.includes(CONSTANTS.CACHE_KEY) &&
+          queryKey.includes(`edgeAppId=${edgeApplicationId}`)
+        )
+      }
+    })
+  }
+
+  // ==================== Create Methods ====================
 
   async createRulesEngine(payload) {
     const { edgeApplicationId, phase } = payload
@@ -22,11 +51,15 @@ export class RulesEngineService extends BaseService {
       body: bodyRequest
     })
 
+    await this.invalidateListCache(edgeApplicationId)
+
     return {
-      feedback: 'Rule successfully created',
+      feedback: CONSTANTS.MESSAGES.CREATE_SUCCESS,
       id: response.data?.id
     }
   }
+
+  // ==================== Load Method ====================
 
   async loadRulesEngine({ edgeApplicationId, id, phase = 'request' }) {
     const currentPhase = this.getCurrentPhase(phase)
@@ -39,6 +72,8 @@ export class RulesEngineService extends BaseService {
     return this.adapter?.transformLoadRulesEngine?.(data, phase) ?? data
   }
 
+  // ==================== Edit Methods ====================
+
   async editRulesEngine({ edgeApplicationId, payload, reorder = false }) {
     const currentPhase = this.getCurrentPhase(payload.phase)
     const bodyRequest = this.adapter?.transformEditRulesEngine?.(payload, reorder)
@@ -49,8 +84,12 @@ export class RulesEngineService extends BaseService {
       body: bodyRequest
     })
 
-    return 'Rule successfully updated'
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
+
+  // ==================== Delete Methods ====================
 
   async deleteRulesEngine({ edgeApplicationId, ruleId, phase = 'request' }) {
     const currentPhase = this.getCurrentPhase(phase)
@@ -59,8 +98,12 @@ export class RulesEngineService extends BaseService {
       url: this.getUrl(edgeApplicationId, currentPhase, `/${ruleId}`)
     })
 
-    return 'Rule successfully deleted'
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
+
+  // ==================== Reorder Methods ====================
 
   async reorderRulesEngine(newOrderData, edgeApplicationId) {
     const adapt = this.adapter?.transformReorderRulesEngine?.(newOrderData)
@@ -81,8 +124,12 @@ export class RulesEngineService extends BaseService {
       })
     }
 
-    return 'Rules Engine successfully ordered'
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.REORDER_SUCCESS
   }
+
+  // ==================== List Methods ====================
 
   async _listRulesEngine({
     edgeApplicationId,
@@ -142,19 +189,25 @@ export class RulesEngineService extends BaseService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
-    const [requestRules, responseRules] = await Promise.all([
-      this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
-      this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
-    ])
+    return this.queryAsync({
+      key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
+      cache: this.cacheType.GLOBAL,
+      queryFn: async () => {
+        const [requestRules, responseRules] = await Promise.all([
+          this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
+          this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
+        ])
 
-    const responseBody = [...requestRules, ...responseRules]
+        const responseBody = [...requestRules, ...responseRules]
 
-    const data = {
-      count: responseBody.length,
-      body: responseBody
-    }
-
-    return data
+        return {
+          count: responseBody.length,
+          body: responseBody
+        }
+      },
+      staleTime: this.cacheTime.TEN_MINUTES,
+      gcTime: this.cacheTime.THIRTY_MINUTES
+    })
   }
 
   getCurrentPhase(phase) {

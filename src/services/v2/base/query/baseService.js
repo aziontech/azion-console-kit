@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import {
   queryClient,
@@ -59,6 +59,21 @@ export class BaseService {
         ...options.meta
       }
     })
+  }
+
+  useMutation(options) {
+    return useMutation(options, this.queryClient)
+  }
+
+  async mutateAsync({ mutationFn, onSuccess, onError, ...options }) {
+    const mutation = this.useMutation({
+      mutationFn,
+      onSuccess,
+      onError,
+      ...options
+    })
+
+    return mutation.mutateAsync()
   }
 
   withMutex(key, mutationFn) {

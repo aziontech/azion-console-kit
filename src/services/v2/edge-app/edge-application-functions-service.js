@@ -2,6 +2,16 @@ import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeApplicationFunctionsAdapter } from './edge-application-functions-adapter'
 
+const CONSTANTS = {
+  CACHE_KEY: 'edge-app-functions-list',
+  DEFAULT_PAGE_SIZE: 10,
+  MESSAGES: {
+    CREATE_SUCCESS: 'Your Function has been created',
+    UPDATE_SUCCESS: 'Your Function has been updated',
+    DELETE_SUCCESS: 'Your Function successfully deleted'
+  }
+}
+
 export class EdgeApplicationFunctionService extends BaseService {
   constructor() {
     super()
@@ -13,6 +23,23 @@ export class EdgeApplicationFunctionService extends BaseService {
   #getUrl(edgeApplicationId, suffix = '') {
     return `${this.baseURL}/${edgeApplicationId}/functions${suffix}`
   }
+
+  async invalidateListCache(edgeApplicationId) {
+    await this.queryClient.removeQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey
+        return (
+          queryKey &&
+          Array.isArray(queryKey) &&
+          queryKey[0] === this.cacheType.GLOBAL &&
+          queryKey.includes(CONSTANTS.CACHE_KEY) &&
+          queryKey.includes(`edgeAppId=${edgeApplicationId}`)
+        )
+      }
+    })
+  }
+
+  // ==================== List Methods ====================
 
   listFunctions = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
     const { data } = await this.http.request({
@@ -50,25 +77,33 @@ export class EdgeApplicationFunctionService extends BaseService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [] }
   ) => {
-    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
-    const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
-    if (!count) return []
+    return this.queryAsync({
+      key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
+      cache: this.cacheType.GLOBAL,
+      queryFn: async () => {
+        params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
+        const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
+        if (!count) return { count: 0, body: [] }
 
-    const enrichedFunctions = await enrichByMatchingReference({
-      items: functionInstances,
-      fetchReferencePage: this.#listFunctionNames,
-      getReferenceId: (item) => item.function,
-      merge: (item, matchedRef) => ({
-        ...item,
-        functionInstanced: matchedRef.name
-      }),
-      pageSize: 100
+        const enrichedFunctions = await enrichByMatchingReference({
+          items: functionInstances,
+          fetchReferencePage: this.#listFunctionNames,
+          getReferenceId: (item) => item.function,
+          merge: (item, matchedRef) => ({
+            ...item,
+            functionInstanced: matchedRef.name
+          }),
+          pageSize: 100
+        })
+
+        return {
+          count: count,
+          body: enrichedFunctions
+        }
+      },
+      staleTime: this.cacheTime.TEN_MINUTES,
+      gcTime: this.cacheTime.THIRTY_MINUTES
     })
-
-    return {
-      count: count,
-      body: enrichedFunctions
-    }
   }
 
   #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
@@ -81,6 +116,8 @@ export class EdgeApplicationFunctionService extends BaseService {
     return { results: data.results, count: data.count }
   }
 
+  // ==================== Load Method ====================
+
   loadEdgeApplicationFunction = async ({ edgeApplicationID, functionID }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -89,6 +126,8 @@ export class EdgeApplicationFunctionService extends BaseService {
 
     return this.adapter?.transformLoadEdgeApplicationFunction(data) ?? data
   }
+
+  // ==================== Create Methods ====================
 
   createEdgeApplicationFunction = async (payload) => {
     const edgeApplicationId = payload.id
@@ -100,11 +139,15 @@ export class EdgeApplicationFunctionService extends BaseService {
       body
     })
 
+    await this.invalidateListCache(edgeApplicationId)
+
     return {
-      feedback: 'Your Function has been created',
+      feedback: CONSTANTS.MESSAGES.CREATE_SUCCESS,
       id: data.data.id
     }
   }
+
+  // ==================== Edit Methods ====================
 
   editEdgeApplicationFunction = async (payload) => {
     const body = this.adapter?.transformEditPayload(payload)
@@ -115,8 +158,12 @@ export class EdgeApplicationFunctionService extends BaseService {
       body
     })
 
-    return 'Your Function has been updated'
+    await this.invalidateListCache(payload.edgeApplicationID)
+
+    return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
+
+  // ==================== Delete Methods ====================
 
   deleteEdgeApplicationFunction = async (functionID, edgeApplicationID) => {
     await this.http.request({
@@ -124,7 +171,9 @@ export class EdgeApplicationFunctionService extends BaseService {
       url: this.#getUrl(edgeApplicationID, `/${functionID}`)
     })
 
-    return 'Your Function successfully deleted'
+    await this.invalidateListCache(edgeApplicationID)
+
+    return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
 }
 

@@ -1,5 +1,16 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
+import { TABLE_FIRST_PAGE_OPTIONS, TABLE_PAGINATION_OPTIONS } from '@/services/v2/base/query/config'
+
+const CONSTANTS = {
+  CACHE_KEY: 'device-groups-list',
+  DEFAULT_PAGE_SIZE: 10,
+  MESSAGES: {
+    CREATE_SUCCESS: 'Device Group successfully created',
+    UPDATE_SUCCESS: 'Device Group successfully updated',
+    DELETE_SUCCESS: 'Device Group successfully deleted'
+  }
+}
 
 export class DeviceGroupService extends BaseService {
   constructor() {
@@ -12,22 +23,65 @@ export class DeviceGroupService extends BaseService {
     return `${this.baseURL}/${edgeApplicationId}/device_groups${suffix}`
   }
 
-  listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10 }) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: this.getUrl(edgeApplicationId),
-      params
+  async invalidateListCache(edgeApplicationId) {
+    await this.queryClient.removeQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey
+        return (
+          queryKey &&
+          Array.isArray(queryKey) &&
+          queryKey[0] === this.cacheType.GLOBAL &&
+          queryKey.includes(CONSTANTS.CACHE_KEY) &&
+          queryKey.includes(`edgeAppId=${edgeApplicationId}`)
+        )
+      }
     })
+  }
 
-    const { results, count } = data
+  // ==================== Private Helper Methods ====================
 
-    const transformed = this.adapter?.transformListDeviceGroup?.(results) ?? results
+  #getCacheOptions(params) {
+    const paramValues = params || {}
+    const isFirstPage = paramValues.page === 1 || !paramValues.page
+    const hasSearch = paramValues.search?.trim()
+
+    const baseOptions = isFirstPage ? TABLE_FIRST_PAGE_OPTIONS : TABLE_PAGINATION_OPTIONS
+    const shouldPersist = isFirstPage && !hasSearch
 
     return {
-      count,
-      body: transformed
+      ...baseOptions,
+      meta: { persist: shouldPersist }
     }
   }
+
+  // ==================== List Methods ====================
+
+  listDeviceGroupService = async (edgeApplicationId, params = { pageSize: CONSTANTS.DEFAULT_PAGE_SIZE }) => {
+    const cacheOptions = this.#getCacheOptions(params)
+
+    return this.queryAsync({
+      key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
+      cache: this.cacheType.GLOBAL,
+      queryFn: async () => {
+        const { data } = await this.http.request({
+          method: 'GET',
+          url: this.getUrl(edgeApplicationId),
+          params
+        })
+
+        const { results, count } = data
+        const transformed = this.adapter?.transformListDeviceGroup?.(results) ?? results
+
+        return {
+          count,
+          body: transformed
+        }
+      },
+      ...cacheOptions
+    })
+  }
+
+  // ==================== Load Method ====================
 
   loadDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
     const { data } = await this.http.request({
@@ -38,9 +92,10 @@ export class DeviceGroupService extends BaseService {
     return this.adapter?.transformLoadDeviceGroup?.(data) ?? data.data
   }
 
+  // ==================== Create Methods ====================
+
   createDeviceGroupService = async (payload) => {
     const { edgeApplicationId } = payload
-
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
     const result = await this.http.request({
@@ -49,11 +104,16 @@ export class DeviceGroupService extends BaseService {
       body
     })
 
+    await this.invalidateListCache(edgeApplicationId)
+
     return {
       id: result.data.data.id,
-      feedback: 'Device Group successfully created'
+      feedback: CONSTANTS.MESSAGES.CREATE_SUCCESS,
+      edgeApplicationId
     }
   }
+
+  // ==================== Edit Methods ====================
 
   editDeviceGroupService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
@@ -64,16 +124,22 @@ export class DeviceGroupService extends BaseService {
       body
     })
 
-    return 'Device Group successfully updated'
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
 
+  // ==================== Delete Methods ====================
+
   deleteDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'DELETE',
       url: this.getUrl(edgeApplicationId, `/${deviceGroupId}`)
     })
 
-    return data.results
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
 }
 

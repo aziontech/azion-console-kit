@@ -31,13 +31,7 @@ export const listOriginsService = async ({ id, orderBy = 'origin_id', sort = 'as
 
   // Determine cache options based on page
   const isFirstPage = page === 1
-  const baseOptions = isFirstPage ? TABLE_FIRST_PAGE_OPTIONS : TABLE_PAGINATION_OPTIONS
-
-  // Override to not persist
-  const options = {
-    ...baseOptions,
-    meta: { persist: false }
-  }
+  const options = isFirstPage ? TABLE_FIRST_PAGE_OPTIONS : TABLE_PAGINATION_OPTIONS
 
   // Use queryClient to get cached data or fetch new
   return await queryClient.ensureQueryData({
