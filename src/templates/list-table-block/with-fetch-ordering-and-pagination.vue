@@ -67,13 +67,6 @@
     reorderableRows: {
       type: Boolean
     },
-    onReorderService: {
-      type: Function
-    },
-    isReorderAllEnabled: {
-      type: Boolean,
-      default: false
-    },
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
