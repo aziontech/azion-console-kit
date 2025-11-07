@@ -42,18 +42,18 @@ export class EdgeAppService extends BaseService {
       predicate: (query) => {
         const queryKey = query.queryKey
         if (!queryKey || !Array.isArray(queryKey)) return false
-        
-        const isLoadCache = 
+
+        const isLoadCache =
           queryKey[0] === this.cacheType.GLOBAL &&
           queryKey.includes(CONSTANTS.CACHE_KEY) &&
           queryKey.includes('load')
-        
+
         if (!isLoadCache) return false
 
         const isCurrentId = queryKey.some(
           (key) => typeof key === 'string' && key === `id=${currentId}`
         )
-        
+
         return !isCurrentId
       }
     })

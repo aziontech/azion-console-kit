@@ -80,7 +80,10 @@ export class EdgeApplicationFunctionService extends BaseService {
       cache: this.cacheType.GLOBAL,
       queryFn: async () => {
         params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
-        const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
+        const { body: functionInstances, count } = await this.listFunctions(
+          edgeApplicationId,
+          params
+        )
         if (!count) return { count: 0, body: [] }
 
         const enrichedFunctions = await enrichByMatchingReference({

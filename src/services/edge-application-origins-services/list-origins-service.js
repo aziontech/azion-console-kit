@@ -6,7 +6,13 @@ import { queryClient } from '@/services/v2/base/query/queryClient'
 const CACHE_KEY = 'origins-list'
 
 // Core function - direct API call without cache
-const listOriginsServiceCore = async ({ id, orderBy = 'origin_id', sort = 'asc', page = 1, pageSize = 200 }) => {
+const listOriginsServiceCore = async ({
+  id,
+  orderBy = 'origin_id',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/origins?${searchParams.toString()}`,
@@ -18,7 +24,13 @@ const listOriginsServiceCore = async ({ id, orderBy = 'origin_id', sort = 'asc',
 }
 
 // Public function - uses cache via queryClient
-export const listOriginsService = async ({ id, orderBy = 'origin_id', sort = 'asc', page = 1, pageSize = 200 }) => {
+export const listOriginsService = async ({
+  id,
+  orderBy = 'origin_id',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
   const queryKey = [
     'global',
     CACHE_KEY,

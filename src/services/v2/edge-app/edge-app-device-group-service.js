@@ -52,7 +52,10 @@ export class DeviceGroupService extends BaseService {
     }
   }
 
-  listDeviceGroupService = async (edgeApplicationId, params = { pageSize: CONSTANTS.DEFAULT_PAGE_SIZE }) => {
+  listDeviceGroupService = async (
+    edgeApplicationId,
+    params = { pageSize: CONSTANTS.DEFAULT_PAGE_SIZE }
+  ) => {
     const cacheOptions = this.#getCacheOptions(params)
 
     return this.queryAsync({

@@ -13,18 +13,16 @@ const invalidatePreviousLoadCache = async (currentId) => {
     predicate: (query) => {
       const queryKey = query.queryKey
       if (!queryKey || !Array.isArray(queryKey)) return false
-      
-      const isLoadCache = 
-        queryKey[0] === CACHE_TYPE &&
-        queryKey.includes(CACHE_KEY)
-      
+
+      const isLoadCache = queryKey[0] === CACHE_TYPE && queryKey.includes(CACHE_KEY)
+
       if (!isLoadCache) return false
-      
+
       // Remove se NÃO for o ID atual
       const isCurrentId = queryKey.some(
         (key) => typeof key === 'string' && key === `id=${currentId}`
       )
-      
+
       return !isCurrentId
     }
   })
