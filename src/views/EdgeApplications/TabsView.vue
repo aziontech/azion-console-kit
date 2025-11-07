@@ -15,6 +15,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
   import EditViewV3 from './V3/EditView.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
@@ -342,7 +343,12 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="!edgeApplication" />
+
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
@@ -357,7 +363,6 @@
         :activeIndex="activeTab"
         @tab-click="({ index = 0 }) => changeTab(index)"
         class="w-full h-full"
-        v-if="edgeApplication"
       >
         <TabPanel
           v-for="(tab, index) in filteredTabs"
