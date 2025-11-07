@@ -93,8 +93,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: fixtures.domainMock.domains,
         network_map: fixtures.domainMock.environment
@@ -137,8 +140,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: fixtures.domainMock.domains,
         network_map: fixtures.domainMock.environment
@@ -184,8 +190,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: fixtures.domainMock.domains,
         network_map: fixtures.domainMock.environment

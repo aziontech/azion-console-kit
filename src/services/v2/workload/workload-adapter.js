@@ -93,16 +93,15 @@ export const WorkloadAdapter = {
         }
       },
       mtls: {
-        verification: payload.mtls.verification,
-        certificate: payload.mtls.certificate ?? null,
-        crl: payload.mtls.crl || null
+        enabled: payload.mtls.isEnabled,
+        config: {
+          verification: payload.mtls.isEnabled ? payload.mtls.verification : null,
+          certificate: payload.mtls.certificate ?? null,
+          crl: payload.mtls.crl || null
+        }
       },
       domains,
       workload_hostname_allow_access: payload.workloadHostnameAllowAccess
-    }
-
-    if (!payload.mtls.isEnabled) {
-      delete payloadResquest.mtls
     }
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
@@ -173,10 +172,10 @@ export const WorkloadAdapter = {
         }
       },
       mtls: {
-        isEnabled: !!workload?.mtls?.certificate,
-        verification: workload.mtls.verification?.toLowerCase() || null,
-        certificate: workload.mtls.certificate,
-        crl: workload.mtls.crl
+        isEnabled: workload.mtls.enabled,
+        verification: workload.mtls.config.verification?.toLowerCase() || null,
+        certificate: workload.mtls.config.certificate,
+        crl: workload.mtls.config.crl
       },
       isLocked: isLocked(workload.product_version)
     }
