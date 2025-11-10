@@ -11,6 +11,7 @@ import {
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
+import { prefetch, prefetchByTrigger, PREFETCH_TRIGGERS } from '@/services/v2/base/query'
 import { unref } from 'vue'
 
 export class BaseService {
@@ -112,6 +113,24 @@ export class BaseService {
   getCachedData({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     return this.queryClient.getQueryData(queryKey)
+  }
+
+  /**
+   * Executes data prefetch
+   * @param {string} name - Configuration name
+   * @param {Object} params - Parameters
+   */
+  async prefetch(name, params = {}) {
+    return prefetch(name, params)
+  }
+
+  /**
+   * Executes prefetch by trigger
+   * @param {string} trigger - Trigger name
+   * @param {Object} params - Parameters
+   */
+  async prefetchByTrigger(trigger, params = {}) {
+    return prefetchByTrigger(trigger, params)
   }
 }
 

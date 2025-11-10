@@ -22,6 +22,7 @@
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { usePrefetchEdgeAppOnAccess } from '@/composables/usePrefetchController'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -127,6 +128,12 @@
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
+
+    // Prefetch all tabs data using the controller (automatically handles deduplication)
+    const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+    usePrefetchEdgeAppOnAccess(edgeApplicationId.value, {
+      edgeFunctionsEnabled: edgeApplication.value?.[edgeFunctionsProperty]
+    })
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
