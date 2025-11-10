@@ -22,7 +22,7 @@ import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
 import { queryPlugin } from '@/services/v2/base/query/queryPlugin'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
-import '@/services/v2/prefetch' // Inicializa o sistema de prefetch (registra módulos)
+import '@/services/v2/prefetch' // Initializes prefetch system (registers modules)
 
 import App from './App.vue'
 import router from './router'
