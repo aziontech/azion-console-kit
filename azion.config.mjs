@@ -168,10 +168,10 @@ const config = {
         options: false
       },
       browser: {
-        maxAgeSeconds: 900
+        maxAgeSeconds: 0
       },
       edge: {
-        maxAgeSeconds: 60 * 60 * 24 * 1 // 1 days
+        maxAgeSeconds: 60 * 60 * 24 * 3 // 3 days
       }
     },
     {
@@ -268,7 +268,44 @@ const config = {
         name: 'Redirect All Non-Asset Requests to to index.html',
         description:
           'Delivers static assets such as CSS, JS, images, and other files directly from object storage.',
-        match: '^\\/',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/graphql'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/billing'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          }
+        ],
         behavior: {
           rewrite: `/index.html`,
           setCache: 'Statics - Cache .html'
@@ -467,7 +504,53 @@ const config = {
             'Cross-Origin-Opener-Policy: unsafe-none'
           ]
         }
-      }
+      },
+      {
+        name: 'Cache Controll to index.html',
+        description:
+          'Applies Cache-Control header to index.html',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/graphql'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/billing'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          }
+        ],
+        behavior: {
+          setHeaders: ['Cache-Control: no-cache, must-revalidate, max-age=0, stale-while-revalidate=30']
+        }
+      },
     ]
   }
 }
