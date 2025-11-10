@@ -520,7 +520,7 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api'
+            inputValue: '^/api' 
           },
           {
             variable: '${uri}',
