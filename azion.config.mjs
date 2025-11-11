@@ -236,6 +236,7 @@ const config = {
         match:
           '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
         behavior: {
+          enableGZIP: true,
           setCache: 'Statics - Cache'
         }
       },
