@@ -11,15 +11,16 @@ import JSZip from 'jszip'
  */
 const buckets = ref([])
 const selectedBucket = ref()
-const isUploading = ref(false)
-const fileToUpload = ref([])
-const uploadCount = ref(1)
-const currentUploadingFile = ref(null)
-const uploadedFiles = ref([])
-const failedFiles = ref([])
-const currentFileProgress = ref(0)
-const totalBytesUploaded = ref(0)
-const totalBytesToUpload = ref(0)
+const isProcessing = ref(false)
+const operationType = ref('') // 'upload' or 'delete'
+const itemsToProcess = ref([])
+const processCount = ref(1)
+const currentProcessingItem = ref(null)
+const processedItems = ref([])
+const failedItems = ref([])
+const currentItemProgress = ref(0)
+const totalBytesProcessed = ref(0)
+const totalBytesToProcess = ref(0)
 const bucketTableNeedRefresh = ref(true)
 const filesTableNeedRefresh = ref(false)
 const selectedFiles = ref([])
@@ -27,28 +28,35 @@ const isDownloading = ref(false)
 const showDragAndDrop = ref(false)
 const folderPath = ref('')
 
-const uploadProgress = computed(() => {
-  if (!totalBytesToUpload.value) return 0
-  const completedFilesBytes = uploadedFiles.value.reduce((sum, file) => sum + file.size, 0)
-  const currentFileBytes =
-    currentFileProgress.value > 0 && currentUploadingFile.value
-      ? (currentUploadingFile.value.sizeBytes * currentFileProgress.value) / 100
-      : 0
-  const totalProgress = ((completedFilesBytes + currentFileBytes) / totalBytesToUpload.value) * 100
-  return Math.round(Math.min(totalProgress, 100))
+const processProgress = computed(() => {
+  if (operationType.value === 'upload') {
+    if (!totalBytesToProcess.value) return 0
+    const completedFilesBytes = processedItems.value.reduce((sum, file) => sum + file.size, 0)
+    const currentFileBytes =
+      currentItemProgress.value > 0 && currentProcessingItem.value
+        ? (currentProcessingItem.value.sizeBytes * currentItemProgress.value) / 100
+        : 0
+    const totalProgress = ((completedFilesBytes + currentFileBytes) / totalBytesToProcess.value) * 100
+    return Math.round(Math.min(totalProgress, 100))
+  } else if (operationType.value === 'delete') {
+    return currentItemProgress.value
+  }
+  return 0
 })
 
-const uploadStatus = computed(() => {
+const processStatus = computed(() => {
   return {
-    total: fileToUpload.value.length,
-    uploaded: uploadCount.value,
-    failed: failedFiles.value.length,
-    current: currentUploadingFile.value,
-    progress: uploadProgress.value,
-    currentFileProgress: currentFileProgress.value,
-    totalBytesUploaded: totalBytesUploaded.value,
-    totalBytesToUpload: totalBytesToUpload.value,
-    bytesRemaining: totalBytesToUpload.value - totalBytesUploaded.value
+    total: itemsToProcess.value.length,
+    uploaded: operationType.value === 'upload' ? processCount.value : 0,
+    deleted: operationType.value === 'delete' ? processCount.value : 0,
+    completed: processCount.value,
+    failed: failedItems.value.length,
+    current: currentProcessingItem.value,
+    progress: processProgress.value,
+    currentFileProgress: currentItemProgress.value,
+    totalBytesUploaded: totalBytesProcessed.value,
+    totalBytesToUpload: totalBytesToProcess.value,
+    bytesRemaining: totalBytesToProcess.value - totalBytesProcessed.value
   }
 })
 const nameRegex = /^[A-Za-z0-9_-]+$/
@@ -130,31 +138,32 @@ export const useEdgeStorage = () => {
           return
         }
 
-        fileToUpload.value = validFiles
+        itemsToProcess.value = validFiles
       } else {
-        fileToUpload.value = filesArray
+        itemsToProcess.value = filesArray
       }
 
-      isUploading.value = true
-      uploadCount.value = 1
-      uploadedFiles.value = []
-      failedFiles.value = []
-      currentUploadingFile.value = null
-      currentFileProgress.value = 0
-      totalBytesUploaded.value = 0
-      totalBytesToUpload.value = fileToUpload.value.reduce((sum, file) => sum + file.size, 0)
+      operationType.value = 'upload'
+      isProcessing.value = true
+      processCount.value = 1
+      processedItems.value = []
+      failedItems.value = []
+      currentProcessingItem.value = null
+      currentItemProgress.value = 0
+      totalBytesProcessed.value = 0
+      totalBytesToProcess.value = itemsToProcess.value.reduce((sum, file) => sum + file.size, 0)
 
       try {
-        for (const file of fileToUpload.value) {
-          currentUploadingFile.value = {
+        for (const file of itemsToProcess.value) {
+          currentProcessingItem.value = {
             name: file.name,
             size: formatBytes(file.size),
             sizeBytes: file.size
           }
-          currentFileProgress.value = 0
+          currentItemProgress.value = 0
 
           const onProgress = (progress) => {
-            currentFileProgress.value = progress.percentage
+            currentItemProgress.value = progress.percentage
           }
           try {
             await edgeStorageService.addEdgeStorageBucketFiles(
@@ -163,20 +172,20 @@ export const useEdgeStorage = () => {
               onProgress,
               folderPath.value
             )
-            uploadedFiles.value.push(file)
-            totalBytesUploaded.value += file.size
-            currentFileProgress.value = 100
-            uploadCount.value++
+            processedItems.value.push(file)
+            totalBytesProcessed.value += file.size
+            currentItemProgress.value = 100
+            processCount.value++
           } catch (fileError) {
-            failedFiles.value.push({ file, error: fileError })
+            failedItems.value.push({ file, error: fileError })
           }
         }
 
-        currentUploadingFile.value = null
-        isUploading.value = false
+        currentProcessingItem.value = null
+        isProcessing.value = false
 
-        const successCount = uploadedFiles.value.length
-        const failureCount = failedFiles.value.length
+        const successCount = processedItems.value.length
+        const failureCount = failedItems.value.length
 
         if (successCount) {
           filesTableNeedRefresh.value = true
@@ -193,12 +202,12 @@ export const useEdgeStorage = () => {
         }
 
         if (failureCount && !successCount) {
-          if (failedFiles.value.filter((file) => file.error.status === 413).length > 0) {
+          if (failedItems.value.filter((file) => file.error.status === 413).length > 0) {
             handleToast(
               'error',
               'File Too Large',
-              `${failedFiles.value.filter((file) => file.error.status === 413).length} file${
-                failedFiles.value.filter((file) => file.error.status === 413).length > 1 ? 's' : ''
+              `${failedItems.value.filter((file) => file.error.status === 413).length} file${
+                failedItems.value.filter((file) => file.error.status === 413).length > 1 ? 's' : ''
               } exceed file size limit and cannot be uploaded.`
             )
           } else {
@@ -210,8 +219,8 @@ export const useEdgeStorage = () => {
           }
         }
       } catch (error) {
-        currentUploadingFile.value = null
-        isUploading.value = false
+        currentProcessingItem.value = null
+        isProcessing.value = false
 
         handleToast(
           'error',
@@ -249,6 +258,77 @@ export const useEdgeStorage = () => {
     for (const fileId of fileIds) {
       await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, fileId)
       filesTableNeedRefresh.value = true
+    }
+  }
+
+  const deleteMultipleFiles = async (fileNames) => {
+    if (!selectedBucket.value || !fileNames.length) return
+
+    itemsToProcess.value = fileNames
+    operationType.value = 'delete'
+    isProcessing.value = true
+    processCount.value = 1
+    processedItems.value = []
+    failedItems.value = []
+    currentProcessingItem.value = null
+    currentItemProgress.value = 0
+
+    try {
+      const onProgress = (progress) => {
+        currentProcessingItem.value = {
+          name: progress.fileName
+        }
+        currentItemProgress.value = progress.percentage
+        processCount.value = progress.completed
+      }
+
+      const results = await edgeStorageService.deleteMultipleEdgeStorageBucketFiles(
+        selectedBucket.value.name,
+        fileNames.map((file) => (folderPath.value ? folderPath.value + file : file)),
+        onProgress
+      )
+
+      const successResults = results.filter((result) => result.success)
+      const failureResults = results.filter((result) => !result.success)
+
+      processedItems.value = successResults
+      failedItems.value = failureResults
+
+      currentProcessingItem.value = null
+      isProcessing.value = false
+
+      const successCount = successResults.length
+      const failureCount = failureResults.length
+
+      if (successCount) {
+        filesTableNeedRefresh.value = true
+        handleToast(
+          failureCount > 0 ? 'warn' : 'success',
+          failureCount > 0 ? 'Deletion Partially Completed' : 'Deletion Successful',
+          failureCount > 0
+            ? `${successCount} file${
+                successCount > 1 ? 's' : ''
+              } deleted successfully, ${failureCount} failed`
+            : `${successCount} file${successCount > 1 ? 's' : ''} deleted successfully`
+        )
+      }
+
+      if (failureCount && !successCount) {
+        handleToast(
+          'error',
+          'Deletion Failed',
+          `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to delete`
+        )
+      }
+    } catch (error) {
+      currentProcessingItem.value = null
+      isProcessing.value = false
+
+      handleToast(
+        'error',
+        'Deletion Failed',
+        'An unexpected error occurred during deletion. Please try again.'
+      )
     }
   }
 
@@ -305,21 +385,22 @@ export const useEdgeStorage = () => {
   return {
     buckets,
     selectedBucket,
-    isUploading,
-    fileToUpload,
-    uploadCount,
-    uploadProgress,
-    uploadStatus,
-    currentUploadingFile,
-    uploadedFiles,
-    failedFiles,
-    currentFileProgress,
-    totalBytesUploaded,
-    totalBytesToUpload,
+    isProcessing,
+    operationType,
+    itemsToProcess,
+    processCount,
+    processStatus,
+    currentProcessingItem,
+    processedItems,
+    failedItems,
+    currentItemProgress,
+    totalBytesProcessed,
+    totalBytesToProcess,
     findBucketById,
     uploadFiles,
     createFolder,
     removeFiles,
+    deleteMultipleFiles,
     bucketTableNeedRefresh,
     validationSchema,
     handleFileChange,

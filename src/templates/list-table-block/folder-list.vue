@@ -686,7 +686,7 @@
   }
 
   const toggleRowSelection = (rowData) => {
-    if (rowData.isSkeletonRow) return
+    if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav) return
 
     const isSelected = selectedItems.value.includes(rowData)
     if (isSelected) {
@@ -697,7 +697,7 @@
   }
 
   const toggleSelectAll = () => {
-    const selectableRows = filterData.value.filter((row) => !row.isFolder)
+    const selectableRows = filterData.value.filter((row) => !row.isFolder && !row.isParentNav)
     if (isAllSelected.value) {
       selectedItems.value = []
     } else {
@@ -706,7 +706,7 @@
   }
 
   const isAllSelected = computed(() => {
-    const selectableRows = filterData.value.filter((row) => !row.isFolder)
+    const selectableRows = filterData.value.filter((row) => !row.isFolder && !row.isParentNav)
     return (
       selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
     )

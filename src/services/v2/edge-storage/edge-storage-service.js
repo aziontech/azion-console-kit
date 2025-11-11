@@ -5,13 +5,13 @@ export class EdgeStorageService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeStorageAdapter
-    this.baseURL = 'v4/edge_storage/buckets'
+    this.baseURL = 'v4/edge_storage'
   }
 
   listEdgeStorageBuckets = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
+      url: `${this.baseURL}/buckets`,
       params: {
         search: '',
         fields: '',
@@ -28,7 +28,7 @@ export class EdgeStorageService extends BaseService {
   createEdgeStorageBucket = async (bucket = {}) => {
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.baseURL,
+      url: `${this.baseURL}/buckets`,
       body: bucket
     })
 
@@ -38,7 +38,7 @@ export class EdgeStorageService extends BaseService {
   listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects`,
+      url: `${this.baseURL}/buckets/${bucketName}/objects`,
       params: {
         all_levels,
         prefix,
@@ -52,7 +52,7 @@ export class EdgeStorageService extends BaseService {
   updateEdgeStorageBucket = async (bucket = {}) => {
     await this.http.request({
       method: 'PATCH',
-      url: `${this.baseURL}/${bucket.name}`,
+      url: `${this.baseURL}/buckets/${bucket.name}`,
       body: { edge_access: bucket.edge_access }
     })
 
@@ -62,7 +62,7 @@ export class EdgeStorageService extends BaseService {
   deleteEdgeStorageBucket = async (bucketName = '') => {
     await this.http.request({
       method: 'DELETE',
-      url: `${this.baseURL}/${bucketName}`
+      url: `${this.baseURL}/buckets/${bucketName}`
     })
 
     return `Bucket "${bucketName}" has been deleted successfully`
@@ -92,7 +92,7 @@ export class EdgeStorageService extends BaseService {
     }
     await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${bucketName}/objects/${encodeURIComponent(prefix)}${
+      url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(prefix)}${
         file.webkitRelativePath ? file.webkitRelativePath : file.name
       }`,
       body: file,
@@ -104,9 +104,54 @@ export class EdgeStorageService extends BaseService {
   deleteEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     await this.http.request({
       method: 'DELETE',
-      url: `${this.baseURL}/${bucketName}/objects/${fileName}`
+      url: `${this.baseURL}/buckets/${bucketName}/objects/${fileName}`
     })
     return `File "${fileName}" has been deleted successfully`
+  }
+
+  deleteMultipleEdgeStorageBucketFiles = async (
+    bucketName = '',
+    fileNames = [],
+    onProgress = null
+  ) => {
+    const results = []
+    const totalFiles = fileNames.length
+
+    for (let aux = 0; aux < fileNames.length; aux++) {
+      const fileName = fileNames[aux]
+
+      if (onProgress && typeof onProgress === 'function') {
+        const progress = {
+          fileName: fileName,
+          completed: aux + 1,
+          total: totalFiles,
+          percentage: Math.round(((aux + 1) / totalFiles) * 100)
+        }
+        onProgress(progress)
+      }
+
+      try {
+        await this.http.request({
+          method: 'DELETE',
+          url: `${this.baseURL}/buckets/${bucketName}/objects/${fileName}`
+        })
+
+        results.push({
+          fileName,
+          success: true,
+          message: `File "${fileName}" has been deleted successfully`
+        })
+      } catch (error) {
+        results.push({
+          fileName,
+          success: false,
+          error: error,
+          message: `Failed to delete file "${fileName}"`
+        })
+      }
+    }
+
+    return results
   }
 
   downloadEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
@@ -151,6 +196,31 @@ export class EdgeStorageService extends BaseService {
     })
 
     return data.data.edgeStorageMetrics
+  }
+
+  listCredentials = async (bucketName, params = {}) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `${this.baseURL}/credentials`,
+      params
+    })
+
+    return this.adapter?.transformListEdgeStorageCredentials?.(data, bucketName)
+  }
+  createCredential = async (credential = {}) => {
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/credentials`,
+      body: credential
+    })
+
+    return data
+  }
+  deleteCredential = async (credentialId) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/credentials/${credentialId}`
+    })
   }
 }
 export const edgeStorageService = new EdgeStorageService()

@@ -99,7 +99,7 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
-                  :disabled="isUploading"
+                  :disabled="isProcessing"
                   :menuButtonProps="{
                     class: 'rounded-l-none',
                     style: { color: 'var(--primary-text-color) !important' }
@@ -110,7 +110,7 @@
                 />
               </div>
             </div>
-            <UploadCard />
+            <ProgressCard />
 
             <DragAndDrop
               v-if="showDragAndDrop"
@@ -119,7 +119,7 @@
             />
             <div
               v-else
-              class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
+              class="flex flex-col gap-3 items-center border-1 border-transparent justify-center w-full"
               :class="{ 'border-dashed border-[#f3652b] rounded-md pb-4': isDragOver }"
             >
               <ListTableBlock
@@ -153,11 +153,11 @@
                   <span
                     class="transition-colors"
                     :class="
-                      isUploading
+                      isProcessing
                         ? 'text-color-secondary cursor-not-allowed'
                         : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
                     "
-                    @click="!isUploading && openFileSelector()"
+                    @click="!isProcessing && openFileSelector()"
                     >choose your files</span
                   >
                 </p>
@@ -187,7 +187,7 @@
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import UploadCard from './components/UploadCard.vue'
+  import ProgressCard from './components/ProgressCard.vue'
 
   const router = useRouter()
   const route = useRoute()
@@ -196,6 +196,7 @@
     buckets,
     selectedBucket,
     removeFiles,
+    deleteMultipleFiles,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -203,7 +204,7 @@
     isDownloading,
     showDragAndDrop,
     folderPath,
-    isUploading
+    isProcessing
   } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
@@ -413,7 +414,7 @@
     listServiceFilesRef.value?.reload()
   }
   const handleSettingsTrackEvent = () => {
-    router.push(`/object-storage/edit/${selectedBucket.value.id}`)
+    router.push(`/object-storage/${selectedBucket.value.id}/edit/main-settings`)
   }
 
   const handleFileSearch = () => {
@@ -421,7 +422,7 @@
   }
 
   const openFileSelector = (type = 'files') => {
-    if (isUploading.value) return
+    if (isProcessing.value) return
 
     const input = document.createElement('input')
     input.type = 'file'
@@ -470,7 +471,11 @@
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
-
+  const handleDeleteTeste = () => {
+    Promise.resolve().then(() => {
+      deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
+    })
+  }
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
       title: selectedFiles.value.length > 1 ? `${selectedFiles.value.length} files` : 'File',
@@ -479,13 +484,10 @@
         deleteConfirmationText:
           selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
       },
-      deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
-      successCallback: () => {
-        listServiceFilesRef.value?.reload()
-      },
+      showToast: false,
+      deleteService: () => handleDeleteTeste(),
       closeCallback: () => {
         selectedFiles.value = []
-        listServiceFilesRef.value?.reload()
       }
     })
   }
@@ -544,7 +546,7 @@
 
   const handleDragDropUpload = async (event) => {
     isDragOver.value = false
-    if (isUploading.value) return
+    if (isProcessing.value) return
 
     const files = event.target.files || event.dataTransfer.files
     if (files.length) {
@@ -571,12 +573,30 @@
     listServiceFilesRef.value?.reload()
   }
 
+  const handleRouteChange = () => {
+    const newId = route.params.id
+
+    if (!newId) {
+      selectBucket(null)
+    } else {
+      const bucket = buckets.value.find((bucket) => bucket.name === newId)
+      selectBucket(bucket)
+    }
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+  }
+
+  watch(
+    () => route.fullPath,
+    () => {
+      handleRouteChange()
+    },
+    { immediate: true }
+  )
+
   watch(
     () => route.params.id,
     () => {
-      const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
-      selectBucket(bucket)
-      breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+      handleRouteChange()
     }
   )
 
