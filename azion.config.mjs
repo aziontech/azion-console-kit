@@ -167,9 +167,9 @@ const config = {
         post: false,
         options: false
       },
-      browser: {
-        maxAgeSeconds: 0
-      },
+      // browser: {
+      //   maxAgeSeconds: 0
+      // }, // comented to not rewrite to 0 due not support to honor browser cache option
       edge: {
         maxAgeSeconds: 60 * 60 * 24 * 3 // 3 days
       }
@@ -236,6 +236,7 @@ const config = {
         match:
           '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
         behavior: {
+          enableGZIP: true,
           setCache: 'Statics - Cache'
         }
       },
