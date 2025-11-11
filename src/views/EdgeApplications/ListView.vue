@@ -90,8 +90,8 @@
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: { value: columnData.text, showMoreText: false },
-            columnAppearance: 'expand-text-column'
+            data: { text: columnData.text },
+            columnAppearance: 'text-format'
           })
         }
       },

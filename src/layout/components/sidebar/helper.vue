@@ -75,7 +75,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col h-[calc(100vh-3.5rem)]">
+  <div class="flex flex-col h-[calc(100vh-3.5rem)] surface-section">
     <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
       <h3 class="text-color text-lg font-medium">Help</h3>
       <PrimeButton
@@ -181,15 +181,15 @@
           class="ml-6 mr-8 mb-20"
           v-if="!currentArticleContent"
         >
-          <div class="p-6 mt-2 rounded bg-gray-900 bg-header relative overflow-hidden">
+          <div class="p-6 mt-2 rounded surface-border border surface-card relative overflow-hidden">
             <div class="flex flex-col items-start gap-4 max-w-xs w-full">
-              <h1 class="text-white text-sm leading-7 w-2/3">
+              <h1 class="text-color text-sm leading-7 w-2/3">
                 Connect and build together with the Azion Community.
               </h1>
 
               <a
                 href="https://discord.com/invite/Yp9N7RMVZy"
-                class="p-button gap-2"
+                class="p-button p-button-sm gap-2"
                 icon="pi pi-discord"
                 target="_blank"
               >
@@ -197,7 +197,9 @@
                 Join Discord</a
               >
             </div>
-            <DiscordLogo />
+            <div class="text-[var(--surface-600)]">
+              <DiscordLogo />
+            </div>
           </div>
         </div>
       </div>
