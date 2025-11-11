@@ -89,7 +89,7 @@
             data-testid="data-table-row-checkbox"
           >
             <Checkbox
-              v-if="selectedItems.includes(rowData)"
+              v-if="selectedItems.includes(rowData) && !rowData.isNewFolder"
               :model-value="selectedItems.includes(rowData)"
               @update:model-value="toggleRowSelection(rowData)"
               @click.stop="toggleRowSelection(rowData)"
@@ -142,7 +142,35 @@
           </div>
         </template>
         <template #body="{ data: rowData }">
-          <template v-if="col.type !== 'component'">
+          <template v-if="rowData.isNewFolder && col.field === 'name'">
+            <div class="flex items-center gap-2">
+              <InputText
+                :value="props.newFolderName"
+                @input="handleFolderNameInput"
+                @keyup.enter="emit('save-new-folder')"
+                @keyup.escape="emit('cancel-new-folder')"
+                placeholder="Enter folder name"
+                class="flex-1"
+                :class="{ 'p-invalid border-red-500': hasInvalidChars }"
+                autofocus
+                size="small"
+              />
+              <PrimeButton
+                icon="pi pi-check"
+                size="small"
+                outlined
+                @click="emit('save-new-folder')"
+                :disabled="!props.newFolderName.trim() || hasInvalidChars"
+              />
+              <PrimeButton
+                icon="pi pi-times"
+                size="small"
+                outlined
+                @click="emit('cancel-new-folder')"
+              />
+            </div>
+          </template>
+          <template v-else-if="col.type !== 'component'">
             <div
               @click="editItemSelected(rowData)"
               v-html="rowData[col.field]"
@@ -228,7 +256,7 @@
         >
           <div
             class="flex items-center gap-2 justify-end"
-            v-if="!rowData.isFolder && !rowData.isParentNav"
+            v-if="!rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder"
           >
             <div
               v-if="showLastModified"
@@ -424,7 +452,10 @@
     'update:selectedItensData',
     'on-row-click-edit-folder',
     'delete-selected-items',
-    'page'
+    'page',
+    'save-new-folder',
+    'cancel-new-folder',
+    'update:newFolderName'
   ])
 
   const props = defineProps({
@@ -515,6 +546,14 @@
     currentPage: {
       type: Number,
       default: 1
+    },
+    isCreatingNewFolder: {
+      type: Boolean,
+      default: false
+    },
+    newFolderName: {
+      type: String,
+      default: ''
     }
   })
 
@@ -567,9 +606,23 @@
   }))
 
   const filterData = computed(() => {
-    return data.value.filter((item) => {
+    let filteredData = data.value.filter((item) => {
       return item.name.toLowerCase().includes(props.searchFilter.toLowerCase())
     })
+
+    if (props.isCreatingNewFolder) {
+      const newFolderRow = {
+        id: 'new-folder-temp',
+        name: props.newFolderName,
+        isFolder: true,
+        isNewFolder: true,
+        size: '-',
+        last_modified: '-'
+      }
+      filteredData = [newFolderRow, ...filteredData]
+    }
+
+    return filteredData
   })
 
   onMounted(() => {
@@ -667,7 +720,7 @@
   }
 
   const editItemSelected = (item) => {
-    if (item.isSkeletonRow) return
+    if (item.isSkeletonRow || item.isNewFolder) return
 
     emit('on-before-go-to-edit', item)
 
@@ -679,7 +732,8 @@
   }
 
   const toggleRowSelection = (rowData) => {
-    if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav) return
+    if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav || rowData.isNewFolder)
+      return
 
     const isSelected = selectedItems.value.includes(rowData)
     if (isSelected) {
@@ -690,7 +744,9 @@
   }
 
   const toggleSelectAll = () => {
-    const selectableRows = filterData.value.filter((row) => !row.isFolder && !row.isParentNav)
+    const selectableRows = filterData.value.filter(
+      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder
+    )
     if (isAllSelected.value) {
       selectedItems.value = []
     } else {
@@ -699,7 +755,9 @@
   }
 
   const isAllSelected = computed(() => {
-    const selectableRows = filterData.value.filter((row) => !row.isFolder && !row.isParentNav)
+    const selectableRows = filterData.value.filter(
+      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder
+    )
     return (
       selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
     )
@@ -752,6 +810,16 @@
 
     return [...filters, ...filtersPath]
   })
+
+  const hasInvalidChars = computed(() => {
+    const specialCharRegex = /[^\u0020-\u007F]/g
+    const isInvalid = specialCharRegex.test(props.newFolderName)
+    return isInvalid
+  })
+
+  const handleFolderNameInput = (event) => {
+    emit('update:newFolderName', event.target.value)
+  }
 
   const loadLastModifiedToggleState = () => {
     const saved = localStorage.getItem('lastModifiedToggled')

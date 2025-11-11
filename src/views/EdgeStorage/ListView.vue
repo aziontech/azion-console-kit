@@ -91,6 +91,14 @@
                     outlined
                     class="px-4 py-1 flex items-center justify-center"
                   />
+                  <PrimeButton
+                    icon="pi pi-folder-plus"
+                    size="small"
+                    @click="handleNewFolder"
+                    :label="isGreaterThanXL ? 'New Folder' : ''"
+                    outlined
+                    class="px-4 py-1 flex items-center justify-center"
+                  />
                 </template>
                 <SplitButton
                   size="small"
@@ -137,12 +145,17 @@
                 :searchFilter="fileSearchTerm"
                 :isPaginationLoading="isPaginationLoading"
                 :currentPage="currentPage"
+                :isCreatingNewFolder="isCreatingNewFolder"
+                :newFolderName="newFolderName"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
                 @page="handlePaginationChange"
+                @save-new-folder="handleSaveNewFolder"
+                @cancel-new-folder="handleCancelNewFolder"
+                @update:newFolderName="newFolderName = $event"
                 class="w-full"
               />
 
@@ -260,6 +273,8 @@
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
   const currentPage = ref(1)
+  const isCreatingNewFolder = ref(false)
+  const newFolderName = ref('')
 
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
@@ -392,7 +407,9 @@
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
     selectedBucket.value = bucket
-    folderPath.value = ''
+    if (!route.query?.folderPath) {
+      folderPath.value = ''
+    }
     currentPage.value = 1
     selectedFiles.value = []
     listServiceFilesRef.value?.reload()
@@ -470,9 +487,11 @@
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
-  const handleDeleteTeste = () => {
-    Promise.resolve().then(() => {
-      deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
+  const handleMultipleDelete = () => {
+    Promise.resolve().then(async () => {
+      await deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
+      filesTableNeedRefresh.value = true
+      listServiceFilesRef.value?.reload()
     })
   }
   const handleDeleteSelectedItems = () => {
@@ -484,7 +503,7 @@
           selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
       },
       showToast: false,
-      deleteService: () => handleDeleteTeste(),
+      deleteService: () => handleMultipleDelete(),
       closeCallback: () => {
         selectedFiles.value = []
       }
@@ -572,6 +591,34 @@
     listServiceFilesRef.value?.reload()
   }
 
+  const handleNewFolder = () => {
+    isCreatingNewFolder.value = true
+    newFolderName.value = ''
+  }
+
+  const handleSaveNewFolder = () => {
+    const folderName = newFolderName.value.trim()
+    if (folderName) {
+      const specialCharRegex = /[^\u0020-\u007F]/g
+      if (specialCharRegex.test(folderName)) {
+        return
+      }
+      const newPath = folderPath.value + folderName + '/'
+      folderPath.value = newPath
+      router.replace({ query: { folderPath: newPath } })
+      currentPage.value = 1
+      filesTableNeedRefresh.value = true
+      listServiceFilesRef.value?.reload()
+    }
+    isCreatingNewFolder.value = false
+    newFolderName.value = ''
+  }
+
+  const handleCancelNewFolder = () => {
+    isCreatingNewFolder.value = false
+    newFolderName.value = ''
+  }
+
   const handleRouteChange = () => {
     const newId = route.params.id
 
@@ -580,6 +627,10 @@
     } else {
       const bucket = buckets.value.find((bucket) => bucket.name === newId)
       selectBucket(bucket)
+
+      if (route.query?.folderPath) {
+        folderPath.value = route.query.folderPath
+      }
     }
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
   }
