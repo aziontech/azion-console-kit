@@ -124,13 +124,6 @@
               <PrimeButton
                 size="small"
                 outlined
-                icon="pi pi-arrow-right-arrow-left"
-                label="Move"
-                class="px-4"
-              />
-              <PrimeButton
-                size="small"
-                outlined
                 :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
                 label="Download"
                 class="px-4"
