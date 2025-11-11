@@ -6,7 +6,7 @@
  * @param {any} params.value - The value to store (will be stringified)
  * @param {number} [params.expirationMinutes=60] - Expiration time in minutes
  */
-export const setWithExpiration = ({ key, value, expirationMinutes = 60 }) => {
+export const setWithExpiration = ({ key, value, expirationMinutes = 60, encrypt = true }) => {
   if (!key) {
     return
   }
@@ -19,9 +19,12 @@ export const setWithExpiration = ({ key, value, expirationMinutes = 60 }) => {
     value,
     expiresAt: expiration.getTime()
   }
-
-  const encryptedData = btoa(JSON.stringify(data))
-  localStorage.setItem(key, encryptedData)
+  try {
+    const payload = encrypt ? btoa(JSON.stringify(data)) : JSON.stringify(data)
+    localStorage.setItem(key, payload)
+  } catch (err) {
+    // ignore quota or serialization errors
+  }
 }
 
 /**
@@ -30,27 +33,23 @@ export const setWithExpiration = ({ key, value, expirationMinutes = 60 }) => {
  * @param {string} key - The key to retrieve the value from
  * @returns {any|null} - The stored value or null if expired/not found
  */
-export const getWithExpiration = (key) => {
+export const getWithExpiration = (key, { encrypt = true } = {}) => {
   if (!key) {
     return null
   }
 
-  const encryptedData = localStorage.getItem(key)
-  if (!encryptedData) return null
+  const stored = localStorage.getItem(key)
+  if (!stored) return null
 
   try {
-    const decryptedData = JSON.parse(atob(encryptedData))
+    const decoded = encrypt ? JSON.parse(atob(stored)) : JSON.parse(stored)
     const now = new Date().getTime()
 
-    if (decryptedData.value) {
+    if (Number.isFinite(decoded.expiresAt) && now > decoded.expiresAt) {
       localStorage.removeItem(key)
-    }
-
-    if (now > decryptedData.expiresAt) {
       return null
     }
-
-    return decryptedData.value
+    return Object.prototype.hasOwnProperty.call(decoded, 'value') ? decoded.value : null
   } catch (error) {
     return null
   }

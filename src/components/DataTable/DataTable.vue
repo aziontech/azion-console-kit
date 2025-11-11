@@ -5,12 +5,13 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length || loading"
+      v-if="shouldRenderTable"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
       :rowHover="rowHover"
       :dataKey="dataKey"
+      :showGridlines="showGridlines"
       :pt="pt"
       :class="[
         tableClass,
@@ -20,6 +21,8 @@
       v-model:filters="internalFilters"
       v-model:sortField="internalSortField"
       v-model:sortOrder="internalSortOrder"
+      :editMode="editMode"
+      v-model:editingRows="internalEditingRows"
       :paginator="paginator"
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="rows"
@@ -39,13 +42,12 @@
       @row-click="emit('rowClick', $event)"
       @page="emit('page', $event)"
       @sort="emit('sort', $event)"
+      @row-edit-save="emit('rowEditSave', $event)"
+      @row-edit-cancel="emit('rowEditCancel', $event)"
       scrollable
       removableSort
     >
-      <template
-        v-if="hasHeaderSlot"
-        #header
-      >
+      <template #header>
         <slot name="header" />
       </template>
 
@@ -103,6 +105,7 @@
       :createButtonLabel="emptyBlock.createButtonLabel"
       :createPagePath="emptyBlock.createPagePath"
       :documentationService="emptyBlock.documentationService"
+      @click-to-create="emit('click-to-create')"
       data-testid="edge-applications-empty-results-block"
     >
       <template #illustration>
@@ -125,6 +128,10 @@
     data: {
       type: Array,
       default: () => []
+    },
+    showGridlines: {
+      type: Boolean,
+      default: false
     },
     lazy: {
       type: Boolean,
@@ -161,6 +168,14 @@
     sortOrder: {
       type: Number,
       default: 1
+    },
+    editMode: {
+      type: String,
+      default: 'row'
+    },
+    editingRows: {
+      type: Array,
+      default: () => []
     },
     paginator: {
       type: Boolean,
@@ -255,6 +270,10 @@
         createPagePath: null,
         documentationService: null
       })
+    },
+    notShowEmptyBlock: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -266,13 +285,24 @@
     'update:filters',
     'update:sortField',
     'update:sortOrder',
-    'update:expandedRowGroups'
+    'update:expandedRowGroups',
+    'update:editingRows',
+    'rowEditSave',
+    'rowEditCancel',
+    'click-to-create'
   ])
 
   const slots = useSlots()
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
+
+  const shouldRenderTable = computed(() => {
+    if (props.notShowEmptyBlock) {
+      return true
+    }
+    return props.data.length || props.loading
+  })
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -294,7 +324,11 @@
     set: (value) => emit('update:expandedRowGroups', value)
   })
 
-  const hasHeaderSlot = computed(() => !!slots.header)
+  const internalEditingRows = computed({
+    get: () => props.editingRows,
+    set: (value) => emit('update:editingRows', value)
+  })
+
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {
