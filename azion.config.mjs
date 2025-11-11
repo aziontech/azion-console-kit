@@ -298,7 +298,7 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/billing'
+            inputValue: '^/billing/invoices'
           },
           {
             variable: '${uri}',
@@ -539,7 +539,7 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/billing'
+            inputValue: '^/billing/invoices'
           },
           {
             variable: '${uri}',
