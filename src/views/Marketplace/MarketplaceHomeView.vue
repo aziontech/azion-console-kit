@@ -41,7 +41,7 @@
           </div>
           <!-- Filters -->
           <div class="flex flex-col gap-3">
-            <label class="text-color text-base font-medium">Filters</label>
+            <label class="text-color text-base font-medium">Categories</label>
             <div class="card flex justify-content-center">
               <Listbox
                 v-model="selectedCategory"
@@ -49,14 +49,11 @@
                 @change="changeCategory"
                 option-label="name"
                 :optionDisabled="disabledOption"
-                class="w-full md:w-14rem border-none sm:min-w-[12rem]"
+                class="w-full md:w-14rem border-none surface-ground sm:min-w-[12rem]"
                 :pt="{
                   list: { class: 'p-0' }
                 }"
               >
-                <template #header>
-                  <div class="text-xs mt-2 ml-3 mb-3">Category</div>
-                </template>
                 <template #option="slotProps">
                   <div class="flex align-items-center justify-between">
                     <div class="mr-2">{{ slotProps.option.name }}</div>

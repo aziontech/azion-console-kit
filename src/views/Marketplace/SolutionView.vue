@@ -43,7 +43,7 @@
       >
         <!-- Content -->
         <div
-          class="w-full lg:max-w-3xl flex flex-col gap-8 p-6 sm:p-8 lg:p-14 border rounded surface-border"
+          class="w-full surface-section lg:max-w-3xl flex flex-col gap-8 p-6 sm:p-8 lg:p-14 border rounded surface-border"
         >
           <div>
             <div class="text-xl font-medium mb-2">Overview</div>
@@ -68,7 +68,7 @@
         <!-- Right Sidebar -->
         <div class="flex flex-col gap-6 w-full lg:max-w-md lg:sticky lg:top-24 self-start">
           <!-- Card -->
-          <div class="p-6 sm:p-8 border rounded surface-border">
+          <div class="p-6 sm:p-8 border surface-section rounded surface-border">
             <div class="text-xl font-medium mb-3">{{ sidebarTitle }}</div>
             <p class="text-base text-color-secondary mb-8">
               {{ sidebarDescription }}

@@ -3,7 +3,7 @@
     <PrimeButton
       v-for="solution in props.solutions"
       :key="solution.id"
-      class="p-6 text-left h-[180px] border-solid border surface-border hover:border-primary transition-all"
+      class="p-6 surface-card text-left h-[180px] border-solid border surface-border hover:border-primary transition-all"
       link
       type="button"
       @click="goToSolution(solution)"
