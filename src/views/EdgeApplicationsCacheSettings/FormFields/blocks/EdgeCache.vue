@@ -210,7 +210,9 @@
     emit('enableSliceConfiguration', value)
   })
   watch(tieredCache, (value) => {
-    checkLargeFileCache(value)
+    if (value) {
+      checkLargeFileCache(value)
+    }
   })
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
