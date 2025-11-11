@@ -202,10 +202,13 @@ export class EdgeStorageService extends BaseService {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/credentials`,
-      params
+      params: {
+        bucket: bucketName,
+        ...params
+      }
     })
 
-    return this.adapter?.transformListEdgeStorageCredentials?.(data, bucketName)
+    return this.adapter?.transformListEdgeStorageCredentials?.(data)
   }
   createCredential = async (credential = {}) => {
     const { data } = await this.http.request({

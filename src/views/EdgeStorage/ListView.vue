@@ -195,7 +195,6 @@
   const {
     buckets,
     selectedBucket,
-    removeFiles,
     deleteMultipleFiles,
     uploadFiles,
     filesTableNeedRefresh,

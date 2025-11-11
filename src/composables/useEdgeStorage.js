@@ -36,7 +36,8 @@ const processProgress = computed(() => {
       currentItemProgress.value > 0 && currentProcessingItem.value
         ? (currentProcessingItem.value.sizeBytes * currentItemProgress.value) / 100
         : 0
-    const totalProgress = ((completedFilesBytes + currentFileBytes) / totalBytesToProcess.value) * 100
+    const totalProgress =
+      ((completedFilesBytes + currentFileBytes) / totalBytesToProcess.value) * 100
     return Math.round(Math.min(totalProgress, 100))
   } else if (operationType.value === 'delete') {
     return currentItemProgress.value
