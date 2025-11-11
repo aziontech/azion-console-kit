@@ -60,6 +60,15 @@
       }
     }
   )
+
+  watch(
+    () => mtls.value?.isEnabled,
+    (newValue) => {
+      if (newValue && !mtls.value.verification) {
+        mtls.value.verification = 'enforce'
+      }
+    }
+  )
 </script>
 
 <template>
