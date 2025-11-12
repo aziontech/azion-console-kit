@@ -28,15 +28,11 @@
           data-sentry-mask
           data-testid="copy-credential-dialog__access-key-field__password-input"
         />
-        <PrimeButton
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          size="small"
-          aria-label="Copy Access Key"
+        <CopyBlock
           label="Copy Access Key"
+          :value="accessKeyValue"
           :disabled="!accessKeyValue"
-          @click="() => params.copyAccessKey(accessKeyValue)"
+          @copy="() => params.copyAccessKey(accessKeyValue)"
           data-testid="copy-credential-dialog__access-key-field__copy-button"
         />
       </span>
@@ -67,15 +63,11 @@
           data-sentry-mask
           data-testid="copy-credential-dialog__secret-key-field__password-input"
         />
-        <PrimeButton
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          size="small"
-          aria-label="Copy Secret Key"
+        <CopyBlock
           label="Copy Secret Key"
+          :value="secretKeyValue"
           :disabled="!secretKeyValue"
-          @click="() => params.copySecretKey(secretKeyValue)"
+          @copy="() => params.copySecretKey(secretKeyValue)"
           data-testid="copy-credential-dialog__secret-key-field__copy-button"
         />
       </span>
@@ -97,6 +89,7 @@
   import { computed, inject } from 'vue'
   import PrimePassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
+  import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   defineOptions({ name: 'CopyCredentialDialog' })
 

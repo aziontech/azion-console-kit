@@ -124,9 +124,6 @@
 
   const loadService = ({ id }) => {
     const bucket = findBucketById(id)
-    // if (!bucket) {
-    //   throw new Error('Bucket not found')
-    // }
 
     return {
       name: bucket?.name,

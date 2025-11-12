@@ -256,7 +256,7 @@
         >
           <div
             class="flex items-center gap-2 justify-end"
-            v-if="!rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder"
+            v-if="showActions(rowData)"
           >
             <div
               v-if="showLastModified"
@@ -870,6 +870,9 @@
         })
       })
     }, 500)
+  }
+  const showActions = (rowData) => {
+    return !rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder
   }
 
   const onScroll = () => {

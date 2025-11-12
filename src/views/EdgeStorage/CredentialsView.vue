@@ -6,7 +6,6 @@
   import CopyCredentialDialog from './Dialog/CopyCredentialDialog.vue'
   import { ref } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import * as yup from 'yup'
@@ -14,7 +13,6 @@
 
   const { selectedBucket } = useEdgeStorage()
 
-  const toast = useToast()
   const dialog = useDialog()
   const listTableBlockRef = ref()
   const showCreateCredentialDrawer = ref(false)
@@ -48,33 +46,12 @@
         style: { width: '32rem' }
       },
       data: {
-        credential: response.data,
-        copyAccessKey: copyToClipboard,
-        copySecretKey: copyToClipboard
+        credential: response.data
       },
       onClose: () => {
         listTableBlockRef.value?.reload()
       }
     })
-  }
-
-  const copyToClipboard = async (text) => {
-    const toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    }
-
-    try {
-      await navigator.clipboard.writeText(text)
-      toast.add({ ...toastConfig })
-    } catch {
-      toast.add({
-        ...toastConfig,
-        severity: 'error',
-        detail: 'The credential was not copied to the clipboard. Try copying it again.'
-      })
-    }
   }
 
   const actions = [

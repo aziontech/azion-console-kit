@@ -303,15 +303,16 @@ export const useEdgeStorage = () => {
 
       if (successCount) {
         filesTableNeedRefresh.value = true
-        handleToast(
-          failureCount > 0 ? 'warn' : 'success',
-          failureCount > 0 ? 'Deletion Partially Completed' : 'Deletion Successful',
-          failureCount > 0
-            ? `${successCount} file${
-                successCount > 1 ? 's' : ''
-              } deleted successfully, ${failureCount} failed`
-            : `${successCount} file${successCount > 1 ? 's' : ''} deleted successfully`
-        )
+
+        const hasFailures = failureCount > 0
+        const toastType = hasFailures ? 'warn' : 'success'
+        const toastTitle = hasFailures ? 'Deletion Partially Completed' : 'Deletion Successful'
+        const successText = `${successCount} file${
+          successCount > 1 ? 's' : ''
+        } deleted successfully`
+        const toastMessage = hasFailures ? `${successText}, ${failureCount} failed` : successText
+
+        handleToast(toastType, toastTitle, toastMessage)
       }
 
       if (failureCount && !successCount) {
