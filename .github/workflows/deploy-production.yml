@@ -44,3 +44,7 @@ jobs:
           VITE_SSO_GOOGLE:  ${{ secrets.PROD_SSO_GOOGLE }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
+      
+      - name: Purge Cache
+        run: |
+          azion purge --wildcard "https://console.azion.com/*" --layer edge_caching

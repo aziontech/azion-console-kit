@@ -25,7 +25,7 @@
     "url": "https://o3s8583vvw.map.azionedge.net"
   },
   "rt-purge": {
-    "purge_on_publish": true
+    "purge_on_publish": false
   },
   "origin": [
     {
@@ -89,7 +89,7 @@
     "rules": [
       {
         "id": 277548,
-        "name": "Apply Common Configuration for All Requests",
+        "name": "Apply Ce All Requests",
         "phase": "request"
       },
       {
