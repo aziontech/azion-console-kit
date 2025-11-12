@@ -358,7 +358,7 @@
         >
           <SelectPanel
             :options="selectPanelOptions"
-            :value="selectPanelOptions[0]"
+            :value="selectPanelValue"
             @update:modelValue="selectPanelUpdateModelValue"
           />
         </div>
