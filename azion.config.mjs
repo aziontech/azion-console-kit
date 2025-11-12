@@ -157,6 +157,24 @@ const config = {
   ],
   cache: [
     {
+      name: 'Statics - Cache .html',
+      stale: false,
+      queryStringSort: false,
+      cacheByQueryString: {
+        option: 'ignore'
+      },
+      methods: {
+        post: false,
+        options: false
+      },
+      // browser: {
+      //   maxAgeSeconds: 0
+      // }, // comented to not rewrite to 0 due not support to honor browser cache option
+      edge: {
+        maxAgeSeconds: 60 * 60 * 24 * 3 // 3 days
+      }
+    },
+    {
       name: 'Statics - Cache',
       stale: false,
       queryStringSort: false,
@@ -212,6 +230,17 @@ const config = {
         }
       },
       {
+        name: 'Set Cache for Static Assets',
+        description:
+          'Sets the cache for all requests using the default object storage.',
+        match:
+          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
+        behavior: {
+          enableGZIP: true,
+          setCache: 'Statics - Cache'
+        }
+      },
+      {
         name: 'Set Storage Origin for All Requests',
         description: 'Sets the default object storage as the origin for all requests.',
         match: '^\\/',
@@ -227,13 +256,12 @@ const config = {
         description:
           'Sets the storage origin and deliver for all requests using the default object storage.',
         match:
-          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
+          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',
             type: 'object_storage'
           },
-          setCache: 'Statics - Cache',
           deliver: true
         }
       },
@@ -241,9 +269,47 @@ const config = {
         name: 'Redirect All Non-Asset Requests to to index.html',
         description:
           'Delivers static assets such as CSS, JS, images, and other files directly from object storage.',
-        match: '^\\/',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/graphql'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/billing/invoices'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          }
+        ],
         behavior: {
-          rewrite: `/index.html`
+          rewrite: `/index.html`,
+          setCache: 'Statics - Cache .html'
         }
       },
       {
@@ -439,7 +505,53 @@ const config = {
             'Cross-Origin-Opener-Policy: unsafe-none'
           ]
         }
-      }
+      },
+      {
+        name: 'Cache Controll to index.html',
+        description:
+          'Applies Cache-Control header to index.html',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/api' 
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/graphql'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/billing/invoices'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          }
+        ],
+        behavior: {
+          setHeaders: ['Cache-Control: no-cache, must-revalidate, max-age=0, stale-while-revalidate=30']
+        }
+      },
     ]
   }
 }

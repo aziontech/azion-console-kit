@@ -48,7 +48,7 @@ export const clearCacheSensitive = async () => {
 }
 
 export const clearAllCache = async () => {
-  queryClient.clear()
+  await queryClient.clear()
 }
 
 export default queryClient
