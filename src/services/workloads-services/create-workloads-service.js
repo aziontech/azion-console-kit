@@ -33,8 +33,11 @@ const adapt = (payload) => {
     firewall: payload.firewall,
     active: payload.active,
     mtls: {
-      verification: payload.mtlsVerification,
-      certificate: payload.mtlsTrustedCertificate
+      enabled: payload.mtlsIsEnabled,
+      config: {
+        verification: payload.mtlsVerification,
+        certificate: payload.mtlsTrustedCertificate
+      }
     },
     protocols: {
       http: {
@@ -49,10 +52,6 @@ const adapt = (payload) => {
     tls: {
       minimum_version: null
     }
-  }
-
-  if (!payload.mtlsIsEnabled) {
-    delete dataRequest.mtls
   }
 
   if (payload.edgeCertificate !== 0) {

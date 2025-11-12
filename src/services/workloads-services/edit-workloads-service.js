@@ -50,16 +50,15 @@ const adapt = (payload) => {
       }
     },
     mtls: {
-      verification: payload.mtlsVerification,
-      certificate: payload.mtlsTrustedCertificate
+      enabled: payload.mtlsIsEnabled,
+      config: {
+        verification: payload.mtlsVerification,
+        certificate: payload.mtlsTrustedCertificate
+      }
     },
     workload_hostname_allow_access: payload.workloadHostnameAllowAccess,
     domains: payload.domains,
     network_map: payload.environment
-  }
-
-  if (!payload.mtlsIsEnabled) {
-    delete dataRequest.mtls
   }
 
   if (payload.edgeCertificate !== 0) {

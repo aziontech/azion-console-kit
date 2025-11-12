@@ -329,7 +329,6 @@
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="handleTrackEdit"
-    showBarGoBack
     @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >

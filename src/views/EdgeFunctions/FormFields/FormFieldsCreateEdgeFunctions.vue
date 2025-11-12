@@ -346,7 +346,7 @@
     <TabPanel header="Arguments">
       <div class="w-full mt-4">
         <div
-          class="w-full flex justify-end rounded-t-md bg-[var(--surface-300)] relative z-10 top-[3px]"
+          class="w-full flex justify-end rounded-t-md border-t border-x surface-border bg-[var(--table-header-color)] p-2 pb-3 relative z-10 top-[3px]"
         >
           <SelectPanel
             :options="selectPanelOptions"
@@ -434,15 +434,16 @@
                   />
                   -->
                 </div>
-              </div>
-              <div class="flex items-center justify-end mt-2">
-                <PrimeButton
-                  text
-                  size="small"
-                  label="Remove Form"
-                  severity="danger"
-                  @click="resetFormBuilder"
-                />
+                <div class="absolute right-2.5 bottom-2 surface-section">
+                  <PrimeButton
+                    size="small"
+                    label="Remove Form"
+                    icon="pi pi-times"
+                    outlined
+                    severity="danger"
+                    @click="resetFormBuilder"
+                  />
+                </div>
               </div>
             </SplitterPanel>
           </Splitter>
