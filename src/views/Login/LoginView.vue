@@ -22,6 +22,7 @@
   import SignInBlock from '@/templates/sign-in-block'
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { clearAllCache } from '@/services/v2/base/query/queryClient'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -53,7 +54,8 @@
 
   const showForgotPasswordStep = ref(false)
 
-  onMounted(() => {
+  onMounted(async () => {
+    await clearAllCache()
     const { email, activated } = route.query
     const isActivatedEmail = !!email && !activated
 
