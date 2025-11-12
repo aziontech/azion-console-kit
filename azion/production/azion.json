@@ -93,6 +93,11 @@
         "phase": "request"
       },
       {
+        "id": 488898,
+        "name": "Set Cache for Static Assets",
+        "phase": "request"
+      },
+      {
         "id": 269749,
         "name": "Set Storage Origin for All Requests",
         "phase": "request"
@@ -201,6 +206,11 @@
         "id": 468658,
         "name": "Secure Headers - General",
         "phase": "response"
+      },
+      {
+        "id": 488899,
+        "name": "Cache Controll to index.html",
+        "phase": "response"
       }
     ]
   },
@@ -212,6 +222,10 @@
     {
       "id": 161053,
       "name": "Cities - Cache"
+    },
+    {
+      "id": 266300,
+      "name": "Statics - Cache .html"
     }
   ]
 }
