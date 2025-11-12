@@ -89,7 +89,7 @@
     "rules": [
       {
         "id": 277548,
-        "name": "Apply Ce All Requests",
+        "name": "Apply Common Configuration for All Requests",
         "phase": "request"
       },
       {
