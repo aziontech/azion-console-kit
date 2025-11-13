@@ -188,7 +188,7 @@
 
   const getDocumentStatusChip = (status) => {
     const statusLower = status?.toLowerCase() || ''
-    
+
     switch (statusLower) {
       case 'queued':
         return {
