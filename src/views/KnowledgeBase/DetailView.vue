@@ -35,6 +35,14 @@
                   @click="handleRefresh"
                 />
                 <PrimeButton
+                  icon="pi pi-comments"
+                  size="small"
+                  @click="handleQuery"
+                  :label="isGreaterThanXL ? 'Query' : ''"
+                  outlined
+                  class="px-4 py-1 flex items-center justify-center"
+                />
+                <PrimeButton
                   icon="pi pi-cog"
                   size="small"
                   @click="handleSettings"
@@ -136,6 +144,12 @@
       </div>
     </template>
   </ContentBlock>
+
+  <!-- Query Sidebar -->
+  <QuerySidebar
+    v-model:visible="querySidebarVisible"
+    :kb-id="route.params.id"
+  />
 </template>
 
 <script setup>
@@ -154,6 +168,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import UploadCard from './components/UploadCard.vue'
   import DragAndDrop from './components/DragAndDrop.vue'
+  import QuerySidebar from './components/QuerySidebar.vue'
 
   defineOptions({
     name: 'knowledge-base-detail'
@@ -172,6 +187,7 @@
   const isDragOver = ref(false)
   const headerContainer = ref(null)
   const showDragAndDrop = ref(false)
+  const querySidebarVisible = ref(false)
 
   const uploadMenuItems = [
     {
@@ -300,6 +316,10 @@
 
   const handleSettings = () => {
     router.push(`/ai/knowledge-base/edit/${route.params.id}`)
+  }
+
+  const handleQuery = () => {
+    querySidebarVisible.value = true
   }
 
   const openDocumentSelector = (type = 'files') => {

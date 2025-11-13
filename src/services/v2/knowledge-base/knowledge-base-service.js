@@ -149,6 +149,22 @@ export class KnowledgeBaseService extends BaseService {
 
     return 'Document deleted successfully'
   }
+
+  // Query KB method
+  askKnowledgeBase = async (kbId, question, topK = 5) => {
+    const response = await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/${kbId}/ask`,
+      body: {
+        question,
+        top_k: topK,
+        model: 'gpt-4.1'
+      }
+    })
+
+    // API returns { answer: string, context: Array<{chunk_id, title, content, source, similarity, search_type}> }
+    return response.data
+  }
 }
 
 export const knowledgeBaseService = new KnowledgeBaseService()
