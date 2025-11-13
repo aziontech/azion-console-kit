@@ -59,3 +59,5 @@ claude.md
 .edge/
 .vulcan
 .open-next
+src/services/v2/knowledge-base/ai-studio-api.yaml
+docs/*

@@ -151,6 +151,7 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { knowledgeBaseService } from '@/services/v2/knowledge-base/knowledge-base-service'
   import { useKnowledgeBase } from '@/composables/useKnowledgeBase'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import UploadCard from './components/UploadCard.vue'
   import DragAndDrop from './components/DragAndDrop.vue'
 
@@ -162,7 +163,8 @@
   const router = useRouter()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
-  const { uploadDocuments, removeDocuments, handleToast, selectedDocuments, isUploading } = useKnowledgeBase()
+  const { uploadDocuments, removeDocuments, handleToast, selectedDocuments, isUploading } =
+    useKnowledgeBase()
 
   const knowledgeBase = ref(null)
   const documentSearchTerm = ref('')
@@ -184,6 +186,33 @@
     }
   ]
 
+  const getDocumentStatusChip = (status) => {
+    const statusLower = status?.toLowerCase() || ''
+    
+    switch (statusLower) {
+      case 'queued':
+        return {
+          content: 'Queued',
+          severity: 'warn'
+        }
+      case 'processing':
+        return {
+          content: 'Processing',
+          severity: 'info'
+        }
+      case 'indexed':
+        return {
+          content: 'Indexed',
+          severity: 'success'
+        }
+      default:
+        return {
+          content: status || 'Unknown',
+          severity: 'secondary'
+        }
+    }
+  }
+
   const getColumns = [
     {
       field: 'name',
@@ -195,7 +224,14 @@
     },
     {
       field: 'status',
-      header: 'Status'
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     },
     {
       field: 'lastEditor',
@@ -228,7 +264,8 @@
         documentId: documentRecord.documentId,
         name: documentRecord.name,
         type: documentRecord.type?.toUpperCase(),
-        status: documentRecord.status,
+        status: getDocumentStatusChip(documentRecord.status),
+        originalStatus: documentRecord.status,
         lastEditor: documentRecord.lastEditor,
         lastModified: documentRecord.lastModified
       }))

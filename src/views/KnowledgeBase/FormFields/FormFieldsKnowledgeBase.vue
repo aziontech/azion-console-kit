@@ -24,7 +24,7 @@
 <template>
   <FormHorizontal
     title="Knowledge Base"
-    description="Create knowledge base entries to store and organize information for AI assistance."
+    description="Store and organize documents for AI-powered assistance. Documents are automatically stored in Object Storage and indexed in an SQL database for fast semantic search retrieval."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -68,7 +68,7 @@
           :description="
             props.isEditMode
               ? 'Embedding model cannot be changed after creation.'
-              : 'The default embedding model is pre-selected for this knowledge base.'
+              : 'Select an embedding model. You will not be able to change it after the knowledge base has been created.'
           "
           data-testid="knowledge-base-form__embedding-model-field"
         />

@@ -27,7 +27,9 @@
 
   const route = useRoute()
   const isCreatePage = computed(() => route.name === 'create-knowledge-base')
-  const title = computed(() => (isCreatePage.value ? 'Create Knowledge Base' : 'Edit Knowledge Base'))
+  const title = computed(() =>
+    isCreatePage.value ? 'Create Knowledge Base' : 'Edit Knowledge Base'
+  )
 
   const validationSchema = yup.object({
     name: yup
