@@ -13,8 +13,8 @@ export async function logoutGuard({ to, accountStore, tracker }) {
 
   if (to.path === '/logout' || to.query.ref === 'logout') {
     tracker.reset()
-    await logoutService()
     await clearAllCache()
+    await logoutService()
     accountStore.setAccountData({})
     return { name: 'login' }
   }

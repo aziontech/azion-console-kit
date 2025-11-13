@@ -95,8 +95,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment
@@ -141,8 +144,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment
@@ -189,8 +195,11 @@ describe('DomainsServicesV4', () => {
           }
         },
         mtls: {
-          verification: fixtures.domainMock.mtlsVerification,
-          certificate: fixtures.domainMock.mtlsTrustedCertificate
+          enabled: fixtures.domainMock.mtlsIsEnabled,
+          config: {
+            verification: fixtures.domainMock.mtlsVerification,
+            certificate: fixtures.domainMock.mtlsTrustedCertificate
+          }
         },
         domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment

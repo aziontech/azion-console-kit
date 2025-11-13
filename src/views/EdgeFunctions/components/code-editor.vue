@@ -3,7 +3,7 @@
     v-model:value="code"
     :language="runtime"
     :theme="theme"
-    class="w-full min-h-[400px] h-full border surface-border border-r rounded-md"
+    class="w-full min-h-[390px] h-full border surface-border border-r rounded-md"
     :class="{
       'border-transparent': !errors,
       '!border-red-500 border h-[calc(100%-1.5rem)]': errors,

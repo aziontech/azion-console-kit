@@ -34,7 +34,7 @@
 
 <template>
   <div
-    class="flex flex-col justify-center"
+    class="flex flex-col justify-center surface-section rounded-md"
     :class="{
       'mt-4 pb-8': inTabs,
       'border surface-border': !noBorder,
