@@ -25,7 +25,7 @@
     "url": "https://j65rq1emi4.map.azionedge.net"
   },
   "rt-purge": {
-    "purge_on_publish": true
+    "purge_on_publish": false
   },
   "origin": [
     {
