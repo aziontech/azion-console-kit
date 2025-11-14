@@ -149,7 +149,7 @@ export class EdgeAppService extends BaseService {
         gcTime: this.cacheTime.THIRTY_MINUTES,
         enabled: !!unref(edgeApplicationId),
         meta: {
-          persist: true
+          persist: false
         },
         ...options
       },

@@ -1,24 +1,21 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
 import { queryClient } from '@/services/v2/base/query/queryClient'
+import { CACHE_TIME, CACHE_TYPE } from '@/services/v2/base/query/config'
 
 const CACHE_KEY = 'edge-application-load'
-const CACHE_TYPE = 'global'
-const STALE_TIME = 10 * 60 * 1000 // 10 minutos
-const GC_TIME = 30 * 60 * 1000 // 30 minutos
-
+const STALE_TIME = CACHE_TIME.TEN_MINUTES
+const GC_TIME = CACHE_TIME.THIRTY_MINUTES
 const invalidatePreviousLoadCache = async (currentId) => {
-  // Remove todos os caches de load EXCETO o atual
   await queryClient.removeQueries({
     predicate: (query) => {
       const queryKey = query.queryKey
       if (!queryKey || !Array.isArray(queryKey)) return false
 
-      const isLoadCache = queryKey[0] === CACHE_TYPE && queryKey.includes(CACHE_KEY)
+      const isLoadCache = queryKey[0] === CACHE_TYPE.GLOBAL && queryKey.includes(CACHE_KEY)
 
       if (!isLoadCache) return false
 
-      // Remove se NÃO for o ID atual
       const isCurrentId = queryKey.some(
         (key) => typeof key === 'string' && key === `id=${currentId}`
       )
@@ -29,11 +26,10 @@ const invalidatePreviousLoadCache = async (currentId) => {
 }
 
 export const loadEdgeApplicationService = async ({ id }) => {
-  // Invalida cache do item anterior antes de carregar o novo
   await invalidatePreviousLoadCache(id)
 
   return queryClient.fetchQuery({
-    queryKey: [CACHE_TYPE, CACHE_KEY, `id=${id}`],
+    queryKey: [CACHE_TYPE.GLOBAL, CACHE_KEY, `id=${id}`],
     queryFn: async () => {
       let httpResponse = await AxiosHttpClientAdapter.request({
         url: `${makeEdgeApplicationBaseUrl()}/${id}`,
@@ -45,7 +41,7 @@ export const loadEdgeApplicationService = async ({ id }) => {
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
     meta: {
-      persist: true // Persiste apenas o último item carregado
+      persist: true
     }
   })
 }
