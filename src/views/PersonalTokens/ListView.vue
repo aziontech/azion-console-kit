@@ -8,6 +8,7 @@
         v-if="hasContentToList"
         :listService="listPersonalTokensService"
         :columns="getColumns"
+        :disabledList="true"
         addButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
         @on-load-data="handleLoadData"
