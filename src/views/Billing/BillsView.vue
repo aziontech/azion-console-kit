@@ -1,6 +1,8 @@
 <template>
   <div class="w-full flex flex-col-reverse sm:flex-row gap-6 mt-4">
-    <div class="w-full sm:w-1/2 flex flex-col justify-between border surface-border rounded-md">
+    <div
+      class="w-full surface-section sm:w-1/2 flex flex-col justify-between border surface-border rounded-md"
+    >
       <div class="p-3 md:p-6 flex flex-col gap-4">
         <div class="flex justify-between">
           <span class="font-medium text-lg text-color">Current Invoice</span>
@@ -83,7 +85,9 @@
         </div>
       </div>
     </div>
-    <div class="w-full sm:w-1/2 border surface-border rounded-md flex flex-col justify-between">
+    <div
+      class="w-full surface-section sm:w-1/2 border surface-border rounded-md flex flex-col justify-between"
+    >
       <div class="p-3 md:p-6 flex flex-col gap-4">
         <div class="flex justify-between">
           <span class="font-medium text-lg text-color">Service Plan</span>

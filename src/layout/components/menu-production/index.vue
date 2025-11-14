@@ -23,7 +23,7 @@
   <Sidebar
     :pt="{
       header: { class: 'hidden' },
-      root: { class: 'shadow-none' },
+      root: { class: 'shadow-none bg-[var(--surface-section)]' },
       mask: { class: 'top-14' },
       content: { class: 'px-0 md:px-4 pt-0' }
     }"
