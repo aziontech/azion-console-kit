@@ -15,12 +15,37 @@
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
   import EditViewV3 from './V3/EditView.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { listOriginsService } from '@/services/edge-application-origins-services/list-origins-service'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+
+  /**
+   * Gets the pageSize from localStorage tableDefinitions
+   * Falls back to default value if not found
+   */
+  const getPageSizeFromTableDefinitions = (defaultValue = 10) => {
+    try {
+      const tableDefinitions = localStorage.getItem('tableDefinitions')
+      if (tableDefinitions) {
+        const parsed = JSON.parse(tableDefinitions)
+        const numberOfLinesPerPage = parsed?.numberOfLinesPerPage
+        if (numberOfLinesPerPage && typeof numberOfLinesPerPage === 'number') {
+          return numberOfLinesPerPage
+        }
+      }
+    } catch (error) {
+      // Silently fallback to default if localStorage parse fails
+    }
+    return defaultValue
+  }
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -126,6 +151,81 @@
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
+
+    // Load list data immediately (origins, functions instance, rules engine)
+    // This ensures data is loaded when opening the edit view
+    // Using the same parameters as prefetch config to ensure cache hits
+    const loadPromises = []
+
+    // Get pageSize from user preferences (same as prefetch config)
+    const functionsPageSize = getPageSizeFromTableDefinitions(10)
+
+    // Load origins if API v4 is enabled
+    // Component calls without pageSize, so it uses default 200
+    // We also don't pass pageSize to match the component's behavior
+    // Component calls: listOriginsService({ id: props.edgeApplicationId })
+    // This uses defaults: orderBy='origin_id', sort='asc', page=1, pageSize=200
+    if (hasFlagBlockApiV4()) {
+      loadPromises.push(
+        listOriginsService({
+          id: edgeApplicationId.value
+        }).catch(() => {
+          // Silently fail - component will handle loading
+        })
+      )
+    }
+
+    // Load functions instance if edge functions is enabled
+    // Component uses FetchListTableBlock with useTableQuery which passes:
+    // { page: 1, pageSize: itemsByPage.value, fields: apiFields, ordering: defaultOrderingFieldName }
+    // apiFields = ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor']
+    // defaultOrderingFieldName = 'name'
+    const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+    if (edgeApplication.value?.[edgeFunctionsProperty]) {
+      loadPromises.push(
+        edgeApplicationFunctionService
+          .listEdgeApplicationFunctions(edgeApplicationId.value, {
+            page: 1,
+            pageSize: functionsPageSize,
+            fields: ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor'],
+            ordering: 'name'
+          })
+          .catch(() => {
+            // Silently fail - component will handle loading
+          })
+      )
+    }
+
+    // Load rules engine
+    // Component uses TableBlock v2 which calls loadData({ fields: apiFields, ordering: defaultOrderingFieldName }) on onMounted
+    // apiFields = ['id', 'name', 'description', 'phase', 'active', 'order', 'last_modified', 'last_editor']
+    // defaultOrderingFieldName = '' (empty string)
+    // So it passes { fields: [...], ordering: '' } without page or pageSize
+    loadPromises.push(
+      rulesEngineService
+        .listRulesEngineRequestAndResponsePhase({
+          edgeApplicationId: edgeApplicationId.value,
+          params: {
+            fields: [
+              'id',
+              'name',
+              'description',
+              'phase',
+              'active',
+              'order',
+              'last_modified',
+              'last_editor'
+            ],
+            ordering: ''
+          }
+        })
+        .catch(() => {
+          // Silently fail - component will handle loading
+        })
+    )
+
+    // Execute all loads in parallel
+    await Promise.allSettled(loadPromises)
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
@@ -342,7 +442,12 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="!edgeApplication" />
+
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
@@ -357,7 +462,6 @@
         :activeIndex="activeTab"
         @tab-click="({ index = 0 }) => changeTab(index)"
         class="w-full h-full"
-        v-if="edgeApplication"
       >
         <TabPanel
           v-for="(tab, index) in filteredTabs"

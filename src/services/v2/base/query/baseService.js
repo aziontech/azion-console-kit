@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import {
   queryClient,
@@ -11,6 +11,8 @@ import {
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
+import { prefetch, prefetchByTrigger } from '@/services/v2/base/query'
+import { unref } from 'vue'
 
 export class BaseService {
   constructor() {
@@ -24,32 +26,55 @@ export class BaseService {
     this.constructor.instance = this
   }
 
-  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, ...options }) {
     const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
+    const defaultOptions = getCacheOptions(cache)
     const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return useQuery({
       queryKey,
       queryFn: coalescedQueryFn,
+      ...defaultOptions,
       ...options,
-      ...overrides
+      meta: {
+        ...defaultOptions.meta,
+        ...options.meta
+      }
     })
   }
 
-  async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
+  async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, ...options }) {
     await waitForPersistenceRestore()
 
     const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
+    const defaultOptions = getCacheOptions(cache)
     const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
 
     return this.queryClient.ensureQueryData({
       queryKey,
       queryFn: coalescedQueryFn,
+      ...defaultOptions,
       ...options,
-      ...overrides
+      meta: {
+        ...defaultOptions.meta,
+        ...options.meta
+      }
     })
+  }
+
+  useMutation(options) {
+    return useMutation(options, this.queryClient)
+  }
+
+  async mutateAsync({ mutationFn, onSuccess, onError, ...options }) {
+    const mutation = this.useMutation({
+      mutationFn,
+      onSuccess,
+      onError,
+      ...options
+    })
+
+    return mutation.mutateAsync()
   }
 
   withMutex(key, mutationFn) {
@@ -88,5 +113,39 @@ export class BaseService {
   getCachedData({ key, cache = this.cacheType.GLOBAL }) {
     const queryKey = createQueryKey(key, cache)
     return this.queryClient.getQueryData(queryKey)
+  }
+
+  /**
+   * Executes data prefetch
+   * @param {string} name - Configuration name
+   * @param {Object} params - Parameters
+   */
+  async prefetch(name, params = {}) {
+    return prefetch(name, params)
+  }
+
+  /**
+   * Executes prefetch by trigger
+   * @param {string} trigger - Trigger name
+   * @param {Object} params - Parameters
+   */
+  async prefetchByTrigger(trigger, params = {}) {
+    return prefetchByTrigger(trigger, params)
+  }
+}
+
+export function createReactiveQueryKey(baseKey, params, keyParams = []) {
+  return () => {
+    const paramValues = unref(params) || {}
+    const keyParts = [...baseKey]
+
+    keyParams.forEach((paramName) => {
+      const value = paramValues[paramName]
+      if (value !== undefined && value !== null && value !== '') {
+        keyParts.push(`${paramName}=${value}`)
+      }
+    })
+
+    return keyParts
   }
 }

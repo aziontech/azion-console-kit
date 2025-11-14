@@ -1,13 +1,17 @@
-import { listOriginsService } from './list-origins-service'
-import { createOriginService } from './create-origin-service'
-import { editOriginService } from './edit-origin-service'
+import { listOriginsService, invalidateOriginsCache } from './list-origins-service'
+import { createOriginService, useCreateOrigin } from './create-origin-service'
+import { editOriginService, useEditOrigin } from './edit-origin-service'
 import { loadOriginService } from './load-origin-service'
-import { deleteOriginsService } from './delete-origin-service'
+import { deleteOriginsService, useDeleteOrigin } from './delete-origin-service'
 
 export {
   listOriginsService,
   createOriginService,
   editOriginService,
   loadOriginService,
-  deleteOriginsService
+  deleteOriginsService,
+  useCreateOrigin,
+  useEditOrigin,
+  useDeleteOrigin,
+  invalidateOriginsCache
 }

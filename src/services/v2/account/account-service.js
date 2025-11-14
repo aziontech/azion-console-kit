@@ -21,7 +21,7 @@ export class AccountService extends BaseService {
       key: ['account', 'info'],
       queryFn: () => this.fetchAccountInfo(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
+      ...options
     })
   }
 
