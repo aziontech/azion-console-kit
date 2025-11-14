@@ -20,7 +20,7 @@ export class AccountSettingsService extends BaseService {
       key: ['account', 'job-role'],
       queryFn: () => this.fetchAccountJobRole(),
       cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
+      ...options
     })
   }
 

@@ -10,7 +10,12 @@ export const cloneEdgeApplicationService = async ({ edgeApplicationName, payload
     body: adapt(payload, edgeApplicationName)
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+
+  const { edgeAppService } = await import('@/services/v2/edge-app/edge-app-service')
+  await edgeAppService.invalidateListCache()
+
+  return result
 }
 
 const adapt = (payload, edgeApplicationName) => {

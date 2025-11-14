@@ -1,8 +1,11 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
+import { useMutation } from '@tanstack/vue-query'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { invalidateOriginsCache } from './list-origins-service'
 
-export const editOriginService = async (payload) => {
+const editOriginServiceCore = async (payload) => {
   const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/origins/${payload.id}`,
@@ -11,6 +14,29 @@ export const editOriginService = async (payload) => {
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+export const editOriginService = async (payload) => {
+  const result = await editOriginServiceCore(payload)
+  await invalidateOriginsCache(payload.edgeApplicationId)
+  return result
+}
+
+export const useEditOrigin = (options = {}) => {
+  return useMutation(
+    {
+      mutationFn: editOriginServiceCore,
+      onSuccess: async (data, variables, context) => {
+        await invalidateOriginsCache(variables.edgeApplicationId)
+
+        if (options.onSuccess) {
+          await options.onSuccess(data, variables, context)
+        }
+      },
+      ...options
+    },
+    queryClient
+  )
 }
 
 const adapt = (payload) => {
