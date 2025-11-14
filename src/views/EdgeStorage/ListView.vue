@@ -91,6 +91,14 @@
                     outlined
                     class="px-4 py-1 flex items-center justify-center"
                   />
+                  <PrimeButton
+                    icon="pi pi-folder-plus"
+                    size="small"
+                    @click="handleNewFolder"
+                    :label="isGreaterThanXL ? 'New Folder' : ''"
+                    outlined
+                    class="px-4 py-1 flex items-center justify-center"
+                  />
                 </template>
                 <SplitButton
                   size="small"
@@ -99,7 +107,7 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
-                  :disabled="isUploading"
+                  :disabled="isProcessing"
                   :menuButtonProps="{
                     class: 'rounded-l-none',
                     style: { color: 'var(--primary-text-color) !important' }
@@ -110,7 +118,7 @@
                 />
               </div>
             </div>
-            <UploadCard />
+            <ProgressCard />
 
             <DragAndDrop
               v-if="showDragAndDrop"
@@ -119,7 +127,7 @@
             />
             <div
               v-else
-              class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
+              class="flex flex-col gap-3 items-center border-1 border-transparent justify-center w-full"
               :class="{ 'border-dashed border-[#f3652b] rounded-md pb-4': isDragOver }"
             >
               <ListTableBlock
@@ -137,12 +145,17 @@
                 :searchFilter="fileSearchTerm"
                 :isPaginationLoading="isPaginationLoading"
                 :currentPage="currentPage"
+                :isCreatingNewFolder="isCreatingNewFolder"
+                :newFolderName="newFolderName"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
                 @page="handlePaginationChange"
+                @save-new-folder="handleSaveNewFolder"
+                @cancel-new-folder="handleCancelNewFolder"
+                @update:newFolderName="newFolderName = $event"
                 class="w-full"
               />
 
@@ -153,11 +166,11 @@
                   <span
                     class="transition-colors"
                     :class="
-                      isUploading
+                      isProcessing
                         ? 'text-color-secondary cursor-not-allowed'
                         : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
                     "
-                    @click="!isUploading && openFileSelector()"
+                    @click="!isProcessing && openFileSelector()"
                     >choose your files</span
                   >
                 </p>
@@ -187,7 +200,7 @@
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import UploadCard from './components/UploadCard.vue'
+  import ProgressCard from './components/ProgressCard.vue'
 
   const router = useRouter()
   const route = useRoute()
@@ -195,7 +208,7 @@
   const {
     buckets,
     selectedBucket,
-    removeFiles,
+    deleteMultipleFiles,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -203,7 +216,7 @@
     isDownloading,
     showDragAndDrop,
     folderPath,
-    isUploading
+    isProcessing
   } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
@@ -260,6 +273,8 @@
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
   const currentPage = ref(1)
+  const isCreatingNewFolder = ref(false)
+  const newFolderName = ref('')
 
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
@@ -392,7 +407,9 @@
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
     selectedBucket.value = bucket
-    folderPath.value = ''
+    if (!route.query?.folderPath) {
+      folderPath.value = ''
+    }
     currentPage.value = 1
     selectedFiles.value = []
     listServiceFilesRef.value?.reload()
@@ -413,7 +430,7 @@
     listServiceFilesRef.value?.reload()
   }
   const handleSettingsTrackEvent = () => {
-    router.push(`/object-storage/edit/${selectedBucket.value.id}`)
+    router.push(`/object-storage/${selectedBucket.value.id}/edit/main-settings`)
   }
 
   const handleFileSearch = () => {
@@ -421,7 +438,7 @@
   }
 
   const openFileSelector = (type = 'files') => {
-    if (isUploading.value) return
+    if (isProcessing.value) return
 
     const input = document.createElement('input')
     input.type = 'file'
@@ -470,7 +487,13 @@
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
-
+  const handleMultipleDelete = () => {
+    Promise.resolve().then(async () => {
+      await deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
+      filesTableNeedRefresh.value = true
+      listServiceFilesRef.value?.reload()
+    })
+  }
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
       title: selectedFiles.value.length > 1 ? `${selectedFiles.value.length} files` : 'File',
@@ -479,13 +502,10 @@
         deleteConfirmationText:
           selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
       },
-      deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
-      successCallback: () => {
-        listServiceFilesRef.value?.reload()
-      },
+      showToast: false,
+      deleteService: () => handleMultipleDelete(),
       closeCallback: () => {
         selectedFiles.value = []
-        listServiceFilesRef.value?.reload()
       }
     })
   }
@@ -544,7 +564,7 @@
 
   const handleDragDropUpload = async (event) => {
     isDragOver.value = false
-    if (isUploading.value) return
+    if (isProcessing.value) return
 
     const files = event.target.files || event.dataTransfer.files
     if (files.length) {
@@ -571,12 +591,62 @@
     listServiceFilesRef.value?.reload()
   }
 
+  const handleNewFolder = () => {
+    isCreatingNewFolder.value = true
+    newFolderName.value = ''
+  }
+
+  const handleSaveNewFolder = () => {
+    const folderName = newFolderName.value.trim()
+    if (folderName) {
+      const specialCharRegex = /[^\u0020-\u007F]/g
+      if (specialCharRegex.test(folderName)) {
+        return
+      }
+      const newPath = folderPath.value + folderName + '/'
+      folderPath.value = newPath
+      router.replace({ query: { folderPath: newPath } })
+      currentPage.value = 1
+      filesTableNeedRefresh.value = true
+      listServiceFilesRef.value?.reload()
+    }
+    isCreatingNewFolder.value = false
+    newFolderName.value = ''
+  }
+
+  const handleCancelNewFolder = () => {
+    isCreatingNewFolder.value = false
+    newFolderName.value = ''
+  }
+
+  const handleRouteChange = () => {
+    const newId = route.params.id
+
+    if (!newId) {
+      selectBucket(null)
+    } else {
+      const bucket = buckets.value.find((bucket) => bucket.name === newId)
+      selectBucket(bucket)
+
+      if (route.query?.folderPath) {
+        folderPath.value = route.query.folderPath
+      }
+    }
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+  }
+
+  watch(
+    () => route.fullPath,
+    () => {
+      handleRouteChange()
+    },
+    { immediate: true }
+  )
+
   watch(
     () => route.params.id,
     () => {
-      const bucket = buckets.value.find((bucket) => bucket.name === route.params.id)
-      selectBucket(bucket)
-      breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+      handleRouteChange()
     }
   )
 
