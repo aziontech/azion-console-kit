@@ -2,6 +2,7 @@ import { useAccountStore } from '@stores/account'
 
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
+import { useAccountStore } from '@/stores/account'
 
 /**
  * Converts a given value to a date string in a specific format.
@@ -243,6 +244,18 @@ function getRemainingDays(dateStr) {
   return Math.floor(days)
 }
 
+const getDateRangeByHourRange = (hourRange) => {
+  const accountStore = useAccountStore()
+  const startDate = new Date().toUTC(accountStore.account.utc_offset)
+  const endDate = new Date().toUTC(accountStore.account.utc_offset)
+  startDate.setHours(startDate.getHours() - parseInt(hourRange))
+  const formattedStartDate = startDate.toUTC(accountStore.account.utc_offset).toBeholderFormat()
+  const formattedEndDate = endDate.toUTC(accountStore.account.utc_offset).toBeholderFormat()
+
+  return {
+    startDate: formattedStartDate,
+    endDate: formattedEndDate
+  }
 const convertToRelativeTime = (date) => {
   const now = new Date()
   const targetDate = new Date(date)
@@ -330,5 +343,6 @@ export {
   formatDateToDayMonthYearHour,
   getRemainingDays,
   getCurrentDateTimeIntl,
+  getDateRangeByHourRange
   convertToRelativeTime
 }

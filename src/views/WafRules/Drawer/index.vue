@@ -13,16 +13,16 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import { useAccountStore } from '@/stores/account'
 
-  const accountStore = useAccountStore()
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import { wafRulesTuningGqlService } from '@/services/v2/waf-rules-tunning/waf-rules-tuning-gql-service'
 
   defineOptions({
     name: 'more-details'
   })
 
   const emit = defineEmits(['update:visible', 'attack-on'])
+
   const props = defineProps({
     visible: {
       type: Boolean,
@@ -75,6 +75,7 @@
       required: true
     }
   })
+
   const showGoBack = ref(false)
   const selectedAttack = ref([])
   const selectedFilter = ref({
@@ -91,8 +92,6 @@
       emit('update:visible', value)
     }
   })
-
-  const hasEnableWafTuning = computed(() => accountStore.hasEnableWafTuning)
 
   const recordsFoundLabel = computed(() => {
     return `${totalRecordsFound.value} records found`
@@ -215,20 +214,6 @@
     listTableRef.value?.reload({ filters: query })
   }
 
-  const toggleDrawerVisibility = (isVisible) => {
-    visibleDrawer.value = isVisible
-  }
-  const closeDrawer = () => {
-    toggleDrawerVisibility(false)
-  }
-  const handleGoBack = () => {
-    showGoBack.value = false
-    toggleDrawerVisibility(false)
-  }
-  const createAllowed = () => {
-    emit('attack-on', selectedAttack.value)
-  }
-
   const listAttacks = async (params) => {
     let query
 
@@ -251,14 +236,16 @@
     } else {
       query = params.filters
     }
-    query.domains = props.domains.join(',')
-    const response = await props.listService({
+
+    query.domains = props.domains
+
+    const response = await wafRulesTuningGqlService.listWafRulesTuningAttacks({
       wafId: props.wafRuleId,
       tuningId: props.tuningObject.ruleId,
       query: query
     })
-    totalRecordsFound.value = response.length
-    return response
+    totalRecordsFound.value = response.recordsFound
+    return response?.data
   }
 
   const filterTuning = async () => {
@@ -314,6 +301,23 @@
 
   const downloadCSV = () => {
     listTableRef.value?.handleExportTableDataToCSV()
+  }
+
+  const toggleDrawerVisibility = (isVisible) => {
+    visibleDrawer.value = isVisible
+  }
+
+  const closeDrawer = () => {
+    toggleDrawerVisibility(false)
+  }
+
+  const handleGoBack = () => {
+    showGoBack.value = false
+    toggleDrawerVisibility(false)
+  }
+
+  const createAllowed = () => {
+    emit('attack-on', selectedAttack.value)
   }
 
   onBeforeMount(() => {
@@ -439,7 +443,6 @@
                   @click="downloadCSV"
                 />
               </div>
-
               <WithSelectionBehavior
                 ref="listTableRef"
                 v-model:selectedItensData="selectedAttack"
@@ -453,10 +456,8 @@
         </div>
       </div>
     </template>
-    <template
-      #footer
-      v-if="hasEnableWafTuning"
-    >
+
+    <template #footer>
       <div class="sticky bottom-0">
         <GoBack
           :goBack="handleGoBack"
