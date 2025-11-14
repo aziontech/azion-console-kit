@@ -32,7 +32,7 @@ export const listOriginsService = async ({
   pageSize = 200
 }) => {
   const queryKey = [
-    'global',
+    'GLOBAL',
     CACHE_KEY,
     `edgeAppId=${id}`,
     `orderBy=${orderBy}`,
@@ -60,7 +60,7 @@ export const invalidateOriginsCache = async (edgeApplicationId) => {
       return (
         queryKey &&
         Array.isArray(queryKey) &&
-        queryKey[0] === 'global' &&
+        queryKey[0] === 'GLOBAL' &&
         queryKey.includes(CACHE_KEY) &&
         queryKey.includes(`edgeAppId=${edgeApplicationId}`)
       )
