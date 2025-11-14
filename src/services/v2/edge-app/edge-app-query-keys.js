@@ -1,9 +1,9 @@
 /**
  * Query Keys Factory Pattern for Edge Applications
- * 
+ *
  * Centralizes all query keys used in Edge Applications to ensure consistency
  * and enable easy prefetching of related data.
- * 
+ *
  * IMPORTANT: Do NOT include 'GLOBAL' or other cache types in these keys.
  * The createQueryKey() function will add the cache type automatically.
  */
@@ -36,11 +36,11 @@ export const edgeAppKeys = {
    */
   list: (params = {}) => {
     const key = [CACHE_KEYS.EDGE_APP]
-    
+
     // Add parameters in the same order as listEdgeApplicationsService
     // to ensure cache key consistency
     const { page, pageSize, ordering, search } = params
-    
+
     if (page !== undefined && page !== null) {
       key.push(`page=${page}`)
     }
@@ -53,7 +53,7 @@ export const edgeAppKeys = {
     if (search !== undefined && search !== null && search !== '') {
       key.push(`search=${search}`)
     }
-    
+
     return key
   },
 
@@ -110,7 +110,11 @@ export const edgeAppKeys = {
   functions: {
     all: (edgeApplicationId) => [CACHE_KEYS.FUNCTIONS, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {
-      const defaultParams = { pageSize: 10, fields: ['id', 'name', 'last_editor', 'last_modified', 'function'], ...params }
+      const defaultParams = {
+        pageSize: 10,
+        fields: ['id', 'name', 'last_editor', 'last_modified', 'function'],
+        ...params
+      }
       return [CACHE_KEYS.FUNCTIONS, `edgeAppId=${edgeApplicationId}`, defaultParams]
     }
   },

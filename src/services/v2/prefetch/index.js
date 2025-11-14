@@ -1,6 +1,6 @@
 /**
  * Prefetch System - Entry Point (Legacy)
- * 
+ *
  * @deprecated Use @/services/v2/base/query instead
  * Maintained for compatibility, but redirects to the new architecture
  */
@@ -26,5 +26,14 @@ if (typeof window !== 'undefined') {
 }
 
 // Re-exports for compatibility
-export { prefetch, prefetchMany, prefetchByTrigger, registerPrefetchModule, PREFETCH_TRIGGERS } from '@/services/v2/base/query'
-export { usePrefetchController, usePrefetchEdgeAppOnAccess } from '@/composables/usePrefetchController'
+export {
+  prefetch,
+  prefetchMany,
+  prefetchByTrigger,
+  registerPrefetchModule,
+  PREFETCH_TRIGGERS
+} from '@/services/v2/base/query'
+export {
+  usePrefetchController,
+  usePrefetchEdgeAppOnAccess
+} from '@/composables/usePrefetchController'

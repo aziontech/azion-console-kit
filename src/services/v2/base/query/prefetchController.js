@@ -1,6 +1,6 @@
 /**
  * Prefetch Controller
- * 
+ *
  * Integrated prefetch system that integrates with the base architecture.
  * Manages automatic prefetches, avoiding duplicate requests and waiting for
  * pending requests. Uses the existing coalescing system.
@@ -53,7 +53,7 @@ class PrefetchTask {
     // Creates new promise with coalescing (uses existing system)
     this.status = 'pending'
     const coalescedFn = coalesceRequest(this.queryKey, this.queryFn)
-    
+
     this.promise = queryClient
       .prefetchQuery({
         queryKey: this.queryKey,
@@ -145,10 +145,11 @@ class PrefetchController {
 
     // Checks if prefetch is enabled
     if (config.options?.enabled !== undefined) {
-      const enabled = typeof config.options.enabled === 'function' 
-        ? config.options.enabled(params) 
-        : config.options.enabled
-      
+      const enabled =
+        typeof config.options.enabled === 'function'
+          ? config.options.enabled(params)
+          : config.options.enabled
+
       if (!enabled) {
         return Promise.resolve()
       }
@@ -156,7 +157,7 @@ class PrefetchController {
 
     // Generates a unique key based on name and parameters
     const taskKey = this._generateTaskKey(name, params)
-    
+
     // If task already exists, reuses it
     if (this.tasks.has(taskKey)) {
       const task = this.tasks.get(taskKey)
@@ -175,12 +176,7 @@ class PrefetchController {
     const task = new PrefetchTask(taskKey, queryKey, queryFn, finalOptions)
     this.tasks.set(taskKey, task)
 
-    try {
-      return await task.execute()
-    } catch (error) {
-      // Error executing prefetch
-      throw error
-    }
+    return task.execute()
   }
 
   /**
@@ -202,7 +198,7 @@ class PrefetchController {
    */
   async prefetchByTrigger(trigger, params = {}) {
     const configsToRun = []
-    
+
     for (const [name, config] of this.configs.entries()) {
       if (config.triggers.includes(trigger)) {
         configsToRun.push(name)
@@ -224,11 +220,11 @@ class PrefetchController {
   async waitIfPending(name, params = {}) {
     const taskKey = this._generateTaskKey(name, params)
     const task = this.tasks.get(taskKey)
-    
+
     if (task) {
       return task.waitIfPending()
     }
-    
+
     return Promise.resolve()
   }
 
@@ -287,4 +283,3 @@ if (typeof window !== 'undefined') {
 }
 
 export default prefetchController
-

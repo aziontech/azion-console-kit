@@ -11,7 +11,7 @@ import {
 import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
-import { prefetch, prefetchByTrigger, PREFETCH_TRIGGERS } from '@/services/v2/base/query'
+import { prefetch, prefetchByTrigger } from '@/services/v2/base/query'
 import { unref } from 'vue'
 
 export class BaseService {

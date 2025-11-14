@@ -1,6 +1,6 @@
 /**
  * Prefetch System - Simplified
- * 
+ *
  * Simple prefetch system that leverages TanStack Query native features.
  * TanStack Query already manages cache, deduplication and promises automatically.
  */
@@ -12,16 +12,16 @@ import { waitForPersistenceRestore } from './queryPlugin'
 
 /**
  * Available triggers for prefetch execution
- * 
+ *
  * Descriptive names that indicate when the prefetch should be executed.
  * Use specific and descriptive names following the pattern: view{Module} or {action}{Resource}
- * 
+ *
  * Examples:
  * - LOGIN: Executes after user login
  * - VIEW_EDGE_APP: Executes when viewing/editing Edge Application
  * - VIEW_EDGE_FIREWALL: Executes when viewing/editing Edge Firewall
  * - MANUAL: Manual/explicit execution
- * 
+ *
  * To add new triggers:
  * 1. Add the constant here
  * 2. Use in prefetch registrations (edge-app-prefetch-config.js, etc.)
@@ -30,11 +30,11 @@ import { waitForPersistenceRestore } from './queryPlugin'
 export const PREFETCH_TRIGGERS = {
   // Authentication
   LOGIN: 'login',
-  
+
   // Specific views
   VIEW_EDGE_APP: 'viewEdgeApp',
   VIEW_EDGE_FIREWALL: 'viewEdgeFirewall',
-  
+
   // Manual (explicit execution)
   MANUAL: 'manual'
 }
@@ -78,9 +78,10 @@ export async function prefetch(name, params = {}) {
 
   // Check if enabled
   if (config.options?.enabled !== undefined) {
-    const enabled = typeof config.options.enabled === 'function'
-      ? config.options.enabled(params)
-      : config.options.enabled
+    const enabled =
+      typeof config.options.enabled === 'function'
+        ? config.options.enabled(params)
+        : config.options.enabled
     if (!enabled) {
       return Promise.resolve()
     }

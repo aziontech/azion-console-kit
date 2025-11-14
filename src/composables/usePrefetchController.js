@@ -1,10 +1,15 @@
 /**
  * Composable for using Prefetch Controller
- * 
+ *
  * Facilitates the use of prefetch controller in Vue components
  */
 
-import { prefetch, prefetchMany, prefetchByTrigger, PREFETCH_TRIGGERS } from '@/services/v2/base/query'
+import {
+  prefetch,
+  prefetchMany,
+  prefetchByTrigger,
+  PREFETCH_TRIGGERS
+} from '@/services/v2/base/query'
 import { onMounted } from 'vue'
 
 /**
