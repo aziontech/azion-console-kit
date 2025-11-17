@@ -110,6 +110,12 @@
 
   const loadInitialData = async () => {
     try {
+      if (props.initialValues && Object.keys(props.initialValues).length > 0) {
+        const initialValues = props.initialValues
+        emit('loaded-service-object', initialValues)
+        resetForm({ values: initialValues })
+        return
+      }
       isLoadingInitialData.value = true
       const { id } = route.params
       const initialValues = await props.loadService({ id })

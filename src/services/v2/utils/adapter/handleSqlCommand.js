@@ -1,5 +1,5 @@
 export const adaptSqlQuery = (sql) => {
-  const sqlInput = Array.isArray(sql) ? sql[0] : sql
+  const sqlInput = Array.isArray(sql) ? sql.join('') : sql
 
   if (!sqlInput || sqlInput.trim() === '') {
     return { statements: [] }
