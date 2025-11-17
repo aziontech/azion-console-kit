@@ -99,8 +99,8 @@
 
   const props = defineProps({
     modelValue: { type: [String, Number, Object, null], default: null },
-    listService: { type: Function, required: true }, // async ({ page, size, search }) => { items, total }
-    getByIdService: { type: Function, required: true }, // async (id) => item
+    listService: { type: Function, required: true },
+    getByIdService: { type: Function, required: true },
     optionLabel: { type: String, default: 'label' },
     optionValue: { type: String, default: 'value' },
     name: { type: String, default: '' },
@@ -118,7 +118,6 @@
 
   const emit = defineEmits(['update:modelValue', 'onSelectOption'])
 
-  // state
   const dropdownRef = ref(null)
   const internalValue = ref(props.modelValue)
   const isOpen = ref(false)
@@ -136,12 +135,9 @@
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
 
-  // derived
   const hasMore = computed(
     () => !noMore.value && (total.value === 0 || options.value.length < total.value)
   )
-
-  // helpers
   const optionId = (opt) => opt?.[props.optionValue]
   const applyIconColor = (icon) => props.iconColor?.[icon] || ''
   const getSelectedOption = (val) => {
@@ -164,7 +160,6 @@
     }
   }
 
-  // merge new items, keeping uniqueness by optionValue
   const addOptions = (items) => {
     const incoming = []
     for (const item of items || []) {
@@ -179,7 +174,6 @@
     }
   }
 
-  // reset pagination/search state
   const resetState = () => {
     page.value = 1
     total.value = 0
@@ -216,7 +210,6 @@
     }
   }
 
-  // lifecycle: open/close
   const onShow = async () => {
     isOpen.value = true
     if (!options.value.length) {
@@ -247,7 +240,6 @@
     emit('onSelectOption', val)
   }
 
-  // virtual scroller: fetch next page at end of list
   const isEndOfList = (last) =>
     typeof last === 'number' && last >= Math.max(0, options.value.length - 1)
   const canAppend = () => isOpen.value && hasMore.value && !isLoading.value && !isAppending.value
