@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-  import { ref, watch, computed, nextTick, onBeforeUnmount } from 'vue'
+  import { ref, watch, computed, nextTick } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
@@ -117,6 +117,7 @@
 
   const emit = defineEmits(['update:modelValue', 'change'])
 
+  // state
   const dropdownRef = ref(null)
   const internalValue = ref(props.modelValue)
   const isOpen = ref(false)
@@ -134,23 +135,35 @@
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
 
+  // derived
   const hasMore = computed(
     () => !noMore.value && (total.value === 0 || options.value.length < total.value)
   )
 
+  // helpers
   const optionId = (opt) => opt?.[props.optionValue]
-
-  const applyIconColor = (icon) => {
-    return props.iconColor?.[icon] || ''
-  }
-
+  const applyIconColor = (icon) => props.iconColor?.[icon] || ''
   const getSelectedOption = (val) => {
     if (val == null) return null
     const id = typeof val === 'object' ? optionId(val) : val
     if (id == null) return null
     return options.value.find((opt) => optionId(opt) === id) || null
   }
+  const buildListParams = () => ({
+    page: page.value,
+    pageSize: props.pageSize,
+    search: search.value?.trim() || ''
+  })
+  const markEndOfData = (receivedCount) => {
+    if (
+      receivedCount < props.pageSize ||
+      (total.value > 0 && options.value.length >= total.value)
+    ) {
+      noMore.value = true
+    }
+  }
 
+  // merge new items, keeping uniqueness by optionValue
   const addOptions = (items) => {
     const incoming = []
     for (const item of items || []) {
@@ -165,6 +178,7 @@
     }
   }
 
+  // reset pagination/search state
   const resetState = () => {
     page.value = 1
     total.value = 0
@@ -178,21 +192,11 @@
     if (append && noMore.value) return
     try {
       append ? (isAppending.value = true) : (isLoading.value = true)
-      const { body, count } = await props.listService({
-        page: page.value,
-        pageSize: props.pageSize,
-        search: search.value?.trim() || ''
-      })
+      const { body = [], count = 0 } = await props.listService(buildListParams())
       total.value = count
       addOptions(body)
       if (body.length > 0) page.value += 1
-      // Mark end-of-data when fewer than pageSize items are returned or we've reached total
-      if (
-        body.length < props.pageSize ||
-        (total.value > 0 && options.value.length >= total.value)
-      ) {
-        noMore.value = true
-      }
+      markEndOfData(body.length)
     } finally {
       isLoading.value = false
       isAppending.value = false
@@ -211,6 +215,7 @@
     }
   }
 
+  // lifecycle: open/close
   const onShow = async () => {
     isOpen.value = true
     if (!options.value.length) {
@@ -229,14 +234,15 @@
     emit('change', event)
   }
 
+  // virtual scroller: fetch next page at end of list
+  const isEndOfList = (last) =>
+    typeof last === 'number' && last >= Math.max(0, options.value.length - 1)
+  const canAppend = () => isOpen.value && hasMore.value && !isLoading.value && !isAppending.value
   const handleLazyLoad = async (event) => {
     const { last } = event || {}
-    // Only load when user has scrolled near the end
-    const goRequest =
-      typeof last === 'number' ? last >= Math.max(0, options.value.length - 1) : true
-    if (isOpen.value && goRequest && hasMore.value && !isLoading.value && !isAppending.value) {
-      await fetchPage({ append: true })
-    }
+    if (!isEndOfList(last)) return
+    if (!canAppend()) return
+    await fetchPage({ append: true })
   }
 
   watch(
@@ -246,8 +252,6 @@
       await ensureSelectedLoaded()
     }
   )
-
-  onBeforeUnmount(() => {})
 
   watchDebounced(
     search,
