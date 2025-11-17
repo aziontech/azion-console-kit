@@ -1,8 +1,6 @@
 <script setup>
   import { computed, onMounted, onUnmounted, ref, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-  import Splitter from 'primevue/splitter'
-  import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import PrimeButton from 'primevue/button'
@@ -24,6 +22,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
+  import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
 
   defineProps({
     isDrawer: {
@@ -57,6 +56,7 @@
   const selectPanelOptions = ['JSON', 'Form Builder']
   const selectPanelValue = ref(selectPanelOptions[0])
   const renderers = markRaw([...vanillaRenderers])
+  const activeTab = ref(0)
 
   const { value: name } = useField('name')
   const { value: azionForm } = useField('azionForm')
@@ -211,7 +211,10 @@
 </script>
 
 <template>
-  <TabView class="w-full">
+  <TabView
+    class="w-full"
+    v-model:activeIndex="activeTab"
+  >
     <TabPanel header="Main Settings">
       <FormHorizontal
         class="mt-8"
@@ -291,43 +294,45 @@
     </TabPanel>
 
     <TabPanel header="Code">
-      <Splitter
+      <ResizableSplitter
+        v-if="activeTab === 1"
         :style="{ height: SPLITTER_PROPS.height }"
         class="mt-8 surface-border border rounded-md hidden md:flex"
-        @resizestart="showPreview = false"
         @resizeend="showPreview = true"
-        :layout="SPLITTER_PROPS.layout"
-        :pt="{
-          gutter: { style: { backgroundColor: 'transparent' } },
-          gutterHandle: { style: { backgroundColor: 'transparent' } }
-        }"
+        :initialTopPanelPercent="60"
+        direction="vertical"
+        :panelSizes="SPLITTER_PROPS.panelsSizes"
+        @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
       >
-        <SplitterPanel
-          :size="SPLITTER_PROPS.panelsSizes[0]"
-          class="flex flex-col h-full gap-2"
-        >
-          <CodeEditor
-            v-model="code"
-            :initialValue="HelloWorldSample"
-            runtime="javascript"
-            :errors="hasCodeError"
-          />
-          <small
-            v-if="codeError"
-            class="p-error text-xs font-normal"
-          >
-            {{ codeError }}
-          </small>
-        </SplitterPanel>
-
-        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
-          <CodePreview
+        <template #panel-a>
+          <div class="flex flex-col h-full gap-2">
+            <CodeEditor
+              v-model="code"
+              :initialValue="HelloWorldSample"
+              runtime="javascript"
+              :errors="hasCodeError"
+            />
+            <small
+              v-if="codeError"
+              class="p-error text-xs font-normal"
+            >
+              {{ codeError }}
+            </small>
+          </div>
+        </template>
+        <template #panel-b>
+          <div
             v-if="showPreview"
-            :updateObject="updateObject"
-          />
-        </SplitterPanel>
-      </Splitter>
-      <div class="flex flex-col mt-0 surface-border border rounded-md gap-2 md:hidden h-[50vh]">
+            class="h-full"
+          >
+            <CodePreview :updateObject="updateObject" />
+          </div>
+        </template>
+      </ResizableSplitter>
+      <div
+        v-if="activeTab === 1"
+        class="flex flex-col mt-0 surface-border border rounded-md gap-2 md:hidden h-[50vh]"
+      >
         <CodeEditor
           v-model="code"
           :initialValue="HelloWorldSample"
@@ -344,31 +349,30 @@
     </TabPanel>
 
     <TabPanel header="Arguments">
-      <div class="w-full mt-4">
+      <div
+        v-if="activeTab === 2"
+        class="w-full mt-4"
+      >
         <div
           class="w-full flex justify-end rounded-t-md border-t border-x surface-border bg-[var(--table-header-color)] p-2 pb-3 relative z-10 top-[3px]"
         >
           <SelectPanel
             :options="selectPanelOptions"
-            :value="selectPanelOptions[0]"
+            :value="selectPanelValue"
             @update:modelValue="selectPanelUpdateModelValue"
           />
         </div>
 
-        <Splitter
+        <ResizableSplitter
           class="!z-20 relative"
           :style="{ height: SPLITTER_PROPS.height }"
-          :layout="SPLITTER_PROPS.layout"
-          :pt="{
-            root: {
-              class: 'mt-0'
-            },
-            gutter: { style: { backgroundColor: 'transparent' } },
-            gutterHandle: { style: { backgroundColor: 'transparent' } }
-          }"
+          direction="vertical"
+          :panelSizes="SPLITTER_PROPS.panelsSizes"
+          :initialTopPanelPercent="60"
+          @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
           v-if="!showFormBuilder"
         >
-          <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
+          <template #panel-a>
             <CodeEditor
               v-model="defaultArgs"
               runtime="json"
@@ -377,36 +381,30 @@
               :errors="hasArgsError"
               @update:modelValue="codeEditorArgsUpdate"
             />
-          </SplitterPanel>
-        </Splitter>
+          </template>
+        </ResizableSplitter>
         <div v-if="hasFormBuilder">
-          <Splitter
+          <ResizableSplitter
             class="!z-20 relative"
             :style="{ height: SPLITTER_PROPS.height }"
-            :layout="SPLITTER_PROPS.layout"
-            :pt="{
-              root: {
-                class: 'mt-0'
-              },
-              gutter: { style: { backgroundColor: 'transparent' } },
-              gutterHandle: { style: { backgroundColor: 'transparent' } }
-            }"
+            direction="vertical"
+            :panelSizes="SPLITTER_PROPS.panelsSizes"
+            @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
             v-if="showFormBuilder"
           >
-            <SplitterPanel
-              :size="SPLITTER_PROPS.panelsSizes[0]"
-              class="flex flex-col h-full gap-2"
-            >
-              <CodeEditor
-                v-model="schemaAzionFormString"
-                runtime="json"
-                :initialValue="schemaAzionFormString"
-                :errors="hasAzionFormError"
-                :minimap="false"
-                @update:modelValue="codeEditorFormBuilderUpdate"
-              />
-            </SplitterPanel>
-            <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
+            <template #panel-a>
+              <div class="flex flex-col h-full gap-2">
+                <CodeEditor
+                  v-model="schemaAzionFormString"
+                  runtime="json"
+                  :initialValue="schemaAzionFormString"
+                  :errors="hasAzionFormError"
+                  :minimap="false"
+                  @update:modelValue="codeEditorFormBuilderUpdate"
+                />
+              </div>
+            </template>
+            <template #panel-b>
               <div class="overflow-y-auto h-full p-4 md:p-8">
                 <div
                   id="azionform"
@@ -445,8 +443,8 @@
                   />
                 </div>
               </div>
-            </SplitterPanel>
-          </Splitter>
+            </template>
+          </ResizableSplitter>
         </div>
 
         <div v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder">
