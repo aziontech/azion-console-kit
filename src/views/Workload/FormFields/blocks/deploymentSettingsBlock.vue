@@ -1,7 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import PaginatedDropdown from '@/components/Dropdown/PaginatedDropdown.vue'
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
@@ -95,14 +94,17 @@
           ref="drawerRef"
           @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
-        <PaginatedDropdown
+        <FieldDropdownLazyLoader
           label="Application"
+          required
+          data-testid="domains-form__edge-application-field"
           name="application"
-          v-model="application"
-          :listService="listEdgeApplicationsDecorator"
-          :getByIdService="edgeAppService.loadEdgeApplicationService"
+          :service="listEdgeApplicationsDecorator"
+          :loadService="edgeAppService.loadEdgeApplicationService"
           optionLabel="name"
-          optionValue="id"
+          optionValue="value"
+          :value="application"
+          appendTo="self"
           placeholder="Select an Application"
         >
           <template #footer>
@@ -124,7 +126,7 @@
               </li>
             </ul>
           </template>
-        </PaginatedDropdown>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
