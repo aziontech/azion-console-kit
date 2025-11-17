@@ -1,38 +1,101 @@
 <template>
+  <LabelBlock
+    v-if="label"
+    :for="name"
+    :label="label"
+    :isRequired="$attrs.required"
+  />
   <Dropdown
     ref="dropdownRef"
     v-model="internalValue"
     :options="options"
     :optionLabel="optionLabel"
     :optionValue="optionValue"
+    :dataKey="optionValue"
     :placeholder="placeholder"
     :disabled="disabled"
     :loading="isLoading"
-    :filter="filter"
-    :filterPlaceholder="filterPlaceholder"
+    :id="name"
+    :name="name"
+    appendTo="self"
+    :virtualScrollerOptions="{
+      lazy: true,
+      onLazyLoad: handleLazyLoad,
+      itemSize: 38,
+      showLoader: true,
+      loading: isAppending || isLoading
+    }"
     @show="onShow"
     @hide="onHide"
     @change="onChange"
-    @filter="onFilter"
     class="w-full"
+    v-bind="$attrs"
   >
+    <template #header>
+      <div class="p-2 flex">
+        <div class="p-inputgroup w-full">
+          <InputText
+            type="text"
+            v-model="search"
+            :placeholder="filterPlaceholder"
+            class="w-full"
+          />
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+          </span>
+        </div>
+      </div>
+    </template>
     <template #empty>
       <div class="p-3 text-sm text-color-secondary">
         {{ emptyMessage }}
       </div>
     </template>
+    <template #value="slotProps">
+      <span class="flex align-items-center gap-2">
+        <template v-if="getSelectedOption(slotProps.value)">
+          <i
+            v-if="getSelectedOption(slotProps.value)?.icon"
+            :class="`pi ${getSelectedOption(slotProps.value).icon} ${applyIconColor(
+              getSelectedOption(slotProps.value).icon
+            )}`"
+          ></i>
+          {{
+            getSelectedOption(slotProps.value)?.[optionLabel] ||
+            getSelectedOption(slotProps.value)?.name ||
+            ''
+          }}
+        </template>
+        <template v-else>
+          {{ placeholder }}
+        </template>
+      </span>
+    </template>
+    <template #option="slotProps">
+      <div class="flex align-items-center gap-2">
+        <i
+          v-if="slotProps.option.icon"
+          :class="`pi ${slotProps.option.icon} ${applyIconColor(slotProps.option.icon)}`"
+        ></i>
+        <span
+          v-else-if="!slotProps.option.icon && showIcon"
+          class="w-4"
+        ></span>
+        <div>{{ slotProps.option[optionLabel] || slotProps.option.name }}</div>
+      </div>
+    </template>
     <template #footer>
-      <div
-        ref="sentinelRef"
-        class="h-1 w-full"
-      ></div>
+      <slot name="footer" />
     </template>
   </Dropdown>
 </template>
 
 <script setup>
   import { ref, watch, computed, nextTick, onBeforeUnmount } from 'vue'
+  import { watchDebounced } from '@vueuse/core'
   import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     modelValue: { type: [String, Number, Object, null], default: null },
@@ -40,18 +103,21 @@
     getByIdService: { type: Function, required: true }, // async (id) => item
     optionLabel: { type: String, default: 'label' },
     optionValue: { type: String, default: 'value' },
-    pageSize: { type: Number, default: 25 },
+    name: { type: String, default: '' },
+    label: { type: String, default: '' },
+    pageSize: { type: Number, default: 100 },
     placeholder: { type: String, default: 'Select' },
     disabled: { type: Boolean, default: false },
     filter: { type: Boolean, default: true },
     filterPlaceholder: { type: String, default: 'Search' },
-    emptyMessage: { type: String, default: 'No results' }
+    emptyMessage: { type: String, default: 'No results' },
+    showIcon: { type: Boolean, default: false },
+    iconColor: { type: Object, default: () => ({}) }
   })
 
   const emit = defineEmits(['update:modelValue', 'change'])
 
   const dropdownRef = ref(null)
-  const sentinelRef = ref(null)
   const internalValue = ref(props.modelValue)
   const isOpen = ref(false)
   const isLoading = ref(false)
@@ -61,19 +127,41 @@
   const search = ref('')
   const loadedIds = ref(new Set())
   const options = ref([])
-  let intersectionObserver = null
+  const noMore = ref(false)
 
-  const hasMore = computed(() => options.value.length < total.value)
+  const SEARCH_DEBOUNCE = 500
+  const SEARCH_MAX_WAIT = 1000
+  const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
+  const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
+
+  const hasMore = computed(
+    () => !noMore.value && (total.value === 0 || options.value.length < total.value)
+  )
 
   const optionId = (opt) => opt?.[props.optionValue]
 
+  const applyIconColor = (icon) => {
+    return props.iconColor?.[icon] || ''
+  }
+
+  const getSelectedOption = (val) => {
+    if (val == null) return null
+    const id = typeof val === 'object' ? optionId(val) : val
+    if (id == null) return null
+    return options.value.find((opt) => optionId(opt) === id) || null
+  }
+
   const addOptions = (items) => {
+    const incoming = []
     for (const item of items || []) {
       const id = optionId(item)
       if (!loadedIds.value.has(id)) {
         loadedIds.value.add(id)
-        options.value.push(item)
+        incoming.push(item)
       }
+    }
+    if (incoming.length) {
+      options.value = options.value.concat(incoming)
     }
   }
 
@@ -82,20 +170,29 @@
     total.value = 0
     loadedIds.value = new Set()
     options.value = []
+    noMore.value = false
   }
 
   const fetchPage = async ({ append } = { append: false }) => {
     if (isLoading.value || isAppending.value) return
+    if (append && noMore.value) return
     try {
       append ? (isAppending.value = true) : (isLoading.value = true)
-      const { items = [], total: totalCount = 0 } = await props.listService({
+      const { body, count } = await props.listService({
         page: page.value,
-        size: props.pageSize,
+        pageSize: props.pageSize,
         search: search.value?.trim() || ''
       })
-      total.value = totalCount
-      addOptions(items)
-      if (items.length > 0) page.value += 1
+      total.value = count
+      addOptions(body)
+      if (body.length > 0) page.value += 1
+      // Mark end-of-data when fewer than pageSize items are returned or we've reached total
+      if (
+        body.length < props.pageSize ||
+        (total.value > 0 && options.value.length >= total.value)
+      ) {
+        noMore.value = true
+      }
     } finally {
       isLoading.value = false
       isAppending.value = false
@@ -116,17 +213,15 @@
 
   const onShow = async () => {
     isOpen.value = true
-    if (options.value.length === 0) {
+    if (!options.value.length) {
       await fetchPage({ append: false })
     }
-    await ensureSelectedLoaded()
     await nextTick()
-    setupObserver()
+    await ensureSelectedLoaded()
   }
 
   const onHide = () => {
     isOpen.value = false
-    cleanupObserver()
   }
 
   const onChange = (event) => {
@@ -134,47 +229,13 @@
     emit('change', event)
   }
 
-  const onFilter = async (event) => {
-    const query = String(event?.value ?? '').trim()
-    // Debounce-lite: ignore identical queries
-    if (query === search.value) return
-    search.value = query
-    resetState()
-    await fetchPage({ append: false })
-    await ensureSelectedLoaded()
-  }
-
-  const setupObserver = () => {
-    cleanupObserver()
-    const el = sentinelRef.value
-    if (!el) return
-    intersectionObserver = new IntersectionObserver(
-      async (entries) => {
-        const entry = entries[0]
-        if (entry && entry.isIntersecting && hasMore.value && isOpen.value) {
-          await fetchPage({ append: true })
-        }
-      },
-      { root: panelScrollableRoot(), threshold: 1.0 }
-    )
-    intersectionObserver.observe(el)
-  }
-
-  const panelScrollableRoot = () => {
-    // Try to resolve the dropdown panel scroll container
-    const overlay = dropdownRef.value?.$el?.querySelector?.('.p-dropdown-panel .p-dropdown-items')
-    return overlay || null
-  }
-
-  const cleanupObserver = () => {
-    if (intersectionObserver) {
-      try {
-        intersectionObserver.disconnect()
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error disconnecting intersection observer:', error)
-      }
-      intersectionObserver = null
+  const handleLazyLoad = async (event) => {
+    const { last } = event || {}
+    // Only load when user has scrolled near the end
+    const goRequest =
+      typeof last === 'number' ? last >= Math.max(0, options.value.length - 1) : true
+    if (isOpen.value && goRequest && hasMore.value && !isLoading.value && !isAppending.value) {
+      await fetchPage({ append: true })
     }
   }
 
@@ -182,11 +243,24 @@
     () => props.modelValue,
     async (val) => {
       internalValue.value = val
-      if (isOpen.value) await ensureSelectedLoaded()
+      await ensureSelectedLoaded()
     }
   )
 
-  onBeforeUnmount(() => {
-    cleanupObserver()
-  })
+  onBeforeUnmount(() => {})
+
+  watchDebounced(
+    search,
+    async () => {
+      if (
+        search.value.length >= NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH ||
+        search.value.length === NUMBER_OF_CHARACTERS_TO_RESET_SEARCH
+      ) {
+        resetState()
+        await fetchPage({ append: false })
+        await ensureSelectedLoaded()
+      }
+    },
+    { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
+  )
 </script>
