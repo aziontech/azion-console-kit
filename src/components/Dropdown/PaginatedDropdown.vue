@@ -112,10 +112,11 @@
     filterPlaceholder: { type: String, default: 'Search' },
     emptyMessage: { type: String, default: 'No results' },
     showIcon: { type: Boolean, default: false },
-    iconColor: { type: Object, default: () => ({}) }
+    iconColor: { type: Object, default: () => ({}) },
+    moreOptions: { type: Array, default: () => [] }
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const emit = defineEmits(['update:modelValue', 'onSelectOption'])
 
   // state
   const dropdownRef = ref(null)
@@ -230,8 +231,20 @@
   }
 
   const onChange = (event) => {
-    emit('update:modelValue', event.value)
-    emit('change', event)
+    const val = event.value
+    emit('update:modelValue', val)
+    if (props.moreOptions.length) {
+      const id = typeof val === 'object' ? optionId(val) : val
+      let option = options.value.find((opt) => optionId(opt) === id)
+      if (!option && typeof val === 'object') option = val
+      const payload = props.moreOptions.reduce((acc, key) => {
+        acc[key] = option ? option[key] : undefined
+        return acc
+      }, {})
+      emit('onSelectOption', payload)
+      return
+    }
+    emit('onSelectOption', val)
   }
 
   // virtual scroller: fetch next page at end of list
