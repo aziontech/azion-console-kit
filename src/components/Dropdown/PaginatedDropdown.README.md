@@ -22,8 +22,9 @@ This document describes `PaginatedDropdown.vue` as implemented today. It focuses
 ## Props
 
 - `modelValue: string | number | object | null` — current value (id or object)
-- `listService: ({ page, pageSize, search }) => Promise<{ body: any[], count: number }>` — required
-- `getByIdService: (id) => Promise<any>` — required
+- `listService: ({ page, pageSize, search, ordering }) => Promise<{ body: any[], count: number }>` — required
+- `getByIdService: ({ id }) => Promise<any>` — required
+  Used to inject the selected item when it is not present in the loaded options. Receives `{ id }`.
 - `optionLabel: string` (default `label`)
 - `optionValue: string` (default `value`)
 - `name: string` — used for `id`/`name` and LabelBlock
@@ -47,9 +48,16 @@ This document describes `PaginatedDropdown.vue` as implemented today. It focuses
 
 ## Slots
 
+- `#header` — remote search input (`<InputText v-model="search" />`)
+- `#value` — selected option renderer (icon + label)
+- `#option` — option renderer (icon + label)
+- `#footer` — custom footer actions (e.g., create button)
+
 ## Behavior
 
 - Open: if no options, fetch `{ page: 1, pageSize, search }`; then ensure selected is loaded by id
+- Mount: prefetch first page once (if empty), then ensure selected is loaded by id
+- Open: no extra request; panel apenas exibe dados já em memória
 - Infinite scroll: VirtualScroller `onLazyLoad` appends next page when reaching the end and `hasMore`
 - End-of-data: stop paging when a page returns `< pageSize` or when `options.length >= total`
 - Remote search: debounced `watchDebounced(search)` fires when length >= 3 or cleared (0), resets state and fetches page 1
@@ -100,8 +108,24 @@ function handleSelect(payload) {
 }
 ```
 
+### Services
+
+```js
+// Must return { body, count }
+async function listApps({ page, pageSize, search, ordering }) {
+  const res = await api.listEdgeApps({ page, pageSize, search, ordering })
+  return { body: res.body, count: res.count }
+}
+
+// Receives an object { id }
+async function loadAppById({ id }) {
+  return api.getEdgeAppById(id)
+}
+```
+
 ## Notes
 
 - `listService` must return `{ body, count }`
 - Keep `pageSize` aligned with backend pagination
 - Local filter is disabled by design; all searches are remote and debounced
+- Requests include `ordering: 'name'` by default

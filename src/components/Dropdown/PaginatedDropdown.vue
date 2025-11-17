@@ -91,11 +91,18 @@
 </template>
 
 <script setup>
-  import { ref, watch, computed, nextTick } from 'vue'
+  import { ref, watch, computed, nextTick, onMounted } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
+  import {
+    buildListParams,
+    markEndOfData,
+    isEndOfList as utilIsEndOfList,
+    addUniqueItems,
+    createSelectPayload as utilCreateSelectPayload
+  } from './utils'
 
   const props = defineProps({
     modelValue: { type: [String, Number, Object, null], default: null },
@@ -140,40 +147,41 @@
   )
   const optionId = (opt) => opt?.[props.optionValue]
   const applyIconColor = (icon) => props.iconColor?.[icon] || ''
+  const deriveId = (val) => (typeof val === 'object' ? optionId(val) : val)
+  const findOptionById = (id) => options.value.find((opt) => optionId(opt) === id) || null
   const getSelectedOption = (val) => {
     if (val == null) return null
-    const id = typeof val === 'object' ? optionId(val) : val
+    const id = deriveId(val)
     if (id == null) return null
-    return options.value.find((opt) => optionId(opt) === id) || null
+    return findOptionById(id)
   }
-  const buildListParams = () => ({
-    page: page.value,
-    pageSize: props.pageSize,
-    search: search.value?.trim() || ''
-  })
-  const markEndOfData = (receivedCount) => {
-    if (
-      receivedCount < props.pageSize ||
-      (total.value > 0 && options.value.length >= total.value)
-    ) {
-      noMore.value = true
-    }
+  const buildParams = () =>
+    buildListParams({
+      page: page.value,
+      pageSize: props.pageSize,
+      search: search.value,
+      ordering: 'name'
+    })
+
+  /**
+   * Add options to the list, ensuring uniqueness.
+   * @param {Array} items - Options to add.
+   * @param {Object} options - Options object.
+   * @param {Boolean} options.prepend - Whether to prepend the new options.
+   */
+  const addOptions = (items, { prepend = false } = {}) => {
+    options.value = addUniqueItems({
+      items: items || [],
+      existing: options.value,
+      loadedIds: loadedIds.value,
+      optionValue: props.optionValue,
+      prepend
+    })
   }
 
-  const addOptions = (items) => {
-    const incoming = []
-    for (const item of items || []) {
-      const id = optionId(item)
-      if (!loadedIds.value.has(id)) {
-        loadedIds.value.add(id)
-        incoming.push(item)
-      }
-    }
-    if (incoming.length) {
-      options.value = options.value.concat(incoming)
-    }
-  }
-
+  /**
+   * Reset the state of the component.
+   */
   const resetState = () => {
     page.value = 1
     total.value = 0
@@ -182,12 +190,16 @@
     noMore.value = false
   }
 
+  /**
+   * Fetch a page of options.
+   * @param {{ append?: boolean }} param0
+   */
   const fetchPage = async ({ append } = { append: false }) => {
     if (isLoading.value || isAppending.value) return
     if (append && noMore.value) return
     try {
       append ? (isAppending.value = true) : (isLoading.value = true)
-      const { body = [], count = 0 } = await props.listService(buildListParams())
+      const { body = [], count = 0 } = await props.listService(buildParams())
       total.value = count
       addOptions(body)
       if (body.length > 0) page.value += 1
@@ -198,25 +210,25 @@
     }
   }
 
+  /** Ensure the currently selected value exists in options (load by id if missing).
+   * Skips when a search is active to avoid polluting filtered results.
+   */
   const ensureSelectedLoaded = async () => {
-    const id =
-      typeof internalValue.value === 'object' ? optionId(internalValue.value) : internalValue.value
+    if (search.value && search.value.trim().length > 0) return
+    const id = deriveId(internalValue.value)
     if (id == null || loadedIds.value.has(id)) return
     try {
-      const item = await props.getByIdService(id)
-      if (item) addOptions([item])
+      const item = await props.getByIdService({ id })
+      if (item) addOptions([item], { prepend: true })
     } catch (error) {
       // ignore fetch by id errors
     }
   }
 
+  /** Panel open handler: do not fetch; data is prefetched on mount. */
   const onShow = async () => {
     isOpen.value = true
-    if (!options.value.length) {
-      await fetchPage({ append: false })
-    }
     await nextTick()
-    await ensureSelectedLoaded()
   }
 
   const onHide = () => {
@@ -226,22 +238,18 @@
   const onChange = (event) => {
     const val = event.value
     emit('update:modelValue', val)
-    if (props.moreOptions.length) {
-      const id = typeof val === 'object' ? optionId(val) : val
-      let option = options.value.find((opt) => optionId(opt) === id)
-      if (!option && typeof val === 'object') option = val
-      const payload = props.moreOptions.reduce((acc, key) => {
-        acc[key] = option ? option[key] : undefined
-        return acc
-      }, {})
-      emit('onSelectOption', payload)
-      return
-    }
-    emit('onSelectOption', val)
+    emit(
+      'onSelectOption',
+      utilCreateSelectPayload(val, {
+        moreOptions: props.moreOptions,
+        optionValue: props.optionValue,
+        options: options.value
+      })
+    )
   }
 
   const isEndOfList = (last) =>
-    typeof last === 'number' && last >= Math.max(0, options.value.length - 1)
+    utilIsEndOfList({ lastIndex: last, optionsLength: options.value.length })
   const canAppend = () => isOpen.value && hasMore.value && !isLoading.value && !isAppending.value
   const handleLazyLoad = async (event) => {
     const { last } = event || {}
@@ -258,6 +266,15 @@
     }
   )
 
+  onMounted(async () => {
+    // Prefetch first page to avoid delay on open
+    if (!options.value.length) {
+      await fetchPage({ append: false })
+    }
+    // Ensure selected value (if any) is available in options
+    await ensureSelectedLoaded()
+  })
+
   watchDebounced(
     search,
     async () => {
@@ -267,7 +284,6 @@
       ) {
         resetState()
         await fetchPage({ append: false })
-        await ensureSelectedLoaded()
       }
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
