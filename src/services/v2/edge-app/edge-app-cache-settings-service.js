@@ -1,5 +1,16 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { CacheSettingsAdapter } from './edge-app-cache-settings-adapter'
+
+const CONSTANTS = {
+  CACHE_KEY: 'cache-settings-list',
+  DEFAULT_PAGE_SIZE: 100,
+  MESSAGES: {
+    CREATE_SUCCESS: 'Cache Settings successfully created',
+    UPDATE_SUCCESS: 'Cache Settings successfully edited',
+    DELETE_SUCCESS: 'Cache Settings successfully deleted'
+  }
+}
+
 export class CacheSettingsService extends BaseService {
   constructor() {
     super()
@@ -11,21 +22,43 @@ export class CacheSettingsService extends BaseService {
     return `${this.baseURL}/${edgeApplicationId}/cache_settings${suffix}`
   }
 
-  listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100 }) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: this.getUrl(edgeApplicationId),
-      params
+  async invalidateListCache(edgeApplicationId) {
+    await this.queryClient.removeQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey
+        return (
+          queryKey &&
+          Array.isArray(queryKey) &&
+          queryKey[0] === this.cacheType.GLOBAL &&
+          queryKey.includes(CONSTANTS.CACHE_KEY) &&
+          queryKey.includes(`edgeAppId=${edgeApplicationId}`)
+        )
+      }
     })
+  }
 
-    const { results, count } = data
+  listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100 }) => {
+    return this.queryAsync({
+      key: [CONSTANTS.CACHE_KEY, `edgeAppId=${edgeApplicationId}`, params],
+      cache: this.cacheType.GLOBAL,
+      queryFn: async () => {
+        const { data } = await this.http.request({
+          method: 'GET',
+          url: this.getUrl(edgeApplicationId),
+          params
+        })
 
-    const transformed = this.adapter?.transformListCacheSetting?.(results) ?? results
+        const { results, count } = data
+        const transformed = this.adapter?.transformListCacheSetting?.(results) ?? results
 
-    return {
-      count,
-      body: transformed
-    }
+        return {
+          count,
+          body: transformed
+        }
+      },
+      staleTime: this.cacheTime.TEN_MINUTES,
+      gcTime: this.cacheTime.THIRTY_MINUTES
+    })
   }
 
   loadCacheSettingsService = async (edgeApplicationId, cacheSettingId) => {
@@ -46,8 +79,10 @@ export class CacheSettingsService extends BaseService {
       body
     })
 
+    await this.invalidateListCache(edgeApplicationId)
+
     return {
-      feedback: 'Cache Settings successfully created',
+      feedback: CONSTANTS.MESSAGES.CREATE_SUCCESS,
       cacheId: data.data.id
     }
   }
@@ -61,16 +96,20 @@ export class CacheSettingsService extends BaseService {
       body
     })
 
-    return 'Cache Settings successfully edited'
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.UPDATE_SUCCESS
   }
 
   deleteCacheSettingService = async (edgeApplicationId, cacheSettingId) => {
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'DELETE',
       url: this.getUrl(edgeApplicationId, `/${cacheSettingId}`)
     })
 
-    return data.results
+    await this.invalidateListCache(edgeApplicationId)
+
+    return CONSTANTS.MESSAGES.DELETE_SUCCESS
   }
 }
 

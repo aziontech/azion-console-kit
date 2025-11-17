@@ -1,5 +1,7 @@
 <template>
-  <Toolbar class="border-noround border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none">
+  <Toolbar
+    class="border-noround surface-section border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none"
+  >
     <template #start>
       <h3 class="text-color text-lg font-medium flex gap-3">
         Azion Copilot
@@ -17,7 +19,7 @@
     </template>
   </Toolbar>
   <div
-    class="flex flex-auto flex-col overflow-x-hidden p-6 pt-3 custom-scroll"
+    class="flex flex-auto surface-section flex-col overflow-x-hidden p-6 pt-3 custom-scroll"
     :class="{ 'justify-center gap-6': !getStartConversation }"
     ref="chatContainer"
   >
@@ -42,7 +44,7 @@
     </div>
   </div>
 
-  <ChatInput class="p-6" />
+  <ChatInput class="p-6 surface-section" />
 </template>
 
 <script setup>

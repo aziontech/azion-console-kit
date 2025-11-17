@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
 /**
  * @param {Object} payload - The error schema.
@@ -15,7 +16,11 @@ export const deleteEdgeApplicationService = async (edgeApplicationId) => {
     method: 'DELETE'
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+
+  await edgeAppService.invalidateListCache()
+
+  return result
 }
 
 /**

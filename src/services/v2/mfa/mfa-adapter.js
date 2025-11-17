@@ -15,7 +15,8 @@ export const MFAAdapter = {
       data?.map((user) => {
         return {
           id: user.id,
-          email: user.name,
+          name: user.name,
+          email: user.email,
           confirmed: CONFIRMED_AS_TAG[user.confirmed]
         }
       }) || []

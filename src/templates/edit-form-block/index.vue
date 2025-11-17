@@ -56,6 +56,7 @@
   const route = useRoute()
   const toast = useToast()
   const blockViewRedirection = ref(true)
+  const isLoadingInitialData = ref(true)
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
     validationSchema: props.schema,
@@ -115,6 +116,7 @@
         resetForm({ values: initialValues })
         return
       }
+      isLoadingInitialData.value = true
       const { id } = route.params
       const initialValues = await props.loadService({ id })
       emit('loaded-service-object', initialValues)
@@ -127,6 +129,8 @@
         showToast('error', error)
       }
       goBackToList()
+    } finally {
+      isLoadingInitialData.value = false
     }
   }
 
@@ -170,7 +174,13 @@
 
 <template>
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
+    <slot
+      v-if="isLoadingInitialData"
+      name="skeleton"
+    />
+
     <form
+      v-else
       @submit.prevent="handleSubmit"
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
       :class="{ 'mt-4': isTabs }"
@@ -198,7 +208,7 @@
     :formValid="meta.valid"
     :onCancel="onCancel"
     :errors="errors"
-    :loading="isSubmitting"
+    :loading="isSubmitting || isLoadingInitialData"
     :values="values"
     :setValues="setValues"
   />

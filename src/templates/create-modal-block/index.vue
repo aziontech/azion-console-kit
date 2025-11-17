@@ -381,7 +381,7 @@
             v-for="template in filteredTemplates"
             :key="template.id"
             @click="redirectToSolution(template, 'recommended')"
-            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
             link
             data-testid="integrations-list-content-recommended-item"
           >
@@ -432,7 +432,7 @@
             v-for="template in filteredTemplates"
             :key="template.id"
             @click="redirectToSolution(template, 'templates')"
-            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
             link
             data-testid="integrations-list-content-templates-item"
           >
@@ -483,7 +483,7 @@
             v-for="resource in filteredTemplates"
             :key="resource.to"
             @click="redirect(resource.to, resource.label)"
-            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
             link
             data-testid="integrations-list-content-new-resources-item"
           >
@@ -523,7 +523,7 @@
             v-for="(template, index) in filteredTemplates"
             :key="index"
             @click="redirectGithubImport(template, 'githubImport')"
-            class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
             link
             data-testid="integrations-list-content-github-import-item"
           >

@@ -126,10 +126,10 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full flex flex-col gap-4 md:gap-6">
+      <section class="w-full flex flex-col gap-4 md:gap-5 pt-1">
         <div
           v-if="showExperimental"
-          class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
+          class="w-full surface-section p-3 surface-border border rounded-md flex flex-col gap-3 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
         >
           <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl">
             {{ disclaimer }}
@@ -144,7 +144,7 @@
           />
         </div>
         <div
-          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-4 md:gap-6 justify-between"
+          class="w-full p-3 sm:p-8 surface-border border surface-section rounded-md flex flex-col gap-4 md:gap-5 justify-between"
         >
           <div class="flex flex-col gap-2 max-w-4xl">
             <h1 class="text-color text-xl md:text-2xl font-medium">Get Started</h1>
@@ -165,11 +165,13 @@
         </div>
 
         <div
-          class="flex gap-6 flex-col"
+          class="flex gap-4 md:gap-5 flex-col"
           :class="{ 'xl:flex-row': !showSidebar }"
         >
           <!-- Manage Applications -->
-          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+          <div
+            class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border surface-section border rounded-md"
+          >
             <div class="flex flex-row justify-start gap-3">
               <div
                 class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
@@ -209,7 +211,9 @@
             </div>
           </div>
           <!-- View Analytics -->
-          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+          <div
+            class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border surface-section border rounded-md"
+          >
             <div class="flex flex-row justify-start gap-3">
               <div
                 class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
@@ -249,7 +253,9 @@
             </div>
           </div>
           <!-- Ask Azion Copilot -->
-          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+          <div
+            class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border surface-section border rounded-md"
+          >
             <div class="flex flex-row justify-start gap-3">
               <div
                 class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
@@ -277,7 +283,7 @@
         </div>
 
         <div
-          class="w-full p-3 sm:p-6 surface-border border rounded-md flex flex-col gap-6 justify-between relative"
+          class="w-full p-3 sm:p-6 surface-border surface-section border rounded-md flex flex-col gap-6 justify-between relative"
           v-if="showInviteSession"
         >
           <PrimeButton
@@ -321,11 +327,11 @@
           </CreateFormBlock>
         </div>
 
-        <div class="flex flex-col xl:flex-row gap-4 md:gap-6">
+        <div class="flex flex-col xl:flex-row gap-4 md:gap-5">
           <!-- Product -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary surface-section w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openProductDocumentation"
           >
             <div class="text-lg font-medium">Product Documentation</div>
@@ -336,7 +342,7 @@
           <!-- API -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary surface-section w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openAPIDocumentation"
           >
             <div class="text-lg font-medium">API Documentation</div>
@@ -347,7 +353,7 @@
           <!-- Contact -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary surface-section w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="OpenSidebarComponent('copilot', { clearChat: true })"
           >
             <div class="text-lg font-medium">Get Assistance</div>

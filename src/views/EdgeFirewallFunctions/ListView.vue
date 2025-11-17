@@ -35,7 +35,7 @@
     title="No Functions have been instantiated"
     description="Click the button below to instantiate your first Function."
     createButtonLabel="Function Instance"
-    :documentationService="props.documentationService"
+    :documentationService="documentationService"
     :inTabs="true"
   >
     <template #default>
@@ -63,6 +63,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
+  import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -94,10 +95,6 @@
     deleteFunctionService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
     }
   })
 
@@ -114,6 +111,10 @@
     'version',
     'function'
   ]
+
+  const documentationService = () => {
+    openDocumentationProducts('/secure/firewall/functions-instances/')
+  }
 
   const getColumns = computed(() => {
     return [

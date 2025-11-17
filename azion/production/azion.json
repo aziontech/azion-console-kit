@@ -25,7 +25,7 @@
     "url": "https://j65rq1emi4.map.azionedge.net"
   },
   "rt-purge": {
-    "purge_on_publish": true
+    "purge_on_publish": false
   },
   "origin": [
     {
@@ -90,6 +90,11 @@
       {
         "id": 269748,
         "name": "Apply Common Configuration for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 488898,
+        "name": "Set Cache for Static Assets",
         "phase": "request"
       },
       {
@@ -201,6 +206,11 @@
         "id": 468658,
         "name": "Secure Headers - General",
         "phase": "response"
+      },
+      {
+        "id": 488899,
+        "name": "Cache Controll to index.html",
+        "phase": "response"
       }
     ]
   },
@@ -212,6 +222,10 @@
     {
       "id": 161053,
       "name": "Cities - Cache"
+    },
+    {
+      "id": 266300,
+      "name": "Statics - Cache .html"
     }
   ]
 }

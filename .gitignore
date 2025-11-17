@@ -52,3 +52,4 @@ src/views/Playground/PlaygroundView.vue
 .edge/
 .vulcan
 specs.json
+.claude/

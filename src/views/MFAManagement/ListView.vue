@@ -46,7 +46,7 @@
 
   const hasContentToList = ref(true)
 
-  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id']
+  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id', 'email']
 
   const actions = [
     {
@@ -59,9 +59,14 @@
 
   const getColumns = computed(() => [
     {
+      field: 'name',
+      header: 'Name',
+      sortField: 'name'
+    },
+    {
       field: 'email',
       header: 'Email',
-      sortField: 'name'
+      sortField: 'email'
     },
     {
       field: 'confirmed',

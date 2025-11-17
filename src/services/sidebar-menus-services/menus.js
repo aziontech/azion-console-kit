@@ -107,7 +107,6 @@ function createObserveItems() {
       label: 'Real-Time Events',
       to: '/real-time-events',
       icon: 'ai ai-real-time-events',
-      tag: 'Preview',
       id: 'real-time-events'
     },
     {

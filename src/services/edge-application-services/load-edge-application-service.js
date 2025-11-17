@@ -1,13 +1,49 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { CACHE_TIME, CACHE_TYPE } from '@/services/v2/base/query/config'
+
+const CACHE_KEY = 'edge-application-load'
+const STALE_TIME = CACHE_TIME.TEN_MINUTES
+const GC_TIME = CACHE_TIME.THIRTY_MINUTES
+const invalidatePreviousLoadCache = async (currentId) => {
+  await queryClient.removeQueries({
+    predicate: (query) => {
+      const queryKey = query.queryKey
+      if (!queryKey || !Array.isArray(queryKey)) return false
+
+      const isLoadCache = queryKey[0] === CACHE_TYPE.GLOBAL && queryKey.includes(CACHE_KEY)
+
+      if (!isLoadCache) return false
+
+      const isCurrentId = queryKey.some(
+        (key) => typeof key === 'string' && key === `id=${currentId}`
+      )
+
+      return !isCurrentId
+    }
+  })
+}
 
 export const loadEdgeApplicationService = async ({ id }) => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}`,
-    method: 'GET'
+  await invalidatePreviousLoadCache(id)
+
+  return queryClient.fetchQuery({
+    queryKey: [CACHE_TYPE.GLOBAL, CACHE_KEY, `id=${id}`],
+    queryFn: async () => {
+      let httpResponse = await AxiosHttpClientAdapter.request({
+        url: `${makeEdgeApplicationBaseUrl()}/${id}`,
+        method: 'GET'
+      })
+      httpResponse = adapt(httpResponse)
+      return parseHttpResponse(httpResponse)
+    },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    meta: {
+      persist: true
+    }
   })
-  httpResponse = adapt(httpResponse)
-  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {

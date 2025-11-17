@@ -90,8 +90,8 @@
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: { value: columnData.text, showMoreText: false },
-            columnAppearance: 'expand-text-column'
+            data: { text: columnData.text },
+            columnAppearance: 'text-format'
           })
         }
       },
@@ -150,7 +150,7 @@
         addButtonLabel="Application"
         createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
-        :listService="edgeAppService.listEdgeApplicationsService"
+        :useQueryFn="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-load-data="handleLoadData"

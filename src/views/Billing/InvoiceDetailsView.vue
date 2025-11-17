@@ -26,6 +26,7 @@
                 label="Export"
                 @click="invoiceDownload"
                 :disabled="invoiceData?.disabledExport"
+                v-if="showExportBilling"
               />
             </div>
             <div class="flex justify-between mt-4">
@@ -222,7 +223,7 @@
   const toast = useToast()
   const accountStore = useAccountStore()
 
-  const { accountIsNotRegular } = storeToRefs(accountStore)
+  const { accountIsNotRegular, showExportBilling } = storeToRefs(accountStore)
 
   const invoiceData = ref({})
   const cardDefault = ref({})
