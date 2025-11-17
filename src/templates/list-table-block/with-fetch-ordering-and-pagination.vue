@@ -167,7 +167,6 @@
 
     // Functions
     reload,
-    navigateToAddPage,
     editItemSelected,
     actionOptions,
     executeCommand,
@@ -239,14 +238,6 @@
     }
     return null
   }
-
-  const navigateToOtherLink = () => {
-    window.open('https://www.azion.com', '_blank')
-  }
-
-  const navigateToGetHelp = () => {
-    window.open('https://www.azion.com', '_blank')
-  }
 </script>
 
 <template>
@@ -295,53 +286,6 @@
         <slot name="header">
           <div class="flex flex-col gap-2 w-full">
             <DataTable.Header>
-              <template #actions>
-                <div class="flex justify-between gap-2 w-full">
-                  <DataTable.Actions>
-                    <div class="flex gap-2">
-                      <PrimeButton
-                        size="small"
-                        link
-                        @click="navigateToOtherLink"
-                      >
-                        Other Link
-                      </PrimeButton>
-                      <PrimeButton
-                        size="small"
-                        link
-                        @click="navigateToGetHelp"
-                      >
-                        Get Help
-                      </PrimeButton>
-                    </div>
-                    <slot
-                      name="addButton"
-                      data-testid="data-table-add-button"
-                      :reload="reload"
-                      :data="data"
-                    >
-                      <PrimeButton
-                        size="small"
-                        icon="pi pi-upload"
-                        @click="handleOtherActions"
-                        label="Other Actions"
-                        severity="primary"
-                        outlined
-                        data-testid="data-table-other-actions-button"
-                      />
-                      <DataTable.AddButton
-                        size="small"
-                        v-if="addButtonLabel"
-                        :disabled="disabledAddButton"
-                        @click="navigateToAddPage"
-                        :label="addButtonLabel"
-                        :data-testid="`create_${addButtonLabel}_button`"
-                      />
-                    </slot>
-                  </DataTable.Actions>
-                </div>
-              </template>
-
               <template #filters>
                 <div class="flex flex-wrap justify-between gap-2 w-full">
                   <!-- We dont have this fun yet, but we will add -in the future -->

@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -140,13 +141,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Functions" />
+      <PageHeadingBlock pageTitle="Functions">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Function"
+                @click="handleCreateTrackEvent"
+                createPagePath="functions/create?origin=list"
+                data-testid="create_Function_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
-        addButtonLabel="Function"
         createPagePath="functions/create?origin=list"
         editPagePath="functions/edit"
         @on-before-go-to-add-page="handleCreateTrackEvent"

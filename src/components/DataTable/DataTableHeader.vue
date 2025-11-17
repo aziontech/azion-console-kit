@@ -14,5 +14,5 @@
   import { computed, useSlots } from 'vue'
 
   const slots = useSlots()
-  const hasFiltersSlot = computed(() => !!slots.filters)
+  const hasFiltersSlot = computed(() => !!slots.filters && !!slots.actions)
 </script>

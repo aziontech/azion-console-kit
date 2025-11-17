@@ -3,7 +3,7 @@ import DataTableHeaderComponent from './DataTableHeader.vue'
 import DataTableActionsComponent from './DataTableActions.vue'
 import DataTableSearchComponent from './DataTableSearch.vue'
 import DataTableExportComponent from './DataTableExport.vue'
-import DataTableAddButtonComponent from './DataTableAddButton.vue'
+import DataTableActionsButtonsComponent from './DataTableActionsButtons.vue'
 import DataTableRowActionsComponent from './DataTableRowActions.vue'
 import DataTableColumnSelectorComponent from './DataTableColumnSelector.vue'
 import LastModifiedPopup from './LastModifiedPopup.vue'
@@ -14,7 +14,7 @@ DataTable.Header = DataTableHeaderComponent
 DataTable.Actions = DataTableActionsComponent
 DataTable.Search = DataTableSearchComponent
 DataTable.Export = DataTableExportComponent
-DataTable.AddButton = DataTableAddButtonComponent
+DataTable.ActionsButtons = DataTableActionsButtonsComponent
 DataTable.RowActions = DataTableRowActionsComponent
 DataTable.ColumnSelector = DataTableColumnSelectorComponent
 DataTable.LastModifiedPopup = LastModifiedPopup
@@ -26,7 +26,7 @@ DataTable.install = (app) => {
   app.component('DataTableActions', DataTableActionsComponent)
   app.component('DataTableSearch', DataTableSearchComponent)
   app.component('DataTableExport', DataTableExportComponent)
-  app.component('DataTableAddButton', DataTableAddButtonComponent)
+  app.component('DataTableActionsButtons', DataTableActionsButtonsComponent)
   app.component('DataTableRowActions', DataTableRowActionsComponent)
   app.component('DataTableColumnSelector', DataTableColumnSelectorComponent)
   app.component('DataTableLastModifiedPopup', LastModifiedPopup)
@@ -41,7 +41,7 @@ export {
   DataTableActionsComponent as DataTableActions,
   DataTableSearchComponent as DataTableSearch,
   DataTableExportComponent as DataTableExport,
-  DataTableAddButtonComponent as DataTableAddButton,
+  DataTableActionsButtonsComponent as DataTableActionsButtons,
   DataTableRowActionsComponent as DataTableRowActions,
   DataTableColumnSelectorComponent as DataTableColumnSelector,
   LastModifiedPopup as DataTableLastModifiedPopup,

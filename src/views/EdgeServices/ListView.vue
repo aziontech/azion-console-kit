@@ -5,6 +5,7 @@
   import ContentBlock from '@/templates/content-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -122,7 +123,7 @@
 
   const handleTrackEventGoToEdit = () => {
     tracker.product.clickToEdit({
-      productName: 'Edge Service'
+      productName: 'Edge Services'
     })
   }
 </script>
@@ -130,13 +131,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Services"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edge Services">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Service"
+                @click="handleTrackEventGoToCreate"
+                createPagePath="edge-services/create"
+                data-testid="create_Service_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
         :listService="listEdgeServiceServices"
         :columns="getColumns"
-        addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"

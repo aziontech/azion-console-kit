@@ -1,23 +1,32 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Personal Tokens"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Personal Tokens">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Personal Token"
+                createPagePath="personal-tokens/create"
+                @click="handleTrackEvent"
+                data-testid="create_PersonalToken_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
         :listService="listPersonalTokensService"
         :columns="getColumns"
-        addButtonLabel="Personal Token"
-        createPagePath="personal-tokens/create"
-        @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         :enableEditClick="false"
         :actions="actions"
         :emptyBlock="{
           title: 'No personal tokens have been generated',
           description: 'Click the button below to generate your first personal token.',
-          createButtonLabel: 'Personal Token',
-          createPagePath: 'personal-tokens/create',
           documentationService: props.documentationService,
           emptyListMessage: 'No personal tokens found.'
         }"
@@ -32,6 +41,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

@@ -1,7 +1,21 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Real-Time Purge"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Real-Time Purge">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Purge"
+                @click="handleTrackEvent"
+                createPagePath="real-time-purge/create"
+                data-testid="create_Purge_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <InlineMessage
@@ -16,8 +30,6 @@
         ref="listPurgeRef"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        addButtonLabel="Purge"
-        createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         :isGraphql="true"
@@ -45,6 +57,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { computed, ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2/purge/purge-service'
