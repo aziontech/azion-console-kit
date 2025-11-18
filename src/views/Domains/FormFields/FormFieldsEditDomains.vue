@@ -55,6 +55,7 @@
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: environment } = useField('environment')
   const { value: domainName } = useField('domainName')
+  const { value: authorityCertificate } = useField('authorityCertificate')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
@@ -148,7 +149,8 @@
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
-  const onDigitalCertificateSuccess = ({ type, id }) => {
+  const onDigitalCertificateSuccess = ({ type, id, authority }) => {
+    authorityCertificate.value = authority
     if (type === TRUSTED_CA_CERTIFICATE) {
       mtlsTrustedCertificate.value = id
       return
@@ -159,7 +161,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id,name'],
+      fields: ['id,name,authority'],
       ...queryParams
     })
   }
@@ -170,6 +172,11 @@
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
+  }
+
+  const moreOptions = ['authority', 'status']
+  const selectCertificate = ({ authority }) => {
+    authorityCertificate.value = authority
   }
 </script>
 
@@ -379,8 +386,10 @@
           :value="edgeCertificate"
           :defaultPosition="1"
           appendTo="self"
+          :moreOptions="moreOptions"
           placeholder="Select a certificate"
           showGroup
+          @onSelectOption="selectCertificate"
           optionGroupLabel="group"
           optionGroupChildren="items"
         >

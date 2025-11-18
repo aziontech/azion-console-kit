@@ -1,18 +1,24 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+import { buildCertificateNames } from '@/services/utils/domain-names'
+import { hasAnyFieldChanged } from '@/services/v2/utils/hasAnyFieldChanged'
+import { DigitalCertificatesAdapter } from '@/services/v2/digital-certificates/digital-certificates-adapter'
+const keysToCheck = ['common_name', 'alternative_names']
+
 import * as Errors from '@/services/axios/errors'
 
 export const editDomainService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}/${payload.id}`,
     method: 'PATCH',
-    body: adapt(payload)
+    body: await adapt(payload)
   })
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (payload) => {
+const adapt = async (payload) => {
   const basePayload = {
     name: payload.name,
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
@@ -26,12 +32,69 @@ const adapt = (payload) => {
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
 
+  const { commonName, alternativeNames } = buildCertificateNames(
+    payload.cnames.split('\n').filter((item) => item !== '')
+  )
+
+  const letEncryptBase = {
+    name: payload.name,
+    letEncrypt: {
+      commonName: commonName,
+      alternativeNames: alternativeNames
+    },
+    tls: {
+      certificate: payload.edgeCertificate === 'lets_encrypt' ? 1 : 2
+    }
+  }
+
+  // Build old certificate names (if available) to detect changes
+  let oldTransformed = null
+  if (Array.isArray(payload.oldDomains) && payload.oldDomains.length) {
+    const { commonName: oldCN, alternativeNames: oldSANs } = buildCertificateNames(
+      payload.oldDomains
+    )
+    const oldLetEncryptBase = {
+      name: payload.name,
+      letEncrypt: {
+        commonName: oldCN,
+        alternativeNames: oldSANs
+      },
+      tls: {
+        certificate: payload.edgeCertificate === 'lets_encrypt' ? 1 : 2
+      }
+    }
+    oldTransformed =
+      DigitalCertificatesAdapter.transformCreateDigitalCertificateLetEncrypt(oldLetEncryptBase)
+  }
+
+  if (payload.authorityCertificate === 'lets_encrypt') {
+    // Compare previous vs current certificate subject fields
+    if (
+      hasAnyFieldChanged(DigitalCertificatesAdapter, oldTransformed, letEncryptBase, keysToCheck)
+    ) {
+      const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
+        letEncryptBase,
+        payload.edgeCertificate
+      )
+      basePayload.digital_certificate_id = id
+    }
+  } else if (
+    payload.edgeCertificate === 'lets_encrypt' ||
+    payload.edgeCertificate === 'lets_encrypt_http'
+  ) {
+    const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
+      letEncryptBase
+    )
+    basePayload.digital_certificate_id = id
+  }
+
   if (!payload.mtlsTrustedCertificate || !payload.mtlsIsEnabled) {
     delete basePayload.mtls_trusted_ca_certificate_id
   }
 
   return basePayload
 }
+
 /**
  * @param {Object} errorSchema - The error schema.
  * @param {string} key - The error key of error schema.

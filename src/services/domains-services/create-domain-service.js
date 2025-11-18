@@ -1,18 +1,24 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+import { buildCertificateNames } from '@/services/utils/domain-names'
+
 import * as Errors from '@/services/axios/errors'
 
+/** using centralized utility: buildCertificateNames */
+
 export const createDomainService = async (payload) => {
+  const bodyRequest = await adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}`,
     method: 'POST',
-    body: adapt(payload)
+    body: bodyRequest
   })
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (payload) => {
+const adapt = async (payload) => {
   const dataRequest = {
     name: payload.name,
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
@@ -34,7 +40,22 @@ const adapt = (payload) => {
   }
 
   if (payload.edgeCertificate !== 0) {
-    dataRequest.digital_certificate_id = payload.edgeCertificate
+    if (
+      payload.edgeCertificate === 'lets_encrypt' ||
+      payload.edgeCertificate === 'lets_encrypt_http'
+    ) {
+      const domains = payload.cnames.split('\n').filter((item) => item !== '')
+      const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt({
+        name: payload.name,
+        letEncrypt: buildCertificateNames(domains),
+        tls: {
+          certificate: payload.edgeCertificate === 'lets_encrypt' ? 1 : 2
+        }
+      })
+      dataRequest.digital_certificate_id = id
+    } else {
+      dataRequest.digital_certificate_id = payload.edgeCertificate
+    }
   }
 
   return dataRequest

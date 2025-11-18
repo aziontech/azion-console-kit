@@ -146,10 +146,12 @@
         message: `Space characters aren't allowed.`,
         test: (value) => value?.includes(' ') === false
       }),
+    oldDomains: yup.array().of(yup.string()).optional(),
     cnameAccessOnly: yup.boolean(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
+    authorityCertificate: yup.string().nullable(),
     mtlsTrustedCertificate: yup
       .string()
       .when('mtlsIsEnabled', {
