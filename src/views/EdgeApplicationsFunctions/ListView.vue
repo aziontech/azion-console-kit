@@ -1,6 +1,7 @@
 <script setup>
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
@@ -127,6 +128,10 @@
       })
       .track()
   }
+
+  defineExpose({
+    openCreateDrawer: openCreateFunctionDrawer
+  })
 
   onMounted(() => {
     openDrawerById({ id: route.query.id })

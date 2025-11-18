@@ -176,6 +176,7 @@
           title: 'No Functions have been created',
           description: 'Click the button below to create your first Function.',
           createButtonLabel: 'Function',
+          createPagePath: 'functions/create?origin=list',
           documentationService: documentationService
         }"
       />

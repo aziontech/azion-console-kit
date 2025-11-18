@@ -321,7 +321,7 @@
             </div>
             <div class="flex gap-2">
               <CreateMenuBlock
-                addButtonLabel="Certificate Manager"
+                addButtonLabel="Certificate"
                 :items="items"
               />
             </div>

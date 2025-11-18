@@ -243,7 +243,6 @@
 <template>
   <div
     class="max-w-full"
-    :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
     <DataTable

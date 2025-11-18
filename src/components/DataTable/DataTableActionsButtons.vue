@@ -30,6 +30,7 @@
       :disabled="disabled"
       @click="handleClick"
       icon="pi pi-plus"
+      size="small"
       :data-testid="testId"
       :label="label"
     />
