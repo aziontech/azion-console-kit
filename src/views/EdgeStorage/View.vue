@@ -154,7 +154,6 @@
     })
   }
 
-  // Atualizar breadcrumb quando o componente for montado
   onMounted(() => {
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
   })
