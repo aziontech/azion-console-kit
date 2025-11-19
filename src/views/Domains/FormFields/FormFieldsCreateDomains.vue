@@ -151,7 +151,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id', 'name'],
+      fields: ['id', 'name', 'authority'],
       ...queryParams
     })
   }
@@ -168,7 +168,8 @@
 
   const selectCertificate = ({ authority, value }) => {
     authorityCertificate.value = authority
-    isLetEncrypt.value = value === 'lets_encrypt' || value === 'lets_encrypt_http'
+    isLetEncrypt.value =
+      value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
   }
 </script>
 

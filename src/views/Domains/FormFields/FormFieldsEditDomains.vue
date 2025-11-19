@@ -182,7 +182,8 @@
   const moreOptions = ['authority', 'status']
   const selectCertificate = ({ authority, value }) => {
     authorityCertificate.value = authority
-    isLetEncrypt.value = value === 'lets_encrypt' || value === 'lets_encrypt_http'
+    isLetEncrypt.value =
+      value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
   }
 </script>
 
