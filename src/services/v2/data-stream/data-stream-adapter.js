@@ -79,7 +79,7 @@ const parseByEndpointType = (payload) => {
         }
       }
     case 's3':
-      return {
+      const obj = {
         type: 's3',
         attributes: {
           access_key: payload.accessKey,
@@ -87,10 +87,13 @@ const parseByEndpointType = (payload) => {
           object_key_prefix: payload.objectKey,
           bucket_name: payload.bucket,
           content_type: payload.contentType,
-          host_url: payload.host,
-          secret_key: payload.secretKey
+          host_url: payload.host
         }
       }
+      if (payload.secretKey) {
+        obj.attributes.secret_key = payload.secretKey
+      }
+      return obj
     case 'big_query':
       return {
         type: 'big_query',
