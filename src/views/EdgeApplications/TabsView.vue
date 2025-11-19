@@ -13,6 +13,7 @@
   import { useToast } from 'primevue/usetoast'
   import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import EditView from './EditView.vue'
   import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
@@ -53,6 +54,7 @@
   const toast = useToast()
   const route = useRoute()
   const router = useRouter()
+  const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
@@ -138,6 +140,8 @@
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
+
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)

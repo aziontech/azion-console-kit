@@ -12,6 +12,9 @@
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
+
+  const breadcrumbs = useBreadcrumbs()
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -135,6 +138,9 @@
     edgeFirewall.value = await loaderEdgeFirewall()
     verifyTab(edgeFirewall.value)
     const activeTabIndexByRoute = mapTabs.value[tab]
+
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
+
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 

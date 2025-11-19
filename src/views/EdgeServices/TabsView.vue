@@ -6,6 +6,7 @@
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { ref, watch, provide, reactive, computed } from 'vue'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useToast } from 'primevue/usetoast'
@@ -28,6 +29,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
+  const breadcrumbs = useBreadcrumbs()
 
   const activeTab = ref(0)
   const edgeServiceId = ref(route.params.id)
@@ -95,6 +97,7 @@
     try {
       const result = await props.loadEdgeService({ id: edgeServiceId.value })
       title.value = result.name
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, result.name)
     } catch (error) {
       toast.add({
         closable: true,
@@ -107,6 +110,7 @@
 
   const updateEdgeServiceValue = (value) => {
     title.value = value.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, value.name)
   }
 
   const mapTabs = ref({ ...defaultTabs })

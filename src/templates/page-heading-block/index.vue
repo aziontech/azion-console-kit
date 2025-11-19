@@ -1,6 +1,7 @@
 <script setup>
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import Breadcrumb from 'primevue/breadcrumb'
+  import Skeleton from 'primevue/skeleton'
   import { computed, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -40,7 +41,7 @@
     <div>
       <Breadcrumb
         :model="breadcrumbs.items"
-        class="-ml-1.5 overflow-auto w-full"
+        class="overflow-auto w-full"
         :pt="{
           label: { class: 'whitespace-nowrap text-[18px]' },
           menuItem: ({ props }) => ({
@@ -49,8 +50,14 @@
         }"
       >
         <template #item="{ item, props }">
+          <Skeleton
+            v-if="item.isLoading"
+            width="8rem"
+            height="1.125rem"
+            class="bg-surface-200 dark:bg-surface-700"
+          />
           <router-link
-            v-if="item.to"
+            v-else-if="item.to"
             :to="item.to"
             v-bind="props.action"
             :class="{ 'text-color-secondary': breadcrumbs.items.indexOf(item) === -1 }"
