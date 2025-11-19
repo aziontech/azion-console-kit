@@ -35,7 +35,7 @@ export const GLOBAL_OPTIONS = {
   ...DEFAULT_OPTIONS,
   staleTime: CACHE_TIME.THIRTY_MINUTES,
   gcTime: CACHE_TIME.TWENTY_FOUR_HOURS,
-  retry: 3
+  retry: 2
 }
 
 /**

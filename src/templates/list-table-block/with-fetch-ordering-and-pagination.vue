@@ -20,8 +20,8 @@
       ]"
       :value="data"
       v-model:filters="filtersDynamically"
-      v-model:sortField="sortFieldValue"
-      v-model:sortOrder="sortOrderValue"
+      :sortField="sortFieldValue"
+      :sortOrder="sortOrderValue"
       :paginator="havePagination"
       :rowsPerPageOptions="props.rowsPerPageOptions"
       :rows="itemsByPage"
@@ -409,6 +409,7 @@
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { useTableQueryParams } from '@/composables/useTableQueryParams'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -534,6 +535,10 @@
     cellQuickActionsItens: {
       type: Array,
       default: () => []
+    },
+    isQuery: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -546,7 +551,25 @@
     return tableDefinitions.getNumberOfLinesPerPage
   })
 
-  const itemsByPage = ref(getSpecificPageCount.value)
+  // Initialize table query params composable
+  const tableQuery = useTableQueryParams({
+    defaultPageSize: getSpecificPageCount.value,
+    defaultOrdering: props.defaultOrderingFieldName,
+    onStateChange: (state) => {
+      // Reload data when URL params change (e.g., browser back/forward)
+      if (!firstLoadData.value && !isLoading.value) {
+        loadDataFromQueryState()
+      }
+    }
+  })
+
+  const itemsByPage = computed({
+    get: () => tableQuery.pageSize.value,
+    set: (value) => {
+      tableDefinitions.setNumberOfLinesPerPage(value)
+      tableQuery.setPageSize(value)
+    }
+  })
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const classActions = isRenderActions
@@ -585,13 +608,14 @@
   const activeCellElement = ref(null)
   const pendingCellElement = ref(null)
 
-  const sortFieldValue = ref(null)
-  const sortOrderValue = ref(null)
+  // Use tableQuery computed properties for sorting
+  const sortFieldValue = computed(() => tableQuery.sortInfo.value.field)
+  const sortOrderValue = computed(() => tableQuery.sortInfo.value.order)
 
   const totalRecords = ref()
-  const savedSearch = ref('')
-  const savedOrdering = ref('')
-  const firstItemIndex = ref(0)
+
+  // firstItemIndex is now computed from tableQuery
+  const firstItemIndex = computed(() => tableQuery.firstItemIndex.value)
 
   const filtersDynamically = computed(() => {
     return props.lazy ? {} : filters.value
@@ -636,16 +660,16 @@
     const currentField = sortFieldValue.value
     const currentOrder = sortOrderValue.value
 
+    let newOrder
     if (currentField === 'lastModified') {
-      sortOrderValue.value = currentOrder === 1 ? -1 : 1
+      newOrder = currentOrder === 1 ? -1 : 1
     } else {
-      sortFieldValue.value = 'lastModified'
-      sortOrderValue.value = 1
+      newOrder = 1
     }
 
     fetchOnSort({
-      sortField: sortFieldValue.value,
-      sortOrder: sortOrderValue.value
+      sortField: 'lastModified',
+      sortOrder: newOrder
     })
   }
 
@@ -722,6 +746,7 @@
   }
 
   const loadData = async ({ page, ...query }, service) => {
+    console.log('loadData', { page, query })
     try {
       isLoading.value = true
       if (service) {
@@ -800,20 +825,36 @@
   }
 
   const reload = async (query = {}, listService = props.listService) => {
-    if (!savedOrdering.value) {
-      savedOrdering.value = props.defaultOrderingFieldName
-    }
+    const apiParams = tableQuery.getApiParams()
 
     const commonParams = {
-      page: 1,
-      pageSize: itemsByPage.value,
+      page: apiParams.page,
+      pageSize: apiParams.pageSize,
       fields: props.apiFields,
-      ordering: savedOrdering.value,
+      ordering: apiParams.ordering,
       ...query
     }
 
     if (props.lazy) {
-      commonParams.search = savedSearch.value
+      commonParams.search = apiParams.search
+    }
+
+    loadData(commonParams, listService)
+  }
+
+  // Helper function to load data from current query state
+  const loadDataFromQueryState = async (listService = props.listService) => {
+    const apiParams = tableQuery.getApiParams()
+
+    const commonParams = {
+      page: apiParams.page,
+      pageSize: apiParams.pageSize,
+      fields: props.apiFields,
+      ordering: apiParams.ordering
+    }
+
+    if (props.lazy) {
+      commonParams.search = apiParams.search
     }
 
     loadData(commonParams, listService)
@@ -833,11 +874,14 @@
 
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
+    const newPage = event.page + 1
+
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-    itemsByPage.value = numberOfLinesPerPage
-    firstItemIndex.value = event.first
+    tableQuery.setPageSize(numberOfLinesPerPage)
+    tableQuery.setPage(newPage)
+
     emit('force-update', true)
-    reload({ page: event.page + 1 })
+    reload()
   }
 
   const filterBy = computed(() => {
@@ -849,32 +893,34 @@
 
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
-    let ordering = sortOrder === -1 ? `-${sortField}` : sortField
-    ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-    const firstPage = 1
-    firstItemIndex.value = firstPage
-    await reload({ ordering })
-    savedOrdering.value = ordering
-    sortFieldValue.value = sortField
-    sortOrderValue.value = sortOrder
+
+    if (sortField === null || sortOrder === null) {
+      // Reset to default ordering
+      tableQuery.setOrdering(props.defaultOrderingFieldName, 1)
+    } else {
+      tableQuery.setOrdering(sortField, sortOrder)
+    }
+
+    await reload()
   }
 
   const fetchOnSearch = () => {
     if (!props.lazy) return
+
+    const searchValue = filters.value.global.value
+    tableQuery.setSearch(searchValue)
+
     emit('force-update', true)
-    const firstPage = 1
-    firstItemIndex.value = firstPage
     reload()
   }
 
   const updateDataTablePagination = () => {
-    const FIRST_NUMBER_PAGE = 1
-    firstItemIndex.value = FIRST_NUMBER_PAGE
+    tableQuery.setPage(1)
   }
 
   const handleSearchValue = () => {
-    const search = filters.value.global.value
-    savedSearch.value = search
+    // Update internal filter value, but don't apply to URL yet
+    // Will be applied when user presses Enter (fetchOnSearch)
   }
 
   const loadLastModifiedToggleState = () => {
@@ -894,14 +940,14 @@
   }
 
   onMounted(() => {
+    // Sync search input with URL params
+    filters.value.global.value = tableQuery.search.value
+
     if (!props.loadDisabled) {
-      loadData({
-        page: 1,
-        pageSize: itemsByPage.value,
-        fields: props.apiFields,
-        ordering: props.defaultOrderingFieldName
-      })
+      // Load data from URL params
+      loadDataFromQueryState()
     }
+
     selectedColumns.value = props.columns.filter(
       (col) => !props.hiddenByDefault?.includes(col.field)
     )
@@ -966,6 +1012,14 @@
       selectedColumns.value = newColumns
     },
     { deep: true }
+  )
+
+  // Sync search input when URL search param changes (e.g., browser back/forward)
+  watch(
+    () => tableQuery.search.value,
+    (newSearch) => {
+      filters.value.global.value = newSearch
+    }
   )
 
   const onScroll = () => {
@@ -1094,17 +1148,20 @@
   }
 
   const searchText = () => {
-    savedSearch.value = cellQuickActions.value.text
-    filters.value.global.value = cellQuickActions.value.text
+    const searchValue = cellQuickActions.value.text
+    filters.value.global.value = searchValue
+    tableQuery.setSearch(searchValue)
     cellQuickActions.value.visible = false
+
     toast.add({
       severity: 'info',
       summary: 'Search applied',
-      detail: `Searching for: "${cellQuickActions.value.text}"`,
+      detail: `Searching for: "${searchValue}"`,
       life: 3000
     })
 
-    fetchOnSearch()
+    emit('force-update', true)
+    reload()
   }
   const quickActions = [
     {
