@@ -7,10 +7,5 @@ export const deleteEdgeApplicationService = async (id) => {
     method: 'DELETE'
   })
 
-  const result = parseHttpResponse(httpResponse)
-
-  const { edgeAppService } = await import('@/services/v2/edge-app/edge-app-service')
-  await edgeAppService.invalidateListCache()
-
-  return result
+  return parseHttpResponse(httpResponse)
 }
