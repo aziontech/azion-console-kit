@@ -15,6 +15,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  const isLetEncrypt = ref(false)
 
   const props = defineProps({
     digitalCertificates: {
@@ -55,6 +56,7 @@
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: environment } = useField('environment')
   const { value: domainName } = useField('domainName')
+  const { value: authorityCertificate } = useField('authorityCertificate')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
@@ -143,12 +145,17 @@
 
   const digitalCertificateDrawerRef = ref('')
 
+  const isRequiredCname = computed(() => {
+    return cnameAccessOnly.value || isLetEncrypt.value
+  })
+
   const openDigitalCertificateDrawer = (certificate) => {
     digitalCertificateDrawerRef.value.changeCertificateType(certificate)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
-  const onDigitalCertificateSuccess = ({ type, id }) => {
+  const onDigitalCertificateSuccess = ({ type, id, authority }) => {
+    authorityCertificate.value = authority
     if (type === TRUSTED_CA_CERTIFICATE) {
       mtlsTrustedCertificate.value = id
       return
@@ -159,7 +166,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id,name'],
+      fields: ['id,name,authority'],
       ...queryParams
     })
   }
@@ -170,6 +177,12 @@
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
+  }
+  const moreOptions = ['authority', 'status']
+  const selectCertificate = ({ authority, value }) => {
+    authorityCertificate.value = authority
+    isLetEncrypt.value =
+      value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
   }
 </script>
 
@@ -359,7 +372,7 @@
         <FieldTextArea
           label="CNAME"
           data-testid="domains-form__cnames-field"
-          :required="cnameAccessOnly"
+          :required="isRequiredCname"
           name="cnames"
           rows="2"
           :value="cnames"
@@ -380,6 +393,8 @@
           :defaultPosition="1"
           appendTo="self"
           placeholder="Select a certificate"
+          :moreOptions="moreOptions"
+          @onSelectOption="selectCertificate"
           showGroup
           optionGroupLabel="group"
           optionGroupChildren="items"
