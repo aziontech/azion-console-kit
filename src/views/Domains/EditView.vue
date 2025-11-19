@@ -137,8 +137,10 @@
     cnames: yup
       .string()
       .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
+      .when(['cnameAccessOnly', 'edgeCertificate'], {
+        is: (cnameAccessOnly, edgeCertificate) =>
+          cnameAccessOnly === true ||
+          ['lets_encrypt', 'lets_encrypt_http'].includes(edgeCertificate),
         then: (schema) => schema.required()
       })
       .test({

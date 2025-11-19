@@ -46,6 +46,7 @@
 
   const EDGE_CERTIFICATE = 'edge_certificate'
   const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
+  const isLetEncrypt = ref(false)
 
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -144,6 +145,10 @@
 
   const digitalCertificateDrawerRef = ref('')
 
+  const isRequiredCname = computed(() => {
+    return cnameAccessOnly.value || isLetEncrypt.value
+  })
+
   const openDigitalCertificateDrawer = (certificate) => {
     digitalCertificateDrawerRef.value.changeCertificateType(certificate)
     digitalCertificateDrawerRef.value.openCreateDrawer()
@@ -175,8 +180,9 @@
   }
 
   const moreOptions = ['authority', 'status']
-  const selectCertificate = ({ authority }) => {
+  const selectCertificate = ({ authority, value }) => {
     authorityCertificate.value = authority
+    isLetEncrypt.value = value === 'lets_encrypt' || value === 'lets_encrypt_http'
   }
 </script>
 
@@ -366,7 +372,7 @@
         <FieldTextArea
           label="CNAME"
           data-testid="domains-form__cnames-field"
-          :required="cnameAccessOnly"
+          :required="isRequiredCname"
           name="cnames"
           rows="2"
           :value="cnames"
