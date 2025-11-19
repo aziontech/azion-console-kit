@@ -172,8 +172,11 @@
     cnames: yup
       .string()
       .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
+      .when(['cnameAccessOnly', 'edgeCertificate', 'authorityCertificate'], {
+        is: (cnameAccessOnly, edgeCertificate, authorityCertificate) =>
+          cnameAccessOnly === true ||
+          ['lets_encrypt', 'lets_encrypt_http'].includes(edgeCertificate) ||
+          authorityCertificate === 'lets_encrypt',
         then: (schema) => schema.required()
       })
       .test({
@@ -185,6 +188,7 @@
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
+    authorityCertificate: yup.string().nullable(),
     mtlsTrustedCertificate: yup
       .string()
       .when('mtlsIsEnabled', {
