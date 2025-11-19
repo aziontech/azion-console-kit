@@ -18,6 +18,11 @@ export const queryClient = new QueryClient({
   }
 })
 
+/**
+ * Returns the appropriate cache configuration based on cache type
+ * @param {string} cacheType - One of CACHE_TYPE values or 'NONE'
+ * @returns {object} TanStack Query options object
+ */
 export const getCacheOptions = (cacheType) => {
   switch (cacheType) {
     case CACHE_TYPE.SENSITIVE:
@@ -30,10 +35,7 @@ export const getCacheOptions = (cacheType) => {
   }
 }
 
-export const createQueryKey = (key, cacheType) => {
-  if (typeof key === 'function') {
-    return () => [cacheType, ...key()]
-  }
+export const createQueryKey = (key, cacheType = CACHE_TYPE.GLOBAL) => {
   return [cacheType, ...key]
 }
 
