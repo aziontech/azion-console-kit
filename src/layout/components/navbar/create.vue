@@ -77,13 +77,13 @@
 </template>
 
 <script setup>
-  import { computed, inject, ref } from 'vue'
+  import { computed, inject } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-  import { solutionService } from '@/services/v2/marketplace/solution-service'
+  import { useListSolutions } from '@/services/v2/marketplace/queries'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import { useToast } from 'primevue/usetoast'
 
@@ -105,40 +105,49 @@
 
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
-  const recommendedQuery = ref(null)
-  const templatesQuery = ref(null)
-  const githubImportQuery = ref(null)
   const toast = useToast()
 
-  const loadQueries = () => {
-    if (accountData.value.kind !== 'client') return
 
-    recommendedQuery.value = solutionService.useListSolutions({
+  const {
+    data: recommendedData,
+    isLoading: recommendedLoading
+  } = useListSolutions(
+    computed(() => ({
       group: 'recommended',
-      type: hasFlagBlockApiV4() ? accountData.value.jobRole : `${accountData.value.jobRole}-v4`
-    })
+      type: hasFlagBlockApiV4()
+        ? accountData.value.jobRole
+        : `${accountData.value.jobRole}-v4`
+    }))
+  )
 
-    templatesQuery.value = solutionService.useListSolutions({
-      group: 'templates',
-      type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
-    })
 
-    githubImportQuery.value = solutionService.useListSolutions({
-      group: 'githubImport',
-      type: 'import-from-github'
-    })
-  }
+  const {
+    data: templatesData,
+    isLoading: templatesLoading
+  } = useListSolutions({
+    group: 'templates',
+    type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
+  })
 
+  const {
+    data: githubImportData,
+    isLoading: githubImportLoading
+  } = useListSolutions({
+    group: 'githubImport',
+    type: 'import-from-github'
+  })
+
+  // Computed values for template consumption
   const solutions = computed(() => ({
-    recommended: recommendedQuery.value.data || [],
-    templates: templatesQuery.value.data || [],
-    githubImport: githubImportQuery.value.data || []
+    recommended: recommendedData.value || [],
+    templates: templatesData.value || [],
+    githubImport: githubImportData.value || []
   }))
 
   const loading = computed(() => ({
-    recommended: !accountData.value.jobRole || recommendedQuery.value.isLoading,
-    templates: templatesQuery.value.isLoading,
-    githubImport: githubImportQuery.value.isLoading
+    recommended: !accountData.value.jobRole || recommendedLoading.value,
+    templates: templatesLoading.value,
+    githubImport: githubImportLoading.value
   }))
 
   const openCreateModalToggle = () => {
@@ -173,6 +182,4 @@
   const createModalIsOpen = computed(() => {
     return createModalStore.isOpen
   })
-
-  loadQueries()
 </script>

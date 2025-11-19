@@ -1,56 +1,54 @@
+/**
+ * TanStack Query Client Configuration
+ * Simplified to follow v5 best practices
+ *
+ * Cache configuration should be done per-query, not globally.
+ * Query keys should represent data hierarchy, not cache types.
+ */
+
 import { QueryClient } from '@tanstack/vue-query'
-import {
-  DEFAULT_OPTIONS,
-  GLOBAL_OPTIONS,
-  SENSITIVE_OPTIONS,
-  NO_CACHE_OPTIONS,
-  CACHE_TYPE
-} from './config'
+
+// Default query configuration
+// These are sensible defaults that work for most use cases
+const DEFAULT_QUERY_OPTIONS = {
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  refetchOnMount: false,
+  retry: 1,
+  staleTime: 5 * 60 * 1000, // 5 minutes - reasonable default
+  gcTime: 24 * 60 * 60 * 1000 // 24 hours - keep in memory
+}
+
+const DEFAULT_MUTATION_OPTIONS = {
+  retry: 0 // Don't retry mutations by default
+}
 
 export const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      ...DEFAULT_OPTIONS
-    },
-    mutations: {
-      ...DEFAULT_OPTIONS
-    }
+    queries: DEFAULT_QUERY_OPTIONS,
+    mutations: DEFAULT_MUTATION_OPTIONS
   }
 })
 
+// =============================================================================
+// CACHE UTILITIES
+// Use these for manual cache operations when needed
+// =============================================================================
+
 /**
- * Returns the appropriate cache configuration based on cache type
- * @param {string} cacheType - One of CACHE_TYPE values or 'NONE'
- * @returns {object} TanStack Query options object
+ * Clear all cached queries
+ * Use sparingly - usually you want invalidateQueries instead
  */
-export const getCacheOptions = (cacheType) => {
-  switch (cacheType) {
-    case CACHE_TYPE.SENSITIVE:
-      return SENSITIVE_OPTIONS
-    case 'NONE':
-      return NO_CACHE_OPTIONS
-    case CACHE_TYPE.GLOBAL:
-    default:
-      return GLOBAL_OPTIONS
-  }
-}
-
-export const createQueryKey = (key, cacheType = CACHE_TYPE.GLOBAL) => {
-  return [cacheType, ...key]
-}
-
-export const clearCacheByType = async (cacheType) => {
-  await queryClient.removeQueries({
-    predicate: (query) => query.queryKey[0] === cacheType
-  })
-}
-
-export const clearCacheSensitive = async () => {
-  await clearCacheByType(CACHE_TYPE.SENSITIVE)
-}
-
 export const clearAllCache = async () => {
   await queryClient.clear()
+}
+
+/**
+ * Invalidate all queries
+ * Marks queries as stale and triggers refetch if they're being observed
+ */
+export const invalidateAllQueries = async () => {
+  await queryClient.invalidateQueries()
 }
 
 export default queryClient

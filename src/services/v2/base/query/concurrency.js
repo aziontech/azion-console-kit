@@ -1,10 +1,17 @@
 /**
  * Concurrency utilities for TanStack Query v5
- * Provides Mutex (mutations) and Request Coalescing (queries)
+ *
+ * IMPORTANT NOTES:
+ * - Mutex: USEFUL for serializing mutations that modify the same resource
+ * - Request Coalescing: NOT NEEDED - TanStack Query handles this automatically
+ *
+ * TanStack Query automatically deduplicates requests with the same queryKey,
+ * so manual request coalescing should be removed in most cases.
  */
 
 // ============================================================================
 // MUTEX - Serializes mutations to prevent race conditions
+// Use this for mutations that need to be executed sequentially
 // ============================================================================
 
 class Mutex {
