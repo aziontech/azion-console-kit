@@ -3,6 +3,7 @@ import * as UsersService from '@/services/users-services'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const settingsRoutes = {
   path: '/settings',
+  name: 'settings',
   children: [
     {
       path: '',

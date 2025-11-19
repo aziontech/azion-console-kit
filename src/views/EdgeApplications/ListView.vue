@@ -150,7 +150,7 @@
         addButtonLabel="Application"
         createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
-        :useQueryFn="edgeAppService.listEdgeApplicationsService"
+        :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-load-data="handleLoadData"

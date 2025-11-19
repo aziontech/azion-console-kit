@@ -8,8 +8,6 @@ import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
-import { prefetchByTrigger, PREFETCH_TRIGGERS } from '@/services/v2/base/query'
-import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
@@ -36,12 +34,6 @@ export const loadUserAndAccountInfo = async () => {
   setFeatureFlags(accountInfo.client_flags)
 
   await solutionService.invalidateSolutionsCache()
-
-  // Executes prefetches configured for 'login' trigger
-  // Non-blocking: login continues even if prefetch fails
-  prefetchByTrigger(PREFETCH_TRIGGERS.LOGIN, {
-    edgeAppService
-  })
 }
 
 export const loadProfileAndAccountInfo = async () => {

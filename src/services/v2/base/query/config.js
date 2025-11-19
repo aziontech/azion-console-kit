@@ -4,7 +4,6 @@ export const CACHE_TIME = {
   TWO_MINUTES: 2 * 60 * 1000,
   THREE_MINUTES: 3 * 60 * 1000,
   FIVE_MINUTES: 5 * 60 * 1000,
-  TEN_MINUTES: 10 * 60 * 1000,
   FIFTEEN_MINUTES: 15 * 60 * 1000,
   THIRTY_MINUTES: 30 * 60 * 1000,
   ONE_HOUR: 60 * 60 * 1000,
@@ -59,24 +58,6 @@ export const NO_CACHE_OPTIONS = {
   gcTime: 0
 }
 
-export const TABLE_FIRST_PAGE_OPTIONS = {
-  ...DEFAULT_OPTIONS,
-  staleTime: CACHE_TIME.TEN_MINUTES,
-  gcTime: CACHE_TIME.THIRTY_MINUTES,
-  meta: {
-    persist: true
-  }
-}
-
-export const TABLE_PAGINATION_OPTIONS = {
-  ...DEFAULT_OPTIONS,
-  staleTime: CACHE_TIME.TWO_MINUTES,
-  gcTime: CACHE_TIME.FIVE_MINUTES,
-  meta: {
-    persist: true
-  }
-}
-
 export const PERSISTENCE_CONFIG = {
   IDB_NAME: 'azion',
   IDB_STORE_NAME: 'cache-store',
@@ -85,15 +66,7 @@ export const PERSISTENCE_CONFIG = {
   MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS,
   DEHYDRATE_OPTIONS: {
     shouldDehydrateQuery: (query) => {
-      if (query.state.status !== 'success') {
-        return false
-      }
-
-      if (query.meta?.persist === false) {
-        return false
-      }
-
-      return true
+      return query.state.status === 'success'
     }
   },
   HYDRATE_OPTIONS: {
