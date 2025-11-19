@@ -149,7 +149,7 @@ describe('DomainsServices', () => {
 
       const response = sut(fixtures.domainMock)
 
-      expect(response).rejects.toBe(expectedError)
+      await expect(response).rejects.toThrow(expectedError)
     }
   )
 })
