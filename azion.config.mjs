@@ -167,11 +167,8 @@ const config = {
         post: false,
         options: false
       },
-      // browser: {
-      //   maxAgeSeconds: 0
-      // }, // comented to not rewrite to 0 due not support to honor browser cache option
       edge: {
-        maxAgeSeconds: 60 * 60 * 24 * 3 // 3 days
+        maxAgeSeconds: 60 * 60 * 24 * 3
       }
     },
     {
@@ -186,10 +183,10 @@ const config = {
         options: false
       },
       browser: {
-        maxAgeSeconds: 1000 * 5 // 5000 seconds
+        maxAgeSeconds: 1000 * 5
       },
       edge: {
-        maxAgeSeconds: 60 * 60 * 24 * 5 // 5 days
+        maxAgeSeconds: 60 * 60 * 24 * 5
       }
     },
     {
@@ -204,10 +201,28 @@ const config = {
         options: false
       },
       browser: {
-        maxAgeSeconds: 1000 * 10 // 10000 seconds
+        maxAgeSeconds: 1000 * 10
       },
       edge: {
-        maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+        maxAgeSeconds: 60 * 60 * 24 * 7
+      }
+    },
+    {
+      name: 'Marketplace - Cache',
+      stale: false,
+      queryStringSort: false,
+      cacheByQueryString: {
+        option: 'varies'
+      },
+      methods: {
+        post: false,
+        options: false
+      },
+      browser: {
+        maxAgeSeconds: 43200
+      },
+      edge: {
+        maxAgeSeconds: 43200
       }
     }
   ],
