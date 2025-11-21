@@ -40,7 +40,7 @@
     }
   })
 
-  const showAllItems = ref(false)
+  const showAllItems = ref(props.showMore)
 
   const SLICE_VALUE = 2
   const formatValue = props.value?.slice(0, SLICE_VALUE) ?? []
