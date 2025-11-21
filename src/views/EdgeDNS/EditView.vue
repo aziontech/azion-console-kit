@@ -1,5 +1,6 @@
 <script setup>
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ContentBlock from '@/templates/content-block'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'

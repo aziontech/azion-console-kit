@@ -60,7 +60,11 @@
             v-else-if="item.to"
             :to="item.to"
             v-bind="props.action"
-            :class="{ 'text-color-secondary': breadcrumbs.items.indexOf(item) === -1 }"
+            :class="{
+              'text-color-secondary': breadcrumbs.items.indexOf(item) === -1,
+              'text-[var(--text-color-secondary)]':
+                breadcrumbs.items.length > 1 && breadcrumbs.items.indexOf(item) === 0
+            }"
           >
             {{ item.label }}
           </router-link>
