@@ -206,24 +206,6 @@ const config = {
       edge: {
         maxAgeSeconds: 60 * 60 * 24 * 7
       }
-    },
-    {
-      name: 'Marketplace - Cache',
-      stale: false,
-      queryStringSort: false,
-      cacheByQueryString: {
-        option: 'varies'
-      },
-      methods: {
-        post: false,
-        options: false
-      },
-      browser: {
-        maxAgeSeconds: 43200
-      },
-      edge: {
-        maxAgeSeconds: 43200
-      }
     }
   ],
   rules: {
