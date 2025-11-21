@@ -42,6 +42,7 @@ cypress.env.*
 #azion
 .edge
 !azion/production
+!azion/production-bkp
 !azion/stage
 
 azion/
