@@ -245,6 +245,10 @@
   const handleNavigateToMainSettings = () => {
     props.navigateToApplicationAccelerator()
   }
+
+  defineExpose({
+    openCreateDrawer: openCreateRulesEngineDrawerByPhase
+  })
 </script>
 
 <template>

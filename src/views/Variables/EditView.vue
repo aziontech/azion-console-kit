@@ -5,11 +5,21 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const variableName = ref('Edit Variable')
+
+  const setVariableName = (variable) => {
+    variableName.value = variable.key
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, variable.key)
+  }
 
   const props = defineProps({
     loadVariableService: { type: Function, required: true },
@@ -49,7 +59,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Variable" />
+      <PageHeadingBlock :pageTitle="variableName" />
     </template>
     <template #content>
       <EditFormBlock
@@ -57,6 +67,7 @@
         :loadService="props.loadVariableService"
         :updatedRedirect="updatedRedirect"
         :schema="validationSchema"
+        @loaded-service-object="setVariableName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >

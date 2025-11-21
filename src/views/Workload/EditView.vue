@@ -30,6 +30,7 @@
 
 <script setup>
   import { ref, inject } from 'vue'
+  import { useRoute } from 'vue-router'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -38,9 +39,13 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { validationSchema } from './Config/validation'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
 
   defineProps({
     updatedRedirect: { type: String, required: true }
@@ -68,5 +73,6 @@
 
   const setWorkloadName = async (workload) => {
     workloadName.value = workload.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, workload.name)
   }
 </script>

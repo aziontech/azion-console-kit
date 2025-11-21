@@ -5,6 +5,7 @@
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -83,17 +84,27 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Network Lists">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Network List"
+                createPagePath="network-lists/create"
+                @click="handleCreateTrackEvent"
+                data-testid="create_NetworkList_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
-        addButtonLabel="Network List"
-        createPagePath="network-lists/create"
         editPagePath="network-lists/edit"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No network lists found."
         :actions="actions"

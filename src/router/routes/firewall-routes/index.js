@@ -66,7 +66,9 @@ export const edgeFirewallRoutes = {
             to: '/firewalls'
           },
           {
-            label: 'Edit Firewall'
+            label: 'Edit Firewall',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

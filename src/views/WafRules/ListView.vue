@@ -6,6 +6,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CloneBlock from '@/templates/clone-block'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -118,14 +119,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="WAF Rules" />
+      <PageHeadingBlock pageTitle="WAF Rules">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="WAF Rule"
+                createPagePath="waf/create"
+                @click="handleTrackClickToCreate"
+                data-testid="create_WAFRule_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="wafService.listWafRules"
         :columns="getColumns"
-        addButtonLabel="WAF Rule"
-        createPagePath="waf/create"
         @on-before-go-to-edit="handleTrackClickToEdit"
         @on-before-go-to-add-page="handleTrackClickToCreate"
         editPagePath="waf/edit"

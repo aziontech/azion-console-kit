@@ -9,9 +9,26 @@
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const userName = ref('Edit User')
+
+  const setUserName = (user) => {
+    const firstName = user.first_name ?? user.firstName ?? ''
+    const lastName = user.last_name ?? user.lastName ?? ''
+    let name = `${firstName} ${lastName}`.trim()
+
+    if (!name) {
+      name = user.name ?? user.email ?? 'User'
+    }
+
+    userName.value = name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, name)
+  }
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -88,7 +105,6 @@
     }
   }
 
-  const route = useRoute()
   const loadUser = async () => {
     const id = route.params.id
     const userData = await props.loadAnotherUserService({ id })
@@ -109,7 +125,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edit User"
+        :pageTitle="userName"
         data-testid="users__edit-view__page-heading"
       />
     </template>
@@ -118,6 +134,7 @@
         :editService="props.editAnotherUserService"
         :loadService="loadUser"
         @on-edit-success="handleResponse"
+        @loaded-service-object="setUserName"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
         @on-edit-fail="handleTrackFailedEdit"

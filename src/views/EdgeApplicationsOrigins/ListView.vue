@@ -130,6 +130,10 @@
     hasContentToList.value = true
   }
 
+  defineExpose({
+    openCreateDrawer: openCreateOriginDrawer
+  })
+
   const actions = [
     {
       type: 'delete',

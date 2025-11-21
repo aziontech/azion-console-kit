@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'edge-connectors-view' })
 
@@ -95,10 +96,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Connectors"
-        data-testid="edge-connectors-heading"
-      />
+      <PageHeadingBlock pageTitle="Connectors">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Connectors"
+                createPagePath="/connectors/create"
+                data-testid="create_Connectors_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
@@ -108,7 +119,6 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No Connectors found."
         :actions="actions"
-        addButtonLabel="Connectors"
         createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         data-testid="edge-connectors-list-table-block"

@@ -7,6 +7,7 @@
   import { useRouter } from 'vue-router'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, onBeforeMount } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'reseller-management-view' })
 
@@ -76,14 +77,25 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Reseller Management" />
+      <PageHeadingBlock pageTitle="Resellers">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Reseller"
+                createPagePath="management/create"
+                data-testid="create_Reseller_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="listAccountsResellerDecorator"
         :columns="getColumns"
-        addButtonLabel="Reseller"
-        createPagePath="management/create"
         emptyListMessage="No reseller accounts found."
         editPagePath="management/edit"
         enableEditClick

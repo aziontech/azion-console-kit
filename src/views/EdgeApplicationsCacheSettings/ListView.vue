@@ -111,6 +111,10 @@
       })
       .track()
   }
+
+  defineExpose({
+    openCreateDrawer
+  })
 </script>
 
 <template>

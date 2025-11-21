@@ -65,7 +65,9 @@ export const groupsManagementRoutes = {
             to: '/group/management'
           },
           {
-            label: 'Edit Group'
+            label: 'Edit Group',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

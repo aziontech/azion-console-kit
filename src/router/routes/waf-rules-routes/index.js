@@ -73,7 +73,9 @@ export const wafRulesRoutes = {
             to: '/waf'
           },
           {
-            label: 'Edit WAF Rule'
+            label: 'Edit WAF Rule',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

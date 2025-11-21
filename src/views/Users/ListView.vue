@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -36,7 +37,6 @@
     })
   }
 
-  const pageTitle = 'Users'
   const actions = [
     {
       type: 'delete',
@@ -134,17 +134,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="pageTitle"
-        data-testid="users__list-view__page-heading"
-      />
+      <PageHeadingBlock pageTitle="Users">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="User"
+                @click="handleTrackEvent"
+                createPagePath="users/create"
+                data-testid="create_User_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="listUsersService"
         :columns="getColumns"
-        addButtonLabel="User"
-        createPagePath="users/create"
         editPagePath="users/edit"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"

@@ -1,33 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Variables" />
-    </template>
-    <template #content>
-      <ListTableBlock
-        @on-before-go-to-edit="checkIfIsEditable"
-        @on-before-go-to-add-page="handleTrackEvent"
-        :listService="listVariablesService"
-        :columns="getColumns"
-        addButtonLabel="Variable"
-        createPagePath="variables/create"
-        editPagePath="variables/edit"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No variables found."
-        :actions="actions"
-        :empty-block="{
-          title: 'No variables have been created',
-          description: 'Click the button below to create your first variable.',
-          createButtonLabel: 'Variable',
-          createPagePath: 'variables/create',
-          documentationService: props.documentationService
-        }"
-      />
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
@@ -35,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { h, computed, ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -126,3 +97,44 @@
     })
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Variables">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Variable"
+                @click="handleTrackEvent"
+                createPagePath="variables/create"
+                data-testid="create_Variable_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTableBlock
+        @on-before-go-to-edit="checkIfIsEditable"
+        @on-before-go-to-add-page="handleTrackEvent"
+        :listService="listVariablesService"
+        :columns="getColumns"
+        editPagePath="variables/edit"
+        ref="refListTable"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No variables found."
+        :actions="actions"
+        :empty-block="{
+          title: 'No variables have been created',
+          description: 'Click the button below to create your first variable.',
+          createButtonLabel: 'Variable',
+          createPagePath: 'variables/create',
+          documentationService: props.documentationService
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

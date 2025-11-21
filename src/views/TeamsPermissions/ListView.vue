@@ -4,6 +4,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -77,7 +78,7 @@
 
   const handleTrackEventGoToEdit = () => {
     tracker.product.clickToEdit({
-      productName: 'Teams Permissions'
+      productName: 'Team'
     })
   }
 </script>
@@ -85,17 +86,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Teams Permissions"
-        data-testid="teams-permissions__list-view__page-heading"
-      />
+      <PageHeadingBlock pageTitle="Teams">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Team"
+                @click="handleTrackEventGoToCreate"
+                createPagePath="teams-permission/create"
+                data-testid="create_Team_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="listTeamPermissionService"
         :columns="getColumns"
-        addButtonLabel="Team"
-        createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         emptyListMessage="No teams found."
         :actions="actions"

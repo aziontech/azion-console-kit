@@ -5,6 +5,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
+  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -95,16 +97,32 @@
 <template>
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Custom Pages"
-        data-testid="custom-pages-heading"
-      />
+      <PageHeadingBlock pageTitle="Custom Pages">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <PrimeButton
+                size="small"
+                link
+                @click="navigateToGetHelp"
+              >
+                Get Help
+              </PrimeButton>
+              <DataTableActionsButtons
+                size="small"
+                label="Custom Page"
+                createPagePath="custom-pages/create"
+                data-testid="create_CustomPage_button"
+                @click="handleTrackEvent"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         ref="listTableBlockRef"
-        addButtonLabel="Custom Page"
-        createPagePath="custom-pages/create"
         editPagePath="custom-pages/edit"
         :listService="customPageService.listCustomPagesService"
         :columns="getColumns"

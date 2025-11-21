@@ -27,7 +27,7 @@ describe('EdgeApplicationDeviceGroupsServicesV4', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/workspace/workloads?ordering=name&page=1&page_size=200&fields=&search=`,
+      url: `v4/workspace/workloads?ordering=name&page=1&page_size=100&fields=&search=`,
       method: 'GET'
     })
   })

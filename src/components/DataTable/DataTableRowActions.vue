@@ -10,7 +10,6 @@
         outlined
         v-bind="singleActionProps"
         @click="handleSingleAction"
-        class="cursor-pointer table-button"
         data-testid="data-table-actions-column-body-action-button"
       />
     </div>
@@ -32,8 +31,8 @@
         icon="pi pi-ellipsis-v"
         outlined
         @click="handleMenuToggle"
-        class="cursor-pointer table-button"
         data-testid="data-table-actions-column-body-actions-menu-button"
+        class="table-button"
       />
     </div>
   </div>

@@ -50,7 +50,9 @@ export const edgeNodeRoutes = {
             to: '/edge-node'
           },
           {
-            label: 'Edit Edge Node'
+            label: 'Edit Edge Node',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

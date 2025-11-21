@@ -130,12 +130,18 @@
       .required(),
     tieredCacheRegion: yup
       .string()
-      .required()
       .label('Tiered Cache Region')
-      .oneOf(
-        ['nearest-region', 'br-east-1', 'us-east-1'],
-        'Tiered Cache Region must be either "nearest-region" or "br-east-1" or "us-east-1"'
-      ),
+      .when('tieredCache', {
+        is: true,
+        then: (schema) =>
+          schema
+            .required()
+            .oneOf(
+              ['nearest-region', 'br-east-1', 'us-east-1'],
+              'Tiered Cache Region must be either "nearest-region" or "br-east-1" or "us-east-1"'
+            ),
+        otherwise: (schema) => schema.notRequired()
+      }),
     enableLargeFileCache: yup.boolean().required(),
     largeFileCacheOffset: yup
       .number()

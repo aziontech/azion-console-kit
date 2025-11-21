@@ -1,6 +1,5 @@
 <script setup>
   import { computed, inject } from 'vue'
-
   import ContentBlock from '@/templates/content-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -9,6 +8,7 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -129,17 +129,25 @@
       <PageHeadingBlock
         pageTitle="Applications"
         data-testid="edge-applications-heading"
-      />
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Application"
+            @click="handleTrackEvent"
+            createPagePath="/applications/create?origin=list"
+            data-testid="create_Application_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        addButtonLabel="Application"
         createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :apiFields="EDGE_APPLICATION_API_FIELDS"
-        @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No applications found."

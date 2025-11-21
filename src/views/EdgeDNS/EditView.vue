@@ -1,5 +1,6 @@
 <script setup>
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ContentBlock from '@/templates/content-block'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
@@ -20,6 +21,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -39,6 +41,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
+  const breadcrumbs = useBreadcrumbs()
   const showCreateRecordDrawer = ref(false)
   const showEditRecordDrawer = ref(false)
   const listEDNSResourcesRef = ref('')
@@ -375,6 +378,7 @@
   const loadEdgeDNS = async (id) => {
     const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
     edgeDNSName.value = edgeDNS.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeDNS.name)
     return edgeDNS
   }
 </script>
@@ -432,7 +436,7 @@
             <FetchListTableBlock
               ref="listEDNSResourcesRef"
               addButtonLabel="Record"
-              defaultOrderingFieldName="entry"
+              defaultOrderingFieldName="id"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
