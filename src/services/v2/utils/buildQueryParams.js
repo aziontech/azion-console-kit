@@ -32,7 +32,8 @@ export const buildQueryParams = ({
   max_object_count,
   prefix,
   all_levels,
-  continuation_token
+  continuation_token,
+  bucket
 }) => {
   const params = new URLSearchParams()
   const paramsMap = {
@@ -48,7 +49,8 @@ export const buildQueryParams = ({
     ...(all_levels !== undefined && { all_levels: all_levels }),
     ...(max_object_count && { max_object_count: max_object_count?.toString() }),
     ...(prefix && { prefix }),
-    ...(continuation_token && { continuation_token })
+    ...(continuation_token && { continuation_token }),
+    ...(bucket && { bucket })
   }
 
   Object.entries(paramsMap)
