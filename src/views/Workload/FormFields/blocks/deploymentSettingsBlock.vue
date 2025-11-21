@@ -1,7 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
