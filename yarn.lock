@@ -3882,10 +3882,10 @@ azion-theme@^1.16.1:
   resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.16.1.tgz#b15f9003c41e7fbc7cc5d70c6e68172fb14100d2"
   integrity sha512-+LzCzpVKlZ3cPAYtGvpbbAIOUzih8NcAsQRVt06d+ZFCZSl+lgQNDNAhpTweW8q7zohGGqwwCdvYJf7xvVAvzg==
 
-azion@^1.20.2:
-  version "1.20.2"
-  resolved "https://registry.npmjs.org/azion/-/azion-1.20.2.tgz"
-  integrity sha512-83mbfbJuK2JxD6bKrJS5HfCF+kPu29sF6leLIITZjT6ST4FlewOeusQQYJ7E3M0hjMJwqnvOpwk34AD8lanG5g==
+azion@^1.20.10:
+  version "1.20.11"
+  resolved "https://registry.yarnpkg.com/azion/-/azion-1.20.11.tgz#3222a51d1df0185a745ad8ab7dce2b5edbf2ce5d"
+  integrity sha512-06/+LRpJNrq1WIYYmEkLQORm2s05rUYiUDk3xz9yVeT6UhArMmyTIw8Z7GKbdUX4Wo2NWFyjqs49zS+dqKMpCQ==
   dependencies:
     "@babel/plugin-proposal-optional-chaining-assign" "^7.25.9"
     "@babel/preset-env" "^7.26.9"
