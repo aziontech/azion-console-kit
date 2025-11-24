@@ -78,7 +78,8 @@
   })
 
   const handleEdit = (bucket) => {
-    router.push(`/object-storage/edit/${bucket.name}`)
+    selectedBucket.value = bucket
+    router.push(`/object-storage/${bucket.name}/edit/main-settings`)
   }
 
   const handleDeleteBucket = async (data) => {

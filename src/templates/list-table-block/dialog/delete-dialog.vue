@@ -136,7 +136,9 @@
     loading.value = true
     try {
       const feedback = await data.deleteService(data.selectedID, data.selectedItemData)
-      showToast('success', 'Success', feedback ?? 'Deleted successfully!')
+      if (data.showToast !== false) {
+        showToast('success', 'Success', feedback ?? 'Deleted successfully!')
+      }
       emit('successfullyDeleted')
       resetForm()
       dialogRef.value.close({ updated: true })
@@ -144,10 +146,12 @@
         data.onSuccess()
       }
     } catch (error) {
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        showToast('error', 'Error', error)
+      if (data.showToast !== false) {
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          showToast('error', 'Error', error)
+        }
       }
     } finally {
       loading.value = false
