@@ -1,0 +1,85 @@
+name: Purge Cache (STAGE)
+permissions:
+  contents: read
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy Console Kit (STAGE)
+    types:
+      - completed
+env:
+  HUSKY: 0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      STAGE_CONSOLE_URL: https://stage-console.azion.com
+    concurrency:
+      group: deploy-console
+      cancel-in-progress: false
+    container:
+      image: node:18-alpine3.18
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SO deps
+        run: apk add curl bash jq awk
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Download Azion CLI
+        run: |
+          wget https://github.com/aziontech/azion/releases/download/4.12.0/azion_4.12.0_linux_amd64.apk
+          apk add --allow-untrusted azion_4.12.0_linux_amd64.apk
+
+      - name: Configure Azion CLI
+        run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+
+      - name: Wait for content update and purge cache
+        run: |
+          set -e
+
+          PACKAGE_URL="$STAGE_CONSOLE_URL/package.json"
+
+          echo "Fetching initial version from $PACKAGE_URL..."
+          INITIAL_VERSION=$(curl -s "$PACKAGE_URL" | jq -r '.version // empty')
+          echo "Initial version: ${INITIAL_VERSION:-<none>}"
+
+          if [ -z "$INITIAL_VERSION" ]; then
+            echo "Initial version could not be determined. Exiting without further polling."
+            exit 1
+          fi
+
+          COUNT=0
+          MAX_COUNT= 88 # 22min
+
+          while true; do
+            COUNT=$((COUNT + 1))
+            echo "[Check $COUNT/$MAX_COUNT] Waiting 15 seconds before next version check..."
+            sleep 15
+
+            echo "Purging package URL: $PACKAGE_URL"
+            azion purge --urls "$PACKAGE_URL" --layer edge_caching
+
+            CURRENT_VERSION=$(curl -s "$PACKAGE_URL" | jq -r '.version // empty')
+            echo "Current version: ${CURRENT_VERSION:-<none>}"
+
+            if [ -z "$CURRENT_VERSION" ]; then
+              echo "Current version is empty; keeping previous value and continuing to poll."
+            elif [ "$CURRENT_VERSION" != "$INITIAL_VERSION" ]; then
+              echo "Version changed from $INITIAL_VERSION to $CURRENT_VERSION. Purging application cache..."
+              azion purge --wildcard "${STAGE_CONSOLE_URL}/*" --layer edge_caching
+              echo "Purge of ${STAGE_CONSOLE_URL}/* completed."
+              break
+            fi
+
+            if [ "$COUNT" -ge "$MAX_COUNT" ]; then
+              echo "Maximum number of checks ($MAX_COUNT) reached without version change. Exiting without final purge."
+              break
+            fi
+          done
