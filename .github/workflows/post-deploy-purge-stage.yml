@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install SO deps
-        run: apk add curl bash jq awk
+        run: apk add curl bash jq
 
       - name: Install dependencies
         run: yarn install
