@@ -27,9 +27,11 @@ export class SolutionService extends BaseService {
       key: ['solutions', 'list', group, type],
       queryFn: () => this.getListSolutions({ group, type }),
       cache: this.cacheType.GLOBAL,
-      staleTime: this.cacheTime.THIRTY_DAYS,
-      refetchInterval: false,
-      ...options
+      overrides: {
+        staleTime: this.cacheTime.THIRTY_DAYS,
+        refetchInterval: false,
+        ...options
+      }
     })
   }
 

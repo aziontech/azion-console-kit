@@ -1,12 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
-import { TABLE_FIRST_PAGE_OPTIONS, TABLE_PAGINATION_OPTIONS } from '@/services/v2/base/query/config'
-import { queryClient } from '@/services/v2/base/query/queryClient'
 
-const CACHE_KEY = 'origins-list'
-
-// Core function - direct API call without cache
-const listOriginsServiceCore = async ({
+export const listOriginsService = async ({
   id,
   orderBy = 'origin_id',
   sort = 'asc',
@@ -20,52 +15,8 @@ const listOriginsServiceCore = async ({
   })
 
   httpResponse = adapt(httpResponse)
+
   return parseHttpResponse(httpResponse)
-}
-
-// Public function - uses cache via queryClient
-export const listOriginsService = async ({
-  id,
-  orderBy = 'origin_id',
-  sort = 'asc',
-  page = 1,
-  pageSize = 200
-}) => {
-  const queryKey = [
-    'GLOBAL',
-    CACHE_KEY,
-    `edgeAppId=${id}`,
-    `orderBy=${orderBy}`,
-    `sort=${sort}`,
-    `page=${page}`,
-    `pageSize=${pageSize}`
-  ]
-
-  // Determine cache options based on page
-  const isFirstPage = page === 1
-  const options = isFirstPage ? TABLE_FIRST_PAGE_OPTIONS : TABLE_PAGINATION_OPTIONS
-
-  // Use queryClient to get cached data or fetch new
-  return await queryClient.ensureQueryData({
-    queryKey,
-    queryFn: () => listOriginsServiceCore({ id, orderBy, sort, page, pageSize }),
-    ...options
-  })
-}
-
-export const invalidateOriginsCache = async (edgeApplicationId) => {
-  await queryClient.removeQueries({
-    predicate: (query) => {
-      const queryKey = query.queryKey
-      return (
-        queryKey &&
-        Array.isArray(queryKey) &&
-        queryKey[0] === 'GLOBAL' &&
-        queryKey.includes(CACHE_KEY) &&
-        queryKey.includes(`edgeAppId=${edgeApplicationId}`)
-      )
-    }
-  })
 }
 
 const adapt = (httpResponse) => {

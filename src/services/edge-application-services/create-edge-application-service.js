@@ -9,12 +9,7 @@ export const createEdgeApplicationService = async (payload) => {
     body: adapt(payload)
   })
 
-  const result = parseHttpResponse(httpResponse)
-
-  const { edgeAppService } = await import('@/services/v2/edge-app/edge-app-service')
-  await edgeAppService.invalidateListCache()
-
-  return result
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (payload) => {
