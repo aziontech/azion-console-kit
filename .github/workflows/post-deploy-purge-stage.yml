@@ -1,4 +1,6 @@
 name: Purge Cache (STAGE)
+permissions:
+  contents: read
 
 on:
   workflow_run:
