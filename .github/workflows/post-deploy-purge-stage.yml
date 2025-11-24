@@ -56,7 +56,7 @@ jobs:
           fi
 
           COUNT=0
-          MAX_COUNT= 88 # 22min
+          MAX_COUNT=88
 
           while true; do
             COUNT=$((COUNT + 1))
