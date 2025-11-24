@@ -116,6 +116,7 @@
                     :class="classPasswordError"
                     @keydown.enter="validateAndSubmit"
                     :feedback="false"
+                    :disabled="isButtonLoading"
                     data-testid="signin-block__password-input"
                   />
                   <small
