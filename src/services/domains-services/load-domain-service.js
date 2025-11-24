@@ -33,7 +33,8 @@ const adapt = (httpResponse) => {
     active: body.is_active,
     mtlsVerification: body?.mtls_verification,
     mtlsTrustedCertificate: body?.mtls_trusted_ca_certificate_id || undefined,
-    environment: body.environment
+    environment: body.environment,
+    oldDomains: Array.isArray(body?.cnames) ? body.cnames : []
   }
 
   return {
