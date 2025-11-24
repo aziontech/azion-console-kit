@@ -3,9 +3,9 @@
     class="flex flex-col gap-2 w-full"
     data-testid="data-table-header"
   >
-    <slot name="actions" />
+    <slot name="first-line" />
     <Divider v-if="hasFiltersSlot" />
-    <slot name="filters" />
+    <slot name="second-line" />
   </div>
 </template>
 

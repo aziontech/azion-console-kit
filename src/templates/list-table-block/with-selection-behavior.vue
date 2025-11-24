@@ -29,7 +29,7 @@
           :exportTableCSV="handleExportTableDataToCSV"
         >
           <DataTable.Header>
-            <template #actions>
+            <template #first-line>
               <div class="flex flex-wrap justify-between gap-2 w-full">
                 <DataTable.Search
                   v-model="filters.global.value"

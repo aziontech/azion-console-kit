@@ -285,7 +285,7 @@
         <slot name="header">
           <div class="flex flex-col gap-2 w-full">
             <DataTable.Header>
-              <template #filters>
+              <template #first-line>
                 <div class="flex flex-wrap justify-between gap-2 w-full">
                   <!-- We dont have this fun yet, but we will add -in the future -->
                   <!-- So comment the component for now, in the future change the justify to justify-between  -->
