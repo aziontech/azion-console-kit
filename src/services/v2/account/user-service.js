@@ -1,31 +1,32 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { CACHE_TYPE } from '@/services/v2/base/query/config'
+
+export const userKeys = {
+  all: ['user'],
+  info: () => [...userKeys.all, 'info']
+}
 
 export class UserService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'user/me'
-  }
+  baseUrl = 'user/me'
 
   async fetchUserInfo() {
     const response = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
+      url: this.baseUrl,
       config: { baseURL: '/api' }
     })
     return response.data
   }
 
   async getUserInfo(options = {}) {
-    return await this.queryAsync({
-      key: ['user', 'info'],
-      queryFn: () => this.fetchUserInfo(),
-      cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
-    })
-  }
-
-  getCurrentUser() {
-    return this.getUserInfo()
+    const queryKey = userKeys.info()
+    const queryFn = async () => {
+      return this.fetchUserInfo()
+    }
+    const meta = {
+      cacheType: CACHE_TYPE.SENSITIVE
+    }
+    return this._ensureQueryData(queryKey, queryFn, meta, options)
   }
 }
 

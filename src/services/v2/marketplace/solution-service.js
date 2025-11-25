@@ -1,15 +1,19 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { unref } from 'vue'
+
+export const solutionsKeys = {
+  all: ['solutions'],
+  lists: () => [...solutionsKeys.all, 'list'],
+  list: (group, type) => [...solutionsKeys.lists(), group, type]
+}
 
 export class SolutionService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'marketplace/solution/'
-  }
+  baseUrl = 'marketplace/solution/'
 
-  getListSolutions = async ({ group, type }) => {
+  async getListSolutions({ group, type }) {
     const response = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
+      url: this.baseUrl,
       config: {
         baseURL: '/api',
         headers: {
@@ -22,25 +26,28 @@ export class SolutionService extends BaseService {
     return this.#adaptResponse(response)
   }
 
-  useListSolutions({ group, type }, options = {}) {
-    return this.useQuery({
-      key: ['solutions', 'list', group, type],
-      queryFn: () => this.getListSolutions({ group, type }),
-      cache: this.cacheType.GLOBAL,
-      overrides: {
+  useListSolutions(params, options = {}) {
+    return this._createQuery(
+      () => {
+        const unreffedParams = unref(params)
+        return solutionsKeys.list(unreffedParams.group, unreffedParams.type)
+      },
+      async () => {
+        const unreffedParams = unref(params)
+        return this.getListSolutions(unreffedParams)
+      },
+      {},
+      {
         staleTime: this.cacheTime.THIRTY_DAYS,
         refetchInterval: false,
         ...options
       }
-    })
+    )
   }
 
   async invalidateSolutionsCache() {
     await this.queryClient.invalidateQueries({
-      predicate: (query) =>
-        query.queryKey[0] === this.cacheType.GLOBAL &&
-        query.queryKey.includes('solutions') &&
-        query.queryKey.includes('list')
+      queryKey: solutionsKeys.lists()
     })
   }
 

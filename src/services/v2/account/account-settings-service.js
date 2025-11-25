@@ -1,27 +1,32 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { CACHE_TYPE } from '@/services/v2/base/query/config'
+
+export const accountSettingsKeys = {
+  all: ['account-settings'],
+  jobRole: () => [...accountSettingsKeys.all, 'job-role']
+}
 
 export class AccountSettingsService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'v4/iam/account'
-  }
+  baseUrl = 'v4/iam/account'
 
   async fetchAccountJobRole() {
     const response = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
+      url: this.baseUrl,
       config: { baseURL: '/api' }
     })
     return this._adaptJobRole(response.data)
   }
 
   async getAccountJobRole(options = {}) {
-    return await this.queryAsync({
-      key: ['account', 'job-role'],
-      queryFn: () => this.fetchAccountJobRole(),
-      cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
-    })
+    const queryKey = accountSettingsKeys.jobRole()
+    const queryFn = async () => {
+      return this.fetchAccountJobRole()
+    }
+    const meta = {
+      cacheType: CACHE_TYPE.SENSITIVE
+    }
+    return this._ensureQueryData(queryKey, queryFn, meta, options)
   }
 
   _adaptJobRole(response) {

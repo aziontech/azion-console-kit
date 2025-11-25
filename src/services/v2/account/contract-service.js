@@ -1,32 +1,33 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { CACHE_TYPE } from '@/services/v2/base/query/config'
+
+export const contractKeys = {
+  all: ['contract'],
+  servicePlans: () => [...contractKeys.all, 'service-plan'],
+  servicePlan: (clientId) => [...contractKeys.servicePlans(), clientId]
+}
 
 export class ContractService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'v3/contract'
-  }
+  baseUrl = 'v3/contract'
 
   async fetchContractServicePlan(clientId) {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${clientId}/products`,
+      url: `${this.baseUrl}/${clientId}/products`,
       config: { baseURL: '/api' }
     })
     return this._adaptContractPlan(response.data)
   }
 
   async getContractServicePlan(clientId, options = {}) {
-    return await this.queryAsync({
-      key: ['contract', 'service-plan', clientId],
-      queryFn: () => this.fetchContractServicePlan(clientId),
-      cache: this.cacheType.SENSITIVE,
-      overrides: {
-        ...options,
-        staleTime: this.cacheTime.FIFTEEN_MINUTES,
-        gcTime: this.cacheTime.THIRTY_MINUTES,
-        refetchInterval: this.cacheTime.THIRTY_MINUTES
-      }
-    })
+    const queryKey = contractKeys.servicePlan(clientId)
+    const queryFn = async () => {
+      return this.fetchContractServicePlan(clientId)
+    }
+    const meta = {
+      cacheType: CACHE_TYPE.SENSITIVE
+    }
+    return this._ensureQueryData(queryKey, queryFn, meta, options)
   }
 
   _adaptContractPlan(response) {
