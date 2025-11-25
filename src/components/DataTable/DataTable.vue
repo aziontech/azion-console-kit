@@ -5,12 +5,13 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="shouldShowTable"
+      v-if="shouldRenderTable"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
       :rowHover="rowHover"
       :dataKey="dataKey"
+      :showGridlines="showGridlines"
       :pt="pt"
       :class="[
         tableClass,
@@ -20,6 +21,8 @@
       v-model:filters="internalFilters"
       v-model:sortField="internalSortField"
       v-model:sortOrder="internalSortOrder"
+      :editMode="editMode"
+      v-model:editingRows="internalEditingRows"
       :paginator="paginator"
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="rows"
@@ -39,7 +42,9 @@
       @row-click="emit('rowClick', $event)"
       @page="emit('page', $event)"
       @sort="emit('sort', $event)"
-      :scrollable="scrollable"
+      @row-edit-save="emit('rowEditSave', $event)"
+      @row-edit-cancel="emit('rowEditCancel', $event)"
+      scrollable
       removableSort
       resizableColumns
       columnResizeMode="fit"
@@ -48,10 +53,7 @@
       paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     >
-      <template
-        v-if="hasHeaderSlot"
-        #header
-      >
+      <template #header>
         <slot name="header" />
       </template>
 
@@ -156,6 +158,10 @@
       type: Array,
       default: () => []
     },
+    showGridlines: {
+      type: Boolean,
+      default: false
+    },
     lazy: {
       type: Boolean,
       default: false
@@ -191,6 +197,14 @@
     sortOrder: {
       type: Number,
       default: 1
+    },
+    editMode: {
+      type: String,
+      default: 'row'
+    },
+    editingRows: {
+      type: Array,
+      default: () => []
     },
     paginator: {
       type: Boolean,
@@ -277,8 +291,14 @@
       default: () => []
     },
     emptyBlock: {
-      type: Boolean,
-      default: false
+      type: Object,
+      default: () => ({
+        title: 'No data has been created',
+        description: 'No data has been created.',
+        createButtonLabel: 'Create',
+        createPagePath: null,
+        documentationService: null
+      })
     },
     scrollable: {
       type: Boolean,
@@ -299,6 +319,10 @@
     appliedFilters: {
       type: Array,
       default: () => []
+    },
+    notShowEmptyBlock: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -311,16 +335,24 @@
     'update:sortField',
     'update:sortOrder',
     'update:expandedRowGroups',
-    'update:selection'
+    'update:selection',
+    'update:editingRows',
+    'rowEditSave',
+    'rowEditCancel',
+    'click-to-create'
   ])
 
   const slots = useSlots()
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
-  const shouldShowTable = computed(
-    () => props.data.length || props.loading || props.appliedFilters.length
-  )
+
+  const shouldRenderTable = computed(() => {
+    if (props.notShowEmptyBlock) {
+      return true
+    }
+    return props.data.length || props.loading || props.appliedFilters.length
+  })
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -347,7 +379,11 @@
     set: (value) => emit('update:selection', value)
   })
 
-  const hasHeaderSlot = computed(() => !!slots.header)
+  const internalEditingRows = computed({
+    get: () => props.editingRows,
+    set: (value) => emit('update:editingRows', value)
+  })
+
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {

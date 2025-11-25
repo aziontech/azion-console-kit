@@ -10,6 +10,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import * as Helpers from '@/helpers'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'list-edge-sql-databases' })
 
@@ -186,6 +187,15 @@
         pageTitle="SQL Database"
         data-testid="edge-sql-heading"
       >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Database"
+            @click="handleTrackEvent"
+            createPagePath="/sql-database/create"
+            data-testid="create_Database_button"
+          />
+        </template>
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -200,8 +210,6 @@
       </InlineMessage>
       <FetchListTableBlock
         ref="fetchListRef"
-        addButtonLabel="Database"
-        createPagePath="/sql-database/create"
         editPagePath="/sql-database/database"
         :enableEditClick="false"
         :listService="edgeSQLService.listDatabases"

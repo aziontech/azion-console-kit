@@ -5,9 +5,7 @@
     :columns="columns"
     :actions="actions"
     :apiFields="fields"
-    addButtonLabel="Bucket"
     defaultOrderingFieldName="-lastModified"
-    createPagePath="/object-storage/create"
     enableEditClick
     editPagePath="/object-storage"
     exportFileName="buckets"
@@ -64,7 +62,8 @@
   const isLoading = ref(true)
 
   const handleEdit = (bucket) => {
-    router.push(`/object-storage/edit/${bucket.name}`)
+    selectedBucket.value = bucket
+    router.push(`/object-storage/${bucket.name}/edit/main-settings`)
   }
 
   const handleDeleteBucket = async (data) => {
@@ -90,40 +89,40 @@
   const loadBuckets = async (params) => {
     try {
       isLoading.value = true
-      let bucketCount = 0
-      if (!buckets.value.length || bucketTableNeedRefresh.value) {
-        const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
-        buckets.value = listBucketsResponse.body
-        bucketCount = listBucketsResponse.count
+      const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
-        buckets.value.forEach((bucket) => {
-          bucket.size = '-'
-        })
+      buckets.value = listBucketsResponse.body
+      const bucketCount = listBucketsResponse.count
 
-        bucketTableNeedRefresh.value = false
-        if (route.params?.id) {
-          const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
-          if (bucketName) {
-            selectedBucket.value = bucketName
-          }
+      buckets.value.forEach((bucket) => {
+        bucket.size = '-'
+      })
+
+      bucketTableNeedRefresh.value = false
+
+      if (route.params?.id) {
+        const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
+        if (bucketName) {
+          selectedBucket.value = bucketName
         }
-
-        edgeStorageService
-          .getEdgeStorageMetrics()
-          .then((metricsResponse) => {
-            buckets.value.forEach((bucket) => {
-              const size = metricsResponse.find(
-                (metric) => metric.bucketName === bucket.name
-              )?.storedGb
-              bucket.size = size ? `${size} GB` : '-'
-            })
-          })
-          .catch(() => {})
       }
+
+      edgeStorageService
+        .getEdgeStorageMetrics()
+        .then((metricsResponse) => {
+          buckets.value.forEach((bucket) => {
+            const size = metricsResponse.find(
+              (metric) => metric.bucketName === bucket.name
+            )?.storedGb
+            bucket.size = size ? `${size} GB` : '-'
+          })
+        })
+        .catch(() => {})
+
       return {
         body: buckets.value,
-        count: bucketCount || buckets.value.length
+        count: bucketCount
       }
     } finally {
       isLoading.value = false

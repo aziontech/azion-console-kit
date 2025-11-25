@@ -23,6 +23,10 @@
     },
     tag: {
       type: Object
+    },
+    loadedItemLabel: {
+      type: String,
+      required: false
     }
   })
 
