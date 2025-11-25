@@ -51,6 +51,10 @@
     }
   }
 
+  const getFilters = computed(() => {
+    return getColumns.value.filter((column) => column.field !== 'active')
+  })
+
   const getColumns = computed(() => {
     return [
       {
@@ -144,6 +148,7 @@
         exportFileName="Edge DNS"
         hideLastModifiedColumn
         :csvMapper="csvMapper"
+        :allowedFilters="getFilters"
         :emptyBlock="{
           title: 'No zone has been added',
           description: 'Click the button below to add your first zone.',

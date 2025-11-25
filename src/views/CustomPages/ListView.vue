@@ -136,6 +136,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Custom Pages"
+        :allowedFilters="getColumns"
         :emptyBlock="{
           title: 'No custom pages have been created',
           description: 'Click the button below to create your first custom page.',

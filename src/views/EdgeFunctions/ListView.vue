@@ -63,7 +63,24 @@
       status: rowData.data?.content
     }
   }
-
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    },
+    {
+      header: 'Initiator Type',
+      field: 'execution_environment'
+    },
+    {
+      header: 'Status',
+      field: 'active'
+    }
+  ]
   const getColumns = computed(() => [
     {
       field: 'name',
@@ -172,6 +189,7 @@
         :frozen-columns="['name']"
         exportFileName="Functions"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Functions have been created',
           description: 'Click the button below to create your first Function.',

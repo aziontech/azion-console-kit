@@ -127,6 +127,13 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No variables found."
         :actions="actions"
+        :lazy="false"
+        :filters="[
+          {
+            field: 'key',
+            header: 'Key'
+          }
+        ]"
         :empty-block="{
           title: 'No variables have been created',
           description: 'Click the button below to create your first variable.',

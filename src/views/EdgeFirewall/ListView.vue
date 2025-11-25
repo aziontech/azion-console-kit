@@ -135,6 +135,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Firewalls"
+        :allowedFilters="getColumns"
         :emptyBlock="{
           title: 'No Firewall has been created.',
           description: 'Click the button below to create your first Firewall.',

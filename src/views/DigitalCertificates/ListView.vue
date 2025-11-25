@@ -257,6 +257,39 @@
     ]
   })
 
+  const allowedFilters = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return [
+        {
+          header: 'Name',
+          field: 'name'
+        },
+        {
+          header: 'ID',
+          field: 'id'
+        }
+      ]
+    }
+    return [
+      {
+        header: 'Name',
+        field: 'name'
+      },
+      {
+        header: 'ID',
+        field: 'id'
+      },
+      {
+        header: 'Type',
+        field: 'type'
+      },
+      {
+        header: 'Managed',
+        field: 'managed'
+      }
+    ]
+  })
+
   const changeListServiceByCertificateType = () => {
     listTableBlock.value?.reload({}, listService.value)
   }
@@ -348,6 +381,7 @@
         :frozenColumns="['name']"
         exportFileName="Certificate Manager"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No digital certificate has been added',
           description: 'Click the button below to add your first digital certificate.',

@@ -156,7 +156,9 @@
       }
     ]
   })
-
+  const allowedFilters = computed(() =>
+    getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
+  )
   const titleEmptyPage = computed(
     () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
@@ -199,6 +201,7 @@
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColumns="['name']"
         exportFileName="Workload"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,

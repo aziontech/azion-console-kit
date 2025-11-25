@@ -43,6 +43,17 @@
     }
   ]
 
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    }
+  ]
+
   const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
@@ -148,6 +159,7 @@
         :frozenColumns="['name']"
         exportFileName="WAF Rules"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No WAF rules have been created',
           description: 'Click the button below to create your first WAF rule.',

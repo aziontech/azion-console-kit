@@ -52,6 +52,7 @@
             exportFileName="Data Stream"
             :csvMapper="csvMapper"
             :documentationService="documentationService"
+            :allowedFilters="getFilters"
             :emptyBlock="{
               title: 'No stream has been created.',
               description: 'Click the button below to create your first stream.',
@@ -219,6 +220,15 @@
           })
       }
     ]
+  })
+
+  const getFilters = computed(() => {
+    return getColumns.value.filter(
+      (column) =>
+        column.field !== 'dataSource' &&
+        column.field !== 'templateName' &&
+        column.field !== 'endpointType'
+    )
   })
 
   onBeforeRouteLeave((to, from, next) => {

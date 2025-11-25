@@ -79,6 +79,17 @@
       }
     ]
   })
+
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    }
+  ]
 </script>
 
 <template>
@@ -112,6 +123,7 @@
         :frozen-columns="['name']"
         exportFileName="Network Lists"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No network lists have been added',
           description:
