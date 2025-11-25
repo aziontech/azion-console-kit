@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -62,7 +63,24 @@
       status: rowData.data?.content
     }
   }
-
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    },
+    {
+      header: 'Initiator Type',
+      field: 'execution_environment'
+    },
+    {
+      header: 'Status',
+      field: 'active'
+    }
+  ]
   const getColumns = computed(() => [
     {
       field: 'name',
@@ -140,13 +158,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Functions" />
+      <PageHeadingBlock pageTitle="Functions">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Function"
+                @click="handleCreateTrackEvent"
+                createPagePath="functions/create?origin=list"
+                data-testid="create_Function_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
-        addButtonLabel="Function"
         createPagePath="functions/create?origin=list"
         editPagePath="functions/edit"
         @on-before-go-to-add-page="handleCreateTrackEvent"
@@ -158,10 +189,12 @@
         :frozen-columns="['name']"
         exportFileName="Functions"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Functions have been created',
           description: 'Click the button below to create your first Function.',
           createButtonLabel: 'Function',
+          createPagePath: 'functions/create?origin=list',
           documentationService: documentationService
         }"
       />

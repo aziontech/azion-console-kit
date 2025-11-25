@@ -12,6 +12,7 @@
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -155,7 +156,9 @@
       }
     ]
   })
-
+  const allowedFilters = computed(() =>
+    getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
+  )
   const titleEmptyPage = computed(
     () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
@@ -167,16 +170,28 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                :label="handleTextDomainWorkload.singularTitle"
+                @click="handleTrackEvent"
+                :createPagePath="createDomainPath"
+                :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
         :listService="workloadService.listWorkloads"
         :columns="getColumns"
-        @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
@@ -186,6 +201,7 @@
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColumns="['name']"
         exportFileName="Workload"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,

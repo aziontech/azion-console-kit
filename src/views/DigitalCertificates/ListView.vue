@@ -257,6 +257,39 @@
     ]
   })
 
+  const allowedFilters = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return [
+        {
+          header: 'Name',
+          field: 'name'
+        },
+        {
+          header: 'ID',
+          field: 'id'
+        }
+      ]
+    }
+    return [
+      {
+        header: 'Name',
+        field: 'name'
+      },
+      {
+        header: 'ID',
+        field: 'id'
+      },
+      {
+        header: 'Type',
+        field: 'type'
+      },
+      {
+        header: 'Managed',
+        field: 'managed'
+      }
+    ]
+  })
+
   const changeListServiceByCertificateType = () => {
     listTableBlock.value?.reload({}, listService.value)
   }
@@ -308,14 +341,32 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Certificate Manager">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <SelectButton
+                v-model="digitalCertificateTypeSelected"
+                :options="optionsSelectButton"
+                aria-labelledby="basic"
+                class="h-9 p-1"
+              />
+            </div>
+            <div class="flex gap-2">
+              <CreateMenuBlock
+                addButtonLabel="Certificate"
+                :items="items"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         :listService="listService"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
-        addButtonLabel="Certificate Manager"
         createPagePath="digital-certificates/create"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -330,6 +381,7 @@
         :frozenColumns="['name']"
         exportFileName="Certificate Manager"
         :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No digital certificate has been added',
           description: 'Click the button below to add your first digital certificate.',
@@ -338,22 +390,6 @@
           documentationService: documentationCatalog.digitalCertificates
         }"
       >
-        <template #select-buttons>
-          <div class="flex flex-row gap-2">
-            <SelectButton
-              v-model="digitalCertificateTypeSelected"
-              :options="optionsSelectButton"
-              aria-labelledby="basic"
-              class="h-9 p-1"
-            />
-          </div>
-        </template>
-        <template #addButton>
-          <CreateMenuBlock
-            addButtonLabel="Certificate Manager"
-            :items="items"
-          />
-        </template>
       </FetchListTableBlock>
     </template>
   </ContentBlock>

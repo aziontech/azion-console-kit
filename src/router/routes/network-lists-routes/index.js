@@ -61,7 +61,9 @@ export const networkListsRoutes = {
             to: '/network-lists'
           },
           {
-            label: 'Edit Network List'
+            label: 'Edit Network List',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

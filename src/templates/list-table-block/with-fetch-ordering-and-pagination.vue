@@ -140,6 +140,10 @@
     hideLastModifiedColumn: {
       type: Boolean,
       default: false
+    },
+    allowedFilters: {
+      type: Array,
+      default: () => []
     }
   })
   // Use the composable for all data table functionality
@@ -152,6 +156,8 @@
     columnSelectorPanel,
     filters,
     filtersDynamically,
+    appliedFilters,
+    filterPanel,
     totalRecords,
     firstItemIndex,
     itemsByPage,
@@ -167,7 +173,6 @@
 
     // Functions
     reload,
-    navigateToAddPage,
     editItemSelected,
     actionOptions,
     executeCommand,
@@ -180,6 +185,9 @@
     sortByLastModified,
     fetchOnSearch,
     handleSearchValue,
+    toggleFilter,
+    handleApplyFilter,
+    handleRemoveFilter,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     extractFieldValue,
@@ -239,20 +247,11 @@
     }
     return null
   }
-
-  const navigateToOtherLink = () => {
-    window.open('https://www.azion.com', '_blank')
-  }
-
-  const navigateToGetHelp = () => {
-    window.open('https://www.azion.com', '_blank')
-  }
 </script>
 
 <template>
   <div
     class="max-w-full"
-    :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
     <DataTable
@@ -287,6 +286,7 @@
       :showLastModifiedColumn="!hideLastModifiedColumn"
       :emptyBlock="emptyBlock"
       :hasEmptyBlockSlot="!!slots.emptyBlock"
+      :appliedFilters="appliedFilters"
     >
       <template
         #header
@@ -294,73 +294,27 @@
       >
         <slot name="header">
           <div class="flex flex-col gap-2 w-full">
-            <DataTable.Header>
-              <template #actions>
-                <div class="flex justify-between gap-2 w-full">
-                  <DataTable.Actions>
-                    <div class="flex gap-2">
-                      <PrimeButton
-                        size="small"
-                        link
-                        @click="navigateToOtherLink"
-                      >
-                        Other Link
-                      </PrimeButton>
-                      <PrimeButton
-                        size="small"
-                        link
-                        @click="navigateToGetHelp"
-                      >
-                        Get Help
-                      </PrimeButton>
-                    </div>
-                    <slot
-                      name="addButton"
-                      data-testid="data-table-add-button"
-                      :reload="reload"
-                      :data="data"
-                    >
-                      <PrimeButton
-                        size="small"
-                        icon="pi pi-upload"
-                        @click="handleOtherActions"
-                        label="Other Actions"
-                        severity="primary"
-                        outlined
-                        data-testid="data-table-other-actions-button"
-                      />
-                      <DataTable.AddButton
-                        size="small"
-                        v-if="addButtonLabel"
-                        :disabled="disabledAddButton"
-                        @click="navigateToAddPage"
-                        :label="addButtonLabel"
-                        :data-testid="`create_${addButtonLabel}_button`"
-                      />
-                    </slot>
-                  </DataTable.Actions>
-                </div>
-              </template>
-
-              <template #filters>
+            <DataTable.Header :showDivider="appliedFilters.length">
+              <template #first-line>
                 <div class="flex flex-wrap justify-between gap-2 w-full">
-                  <!-- We dont have this fun yet, but we will add -in the future -->
-                  <!-- So comment the component for now, in the future change the justify to justify-between  -->
-                  <!-- <PrimeButton
-                    outlined
-                    icon="pi pi-filter"
-                    label="Filter"
-                    size="small"
-                    @click="toggleFilter"
-                    data-testid="data-table-actions-column-header-toggle-filter"
-                  /> -->
-                  <DataTable.Search
-                    v-model="filters.global.value"
-                    @search="fetchOnSearch"
-                    @input="handleSearchValue"
-                  >
-                    <slot name="select-buttons" />
-                  </DataTable.Search>
+                  <div class="flex gap-2 w-[400px]">
+                    <PrimeButton
+                      v-if="allowedFilters.length"
+                      outlined
+                      icon="pi pi-filter"
+                      size="small"
+                      @click="toggleFilter"
+                      data-testid="data-table-actions-column-header-toggle-filter"
+                    />
+
+                    <DataTable.Search
+                      v-model="filters.global.value"
+                      @search="fetchOnSearch"
+                      @input="handleSearchValue"
+                    >
+                      <slot name="select-buttons" />
+                    </DataTable.Search>
+                  </div>
                   <div class="flex gap-2">
                     <PrimeButton
                       outlined
@@ -402,6 +356,15 @@
                     </OverlayPanel>
                   </div>
                 </div>
+              </template>
+              <template
+                #second-line
+                v-if="appliedFilters.length"
+              >
+                <DataTable.AppliedFilters
+                  :applied-filters="appliedFilters"
+                  @remove="handleRemoveFilter"
+                />
               </template>
             </DataTable.Header>
           </div>
@@ -544,6 +507,14 @@
       :last-editor="popupData.lastEditor"
       :last-modified="popupData.lastModified"
       :position="popupPosition"
+    />
+
+    <!-- Filter Panel -->
+    <DataTable.Filter
+      v-if="allowedFilters.length"
+      ref="filterPanel"
+      :filters="allowedFilters"
+      @apply="handleApplyFilter"
     />
   </div>
 </template>

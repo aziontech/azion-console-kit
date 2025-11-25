@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length || loading"
+      v-if="shouldShowTable"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -295,6 +295,10 @@
     hasEmptyBlockSlot: {
       type: Boolean,
       default: false
+    },
+    appliedFilters: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -314,6 +318,9 @@
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
+  const shouldShowTable = computed(
+    () => props.data.length || props.loading || props.appliedFilters.length
+  )
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -459,5 +466,9 @@
 
   :deep(.p-datatable-wrapper) {
     scrollbar-width: thin;
+  }
+  :deep(.p-datatable-header) {
+    padding-left: 0;
+    padding-right: 0;
   }
 </style>

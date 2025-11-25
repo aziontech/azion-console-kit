@@ -1,18 +1,26 @@
 <template>
   <div
-    class="flex flex-col gap-2 w-full"
+    class="flex flex-col w-full"
     data-testid="data-table-header"
+    :class="{ 'gap-2': showDivider }"
   >
-    <slot name="actions" />
-    <Divider v-if="hasFiltersSlot" />
-    <slot name="filters" />
+    <div class="px-3">
+      <slot name="first-line" />
+    </div>
+    <Divider v-if="showDivider" />
+    <div class="px-3">
+      <slot name="second-line" />
+    </div>
   </div>
 </template>
 
 <script setup>
   import Divider from 'primevue/divider'
-  import { computed, useSlots } from 'vue'
 
-  const slots = useSlots()
-  const hasFiltersSlot = computed(() => !!slots.filters)
+  defineProps({
+    showDivider: {
+      type: Boolean,
+      default: true
+    }
+  })
 </script>

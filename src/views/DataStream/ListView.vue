@@ -1,7 +1,21 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Data Stream" />
+      <PageHeadingBlock pageTitle="Data Stream">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Stream"
+                createPagePath="/data-stream/create"
+                :disabled="hasNoPermissionToCreateDataStream || disabledList"
+                data-testid="create_Stream_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <div class="flex flex-col gap-3 items-start">
@@ -25,8 +39,6 @@
         <div class="w-full">
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
-            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
-            addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
             :listService="dataStreamService.listDataStreamService"
@@ -40,6 +52,7 @@
             exportFileName="Data Stream"
             :csvMapper="csvMapper"
             :documentationService="documentationService"
+            :allowedFilters="getFilters"
             :emptyBlock="{
               title: 'No stream has been created.',
               description: 'Click the button below to create your first stream.',
@@ -66,6 +79,8 @@
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
+
   defineOptions({ name: 'data-stream-view' })
 
   defineProps({
@@ -205,6 +220,15 @@
           })
       }
     ]
+  })
+
+  const getFilters = computed(() => {
+    return getColumns.value.filter(
+      (column) =>
+        column.field !== 'dataSource' &&
+        column.field !== 'templateName' &&
+        column.field !== 'endpointType'
+    )
   })
 
   onBeforeRouteLeave((to, from, next) => {

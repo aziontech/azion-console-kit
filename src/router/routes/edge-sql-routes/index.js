@@ -44,7 +44,9 @@ export const edgeSQLRoutes = {
             to: '/sql-database'
           },
           {
-            label: 'Edit Database'
+            label: 'Edit Database',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

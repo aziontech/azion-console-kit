@@ -124,6 +124,10 @@
       })
       .track()
   }
+
+  defineExpose({
+    openCreateDrawer: openCreateDeviceGroupDrawer
+  })
 </script>
 
 <template>

@@ -103,7 +103,9 @@ export const edgeApplicationRoutes = {
             to: '/applications'
           },
           {
-            label: 'Edit Application'
+            label: 'Edit Application',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

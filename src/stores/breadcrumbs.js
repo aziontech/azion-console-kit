@@ -6,7 +6,7 @@ export const useBreadcrumbs = defineStore({
     items: []
   }),
   actions: {
-    update(items, route = null) {
+    update(items, route = null, entityName = null) {
       if (!route) {
         this.items = items
         return
@@ -29,6 +29,24 @@ export const useBreadcrumbs = defineStore({
             label: paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel
           }
         }
+
+        if (item.dynamic && item.routeParam && entityName) {
+          return {
+            ...item,
+            label: entityName
+          }
+        }
+
+        if (item.dynamic && item.routeParam) {
+          const paramValue = route.params[item.routeParam]
+          const isNumericId = paramValue && !isNaN(paramValue)
+          return {
+            ...item,
+            label: isNumericId ? null : paramValue || item.label,
+            isLoading: isNumericId
+          }
+        }
+
         return item
       })
     }

@@ -60,7 +60,9 @@ export const edgeDnsRoutes = {
             to: '/edge-dns'
           },
           {
-            label: 'Edit Zone'
+            label: 'Edit Zone',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

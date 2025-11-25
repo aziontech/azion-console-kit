@@ -5,6 +5,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
   import CloneBlock from '@/templates/clone-block'
 
   defineOptions({ name: 'edge-firewall-view' })
@@ -104,11 +105,24 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Firewalls"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edge Firewall">
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Firewall"
+                @click="handleTrackEvent"
+                createPagePath="/firewalls/create"
+                data-testid="create_Firewall_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        addButtonLabel="Firewall"
         createPagePath="/firewalls/create"
         editPagePath="/firewalls/edit"
         :listService="edgeFirewallService.listEdgeFirewallService"
@@ -121,11 +135,12 @@
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Firewalls"
+        :allowedFilters="getColumns"
         :emptyBlock="{
           title: 'No Firewall has been created.',
           description: 'Click the button below to create your first Firewall.',
           createButtonLabel: 'Firewall',
-          createPagePath: '/firewall/create',
+          createPagePath: '/firewalls/create',
           documentationService: documentationService
         }"
       />

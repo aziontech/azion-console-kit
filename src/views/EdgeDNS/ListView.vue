@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -37,7 +38,7 @@
   }
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
-      productName: 'Edge DNS Zone'
+      productName: 'Edge DNS'
     })
   }
 
@@ -49,6 +50,10 @@
       active: rowData.data?.content || rowData.active
     }
   }
+
+  const getFilters = computed(() => {
+    return getColumns.value.filter((column) => column.field !== 'active')
+  })
 
   const getColumns = computed(() => {
     return [
@@ -104,20 +109,30 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edge DNS"
+        pageTitle="Zones"
         description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
       >
         <template #default>
-          <copyBlock
-            :value="nameServers"
-            label="Copy Nameserver Values"
-          />
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <copyBlock
+                :value="nameServers"
+                label="Copy Nameserver Values"
+              />
+              <DataTableActionsButtons
+                size="small"
+                label="Zone"
+                @click="handleTrackEvent"
+                createPagePath="edge-dns/create"
+                data-testid="create_Zone_button"
+              />
+            </div>
+          </div>
         </template>
       </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
         :listService="edgeDNSService.listEdgeDNSService"
@@ -133,6 +148,7 @@
         exportFileName="Edge DNS"
         hideLastModifiedColumn
         :csvMapper="csvMapper"
+        :allowedFilters="getFilters"
         :emptyBlock="{
           title: 'No zone has been added',
           description: 'Click the button below to add your first zone.',
