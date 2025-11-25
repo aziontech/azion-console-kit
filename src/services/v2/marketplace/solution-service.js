@@ -36,9 +36,7 @@ export class SolutionService extends BaseService {
         const unreffedParams = unref(params)
         return this.getListSolutions(unreffedParams)
       },
-      {
-        persist: false
-      },
+      {},
       {
         staleTime: this.cacheTime.THIRTY_DAYS,
         refetchInterval: false,
