@@ -22,7 +22,6 @@
       >
         <!-- AdvancedFilterSystem - novo filtro unificado (tempo + campos), substitui IntervalFilterBlock/ContentFilterBlock -->
         <AdvancedFilterSystem
-          v-if="filterFields.length"
           v-model:filterData="advancedFilterModel"
           :fieldsInFilter="filterFields"
           :filterDateRangeMaxDays="7"
@@ -95,8 +94,7 @@
       getCurrentInfo,
       getDatasetAvailableFilters,
       infoAvailableFiltersCurrent,
-      dashboardCurrent,
-      getIsLoadingFilters
+      dashboardCurrent
     },
     actions: {
       setInitialPageAndDashboardCurrent,
@@ -160,8 +158,8 @@
   })
 
   const isLoadingFilters = computed(() => {
-    if (!filterData.value) return true
-    return getIsLoadingFilters({ filters: filterData.value })
+    if (!filterFields.value.length) return true
+    return false
   })
 
   // Campos de filtro disponíveis, construídos a partir de dataset/info disponíveis do módulo
