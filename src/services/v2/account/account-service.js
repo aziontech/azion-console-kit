@@ -27,7 +27,8 @@ export class AccountService extends BaseService {
     const meta = {
       cacheType: CACHE_TYPE.SENSITIVE
     }
-    return this._ensureQueryData(queryKey, queryFn, meta, options)
+    const result = await this._ensureQueryData(queryKey, queryFn, meta, options)
+    return result
   }
 
   _adaptAccountInfo(response) {

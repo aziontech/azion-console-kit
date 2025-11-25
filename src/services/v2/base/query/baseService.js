@@ -95,6 +95,6 @@ export class BaseService {
       ...cacheOptions,
       ...options
     })
-    return result.data
+    return result
   }
 }

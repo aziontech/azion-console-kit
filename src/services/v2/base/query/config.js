@@ -50,7 +50,15 @@ export const PERSISTENCE_CONFIG = {
   MAX_AGE: CACHE_TIME.TWENTY_FOUR_HOURS,
   DEHYDRATE_OPTIONS: {
     shouldDehydrateQuery: (query) => {
-      return query.state.status === 'success'
+      if (query.state.status !== 'success') {
+        return false
+      }
+
+      if (query.meta?.persist === false) {
+        return false
+      }
+
+      return true
     }
   },
   HYDRATE_OPTIONS: {
