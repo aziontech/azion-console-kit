@@ -19,6 +19,10 @@
     },
     filterDateRangeMaxDays: {
       type: Number
+    },
+    isLoadingFilters: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -84,6 +88,19 @@
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
     <div
+      v-if="props.isLoadingFilters"
+      class="w-full flex flex-col gap-4 animate-pulse"
+    >
+      <div class="flex gap-2 w-full">
+        <div class="h-10 w-14 rounded-md surface-200" />
+        <div class="h-10 flex-1 rounded-md surface-200" />
+        <div class="h-10 w-44 rounded-md surface-200" />
+        <div class="h-10 w-24 rounded-md surface-200" />
+      </div>
+    </div>
+
+    <div
+      v-else
       class="flex w-full flex-column md:flex-col items-center"
       :class="{ 'gap-6 md:gap-4': filterData.fields.length }"
     >
