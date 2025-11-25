@@ -1,5 +1,9 @@
 <template>
-  <div class="gap-2 flex items-center relative w-full justify-between pr-1">
+  <div
+    class="flex items-center gap-1 relative w-full pr-1"
+    @mouseenter="handleCellMouseEnter"
+    @mouseleave="handleCellMouseLeave"
+  >
     <p
       ref="textElement"
       class="overflow-hidden whitespace-nowrap text-ellipsis flex-1 min-w-0"
@@ -11,6 +15,7 @@
     <CopyBlock
       v-if="shouldShowCopy"
       :value="text"
+      :isCopyVisible="isCellHovered"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
     <Teleport to="body">
@@ -44,6 +49,7 @@
   const popupPosition = ref({ posX: 0, posY: 0 })
   const hoverTimeout = ref(null)
   const popupHovered = ref(false)
+  const isCellHovered = ref(false)
 
   const shouldShowCopy = computed(() => {
     return props.showCopy && props.text
@@ -101,5 +107,13 @@
   const handlePopupMouseLeave = () => {
     popupHovered.value = false
     showPopup.value = false
+  }
+
+  const handleCellMouseEnter = () => {
+    isCellHovered.value = true
+  }
+
+  const handleCellMouseLeave = () => {
+    isCellHovered.value = false
   }
 </script>

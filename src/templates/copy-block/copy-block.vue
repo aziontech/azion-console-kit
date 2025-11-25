@@ -2,7 +2,6 @@
   <div>
     <PrimeButton
       :icon="icon"
-      outlined
       data-testid="copy-block__copy-button"
       type="button"
       :aria-label="labelText"
@@ -10,6 +9,10 @@
       :disabled="disabled"
       size="small"
       @click="animate"
+      :class="[
+        'p-button-text transition-opacity duration-200',
+        isCopyVisible ? 'opacity-50' : 'opacity-0'
+      ]"
     />
   </div>
 </template>
@@ -30,6 +33,10 @@
     value: {
       type: String,
       required: true
+    },
+    isCopyVisible: {
+      type: Boolean,
+      default: false
     }
   })
   const copied = ref(false)
