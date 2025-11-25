@@ -1,11 +1,11 @@
-name: Purge Cache (STAGE)
+name: Purge Cache (PRODUCTION)
 permissions:
   contents: read
 
 on:
   workflow_run:
     workflows:
-      - Deploy Console Kit (STAGE)
+      - Deploy Console Kit (PRODUCTION)
     types:
       - completed
 env:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
-      CONSOLE_URL: https://stage-console.azion.com
+      CONSOLE_URL: https://console.azion.com
     concurrency:
       group: deploy-console
       cancel-in-progress: false
