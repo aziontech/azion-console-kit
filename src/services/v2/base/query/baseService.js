@@ -12,6 +12,10 @@ export class BaseService {
   cacheType = CACHE_TYPE
   cacheTime = CACHE_TIME
 
+  _toParams(params) {
+    return unref(params)
+  }
+
   _createQuery(queryKey, queryFn, meta = {}, options = {}) {
     const { cacheType = CACHE_TYPE.GLOBAL, persist = true } = meta
     const cacheOptions = getCacheOptions(cacheType)

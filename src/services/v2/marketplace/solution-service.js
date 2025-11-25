@@ -1,5 +1,4 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { unref } from 'vue'
 
 export const solutionsKeys = {
   all: ['solutions'],
@@ -29,13 +28,10 @@ export class SolutionService extends BaseService {
   useListSolutions(params, options = {}) {
     return this._createQuery(
       () => {
-        const unreffedParams = unref(params)
-        return solutionsKeys.list(unreffedParams.group, unreffedParams.type)
+        const { group, type } = this._toParams(params)
+        return solutionsKeys.list(group, type)
       },
-      async () => {
-        const unreffedParams = unref(params)
-        return this.getListSolutions(unreffedParams)
-      },
+      () => this.getListSolutions(this._toParams(params)),
       {},
       {
         staleTime: this.cacheTime.THIRTY_DAYS,
