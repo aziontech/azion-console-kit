@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
-      STAGE_CONSOLE_URL: https://stage-console.azion.com
+      CONSOLE_URL: https://stage-console.azion.com
     concurrency:
       group: deploy-console
       cancel-in-progress: false
@@ -44,7 +44,7 @@ jobs:
         run: |
           set -e
 
-          PACKAGE_URL="$STAGE_CONSOLE_URL/package.json"
+          PACKAGE_URL="$CONSOLE_URL/package.json"
 
           echo "Fetching initial version from $PACKAGE_URL..."
           INITIAL_VERSION=$(curl -s "$PACKAGE_URL" | jq -r '.version // empty')
@@ -73,8 +73,8 @@ jobs:
               echo "Current version is empty; keeping previous value and continuing to poll."
             elif [ "$CURRENT_VERSION" != "$INITIAL_VERSION" ]; then
               echo "Version changed from $INITIAL_VERSION to $CURRENT_VERSION. Purging application cache..."
-              azion purge --wildcard "${STAGE_CONSOLE_URL}/*" --layer edge_caching
-              echo "Purge of ${STAGE_CONSOLE_URL}/* completed."
+              azion purge --wildcard "${CONSOLE_URL}/*" --layer edge_caching
+              echo "Purge of ${CONSOLE_URL}/* completed."
               break
             fi
 
