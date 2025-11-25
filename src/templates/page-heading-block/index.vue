@@ -23,6 +23,10 @@
     },
     tag: {
       type: Object
+    },
+    loadedItemLabel: {
+      type: String,
+      required: false
     }
   })
 
@@ -42,13 +46,24 @@
   })
 
   const hasContent = computed(() => props.pageTitle || props.description || hasDefaultSlot.value)
+
+  const breadcrumbModel = computed(() => {
+    const items = breadcrumbs.items || []
+    if (props.loadedItemLabel) {
+      const last = items[items.length - 1]
+      if (!last || last.label !== props.loadedItemLabel) {
+        return [...items, { label: props.loadedItemLabel }]
+      }
+    }
+    return items
+  })
 </script>
 
 <template>
   <div class="w-full flex-col justify-center items-start inline-flex">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
-      :model="breadcrumbs.items"
+      :model="breadcrumbModel"
       class="-ml-1.5 overflow-auto w-full"
       :pt="{
         label: { class: 'whitespace-nowrap' },
