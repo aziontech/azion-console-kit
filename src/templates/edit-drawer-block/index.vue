@@ -232,17 +232,18 @@
           </fieldset>
         </div>
         <!-- Form Content -->
-        <form
-          v-else
-          @submit.prevent="handleSubmit"
-          class="w-full flex flex-col gap-8"
-        >
-          <slot
-            name="formFields"
-            :errors="errors"
-            :disabledFields="isLoading"
-          />
-        </form>
+        <div v-show="!loading">
+          <form
+            @submit.prevent="handleSubmit"
+            class="w-full flex flex-col gap-8"
+          >
+            <slot
+              name="formFields"
+              :errors="errors"
+              :disabledFields="isLoading"
+            />
+          </form>
+        </div>
       </div>
       <div class="w-full fixed left-0 bottom-0 z-1">
         <slot
