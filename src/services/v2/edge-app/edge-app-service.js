@@ -1,14 +1,24 @@
+import { toValue } from 'vue'
 import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 
+export const edgeAppKeys = {
+  all: ['edge-apps'],
+  lists: () => [...edgeAppKeys.all, 'list'],
+  list: ({ page, pageSize, fields, search, ordering }) => [
+    ...edgeAppKeys.lists(),
+    page,
+    pageSize,
+    fields,
+    search,
+    ordering
+  ]
+}
 export class EdgeAppService extends BaseService {
-  constructor() {
-    super()
-    this.adapter = EdgeAppAdapter
-    this.baseURL = 'v4/workspace/applications'
-  }
+  adapter = EdgeAppAdapter
+  baseURL = 'v4/workspace/applications'
 
-  listEdgeApplicationsService = async (
+  getListEdgeApplicationsService = async (
     params = {
       pageSize: 10,
       fields: ['id', 'name', 'active', 'last_editor', 'last_modified', 'product_version']
@@ -26,6 +36,14 @@ export class EdgeAppService extends BaseService {
       body,
       count
     }
+  }
+
+  listEdgeApplicationsService = (params) => {
+    return this._createQuery(
+      () => edgeAppKeys.list(toValue(params)),
+      () => this.getListEdgeApplicationsService(toValue(params)),
+      { persist: toValue(params)?.page === 1 }
+    )
   }
 
   listEdgeApplicationsServiceDropdown = async (
