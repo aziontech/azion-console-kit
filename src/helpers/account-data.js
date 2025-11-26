@@ -37,8 +37,6 @@ export const loadUserAndAccountInfo = async () => {
 
   await solutionService.invalidateSolutionsCache()
 
-  // Executes prefetches configured for 'login' trigger
-  // Non-blocking: login continues even if prefetch fails
   prefetchByTrigger(PREFETCH_TRIGGERS.LOGIN, {
     edgeAppService
   })

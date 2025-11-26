@@ -22,9 +22,6 @@ import { onMounted } from 'vue'
 export function usePrefetchController(options = {}) {
   const { trigger, params = {}, names = null } = options
 
-  /**
-   * Executes prefetch based on trigger or specific names
-   */
   const executePrefetch = async () => {
     if (names && Array.isArray(names)) {
       await prefetchMany(names, params)
@@ -33,7 +30,6 @@ export function usePrefetchController(options = {}) {
     }
   }
 
-  // Executes automatically on mount if trigger or names were provided
   if (trigger || names) {
     onMounted(() => {
       executePrefetch()
@@ -65,7 +61,6 @@ export function usePrefetchEdgeAppOnAccess(edgeApplicationId, options = {}) {
       edgeFunctionsEnabled
     }
 
-    // Executes all 'viewEdgeApp' prefetches for Edge Applications
     await prefetchByTrigger(PREFETCH_TRIGGERS.VIEW_EDGE_APP, params)
   }
 

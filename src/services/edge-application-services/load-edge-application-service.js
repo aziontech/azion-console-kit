@@ -12,18 +12,14 @@ const invalidatePreviousLoadCache = async (currentId) => {
 
       const isEdgeAppRelatedCache =
         (queryKey[0] === CACHE_TYPE.MEDIUM || queryKey[0] === CACHE_TYPE.GLOBAL) &&
-        (
-          queryKey.includes(CACHE_KEY) ||
-          queryKey.some((key) => typeof key === 'string' && key.startsWith('edgeAppId='))
-        )
+        (queryKey.includes(CACHE_KEY) ||
+          queryKey.some((key) => typeof key === 'string' && key.startsWith('edgeAppId=')))
 
       if (!isEdgeAppRelatedCache) return false
 
       const isCurrentId = queryKey.some(
-        (key) => typeof key === 'string' && (
-          key === `id=${currentId}` ||
-          key === `edgeAppId=${currentId}`
-        )
+        (key) =>
+          typeof key === 'string' && (key === `id=${currentId}` || key === `edgeAppId=${currentId}`)
       )
 
       return !isCurrentId

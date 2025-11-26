@@ -28,14 +28,9 @@ import { waitForPersistenceRestore } from './queryPlugin'
  * 3. Execute via prefetchByTrigger(TRIGGER_NAME, params)
  */
 export const PREFETCH_TRIGGERS = {
-  // Authentication
   LOGIN: 'login',
-
-  // Specific views
   VIEW_EDGE_APP: 'viewEdgeApp',
   VIEW_EDGE_FIREWALL: 'viewEdgeFirewall',
-
-  // Manual (explicit execution)
   MANUAL: 'manual'
 }
 
@@ -76,7 +71,6 @@ export async function prefetch(name, params = {}) {
     return Promise.resolve()
   }
 
-  // Check if enabled
   if (config.options?.enabled !== undefined) {
     const enabled =
       typeof config.options.enabled === 'function'
@@ -94,7 +88,6 @@ export async function prefetch(name, params = {}) {
   const cacheOptions = getCacheOptions(config.cache)
   const finalOptions = { ...cacheOptions, ...config.options }
 
-  // TanStack Query already manages deduplication automatically
   return queryClient.prefetchQuery({
     queryKey,
     queryFn,

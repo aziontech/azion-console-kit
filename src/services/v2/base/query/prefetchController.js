@@ -22,7 +22,7 @@ class PrefetchTask {
     this.queryFn = queryFn
     this.options = options
     this.promise = null
-    this.status = 'idle' // 'idle' | 'pending' | 'completed' | 'error'
+    this.status = 'idle'
     this.createdAt = Date.now()
   }
 
@@ -30,12 +30,10 @@ class PrefetchTask {
    * Executes the prefetch, reusing promise if already pending
    */
   async execute() {
-    // If already pending, returns the existing promise
     if (this.status === 'pending' && this.promise) {
       return this.promise
     }
 
-    // If already completed and cache is valid, no need to redo
     if (this.status === 'completed') {
       const cachedData = queryClient.getQueryData(this.queryKey)
       if (cachedData !== undefined) {
@@ -50,7 +48,6 @@ class PrefetchTask {
       }
     }
 
-    // Creates new promise with coalescing (uses existing system)
     this.status = 'pending'
     const coalescedFn = coalesceRequest(this.queryKey, this.queryFn)
 
@@ -69,7 +66,6 @@ class PrefetchTask {
         throw error
       })
       .finally(() => {
-        // Keeps the promise for a while for reuse
         setTimeout(() => {
           if (this.status === 'completed') {
             this.promise = null
@@ -118,10 +114,6 @@ class PrefetchController {
    * @param {Object} config.options - TanStack Query options
    */
   register(name, config) {
-    if (this.configs.has(name)) {
-      // Config already registered, overwriting
-    }
-
     this.configs.set(name, {
       ...config,
       triggers: config.triggers || ['manual'],
@@ -139,11 +131,9 @@ class PrefetchController {
   async prefetch(name, params = {}) {
     const config = this.configs.get(name)
     if (!config) {
-      // Config not found
       return Promise.resolve()
     }
 
-    // Checks if prefetch is enabled
     if (config.options?.enabled !== undefined) {
       const enabled =
         typeof config.options.enabled === 'function'
@@ -155,19 +145,15 @@ class PrefetchController {
       }
     }
 
-    // Generates a unique key based on name and parameters
     const taskKey = this._generateTaskKey(name, params)
 
-    // If task already exists, reuses it
     if (this.tasks.has(taskKey)) {
       const task = this.tasks.get(taskKey)
       return task.execute()
     }
 
-    // Waits for persistence restoration if necessary
     await waitForPersistenceRestore()
 
-    // Creates new task
     const { queryKey: rawQueryKey, queryFn } = config.queryFn(params)
     const queryKey = createQueryKey(rawQueryKey, config.cache)
     const cacheOptions = getCacheOptions(config.cache)
@@ -244,7 +230,7 @@ class PrefetchController {
    */
   cleanup() {
     const now = Date.now()
-    const maxAge = 5 * 60 * 1000 // 5 minutes
+    const maxAge = 5 * 60 * 1000
 
     for (const [key, task] of this.tasks.entries()) {
       if (task.status === 'completed' && now - task.createdAt > maxAge) {
@@ -272,14 +258,12 @@ class PrefetchController {
   }
 }
 
-// Singleton instance - following base architecture pattern
 export const prefetchController = new PrefetchController()
 
-// Periodic cleanup
 if (typeof window !== 'undefined') {
   setInterval(() => {
     prefetchController.cleanup()
-  }, 60000) // Every minute
+  }, 60000)
 }
 
 export default prefetchController

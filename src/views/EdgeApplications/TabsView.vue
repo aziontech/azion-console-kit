@@ -152,34 +152,17 @@
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
 
-    // Load list data immediately (origins, functions instance, rules engine)
-    // This ensures data is loaded when opening the edit view
-    // Using the same parameters as prefetch config to ensure cache hits
     const loadPromises = []
-
-    // Get pageSize from user preferences (same as prefetch config)
     const functionsPageSize = getPageSizeFromTableDefinitions(10)
 
-    // Load origins if API v4 is enabled
-    // Component calls without pageSize, so it uses default 200
-    // We also don't pass pageSize to match the component's behavior
-    // Component calls: listOriginsService({ id: props.edgeApplicationId })
-    // This uses defaults: orderBy='origin_id', sort='asc', page=1, pageSize=200
     if (hasFlagBlockApiV4()) {
       loadPromises.push(
         listOriginsService({
           id: edgeApplicationId.value
-        }).catch(() => {
-          // Silently fail - component will handle loading
         })
       )
     }
 
-    // Load functions instance if edge functions is enabled
-    // Component uses FetchListTableBlock with useTableQuery which passes:
-    // { page: 1, pageSize: itemsByPage.value, fields: apiFields, ordering: defaultOrderingFieldName }
-    // apiFields = ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor']
-    // defaultOrderingFieldName = 'name'
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
     if (edgeApplication.value?.[edgeFunctionsProperty]) {
       loadPromises.push(
@@ -190,41 +173,29 @@
             fields: ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor'],
             ordering: 'name'
           })
-          .catch(() => {
-            // Silently fail - component will handle loading
-          })
+          .catch(() => {})
       )
     }
 
-    // Load rules engine
-    // Component uses TableBlock v2 which calls loadData({ fields: apiFields, ordering: defaultOrderingFieldName }) on onMounted
-    // apiFields = ['id', 'name', 'description', 'phase', 'active', 'order', 'last_modified', 'last_editor']
-    // defaultOrderingFieldName = '' (empty string)
-    // So it passes { fields: [...], ordering: '' } without page or pageSize
     loadPromises.push(
-      rulesEngineService
-        .listRulesEngineRequestAndResponsePhase({
-          edgeApplicationId: edgeApplicationId.value,
-          params: {
-            fields: [
-              'id',
-              'name',
-              'description',
-              'phase',
-              'active',
-              'order',
-              'last_modified',
-              'last_editor'
-            ],
-            ordering: ''
-          }
-        })
-        .catch(() => {
-          // Silently fail - component will handle loading
-        })
+      rulesEngineService.listRulesEngineRequestAndResponsePhase({
+        edgeApplicationId: edgeApplicationId.value,
+        params: {
+          fields: [
+            'id',
+            'name',
+            'description',
+            'phase',
+            'active',
+            'order',
+            'last_modified',
+            'last_editor'
+          ],
+          ordering: ''
+        }
+      })
     )
 
-    // Execute all loads in parallel
     await Promise.allSettled(loadPromises)
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]

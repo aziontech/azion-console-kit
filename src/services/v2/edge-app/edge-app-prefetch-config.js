@@ -1,10 +1,3 @@
-/**
- * Edge Application Prefetch Configuration
- *
- * Defines which data should be prefetched and when for Edge Applications.
- * Integrated with base architecture.
- */
-
 import { edgeAppKeys } from './edge-app-query-keys'
 import { listOriginsService } from '@/services/edge-application-origins-services/list-origins-service'
 import { deviceGroupService } from './edge-app-device-group-service'
@@ -23,18 +16,15 @@ import { hasFlagBlockApiV4 } from '@/composables/user-flag'
  * @returns {number} The page size to use
  */
 const getPageSizeFromTableDefinitions = (defaultValue = 10) => {
-  try {
-    const tableDefinitions = localStorage.getItem('tableDefinitions')
-    if (tableDefinitions) {
-      const parsed = JSON.parse(tableDefinitions)
-      const numberOfLinesPerPage = parsed?.numberOfLinesPerPage
-      if (numberOfLinesPerPage && typeof numberOfLinesPerPage === 'number') {
-        return numberOfLinesPerPage
-      }
+  const tableDefinitions = localStorage.getItem('tableDefinitions')
+  if (tableDefinitions) {
+    const parsed = JSON.parse(tableDefinitions)
+    const numberOfLinesPerPage = parsed?.numberOfLinesPerPage
+    if (numberOfLinesPerPage && typeof numberOfLinesPerPage === 'number') {
+      return numberOfLinesPerPage
     }
-  } catch (error) {
-    // Silently fallback to default if localStorage parse fails
   }
+
   return defaultValue
 }
 
@@ -48,7 +38,6 @@ const CONFIG = {
   ORIGINS: {
     ORDER_BY: 'origin_id',
     SORT: 'asc',
-    // Use dynamic pageSize from user preferences
     get PAGE_SIZE() {
       return getPageSizeFromTableDefinitions(10)
     }
@@ -75,7 +64,6 @@ const CONFIG = {
     }
   },
   LIST: {
-    // Main Edge Applications list - use user's preference
     get PAGE_SIZE() {
       return getPageSizeFromTableDefinitions(10)
     },
@@ -88,7 +76,6 @@ const CONFIG = {
  * @param {Object} helpers - Helpers with registerPrefetch and PREFETCH_TRIGGERS
  */
 export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIGGERS }) {
-  // Origins prefetch
   registerPrefetch('edge-app:origins', {
     queryFn: (params) => {
       const { edgeApplicationId } = params
@@ -119,7 +106,6 @@ export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIG
     }
   })
 
-  // Device Groups prefetch
   registerPrefetch('edge-app:device-groups', {
     queryFn: (params) => {
       const { edgeApplicationId } = params
@@ -142,7 +128,6 @@ export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIG
     options: TABLE_FIRST_PAGE_OPTIONS
   })
 
-  // Cache Settings prefetch
   registerPrefetch('edge-app:cache-settings', {
     queryFn: (params) => {
       const { edgeApplicationId } = params
@@ -163,7 +148,6 @@ export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIG
     options: TABLE_FIRST_PAGE_OPTIONS
   })
 
-  // Functions prefetch
   registerPrefetch('edge-app:functions', {
     queryFn: (params) => {
       const { edgeApplicationId } = params
@@ -191,7 +175,6 @@ export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIG
     }
   })
 
-  // Rules Engine prefetch
   registerPrefetch('edge-app:rules-engine', {
     queryFn: (params) => {
       const { edgeApplicationId } = params
@@ -215,19 +198,14 @@ export function registerEdgeAppPrefetchConfigs({ registerPrefetch, PREFETCH_TRIG
     }
   })
 
-  // Edge Applications list prefetch (useful on login)
   registerPrefetch('edge-app:list', {
     queryFn: (params) => {
       const { edgeAppService } = params
 
-      // Generate the query key in the EXACT same format as listEdgeApplicationsService
-      // This ensures the prefetched data will be reused
-      // IMPORTANT: The ListView uses defaultOrderingFieldName: '-last_modified'
-      // so we must include it here for cache hit
       const queryKey = edgeAppKeys.list({
         page: 1,
         pageSize: CONFIG.LIST.PAGE_SIZE,
-        ordering: '-last_modified' // Must match the default ordering in ListView
+        ordering: '-last_modified'
       })
 
       return {

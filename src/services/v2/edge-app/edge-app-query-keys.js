@@ -24,21 +24,11 @@ const CACHE_KEYS = {
  * @returns {Array} Query key array
  */
 export const edgeAppKeys = {
-  /**
-   * Base key for all edge application queries (without cache type - it will be added by createQueryKey)
-   */
   all: [CACHE_KEYS.EDGE_APP],
 
-  /**
-   * List queries
-   * Uses the same format as createReactiveQueryKey to ensure cache hits
-   * Parameters are formatted as strings: 'param=value'
-   */
   list: (params = {}) => {
     const key = [CACHE_KEYS.EDGE_APP]
 
-    // Add parameters in the same order as listEdgeApplicationsService
-    // to ensure cache key consistency
     const { page, pageSize, ordering, search } = params
 
     if (page !== undefined && page !== null) {
@@ -57,15 +47,9 @@ export const edgeAppKeys = {
     return key
   },
 
-  /**
-   * Load queries
-   */
   loads: () => [...edgeAppKeys.all, 'load'],
   load: (id, params) => [...edgeAppKeys.loads(), `id=${id}`, params || {}],
 
-  /**
-   * Origins queries
-   */
   origins: {
     all: (edgeApplicationId) => [CACHE_KEYS.ORIGINS, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {
@@ -81,10 +65,6 @@ export const edgeAppKeys = {
     }
   },
 
-  /**
-   * Device Groups queries
-   * Note: These services use createQueryKey which adds cache type automatically
-   */
   deviceGroups: {
     all: (edgeApplicationId) => [CACHE_KEYS.DEVICE_GROUPS, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {
@@ -93,9 +73,6 @@ export const edgeAppKeys = {
     }
   },
 
-  /**
-   * Cache Settings queries
-   */
   cacheSettings: {
     all: (edgeApplicationId) => [CACHE_KEYS.CACHE_SETTINGS, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {
@@ -104,9 +81,6 @@ export const edgeAppKeys = {
     }
   },
 
-  /**
-   * Functions queries
-   */
   functions: {
     all: (edgeApplicationId) => [CACHE_KEYS.FUNCTIONS, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {
@@ -119,9 +93,6 @@ export const edgeAppKeys = {
     }
   },
 
-  /**
-   * Rules Engine queries (if needed)
-   */
   rulesEngine: {
     all: (edgeApplicationId) => [CACHE_KEYS.RULES_ENGINE, `edgeAppId=${edgeApplicationId}`],
     list: (edgeApplicationId, params = {}) => {

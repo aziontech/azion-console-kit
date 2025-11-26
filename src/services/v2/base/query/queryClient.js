@@ -55,10 +55,7 @@ export const clearCacheMedium = async () => {
 }
 
 export const clearCacheAccountSpecific = async () => {
-  await Promise.all([
-    clearCacheByType(CACHE_TYPE.SENSITIVE),
-    clearCacheByType(CACHE_TYPE.MEDIUM)
-  ])
+  await Promise.all([clearCacheByType(CACHE_TYPE.SENSITIVE), clearCacheByType(CACHE_TYPE.MEDIUM)])
 }
 
 export const clearAllCache = async () => {
