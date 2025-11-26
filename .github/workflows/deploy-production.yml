@@ -11,7 +11,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     container:
-      image: node:18-alpine3.18
+      image: node:22-alpine
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
