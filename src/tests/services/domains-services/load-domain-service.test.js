@@ -77,10 +77,12 @@ describe('DomainServices', () => {
       edgeApplication: fixtures.domainMock.edge_application_id,
       edgeCertificate: fixtures.domainMock.digital_certificate_id,
       mtlsIsEnabled: fixtures.domainMock.is_mtls_enabled,
+      edgeFirewall: undefined,
       active: fixtures.domainMock.is_active,
       mtlsVerification: fixtures.domainMock.mtls_verification,
       mtlsTrustedCertificate: fixtures.domainMock.mtls_trusted_ca_certificate_id,
-      environment: fixtures.domainMock.environment
+      environment: fixtures.domainMock.environment,
+      oldDomains: ['CName 1', 'CName 2']
     })
   })
 
@@ -104,9 +106,11 @@ describe('DomainServices', () => {
       edgeApplication: fixtures.domainWithoutCertificateMock.edge_application_id,
       edgeCertificate: 0,
       mtlsIsEnabled: fixtures.domainWithoutCertificateMock.is_mtls_enabled,
+      edgeFirewall: undefined,
       active: fixtures.domainWithoutCertificateMock.is_active,
       mtlsVerification: fixtures.domainWithoutCertificateMock.mtls_verification,
-      environment: fixtures.domainMock.environment
+      environment: fixtures.domainMock.environment,
+      oldDomains: ['CName 1', 'CName 2']
     })
   })
 

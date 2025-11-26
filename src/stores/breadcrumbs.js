@@ -29,6 +29,17 @@ export const useBreadcrumbs = defineStore({
             label: paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel
           }
         }
+
+        if (item.dynamic && item.routeParam) {
+          const paramValue = route.params[item.routeParam]
+          const processedTo = item.to ? item.to.replace(`:${item.routeParam}`, paramValue) : item.to
+          return {
+            ...item,
+            label: paramValue || item.label,
+            to: processedTo
+          }
+        }
+
         return item
       })
     }
