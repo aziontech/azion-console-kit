@@ -765,7 +765,9 @@
 
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
-    router.push(props.createPagePath)
+    if (props.createPagePath && props.createPagePath !== '/') {
+      router.push(props.createPagePath)
+    }
   }
 
   const toggleActionsMenu = (event, selectedID) => {
