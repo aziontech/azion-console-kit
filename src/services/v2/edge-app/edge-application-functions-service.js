@@ -1,6 +1,7 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeApplicationFunctionsAdapter } from './edge-application-functions-adapter'
+import { MEDIUM_CACHE_OPTIONS } from '@/services/v2/base/query/config'
 
 const CONSTANTS = {
   CACHE_KEY: 'edge-app-functions-list',
@@ -102,8 +103,7 @@ export class EdgeApplicationFunctionService extends BaseService {
           body: enrichedFunctions
         }
       },
-      staleTime: this.cacheTime.TEN_MINUTES,
-      gcTime: this.cacheTime.THIRTY_MINUTES
+      ...MEDIUM_CACHE_OPTIONS
     })
   }
 

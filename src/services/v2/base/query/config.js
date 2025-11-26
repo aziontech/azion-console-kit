@@ -14,7 +14,8 @@ export const CACHE_TIME = {
 
 export const CACHE_TYPE = {
   GLOBAL: 'GLOBAL',
-  SENSITIVE: 'SENSITIVE'
+  SENSITIVE: 'SENSITIVE',
+  MEDIUM: 'MEDIUM'
 }
 
 /**
@@ -46,6 +47,17 @@ export const GLOBAL_OPTIONS = {
 export const SENSITIVE_OPTIONS = {
   ...DEFAULT_OPTIONS,
   staleTime: CACHE_TIME.FIVE_MINUTES,
+  gcTime: CACHE_TIME.FIVE_MINUTES
+}
+
+/**
+ * Medium cache options - For moderately dynamic data
+ * Examples: user activity logs, recent notifications, session-based data
+ * Use when data changes frequently but doesn't need to be real-time
+ */
+export const MEDIUM_CACHE_OPTIONS = {
+  ...DEFAULT_OPTIONS,
+  staleTime: CACHE_TIME.TWO_MINUTES,
   gcTime: CACHE_TIME.FIVE_MINUTES
 }
 

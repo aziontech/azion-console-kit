@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { CacheSettingsAdapter } from './edge-app-cache-settings-adapter'
+import { MEDIUM_CACHE_OPTIONS } from '@/services/v2/base/query/config'
 
 const CONSTANTS = {
   CACHE_KEY: 'cache-settings-list',
@@ -56,8 +57,7 @@ export class CacheSettingsService extends BaseService {
           body: transformed
         }
       },
-      staleTime: this.cacheTime.TEN_MINUTES,
-      gcTime: this.cacheTime.THIRTY_MINUTES
+      ...MEDIUM_CACHE_OPTIONS
     })
   }
 

@@ -1,23 +1,29 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { CACHE_TIME, CACHE_TYPE } from '@/services/v2/base/query/config'
+import { MEDIUM_CACHE_OPTIONS, CACHE_TYPE } from '@/services/v2/base/query/config'
 
 const CACHE_KEY = 'edge-application-load'
-const STALE_TIME = CACHE_TIME.TEN_MINUTES
-const GC_TIME = CACHE_TIME.THIRTY_MINUTES
 const invalidatePreviousLoadCache = async (currentId) => {
   await queryClient.removeQueries({
     predicate: (query) => {
       const queryKey = query.queryKey
       if (!queryKey || !Array.isArray(queryKey)) return false
 
-      const isLoadCache = queryKey[0] === CACHE_TYPE.GLOBAL && queryKey.includes(CACHE_KEY)
+      const isEdgeAppRelatedCache =
+        (queryKey[0] === CACHE_TYPE.MEDIUM || queryKey[0] === CACHE_TYPE.GLOBAL) &&
+        (
+          queryKey.includes(CACHE_KEY) ||
+          queryKey.some((key) => typeof key === 'string' && key.startsWith('edgeAppId='))
+        )
 
-      if (!isLoadCache) return false
+      if (!isEdgeAppRelatedCache) return false
 
       const isCurrentId = queryKey.some(
-        (key) => typeof key === 'string' && key === `id=${currentId}`
+        (key) => typeof key === 'string' && (
+          key === `id=${currentId}` ||
+          key === `edgeAppId=${currentId}`
+        )
       )
 
       return !isCurrentId
@@ -29,7 +35,7 @@ export const loadEdgeApplicationService = async ({ id }) => {
   await invalidatePreviousLoadCache(id)
 
   return queryClient.fetchQuery({
-    queryKey: [CACHE_TYPE.GLOBAL, CACHE_KEY, `id=${id}`],
+    queryKey: [CACHE_TYPE.MEDIUM, CACHE_KEY, `id=${id}`],
     queryFn: async () => {
       let httpResponse = await AxiosHttpClientAdapter.request({
         url: `${makeEdgeApplicationBaseUrl()}/${id}`,
@@ -38,8 +44,7 @@ export const loadEdgeApplicationService = async ({ id }) => {
       httpResponse = adapt(httpResponse)
       return parseHttpResponse(httpResponse)
     },
-    staleTime: STALE_TIME,
-    gcTime: GC_TIME,
+    ...MEDIUM_CACHE_OPTIONS,
     meta: {
       persist: true
     }

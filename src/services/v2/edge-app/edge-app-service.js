@@ -1,7 +1,12 @@
 import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService, createReactiveQueryKey } from '@/services/v2/base/query/baseService'
 import { unref } from 'vue'
-import { TABLE_FIRST_PAGE_OPTIONS, TABLE_PAGINATION_OPTIONS } from '@/services/v2/base/query/config'
+import {
+  TABLE_FIRST_PAGE_OPTIONS,
+  TABLE_PAGINATION_OPTIONS,
+  MEDIUM_CACHE_OPTIONS,
+  CACHE_TYPE
+} from '@/services/v2/base/query/config'
 import { useQuery } from '@tanstack/vue-query'
 
 const CONSTANTS = {
@@ -43,15 +48,17 @@ export class EdgeAppService extends BaseService {
         const queryKey = query.queryKey
         if (!queryKey || !Array.isArray(queryKey)) return false
 
-        const isLoadCache =
-          queryKey[0] === this.cacheType.GLOBAL &&
-          queryKey.includes(CONSTANTS.CACHE_KEY) &&
-          queryKey.includes('load')
+        const isEdgeAppRelatedCache =
+          (queryKey[0] === CACHE_TYPE.MEDIUM || queryKey[0] === this.cacheType.GLOBAL) &&
+          ((queryKey.includes(CONSTANTS.CACHE_KEY) && queryKey.includes('load')) ||
+            queryKey.some((key) => typeof key === 'string' && key.startsWith('edgeAppId=')))
 
-        if (!isLoadCache) return false
+        if (!isEdgeAppRelatedCache) return false
 
         const isCurrentId = queryKey.some(
-          (key) => typeof key === 'string' && key === `id=${currentId}`
+          (key) =>
+            typeof key === 'string' &&
+            (key === `id=${currentId}` || key === `edgeAppId=${currentId}`)
         )
 
         return !isCurrentId
@@ -126,7 +133,7 @@ export class EdgeAppService extends BaseService {
     return useQuery(
       {
         queryKey: [
-          this.cacheType.GLOBAL,
+          CACHE_TYPE.MEDIUM,
           CONSTANTS.CACHE_KEY,
           'load',
           `id=${unref(edgeApplicationId)}`,
@@ -145,8 +152,7 @@ export class EdgeAppService extends BaseService {
 
           return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
         },
-        staleTime: this.cacheTime.TEN_MINUTES,
-        gcTime: this.cacheTime.THIRTY_MINUTES,
+        ...MEDIUM_CACHE_OPTIONS,
         enabled: !!unref(edgeApplicationId),
         meta: {
           persist: false
@@ -160,8 +166,10 @@ export class EdgeAppService extends BaseService {
   loadEdgeApplicationService = async ({ id, params }) => {
     return this.queryAsync({
       key: [CONSTANTS.CACHE_KEY, 'load', `id=${id}`, params || {}],
-      cache: this.cacheType.GLOBAL,
+      cache: CACHE_TYPE.MEDIUM,
       queryFn: async () => {
+        await this.invalidatePreviousLoadCache(id)
+
         const { data } = await this.http.request({
           method: 'GET',
           url: `${this.baseURL}/${id}`,
@@ -170,8 +178,7 @@ export class EdgeAppService extends BaseService {
 
         return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
       },
-      staleTime: this.cacheTime.TEN_MINUTES,
-      gcTime: this.cacheTime.THIRTY_MINUTES
+      ...MEDIUM_CACHE_OPTIONS
     })
   }
 

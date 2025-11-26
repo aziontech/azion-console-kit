@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
+import { MEDIUM_CACHE_OPTIONS } from '@/services/v2/base/query/config'
 
 const CONSTANTS = {
   CACHE_KEY: 'rules-engine-list',
@@ -193,8 +194,7 @@ export class RulesEngineService extends BaseService {
           body: responseBody
         }
       },
-      staleTime: this.cacheTime.TEN_MINUTES,
-      gcTime: this.cacheTime.THIRTY_MINUTES
+      ...MEDIUM_CACHE_OPTIONS
     })
   }
 

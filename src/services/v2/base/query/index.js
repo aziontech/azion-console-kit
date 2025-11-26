@@ -12,6 +12,8 @@ export {
   createQueryKey,
   clearCacheByType,
   clearCacheSensitive,
+  clearCacheMedium,
+  clearCacheAccountSpecific,
   clearAllCache
 } from './queryClient'
 export { getMutex, coalesceRequest } from './concurrency'
@@ -33,6 +35,7 @@ export {
   DEFAULT_OPTIONS,
   GLOBAL_OPTIONS,
   SENSITIVE_OPTIONS,
+  MEDIUM_CACHE_OPTIONS,
   NO_CACHE_OPTIONS,
   TABLE_FIRST_PAGE_OPTIONS,
   TABLE_PAGINATION_OPTIONS,

@@ -3,6 +3,7 @@ import {
   DEFAULT_OPTIONS,
   GLOBAL_OPTIONS,
   SENSITIVE_OPTIONS,
+  MEDIUM_CACHE_OPTIONS,
   NO_CACHE_OPTIONS,
   CACHE_TYPE
 } from './config'
@@ -22,6 +23,8 @@ export const getCacheOptions = (cacheType) => {
   switch (cacheType) {
     case CACHE_TYPE.SENSITIVE:
       return SENSITIVE_OPTIONS
+    case CACHE_TYPE.MEDIUM:
+      return MEDIUM_CACHE_OPTIONS
     case 'NONE':
       return NO_CACHE_OPTIONS
     case CACHE_TYPE.GLOBAL:
@@ -45,6 +48,17 @@ export const clearCacheByType = async (cacheType) => {
 
 export const clearCacheSensitive = async () => {
   await clearCacheByType(CACHE_TYPE.SENSITIVE)
+}
+
+export const clearCacheMedium = async () => {
+  await clearCacheByType(CACHE_TYPE.MEDIUM)
+}
+
+export const clearCacheAccountSpecific = async () => {
+  await Promise.all([
+    clearCacheByType(CACHE_TYPE.SENSITIVE),
+    clearCacheByType(CACHE_TYPE.MEDIUM)
+  ])
 }
 
 export const clearAllCache = async () => {
