@@ -8,6 +8,9 @@
   import { useField } from 'vee-validate'
   import { ref, onMounted } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
 
   const capabilitiesOptions = [
     {
@@ -58,6 +61,13 @@
         label: bucket.name,
         value: bucket.name
       }))
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load buckets',
+        life: 5000
+      })
     } finally {
       loadingBuckets.value = false
     }

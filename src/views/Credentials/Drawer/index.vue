@@ -17,11 +17,12 @@
   const validationSchema = yup.object({
     name: yup
       .string()
-      .required('Name is required')
+      .label('Name')
+      .required()
       .matches(/^[a-zA-Z0-9-]+$/, 'Name must contain only letters, numbers, and hyphens'),
-    bucket: yup.string().required('Bucket is required'),
-    capabilities: yup.array().min(1, 'At least one capability is required'),
-    expirationDate: yup.date().required('Expiration date is required')
+    bucket: yup.string().label('Bucket').required(),
+    capabilities: yup.array().label('Capabilities').min(1, 'At least one capability is required'),
+    expirationDate: yup.date().label('Expiration Date').required()
   })
 
   const showCreateCredentialDrawer = ref(false)

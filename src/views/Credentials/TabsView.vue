@@ -48,7 +48,7 @@
     let selectedTab = tab
     if (!tab) selectedTab = 'object-storage'
 
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    const activeTabIndexByRoute = mapTabs.value[selectedTab] ?? 0
     changeTab(activeTabIndexByRoute)
   }
 
