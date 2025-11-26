@@ -265,10 +265,51 @@ const loadCurrentReports = async (userUTC) => {
 
   setCurrentReports(availableReports)
 
+  // Filtra os filtros selecionados garantindo que apenas campos presentes em datasetAvailable sejam usados
+  const safeSelectedFilters = { ...filters.selected }
+
+  if (Array.isArray(filters.datasetAvailable)) {
+    const allowedFieldValues = new Set(filters.datasetAvailable.map((available) => available.value))
+
+    const OPERATORS_SUFFIX = ['Eq', 'Lt', 'Lte', 'Gt', 'Gte', 'Ne', 'Range']
+
+    const filterLogicalGroup = (groupFilters) => {
+      if (!groupFilters || typeof groupFilters !== 'object') return undefined
+
+      const entries = Object.entries(groupFilters).filter(([key]) => {
+        if (key === 'meta') return true
+        const matchedOperator = OPERATORS_SUFFIX.find((op) => key.endsWith(op))
+        const baseField = matchedOperator ? key.slice(0, -matchedOperator.length) : key
+        return allowedFieldValues.has(baseField)
+      })
+
+      if (!entries.length) return undefined
+
+      // Se sobrou apenas meta (sem nenhum campo válido), também remove o grupo
+      if (entries.length === 1 && entries[0][0] === 'meta') return undefined
+      return Object.fromEntries(entries)
+    }
+
+    const filteredAnd = filterLogicalGroup(filters.selected.and)
+    const filteredOr = filterLogicalGroup(filters.selected.or)
+
+    if (filteredAnd) {
+      safeSelectedFilters.and = filteredAnd
+    } else {
+      delete safeSelectedFilters.and
+    }
+
+    if (filteredOr) {
+      safeSelectedFilters.or = filteredOr
+    } else {
+      delete safeSelectedFilters.or
+    }
+  }
+
   availableReports.forEach(async (report) => {
     const reportInfo = await ResolveReport(
       report,
-      filters.selected,
+      safeSelectedFilters,
       userUTC,
       abortController.signal
     )
