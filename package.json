@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.46.2",
+  "version": "1.46.3",
   "private": false,
   "type": "module",
   "repository": {
@@ -127,5 +127,10 @@
     "strip-ansi": "6.0.1",
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "npm": ">=10.9.3",
+    "yarn": ">=1.22.22"
   }
 }
