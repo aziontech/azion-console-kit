@@ -12,7 +12,7 @@
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { validationSchema } from './FormFields/composables/validation'
-  import { useBreadcrumbs } from '@/composables/useBreadcrumbs'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
     updatedRedirect: {
