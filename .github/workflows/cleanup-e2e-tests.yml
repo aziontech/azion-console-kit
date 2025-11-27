@@ -1,27 +1,21 @@
 name: Run cleanup e2e tests
-
 # DISABLED: Cleanup E2E tests workflow
 # on:
 #   schedule:
 #     - cron: '15 8 * * *'
 #   workflow_dispatch:
-
 jobs:
   cleanup:
     name: Cleanup e2e tests
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: yarn install
-
       - name: Cleanup Prod
         env:
             PROD_CYPRESS_TOKEN: ${{ secrets.PROD_CYPRESS_TOKEN }}

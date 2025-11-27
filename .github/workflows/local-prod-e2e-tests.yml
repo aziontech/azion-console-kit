@@ -1,11 +1,9 @@
 name: Local Prod E2E Tests
-
 # DISABLED: E2E tests for production environment
 # on:
 #   schedule:
 #     - cron: '0 9,13,15,21 * * 1-5' # Runs at 6:00, 12:00, and 18:00 in UTC-3 
 #   workflow_dispatch:
-
 jobs:
   run-local-prod-e2e-tests:
     name: Run Local Prod E2E Tests
@@ -22,7 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - name: Run Cypress E2E Tests
         uses: cypress-io/github-action@v6
         env:
@@ -37,17 +34,14 @@ jobs:
           wait-on-timeout: 120
           config-file: cypress.config.prod.js
           env: environment=prod,grepTags=-@xfail+-@dont_run_prod
-
       - name: Check E2E Test Coverage
         if: ${{ always() }}
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-
       - name: Compress E2E Coverage Reports
         if: ${{ always() }}
         run: |
           rm -rf coverage/e2e/lcov-report
           zip -r coverage.zip coverage
-
       - name: Upload E2E Coverage Report Artifact
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -55,7 +49,6 @@ jobs:
           name: coverage_e2e_report
           path: coverage.zip
           retention-days: 7
-
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -63,7 +56,6 @@ jobs:
           name: cypress_screenshots
           path: cypress/screenshots
           retention-days: 4
-
       - name: Upload Cypress Videos Artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -71,7 +63,6 @@ jobs:
           name: cypress_videos
           path: cypress/videos
           retention-days: 1
-
       - name: Notify test completion in Slack
         if: ${{ always() && github.event_name == 'schedule' && env.SLACK_WEBHOOK_URL != ''}}
         uses: 8398a7/action-slack@v3

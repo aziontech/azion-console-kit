@@ -1,7 +1,6 @@
 name: Purge Cache (STAGE)
 permissions:
   contents: read
-
 on:
   workflow_run:
     workflows:
@@ -10,7 +9,7 @@ on:
       - completed
 env:
   HUSKY: 0
-
+  CLI_VERSION: 4.12.0
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,21 +24,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Install SO deps
         run: apk add curl bash jq
-
       - name: Install dependencies
         run: yarn install
-
       - name: Download Azion CLI
         run: |
-          wget https://github.com/aziontech/azion/releases/download/4.12.0/azion_4.12.0_linux_amd64.apk
-          apk add --allow-untrusted azion_4.12.0_linux_amd64.apk
-
+          wget https://github.com/aziontech/azion/releases/download/${CLI_VERSION}/azion_${CLI_VERSION}_linux_amd64.apk
+          apk add --allow-untrusted azion_${CLI_VERSION}_linux_amd64.apk
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
-
       - name: Wait for content update and purge cache
         run: |
           set -e
@@ -72,7 +66,6 @@ jobs:
             if [ -z "$CURRENT_VERSION" ]; then
               echo "Current version is empty; keeping previous value and continuing to poll."
             elif [ "$CURRENT_VERSION" != "$INITIAL_VERSION" ]; then
-              echo "Version changed from $INITIAL_VERSION to $CURRENT_VERSION. Purging application cache..."
               azion purge --wildcard "${CONSOLE_URL}/*" --layer edge_caching
               echo "Purge of ${CONSOLE_URL}/* completed."
               break
