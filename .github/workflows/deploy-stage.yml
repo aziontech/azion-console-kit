@@ -1,12 +1,11 @@
 name: Deploy Console Kit (STAGE)
-
 on:
   push:
     branches:
       - dev
 env:
   HUSKY: 0
-
+  CLI_VERSION: 4.12.0
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -14,25 +13,20 @@ jobs:
       group: deploy-console
       cancel-in-progress: false
     container:
-      image: node:18-alpine3.18
+      image: node:22-alpine
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Install SO deps
         run: apk add curl git bash jq
-
       - name: Install dependencies
         run: yarn install
-
       - name: Download Azion CLI
         run: |
-          wget https://github.com/aziontech/azion/releases/download/4.2.0/azion_4.2.0_linux_amd64.apk
-          apk add --allow-untrusted azion_4.2.0_linux_amd64.apk
-
+          wget https://github.com/aziontech/azion/releases/download/${CLI_VERSION}/azion_${CLI_VERSION}_linux_amd64.apk
+          apk add --allow-untrusted azion_${CLI_VERSION}_linux_amd64.apk
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
-
       - name: Build & Deploy
         run: azion deploy --auto --local --debug --config-dir azion/stage
         env:
@@ -49,6 +43,3 @@ jobs:
           VITE_SSO_IDP_SCIM_E2E:  ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.STAGE_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
-      - name: Purge Cache
-        run: |
-          azion purge --wildcard "https://stage-console.azion.com/*" --layer edge_caching

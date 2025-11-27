@@ -1,5 +1,4 @@
 name: Manual E2E Tests
-
 # DISABLED: Manual E2E test runner
 # on:
 #   workflow_dispatch:
@@ -10,19 +9,16 @@ name: Manual E2E Tests
 #       environmentName:
 #         description: 'Environment name (dev | stage | prod)'
 #         required: true
-
 jobs:
   run-manual-e2e-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - name: Run Manual Cypress Tests
         uses: cypress-io/github-action@v6
         env:
@@ -41,7 +37,6 @@ jobs:
           spec: ${{ github.event.inputs.specName }}
           config-file: cypress.config.${{ github.event.inputs.environmentName }}.js
           env: environment=${{ github.event.inputs.environmentName }}
-
       - name: Upload Manual Cypress Screenshots
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -49,7 +44,6 @@ jobs:
           name: cypress_screenshots
           path: cypress/screenshots
           retention-days: 4
-
       - name: Upload Manual Cypress Videos
         uses: actions/upload-artifact@v4
         if: ${{ always() }}

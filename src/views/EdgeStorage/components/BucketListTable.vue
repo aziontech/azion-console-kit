@@ -107,17 +107,31 @@
       isLoading.value = true
       let bucketCount = 0
       if (!buckets.value.length || bucketTableNeedRefresh.value) {
-        const [listBucketsResponse, metricsResponse] = await Promise.all([
-          edgeStorageService.listEdgeStorageBuckets(params),
-          edgeStorageService.getEdgeStorageMetrics()
-        ])
+        const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
         buckets.value = listBucketsResponse.body
         bucketCount = listBucketsResponse.count
+
         buckets.value.forEach((bucket) => {
-          const size = metricsResponse.find((metric) => metric.bucketName === bucket.name)?.storedGb
-          bucket.size = size ? `${size} GB` : '-'
+          bucket.size = '-'
         })
+
+        edgeStorageService
+          .getEdgeStorageMetrics()
+          .then((metricsResponse) => {
+            buckets.value.forEach((bucket) => {
+              const size = metricsResponse.find(
+                (metric) => metric.bucketName === bucket.name
+              )?.storedGb
+              bucket.size = size ? `${size} GB` : '-'
+            })
+          })
+          .catch(() => {
+            buckets.value.forEach((bucket) => {
+              bucket.size = '-'
+            })
+          })
+
         bucketTableNeedRefresh.value = false
         if (route.params?.id) {
           const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
