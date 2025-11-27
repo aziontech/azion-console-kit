@@ -11,8 +11,8 @@
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
-  import { validationSchema, initialValues } from './FormFields/composables/validation'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { validationSchema } from './FormFields/composables/validation'
+  import { useBreadcrumbs } from '@/composables/useBreadcrumbs'
 
   const props = defineProps({
     updatedRedirect: {
@@ -60,7 +60,6 @@
         :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validation"
-        :initialValues="initialValues"
         @loaded-service-object="setStreamName"
       >
         <template #form>

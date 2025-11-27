@@ -21,25 +21,20 @@ This document defines the API contract and behavior for the `ResizableSplitter` 
 ## Props
 
 - `panelSizes: [number, number]` (default: `[70, 30]`)
-
   - The current sizes in percentages that must sum to ~100. Top panel is index `0`, bottom panel is index `1`.
 
 - `direction: 'horizontal' | 'vertical'` (default: `'horizontal'`)
-
   - Orientation of the splitter.
   - `horizontal`: panels stacked top (panel-a) and bottom (panel-b), sizes mapped to heights.
   - `vertical`: panels side-by-side left (panel-a) and right (panel-b), sizes mapped to widths.
 
 - `minSize: [number, number]` (default: `[10, 10]`)
-
   - Minimum sizes (percent) per panel.
 
 - `maxSize: [number, number]` (default: `[95, 95]`)
-
   - Maximum sizes (percent) per panel.
 
 - `initialTopPanelPercent: number | null` (default: `null`)
-
   - Optional initial height for the top panel (percent). Applied on mount if provided.
 
 - `initialTopPanelPixels: number | null` (default: `null`)
@@ -52,7 +47,6 @@ Notes:
 ## Emits
 
 - `update:panelSizes` with payload `[number, number]`
-
   - Emitted while dragging and after initialization, to support v-model-like usage on `panelSizes`.
 
 - `resizeend` with payload `{ sizes: [number, number] }`

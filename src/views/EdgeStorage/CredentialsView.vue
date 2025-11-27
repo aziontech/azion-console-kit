@@ -109,7 +109,7 @@
   }
 
   defineExpose({
-    handleCreateCredential
+    openCreateDrawer: handleCreateCredential
   })
 </script>
 

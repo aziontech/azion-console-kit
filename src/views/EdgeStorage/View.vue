@@ -33,37 +33,19 @@
   const title = computed(() => (isCreatePage.value ? 'Create Bucket' : 'Bucket settings'))
 
   const activeTab = ref(0)
-  const componentsRefs = ref(null)
   const mapTabs = ref({
     'main-settings': 0,
     credentials: 1
   })
 
-  const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
-  const showTabs = {
-    mainSettings: showTab('main-settings'),
-    credentials: showTab('credentials')
-  }
-
-  const tabs = ref([
-    {
-      header: 'Main Settings',
-      show: showTabs.mainSettings,
-      showAddButtonTab: false
-    },
-    {
-      header: 'Credentials',
-      show: showTabs.credentials,
-      showAddButtonTab: true
-    }
-  ])
+  const credentialsViewRef = ref(null)
 
   const addButtonController = computed(() => {
-    const tab = tabs.value[activeTab.value]
+    const showButton = activeTab.value === mapTabs.value.credentials
     return {
-      showAddButtonTab: !!tab?.showAddButtonTab,
+      showAddButtonTab: showButton,
       label: 'Credential',
-      click: () => componentsRefs.value?.handleCreateCredential?.()
+      click: () => credentialsViewRef.value?.openCreateDrawer?.()
     }
   })
 
@@ -221,7 +203,7 @@
       <!-- Edit Mode with Tabs -->
       <div
         v-else
-        class="w-full h-full"
+        class="h-full w-full"
       >
         <div class="flex align-center justify-between relative">
           <TabView
@@ -229,12 +211,8 @@
             @tab-click="({ index = 0 }) => changeTab(index)"
             class="flex-1"
           >
-            <TabPanel
-              v-for="(tab, index) in tabs"
-              :key="index"
-              :header="tab.header"
-            >
-            </TabPanel>
+            <TabPanel header="Main Settings"></TabPanel>
+            <TabPanel header="Credentials"></TabPanel>
           </TabView>
           <div
             v-if="addButtonController.showAddButtonTab"
@@ -245,14 +223,14 @@
               size="small"
               icon="pi pi-plus"
               @click="addButtonController.click"
-              data-testid="create_credential_button_tab"
+              data-testid="create-credential-button"
             />
           </div>
         </div>
 
         <div>
           <EditFormBlock
-            v-if="showTabs.mainSettings.value"
+            v-if="activeTab === mapTabs['main-settings']"
             @on-edit-success="handleResponse"
             @on-response="handleResponse"
             v-bind="editFormProps"
@@ -275,8 +253,8 @@
           </EditFormBlock>
 
           <CredentialsView
-            v-if="showTabs.credentials.value"
-            ref="componentsRefs"
+            v-if="activeTab === mapTabs['credentials']"
+            ref="credentialsViewRef"
             :bucket-id="route.params.id"
           />
         </div>

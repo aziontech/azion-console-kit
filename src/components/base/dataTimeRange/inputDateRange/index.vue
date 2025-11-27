@@ -239,8 +239,8 @@
       return hasChanges.value
         ? tempInputValue.value
         : editingField.value === 'start'
-        ? formatDateSimple(model.value.startDate)
-        : formatDateSimple(model.value.endDate)
+          ? formatDateSimple(model.value.startDate)
+          : formatDateSimple(model.value.endDate)
     },
     set: (value) => {
       model.value.label = ''
