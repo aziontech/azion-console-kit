@@ -712,7 +712,7 @@ The `useDataTable` composable centralizes all common table logic, including:
 
 ```javascript
 {
-  ;(data,
+  data,
     isLoading,
     totalRecords,
     filters,
@@ -729,7 +729,7 @@ The `useDataTable` composable centralizes all common table logic, including:
     handleSearchValue,
     fetchOnSearch,
     handleExportTableDataToCSV,
-    reload)
+    reload
 }
 ```
 
