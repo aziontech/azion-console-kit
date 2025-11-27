@@ -1,5 +1,4 @@
 name: Security Linter
-
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -10,10 +9,8 @@ on:
       - dev
       - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
-
 env:
   HUSKY: 0
-
 jobs:
   security-linter:
     runs-on: ubuntu-latest
@@ -22,12 +19,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Install SO deps
         run: apk add curl bash git
-
       - name: Install dependencies
         run: yarn ci
-
       - name: Run security-linter
         run: yarn security-check
