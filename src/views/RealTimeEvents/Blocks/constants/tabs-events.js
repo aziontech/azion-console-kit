@@ -218,6 +218,33 @@ const TABS_EVENTS = {
       tsFormat: rowData.data,
       summary: rowData.data
     })
+  },
+  edgePulse: {
+    panel: 'edgePulse',
+    index: 8,
+    title: 'Edge Pulse',
+    description: 'Logs of events from queries made to Edge Pulse.',
+    dataset: 'edgePulseEvents',
+    tabRouter: 'edge-pulse',
+    columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'Time'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        disableSort: true,
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
+      }
+    ],
+    customColumnMapper: (rowData) => ({
+      tsFormat: rowData.data,
+      summary: rowData.data
+    })
   }
 }
 
