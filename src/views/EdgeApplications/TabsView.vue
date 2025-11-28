@@ -22,6 +22,8 @@
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -107,6 +109,40 @@
     mapTabs.value = { ...defaultTabs.value }
   }
 
+  const preloadTabData = async () => {
+    if (!edgeApplication.value) return
+
+    const preloadPromises = []
+    const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+
+    if (hasFlagBlockApiV4()) {
+      preloadPromises.push(
+        props.originsServices.listOriginsService({ 
+          id: edgeApplicationId.value,
+          pageSize: 200 
+        })
+      )
+    }
+
+    if (edgeApplication.value[edgeFunctionsProperty]) {
+      preloadPromises.push(
+        edgeApplicationFunctionService.listEdgeApplicationFunctions(
+          edgeApplicationId.value,
+          { pageSize: 10, page: 1 }
+        )
+      )
+    }
+
+    preloadPromises.push(
+      rulesEngineService.listRulesEngineRequestAndResponsePhase({
+        edgeApplicationId: edgeApplicationId.value,
+        params: {}
+      })
+    )
+
+    await Promise.allSettled(preloadPromises)
+  }
+
   const renderTabByCurrentRouter = async () => {
     const { tab } = route.params
 
@@ -115,6 +151,8 @@
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
+
+    preloadTabData()
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
