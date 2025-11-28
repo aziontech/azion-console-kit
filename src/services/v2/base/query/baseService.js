@@ -41,7 +41,6 @@ export class BaseService {
 
     return useMutation({
       mutationFn,
-      ...options,
       async onSuccess(data, variables, context) {
         if (options.onSuccess) {
           await options.onSuccess(data, variables, context)
@@ -87,6 +86,10 @@ export class BaseService {
 
     await waitForPersistenceRestore()
 
-    return this.queryClient.ensureQueryData({ queryKey, queryFn, ...queryOptions })
+    return this.queryClient.ensureQueryData({
+      queryKey: createFinalKey(queryKey),
+      queryFn,
+      ...queryOptions
+    })
   }
 }

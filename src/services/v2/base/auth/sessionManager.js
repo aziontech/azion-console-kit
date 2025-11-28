@@ -23,16 +23,20 @@ const ensure = {
   async solutions() {
     const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
     await solutionService.invalidateSolutionsCache()
-    await solutionService.ensureList(hasFlagBlockApiV4())
+    solutionService.ensureList(hasFlagBlockApiV4())
   },
 
-  lists() {
+  async lists() {
     const pageSize = getPageSizeFromStorage()
+    const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
 
-    Promise.allSettled([
-      edgeAppService.ensureList(pageSize),
-      workloadService.ensureList(pageSize)
-    ])
+    const promises = [edgeAppService.ensureList(pageSize)]
+    
+    if (!hasFlagBlockApiV4()) {
+      promises.push(workloadService.ensureList(pageSize))
+    }
+
+    Promise.allSettled(promises)
   }
 }
 

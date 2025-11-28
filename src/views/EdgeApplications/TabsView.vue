@@ -18,6 +18,7 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
@@ -45,9 +46,7 @@
     functions: !hasFlagBlockApiV4() ? 3 : 5,
     'rules-engine': !hasFlagBlockApiV4() ? 4 : 6
   })
-  const mapTabs = ref({
-    ...defaultTabs.value
-  })
+  const mapTabs = ref({ ...defaultTabs.value })
 
   const toast = useToast()
   const route = useRoute()
@@ -61,20 +60,14 @@
   const formHasUpdated = ref(false)
 
   const handleTrackClickToEditErrorResponses = () => {
-    tracker.product
-      .clickToEdit({
-        productName: 'Error Responses'
-      })
-      .track()
+    tracker.product.clickToEdit({ productName: 'Error Responses' }).track()
   }
 
   const checkIsLocked = async () => {
     if (hasFlagBlockApiV4()) {
       const edgeApplication = await edgeAppService.loadEdgeApplicationService({
         id: edgeApplicationId.value,
-        params: {
-          fields: 'product_version'
-        }
+        params: { fields: 'product_version' }
       })
 
       isLocked.value = edgeApplication.productVersion === 'custom'
@@ -91,11 +84,7 @@
 
       return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      toast.add({ closable: true, severity: 'error', summary: error })
       router.push({ name: props.edgeApplicationServices.updatedRedirect })
     }
   }
@@ -157,15 +146,8 @@
     return selectedTab
   }
   const changeRouteByTab = (tab) => {
-    const params = {
-      id: edgeApplicationId.value,
-      tab
-    }
-    router.push({
-      name: 'edit-application',
-      params,
-      query: route.query
-    })
+    const params = { id: edgeApplicationId.value, tab }
+    router.push({ name: 'edit-application', params, query: route.query })
   }
   const changeTab = (index) => {
     verifyTab(edgeApplication.value)
@@ -178,12 +160,7 @@
 
   const visibleOnSaved = ref(false)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  provide('unsaved', { changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved })
 
   provide('edgeApplication', edgeApplication)
 
@@ -328,10 +305,7 @@
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
         const offsetPosition = elementPosition - totalOffset
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        })
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
       }
     }, 50)
   }
@@ -342,7 +316,12 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="!edgeApplication" />
+
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
@@ -362,9 +341,7 @@
         <TabPanel
           v-for="(tab, index) in filteredTabs"
           :pt="{
-            headerAction: {
-              id: `tab_${index}`
-            },
+            headerAction: { id: `tab_${index}` },
             root: {
               'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
               id: `${tab.header}`
