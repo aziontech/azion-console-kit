@@ -1,5 +1,10 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
+
+export const rulesEngineKeys = {
+  all: (edgeAppId) => ['rules-engine', edgeAppId]
+}
+
 export class RulesEngineService extends BaseService {
   constructor() {
     super()
@@ -21,6 +26,9 @@ export class RulesEngineService extends BaseService {
       url: this.getUrl(edgeApplicationId, currentPhase),
       body: bodyRequest
     })
+
+    // Remove list queries from cache (including IndexedDB) after creating
+    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
 
     return {
       feedback: 'Rule successfully created',
@@ -49,6 +57,9 @@ export class RulesEngineService extends BaseService {
       body: bodyRequest
     })
 
+    // Remove list queries from cache (including IndexedDB) after editing
+    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
+
     return 'Rule successfully updated'
   }
 
@@ -58,6 +69,9 @@ export class RulesEngineService extends BaseService {
       method: 'DELETE',
       url: this.getUrl(edgeApplicationId, currentPhase, `/${ruleId}`)
     })
+
+    // Remove list queries from cache (including IndexedDB) after deleting
+    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
 
     return 'Rule successfully deleted'
   }
@@ -80,6 +94,9 @@ export class RulesEngineService extends BaseService {
         body: { order: adapt.response }
       })
     }
+
+    // Remove list queries from cache (including IndexedDB) after reordering
+    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
 
     return 'Rules Engine successfully ordered'
   }
@@ -142,19 +159,23 @@ export class RulesEngineService extends BaseService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
-    const [requestRules, responseRules] = await Promise.all([
-      this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
-      this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
-    ])
+    return await this._ensureQueryData(
+      () => rulesEngineKeys.all(edgeApplicationId),
+      async () => {
+        const [requestRules, responseRules] = await Promise.all([
+          this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
+          this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
+        ])
 
-    const responseBody = [...requestRules, ...responseRules]
+        const responseBody = [...requestRules, ...responseRules]
 
-    const data = {
-      count: responseBody.length,
-      body: responseBody
-    }
-
-    return data
+        return {
+          count: responseBody.length,
+          body: responseBody
+        }
+      },
+      { persist: true }
+    )
   }
 
   getCurrentPhase(phase) {
