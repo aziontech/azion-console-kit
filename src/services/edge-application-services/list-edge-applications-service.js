@@ -1,12 +1,12 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+import { createFinalKey } from '@/services/v2/base/query/keyFactory'
+import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
+import { edgeAppV3Keys } from './load-edge-application-service'
 
-export const listEdgeApplicationsService = async ({
-  orderBy = 'name',
-  sort = 'asc',
-  page = 1,
-  pageSize = 200
-}) => {
+const fetchList = async ({ orderBy, sort, page, pageSize }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}?${searchParams.toString()}`,
@@ -16,6 +16,29 @@ export const listEdgeApplicationsService = async ({
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
+}
+
+export const listEdgeApplicationsService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+  await waitForPersistenceRestore()
+  
+  const params = { orderBy, sort, page, pageSize }
+  const queryKey = [...edgeAppV3Keys.all, 'list', orderBy, sort, page, pageSize]
+  
+  const queryOptions = {
+    meta: { persist: page === 1, cacheType: CACHE_TYPE.GLOBAL },
+    ...getCacheOptions(CACHE_TYPE.GLOBAL)
+  }
+  
+  return await queryClient.ensureQueryData({
+    queryKey: createFinalKey(queryKey),
+    queryFn: () => fetchList(params),
+    ...queryOptions
+  })
 }
 
 const adapt = (httpResponse) => {

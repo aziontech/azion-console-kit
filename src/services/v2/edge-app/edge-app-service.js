@@ -73,7 +73,7 @@ export class EdgeAppService extends BaseService {
   create = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     const { data } = await this.http.request({ method: 'POST', url: this.baseURL, body })
-    this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
     return data
   }
 
@@ -84,7 +84,7 @@ export class EdgeAppService extends BaseService {
       url: `${this.baseURL}/${payload.id}/clone`,
       body
     })
-    this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
     return {
       feedback: 'Your Application has been cloned',
       urlToEditView: `/applications/edit/${data.data.id}`,
@@ -95,14 +95,14 @@ export class EdgeAppService extends BaseService {
   edit = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     await this.http.request({ method: 'PATCH', url: `${this.baseURL}/${payload.id}`, body })
-    this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.lists() })
-    this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.details() })
+    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: edgeAppKeys.details() })
     return 'Your application has been updated'
   }
 
   delete = async (id) => {
     await this.http.request({ method: 'DELETE', url: `${this.baseURL}/${id}` })
-    this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
     return 'Resource successfully deleted'
   }
 
@@ -130,7 +130,7 @@ export class EdgeAppService extends BaseService {
     })
     
     if (hasDifferentId) {
-      await this.queryClient.invalidateQueries({ queryKey: edgeAppKeys.details() })
+      await this.queryClient.removeQueries({ queryKey: edgeAppKeys.details() })
     }
     
     return await this._ensureQueryData(
