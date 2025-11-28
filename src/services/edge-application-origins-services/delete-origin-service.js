@@ -1,6 +1,8 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { originsKeys } from './list-origins-service'
 
 /**
  * @param {string} payload.originKey - The origins Edge Application id.
@@ -13,7 +15,12 @@ export const deleteOriginsService = async (originKey, id) => {
     method: 'DELETE'
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+  
+  // Remove list queries from cache (including IndexedDB) after deleting
+  queryClient.removeQueries({ queryKey: originsKeys.all(id) })
+  
+  return result
 }
 
 /**
