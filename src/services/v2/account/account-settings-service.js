@@ -1,5 +1,4 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { CACHE_TYPE } from '@/services/v2/base/query/config'
 
 export const accountSettingsKeys = {
   all: ['account-settings'],
@@ -18,25 +17,18 @@ export class AccountSettingsService extends BaseService {
     return this._adaptJobRole(response.data)
   }
 
-  async getAccountJobRole(options = {}) {
+  async getAccountJobRole() {
     const queryKey = accountSettingsKeys.jobRole()
-    const queryFn = async () => {
-      return this.fetchAccountJobRole()
-    }
-    const meta = {
-      cacheType: CACHE_TYPE.SENSITIVE
-    }
-    const result = await this._ensureQueryData(queryKey, queryFn, meta, options)
-    return result
+    return await this._ensureQueryData(queryKey, async () => this.fetchAccountJobRole(), {
+      cacheType: this.cacheType.SENSITIVE
+    })
   }
 
   _adaptJobRole(response) {
     const payload = response?.data
     if (!payload) return { jobRole: 'other' }
 
-    return {
-      jobRole: this._replaceLegacyJobRoles(payload.job_function)
-    }
+    return { jobRole: this._replaceLegacyJobRoles(payload.job_function) }
   }
 
   _replaceLegacyJobRoles(currentAccountJobRoleName) {

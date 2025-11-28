@@ -1,5 +1,4 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { CACHE_TYPE } from '@/services/v2/base/query/config'
 
 export const contractKeys = {
   all: ['contract'],
@@ -19,27 +18,20 @@ export class ContractService extends BaseService {
     return this._adaptContractPlan(response.data)
   }
 
-  async getContractServicePlan(clientId, options = {}) {
+  async getContractServicePlan(clientId) {
     const queryKey = contractKeys.servicePlan(clientId)
-    const queryFn = async () => {
-      return this.fetchContractServicePlan(clientId)
-    }
-    const meta = {
-      cacheType: CACHE_TYPE.SENSITIVE
-    }
-    const result = await this._ensureQueryData(queryKey, queryFn, meta, options)
-    return result
+    return await this._ensureQueryData(
+      queryKey,
+      async () => this.fetchContractServicePlan(clientId),
+      { cacheType: this.cacheType.SENSITIVE }
+    )
   }
 
   _adaptContractPlan(response) {
     const products = response || []
     const slugs = products?.map((product) => product.slug)
 
-    const KEYWORDS = {
-      CONTRACT: 'contract_',
-      SUPPORT: 'support_',
-      PLAN: 'plan_'
-    }
+    const KEYWORDS = { CONTRACT: 'contract_', SUPPORT: 'support_', PLAN: 'plan_' }
 
     const isDeveloperSupportPlan = slugs.every((slug) => {
       return !slug.includes(KEYWORDS.PLAN) && !slug.includes(KEYWORDS.SUPPORT)
@@ -65,11 +57,7 @@ export class ContractService extends BaseService {
   }
 
   _extractWordFromSlug(slug) {
-    const KEYWORDS = {
-      CONTRACT: 'contract_',
-      SUPPORT: 'support_',
-      PLAN: 'plan_'
-    }
+    const KEYWORDS = { CONTRACT: 'contract_', SUPPORT: 'support_', PLAN: 'plan_' }
 
     for (const keyword of Object.values(KEYWORDS)) {
       if (slug.includes(keyword)) {

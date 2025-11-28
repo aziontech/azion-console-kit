@@ -13,38 +13,27 @@ export class SolutionService extends BaseService {
     const response = await this.http.request({
       method: 'GET',
       url: this.baseUrl,
-      config: {
-        baseURL: '/api',
-        headers: {
-          'Mktp-Api-Context': type
-        }
-      },
+      config: { baseURL: '/api', headers: { 'Mktp-Api-Context': type } },
       params: { group }
     })
 
     return this.#adaptResponse(response)
   }
 
-  useListSolutions(params, options = {}) {
+  useListSolutions(params) {
+    const { group, type } = params
     return this._createQuery(
-      () => {
-        const { group, type } = this._toParams(params)
-        return solutionsKeys.list(group, type)
-      },
-      () => this.getListSolutions(this._toParams(params)),
-      {},
-      {
-        staleTime: this.cacheTime.THIRTY_DAYS,
-        refetchInterval: false,
-        ...options
+      solutionsKeys.list(group, type),
+      () => this.getListSolutions(params),
+      { 
+        staleTime: this.toMilliseconds({ days: 30 }), 
+        refetchInterval: false
       }
     )
   }
 
   async invalidateSolutionsCache() {
-    await this.queryClient.invalidateQueries({
-      queryKey: solutionsKeys.lists()
-    })
+    await this.queryClient.invalidateQueries({ queryKey: solutionsKeys.lists() })
   }
 
   #adaptResponse(response) {

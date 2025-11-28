@@ -1,11 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
-import { CACHE_TYPE } from '@/services/v2/base/query/config'
 
-export const accountKeys = {
-  all: ['account'],
-  info: () => [...accountKeys.all, 'info']
-}
+export const accountKeys = { all: ['account'], info: () => [...accountKeys.all, 'info'] }
 
 export class AccountService extends BaseService {
   baseUrl = 'account/info'
@@ -19,16 +15,11 @@ export class AccountService extends BaseService {
     return this._adaptAccountInfo(response.data)
   }
 
-  async getAccountInfo(options = {}) {
+  async getAccountInfo() {
     const queryKey = accountKeys.info()
-    const queryFn = async () => {
-      return this.fetchAccountInfo()
-    }
-    const meta = {
-      cacheType: CACHE_TYPE.SENSITIVE
-    }
-    const result = await this._ensureQueryData(queryKey, queryFn, meta, options)
-    return result
+    return await this._ensureQueryData(queryKey, async () => this.fetchAccountInfo(), {
+      cacheType: this.cacheType.SENSITIVE
+    })
   }
 
   _adaptAccountInfo(response) {

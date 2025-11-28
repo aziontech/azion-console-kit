@@ -1,11 +1,11 @@
 import { QueryClient } from '@tanstack/vue-query'
 import { broadcastQueryClient } from '@tanstack/query-broadcast-client-experimental'
-import { GLOBAL_OPTIONS, CACHE_TYPE } from './config'
+import { getCacheOptions, CACHE_TYPE } from './queryOptions'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      ...GLOBAL_OPTIONS
+      ...getCacheOptions()
     },
     mutations: {
       retry: 1
