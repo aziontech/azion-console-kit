@@ -153,6 +153,12 @@ const config = {
       type: 'single_origin',
       hostHeader: `automate.azion.net`,
       addresses: [`automate.azion.net`]
+    },
+    {
+      name: 'origin-help-center',
+      type: 'single_origin',
+      hostHeader: 'storage.googleapis.com',
+      addresses: ['storage.googleapis.com']
     }
   ],
   cache: [
@@ -227,6 +233,18 @@ const config = {
           bypassCache: true,
           forwardCookies: true,
           httpToHttps: true
+        }
+      },
+      {
+        name: 'Set Origin for Help Center',
+        description: 'Sets the origin for help center requests.',
+        match: '^/gcs-docs-help-center/console',
+        behavior: {
+          setOrigin: {
+            name: 'origin-help-center',
+            type: 'single_origin'
+          },
+          bypassCache: true
         }
       },
       {
