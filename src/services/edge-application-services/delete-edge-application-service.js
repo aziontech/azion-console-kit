@@ -10,9 +10,9 @@ export const deleteEdgeApplicationService = async (id) => {
   })
 
   const result = parseHttpResponse(httpResponse)
-  
+
   // Remove list queries from cache (including IndexedDB) after deleting
   queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
-  
+
   return result
 }

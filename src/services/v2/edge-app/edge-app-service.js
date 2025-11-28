@@ -106,7 +106,6 @@ export class EdgeAppService extends BaseService {
     return 'Resource successfully deleted'
   }
 
-
   /** @deprecated Use listEdgeApplicationsService with useQuery */
   listEdgeApplicationsService = async (params) => {
     const paramsValue = toValue(params)
@@ -123,16 +122,16 @@ export class EdgeAppService extends BaseService {
   /** @deprecated Use #fetchOne internally */
   loadEdgeApplicationService = async (params) => {
     const cachedQueries = this.queryClient.getQueriesData({ queryKey: edgeAppKeys.details() })
-    
+
     const hasDifferentId = cachedQueries.some(([key]) => {
       const cachedId = key[key.length - 1]
       return cachedId && cachedId !== params.id
     })
-    
+
     if (hasDifferentId) {
       await this.queryClient.removeQueries({ queryKey: edgeAppKeys.details() })
     }
-    
+
     return await this._ensureQueryData(
       () => edgeAppKeys.detail(params.id),
       () => this.#fetchOne(params),

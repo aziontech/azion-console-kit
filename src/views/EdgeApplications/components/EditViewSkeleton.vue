@@ -287,4 +287,3 @@
 
   defineOptions({ name: 'edit-view-skeleton' })
 </script>
-

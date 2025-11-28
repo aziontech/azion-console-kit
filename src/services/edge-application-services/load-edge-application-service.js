@@ -22,23 +22,23 @@ const fetchEdgeApplication = async ({ id }) => {
 
 export const loadEdgeApplicationService = async ({ id }) => {
   const cachedQueries = queryClient.getQueriesData({ queryKey: edgeAppV3Keys.details() })
-  
+
   const hasDifferentId = cachedQueries.some(([key]) => {
     const cachedId = key[key.length - 1]
     return cachedId && cachedId !== id
   })
-  
+
   if (hasDifferentId) {
     await queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
   }
-  
+
   await waitForPersistenceRestore()
-  
+
   const queryOptions = {
     meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
     ...getCacheOptions(CACHE_TYPE.GLOBAL)
   }
-  
+
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(edgeAppV3Keys.detail(id)),
     queryFn: () => fetchEdgeApplication({ id }),

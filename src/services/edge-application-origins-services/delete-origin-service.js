@@ -16,10 +16,10 @@ export const deleteOriginsService = async (originKey, id) => {
   })
 
   const result = parseHttpResponse(httpResponse)
-  
+
   // Remove list queries from cache (including IndexedDB) after deleting
   queryClient.removeQueries({ queryKey: originsKeys.all(id) })
-  
+
   return result
 }
 

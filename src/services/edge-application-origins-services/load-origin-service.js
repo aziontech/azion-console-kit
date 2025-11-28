@@ -18,24 +18,26 @@ const fetchOrigin = async ({ edgeApplicationId, id }) => {
 }
 
 export const loadOriginService = async ({ edgeApplicationId, id }) => {
-  const cachedQueries = queryClient.getQueriesData({ queryKey: originsKeys.details(edgeApplicationId) })
-  
+  const cachedQueries = queryClient.getQueriesData({
+    queryKey: originsKeys.details(edgeApplicationId)
+  })
+
   const hasDifferentId = cachedQueries.some(([key]) => {
     const cachedId = key[key.length - 1]
     return cachedId && cachedId !== id
   })
-  
+
   if (hasDifferentId) {
     await queryClient.removeQueries({ queryKey: originsKeys.details(edgeApplicationId) })
   }
-  
+
   await waitForPersistenceRestore()
-  
+
   const queryOptions = {
     meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
     ...getCacheOptions(CACHE_TYPE.GLOBAL)
   }
-  
+
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey([...originsKeys.details(edgeApplicationId), id]),
     queryFn: () => fetchOrigin({ edgeApplicationId, id }),

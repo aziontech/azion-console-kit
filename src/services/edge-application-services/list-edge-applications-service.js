@@ -25,15 +25,15 @@ export const listEdgeApplicationsService = async ({
   pageSize = 200
 }) => {
   await waitForPersistenceRestore()
-  
+
   const params = { orderBy, sort, page, pageSize }
   const queryKey = [...edgeAppV3Keys.all, 'list', orderBy, sort, page, pageSize]
-  
+
   const queryOptions = {
     meta: { persist: page === 1, cacheType: CACHE_TYPE.GLOBAL },
     ...getCacheOptions(CACHE_TYPE.GLOBAL)
   }
-  
+
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(queryKey),
     queryFn: () => fetchList(params),

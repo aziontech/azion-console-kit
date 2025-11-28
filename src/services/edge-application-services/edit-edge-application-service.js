@@ -40,11 +40,11 @@ export const editEdgeApplicationService = async (payload) => {
   })
 
   const result = parseHttpResponse(httpResponse)
-  
+
   // Remove list and detail queries from cache (including IndexedDB) after editing
   queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
   queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
-  
+
   return result
 }
 

@@ -13,10 +13,10 @@ export const createOriginService = async (payload) => {
   })
 
   const result = parseHttpResponse(httpResponse, id)
-  
+
   // Remove list queries from cache (including IndexedDB) after creating
   queryClient.removeQueries({ queryKey: originsKeys.all(id) })
-  
+
   return result
 }
 

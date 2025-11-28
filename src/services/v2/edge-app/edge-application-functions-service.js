@@ -80,7 +80,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
     const queryKey = edgeAppFunctionsKeys.lists(edgeApplicationId)
-    
+
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
@@ -108,21 +108,21 @@ export class EdgeApplicationFunctionService extends BaseService {
   }
 
   loadEdgeApplicationFunction = async ({ edgeApplicationID, functionID }) => {
-    const cachedQueries = this.queryClient.getQueriesData({ 
-      queryKey: edgeAppFunctionsKeys.details(edgeApplicationID) 
+    const cachedQueries = this.queryClient.getQueriesData({
+      queryKey: edgeAppFunctionsKeys.details(edgeApplicationID)
     })
-    
+
     const hasDifferentId = cachedQueries.some(([key]) => {
       const cachedId = key[key.length - 1]
       return cachedId && cachedId !== functionID
     })
-    
+
     if (hasDifferentId) {
-      await this.queryClient.removeQueries({ 
-        queryKey: edgeAppFunctionsKeys.details(edgeApplicationID) 
+      await this.queryClient.removeQueries({
+        queryKey: edgeAppFunctionsKeys.details(edgeApplicationID)
       })
     }
-    
+
     return await this._ensureQueryData(
       () => edgeAppFunctionsKeys.detail(edgeApplicationID, functionID),
       () => this.#fetchEdgeApplicationFunction({ edgeApplicationID, functionID }),
@@ -159,8 +159,12 @@ export class EdgeApplicationFunctionService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: edgeAppFunctionsKeys.all(payload.edgeApplicationID) })
-    this.queryClient.removeQueries({ queryKey: edgeAppFunctionsKeys.details(payload.edgeApplicationID) })
+    this.queryClient.removeQueries({
+      queryKey: edgeAppFunctionsKeys.all(payload.edgeApplicationID)
+    })
+    this.queryClient.removeQueries({
+      queryKey: edgeAppFunctionsKeys.details(payload.edgeApplicationID)
+    })
 
     return 'Your Function has been updated'
   }

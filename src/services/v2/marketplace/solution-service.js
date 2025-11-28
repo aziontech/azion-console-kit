@@ -23,9 +23,7 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(
-     solutionsKeys.list(group, type),
-     () => this.getListSolutions(params), {
+    return this._createQuery(solutionsKeys.list(group, type), () => this.getListSolutions(params), {
       staleTime: this.toMilliseconds({ days: 30 }),
       refetchInterval: false
     })

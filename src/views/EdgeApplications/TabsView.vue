@@ -24,6 +24,9 @@
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
+  import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -117,19 +120,37 @@
 
     if (hasFlagBlockApiV4()) {
       preloadPromises.push(
-        props.originsServices.listOriginsService({ 
+        props.originsServices.listOriginsService({
           id: edgeApplicationId.value,
-          pageSize: 200 
+          pageSize: 200
+        })
+      )
+
+      preloadPromises.push(
+        edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
+          edgeApplicationId: edgeApplicationId.value,
+          params: {}
         })
       )
     }
 
+    preloadPromises.push(
+      deviceGroupService.listDeviceGroupService(edgeApplicationId.value, { pageSize: 10, page: 1 })
+    )
+
+    preloadPromises.push(
+      cacheSettingsService.listCacheSettingsService(edgeApplicationId.value, {
+        pageSize: 100,
+        page: 1
+      })
+    )
+
     if (edgeApplication.value[edgeFunctionsProperty]) {
       preloadPromises.push(
-        edgeApplicationFunctionService.listEdgeApplicationFunctions(
-          edgeApplicationId.value,
-          { pageSize: 10, page: 1 }
-        )
+        edgeApplicationFunctionService.listEdgeApplicationFunctions(edgeApplicationId.value, {
+          pageSize: 10,
+          page: 1
+        })
       )
     }
 

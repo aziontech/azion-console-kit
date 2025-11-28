@@ -12,10 +12,10 @@ export const createEdgeApplicationService = async (payload) => {
   })
 
   const result = parseHttpResponse(httpResponse)
-  
+
   // Remove list queries from cache (including IndexedDB) after creating
   queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
-  
+
   return result
 }
 

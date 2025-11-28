@@ -31,7 +31,7 @@ const ensure = {
     const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
 
     const promises = [edgeAppService.ensureList(pageSize)]
-    
+
     if (!hasFlagBlockApiV4()) {
       promises.push(workloadService.ensureList(pageSize))
     }
