@@ -80,8 +80,9 @@ const resolveCertificateId = async (payload, cnames) => {
   // If user selected Let's Encrypt directly, ensure a new certificate is created
   if (edgeCertificate === 'lets_encrypt' || edgeCertificate === 'lets_encrypt_http') {
     const letEncryptBase = buildLetsEncryptBase(payload.name, cnames, edgeCertificate)
-    const { id } =
-      await digitalCertificatesService.createDigitalCertificateLetEncrypt(letEncryptBase)
+    const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
+      letEncryptBase
+    )
     return id
   }
 
