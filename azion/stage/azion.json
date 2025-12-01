@@ -93,6 +93,11 @@
         "phase": "request"
       },
       {
+        "id": 499519,
+        "name": "Set Origin for Help Center",
+        "phase": "request"
+      },
+      {
         "id": 488885,
         "name": "Set Cache for Static Assets",
         "phase": "request"
