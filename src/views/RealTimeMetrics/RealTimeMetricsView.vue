@@ -162,7 +162,6 @@
     return false
   })
 
-  // Campos de filtro disponíveis, construídos a partir de dataset/info disponíveis do módulo
   const filterFields = computed(() => {
     if (!filterData.value || !currentDashboard.value) return []
 
@@ -223,7 +222,6 @@
     })
   }
 
-  // Carregamento inicial da página: resolve grupo/dashboard, filtros disponíveis, time range inicial e faz primeiro load dos charts
   const loadPageInfo = async () => {
     setCurrentPageAndDashboard()
     await setInfoAvailableFilters()
@@ -281,7 +279,6 @@
     return getCurrentInfo({ group: groupData.value })
   })
 
-  // Sincroniza o modelo do AdvancedFilterSystem com os filtros atuais do módulo (tsRange)
   const syncAdvancedFilterModelWithModule = () => {
     if (!filterData.value || !filterData.value.selected) return
 
