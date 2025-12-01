@@ -248,7 +248,7 @@ const config = {
           {
             variable: '${uri}',
             conditional: 'and',
-            operator: 'does_not_match',
+            operator: 'matches',
             inputValue: '.(html|md)$'
           }
         ],
