@@ -285,8 +285,7 @@ const loadCurrentReports = async (userUTC) => {
 
       if (!entries.length) return undefined
 
-      // Se sobrou apenas meta (sem nenhum campo válido), também remove o grupo
-      if (entries.length === 1 && entries[0][0] === 'meta') return undefined
+      if (entries.length === 1 && entries[0]?.[0] === 'meta') return undefined
       return Object.fromEntries(entries)
     }
 
