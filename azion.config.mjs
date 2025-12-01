@@ -276,7 +276,7 @@ const config = {
       {
         name: 'Set Storage Origin for All Requests',
         description: 'Sets the default object storage as the origin for all requests.',
-        match: '^\/',
+        match: '^/',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',
