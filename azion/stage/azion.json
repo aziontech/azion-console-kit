@@ -82,6 +82,11 @@
       "origin-id": 198605,
       "origin-key": "e967f66e-0198-4d32-93b6-1f2f3f5a2571",
       "name": "origin-template-engine"
+    },
+    {
+      "origin-id": 249560,
+      "origin-key": "692eae10-1ab6-402c-ad7a-c1d9d6a1fe74",
+      "name": "origin-help-center"
     }
   ],
   "rules-engine": {
