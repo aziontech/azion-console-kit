@@ -1,10 +1,6 @@
 import { get, set, del, createStore } from 'idb-keyval'
 import { CACHE_TYPE } from './queryOptions'
-import {
-  encryptSensitiveData,
-  decryptSensitiveData,
-  isEncryptionAvailable
-} from './encryption'
+import { encryptSensitiveData, decryptSensitiveData, isEncryptionAvailable } from './encryption'
 
 /**
  * Encrypts a single query's data if it's marked as sensitive
@@ -61,13 +57,11 @@ async function encryptSensitiveQueries(data) {
   // Handle TanStack Query dehydrated cache structure
   // The cache has a structure like: { queries: [...], mutations: [...] }
   if (data.queries && Array.isArray(data.queries)) {
-    const encryptedQueries = await Promise.all(
-      data.queries.map((query) => encryptQuery(query))
-    )
-    
+    const encryptedQueries = await Promise.all(data.queries.map((query) => encryptQuery(query)))
+
     // Filter out null values (failed encryptions)
     const validQueries = encryptedQueries.filter((query) => query !== null)
-    
+
     return {
       ...data,
       queries: validQueries
@@ -149,13 +143,11 @@ async function decryptSensitiveQueries(data) {
   // Handle TanStack Query dehydrated cache structure
   // The cache has a structure like: { queries: [...], mutations: [...] }
   if (data.queries && Array.isArray(data.queries)) {
-    const decryptedQueries = await Promise.all(
-      data.queries.map((query) => decryptQuery(query))
-    )
-    
+    const decryptedQueries = await Promise.all(data.queries.map((query) => decryptQuery(query)))
+
     // Filter out null values (failed decryptions)
     const validQueries = decryptedQueries.filter((query) => query !== null)
-    
+
     return {
       ...data,
       queries: validQueries
@@ -188,10 +180,10 @@ export function createIDBPersister(config, onRestoreComplete = null) {
       try {
         // Encrypt sensitive data before persisting
         const encryptedClient = await encryptSensitiveQueries(client)
-        
+
         // Filter out null values (failed encryptions)
         const filteredClient = filterNullValues(encryptedClient)
-        
+
         await set(cacheKey, filteredClient, customStore)
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -213,7 +205,7 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 
         // Decrypt sensitive data after restoring
         const decryptedClient = await decryptSensitiveQueries(client)
-        
+
         // Filter out null values (failed decryptions)
         const filteredClient = filterNullValues(decryptedClient)
 

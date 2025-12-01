@@ -113,7 +113,7 @@ export async function encryptSensitiveData(data) {
   try {
     const key = await getEncryptionKey()
     const encoder = new TextEncoder()
-    
+
     // JSON.stringify handles all characters including Unicode and special characters
     // TextEncoder.encode converts the string to UTF-8 bytes, preserving all characters
     const dataString = JSON.stringify(data)
@@ -194,4 +194,3 @@ export async function decryptSensitiveData(encryptedData) {
 export function isEncryptionAvailable() {
   return typeof crypto !== 'undefined' && typeof crypto.subtle !== 'undefined'
 }
-
