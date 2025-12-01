@@ -238,13 +238,28 @@ const config = {
       {
         name: 'Set Origin for Help Center',
         description: 'Sets the origin for help center requests.',
-        match: '^/gcs-docs-help-center/console',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/gcs-docs-help-center/console'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '.(html|md)$'
+          }
+        ],
         behavior: {
           setOrigin: {
             name: 'origin-help-center',
             type: 'single_origin'
           },
-          bypassCache: true
+          setCache: 'Statics - Cache',
+          enableGZIP: true,
+          deliver: true
         }
       },
       {
