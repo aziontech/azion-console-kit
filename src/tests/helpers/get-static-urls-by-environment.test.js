@@ -52,18 +52,13 @@ const scenarios = [
   },
   {
     section: 'helpCenter',
-    env: 'development',
-    expected: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/'
-  },
-  {
-    section: 'helpCenter',
     env: 'stage',
-    expected: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/'
+    expected: 'https://stage-console.azion.com/gcs-docs-help-center-stage/console/'
   },
   {
     section: 'helpCenter',
     env: 'production',
-    expected: 'https://storage.googleapis.com/gcs-docs-help-center/console/'
+    expected: 'https://console.azion.com/gcs-docs-help-center/console/'
   }
 ]
 
