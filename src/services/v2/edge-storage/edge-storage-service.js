@@ -35,14 +35,20 @@ export class EdgeStorageService extends BaseService {
     return data
   }
 
-  listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
+  listEdgeStorageBucketFiles = async (
+    bucketName = '',
+    all_levels = false,
+    prefix = '',
+    continuation_token = ''
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/buckets/${bucketName}/objects`,
       params: {
         all_levels,
         prefix,
-        max_object_count: 110
+        max_object_count: 110,
+        continuation_token
       }
     })
 

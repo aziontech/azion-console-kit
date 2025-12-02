@@ -164,6 +164,9 @@
     sortFieldValue,
     sortOrderValue,
     selectedItems,
+    showPopup,
+    popupPosition,
+    popupData,
 
     // Computed properties
     isRenderActions,
@@ -188,6 +191,8 @@
     toggleFilter,
     handleApplyFilter,
     handleRemoveFilter,
+    handleMouseEnter,
+    handleMouseLeave,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     extractFieldValue,
@@ -195,12 +200,6 @@
   } = useDataTable(props, emit)
 
   const slots = useSlots()
-
-  // Last Modified Popup state
-  const showPopup = ref(false)
-  const popupPosition = ref({ posX: 0, posY: 0 })
-  const popupData = ref({ lastEditor: '', lastModified: '' })
-  const hoverTimeout = ref(null)
 
   // Additional computed properties specific to this component
   const havePagination = ref(true)
@@ -211,31 +210,6 @@
   )
   const dataKey = ref('id')
   const columns = computed(() => props.columns)
-
-  // Last Modified Popup functions
-  const handleMouseEnter = (event, rowData) => {
-    clearTimeout(hoverTimeout.value)
-
-    hoverTimeout.value = setTimeout(() => {
-      const rect = event.target.getBoundingClientRect()
-      popupPosition.value = {
-        posX: rect.right,
-        posY: rect.top - 30
-      }
-
-      popupData.value = {
-        lastEditor: rowData.lastEditor,
-        lastModified: rowData.lastModified || rowData.lastModify
-      }
-
-      showPopup.value = true
-    }, 1000)
-  }
-
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout.value)
-    showPopup.value = false
-  }
 
   defineExpose({ reload, handleExportTableDataToCSV })
 
@@ -465,23 +439,12 @@
           v-if="isRenderActions"
         >
           <div class="flex items-center gap-2 justify-end">
-            <div
+            <DataTable.LastModifiedCell
               v-if="!hideLastModifiedColumn"
-              :data-testid="`list-table-block__column__lastModify__row`"
-              class="cursor-pointer flex items-center max-w-[234px] overflow-hidden"
-              @mouseenter="(event) => handleMouseEnter(event, rowData)"
-              @mouseleave="handleMouseLeave"
-            >
-              <div class="text-ellipsis whitespace-nowrap overflow-hidden block">
-                <span>{{ rowData.lastModify || rowData.lastModified }}</span>
-                <span
-                  v-if="rowData.lastEditor && rowData.lastEditor !== '-'"
-                  class="text-xs"
-                >
-                  by {{ rowData.lastEditor }}</span
-                >
-              </div>
-            </div>
+              :rowData="rowData"
+              :handleMouseEnter="handleMouseEnter"
+              :handleMouseLeave="handleMouseLeave"
+            />
             <DataTable.RowActions
               :rowData="rowData"
               :actions="actionOptions(rowData)"

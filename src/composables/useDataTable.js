@@ -30,6 +30,12 @@ export function useDataTable(props, emit) {
   const lastModifiedToggled = ref(false)
   const expandedGroups = ref(props.expandedRowGroups || [])
 
+  // Last Modified Popup state
+  const showPopup = ref(false)
+  const popupPosition = ref({ posX: 0, posY: 0 })
+  const popupData = ref({ lastEditor: '', lastModified: '' })
+  const hoverTimeout = ref(null)
+
   // Filters
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -416,6 +422,31 @@ export function useDataTable(props, emit) {
     saveLastModifiedToggleState()
   }
 
+  // Last Modified Popup functions
+  const handleMouseEnter = (event, rowData) => {
+    clearTimeout(hoverTimeout.value)
+
+    hoverTimeout.value = setTimeout(() => {
+      const rect = event.target.getBoundingClientRect()
+      popupPosition.value = {
+        posX: rect.right,
+        posY: rect.top - 30
+      }
+
+      popupData.value = {
+        lastEditor: rowData.lastEditor,
+        lastModified: rowData.lastModified || rowData.lastModify
+      }
+
+      showPopup.value = true
+    }, 1000)
+  }
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimeout.value)
+    showPopup.value = false
+  }
+
   // CSV Export
   const exportFunctionMapper = (rowData) => {
     if (!hasExportToCsvMapper.value) return
@@ -643,6 +674,10 @@ export function useDataTable(props, emit) {
     expandedGroups,
     selectedItems,
     isAllSelected,
+    showPopup,
+    popupPosition,
+    popupData,
+    hoverTimeout,
 
     // Computed properties
     isRenderActions,
@@ -672,6 +707,8 @@ export function useDataTable(props, emit) {
     handleApplyFilter,
     handleRemoveFilter,
     toggleLastModifiedDisplay,
+    handleMouseEnter,
+    handleMouseLeave,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     // alias for clarity

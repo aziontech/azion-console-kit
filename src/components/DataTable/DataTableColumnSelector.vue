@@ -1,12 +1,11 @@
 <template>
   <div
-    class="flex justify-end w-full"
+    class="flex justify-end"
     data-testid="data-table-actions-column-header"
   >
     <PrimeButton
       outlined
       icon="ai ai-column"
-      class="table-button"
       @click="toggleColumnSelector"
       v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
       data-testid="data-table-actions-column-header-toggle-columns"

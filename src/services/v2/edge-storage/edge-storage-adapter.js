@@ -30,7 +30,7 @@ export const EdgeStorageAdapter = {
     const files = data.results.map((file) => ({
       id: file.key,
       name: file.key,
-      lastModified: formatDateToDayMonthYearHour(file.last_modified) || '-',
+      lastModified: file.last_modified || '-',
       lastModify: file.last_modified ? convertToRelativeTime(file.last_modified) : '-',
       size: file.is_folder ? '-' : formatBytes(file.size),
       isFolder: file.is_folder

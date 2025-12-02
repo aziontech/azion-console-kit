@@ -50,22 +50,33 @@
       columnResizeMode="fit"
       @columnResizeEnd="applyDirtyColumnResizeFix"
       :scrollHeight="scrollHeight"
+      :frozenValue="frozenValue"
       paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     >
-      <template #header>
+      <template
+        v-if="hasHeaderSlot"
+        #header
+      >
         <slot name="header" />
       </template>
 
-      <template v-if="loading">
+      <template v-if="shouldShowFullSkeleton">
         <Column
-          v-for="col in columns"
+          v-for="(col, index) in columns"
           :key="col.field"
           :field="col.field"
           :header="col.header"
         >
           <template #body>
-            <Skeleton class="h-[12px]" />
+            <div class="flex gap-10 items-center">
+              <Skeleton
+                v-if="isSelectable && index === 0"
+                width="1.5rem"
+                height="1.5rem"
+              />
+              <Skeleton class="h-[12px]" />
+            </div>
           </template>
         </Column>
 
@@ -306,7 +317,7 @@
     },
     scrollHeight: {
       type: String,
-      default: 'calc(100vh - 400px)'
+      default: 'calc(100vh - 300px)'
     },
     showLastModifiedColumn: {
       type: Boolean,
@@ -321,6 +332,14 @@
       default: () => []
     },
     notShowEmptyBlock: {
+      type: Boolean,
+      default: false
+    },
+    frozenValue: {
+      type: Array,
+      default: () => []
+    },
+    isSelectable: {
       type: Boolean,
       default: false
     }
@@ -354,6 +373,8 @@
     return props.data.length || props.loading || props.appliedFilters.length
   })
 
+  const hasHeaderSlot = computed(() => !!slots.header)
+
   const internalFilters = computed({
     get: () => props.filters,
     set: (value) => emit('update:filters', value)
@@ -386,8 +407,16 @@
 
   const hasFooterSlot = computed(() => !!slots.footer)
 
+  const hasSkeletonRows = computed(() => {
+    return props.data.some((row) => row.isSkeletonRow)
+  })
+
+  const shouldShowFullSkeleton = computed(() => {
+    return props.loading && !hasSkeletonRows.value
+  })
+
   const displayData = computed(() => {
-    if (props.loading && props.columns.length) {
+    if (shouldShowFullSkeleton.value && props.columns.length) {
       // eslint-disable-next-line no-unused-vars
       return Array.from({ length: props.rows }, (aux, index) => {
         const row = { id: index }
@@ -433,7 +462,7 @@
   .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
     transition: color 0.2s ease !important;
     height: 44px;
-    padding: 0 12px;
+    padding: 0 14px;
     font-size: 12px;
   }
 
