@@ -150,11 +150,6 @@
     }
   })
 
-  const frozenRows = computed(() => {
-    const frozen = props.currentPage !== 1 ? data.value.filter((item) => item.isParentNav) : []
-    return frozen
-  })
-
   const parsedDatatablePt = computed(() => ({
     ...props.pt,
     rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
@@ -390,6 +385,11 @@
     )
   }
 
+  const getRowIcon = (rowData) => {
+    if (!rowData || !rowData.name) return 'mdi mdi-file text-gray-500'
+    return getFileIcon(rowData)
+  }
+
   watch(
     () => [props.currentPage, minimumOfItemsPerPage.value, props.isPaginationLoading],
     () => {
@@ -469,8 +469,9 @@
             />
             <i
               v-else
+              :key="`icon-${rowData.id}-${rowData.name}`"
               class="text-xl"
-              :class="getFileIcon(rowData)"
+              :class="getRowIcon(rowData)"
             ></i>
           </div>
         </template>
