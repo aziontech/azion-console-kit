@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col h-full">
+  <div class="min-h-screen flex flex-col surface-ground">
     <ToastBlock />
 
     <AppNavbar
@@ -11,7 +11,7 @@
     <AppSidebar />
 
     <main
-      class="flex flex-col flex-1 min-h-screen transition-margin-right pt-14 h-full"
+      class="flex flex-col flex-1 min-h-screen transition-margin-right pt-14"
       :class="{ 'mr-[32rem]': showSidebar }"
       :style="{ transition: 'margin-right 0.2s' }"
     >

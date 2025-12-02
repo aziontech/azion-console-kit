@@ -5,9 +5,9 @@ import {
   contractService
 } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
-import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
+import { sessionManager } from '@/services/v2/base/auth'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
@@ -29,15 +29,11 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.user_id = userResults.id
   accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
-  const isAzionEmail =
-    accountInfo.email.endsWith('@azion.com') || accountInfo.email.endsWith('@azion.com.br')
-  if (isAzionEmail) {
-    accountInfo.client_flags?.push('is_azion_email')
-  }
+
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
 
-  await solutionService.invalidateSolutionsCache()
+  sessionManager.afterLogin()
 }
 
 export const loadProfileAndAccountInfo = async () => {

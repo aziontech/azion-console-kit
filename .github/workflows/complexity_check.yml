@@ -1,13 +1,10 @@
 name: SCC Complexity Check
-
 on:
   pull_request:
     branches: [main]
-
 jobs:
   scc-check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Install dependencies and SCC
         run: |
@@ -35,23 +32,19 @@ jobs:
 
           # Verify SCC installation
           scc --version
-
       # Checkout target branch (base_ref)
       - name: Checkout target branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
           fetch-depth: 0
-
       - name: Debug target branch SCC
         run: scc
-
       - name: Calculate target branch complexity
         id: target-complexity
         run: |
           echo "TARGET_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
           echo "TARGET_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
-
       # Checkout source branch (head_ref)
       - name: Checkout source branch
         uses: actions/checkout@v4
@@ -61,19 +54,16 @@ jobs:
 
       - name: Debug source branch SCC
         run: scc
-
       - name: Calculate source branch complexity
         id: source-complexity
         run: |
           echo "SOURCE_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
           echo "SOURCE_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
-
       - name: Calculate differences
         id: calculate-diff
         run: |
           echo "COMPLEXITY_DIFF=$(($SOURCE_COMPLEXITY - $TARGET_COMPLEXITY))" >> $GITHUB_ENV
           echo "CODE_DIFF=$(($SOURCE_CODE - $TARGET_CODE))" >> $GITHUB_ENV
-
       - name: Add PR comment
         uses: actions/github-script@v6
         with:

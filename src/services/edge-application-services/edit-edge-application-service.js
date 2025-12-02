@@ -24,6 +24,8 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { edgeAppV3Keys } from './load-edge-application-service'
 
 /**
  * Edits an edge application.
@@ -37,7 +39,13 @@ export const editEdgeApplicationService = async (payload) => {
     body: adapt(payload)
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+
+  // Remove list and detail queries from cache (including IndexedDB) after editing
+  queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
+  queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
+
+  return result
 }
 
 /**

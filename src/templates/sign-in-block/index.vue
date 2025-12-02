@@ -1,10 +1,10 @@
 <template>
   <form
-    class="h-full"
+    class="h-full w-full"
     @submit.prevent
   >
     <div class="h-full flex flex-col justify-center items-center">
-      <div class="flex flex-col align-top items-center animate-fadeIn w-full max-w-[448px]">
+      <div class="flex flex-col align-top items-center animate-fadeIn w-full max-w-[448px] h-full">
         <div
           class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 sm:gap-8 flex"
         >
@@ -116,6 +116,7 @@
                     :class="classPasswordError"
                     @keydown.enter="validateAndSubmit"
                     :feedback="false"
+                    :disabled="isButtonLoading"
                     data-testid="signin-block__password-input"
                   />
                   <small

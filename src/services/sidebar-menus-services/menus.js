@@ -1,5 +1,5 @@
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-import { hasFlagBlockApiV4, hasFlagIsAzionEmail } from '@/composables/user-flag'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 function createHomeItem() {
   return {
@@ -107,7 +107,6 @@ function createObserveItems() {
       label: 'Real-Time Events',
       to: '/real-time-events',
       icon: 'ai ai-real-time-events',
-      tag: 'Preview',
       id: 'real-time-events'
     },
     {
@@ -200,15 +199,14 @@ function createStoreItems() {
       icon: 'ai ai-edge-storage',
       id: 'object-storage',
       tag: 'Preview'
+    },
+    {
+      label: 'SQL Database',
+      to: '/sql-database',
+      icon: 'ai ai-edge-sql',
+      tag: 'Preview',
+      id: 'sql-database'
     }
-    //  Uncoment this when database is ready
-    //  {
-    //   label: 'SQL Database',
-    //   to: '/sql-database',
-    //   icon: 'ai ai-edge-sql',
-    //   tag: 'Preview',
-    //   id: 'sql-database'
-    //  }
   ]
 }
 
@@ -251,11 +249,6 @@ export function getMenuItens(showMarketplaceProductsItens) {
       items: createMarketplaceProductsItems()
     }
   ]
-
-  if (!hasFlagIsAzionEmail()) {
-    const storeIndex = menus.findIndex((menu) => menu.label === 'Store')
-    menus.splice(storeIndex, 1)
-  }
 
   return menus
 }

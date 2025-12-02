@@ -3,8 +3,7 @@ export const edgeStorageRoutes = {
   path: '/object-storage',
   name: 'object-storage',
   meta: {
-    title: 'Object Storage',
-    flag: 'only_azion_email'
+    title: 'Object Storage'
   },
   children: [
     {
@@ -24,9 +23,6 @@ export const edgeStorageRoutes = {
       path: ':id',
       name: 'object-storage-view',
       component: () => import('@/views/EdgeStorage/ListView.vue'),
-      props: {
-        mode: 'view'
-      },
       meta: {
         breadCrumbs: [
           {
@@ -34,13 +30,10 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Edit Bucket',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Bucket'
           }
         ]
-      },
-      alias: '/object-storage/:id'
+      }
     },
     {
       path: 'create',
@@ -60,18 +53,20 @@ export const edgeStorageRoutes = {
       }
     },
     {
-      path: 'edit/:id',
-      name: 'object-storage-bucket-settings',
+      path: ':id/edit/:tab?',
+      name: 'object-storage-edit',
       component: () => import('@/views/EdgeStorage/View.vue'),
-      props: {
-        mode: 'edit',
-        updatedRedirect: 'object-storage-list'
-      },
       meta: {
         breadCrumbs: [
           {
             label: 'Object Storage',
             to: '/object-storage'
+          },
+          {
+            label: 'Edit Bucket',
+            to: '/object-storage/:id',
+            dynamic: true,
+            routeParam: 'id'
           },
           {
             label: 'Bucket Settings'

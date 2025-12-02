@@ -19,11 +19,11 @@
           <span
             class="transition-colors"
             :class="
-              isUploading
+              isProcessing
                 ? 'text-color-secondary cursor-not-allowed'
                 : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
             "
-            @click="!isUploading && openFileSelector()"
+            @click="!isProcessing && openFileSelector()"
             >choose your files</span
           >
         </p>
@@ -37,7 +37,7 @@
       type="file"
       multiple
       class="hidden"
-      :disabled="isUploading"
+      :disabled="isProcessing"
       @change="handleFileChangeDragDrop"
     />
   </div>
@@ -47,12 +47,12 @@
   import { ref, onMounted, onUnmounted } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { handleFileChange, isUploading } = useEdgeStorage()
+  const { handleFileChange, isProcessing } = useEdgeStorage()
   const fileInput = ref(null)
   const emit = defineEmits(['reload'])
 
   const openFileSelector = () => {
-    if (isUploading.value) return
+    if (isProcessing.value) return
     fileInput.value?.click()
   }
 

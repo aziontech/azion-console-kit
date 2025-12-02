@@ -137,8 +137,11 @@
     cnames: yup
       .string()
       .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
+      .when(['cnameAccessOnly', 'edgeCertificate', 'authorityCertificate'], {
+        is: (cnameAccessOnly, edgeCertificate, authorityCertificate) =>
+          cnameAccessOnly === true ||
+          ['lets_encrypt', 'lets_encrypt_http'].includes(edgeCertificate) ||
+          authorityCertificate === 'lets_encrypt',
         then: (schema) => schema.required()
       })
       .test({
@@ -158,6 +161,8 @@
       })
       .label('Trusted CA Certificate'),
     active: yup.boolean(),
-    environment: yup.string()
+    environment: yup.string(),
+    oldDomains: yup.array().of(yup.string()).optional(),
+    authorityCertificate: yup.string().nullable()
   })
 </script>
