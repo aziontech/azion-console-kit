@@ -383,6 +383,10 @@
     )
   })
 
+  const needFetchToAPI = computed(() => {
+    return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
+  })
+
   const setEllipsisPopup = (value) => {
     if (!value) {
       setTimeout(() => {
@@ -409,9 +413,6 @@
     }
     showEllipsisPopup.value = true
   }
-  const needFetchToAPI = computed(() => {
-    return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
-  })
 
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
@@ -432,7 +433,7 @@
       const pathToFolder = folders.slice(0, item.index).join('/')
       folderPath.value = `${pathToFolder}/`
     }
-
+    selectedBucket.value.continuation_token = null
     currentPage.value = 1
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
@@ -481,32 +482,34 @@
     input.click()
   }
 
-  const handleEditFolder = (item) => {
+  const handleEditFolder = async (item) => {
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
       folderPath.value += item.name
       router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-      currentPage.value = 1
       filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
+      await listServiceFilesRef.value?.reload()
+      currentPage.value = 1
     }
   }
 
-  const goBackToBucket = () => {
+  const goBackToBucket = async () => {
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    selectedBucket.value.continuation_token = null
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    currentPage.value = 1
     filesTableNeedRefresh.value = true
-    listServiceFilesRef.value?.reload()
+    await listServiceFilesRef.value?.reload()
+    currentPage.value = 1
   }
   const handleMultipleDelete = () => {
     Promise.resolve().then(async () => {
       await deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
       filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
+      await listServiceFilesRef.value?.reload()
+      currentPage.value = 1
     })
   }
   const handleDeleteSelectedItems = () => {
@@ -531,7 +534,7 @@
         selectedBucket.value.name,
         false,
         folderPath.value,
-        { continuation_token: selectedBucket.value.continuation_token }
+        selectedBucket.value.continuation_token
       )
       selectedBucket.value.continuation_token = continuation_token
       const filterFiles = files.map((file) => ({
@@ -564,13 +567,18 @@
   const handlePaginationChange = async (event) => {
     const { page, pageCount } = event
     const isLastPage = page >= pageCount - 1
+
+    if (isPaginationLoading.value && page === 0) {
+      return
+    }
+
     currentPage.value = page + 1
 
-    if (isLastPage && selectedBucket.value?.continuation_token) {
+    if (isLastPage && selectedBucket.value?.continuation_token && !isPaginationLoading.value) {
       try {
         isPaginationLoading.value = true
         filesTableNeedRefresh.value = true
-        await listServiceFilesRef.value?.loadData({ page: page + 1, keepCurrentPage: true })
+        await listServiceFilesRef.value?.loadData()
       } finally {
         isPaginationLoading.value = false
       }
@@ -621,7 +629,9 @@
       const newPath = folderPath.value + folderName + '/'
       folderPath.value = newPath
       router.replace({ query: { folderPath: newPath } })
-      currentPage.value = 1
+      if (!isPaginationLoading.value) {
+        currentPage.value = 1
+      }
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
