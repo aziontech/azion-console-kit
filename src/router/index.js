@@ -53,6 +53,7 @@ import { mfaManagementRoutes } from '@routes/mfa-management-routes'
 import { edgeConnectorsRoutes } from '@routes/edge-connectors-routes'
 import { edgeSQLRoutes } from '@routes/edge-sql-routes'
 import { edgeStorageRoutes } from '@routes/edge-storage'
+import { credentialsRoutes } from '@routes/credentials-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -103,7 +104,8 @@ const router = createRouter({
     mfaManagementRoutes,
     edgeConnectorsRoutes,
     edgeSQLRoutes,
-    edgeStorageRoutes
+    edgeStorageRoutes,
+    credentialsRoutes
   ].concat(errorRoutes)
 })
 
