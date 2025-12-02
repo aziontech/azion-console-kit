@@ -86,7 +86,7 @@
         v-if="props.pageTitle || props.description"
       >
         <div
-          class="text-[var(--text-color-secondary)] text-xs font-normal leading-7 max-md:text-base"
+          class="text-[var(--text-color-secondary)] md:ml-[6px] text-xs font-normal leading-7 max-md:text-base"
           v-if="props.description"
         >
           {{ props.description }}
