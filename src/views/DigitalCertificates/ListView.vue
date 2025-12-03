@@ -371,21 +371,17 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Certificate Manager">
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <SelectButton
-                v-model="digitalCertificateTypeSelected"
-                :options="optionsSelectButton"
-                aria-labelledby="basic"
-                class="h-9 p-1"
-              />
-            </div>
-            <div class="flex gap-2">
-              <CreateMenuBlock
-                addButtonLabel="Certificate"
-                :items="items"
-              />
-            </div>
+          <div class="flex justify-between gap-3 w-full">
+            <SelectButton
+              v-model="digitalCertificateTypeSelected"
+              :options="optionsSelectButton"
+              aria-labelledby="basic"
+              class="h-9 p-1"
+            />
+            <CreateMenuBlock
+              addButtonLabel="Certificate"
+              :items="items"
+            />
           </div>
         </template>
       </PageHeadingBlock>
