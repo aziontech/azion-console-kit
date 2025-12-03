@@ -121,10 +121,6 @@
       type: Boolean,
       default: true
     },
-    cellQuickActionsItens: {
-      type: Array,
-      default: () => []
-    },
     frozenColumns: {
       type: Array,
       default: () => []
@@ -185,7 +181,6 @@
     toggleColumnSelector,
     changeNumberOfLinesPerPage,
     fetchOnSort,
-    sortByLastModified,
     fetchOnSearch,
     handleSearchValue,
     toggleFilter,
@@ -252,7 +247,6 @@
       :first="firstItemIndex"
       :rowClass="getRowClass"
       :emptyListMessage="emptyListMessage"
-      :cellQuickActionsItens="cellQuickActionsItens"
       :columns="columns"
       @rowReorder="onRowReorder"
       @page="changeNumberOfLinesPerPage"
@@ -270,7 +264,7 @@
           <div class="flex flex-col gap-2 w-full">
             <DataTable.Header :showDivider="appliedFilters.length">
               <template #first-line>
-                <div class="flex flex-wrap justify-between gap-2 w-full">
+                <div class="flex justify-between gap-2 w-full">
                   <div class="flex gap-2 w-[400px]">
                     <PrimeButton
                       v-if="allowedFilters.length"
@@ -370,7 +364,7 @@
           :style="col.style"
           :frozen="frozenColumns.includes(col.field)"
           :alignFrozen="'left'"
-          :headerStyle="frozenColumns.includes(col.field) ? 'width: 240px' : ''"
+          :headerStyle="frozenColumns.includes(col.field) ? 'width: 300px' : ''"
         >
           <template #body="{ data: rowData }">
             <div
@@ -390,7 +384,12 @@
               </template>
               <template v-else>
                 <component
-                  :is="col.component(extractFieldValue(rowData, col.field), rowData)"
+                  :is="
+                    col.component(extractFieldValue(rowData, col.field), rowData, {
+                      handleMouseEnter,
+                      handleMouseLeave
+                    })
+                  "
                   :data-testid="`list-table-block__column__${col.field}__row`"
                   class="overflow-hidden whitespace-nowrap text-ellipsis"
                 />
@@ -408,43 +407,11 @@
         :reorderableColumn="false"
         style="width: 200px"
       >
-        <template #header>
-          <div
-            v-if="!hideLastModifiedColumn"
-            class="flex items-center gap-2 justify-start w-full"
-            data-testid="data-table-actions-column-header"
-          >
-            Last Modified
-            <span
-              @click="sortByLastModified"
-              class="cursor-pointer select-none flex items-center gap-2 group"
-              data-testid="last-modified-header-sort"
-            >
-              <i
-                v-if="sortFieldValue === 'lastModified'"
-                :class="{
-                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
-                  'pi pi-sort-amount-down': sortOrderValue === -1
-                }"
-              />
-              <i
-                v-else
-                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-            </span>
-          </div>
-        </template>
         <template
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
           <div class="flex items-center gap-2 justify-end">
-            <DataTable.LastModifiedCell
-              v-if="!hideLastModifiedColumn"
-              :rowData="rowData"
-              :handleMouseEnter="handleMouseEnter"
-              :handleMouseLeave="handleMouseLeave"
-            />
             <DataTable.RowActions
               :rowData="rowData"
               :actions="actionOptions(rowData)"
@@ -481,18 +448,3 @@
     />
   </div>
 </template>
-
-<style scoped lang="scss">
-  .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
-    transition: color 0.2s ease;
-  }
-
-  .table-with-orange-borders.outline-visible
-    :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
-  .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
-    outline: 2px dashed #f97316 !important;
-    outline-offset: -2px;
-    transition-delay: 0.3s;
-    border-radius: 0 6px 6px 6px;
-  }
-</style>

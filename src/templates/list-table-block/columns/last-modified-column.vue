@@ -1,7 +1,7 @@
 <template>
   <div
     :data-testid="`list-table-block__column__lastModify__row`"
-    class="cursor-pointer flex items-center max-w-[234px] overflow-hidden"
+    class="cursor-pointer flex items-center overflow-hidden"
     @mouseenter="(event) => handleMouseEnter(event, rowData)"
     @mouseleave="handleMouseLeave"
   >

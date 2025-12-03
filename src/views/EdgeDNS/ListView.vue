@@ -24,6 +24,7 @@
   const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'zone',
       icon: 'pi pi-trash',
@@ -61,7 +62,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

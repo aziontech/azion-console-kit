@@ -137,7 +137,7 @@
           header: 'Name',
           type: 'component',
           sortField: 'name',
-          style: 'max-width: 240px',
+          style: 'max-width: 300px',
           component: (columnData) => {
             return columnBuilder({
               data: columnData,
@@ -166,6 +166,20 @@
               data: { ...columnData.status, tooltipText: columnData.statusDetail },
               columnAppearance: 'tag-with-tooltip'
             })
+        },
+        {
+          field: 'last_modified',
+          header: 'Last Modified',
+          sortField: 'last_modified',
+          filterPath: 'last_modified',
+          type: 'component',
+          component: (columnData, rowData, dependencies) => {
+            return columnBuilder({
+              data: rowData,
+              columnAppearance: 'last-modified',
+              dependencies
+            })
+          }
         }
       ]
     }
@@ -175,7 +189,7 @@
         header: 'Name',
         type: 'component',
         sortField: 'name',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -194,7 +208,7 @@
         header: 'Subject Names',
         sortField: 'subject_name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
@@ -213,7 +227,7 @@
         header: 'Expiration Date',
         sortField: 'validity',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
       },
@@ -253,6 +267,20 @@
         field: 'keyAlgorithm',
         header: 'Key Algorithm',
         sortField: 'key_algorithm'
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })

@@ -434,8 +434,8 @@ export function useDataTable(props, emit) {
       }
 
       popupData.value = {
-        lastEditor: rowData.lastEditor,
-        lastModified: rowData.lastModified || rowData.lastModify
+        lastEditor: rowData.last_editor || rowData.lastEditor,
+        lastModified: rowData.last_modified || rowData.lastModified
       }
 
       showPopup.value = true

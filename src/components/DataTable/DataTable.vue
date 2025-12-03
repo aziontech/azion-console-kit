@@ -79,21 +79,6 @@
             </div>
           </template>
         </Column>
-
-        <Column
-          v-if="showLastModifiedColumn"
-          :frozen="true"
-          :alignFrozen="'right'"
-          :bodyStyle="classActions"
-          data-testid="data-table-actions-column"
-          :reorderableColumn="false"
-          style="width: 200px"
-        >
-          <template #header> Last Modified </template>
-          <template #body>
-            <Skeleton class="h-[12px]" />
-          </template>
-        </Column>
       </template>
       <slot v-else />
 
@@ -510,11 +495,16 @@
 
   :deep(.p-paginator .p-dropdown) {
     width: 61px;
-    height: 32px;
+    height: 26px;
     font-size: 12px;
     line-height: 21px;
+    margin: 0;
     .p-dropdown-label {
       width: fit-content;
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
     }
     .p-dropdown-trigger {
       width: 16px;
@@ -523,7 +513,7 @@
   }
   :deep(.p-paginator-page-input .p-inputtext) {
     width: fit-content;
-    height: 32px;
+    height: 26px;
     font-size: 12px;
     line-height: 21px;
     text-align: center;
@@ -535,5 +525,14 @@
   :deep(.p-datatable-header) {
     padding-left: 0;
     padding-right: 0;
+  }
+  :deep(.p-icon.p-sortable-column-icon) {
+    width: 12px;
+  }
+  :deep(.p-paginator-current) {
+    cursor: auto;
+  }
+  :deep(.p-frozen-column) {
+    z-index: 50;
   }
 </style>

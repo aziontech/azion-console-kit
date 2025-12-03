@@ -3,6 +3,7 @@
   import DrawerResource from '@/views/EdgeServices/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'list-edge-service-resources-tab' })
 
@@ -59,8 +60,18 @@
       header: 'Last Editor'
     },
     {
-      field: 'lastModified',
-      header: 'Last Modified'
+      field: 'last_modified',
+      header: 'Last Modified',
+      sortField: 'last_modified',
+      filterPath: 'last_modified',
+      type: 'component',
+      component: (columnData, rowData, dependencies) => {
+        return columnBuilder({
+          data: rowData,
+          columnAppearance: 'last-modified',
+          dependencies
+        })
+      }
     }
   ])
 

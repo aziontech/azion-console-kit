@@ -64,7 +64,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -83,6 +83,20 @@
         header: 'Function',
         sortField: 'edge_function',
         disableSort: true
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })
@@ -129,6 +143,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'function instance',
       icon: 'pi pi-trash',

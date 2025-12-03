@@ -185,6 +185,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'rule',
       icon: 'pi pi-trash',
