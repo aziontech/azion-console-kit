@@ -75,7 +75,7 @@
 </template>
 <script setup>
   defineOptions({ name: 'tables-view' })
-  import { ref, computed, nextTick, watch } from 'vue'
+  import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import InlineMessage from 'primevue/inlinemessage'
   import ConfirmDialog from 'primevue/confirmdialog'
@@ -314,6 +314,10 @@
   const reloadTables = () => {
     emit('load-tables')
   }
+
+  onMounted(() => {
+    reloadTables()
+  })
 
   const showTableMenu = (event, table) => {
     selectedTable.value = table

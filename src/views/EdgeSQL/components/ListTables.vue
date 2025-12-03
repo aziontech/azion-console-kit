@@ -14,6 +14,7 @@
           @click="$emit('reload-tables')"
           data-testid="reload-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
+          v-tooltip.top="{ value: 'Reload Tables' }"
         />
         <PrimeButton
           icon="pi pi-plus"
@@ -22,6 +23,7 @@
           @click="$emit('create-table')"
           data-testid="create-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
+          v-tooltip.top="{ value: 'Create Table' }"
         />
       </div>
     </div>
