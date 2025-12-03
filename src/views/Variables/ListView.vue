@@ -115,7 +115,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Variables">
+      <PageHeadingBlock
+        pageTitle="Variables"
+        description="Store and manage environment variables for solutions."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">
