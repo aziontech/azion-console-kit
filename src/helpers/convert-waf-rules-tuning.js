@@ -112,7 +112,7 @@ const parserWafWatchs = (wafWatchs, isDescription) => {
     return {
       location: isDescription
         ? conditionsMapDescription[condition]
-        : conditionsMap[condition] ?? 'unknown',
+        : (conditionsMap[condition] ?? 'unknown'),
       matchesOn
     }
   })

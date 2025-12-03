@@ -2,7 +2,6 @@ import { useAccountStore } from '@stores/account'
 
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
-import { useAccountStore } from '@/stores/account'
 
 /**
  * Converts a given value to a date string in a specific format.
@@ -256,6 +255,8 @@ const getDateRangeByHourRange = (hourRange) => {
     startDate: formattedStartDate,
     endDate: formattedEndDate
   }
+}
+
 const convertToRelativeTime = (date) => {
   const now = new Date()
   const targetDate = new Date(date)
@@ -343,6 +344,6 @@ export {
   formatDateToDayMonthYearHour,
   getRemainingDays,
   getCurrentDateTimeIntl,
-  getDateRangeByHourRange
+  getDateRangeByHourRange,
   convertToRelativeTime
 }
