@@ -516,7 +516,7 @@
         selectedBucket.value.name,
         false,
         folderPath.value,
-        { continuation_token: selectedBucket.value.continuation_token }
+        selectedBucket.value.continuation_token
       )
       selectedBucket.value.continuation_token = continuation_token
       const filterFiles = files.map((file) => ({
