@@ -368,7 +368,7 @@
         >
           <template #body="{ data: rowData }">
             <div
-              class="flex items-center gap-2 text-[12px]"
+              class="flex items-center gap-2"
               :class="{
                 'cursor-pointer hover:underline': frozenColumns.includes(col.field),
                 'cursor-pointer': !frozenColumns.length

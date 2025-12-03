@@ -448,7 +448,7 @@
     transition: color 0.2s ease !important;
     height: 44px;
     padding: 0 14px;
-    font-size: 12px;
+    // font-size: 12px;
   }
 
   .table-with-orange-borders :deep(.p-datatable-tbody > tr) {

@@ -9,7 +9,7 @@
       <span>{{ rowData.lastModify || rowData.lastModified }}</span>
       <span
         v-if="rowData.lastEditor && rowData.lastEditor !== '-'"
-        class="text-xs"
+        class="text-sm"
       >
         by {{ rowData.lastEditor }}</span
       >

@@ -811,7 +811,6 @@
           </template>
           <template v-else-if="col.type !== 'component'">
             <div
-              class="text-[12px]"
               :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
               @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
               v-html="rowData[col.field]"
@@ -823,7 +822,6 @@
               @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
-              class="text-[12px]"
               :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
             />
           </template>
