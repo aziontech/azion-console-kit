@@ -136,6 +136,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'origin',
       icon: 'pi pi-trash',

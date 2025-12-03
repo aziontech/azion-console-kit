@@ -46,6 +46,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'cache setting',
       icon: 'pi pi-trash',
@@ -71,7 +72,7 @@
         field: 'name',
         header: 'Origin Name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

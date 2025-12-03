@@ -20,12 +20,13 @@ import TextFormatColumn from './text-format.vue'
 import IconWithTooltip from './icon-with-tooltip.vue'
 import TextFormatWithPopupColumn from './text-format-with-popup.vue'
 import TextArrayWithPopupColumn from './text-array-with-popup.vue'
+import LastModifiedColumn from './last-modified-column.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
  *
  * @param {Object} params - The parameters to build the column.
- * @param {'expand-column'| 'expand-text-column'| 'avatar-with-text'| 'avatar-with-text-and-tooltip'| 'text-with-clipboard'| 'clickable-text'| 'clickable-tag'| 'clickable-link'| 'tag'| 'language-icon-with-text'| 'text-with-tag'| 'credit-card-column' | 'country-flag-column' | 'log-body'} params.columnAppearance - The appearance of the column.
+ * @param {'expand-column'| 'expand-text-column'| 'avatar-with-text'| 'avatar-with-text-and-tooltip'| 'text-with-clipboard'| 'clickable-text'| 'clickable-tag'| 'clickable-link'| 'tag'| 'language-icon-with-text'| 'text-with-tag'| 'credit-card-column' | 'country-flag-column' | 'log-body' | 'last-modified'} params.columnAppearance - The appearance of the column.
  * @param {Object} params.data - The data with specific properties of the column appearance.
  * @param {Object} [params.dependencies] - (Optional) The dependencies needed for rendering this column appearance.
  *
@@ -149,6 +150,12 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(IconWithTooltip, {
         vendorData: data.vendorData,
         iconClass: data.iconClass
+      })
+    case 'last-modified':
+      return h(LastModifiedColumn, {
+        rowData: data,
+        handleMouseEnter: dependencies.handleMouseEnter,
+        handleMouseLeave: dependencies.handleMouseLeave
       })
     default:
       throw new Error('Invalid column appearance')

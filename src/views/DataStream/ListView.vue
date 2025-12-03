@@ -133,6 +133,7 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'stream',
       icon: 'pi pi-trash',
@@ -183,7 +184,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -221,6 +222,20 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })

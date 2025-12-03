@@ -94,7 +94,7 @@
   <OverlayPanel
     ref="overlayPanel"
     :pt="{
-      root: { class: 'w-[600px]' },
+      root: { class: 'md:w-[600px] w-[400px]' },
       content: { class: 'p-0' }
     }"
   >

@@ -39,6 +39,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'user',
       icon: 'pi pi-trash',

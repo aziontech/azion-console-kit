@@ -45,7 +45,7 @@
     <div>
       <Breadcrumb
         :model="breadcrumbs.items"
-        class="overflow-auto w-full"
+        class="overflow-auto w-full px-0"
         :pt="{
           label: { class: 'whitespace-nowrap text-[18px]' },
           menuItem: ({ props }) => ({
@@ -82,7 +82,7 @@
       </Breadcrumb>
 
       <div
-        class="flex flex-col justify-start gap-3 max-md:w-full"
+        class="flex flex-col justify-start gap-3 px-0.5"
         v-if="props.pageTitle || props.description"
       >
         <div
@@ -95,9 +95,14 @@
     </div>
     <div
       v-if="hasDefaultSlot"
-      class="items-center flex justify-end max-md:w-full"
+      class="items-center flex justify-end"
     >
       <slot name="default"></slot>
     </div>
   </div>
 </template>
+<style scoped lang="scss">
+  :deep(.p-breadcrumb .p-breadcrumb-list .p-menuitem:hover) {
+    text-decoration: none !important;
+  }
+</style>

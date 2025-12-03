@@ -37,6 +37,7 @@
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
@@ -87,7 +88,7 @@
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData.text,
@@ -107,7 +108,7 @@
         filterPath: 'domains',
         disableSort: true,
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: Array.isArray(columnData) ? columnData : columnData.content,
@@ -153,6 +154,20 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })

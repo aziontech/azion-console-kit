@@ -3,9 +3,11 @@
   import Checkbox from 'primevue/checkbox'
   import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import Breadcrumb from 'primevue/breadcrumb'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Listbox from 'primevue/listbox'
+  import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDataTable } from '@/composables/useDataTable'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -115,6 +117,30 @@
     newFolderName: {
       type: String,
       default: ''
+    },
+    folderPath: {
+      type: String,
+      default: ''
+    },
+    onBreadcrumbClick: {
+      type: Function,
+      default: null
+    },
+    onRefresh: {
+      type: Function,
+      default: null
+    },
+    headerContainer: {
+      type: Object,
+      default: null
+    },
+    buttonsContainer: {
+      type: Object,
+      default: null
+    },
+    containerWidth: {
+      type: Number,
+      default: 0
     }
   })
 
@@ -122,7 +148,6 @@
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
-  const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const isLoading = ref(false)
@@ -130,16 +155,14 @@
   const selectedColumns = ref([])
   const menuRef = ref({})
   const toast = useToast()
+  const columnSelectorPanel = ref(null)
+  const showEllipsisPopup = ref(false)
+  const hidePopupTimeout = ref(null)
 
   const internalFirstItem = ref(0)
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
-
-  const { showPopup, popupPosition, popupData, handleMouseEnter, handleMouseLeave } = useDataTable(
-    props,
-    emit
-  )
 
   const selectedItems = computed({
     get: () => {
@@ -328,19 +351,6 @@
     )
   })
 
-  const executeCommand = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    firstAction?.command()
-  }
-
-  const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    return {
-      icon: firstAction?.icon,
-      disabled: firstAction?.disabled
-    }
-  }
-
   const stateClassRules = (row) => {
     if (selectedItems.value.find((item) => item.id === row.id)) {
       return 'bg-[var(--table-body-row-hover-bg)] bg-altered'
@@ -390,6 +400,143 @@
     return getFileIcon(rowData)
   }
 
+  const breadcrumbItems = computed(() => {
+    if (!props.selectedBucket) return []
+
+    const items = [
+      {
+        label: props.selectedBucket.name,
+        index: 0,
+        icon: 'pi pi-cloud'
+      }
+    ]
+
+    if (props.folderPath) {
+      const folders = props.folderPath.split('/').filter((folder) => folder.trim() !== '')
+      folders.forEach((folder, index) => {
+        items.push({
+          label: folder + '/',
+          index: index + 1,
+          icon: 'pi pi-folder'
+        })
+      })
+    }
+
+    return items
+  })
+
+  const availableWidth = computed(() => {
+    if (props.containerWidth === 0) {
+      return 1000
+    }
+
+    const buttonsWidth = props.buttonsContainer ? props.buttonsContainer.offsetWidth : 400
+    const gap = 16
+    return Math.max(200, props.containerWidth - buttonsWidth - gap)
+  })
+
+  const displayedBreadcrumbItems = computed(() => {
+    const items = breadcrumbItems.value
+    const width = availableWidth.value
+
+    if (items.length <= 1) {
+      return items
+    }
+
+    const estimatedItemWidth = 120
+    const separatorWidth = 32
+    const ellipsisWidth = 40
+
+    const calculateBreadcrumbWidth = (itemsToShow) => {
+      const totalItems = itemsToShow.length
+      const hasEllipsis = itemsToShow.some((item) => item.label === '...')
+
+      let totalWidth = totalItems * estimatedItemWidth + (totalItems - 1) * separatorWidth
+      if (hasEllipsis) {
+        totalWidth = totalWidth - estimatedItemWidth + ellipsisWidth
+      }
+
+      return totalWidth
+    }
+
+    if (calculateBreadcrumbWidth(items) <= width) {
+      return items
+    }
+
+    if (items.length === 2) {
+      return items
+    }
+
+    let currentItems = [...items]
+
+    while (currentItems.length > 2) {
+      const testItems = [currentItems[0], { label: '...' }, ...currentItems.slice(2)]
+
+      if (calculateBreadcrumbWidth(testItems) <= width) {
+        return testItems
+      }
+
+      currentItems.splice(1, 1)
+    }
+
+    return [items[0], { label: '...', disabled: true }, items[items.length - 1]]
+  })
+
+  const hiddenBreadcrumbItems = computed(() => {
+    const items = breadcrumbItems.value
+    const displayed = displayedBreadcrumbItems.value
+
+    const hasEllipsis = displayed.some((item) => item.label === '...')
+    if (!hasEllipsis) {
+      return []
+    }
+
+    const firstDisplayedIndex = displayed[0].index
+    const lastDisplayedItems = displayed.slice(-2)
+    const lastDisplayedIndex = lastDisplayedItems[0].index
+
+    return items.filter(
+      (item) => item.index > firstDisplayedIndex && item.index < lastDisplayedIndex
+    )
+  })
+
+  const setEllipsisPopup = (value) => {
+    if (!value) {
+      setTimeout(() => {
+        showEllipsisPopup.value = value
+      }, 500)
+    } else {
+      showEllipsisPopup.value = value
+    }
+  }
+
+  const scheduleHidePopup = () => {
+    if (hidePopupTimeout.value) {
+      clearTimeout(hidePopupTimeout.value)
+    }
+    hidePopupTimeout.value = setTimeout(() => {
+      showEllipsisPopup.value = false
+    }, 200)
+  }
+
+  const cancelHidePopup = () => {
+    if (hidePopupTimeout.value) {
+      clearTimeout(hidePopupTimeout.value)
+      hidePopupTimeout.value = null
+    }
+    showEllipsisPopup.value = true
+  }
+
+  const handleBreadcrumbClick = (item) => {
+    if (props.onBreadcrumbClick) {
+      props.onBreadcrumbClick(item)
+    }
+  }
+
+  const toggleColumnSelector = () => {
+    columnSelectorPanel.value.toggle(event)
+  }
+
   watch(
     () => [props.currentPage, minimumOfItemsPerPage.value, props.isPaginationLoading],
     () => {
@@ -409,6 +556,12 @@
       loadData({ page: 1 })
     }
     selectedColumns.value = props.columns
+  })
+
+  onUnmounted(() => {
+    if (hidePopupTimeout.value) {
+      clearTimeout(hidePopupTimeout.value)
+    }
   })
 </script>
 <template>
@@ -437,6 +590,112 @@
       :frozenValue="frozenRows"
       isSelectable
     >
+      <template #header>
+        <div class="flex flex-col gap-2 w-full">
+          <DataTable.Header :showDivider="props.folderPath">
+            <template #first-line>
+              <div class="flex justify-between gap-2 w-full">
+                <div class="flex gap-2 w-full">
+                  <slot name="search-slot" />
+                </div>
+                <div class="flex gap-2">
+                  <PrimeButton
+                    v-if="props.onRefresh"
+                    outlined
+                    icon="pi pi-refresh"
+                    size="small"
+                    @click="props.onRefresh"
+                    data-testid="data-table-actions-column-header-refresh"
+                  />
+                  <DataTable.Export @export="handleExportTableDataToCSV($event)" />
+                  <PrimeButton
+                    outlined
+                    icon="ai ai-column"
+                    size="small"
+                    @click="toggleColumnSelector"
+                    v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+                    data-testid="data-table-actions-column-header-toggle-columns"
+                  />
+                  <OverlayPanel
+                    ref="columnSelectorPanel"
+                    :pt="{
+                      content: { class: 'p-0' }
+                    }"
+                    data-testid="data-table-actions-column-header-toggle-columns-panel"
+                  >
+                    <Listbox
+                      v-model="selectedColumns"
+                      multiple
+                      :options="[{ label: 'Available Columns', items: columns }]"
+                      class="hidden-columns-panel"
+                      optionLabel="header"
+                      optionGroupLabel="label"
+                      optionGroupChildren="items"
+                      data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                    >
+                      <template #optiongroup="slotProps">
+                        <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                      </template>
+                    </Listbox>
+                  </OverlayPanel>
+                  <slot name="header-actions" />
+                </div>
+              </div>
+            </template>
+            <template #second-line>
+              <div class="flex justify-between items-center gap-2">
+                <div class="relative flex-1 min-w-0">
+                  <Breadcrumb
+                    :model="displayedBreadcrumbItems"
+                    class="text-color-primary overflow-hidden p-0 text-[12px] text-[var(--text-color-secondary)] hover:no-underline"
+                    :pt="{
+                      root: { class: 'overflow-hidden no-underline' },
+                      menu: { class: 'flex flex-nowrap overflow-hidden max-w-full' }
+                    }"
+                  >
+                    <template #item="{ item }">
+                      <div class="flex gap-2 items-center">
+                        <i
+                          class="hover:no-underline"
+                          :class="item.icon"
+                        ></i>
+                        <a
+                          class="cursor-pointer whitespace-nowrap hover:no-underline"
+                          @click="item.label === '...' ? null : handleBreadcrumbClick(item)"
+                          @mouseenter.stop="item.label === '...' && setEllipsisPopup(true)"
+                          @mouseleave.stop="item.label === '...' && scheduleHidePopup()"
+                        >
+                          {{ item.label }}
+                        </a>
+                      </div>
+                    </template>
+                  </Breadcrumb>
+                  <div
+                    class="absolute top-full left-20 mt-1 bg-[var(--menu-bg)] rounded-md z-[-50] opacity-0"
+                    @mouseleave="scheduleHidePopup()"
+                    @mouseenter="cancelHidePopup()"
+                    :class="{
+                      'opacity-100 transition-opacity duration-300 z-[50]': showEllipsisPopup
+                    }"
+                  >
+                    <div
+                      v-for="hiddenItem in hiddenBreadcrumbItems"
+                      :key="hiddenItem.index"
+                      class="px-3 py-2 hover:bg-[var(--surface-hover)] rounded-md cursor-pointer text-sm whitespace-nowrap text-[12px]"
+                      @click="handleBreadcrumbClick(hiddenItem)"
+                    >
+                      {{ hiddenItem.label }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                  <slot name="second-line-actions" />
+                </div>
+              </div>
+            </template>
+          </DataTable.Header>
+        </div>
+      </template>
       <DataTable.Column
         :class="{ '!hover:cursor-pointer': !disabledList }"
         headerStyle="width: 3rem"
@@ -552,7 +811,6 @@
           </template>
           <template v-else-if="col.type !== 'component'">
             <div
-              class="text-[12px]"
               :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
               @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
               v-html="rowData[col.field]"
@@ -564,7 +822,6 @@
               @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
-              class="text-[12px]"
               :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
             />
           </template>
@@ -577,36 +834,6 @@
         headerStyle="width: 13rem"
         data-testid="data-table-actions-column"
       >
-        <template #header>
-          <div
-            class="flex items-center gap-2 justify-end w-full"
-            data-testid="data-table-actions-column-header"
-          >
-            <span
-              @click="sortByLastModified"
-              v-if="showLastModified"
-              class="cursor-pointer select-none flex items-center gap-2 group"
-              data-testid="last-modified-header-sort"
-            >
-              <i
-                v-if="sortFieldValue === 'lastModified'"
-                :class="{
-                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
-                  'pi pi-sort-amount-down': sortOrderValue === -1
-                }"
-              />
-              <i
-                v-else
-                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              Last Modified
-            </span>
-            <DataTable.ColumnSelector
-              :columns="columns"
-              v-model:selectedColumns="selectedColumns"
-            />
-          </div>
-        </template>
         <template
           #body="{ data: rowData }"
           v-if="isRenderActions"
@@ -625,21 +852,7 @@
             class="flex items-center gap-2 justify-end"
             v-else-if="showActions(rowData)"
           >
-            <DataTable.LastModifiedCell
-              v-if="showLastModified"
-              :rowData="rowData"
-              :handleMouseEnter="handleMouseEnter"
-              :handleMouseLeave="handleMouseLeave"
-            />
             <DataTable.RowActions
-              v-if="isRenderOneOption"
-              :rowData="rowData"
-              :singleAction="optionsOneAction(rowData)"
-              :actions="[]"
-              :onActionExecute="executeCommand"
-            />
-            <DataTable.RowActions
-              v-else
               :rowData="rowData"
               :actions="actionOptions(rowData)"
               :menuRefSetter="setMenuRefForRow"
@@ -662,12 +875,10 @@
         </slot>
       </template>
     </DataTable>
-
-    <DataTable.LastModifiedPopup
-      :visible="showPopup"
-      :last-editor="popupData.lastEditor"
-      :last-modified="popupData.lastModified"
-      :position="popupPosition"
-    />
   </div>
 </template>
+<style scoped lang="scss">
+  :deep(.p-breadcrumb .p-breadcrumb-list .p-menuitem:hover) {
+    text-decoration: none !important;
+  }
+</style>
