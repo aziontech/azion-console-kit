@@ -68,6 +68,7 @@
           description: 'Create your first table to store your data at the edge.',
           createButtonLabel: 'Table'
         }"
+        :not-show-empty-block="notShowEmptyBlock"
       >
       </SqlDatabaseList>
     </div>
@@ -123,6 +124,8 @@
   const columns = ref([])
   const tableRows = ref([])
   const isLoadingQuery = ref(false)
+  const notShowEmptyBlock = ref(false)
+
   const tableColumns = computed(() => {
     if (activeView.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
@@ -293,6 +296,7 @@
   const selectTable = async (table) => {
     isLoadingQuery.value = true
     selectedTable.value = table
+    notShowEmptyBlock.value = true
     try {
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
       columns.value = result.body.tableSchema.map(({ name, type }) => ({

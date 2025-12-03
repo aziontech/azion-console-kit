@@ -21,7 +21,7 @@
       @sort="(e) => $emit('sort', e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
-      :notShowEmptyBlock="notShowEmptyBlock"
+      :notShowEmptyBlock="notShowEmptyBlockComputed"
       removableSort
       scrollable
       scrollHeight="flex"
@@ -328,6 +328,7 @@
         documentationService: null
       })
     },
+    notShowEmptyBlock: { type: Boolean, default: false },
     options: {
       type: Array,
       default: () => [
@@ -365,7 +366,10 @@
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
-  const notShowEmptyBlock = computed(() => selectedView.value?.value === 'json')
+  const notShowEmptyBlockComputed = computed(() => {
+    const isJsonView = selectedView.value?.value === 'json'
+    return Boolean(props.notShowEmptyBlock || isJsonView)
+  })
 
   const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 
@@ -559,7 +563,8 @@
   }
 
   // Use centralized export helpers from useDataTable
-  const exportAsCSV = () => handleExportTableDataToCSV()
+  const exportAsCSV = () =>
+    handleExportTableDataToCSV(props.title, editableData.value, selectedColumns.value)
   const exportAsJSON = () =>
     exportTableAsJSON(props.title, editableData.value, selectedColumns.value)
   const exportAsXLSX = () =>
