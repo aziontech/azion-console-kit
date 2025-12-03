@@ -144,7 +144,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="WAF Rules">
+      <PageHeadingBlock
+        pageTitle="WAF Rules"
+        description="Manage Web Application Firewall (WAF) rules for secure connections."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

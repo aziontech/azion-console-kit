@@ -138,6 +138,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Billing"
+        description="View and manage invoices, payments, and subscription details."
         :isRightAlignment="true"
       >
         <template #default>

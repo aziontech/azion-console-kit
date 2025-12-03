@@ -110,7 +110,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Network Lists">
+      <PageHeadingBlock
+        pageTitle="Network Lists"
+        description="Organize and manage IP and network lists securely."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

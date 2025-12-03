@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Real-Time Purge">
+      <PageHeadingBlock
+        pageTitle="Real-Time Purge"
+        description="Invalidate manually cached content across the network."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

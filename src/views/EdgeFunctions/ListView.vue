@@ -173,7 +173,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Functions">
+      <PageHeadingBlock
+        pageTitle="Functions"
+        description="Manage serverless functions for applications."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

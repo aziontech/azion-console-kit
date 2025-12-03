@@ -369,7 +369,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Certificate Manager">
+      <PageHeadingBlock
+        pageTitle="Certificate Manager"
+        description="Manage SSL/TLS certificates for secure connections."
+      >
         <template #default>
           <div class="flex justify-between gap-3 w-full">
             <SelectButton

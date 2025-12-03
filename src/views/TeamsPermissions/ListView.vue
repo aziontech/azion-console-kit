@@ -87,7 +87,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Teams">
+      <PageHeadingBlock
+        pageTitle="Teams"
+        description="Configure and assign permissions for team collaboration."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

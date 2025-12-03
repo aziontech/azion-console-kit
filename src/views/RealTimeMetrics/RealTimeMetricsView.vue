@@ -3,6 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Real-Time Metrics"
+        description="Gain insights with real-time metrics for operations."
         data-testid="real-time-metrics__page-heading-block__title"
       />
     </template>

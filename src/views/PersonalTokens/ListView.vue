@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Personal Tokens">
+      <PageHeadingBlock
+        pageTitle="Personal Tokens"
+        description="Generate and manage personal tokens for secure access to your account."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

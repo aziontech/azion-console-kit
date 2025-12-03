@@ -145,7 +145,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Services">
+      <PageHeadingBlock
+        pageTitle="Edge Services"
+        description="Deliver and manage services for applications."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

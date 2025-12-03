@@ -135,7 +135,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Users">
+      <PageHeadingBlock
+        pageTitle="Users"
+        description="Manage users and define access levels."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">
