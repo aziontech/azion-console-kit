@@ -56,6 +56,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'credential',
       icon: 'pi pi-trash',
@@ -90,6 +91,20 @@
     {
       field: 'expirationDate',
       header: 'Expiration Date'
+    },
+    {
+      field: 'last_modified',
+      header: 'Last Modified',
+      sortField: 'last_modified',
+      filterPath: 'last_modified',
+      type: 'component',
+      component: (columnData, rowData, dependencies) => {
+        return columnBuilder({
+          data: rowData,
+          columnAppearance: 'last-modified',
+          dependencies
+        })
+      }
     }
   ]
 

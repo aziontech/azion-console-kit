@@ -8,7 +8,6 @@
   import Listbox from 'primevue/listbox'
   import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDataTable } from '@/composables/useDataTable'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -149,7 +148,6 @@
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
-  const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
   const isLoading = ref(false)
@@ -160,18 +158,11 @@
   const columnSelectorPanel = ref(null)
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
-  const sortFieldValue = ref(null)
-  const sortOrderValue = ref(1)
 
   const internalFirstItem = ref(0)
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
-
-  const { showPopup, popupPosition, popupData, handleMouseEnter, handleMouseLeave } = useDataTable(
-    props,
-    emit
-  )
 
   const selectedItems = computed({
     get: () => {
@@ -360,19 +351,6 @@
     )
   })
 
-  const executeCommand = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    firstAction?.command()
-  }
-
-  const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    return {
-      icon: firstAction?.icon,
-      disabled: firstAction?.disabled
-    }
-  }
-
   const stateClassRules = (row) => {
     if (selectedItems.value.find((item) => item.id === row.id)) {
       return 'bg-[var(--table-body-row-hover-bg)] bg-altered'
@@ -557,15 +535,6 @@
 
   const toggleColumnSelector = () => {
     columnSelectorPanel.value.toggle(event)
-  }
-
-  const sortByLastModified = () => {
-    if (sortFieldValue.value === 'lastModified') {
-      sortOrderValue.value = sortOrderValue.value === 1 ? -1 : 1
-    } else {
-      sortFieldValue.value = 'lastModified'
-      sortOrderValue.value = 1
-    }
   }
 
   watch(
@@ -867,32 +836,6 @@
         headerStyle="width: 13rem"
         data-testid="data-table-actions-column"
       >
-        <template #header>
-          <div
-            class="flex items-center gap-2 justify-start w-full"
-            data-testid="data-table-actions-column-header"
-          >
-            <span
-              @click="sortByLastModified"
-              v-if="showLastModified"
-              class="cursor-pointer select-none flex items-center gap-2 group"
-              data-testid="last-modified-header-sort"
-            >
-              <i
-                v-if="sortFieldValue === 'lastModified'"
-                :class="{
-                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
-                  'pi pi-sort-amount-down': sortOrderValue === -1
-                }"
-              />
-              <i
-                v-else
-                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              Last Modified
-            </span>
-          </div>
-        </template>
         <template
           #body="{ data: rowData }"
           v-if="isRenderActions"
@@ -911,21 +854,7 @@
             class="flex items-center gap-2 justify-end"
             v-else-if="showActions(rowData)"
           >
-            <DataTable.LastModifiedCell
-              v-if="showLastModified"
-              :rowData="rowData"
-              :handleMouseEnter="handleMouseEnter"
-              :handleMouseLeave="handleMouseLeave"
-            />
             <DataTable.RowActions
-              v-if="isRenderOneOption"
-              :rowData="rowData"
-              :singleAction="optionsOneAction(rowData)"
-              :actions="[]"
-              :onActionExecute="executeCommand"
-            />
-            <DataTable.RowActions
-              v-else
               :rowData="rowData"
               :actions="actionOptions(rowData)"
               :menuRefSetter="setMenuRefForRow"
@@ -948,13 +877,6 @@
         </slot>
       </template>
     </DataTable>
-
-    <DataTable.LastModifiedPopup
-      :visible="showPopup"
-      :last-editor="popupData.lastEditor"
-      :last-modified="popupData.lastModified"
-      :position="popupPosition"
-    />
   </div>
 </template>
 <style scoped lang="scss">

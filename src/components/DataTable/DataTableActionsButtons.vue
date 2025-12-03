@@ -54,7 +54,7 @@
     },
     buttonClass: {
       type: [String, Object, Array],
-      default: 'max-sm:w-full'
+      default: ''
     },
     testId: {
       type: String,

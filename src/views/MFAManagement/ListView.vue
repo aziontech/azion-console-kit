@@ -16,6 +16,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'MFA',
       icon: 'pi pi-trash',
@@ -41,7 +42,7 @@
       header: 'Email',
       sortField: 'email',
       type: 'component',
-      style: 'max-width: 240px',
+      style: 'max-width: 300px',
       component: (columnData) => {
         return columnBuilder({
           data: columnData,

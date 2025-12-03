@@ -38,7 +38,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -66,7 +66,7 @@
         field: 'userAgent',
         header: 'User Agent',
         type: 'component',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -103,6 +103,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'device group',
       icon: 'pi pi-trash',

@@ -36,6 +36,7 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'variable',
       icon: 'pi pi-trash',
@@ -58,7 +59,7 @@
         header: 'Value',
         type: 'component',
         filterPath: 'value.content',
-        style: 'max-width: 240px',
+        style: 'max-width: 300px',
         component: (columnData) => {
           if (columnData.isSecret) {
             return h('span', `${columnData.content}`)
@@ -71,6 +72,20 @@
               }
             })
           }
+        }
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
         }
       }
     ]

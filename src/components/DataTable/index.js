@@ -8,8 +8,7 @@ import DataTableRowActionsComponent from './DataTableRowActions.vue'
 import DataTableColumnSelectorComponent from './DataTableColumnSelector.vue'
 import DataTableFilterComponent from './DataTableFilter.vue'
 import DataTableAppliedFiltersComponent from './DataTableAppliedFilters.vue'
-import LastModifiedPopup from './LastModifiedPopup.vue'
-import DataTableLastModifiedCellComponent from './DataTableLastModifiedCell.vue'
+import LastModifiedPopupComponent from './LastModifiedPopup.vue'
 import Column from 'primevue/column'
 const DataTable = DataTableComponent
 
@@ -22,8 +21,7 @@ DataTable.RowActions = DataTableRowActionsComponent
 DataTable.ColumnSelector = DataTableColumnSelectorComponent
 DataTable.Filter = DataTableFilterComponent
 DataTable.AppliedFilters = DataTableAppliedFiltersComponent
-DataTable.LastModifiedPopup = LastModifiedPopup
-DataTable.LastModifiedCell = DataTableLastModifiedCellComponent
+DataTable.LastModifiedPopup = LastModifiedPopupComponent
 DataTable.Column = Column
 
 DataTable.install = (app) => {
@@ -37,8 +35,7 @@ DataTable.install = (app) => {
   app.component('DataTableColumnSelector', DataTableColumnSelectorComponent)
   app.component('DataTableFilter', DataTableFilterComponent)
   app.component('DataTableAppliedFilters', DataTableAppliedFiltersComponent)
-  app.component('DataTableLastModifiedPopup', LastModifiedPopup)
-  app.component('DataTableLastModifiedCell', DataTableLastModifiedCellComponent)
+  app.component('LastModifiedPopup', LastModifiedPopupComponent)
   app.component('DataTableColumn', Column)
 }
 
@@ -55,7 +52,6 @@ export {
   DataTableColumnSelectorComponent as DataTableColumnSelector,
   DataTableFilterComponent as DataTableFilter,
   DataTableAppliedFiltersComponent as DataTableAppliedFilters,
-  LastModifiedPopup as DataTableLastModifiedPopup,
-  DataTableLastModifiedCellComponent as DataTableLastModifiedCell,
+  LastModifiedPopupComponent as LastModifiedPopup,
   Column as DataTableColumn
 }
