@@ -105,7 +105,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Firewall">
+      <PageHeadingBlock
+        pageTitle="Edge Firewall"
+        description="Protect applications with advanced security rules."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

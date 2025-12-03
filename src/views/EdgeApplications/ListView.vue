@@ -128,6 +128,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Applications"
+        description="Manage and optimize applications efficiently."
         data-testid="edge-applications-heading"
       >
         <template #default>

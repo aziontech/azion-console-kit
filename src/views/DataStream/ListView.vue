@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Data Stream">
+      <PageHeadingBlock
+        pageTitle="Data Stream"
+        description="Stream real-time data for analytics and insights."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

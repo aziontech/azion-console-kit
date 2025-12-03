@@ -186,6 +186,7 @@
       <PageHeadingBlock
         pageTitle="SQL Database"
         data-testid="edge-sql-heading"
+        description="Manage relational data with scalable and efficient SQL database solutions."
       >
         <template #default>
           <DataTableActionsButtons

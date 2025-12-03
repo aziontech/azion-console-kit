@@ -86,7 +86,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edge Nodes"
+        description="Monitor and manage nodes for optimal performance."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock

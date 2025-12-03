@@ -165,12 +165,21 @@
   const descriptionEmptyPage = computed(
     () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
   )
+
+  const pageDescription = computed(() => {
+    return isWorkload.value 
+      ? 'Deploy and manage scalable workloads across the network.'
+      : 'Manage and secure domains for applications.'
+  })
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`">
+      <PageHeadingBlock
+        :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"
+        :description="pageDescription"
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">
