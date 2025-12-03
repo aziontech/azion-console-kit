@@ -167,7 +167,7 @@
   )
 
   const pageDescription = computed(() => {
-    return isWorkload.value 
+    return isWorkload.value
       ? 'Deploy and manage scalable workloads across the network.'
       : 'Manage and secure domains for applications.'
   })
