@@ -115,9 +115,6 @@ async function decryptQuery(query) {
           }
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to decrypt sensitive query data:', error)
-        // If decryption fails, return null to skip this query
         return null
       }
     } else {
@@ -132,10 +129,12 @@ async function decryptQuery(query) {
 
 /**
  * Recursively decrypts sensitive query data in the cache
- * @param {any} data - Cache data to process
- * @returns {Promise<any>} Processed cache data with sensitive data decrypted
+ * @param {any} data - Cache data to decrypt
+ * @param {Object} options - Options for decryption
+ * @param {Function} options.onCorruption - Callback when corruption is detected
+ * @returns {Promise<any>} Decrypted cache data
  */
-async function decryptSensitiveQueries(data) {
+async function decryptSensitiveQueries(data, options = {}) {
   if (!data || typeof data !== 'object') {
     return data
   }
@@ -148,6 +147,27 @@ async function decryptSensitiveQueries(data) {
     // Filter out null values (failed decryptions)
     const validQueries = decryptedQueries.filter((query) => query !== null)
 
+    const failedCount = decryptedQueries.length - validQueries.length
+    if (failedCount > 0) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[TanStack Query] Skipped ${failedCount} corrupted cache entries (decryption failed)`
+      )
+
+      // If more than 50% of queries failed, cache is likely corrupted
+      // Clear it to prevent future errors
+      const failureRate = failedCount / decryptedQueries.length
+      if (failureRate > 0.5) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          '[TanStack Query] High cache corruption detected (>50% failure rate). Clearing cache automatically...'
+        )
+        if (options.onCorruption) {
+          options.onCorruption()
+        }
+      }
+    }
+
     return {
       ...data,
       queries: validQueries
@@ -156,7 +176,7 @@ async function decryptSensitiveQueries(data) {
 
   // Handle array of queries
   if (Array.isArray(data)) {
-    const decrypted = await Promise.all(data.map((item) => decryptSensitiveQueries(item)))
+    const decrypted = await Promise.all(data.map((item) => decryptSensitiveQueries(item, options)))
     return decrypted.filter((item) => item !== null)
   }
 
@@ -164,7 +184,7 @@ async function decryptSensitiveQueries(data) {
   const processed = { ...data }
   for (const key in processed) {
     if (processed[key] && typeof processed[key] === 'object') {
-      processed[key] = await decryptSensitiveQueries(processed[key])
+      processed[key] = await decryptSensitiveQueries(processed[key], options)
     }
   }
 
@@ -203,8 +223,28 @@ export function createIDBPersister(config, onRestoreComplete = null) {
           return undefined
         }
 
+        let shouldClearCache = false
+
         // Decrypt sensitive data after restoring
-        const decryptedClient = await decryptSensitiveQueries(client)
+        const decryptedClient = await decryptSensitiveQueries(client, {
+          onCorruption: () => {
+            shouldClearCache = true
+          }
+        })
+
+        // If cache is corrupted, clear it immediately
+        if (shouldClearCache) {
+          // eslint-disable-next-line no-console
+          console.warn('[TanStack Query] Clearing corrupted cache from IndexedDB...')
+          await del(cacheKey, customStore)
+          // eslint-disable-next-line no-console
+          console.info('[TanStack Query] Cache cleared successfully. Fresh data will be fetched.')
+
+          if (onRestoreComplete) {
+            queueMicrotask(() => onRestoreComplete(null))
+          }
+          return undefined
+        }
 
         // Filter out null values (failed decryptions)
         const filteredClient = filterNullValues(decryptedClient)
@@ -215,6 +255,20 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 
         return filteredClient
       } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('[TanStack Query] Error restoring cache:', error)
+        // eslint-disable-next-line no-console
+        console.warn('[TanStack Query] Clearing cache due to restore error...')
+
+        try {
+          await del(cacheKey, customStore)
+          // eslint-disable-next-line no-console
+          console.info('[TanStack Query] Cache cleared after error.')
+        } catch (clearError) {
+          // eslint-disable-next-line no-console
+          console.error('[TanStack Query] Failed to clear cache:', clearError)
+        }
+
         if (onRestoreComplete) {
           queueMicrotask(() => onRestoreComplete(error))
         }

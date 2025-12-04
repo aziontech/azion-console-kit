@@ -181,8 +181,6 @@ export async function decryptSensitiveData(encryptedData) {
     const decryptedString = decoder.decode(decryptedData)
     return JSON.parse(decryptedString)
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error decrypting sensitive data:', error)
     throw new Error('Failed to decrypt sensitive data')
   }
 }

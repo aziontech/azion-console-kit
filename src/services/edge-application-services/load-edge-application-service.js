@@ -36,13 +36,13 @@ export const loadEdgeApplicationService = async ({ id }) => {
 
   const queryOptions = {
     meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
+    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
   }
 
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(edgeAppV3Keys.detail(id)),
     queryFn: () => fetchEdgeApplication({ id }),
-    ...queryOptions
+    ...(queryOptions || {})
   })
 }
 

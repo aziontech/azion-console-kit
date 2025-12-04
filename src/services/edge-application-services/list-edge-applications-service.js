@@ -31,13 +31,13 @@ export const listEdgeApplicationsService = async ({
 
   const queryOptions = {
     meta: { persist: page === 1, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
+    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
   }
 
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(queryKey),
     queryFn: () => fetchList(params),
-    ...queryOptions
+    ...(queryOptions || {})
   })
 }
 
