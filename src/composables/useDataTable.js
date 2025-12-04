@@ -407,7 +407,6 @@ export function useDataTable(props, emit) {
     const rows = buildExportRows(rowsArg, columnsArg)
     const fields = getVisibleFields(columnsArg).map((column) => column.field)
 
-    // Remove linhas onde todos os campos exportados estão vazios (null/undefined/'')
     const nonEmptyRows = rows.filter((row) =>
       fields.some((fieldName) => {
         const value = row?.[fieldName]
