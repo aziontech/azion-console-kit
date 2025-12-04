@@ -21,6 +21,7 @@
       @sort="(e) => $emit('sort', e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
+      :notShowEmptyBlock="notShowEmptyBlock"
       removableSort
       scrollable
       scrollHeight="flex"
@@ -364,6 +365,7 @@
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
+  const notShowEmptyBlock = computed(() => selectedView.value?.value === 'json')
 
   const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 

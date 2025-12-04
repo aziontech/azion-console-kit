@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, onUnmounted, ref, watch, markRaw } from 'vue'
+  import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
 
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
@@ -8,7 +8,6 @@
   import PrimeButton from 'primevue/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import { useResize } from '@/composables/useResize'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
@@ -212,32 +211,6 @@
 
     emit('additionalErrors', azionFormValidationErrors.value)
   }
-
-  const setSplitterDirection = () => {
-    if (isGreaterThanLG.value) {
-      SPLITTER_PROPS.value = {
-        height: '50vh',
-        layout: 'horizontal',
-        panelsSizes: [60, 40]
-      }
-    } else {
-      SPLITTER_PROPS.value = {
-        height: '',
-        layout: 'vertical',
-        panelsSizes: []
-      }
-    }
-  }
-
-  onMounted(() => {
-    window.addEventListener('resize', () => {
-      setSplitterDirection()
-    })
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', setSplitterDirection)
-  })
 </script>
 
 <template>

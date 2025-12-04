@@ -5,7 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
-      v-if="data.length || loading || hasHeaderSlot"
+      v-if="shouldRenderTable"
       ref="dataTableRef"
       :value="displayData"
       :lazy="lazy"
@@ -270,6 +270,10 @@
         createPagePath: null,
         documentationService: null
       })
+    },
+    notShowEmptyBlock: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -292,6 +296,13 @@
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
+
+  const shouldRenderTable = computed(() => {
+    if (props.notShowEmptyBlock) {
+      return true
+    }
+    return props.data.length || props.loading
+  })
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -318,7 +329,6 @@
     set: (value) => emit('update:editingRows', value)
   })
 
-  const hasHeaderSlot = computed(() => !!slots.header)
   const hasFooterSlot = computed(() => !!slots.footer)
 
   const displayData = computed(() => {
