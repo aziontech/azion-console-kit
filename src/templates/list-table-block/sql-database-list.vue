@@ -238,7 +238,6 @@
               inputmode="decimal"
             />
 
-            <!-- demais tipos: texto normal -->
             <InputText
               v-else
               v-model="data[field]"
