@@ -1122,7 +1122,7 @@
     ...(props.cellQuickActionsItens || [])
   ]
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+  defineExpose({ reload, handleExportTableDataToCSV, data })
 </script>
 <style scoped lang="scss">
   .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {

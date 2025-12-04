@@ -68,6 +68,7 @@
           description: 'Create your first table to store your data at the edge.',
           createButtonLabel: 'Table'
         }"
+        :not-show-empty-block="notShowEmptyBlock"
       >
       </SqlDatabaseList>
     </div>
@@ -75,7 +76,7 @@
 </template>
 <script setup>
   defineOptions({ name: 'tables-view' })
-  import { ref, computed, nextTick, watch } from 'vue'
+  import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import InlineMessage from 'primevue/inlinemessage'
   import ConfirmDialog from 'primevue/confirmdialog'
@@ -123,6 +124,19 @@
   const columns = ref([])
   const tableRows = ref([])
   const isLoadingQuery = ref(false)
+  const notShowEmptyBlock = ref(false)
+
+  const resetTable = () => {
+    selectedTable.value = null
+    columns.value = []
+    tableRows.value = []
+    tableSchema.value = []
+    isSelectionMode.value = false
+    selectedTableNames.value = []
+    notShowEmptyBlock.value = false
+    tableMenuRef.value.hide()
+  }
+
   const tableColumns = computed(() => {
     if (activeView.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
@@ -171,6 +185,8 @@
 
     const namesTablesDeleted = selectedTableNames.value.join(', ')
     selectedTableNames.value = []
+    notShowEmptyBlock.value = false
+    resetTable()
     emit('load-tables')
     return `Table "${namesTablesDeleted}" deleted successfully`
   }
@@ -293,6 +309,7 @@
   const selectTable = async (table) => {
     isLoadingQuery.value = true
     selectedTable.value = table
+    notShowEmptyBlock.value = true
     try {
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
       columns.value = result.body.tableSchema.map(({ name, type }) => ({
@@ -314,6 +331,10 @@
   const reloadTables = () => {
     emit('load-tables')
   }
+
+  onMounted(() => {
+    reloadTables()
+  })
 
   const showTableMenu = (event, table) => {
     selectedTable.value = table
@@ -360,7 +381,8 @@
       rejectLabel: 'Cancel',
       acceptLabel: 'Delete',
       acceptClass: 'p-button-danger',
-      deleteService: deleteTableService
+      deleteService: deleteTableService,
+      successCallback: () => emit('load-tables')
     })
   }
 
