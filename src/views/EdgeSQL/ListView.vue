@@ -157,6 +157,24 @@
     { immediate: true }
   )
 
+  watch(
+    () => fetchListRef.value?.data,
+    (data) => {
+      if (Array.isArray(data) && data.length) {
+        const databaseCreating = data.find((database) => {
+          const statusContent =
+            typeof database.status === 'string' ? database.status : database.status?.content
+          return statusContent === 'creating'
+        })
+
+        if (databaseCreating?.id) {
+          startPolling(databaseCreating.id)
+        }
+      }
+    },
+    { immediate: true }
+  )
+
   onUnmounted(() => {
     stopPolling()
     stopDeletePolling()
