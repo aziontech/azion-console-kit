@@ -473,6 +473,8 @@
   })
 
   const openAccordionWithFormErrors = () => {
+    if (!props.errors) return
+
     const errorsKeys = Object.keys(props.errors)
     if (errorsKeys.length > 0) {
       const match = errorsKeys.find((key) => key.includes('criteria'))

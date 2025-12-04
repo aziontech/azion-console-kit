@@ -19,7 +19,14 @@ export const workloadKeys = {
     ordering
   ],
   details: () => [...workloadKeys.all, 'detail'],
-  detail: (id) => [...workloadKeys.details(), id]
+  detail: (id) => {
+    if (!id) {
+      // eslint-disable-next-line no-console
+      console.warn('[workloadKeys] Invalid id provided to detail():', id)
+      return [...workloadKeys.details(), '__invalid_id__']
+    }
+    return [...workloadKeys.details(), id]
+  }
 }
 
 export class WorkloadService extends BaseService {

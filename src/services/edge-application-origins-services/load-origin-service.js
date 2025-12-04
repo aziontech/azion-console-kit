@@ -35,7 +35,7 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
 
   const queryOptions = {
     meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
+    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
   }
 
   return await queryClient.ensureQueryData({
