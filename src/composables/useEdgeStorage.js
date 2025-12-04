@@ -122,21 +122,6 @@ export const useEdgeStorage = () => {
         return
       }
 
-      const specialCharRegex = /[^a-zA-Z0-9._\-()[\]{}]/
-      const invalidNameFiles = filesArray.filter((file) => specialCharRegex.test(file.name))
-
-      if (invalidNameFiles.length) {
-        handleToast(
-          'error',
-          'Invalid File Names',
-          `${invalidNameFiles.length} file${
-            invalidNameFiles.length > 1 ? 's have' : ' has'
-          } accented characters or cedilla. These characters are not allowed in file names.`
-        )
-        filesTableNeedRefresh.value = false
-        return
-      }
-
       const oversizedFiles = filesArray.filter((file) => file.size > maxFileSize)
 
       if (oversizedFiles.length) {
