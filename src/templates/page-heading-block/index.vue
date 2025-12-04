@@ -41,8 +41,8 @@
 </script>
 
 <template>
-  <div class="w-full flex justify-between items-center">
-    <div>
+  <div class="w-full md:h-16 flex md:flex-row flex-col gap-4 md:justify-between items-center">
+    <div class="w-full md:w-auto flex flex-col">
       <Breadcrumb
         :model="breadcrumbs.items"
         class="overflow-auto w-full px-0"
@@ -86,7 +86,7 @@
         v-if="props.pageTitle || props.description"
       >
         <div
-          class="text-[var(--text-color-secondary)] md:ml-[2px] text-xs font-normal leading-7 max-md:text-base"
+          class="text-color-secondary md:ml-[1.25px] !text-sm"
           v-if="props.description"
         >
           {{ props.description }}
@@ -95,7 +95,7 @@
     </div>
     <div
       v-if="hasDefaultSlot"
-      class="items-center flex justify-end"
+      class="w-full md:w-auto flex items-center justify-end"
     >
       <slot name="default"></slot>
     </div>
