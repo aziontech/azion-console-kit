@@ -3,7 +3,14 @@ import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 export const deviceGroupsKeys = {
-  all: (edgeAppId) => ['device-groups', edgeAppId],
+  all: (edgeAppId) => {
+    if (edgeAppId === null || edgeAppId === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[deviceGroupsKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['device-groups', '__invalid_edge_app_id__']
+    }
+    return ['device-groups', edgeAppId]
+  },
   lists: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'list'],
   details: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'detail']
 }

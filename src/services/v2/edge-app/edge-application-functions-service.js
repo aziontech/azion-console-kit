@@ -3,10 +3,24 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeApplicationFunctionsAdapter } from './edge-application-functions-adapter'
 
 export const edgeAppFunctionsKeys = {
-  all: (edgeAppId) => ['edge-app-functions', edgeAppId],
+  all: (edgeAppId) => {
+    if (edgeAppId === null || edgeAppId === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[edgeAppFunctionsKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['edge-app-functions', '__invalid_edge_app_id__']
+    }
+    return ['edge-app-functions', edgeAppId]
+  },
   lists: (edgeAppId) => [...edgeAppFunctionsKeys.all(edgeAppId), 'list'],
   details: (edgeAppId) => [...edgeAppFunctionsKeys.all(edgeAppId), 'detail'],
-  detail: (edgeAppId, functionId) => [...edgeAppFunctionsKeys.details(edgeAppId), functionId]
+  detail: (edgeAppId, functionId) => {
+    if (functionId === null || functionId === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[edgeAppFunctionsKeys] Invalid functionId provided:', functionId)
+      return [...edgeAppFunctionsKeys.details(edgeAppId), '__invalid_function_id__']
+    }
+    return [...edgeAppFunctionsKeys.details(edgeAppId), functionId]
+  }
 }
 
 export class EdgeApplicationFunctionService extends BaseService {

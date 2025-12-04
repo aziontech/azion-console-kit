@@ -41,7 +41,7 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey([...originsKeys.details(edgeApplicationId), id]),
     queryFn: () => fetchOrigin({ edgeApplicationId, id }),
-    ...(queryOptions || {})
+    ...queryOptions
   })
 }
 

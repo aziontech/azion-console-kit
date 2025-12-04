@@ -8,7 +8,14 @@ import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptio
 export const edgeAppV3Keys = {
   all: ['edge-apps-v3'],
   details: () => [...edgeAppV3Keys.all, 'detail'],
-  detail: (id) => [...edgeAppV3Keys.details(), id]
+  detail: (id) => {
+    if (id === null || id === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[edgeAppV3Keys] Invalid id provided to detail():', id)
+      return [...edgeAppV3Keys.details(), '__invalid_id__']
+    }
+    return [...edgeAppV3Keys.details(), id]
+  }
 }
 
 const fetchEdgeApplication = async ({ id }) => {
@@ -42,7 +49,7 @@ export const loadEdgeApplicationService = async ({ id }) => {
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(edgeAppV3Keys.detail(id)),
     queryFn: () => fetchEdgeApplication({ id }),
-    ...(queryOptions || {})
+    ...queryOptions
   })
 }
 

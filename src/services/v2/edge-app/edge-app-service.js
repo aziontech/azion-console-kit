@@ -14,7 +14,14 @@ export const edgeAppKeys = {
     ordering
   ],
   details: () => [...edgeAppKeys.all, 'detail'],
-  detail: (id) => [...edgeAppKeys.details(), id]
+  detail: (id) => {
+    if (id === null || id === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[edgeAppKeys] Invalid id provided to detail():', id)
+      return [...edgeAppKeys.details(), '__invalid_id__']
+    }
+    return [...edgeAppKeys.details(), id]
+  }
 }
 
 export class EdgeAppService extends BaseService {

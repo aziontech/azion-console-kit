@@ -3,7 +3,14 @@ import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 export const errorResponseKeys = {
-  all: (edgeAppId) => ['error-responses', edgeAppId],
+  all: (edgeAppId) => {
+    if (edgeAppId === null || edgeAppId === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[errorResponseKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['error-responses', '__invalid_edge_app_id__']
+    }
+    return ['error-responses', edgeAppId]
+  },
   lists: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'list'],
   details: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'detail']
 }

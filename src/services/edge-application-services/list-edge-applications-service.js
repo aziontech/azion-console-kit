@@ -37,7 +37,7 @@ export const listEdgeApplicationsService = async ({
   return await queryClient.ensureQueryData({
     queryKey: createFinalKey(queryKey),
     queryFn: () => fetchList(params),
-    ...(queryOptions || {})
+    ...queryOptions
   })
 }
 

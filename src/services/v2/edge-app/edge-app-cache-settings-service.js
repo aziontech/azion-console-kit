@@ -3,7 +3,14 @@ import { CacheSettingsAdapter } from './edge-app-cache-settings-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 export const cacheSettingsKeys = {
-  all: (edgeAppId) => ['cache-settings', edgeAppId],
+  all: (edgeAppId) => {
+    if (edgeAppId === null || edgeAppId === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('[cacheSettingsKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['cache-settings', '__invalid_edge_app_id__']
+    }
+    return ['cache-settings', edgeAppId]
+  },
   lists: (edgeAppId) => [...cacheSettingsKeys.all(edgeAppId), 'list'],
   details: (edgeAppId) => [...cacheSettingsKeys.all(edgeAppId), 'detail']
 }

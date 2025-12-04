@@ -37,7 +37,7 @@ export class BaseService {
       const queryOptions = this.#getQueryOptions(options)
       const finalKey = createFinalKey(queryKey)
 
-      return useQuery({ queryKey: finalKey, queryFn, ...(queryOptions || {}) })
+      return useQuery({ queryKey: finalKey, queryFn, ...queryOptions })
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('[TanStack Query] Error creating query:', error)
@@ -52,8 +52,11 @@ export class BaseService {
           return null
         },
         initialData: null,
-        staleTime: Infinity,
-        retry: false
+        staleTime: this.toMilliseconds({ seconds: 30 }),
+        gcTime: this.toMilliseconds({ minutes: 1 }),
+        retry: false,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false
       })
     }
   }
@@ -110,7 +113,7 @@ export class BaseService {
       return this.queryClient.prefetchQuery({
         queryKey: createFinalKey(queryKey),
         queryFn,
-        ...(queryOptions || {})
+        ...queryOptions
       })
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -128,7 +131,7 @@ export class BaseService {
       return this.queryClient.ensureQueryData({
         queryKey: createFinalKey(queryKey),
         queryFn,
-        ...(queryOptions || {})
+        ...queryOptions
       })
     } catch (error) {
       // eslint-disable-next-line no-console
