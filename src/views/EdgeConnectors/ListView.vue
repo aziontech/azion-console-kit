@@ -111,7 +111,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock 
+      <PageHeadingBlock
         pageTitle="Connectors"
         description="Establish seamless connections with origins to retrieve and integrate data efficiently."
       >
