@@ -115,17 +115,13 @@
         description="Organize and manage IP and network lists securely."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Network List"
-                createPagePath="network-lists/create"
-                @click="handleCreateTrackEvent"
-                data-testid="create_NetworkList_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Network List"
+            createPagePath="network-lists/create"
+            @click="handleCreateTrackEvent"
+            data-testid="create_NetworkList_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

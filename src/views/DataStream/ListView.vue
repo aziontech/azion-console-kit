@@ -6,17 +6,13 @@
         description="Stream real-time data for analytics and insights."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Stream"
-                createPagePath="/data-stream/create"
-                :disabled="hasNoPermissionToCreateDataStream || disabledList"
-                data-testid="create_Stream_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Stream"
+            createPagePath="/data-stream/create"
+            :disabled="hasNoPermissionToCreateDataStream || disabledList"
+            data-testid="create_Stream_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

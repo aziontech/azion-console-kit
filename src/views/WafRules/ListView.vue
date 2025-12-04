@@ -149,17 +149,13 @@
         description="Manage Web Application Firewall (WAF) rules for secure connections."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="WAF Rule"
-                createPagePath="waf/create"
-                @click="handleTrackClickToCreate"
-                data-testid="create_WAFRule_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="WAF Rule"
+            createPagePath="waf/create"
+            @click="handleTrackClickToCreate"
+            data-testid="create_WAFRule_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

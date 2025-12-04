@@ -124,17 +124,13 @@
         description="Protect applications with advanced security rules."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Firewall"
-                @click="handleTrackEvent"
-                createPagePath="/firewalls/create"
-                data-testid="create_Firewall_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Firewall"
+            @click="handleTrackEvent"
+            createPagePath="/firewalls/create"
+            data-testid="create_Firewall_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

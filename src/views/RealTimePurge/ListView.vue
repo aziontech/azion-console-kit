@@ -6,17 +6,13 @@
         description="Invalidate manually cached content across the network."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Purge"
-                @click="handleTrackEvent"
-                createPagePath="real-time-purge/create"
-                data-testid="create_Purge_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Purge"
+            @click="handleTrackEvent"
+            createPagePath="real-time-purge/create"
+            data-testid="create_Purge_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

@@ -178,17 +178,13 @@
         description="Manage serverless functions for applications."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Function"
-                @click="handleCreateTrackEvent"
-                createPagePath="functions/create?origin=list"
-                data-testid="create_Function_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Function"
+            @click="handleCreateTrackEvent"
+            createPagePath="functions/create?origin=list"
+            data-testid="create_Function_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

@@ -157,7 +157,7 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <div class="mb-4">
+      <div class="mb-2">
         <slot
           name="notification"
           v-bind="propsNotification()"

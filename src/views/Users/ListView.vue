@@ -140,17 +140,13 @@
         description="Manage users and define access levels."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="User"
-                @click="handleTrackEvent"
-                createPagePath="users/create"
-                data-testid="create_User_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="User"
+            @click="handleTrackEvent"
+            createPagePath="users/create"
+            data-testid="create_User_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

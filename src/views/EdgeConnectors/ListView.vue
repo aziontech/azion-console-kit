@@ -116,16 +116,12 @@
         description="Establish seamless connections with origins to retrieve and integrate data efficiently."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Connectors"
-                createPagePath="/connectors/create"
-                data-testid="create_Connectors_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Connectors"
+            createPagePath="/connectors/create"
+            data-testid="create_Connectors_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

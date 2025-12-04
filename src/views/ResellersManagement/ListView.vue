@@ -79,16 +79,12 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Resellers">
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Reseller"
-                createPagePath="management/create"
-                data-testid="create_Reseller_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Reseller"
+            createPagePath="management/create"
+            data-testid="create_Reseller_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

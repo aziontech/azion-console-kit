@@ -86,7 +86,7 @@
         v-if="props.pageTitle || props.description"
       >
         <div
-          class="text-color-secondary md:ml-[1.25px] !text-sm"
+          class="text-color-secondary lg:max-w-[36rem] overflow-hidden lg:truncate lg:ml-[1.25px] !text-sm"
           v-if="props.description"
         >
           {{ props.description }}
@@ -95,7 +95,7 @@
     </div>
     <div
       v-if="hasDefaultSlot"
-      class="w-full md:w-auto flex items-center justify-end"
+      class="flex items-center gap-3 w-full md:w-auto md:justify-end"
     >
       <slot name="default"></slot>
     </div>

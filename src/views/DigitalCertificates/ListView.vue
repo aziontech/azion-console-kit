@@ -374,18 +374,16 @@
         description="Manage SSL/TLS certificates for secure connections."
       >
         <template #default>
-          <div class="flex justify-between gap-3 w-full">
-            <SelectButton
-              v-model="digitalCertificateTypeSelected"
-              :options="optionsSelectButton"
-              aria-labelledby="basic"
-              class="h-9 p-1"
-            />
-            <CreateMenuBlock
-              addButtonLabel="Certificate"
-              :items="items"
-            />
-          </div>
+          <SelectButton
+            v-model="digitalCertificateTypeSelected"
+            :options="optionsSelectButton"
+            aria-labelledby="basic"
+            class="h-9 p-1"
+          />
+          <CreateMenuBlock
+            addButtonLabel="Certificate"
+            :items="items"
+          />
         </template>
       </PageHeadingBlock>
     </template>

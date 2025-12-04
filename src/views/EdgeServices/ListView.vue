@@ -150,17 +150,13 @@
         description="Deliver and manage services for applications."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Service"
-                @click="handleTrackEventGoToCreate"
-                createPagePath="edge-services/create"
-                data-testid="create_Service_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Service"
+            @click="handleTrackEventGoToCreate"
+            createPagePath="edge-services/create"
+            data-testid="create_Service_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

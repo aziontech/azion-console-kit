@@ -3,16 +3,12 @@
     <template #heading>
       <PageHeadingBlock pageTitle="SSO Management">
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Identity Provider"
-                createPagePath="identity-providers/create"
-                data-testid="create_IdentityProvider_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Identity Provider"
+            createPagePath="identity-providers/create"
+            data-testid="create_IdentityProvider_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

@@ -114,21 +114,18 @@
         description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <copyBlock
-                :value="nameServers"
-                label="Copy Nameserver Values"
-              />
-              <DataTableActionsButtons
-                size="small"
-                label="Zone"
-                @click="handleTrackEvent"
-                createPagePath="edge-dns/create"
-                data-testid="create_Zone_button"
-              />
-            </div>
-          </div>
+          <copyBlock
+            :value="nameServers"
+            is-copy-visible="true"
+            label="Copy Nameserver Values"
+          />
+          <DataTableActionsButtons
+            size="small"
+            label="Zone"
+            @click="handleTrackEvent"
+            createPagePath="edge-dns/create"
+            data-testid="create_Zone_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

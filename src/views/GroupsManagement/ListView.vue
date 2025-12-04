@@ -80,16 +80,12 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Groups">
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Group"
-                createPagePath="management/create"
-                data-testid="create_Group_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Group"
+            createPagePath="management/create"
+            data-testid="create_Group_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

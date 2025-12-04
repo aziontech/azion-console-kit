@@ -113,24 +113,20 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Custom Pages">
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <PrimeButton
-                size="small"
-                link
-                @click="navigateToGetHelp"
-              >
-                Get Help
-              </PrimeButton>
-              <DataTableActionsButtons
-                size="small"
-                label="Custom Page"
-                createPagePath="custom-pages/create"
-                data-testid="create_CustomPage_button"
-                @click="handleTrackEvent"
-              />
-            </div>
-          </div>
+          <PrimeButton
+            size="small"
+            link
+            @click="navigateToGetHelp"
+          >
+            Get Help
+          </PrimeButton>
+          <DataTableActionsButtons
+            size="small"
+            label="Custom Page"
+            createPagePath="custom-pages/create"
+            data-testid="create_CustomPage_button"
+            @click="handleTrackEvent"
+          />
         </template>
       </PageHeadingBlock>
     </template>

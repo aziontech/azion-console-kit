@@ -6,17 +6,13 @@
         description="Generate and manage personal tokens for secure access to your account."
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Personal Token"
-                createPagePath="personal-tokens/create"
-                @click="handleTrackEvent"
-                data-testid="create_PersonalToken_button"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            label="Personal Token"
+            createPagePath="personal-tokens/create"
+            @click="handleTrackEvent"
+            data-testid="create_PersonalToken_button"
+          />
         </template>
       </PageHeadingBlock>
     </template>

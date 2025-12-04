@@ -196,17 +196,13 @@
         :description="pageDescription"
       >
         <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                :label="handleTextDomainWorkload.singularTitle"
-                @click="handleTrackEvent"
-                :createPagePath="createDomainPath"
-                :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
-              />
-            </div>
-          </div>
+          <DataTableActionsButtons
+            size="small"
+            :label="handleTextDomainWorkload.singularTitle"
+            @click="handleTrackEvent"
+            :createPagePath="createDomainPath"
+            :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
+          />
         </template>
       </PageHeadingBlock>
     </template>
