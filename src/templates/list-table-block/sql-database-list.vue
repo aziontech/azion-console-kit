@@ -227,7 +227,11 @@
             />
 
             <InputText
-              v-else-if="['integer', 'bigint', 'decimal', 'float'].includes(String(col.tagType).toLowerCase())"
+              v-else-if="
+                ['integer', 'bigint', 'decimal', 'float'].includes(
+                  String(col.tagType).toLowerCase()
+                )
+              "
               v-model="data[field]"
               type="number"
               class="w-full"
