@@ -58,7 +58,7 @@
                 :model="items"
               />
             </div>
-            <div class="flex items-center gap-2 justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
               <div class="flex gap-2 items-center">
                 <DataTable.Search
                   v-model="filters.global.value"

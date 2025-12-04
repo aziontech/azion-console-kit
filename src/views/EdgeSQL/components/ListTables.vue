@@ -128,12 +128,12 @@
             </div>
 
             <PrimeButton
-              icon="pi pi-ellipsis-v"
+              icon="pi pi-ellipsis-h"
               size="small"
               outlined
               @click.stop="$emit('show-table-menu', $event, table)"
               data-testid="table-menu-button"
-              class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              class="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             />
           </div>
         </div>
