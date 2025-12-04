@@ -18,10 +18,10 @@
       :rowsPerPageOptions="[10, 25, 50, 100]"
       :rows="minimumOfItemsPerPage"
       @page="onPage"
-      @sort="(e) => $emit('sort', e)"
+      @sort="(e) => onSort(e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
-      :notShowEmptyBlock="notShowEmptyBlock"
+      :notShowEmptyBlock="notShowEmptyBlockComputed"
       removableSort
       scrollable
       scrollHeight="flex"
@@ -58,7 +58,7 @@
                 :model="items"
               />
             </div>
-            <div class="flex items-center gap-2 justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
               <div class="flex gap-2 items-center">
                 <DataTable.Search
                   v-model="filters.global.value"
@@ -227,6 +227,18 @@
             />
 
             <InputText
+              v-else-if="
+                ['integer', 'bigint', 'decimal', 'float'].includes(
+                  String(col.tagType).toLowerCase()
+                )
+              "
+              v-model="data[field]"
+              type="number"
+              class="w-full"
+              inputmode="decimal"
+            />
+
+            <InputText
               v-else
               v-model="data[field]"
               class="w-full"
@@ -234,15 +246,15 @@
           </template>
         </Column>
         <DataTable.Column header="Actions">
-          <template #body="{ data, index }">
+          <template #body="{ data }">
             <div
-              v-if="isRowEditing(index)"
+              v-if="isRowEditing(data)"
               class="flex gap-1 justify-end"
             >
               <PrimeButton
                 :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
                 size="small"
-                @click.stop="saveRowEdit(data, index)"
+                @click.stop="saveRowEdit(data)"
                 outlined
                 iconOnly
                 data-testid="row-save-button"
@@ -255,7 +267,7 @@
                 severity="secondary"
                 outlined
                 iconOnly
-                @click.stop="cancelRowEdit(data, index)"
+                @click.stop="cancelRowEdit(data)"
                 data-testid="row-cancel-button"
                 v-tooltip.top="'Cancel'"
               />
@@ -328,6 +340,7 @@
         documentationService: null
       })
     },
+    notShowEmptyBlock: { type: Boolean, default: false },
     options: {
       type: Array,
       default: () => [
@@ -365,7 +378,10 @@
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
-  const notShowEmptyBlock = computed(() => selectedView.value?.value === 'json')
+  const notShowEmptyBlockComputed = computed(() => {
+    const isJsonView = selectedView.value?.value === 'json'
+    return Boolean(props.notShowEmptyBlock || isJsonView)
+  })
 
   const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 
@@ -451,6 +467,12 @@
     }
   }
 
+  const onSort = (event) => {
+    editingRows.value = []
+    backups.value.clear()
+    emit('sort', event)
+  }
+
   const onRowEditSave = (event) => {
     const { newData, data } = event || {}
     const key = getRowKey(newData) ?? getRowKey(data)
@@ -496,12 +518,13 @@
     emit('row-edit-cancel', { id: key, original })
   }
 
-  const isRowEditing = (rowIndex) => {
-    const row = editableData.value[rowIndex]
+  const isRowEditing = (row) => {
     if (!row) return false
     const key = getRowKey(row)
-    if (key != null) return editingRows.value.some((editing) => getRowKey(editing) === key)
-    return editingRows.value.includes(row)
+    if (key == null) {
+      return editingRows.value.includes(row)
+    }
+    return editingRows.value.some((editing) => getRowKey(editing) === key)
   }
 
   const showRowMenu = (event, rowData) => {
@@ -512,15 +535,14 @@
     }
   }
 
-  const saveRowEdit = (rowData, rowIndex) => {
+  const saveRowEdit = (rowData) => {
     isLoadingEditRow.value = true
-    onRowEditSave({ newData: { ...rowData }, data: rowData, index: rowIndex })
-
+    onRowEditSave({ newData: { ...rowData }, data: rowData })
     isLoadingEditRow.value = false
   }
 
-  const cancelRowEdit = (rowData, rowIndex) => {
-    onRowEditCancel({ data: rowData, index: rowIndex })
+  const cancelRowEdit = (rowData) => {
+    onRowEditCancel({ data: rowData })
   }
 
   const computedMenuItems = computed(() => {
@@ -559,7 +581,8 @@
   }
 
   // Use centralized export helpers from useDataTable
-  const exportAsCSV = () => handleExportTableDataToCSV()
+  const exportAsCSV = () =>
+    handleExportTableDataToCSV(props.title, editableData.value, selectedColumns.value)
   const exportAsJSON = () =>
     exportTableAsJSON(props.title, editableData.value, selectedColumns.value)
   const exportAsXLSX = () =>
