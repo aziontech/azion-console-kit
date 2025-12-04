@@ -174,7 +174,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock 
+        :pageTitle="title"
+        description="Store and retrieve objects with high availability and performance."
+      />
     </template>
     <template #content>
       <!-- Create Mode -->

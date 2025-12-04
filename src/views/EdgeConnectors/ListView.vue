@@ -111,7 +111,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Connectors">
+      <PageHeadingBlock 
+        pageTitle="Connectors"
+        description="Establish seamless connections with origins to retrieve and integrate data efficiently."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">
