@@ -11,7 +11,7 @@
       @click="animate"
       :class="[
         'p-button-text transition-opacity duration-200',
-        isCopyVisible ? 'opacity-50' : 'opacity-0'
+        isCopyVisible ? 'opacity-100' : 'opacity-0'
       ]"
     />
   </div>
