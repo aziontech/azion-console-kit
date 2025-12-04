@@ -468,6 +468,7 @@
   }
 
   const onSort = (event) => {
+    editableData.value = editableData.value.filter((row) => row?._isNew !== true)
     editingRows.value = []
     backups.value.clear()
     emit('sort', event)
