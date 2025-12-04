@@ -2,7 +2,14 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
 
 export const rulesEngineKeys = {
-  all: (edgeAppId) => ['rules-engine', edgeAppId]
+  all: (edgeAppId) => {
+    if (!edgeAppId) {
+      // eslint-disable-next-line no-console
+      console.warn('[rulesEngineKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['rules-engine', '__invalid_edge_app_id__']
+    }
+    return ['rules-engine', edgeAppId]
+  }
 }
 
 export class RulesEngineService extends BaseService {
