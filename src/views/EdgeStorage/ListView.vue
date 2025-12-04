@@ -100,14 +100,15 @@
                   />
                 </template>
                 <template #second-line-actions>
-                  <PrimeButton
+                  <!-- comment button for hide to users -->
+                  <!-- <PrimeButton
                     icon="pi pi-folder-plus"
                     size="small"
                     @click="handleNewFolder"
                     :label="isGreaterThanMD ? 'New Folder' : ''"
                     outlined
                     class="px-4 py-1 flex items-center justify-center"
-                  />
+                  /> -->
                   <SplitButton
                     size="small"
                     label="Add to files"
@@ -441,11 +442,11 @@
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
-
-  const handleNewFolder = () => {
-    isCreatingNewFolder.value = true
-    newFolderName.value = ''
-  }
+  //  comment handleNewFolder for hide new folder button
+  // const handleNewFolder = () => {
+  //   isCreatingNewFolder.value = true
+  //   newFolderName.value = ''
+  // }
 
   const handleSaveNewFolder = () => {
     const folderName = newFolderName.value.trim()
