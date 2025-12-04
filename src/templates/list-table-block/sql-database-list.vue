@@ -18,7 +18,7 @@
       :rowsPerPageOptions="[10, 25, 50, 100]"
       :rows="minimumOfItemsPerPage"
       @page="onPage"
-      @sort="(e) => $emit('sort', e)"
+      @sort="(e) => onSort(e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
       :notShowEmptyBlock="notShowEmptyBlockComputed"
@@ -234,15 +234,15 @@
           </template>
         </Column>
         <DataTable.Column header="Actions">
-          <template #body="{ data, index }">
+          <template #body="{ data }">
             <div
-              v-if="isRowEditing(index)"
+              v-if="isRowEditing(data)"
               class="flex gap-1 justify-end"
             >
               <PrimeButton
                 :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
                 size="small"
-                @click.stop="saveRowEdit(data, index)"
+                @click.stop="saveRowEdit(data)"
                 outlined
                 iconOnly
                 data-testid="row-save-button"
@@ -255,7 +255,7 @@
                 severity="secondary"
                 outlined
                 iconOnly
-                @click.stop="cancelRowEdit(data, index)"
+                @click.stop="cancelRowEdit(data)"
                 data-testid="row-cancel-button"
                 v-tooltip.top="'Cancel'"
               />
@@ -455,6 +455,12 @@
     }
   }
 
+  const onSort = (event) => {
+    editingRows.value = []
+    backups.value.clear()
+    emit('sort', event)
+  }
+
   const onRowEditSave = (event) => {
     const { newData, data } = event || {}
     const key = getRowKey(newData) ?? getRowKey(data)
@@ -500,12 +506,13 @@
     emit('row-edit-cancel', { id: key, original })
   }
 
-  const isRowEditing = (rowIndex) => {
-    const row = editableData.value[rowIndex]
+  const isRowEditing = (row) => {
     if (!row) return false
     const key = getRowKey(row)
-    if (key != null) return editingRows.value.some((editing) => getRowKey(editing) === key)
-    return editingRows.value.includes(row)
+    if (key == null) {
+      return editingRows.value.includes(row)
+    }
+    return editingRows.value.some((editing) => getRowKey(editing) === key)
   }
 
   const showRowMenu = (event, rowData) => {
@@ -516,15 +523,14 @@
     }
   }
 
-  const saveRowEdit = (rowData, rowIndex) => {
+  const saveRowEdit = (rowData) => {
     isLoadingEditRow.value = true
-    onRowEditSave({ newData: { ...rowData }, data: rowData, index: rowIndex })
-
+    onRowEditSave({ newData: { ...rowData }, data: rowData })
     isLoadingEditRow.value = false
   }
 
-  const cancelRowEdit = (rowData, rowIndex) => {
-    onRowEditCancel({ data: rowData, index: rowIndex })
+  const cancelRowEdit = (rowData) => {
+    onRowEditCancel({ data: rowData })
   }
 
   const computedMenuItems = computed(() => {
