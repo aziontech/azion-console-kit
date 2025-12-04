@@ -126,6 +126,17 @@
   const isLoadingQuery = ref(false)
   const notShowEmptyBlock = ref(false)
 
+  const resetTable = () => {
+    selectedTable.value = null
+    columns.value = []
+    tableRows.value = []
+    tableSchema.value = []
+    isSelectionMode.value = false
+    selectedTableNames.value = []
+    notShowEmptyBlock.value = false
+    tableMenuRef.value.hide()
+  }
+
   const tableColumns = computed(() => {
     if (activeView.value === 'table') {
       return Array.isArray(columns.value) ? columns.value : []
@@ -174,6 +185,8 @@
 
     const namesTablesDeleted = selectedTableNames.value.join(', ')
     selectedTableNames.value = []
+    notShowEmptyBlock.value = false
+    resetTable()
     emit('load-tables')
     return `Table "${namesTablesDeleted}" deleted successfully`
   }
@@ -368,7 +381,8 @@
       rejectLabel: 'Cancel',
       acceptLabel: 'Delete',
       acceptClass: 'p-button-danger',
-      deleteService: deleteTableService
+      deleteService: deleteTableService,
+      successCallback: () => emit('load-tables')
     })
   }
 
