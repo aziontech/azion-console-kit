@@ -174,9 +174,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="title"
-      />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <!-- Create Mode -->
