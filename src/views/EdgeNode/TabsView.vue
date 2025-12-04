@@ -115,7 +115,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        :entityName="edgeNode?.name"
+      />
     </template>
     <template #content>
       <TabView

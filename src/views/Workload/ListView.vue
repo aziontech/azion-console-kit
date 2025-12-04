@@ -111,7 +111,7 @@
         style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
-            data: Array.isArray(columnData) ? columnData : columnData.content,
+            data: Array.isArray(columnData) ? columnData : columnData?.content,
             columnAppearance: 'text-array-with-popup',
             dependencies: {
               showCopy: Helpers.clipboardWrite

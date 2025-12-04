@@ -195,7 +195,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        :entityName="edgeFirewall?.name"
+      />
     </template>
     <template #content>
       <div

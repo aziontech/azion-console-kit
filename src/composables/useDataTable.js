@@ -526,15 +526,24 @@ export function useDataTable(props, emit) {
   const exportTableAsXLSX = async (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
     const rows = buildExportRows(rowsArg, columnsArg)
     const fields = getVisibleFields(columnsArg).map((column) => column.field)
+
+    const nonEmptyRows = rows.filter((row) =>
+      fields.some((fieldName) => {
+        const value = row?.[fieldName]
+        return value !== null && value !== undefined && value !== ''
+      })
+    )
+
     const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.xlsx`
     try {
       const mod = await import('xlsx')
       const XLSX = mod.default ?? mod
       const headerRow = fields
-      const dataRows = rows.map((row) => fields.map((fieldName) => row?.[fieldName]))
+      const dataRows = nonEmptyRows.map((row) => fields.map((fieldName) => row?.[fieldName]))
       const worksheetData = [headerRow, ...dataRows]
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.aoa_to_sheet(worksheetData)
+
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
       const arrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
       const blob = new Blob([arrayBuffer], {

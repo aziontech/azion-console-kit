@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.46.3",
+  "version": "1.46.9",
   "private": false,
   "type": "module",
   "repository": {
@@ -43,6 +43,7 @@
     "@sentry/vite-plugin": "^4.3.0",
     "@sentry/vue": "^10.27.0",
     "@stripe/stripe-js": "^4.1.0",
+    "@tanstack/query-broadcast-client-experimental": "^5.90.10",
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.3",
     "@vee-validate/yup": "^4.15.1",
@@ -65,7 +66,7 @@
     "pinia-plugin-persistedstate": "^3.2.0",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
-    "primevue": "3.46.0",
+    "primevue": "3.35.0",
     "psl": "^1.15.0",
     "qrcode.vue": "^3.4.1",
     "recaptcha-v3": "^1.10.0",

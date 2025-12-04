@@ -19,10 +19,15 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
+  import PrimeButton from 'primevue/button'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
-  import PrimeButton from 'primevue/button'
-
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
+  import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -47,9 +52,7 @@
     functions: !hasFlagBlockApiV4() ? 3 : 5,
     'rules-engine': !hasFlagBlockApiV4() ? 4 : 6
   })
-  const mapTabs = ref({
-    ...defaultTabs.value
-  })
+  const mapTabs = ref({ ...defaultTabs.value })
 
   const toast = useToast()
   const route = useRoute()
@@ -75,20 +78,14 @@
   })
 
   const handleTrackClickToEditErrorResponses = () => {
-    tracker.product
-      .clickToEdit({
-        productName: 'Error Responses'
-      })
-      .track()
+    tracker.product.clickToEdit({ productName: 'Error Responses' }).track()
   }
 
   const checkIsLocked = async () => {
     if (hasFlagBlockApiV4()) {
       const edgeApplication = await edgeAppService.loadEdgeApplicationService({
         id: edgeApplicationId.value,
-        params: {
-          fields: 'product_version'
-        }
+        params: { fields: 'product_version' }
       })
 
       isLocked.value = edgeApplication.productVersion === 'custom'
@@ -105,11 +102,7 @@
 
       return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      toast.add({ closable: true, severity: 'error', summary: error })
       router.push({ name: props.edgeApplicationServices.updatedRedirect })
     }
   }
@@ -132,6 +125,58 @@
     mapTabs.value = { ...defaultTabs.value }
   }
 
+  const preloadTabData = async () => {
+    if (!edgeApplication.value) return
+
+    const preloadPromises = []
+    const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+
+    if (hasFlagBlockApiV4()) {
+      preloadPromises.push(
+        props.originsServices.listOriginsService({
+          id: edgeApplicationId.value,
+          pageSize: 200
+        })
+      )
+
+      preloadPromises.push(
+        edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
+          edgeApplicationId: edgeApplicationId.value,
+          params: {}
+        })
+      )
+    }
+
+    preloadPromises.push(
+      deviceGroupService.listDeviceGroupService(edgeApplicationId.value, { pageSize: 10, page: 1 })
+    )
+
+    preloadPromises.push(
+      cacheSettingsService.listCacheSettingsService(edgeApplicationId.value, {
+        pageSize: 100,
+        page: 1
+      })
+    )
+
+    if (edgeApplication.value[edgeFunctionsProperty]) {
+      preloadPromises.push(
+        edgeApplicationFunctionService.listEdgeApplicationFunctions(edgeApplicationId.value, {
+          pageSize: 10,
+          page: 1
+        })
+      )
+    }
+
+    preloadPromises.push(
+      rulesEngineService.listRulesEngineRequestAndResponsePhase({
+        edgeApplicationId: edgeApplicationId.value,
+        params: {}
+      })
+    )
+
+    await Promise.allSettled(preloadPromises)
+  }
+
   const renderTabByCurrentRouter = async () => {
     const { tab } = route.params
 
@@ -142,6 +187,7 @@
     verifyTab(edgeApplication.value)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
+    preloadTabData()
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
@@ -173,15 +219,8 @@
     return selectedTab
   }
   const changeRouteByTab = (tab) => {
-    const params = {
-      id: edgeApplicationId.value,
-      tab
-    }
-    router.push({
-      name: 'edit-application',
-      params,
-      query: route.query
-    })
+    const params = { id: edgeApplicationId.value, tab }
+    router.push({ name: 'edit-application', params, query: route.query })
   }
   const changeTab = (index) => {
     verifyTab(edgeApplication.value)
@@ -194,12 +233,7 @@
 
   const visibleOnSaved = ref(false)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  provide('unsaved', { changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved })
 
   provide('edgeApplication', edgeApplication)
 
@@ -348,10 +382,7 @@
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
         const offsetPosition = elementPosition - totalOffset
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        })
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
       }
     }, 50)
   }
@@ -362,13 +393,19 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="!edgeApplication" />
+
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
       <PageHeadingBlock
         :pageTitle="tabTitle"
         :tag="tagLocked"
+        :entityName="edgeApplication?.name"
         data-testid="edge-application-details-heading"
       />
     </template>

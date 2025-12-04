@@ -164,7 +164,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        :entityName="title"
+      />
     </template>
     <template #content>
       <div class="h-full w-full">

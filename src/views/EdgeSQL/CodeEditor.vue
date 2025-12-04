@@ -31,7 +31,9 @@
       >
         <template #panel-a>
           <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
-            <div class="flex justify-between border-x border-t surface-border rounded-t-md p-3">
+            <div
+              class="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between border-x border-t surface-border rounded-t-md p-3"
+            >
               <Button
                 :label="labelRunQuery"
                 icon="pi pi-play"

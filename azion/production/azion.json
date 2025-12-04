@@ -77,6 +77,16 @@
       "origin-id": 249264,
       "origin-key": "feb48ca4-c97d-4717-b28c-030e310f0c19",
       "name": "origin-console-feedback"
+    },
+    {
+      "origin-id": 249254,
+      "origin-key": "cfde12ef-62ca-4581-9b34-87157443b6a2",
+      "name": "consolekit-production_single"
+    },
+    {
+      "origin-id": 249764,
+      "origin-key": "6ac11a1c-cd32-4702-b610-af5e09b7af11",
+      "name": "origin-help-center"
     }
   ],
   "rules-engine": {
@@ -206,6 +216,11 @@
         "id": 498046,
         "name": "Cache Controll to index.html",
         "phase": "response"
+      },
+      {
+        "id": 500742,
+        "name": "Set Origin for Help Center",
+        "phase": "request"
       }
     ]
   },

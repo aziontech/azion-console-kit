@@ -27,13 +27,21 @@
     loadedItemLabel: {
       type: String,
       required: false
+    },
+    entityName: {
+      type: String,
+      required: false
     }
   })
 
   const router = useRouter()
   const slots = useSlots()
   const breadcrumbs = useBreadcrumbs()
-  breadcrumbs.update(router.currentRoute.value.meta.breadCrumbs ?? [], router.currentRoute.value)
+  breadcrumbs.update(
+    router.currentRoute.value.meta.breadCrumbs ?? [],
+    router.currentRoute.value,
+    props.entityName
+  )
 
   const hasDefaultSlot = computed(() => {
     return !!slots.default

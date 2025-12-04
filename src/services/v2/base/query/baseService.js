@@ -1,92 +1,145 @@
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
-import {
-  queryClient,
-  getCacheOptions,
-  createQueryKey,
-  clearCacheByType,
-  clearCacheSensitive,
-  clearAllCache
-} from '@/services/v2/base/query/queryClient'
-import { CACHE_TYPE, CACHE_TIME } from '@/services/v2/base/query/config'
+import { queryClient } from './queryClient'
+import { createFinalKey } from './keyFactory'
+import { CACHE_TYPE, getCacheOptions } from './queryOptions'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { getMutex, coalesceRequest } from '@/services/v2/base/query/concurrency'
+import { toMilliseconds } from './config'
 
 export class BaseService {
-  constructor() {
-    if (this.constructor.instance) return this.constructor.instance
+  http = httpService
+  queryClient = queryClient
+  cacheType = CACHE_TYPE
+  toMilliseconds = toMilliseconds
 
-    this.cacheTime = CACHE_TIME
-    this.cacheType = CACHE_TYPE
-    this.http = httpService
-    this.queryClient = queryClient
+  #getQueryOptions(options = {}) {
+    if (options && typeof options !== 'object') {
+      // eslint-disable-next-line no-console
+      console.error(
+        '[TanStack Query] Invalid options type. Expected object, received:',
+        typeof options
+      )
+      return {
+        meta: { persist: true, cacheType: this.cacheType.GLOBAL },
+        ...getCacheOptions(this.cacheType.GLOBAL)
+      }
+    }
 
-    this.constructor.instance = this
+    const { persist = true, cacheType = this.cacheType.GLOBAL, ...restOptions } = options || {}
+
+    const queryOptions = { meta: { persist, cacheType }, ...getCacheOptions(cacheType) }
+
+    return { ...queryOptions, ...(restOptions || {}) }
   }
 
-  useQuery({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
-    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
+  _createQuery(queryKey, queryFn, options = {}) {
+    try {
+      const queryOptions = this.#getQueryOptions(options)
+      const finalKey = createFinalKey(queryKey)
 
-    return useQuery({
-      queryKey,
-      queryFn: coalescedQueryFn,
-      ...options,
-      ...overrides
+      return useQuery({ queryKey: finalKey, queryFn, ...queryOptions })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error creating query:', error)
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Returning fallback query with empty data to prevent UI crash')
+
+      return useQuery({
+        queryKey: ['__error_fallback__', Date.now()],
+        queryFn: async () => {
+          // eslint-disable-next-line no-console
+          console.warn(
+            '[TanStack Query] Using fallback empty data due to configuration error',
+            error
+          )
+          return null
+        },
+        initialData: null,
+        staleTime: this.toMilliseconds({ seconds: 30 }),
+        gcTime: this.toMilliseconds({ minutes: 1 }),
+        retry: false,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false
+      })
+    }
+  }
+
+  _createMutation(mutationFn, options = {}) {
+    const {
+      invalidateKeysSuccess = [],
+      invalidateKeysError = [],
+      invalidateKeysSettled = []
+    } = options || {}
+
+    const invalidateKeys = (invalidate) => {
+      invalidate.forEach((key) => {
+        this.queryClient.invalidateQueries({ queryKey: key })
+      })
+    }
+
+    return useMutation({
+      mutationFn,
+      async onSuccess(data, variables, context) {
+        if (options?.onSuccess) {
+          await options.onSuccess(data, variables, context)
+        }
+        if (invalidateKeysSuccess.length > 0) {
+          invalidateKeys(invalidateKeysSuccess)
+        }
+      },
+      onError(error, variables, context) {
+        if (options?.onError) {
+          options.onError(error, variables, context)
+        }
+        if (invalidateKeysError.length > 0) {
+          invalidateKeys(invalidateKeysError)
+        }
+      },
+      onSettled(data, error, variables, context) {
+        if (options?.onSettled) {
+          options.onSettled(data, error, variables, context)
+        }
+        if (invalidateKeysSettled.length > 0) {
+          invalidateKeys(invalidateKeysSettled)
+        }
+      },
+      ...(options || {})
     })
   }
 
-  async queryAsync({ key, queryFn, cache = this.cacheType.GLOBAL, overrides = {} }) {
-    await waitForPersistenceRestore()
+  async _prefetchQuery(queryKey, queryFn, options = {}) {
+    try {
+      const queryOptions = this.#getQueryOptions(options)
 
-    const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
-    const coalescedQueryFn = coalesceRequest(queryKey, queryFn)
+      await waitForPersistenceRestore()
 
-    return this.queryClient.ensureQueryData({
-      queryKey,
-      queryFn: coalescedQueryFn,
-      ...options,
-      ...overrides
-    })
+      return this.queryClient.prefetchQuery({
+        queryKey: createFinalKey(queryKey),
+        queryFn,
+        ...queryOptions
+      })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error prefetching query:', error)
+      return Promise.resolve(null)
+    }
   }
 
-  withMutex(key, mutationFn) {
-    const mutex = getMutex(key)
-    return (variables) => mutex.run(() => mutationFn(variables))
-  }
+  async _ensureQueryData(queryKey, queryFn, options = {}) {
+    try {
+      const queryOptions = this.#getQueryOptions(options)
 
-  async clearByType(cache = this.cacheType.GLOBAL) {
-    return clearCacheByType(cache)
-  }
+      await waitForPersistenceRestore()
 
-  async clearSensitive() {
-    return clearCacheSensitive()
-  }
-
-  async clearAll() {
-    return clearAllCache()
-  }
-
-  hasFreshCache({ key, cache = this.cacheType.GLOBAL }) {
-    const queryKey = createQueryKey(key, cache)
-    const options = getCacheOptions(cache)
-
-    const cachedData = this.queryClient.getQueryData(queryKey)
-    if (cachedData === undefined) return false
-
-    const query = this.queryClient.getQueryState(queryKey)
-    if (!query || !query.dataUpdatedAt) return false
-
-    const staleTime = options.staleTime || 0
-    const isStale = Date.now() - query.dataUpdatedAt > staleTime
-
-    return !isStale
-  }
-
-  getCachedData({ key, cache = this.cacheType.GLOBAL }) {
-    const queryKey = createQueryKey(key, cache)
-    return this.queryClient.getQueryData(queryKey)
+      return this.queryClient.ensureQueryData({
+        queryKey: createFinalKey(queryKey),
+        queryFn,
+        ...queryOptions
+      })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error ensuring query data:', error)
+      return Promise.resolve(null)
+    }
   }
 }

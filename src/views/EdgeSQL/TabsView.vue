@@ -96,6 +96,7 @@
   })
 
   const showActionBar = computed(() => activeTab.value === mapTabs.value.settings)
+  const showTablesView = computed(() => activeTab.value === mapTabs.value.tables)
 
   renderTabCurrentRouter()
   loadTables()
@@ -123,6 +124,7 @@
         >
           <TablesView
             @go-editor="goEditor"
+            v-if="showTablesView"
             @load-tables="loadTables"
             :listTables="listTables"
             :isLoadTables="loadedTables"
