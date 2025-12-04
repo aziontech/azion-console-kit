@@ -6,7 +6,14 @@ import { createFinalKey } from '@/services/v2/base/query/keyFactory'
 import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
 
 export const originsKeys = {
-  all: (edgeAppId) => ['origins', edgeAppId],
+  all: (edgeAppId) => {
+    if (!edgeAppId) {
+      // eslint-disable-next-line no-console
+      console.warn('[originsKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['origins', '__invalid_edge_app_id__']
+    }
+    return ['origins', edgeAppId]
+  },
   lists: (edgeAppId) => [...originsKeys.all(edgeAppId), 'list'],
   details: (edgeAppId) => [...originsKeys.all(edgeAppId), 'detail']
 }
@@ -37,7 +44,7 @@ export const listOriginsService = async ({
 
   const queryOptions = {
     meta: { persist: page === 1, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
+    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
   }
 
   return await queryClient.ensureQueryData({

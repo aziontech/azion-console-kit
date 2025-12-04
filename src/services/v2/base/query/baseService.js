@@ -13,17 +13,55 @@ export class BaseService {
   toMilliseconds = toMilliseconds
 
   #getQueryOptions(options = {}) {
-    const { persist = true, cacheType = this.cacheType.GLOBAL, ...restOptions } = options
+    if (options && typeof options !== 'object') {
+      // eslint-disable-next-line no-console
+      console.error(
+        '[TanStack Query] Invalid options type. Expected object, received:',
+        typeof options
+      )
+      return {
+        meta: { persist: true, cacheType: this.cacheType.GLOBAL },
+        ...getCacheOptions(this.cacheType.GLOBAL)
+      }
+    }
+
+    const { persist = true, cacheType = this.cacheType.GLOBAL, ...restOptions } = options || {}
 
     const queryOptions = { meta: { persist, cacheType }, ...getCacheOptions(cacheType) }
 
-    return { ...queryOptions, ...restOptions }
+    return { ...queryOptions, ...(restOptions || {}) }
   }
 
   _createQuery(queryKey, queryFn, options = {}) {
-    const queryOptions = this.#getQueryOptions(options)
+    try {
+      const queryOptions = this.#getQueryOptions(options)
+      const finalKey = createFinalKey(queryKey)
 
-    return useQuery({ queryKey: createFinalKey(queryKey), queryFn, ...queryOptions })
+      return useQuery({ queryKey: finalKey, queryFn, ...queryOptions })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error creating query:', error)
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Returning fallback query with empty data to prevent UI crash')
+
+      return useQuery({
+        queryKey: ['__error_fallback__', Date.now()],
+        queryFn: async () => {
+          // eslint-disable-next-line no-console
+          console.warn(
+            '[TanStack Query] Using fallback empty data due to configuration error',
+            error
+          )
+          return null
+        },
+        initialData: null,
+        staleTime: this.toMilliseconds({ seconds: 30 }),
+        gcTime: this.toMilliseconds({ minutes: 1 }),
+        retry: false,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false
+      })
+    }
   }
 
   _createMutation(mutationFn, options = {}) {
@@ -31,7 +69,7 @@ export class BaseService {
       invalidateKeysSuccess = [],
       invalidateKeysError = [],
       invalidateKeysSettled = []
-    } = options
+    } = options || {}
 
     const invalidateKeys = (invalidate) => {
       invalidate.forEach((key) => {
@@ -42,7 +80,7 @@ export class BaseService {
     return useMutation({
       mutationFn,
       async onSuccess(data, variables, context) {
-        if (options.onSuccess) {
+        if (options?.onSuccess) {
           await options.onSuccess(data, variables, context)
         }
         if (invalidateKeysSuccess.length > 0) {
@@ -50,7 +88,7 @@ export class BaseService {
         }
       },
       onError(error, variables, context) {
-        if (options.onError) {
+        if (options?.onError) {
           options.onError(error, variables, context)
         }
         if (invalidateKeysError.length > 0) {
@@ -58,38 +96,50 @@ export class BaseService {
         }
       },
       onSettled(data, error, variables, context) {
-        if (options.onSettled) {
+        if (options?.onSettled) {
           options.onSettled(data, error, variables, context)
         }
         if (invalidateKeysSettled.length > 0) {
           invalidateKeys(invalidateKeysSettled)
         }
       },
-      ...options
+      ...(options || {})
     })
   }
 
   async _prefetchQuery(queryKey, queryFn, options = {}) {
-    const queryOptions = this.#getQueryOptions(options)
+    try {
+      const queryOptions = this.#getQueryOptions(options)
 
-    await waitForPersistenceRestore()
+      await waitForPersistenceRestore()
 
-    return this.queryClient.prefetchQuery({
-      queryKey: createFinalKey(queryKey),
-      queryFn,
-      ...queryOptions
-    })
+      return this.queryClient.prefetchQuery({
+        queryKey: createFinalKey(queryKey),
+        queryFn,
+        ...queryOptions
+      })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error prefetching query:', error)
+      return Promise.resolve(null)
+    }
   }
 
   async _ensureQueryData(queryKey, queryFn, options = {}) {
-    const queryOptions = this.#getQueryOptions(options)
+    try {
+      const queryOptions = this.#getQueryOptions(options)
 
-    await waitForPersistenceRestore()
+      await waitForPersistenceRestore()
 
-    return this.queryClient.ensureQueryData({
-      queryKey: createFinalKey(queryKey),
-      queryFn,
-      ...queryOptions
-    })
+      return this.queryClient.ensureQueryData({
+        queryKey: createFinalKey(queryKey),
+        queryFn,
+        ...queryOptions
+      })
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[TanStack Query] Error ensuring query data:', error)
+      return Promise.resolve(null)
+    }
   }
 }
