@@ -1,7 +1,9 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="selectedBucket?.name ? selectedBucket.name : 'Object Storage'">
+      <PageHeadingBlock 
+        :pageTitle="selectedBucket?.name ? selectedBucket.name : 'Object Storage'"
+        :description="!selectedBucket?.name ? 'Store and retrieve objects with high availability and performance.' : ''">
         <template #default>
           <DataTable.ActionsButtons
             v-if="!selectedBucket"
