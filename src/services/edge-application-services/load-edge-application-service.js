@@ -9,7 +9,7 @@ export const edgeAppV3Keys = {
   all: ['edge-apps-v3'],
   details: () => [...edgeAppV3Keys.all, 'detail'],
   detail: (id) => {
-    if (id === null || id === undefined) {
+    if (!id) {
       // eslint-disable-next-line no-console
       console.warn('[edgeAppV3Keys] Invalid id provided to detail():', id)
       return [...edgeAppV3Keys.details(), '__invalid_id__']

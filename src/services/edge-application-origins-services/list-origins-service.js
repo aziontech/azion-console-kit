@@ -7,7 +7,7 @@ import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptio
 
 export const originsKeys = {
   all: (edgeAppId) => {
-    if (edgeAppId === null || edgeAppId === undefined) {
+    if (!edgeAppId) {
       // eslint-disable-next-line no-console
       console.warn('[originsKeys] Invalid edgeAppId provided:', edgeAppId)
       return ['origins', '__invalid_edge_app_id__']

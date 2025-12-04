@@ -48,7 +48,10 @@ export class BaseService {
         queryKey: ['__error_fallback__', Date.now()],
         queryFn: async () => {
           // eslint-disable-next-line no-console
-          console.warn('[TanStack Query] Using fallback empty data due to configuration error')
+          console.warn(
+            '[TanStack Query] Using fallback empty data due to configuration error',
+            error
+          )
           return null
         },
         initialData: null,

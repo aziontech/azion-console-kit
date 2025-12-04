@@ -263,7 +263,7 @@ export function createIDBPersister(config, onRestoreComplete = null) {
         try {
           await del(cacheKey, customStore)
           // eslint-disable-next-line no-console
-          console.info('[TanStack Query] Cache cleared after error.')
+          console.info('[TanStack Query] Cache cleared after error.', cacheKey, error)
         } catch (clearError) {
           // eslint-disable-next-line no-console
           console.error('[TanStack Query] Failed to clear cache:', clearError)

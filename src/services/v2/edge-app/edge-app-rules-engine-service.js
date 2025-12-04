@@ -3,7 +3,7 @@ import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
 
 export const rulesEngineKeys = {
   all: (edgeAppId) => {
-    if (edgeAppId === null || edgeAppId === undefined) {
+    if (!edgeAppId) {
       // eslint-disable-next-line no-console
       console.warn('[rulesEngineKeys] Invalid edgeAppId provided:', edgeAppId)
       return ['rules-engine', '__invalid_edge_app_id__']

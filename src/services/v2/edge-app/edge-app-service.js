@@ -15,7 +15,7 @@ export const edgeAppKeys = {
   ],
   details: () => [...edgeAppKeys.all, 'detail'],
   detail: (id) => {
-    if (id === null || id === undefined) {
+    if (!id) {
       // eslint-disable-next-line no-console
       console.warn('[edgeAppKeys] Invalid id provided to detail():', id)
       return [...edgeAppKeys.details(), '__invalid_id__']

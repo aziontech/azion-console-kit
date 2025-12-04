@@ -4,7 +4,7 @@ import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 export const cacheSettingsKeys = {
   all: (edgeAppId) => {
-    if (edgeAppId === null || edgeAppId === undefined) {
+    if (!edgeAppId) {
       // eslint-disable-next-line no-console
       console.warn('[cacheSettingsKeys] Invalid edgeAppId provided:', edgeAppId)
       return ['cache-settings', '__invalid_edge_app_id__']

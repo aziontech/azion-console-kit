@@ -20,7 +20,7 @@ export const workloadKeys = {
   ],
   details: () => [...workloadKeys.all, 'detail'],
   detail: (id) => {
-    if (id === null || id === undefined) {
+    if (!id) {
       // eslint-disable-next-line no-console
       console.warn('[workloadKeys] Invalid id provided to detail():', id)
       return [...workloadKeys.details(), '__invalid_id__']

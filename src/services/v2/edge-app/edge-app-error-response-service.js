@@ -4,7 +4,7 @@ import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 export const errorResponseKeys = {
   all: (edgeAppId) => {
-    if (edgeAppId === null || edgeAppId === undefined) {
+    if (!edgeAppId) {
       // eslint-disable-next-line no-console
       console.warn('[errorResponseKeys] Invalid edgeAppId provided:', edgeAppId)
       return ['error-responses', '__invalid_edge_app_id__']
