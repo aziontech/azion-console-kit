@@ -106,7 +106,7 @@
       <FetchListTableBlock
         :listService="listTeamPermissionService"
         :columns="getColumns"
-        editPagePath="teams-permission/edit"
+        editPagePath="/teams-permission/edit"
         emptyListMessage="No teams found."
         :actions="actions"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"

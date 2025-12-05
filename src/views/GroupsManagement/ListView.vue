@@ -93,7 +93,7 @@
       <FetchListTableBlock
         :listService="listAccountsGroupDecorator"
         :columns="getColumns"
-        editPagePath="management/edit"
+        editPagePath="/management/edit"
         emptyListMessage="No groups found."
         :frozen-columns="['name']"
         exportFileName="Group Management"

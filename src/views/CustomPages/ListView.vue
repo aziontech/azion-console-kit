@@ -133,7 +133,7 @@
     <template #content>
       <FetchListTableBlock
         ref="listTableBlockRef"
-        editPagePath="custom-pages/edit"
+        editPagePath="/custom-pages/edit"
         :listService="customPageService.listCustomPagesService"
         :columns="getColumns"
         :apiFields="CUSTOM_PAGES_API_FIELDS"

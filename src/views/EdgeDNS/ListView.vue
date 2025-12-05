@@ -132,7 +132,7 @@
     <template #content>
       <FetchListTableBlock
         createPagePath="edge-dns/create"
-        editPagePath="edge-dns/edit"
+        editPagePath="/edge-dns/edit"
         :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
         :apiFields="EDGE_DNS_API_FIELDS"

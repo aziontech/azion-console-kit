@@ -136,7 +136,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :listService="listVariablesService"
         :columns="getColumns"
-        editPagePath="variables/edit"
+        editPagePath="/variables/edit"
         ref="refListTable"
         @on-load-data="handleLoadData"
         emptyListMessage="No variables found."

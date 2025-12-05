@@ -165,7 +165,7 @@
         :columns="getColumns"
         @on-before-go-to-edit="handleTrackClickToEdit"
         @on-before-go-to-add-page="handleTrackClickToCreate"
-        editPagePath="waf/edit"
+        editPagePath="/waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"

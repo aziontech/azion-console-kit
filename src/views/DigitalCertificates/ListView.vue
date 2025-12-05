@@ -391,7 +391,7 @@
       <FetchListTableBlock
         :listService="listService"
         :columns="getColumns"
-        editPagePath="digital-certificates/edit"
+        editPagePath="/digital-certificates/edit"
         createPagePath="digital-certificates/create"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         @on-load-data="handleLoadData"

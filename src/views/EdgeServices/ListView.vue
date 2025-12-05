@@ -165,7 +165,7 @@
         :listService="listEdgeServiceServices"
         :columns="getColumns"
         createPagePath="edge-services/create"
-        editPagePath="edge-services/edit"
+        editPagePath="/edge-services/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
         emptyListMessage="No services found."

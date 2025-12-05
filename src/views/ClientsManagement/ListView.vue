@@ -23,7 +23,7 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No clients found."
-        editPagePath="management/edit"
+        editPagePath="/management/edit"
         enableEditClick
         exportFileName="Client Management"
         :csvMapper="csvMapper"

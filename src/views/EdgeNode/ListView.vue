@@ -110,7 +110,7 @@
         v-if="hasContentToList"
         :listService="listEdgeNodeService"
         :columns="getColumns"
-        editPagePath="edge-node/edit"
+        editPagePath="/edge-node/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge nodes found."
         :actions="actions"

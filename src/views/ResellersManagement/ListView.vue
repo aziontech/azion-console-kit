@@ -93,7 +93,7 @@
         :listService="listAccountsResellerDecorator"
         :columns="getColumns"
         emptyListMessage="No reseller accounts found."
-        editPagePath="management/edit"
+        editPagePath="/management/edit"
         enableEditClick
         :frozen-columns="['name']"
         exportFileName="Reseller Management"

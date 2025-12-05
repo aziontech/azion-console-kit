@@ -193,7 +193,7 @@
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
         createPagePath="functions/create?origin=list"
-        editPagePath="functions/edit"
+        editPagePath="/functions/edit"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No Functions found."
