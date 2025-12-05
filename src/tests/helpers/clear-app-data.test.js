@@ -34,7 +34,6 @@ describe('clearAppData', () => {
   it('should clear items with specific prefixes', () => {
     localStorage.setItem('edge_sql_test', 'data')
     localStorage.setItem('schema_cache_test', 'data')
-    localStorage.setItem('other_key', 'data')
 
     clearAppData()
 
