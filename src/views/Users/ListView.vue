@@ -154,7 +154,7 @@
       <FetchListTableBlock
         :listService="listUsersService"
         :columns="getColumns"
-        editPagePath="users/edit"
+        editPagePath="/users/edit"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."

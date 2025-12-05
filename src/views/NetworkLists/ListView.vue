@@ -129,7 +129,7 @@
       <FetchListTableBlock
         :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
-        editPagePath="network-lists/edit"
+        editPagePath="/network-lists/edit"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No network lists found."
         :actions="actions"

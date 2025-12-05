@@ -209,7 +209,7 @@
     <template #content>
       <FetchListTableBlock
         :createPagePath="createDomainPath"
-        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
+        :editPagePath="`/${handleTextDomainWorkload.pluralLabel}/edit`"
         :listService="workloadService.listWorkloads"
         :columns="getColumns"
         @on-before-go-to-add-page="handleTrackEvent"
