@@ -464,7 +464,7 @@
       const newList = Array.isArray(newVal) ? newVal : []
       if (newList.length === 0) {
         const previous = Array.isArray(oldVal) ? oldVal : []
-        if (previous.length > 0) {
+        if (previous.length) {
           selectedColumns.value = previous
           return
         }
@@ -472,7 +472,7 @@
         const availableColumns = (props.columns || []).filter(
           (column) => column?.field !== 'actions'
         )
-        if (availableColumns.length > 0) {
+        if (availableColumns.length) {
           selectedColumns.value = [availableColumns[0]]
         }
       }
