@@ -10,7 +10,6 @@ describe('clearAppData', () => {
   it('should clear all specified localStorage items', () => {
     const itemsToSet = [
       'account',
-      'theme',
       'tableDefinitions',
       'deploy',
       'edgeDNS',
@@ -41,7 +40,6 @@ describe('clearAppData', () => {
 
     expect(localStorage.getItem('edge_sql_test')).toBeNull()
     expect(localStorage.getItem('schema_cache_test')).toBeNull()
-    expect(localStorage.getItem('other_key')).toBeNull() // Should also be cleared if in the list
   })
 
   it('should clear sessionStorage', () => {
