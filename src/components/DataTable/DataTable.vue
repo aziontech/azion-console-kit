@@ -27,7 +27,7 @@
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="rows"
       :globalFilterFields="globalFilterFields"
-      :selection="selection"
+      v-model:selection="internalSelection"
       :exportFilename="exportFilename"
       :exportFunction="exportFunction"
       :totalRecords="totalRecords"
@@ -46,25 +46,45 @@
       @row-edit-cancel="emit('rowEditCancel', $event)"
       scrollable
       removableSort
+      resizableColumns
+      columnResizeMode="fit"
+      @columnResizeEnd="applyDirtyColumnResizeFix"
+      :scrollHeight="scrollHeight"
+      :frozenValue="frozenValue"
+      paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     >
-      <template #header>
+      <template
+        v-if="hasHeaderSlot"
+        #header
+      >
         <slot name="header" />
       </template>
 
-      <template v-if="loading">
+      <template v-if="shouldShowFullSkeleton">
         <Column
-          v-for="col in columns"
+          v-for="(col, index) in columns"
           :key="col.field"
           :field="col.field"
           :header="col.header"
         >
           <template #body>
-            <Skeleton />
+            <div class="flex gap-10 items-center">
+              <Skeleton
+                v-if="isSelectable && index === 0"
+                width="1.5rem"
+                height="1.5rem"
+              />
+              <Skeleton class="h-[12px]" />
+            </div>
           </template>
         </Column>
       </template>
       <slot v-else />
 
+      <template #paginatorstart>
+        <div class="flex-1"></div>
+      </template>
       <template
         v-if="hasFooterSlot"
         #footer
@@ -98,20 +118,25 @@
         @quick-actions-visible="(event) => (cellQuickActionsVisible = event)"
       />
     </DataTable>
-    <EmptyResultsBlock
-      v-else
-      :title="emptyBlock.title"
-      :description="emptyBlock.description"
-      :createButtonLabel="emptyBlock.createButtonLabel"
-      :createPagePath="emptyBlock.createPagePath"
-      :documentationService="emptyBlock.documentationService"
-      @click-to-create="emit('click-to-create')"
-      data-testid="edge-applications-empty-results-block"
-    >
-      <template #illustration>
-        <Illustration />
-      </template>
-    </EmptyResultsBlock>
+    <template v-else>
+      <div v-if="hasEmptyBlockSlot"><slot name="emptyBlock" /></div>
+      <EmptyResultsBlock
+        v-else
+        :title="emptyBlock.title"
+        :description="emptyBlock.description"
+        :createButtonLabel="emptyBlock.createButtonLabel"
+        :createPagePath="emptyBlock.createPagePath"
+        :documentationService="emptyBlock.documentationService"
+        data-testid="edge-applications-empty-results-block"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+        <template #default>
+          <slot name="emptyBlockButton" />
+        </template>
+      </EmptyResultsBlock>
+    </template>
   </div>
 </template>
 
@@ -271,7 +296,35 @@
         documentationService: null
       })
     },
+    scrollable: {
+      type: Boolean,
+      default: true
+    },
+    scrollHeight: {
+      type: String,
+      default: 'calc(100vh - 300px)'
+    },
+    showLastModifiedColumn: {
+      type: Boolean,
+      default: true
+    },
+    hasEmptyBlockSlot: {
+      type: Boolean,
+      default: false
+    },
+    appliedFilters: {
+      type: Array,
+      default: () => []
+    },
     notShowEmptyBlock: {
+      type: Boolean,
+      default: false
+    },
+    frozenValue: {
+      type: Array,
+      default: () => []
+    },
+    isSelectable: {
       type: Boolean,
       default: false
     }
@@ -286,6 +339,7 @@
     'update:sortField',
     'update:sortOrder',
     'update:expandedRowGroups',
+    'update:selection',
     'update:editingRows',
     'rowEditSave',
     'rowEditCancel',
@@ -301,8 +355,10 @@
     if (props.notShowEmptyBlock) {
       return true
     }
-    return props.data.length || props.loading
+    return props.data.length || props.loading || props.appliedFilters.length
   })
+
+  const hasHeaderSlot = computed(() => !!slots.header)
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -324,6 +380,11 @@
     set: (value) => emit('update:expandedRowGroups', value)
   })
 
+  const internalSelection = computed({
+    get: () => props.selection,
+    set: (value) => emit('update:selection', value)
+  })
+
   const internalEditingRows = computed({
     get: () => props.editingRows,
     set: (value) => emit('update:editingRows', value)
@@ -331,8 +392,16 @@
 
   const hasFooterSlot = computed(() => !!slots.footer)
 
+  const hasSkeletonRows = computed(() => {
+    return props.data.some((row) => row.isSkeletonRow)
+  })
+
+  const shouldShowFullSkeleton = computed(() => {
+    return props.loading && !hasSkeletonRows.value
+  })
+
   const displayData = computed(() => {
-    if (props.loading && props.columns.length) {
+    if (shouldShowFullSkeleton.value && props.columns.length) {
       // eslint-disable-next-line no-unused-vars
       return Array.from({ length: props.rows }, (aux, index) => {
         const row = { id: index }
@@ -357,11 +426,37 @@
     dataTableRef,
     exportCSV: () => dataTableRef.value?.exportCSV()
   })
+
+  const applyDirtyColumnResizeFix = () => {
+    const pvIdAttribute = Array.from(dataTableRef.value?.$el?.attributes).find((attr) =>
+      attr.name.startsWith('pv_id_')
+    )?.name
+    const columnSizesStyle = Array.from(document.querySelectorAll('style')).find((style) =>
+      style.textContent.includes('data-pc-name="datatable"')
+    )
+    if (columnSizesStyle) {
+      columnSizesStyle.textContent = columnSizesStyle.textContent.replace(
+        /\[pv_id_[0-9]+\]/gim,
+        `[${pvIdAttribute}]`
+      )
+    }
+  }
 </script>
 
 <style scoped lang="scss">
   .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
     transition: color 0.2s ease !important;
+    height: 44px;
+    padding: 0 14px;
+    // font-size: 12px;
+  }
+
+  .table-with-orange-borders :deep(.p-datatable-tbody > tr) {
+    height: 44px;
+  }
+
+  .table-with-orange-borders :deep(.p-datatable-thead > tr) {
+    height: 44px;
   }
 
   .table-with-orange-borders.outline-visible
@@ -371,5 +466,73 @@
     outline-offset: -2px;
     transition-delay: 0.3s;
     border-radius: 0 6px 6px 6px;
+  }
+
+  /* Paginator styling */
+  :deep(.p-paginator) {
+    height: 48px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 21px;
+  }
+
+  :deep(.p-paginator .p-paginator-current) {
+    margin: 0;
+  }
+
+  /* Paginator buttons styling */
+  :deep(.p-paginator .p-paginator-first),
+  :deep(.p-paginator .p-paginator-prev),
+  :deep(.p-paginator .p-paginator-next),
+  :deep(.p-paginator .p-paginator-last),
+  :deep(.p-paginator .p-paginator-page) {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 21px;
+    margin: 0;
+  }
+
+  :deep(.p-paginator .p-dropdown) {
+    width: 61px;
+    height: 26px;
+    font-size: 12px;
+    line-height: 21px;
+    margin: 0;
+    .p-dropdown-label {
+      width: fit-content;
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+    }
+    .p-dropdown-trigger {
+      width: 16px;
+      padding-right: 6px;
+    }
+  }
+  :deep(.p-paginator-page-input .p-inputtext) {
+    width: fit-content;
+    height: 26px;
+    font-size: 12px;
+    line-height: 21px;
+    text-align: center;
+  }
+
+  :deep(.p-datatable-wrapper) {
+    scrollbar-width: thin;
+  }
+  :deep(.p-datatable-header) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  :deep(.p-icon.p-sortable-column-icon) {
+    width: 12px;
+  }
+  :deep(.p-paginator-current) {
+    cursor: auto;
+  }
+  :deep(.p-frozen-column) {
+    z-index: 50;
   }
 </style>

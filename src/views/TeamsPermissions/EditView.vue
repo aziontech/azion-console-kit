@@ -2,7 +2,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edit Team"
+        :pageTitle="teamName"
         data-testid="teams-permissions__edit-view__page-heading"
       />
     </template>
@@ -13,6 +13,7 @@
         :loadService="props.loadTeamPermissionService"
         :updatedRedirect="updatedRedirect"
         :schema="validationSchema"
+        @loaded-service-object="setTeamName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -32,9 +33,10 @@
 </template>
 
 <script setup>
-  import { inject } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { inject, ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -45,6 +47,14 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const teamName = ref('Edit Team Permission')
+
+  const setTeamName = (team) => {
+    teamName.value = team.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, team.name)
+  }
 
   const props = defineProps({
     editTeamPermissionService: {

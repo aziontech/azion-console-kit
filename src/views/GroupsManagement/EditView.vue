@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Group"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="groupName"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +9,7 @@
         :loadService="loadAccountService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setGroupName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -40,11 +41,21 @@
   import FormFieldsCreateGroups from './FormFields/FormFieldsCreateGroups.vue'
 
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const groupName = ref('Edit Group')
+
+  const setGroupName = (group) => {
+    groupName.value = group.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, group.name)
+  }
 
   defineProps({
     loadAccountService: {

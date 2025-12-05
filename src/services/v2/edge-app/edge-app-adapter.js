@@ -1,4 +1,4 @@
-import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
@@ -25,7 +25,7 @@ const transformMap = {
   name: (value) => parseName(value),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
-  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
+  lastModified: (value) => value.last_modified,
   disableEditClick: (value) => value.product_version === LOCKED_VALUE,
   isLocked: (value) => value.product_version === LOCKED_VALUE
 }
