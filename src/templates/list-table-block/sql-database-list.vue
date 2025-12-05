@@ -458,6 +458,28 @@
     exportTableAsXLSX
   } = useDataTable(tableProps, emit)
 
+  watch(
+    () => selectedColumns.value,
+    (newVal, oldVal) => {
+      const newList = Array.isArray(newVal) ? newVal : []
+      if (newList.length === 0) {
+        const previous = Array.isArray(oldVal) ? oldVal : []
+        if (previous.length > 0) {
+          selectedColumns.value = previous
+          return
+        }
+
+        const availableColumns = (props.columns || []).filter(
+          (column) => column?.field !== 'actions'
+        )
+        if (availableColumns.length > 0) {
+          selectedColumns.value = [availableColumns[0]]
+        }
+      }
+    },
+    { deep: true }
+  )
+
   const editRow = (row) => {
     const key = getRowKey(row)
     if (key == null) return
