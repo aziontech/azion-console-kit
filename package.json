@@ -1,10 +1,6 @@
 {
   "name": "azion-console-kit",
-<<<<<<< HEAD
   "version": "1.47.13",
-=======
-  "version": "1.46.11",
->>>>>>> a359142fc (Revert "[ENG-35553] feat: table improvements (#3029)" (#3032))
   "private": false,
   "type": "module",
   "repository": {
