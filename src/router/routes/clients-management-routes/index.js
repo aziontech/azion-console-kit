@@ -61,9 +61,7 @@ export const clientManagementRoutes = {
             to: '/client/management'
           },
           {
-            label: 'Edit Client',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Client'
           }
         ]
       }

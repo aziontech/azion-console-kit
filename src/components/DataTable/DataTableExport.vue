@@ -16,9 +16,10 @@
 </template>
 
 <script setup>
+  import { inject } from 'vue'
   import PrimeButton from 'primevue/button'
 
-  defineProps({
+  const props = defineProps({
     label: {
       type: String,
       default: ''
@@ -42,12 +43,26 @@
     loading: {
       type: Boolean,
       default: false
+    },
+    customExport: {
+      type: Function,
+      default: null
     }
   })
 
   const emit = defineEmits(['export', 'click'])
 
-  const handleExport = (event) => {
-    emit('export', event)
+  const dataTable = inject('dataTable', null)
+
+  const handleExport = () => {
+    emit('click')
+
+    if (props.customExport) {
+      props.customExport()
+    } else if (dataTable?.exportCSV) {
+      dataTable.exportCSV()
+    }
+
+    emit('export')
   }
 </script>

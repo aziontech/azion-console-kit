@@ -1,20 +1,450 @@
+<template>
+  <div
+    class="max-w-full"
+    :class="{ 'mt-4': isTabs }"
+    data-testid="data-table-container"
+  >
+    <DataTable
+      v-if="!isLoading"
+      ref="dataTableRef"
+      :pt="parsedDatatablePt"
+      class="overflow-clip rounded-md"
+      scrollable
+      removableSort
+      :value="filterData"
+      :paginator="paginator"
+      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rows="minimumOfItemsPerPage"
+      :first="(currentPage - 1) * minimumOfItemsPerPage"
+      v-model:selection="selectedItems"
+      @page="changeNumberOfLinesPerPage"
+      :globalFilterFields="filterBy"
+      :loading="isLoading"
+      data-testid="data-table"
+      rowHover
+      :rowClass="stateClassRules"
+      :class="[
+        'overflow-clip rounded-md table-with-orange-borders',
+        { 'outline-visible': !cellQuickActions.rowData?.isFolder && cellQuickActions.visible }
+      ]"
+    >
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
+        <slot
+          name="header"
+          :exportTableCSV="handleExportTableDataToCSV"
+        >
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-header"
+          >
+            <span
+              class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+              data-testid="data-table-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="h-8 w-full md:min-w-[20rem]"
+                v-model.trim="filters.global.value"
+                data-testid="data-table-search-input"
+                placeholder="Search"
+              />
+            </span>
+
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                :disabled="disabledList"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                size="small"
+                :data-testid="`create_${addButtonLabel}_button`"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+              />
+            </slot>
+          </div>
+        </slot>
+      </template>
+      <Column
+        :class="{ '!hover:cursor-pointer': !disabledList }"
+        headerStyle="width: 3rem"
+      >
+        <template #header>
+          <Checkbox
+            :model-value="isAllSelected"
+            @update:model-value="toggleSelectAll"
+            binary
+          />
+        </template>
+        <template #body="{ data: rowData }">
+          <div
+            @click="toggleRowSelection(rowData)"
+            class="cursor-pointer flex items-center justify-center w-6 h-8"
+            data-testid="data-table-row-checkbox"
+          >
+            <Checkbox
+              v-if="selectedItems.includes(rowData) && !rowData.isNewFolder"
+              :model-value="selectedItems.includes(rowData)"
+              @update:model-value="toggleRowSelection(rowData)"
+              @click.stop="toggleRowSelection(rowData)"
+              binary
+            />
+            <i
+              v-else
+              class="text-xl"
+              :class="getFileIcon(rowData)"
+            ></i>
+          </div>
+        </template>
+      </Column>
+      <Column
+        :sortable="selectedItems.length > 0 ? false : !col.disableSort"
+        v-for="(col, index) of selectedColumns"
+        :key="col.field"
+        :field="col.field"
+        :header="selectedItems.length === 0 ? col.header : ''"
+        :sortField="selectedItems.length > 0 ? null : col?.sortField"
+        headerClass="relative h-16 w-[20rem]"
+        :class="{ 'hover:cursor-pointer ': !disabledList }"
+        data-testid="data-table-column"
+      >
+        <template
+          #header
+          v-if="selectedItems.length > 0 && index === 0"
+        >
+          <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
+            <span class="text-sm">{{ selectedItems.length }} files selected</span>
+            <div class="flex gap-2">
+              <PrimeButton
+                size="small"
+                outlined
+                :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
+                label="Download"
+                class="px-4"
+                :disabled="isDownloading"
+                @click="emit('download-selected-items')"
+              />
+              <PrimeButton
+                size="small"
+                icon="pi pi-trash"
+                label="Delete"
+                severity="danger"
+                class="px-4"
+                @click="emit('delete-selected-items')"
+              />
+            </div>
+          </div>
+        </template>
+        <template #body="{ data: rowData }">
+          <template v-if="rowData.isNewFolder && col.field === 'name'">
+            <div class="flex items-center gap-2">
+              <InputText
+                :value="props.newFolderName"
+                @input="handleFolderNameInput"
+                @keyup.enter="emit('save-new-folder')"
+                @keyup.escape="emit('cancel-new-folder')"
+                placeholder="Enter folder name"
+                class="flex-1"
+                :class="{ 'p-invalid border-red-500': hasInvalidChars }"
+                autofocus
+                size="small"
+              />
+              <PrimeButton
+                icon="pi pi-check"
+                size="small"
+                outlined
+                @click="emit('save-new-folder')"
+                :disabled="!props.newFolderName.trim() || hasInvalidChars"
+              />
+              <PrimeButton
+                icon="pi pi-times"
+                size="small"
+                outlined
+                @click="emit('cancel-new-folder')"
+              />
+            </div>
+          </template>
+          <template v-else-if="col.type !== 'component'">
+            <div
+              @click="editItemSelected(rowData)"
+              v-html="rowData[col.field]"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            />
+          </template>
+          <template v-else>
+            <component
+              @click="editItemSelected(rowData)"
+              :is="col.component(extractFieldValue(rowData, col.field))"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            />
+          </template>
+        </template>
+      </Column>
+
+      <Column
+        :frozen="true"
+        :alignFrozen="'right'"
+        headerStyle="width: 13rem"
+        data-testid="data-table-actions-column"
+      >
+        <template #header>
+          <div
+            class="flex items-center gap-2 justify-end w-full"
+            data-testid="data-table-actions-column-header"
+          >
+            <span
+              @click="sortByLastModified"
+              v-if="showLastModified"
+              class="cursor-pointer select-none flex items-center gap-2 group"
+              data-testid="last-modified-header-sort"
+            >
+              <i
+                v-if="sortFieldValue === 'lastModified'"
+                :class="{
+                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
+                  'pi pi-sort-amount-down': sortOrderValue === -1
+                }"
+              />
+              <i
+                v-else
+                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+              Last Modified
+            </span>
+            <PrimeButton
+              outlined
+              icon="ai ai-column"
+              class="table-button"
+              @click="toggleColumnSelector"
+              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
+              data-testid="data-table-actions-column-header-toggle-columns"
+            >
+            </PrimeButton>
+            <OverlayPanel
+              ref="columnSelectorPanel"
+              :pt="{
+                content: { class: 'p-0' }
+              }"
+              data-testid="data-table-actions-column-header-toggle-columns-panel"
+            >
+              <Listbox
+                v-model="selectedColumns"
+                multiple
+                :options="[{ label: 'Available Columns', items: columns }]"
+                class="hidden-columns-panel"
+                optionLabel="header"
+                optionGroupLabel="label"
+                optionGroupChildren="items"
+                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+              >
+                <template #optiongroup="slotProps">
+                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                </template>
+              </Listbox>
+            </OverlayPanel>
+          </div>
+        </template>
+        <template
+          #body="{ data: rowData }"
+          v-if="isRenderActions"
+        >
+          <div
+            class="flex items-center gap-2 justify-end"
+            v-if="showActions(rowData)"
+          >
+            <div
+              v-if="showLastModified"
+              :data-testid="`list-table-block__column__lastModify__row`"
+              class="cursor-pointer"
+              @click.stop="toggleLastModifiedDisplay"
+            >
+              <div
+                v-if="!lastModifiedToggled"
+                v-html="rowData.lastModify || rowData.lastModified"
+                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
+              />
+              <div
+                v-else
+                v-html="rowData.lastModified"
+                v-tooltip.top="{
+                  value: rowData.lastModify || rowData.lastModified,
+                  showDelay: 300
+                }"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-if="isRenderOneOption"
+              data-testid="data-table-actions-column-body-action"
+            >
+              <PrimeButton
+                size="small"
+                outlined
+                v-bind="optionsOneAction(rowData)"
+                @click="executeCommand(rowData)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-action-button"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-else
+              data-testid="data-table-actions-column-body-actions"
+            >
+              <PrimeMenu
+                :ref="setMenuRefForRow(rowData.id)"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+                data-testid="data-table-actions-column-body-actions-menu"
+                :pt="{
+                  menuitem: ({ context }) => ({
+                    'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
+                  })
+                }"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                outlined
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-actions-menu-button"
+              />
+            </div>
+          </div>
+        </template>
+      </Column>
+      <template #empty>
+        <slot
+          name="noRecordsFound"
+          data-testid="data-table-empty-content"
+        >
+          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <p
+              class="text-md font-normal text-secondary"
+              data-testid="list-table-block__empty-message__text"
+            >
+              {{ emptyListMessage }}
+            </p>
+          </div>
+        </slot>
+      </template>
+    </DataTable>
+    <DataTable
+      v-else
+      :disabled="disabledList"
+      :value="Array(10)"
+      :pt="{
+        header: { class: '!border-t-0' }
+      }"
+      data-testid="data-table-skeleton"
+    >
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
+        <slot name="header">
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-skeleton-header"
+          >
+            <span
+              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
+              data-testid="data-table-skeleton-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full h-8 md:min-w-[20rem]"
+                v-model="filters.global.value"
+                placeholder="Search"
+                data-testid="data-table-skeleton-search-input"
+              />
+            </span>
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                :disabled="disabledList"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                size="small"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+                data-testid="data-table-skeleton-add-button"
+              />
+            </slot>
+          </div>
+        </slot>
+      </template>
+      <Column
+        v-for="col of columns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+        data-testid="data-table-skeleton-column"
+      >
+        <template #body>
+          <Skeleton />
+        </template>
+      </Column>
+    </DataTable>
+    <div
+      :style="{
+        position: 'fixed',
+        top: cellQuickActions.posY + 'px',
+        left: cellQuickActions.posX + 'px',
+        zIndex: 9999
+      }"
+      class="popup-container"
+      @mouseenter="onPopupMouseEnter"
+      @mouseleave="onPopupMouseLeave"
+      :class="{
+        visible: !cellQuickActions.rowData?.isFolder && cellQuickActions.visible
+      }"
+    >
+      <button
+        v-for="item in quickActions"
+        :key="item"
+        @click="item.action(cellQuickActions.rowData)"
+        :title="item.title"
+        class="px-2"
+      >
+        <i :class="item.icon"></i>
+      </button>
+    </div>
+  </div>
+</template>
 <script setup>
+  import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
   import Checkbox from 'primevue/checkbox'
+  import Column from 'primevue/column'
+  import DataTable from 'primevue/datatable'
   import InputText from 'primevue/inputtext'
-  import Skeleton from 'primevue/skeleton'
-  import Breadcrumb from 'primevue/breadcrumb'
-  import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
+  import PrimeMenu from 'primevue/menu'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import { getFileIcon } from '@/utils/icons'
-  import DataTable from '@/components/DataTable'
 
   defineOptions({ name: 'list-table-block-new' })
+
   const emit = defineEmits([
     'on-load-data',
     'on-before-go-to-add-page',
@@ -22,11 +452,10 @@
     'update:selectedItensData',
     'on-row-click-edit-folder',
     'delete-selected-items',
-    'download-selected-items',
     'page',
     'save-new-folder',
     'cancel-new-folder',
-    'update:new-folder-name'
+    'update:newFolderName'
   ])
 
   const props = defineProps({
@@ -57,6 +486,10 @@
     listService: {
       required: true,
       type: Function
+    },
+    addButtonLabel: {
+      type: String,
+      default: () => ''
     },
     emptyListMessage: {
       type: String,
@@ -100,7 +533,11 @@
     },
     showLastModified: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    celllQuickActionsItens: {
+      type: Array,
+      default: () => []
     },
     isPaginationLoading: {
       type: Boolean,
@@ -117,30 +554,6 @@
     newFolderName: {
       type: String,
       default: ''
-    },
-    folderPath: {
-      type: String,
-      default: ''
-    },
-    onBreadcrumbClick: {
-      type: Function,
-      default: null
-    },
-    onRefresh: {
-      type: Function,
-      default: null
-    },
-    headerContainer: {
-      type: Object,
-      default: null
-    },
-    buttonsContainer: {
-      type: Object,
-      default: null
-    },
-    containerWidth: {
-      type: Number,
-      default: 0
     }
   })
 
@@ -148,21 +561,35 @@
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
+  const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
+  const filters = ref({
+    global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+  })
   const isLoading = ref(false)
   const data = ref([])
   const selectedColumns = ref([])
+  const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const toast = useToast()
-  const columnSelectorPanel = ref(null)
-  const showEllipsisPopup = ref(false)
-  const hidePopupTimeout = ref(null)
 
-  const internalFirstItem = ref(0)
+  const lastModifiedToggled = ref(false)
+  const hoverTimeout = ref(null)
+  const hideTimeout = ref(null)
+  const activeCellElement = ref(null)
+  const pendingCellElement = ref(null)
+  const cellQuickActions = ref({
+    visible: false,
+    text: '',
+    posX: 0,
+    posY: 0,
+    rowData: null
+  })
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
+  const router = useRouter()
 
   const selectedItems = computed({
     get: () => {
@@ -177,17 +604,6 @@
     ...props.pt,
     rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
   }))
-
-  const firstItem = computed(() => {
-    if (props.isPaginationLoading && internalFirstItem.value !== 0) {
-      return internalFirstItem.value
-    }
-    return (props.currentPage - 1) * minimumOfItemsPerPage.value
-  })
-
-  const totalRecords = computed(() => {
-    return data.value.length
-  })
 
   const filterData = computed(() => {
     let filteredData = data.value.filter((item) => {
@@ -206,30 +622,21 @@
       filteredData = [newFolderRow, ...filteredData]
     }
 
-    if (props.isPaginationLoading) {
-      const currentPageItemsCount = filteredData.length % minimumOfItemsPerPage.value
-      const itemsInCurrentPage =
-        currentPageItemsCount === 0 ? minimumOfItemsPerPage.value : currentPageItemsCount
-      const skeletonRowsNeeded = minimumOfItemsPerPage.value - itemsInCurrentPage
-
-      if (skeletonRowsNeeded > 0) {
-        // eslint-disable-next-line id-length
-        const skeletonRows = Array.from({ length: skeletonRowsNeeded }, (_, index) => ({
-          id: `skeleton-${index}`,
-          isSkeletonRow: true,
-          name: '',
-          size: '',
-          last_modified: ''
-        }))
-        filteredData = [...filteredData, ...skeletonRows]
-      }
-    }
-
     return filteredData
+  })
+
+  onMounted(() => {
+    if (!props.lazyLoad) {
+      loadData()
+    }
+    selectedColumns.value = props.columns
   })
 
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
+  }
+  const toggleColumnSelector = (event) => {
+    columnSelectorPanel.value.toggle(event)
   }
 
   const reload = () => {
@@ -299,6 +706,11 @@
     }
   }
 
+  const navigateToAddPage = () => {
+    emit('on-before-go-to-add-page')
+    router.push(props.createPagePath)
+  }
+
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -333,7 +745,7 @@
 
   const toggleSelectAll = () => {
     const selectableRows = filterData.value.filter(
-      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
+      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder
     )
     if (isAllSelected.value) {
       selectedItems.value = []
@@ -344,12 +756,25 @@
 
   const isAllSelected = computed(() => {
     const selectableRows = filterData.value.filter(
-      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
+      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder
     )
     return (
       selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
     )
   })
+
+  const executeCommand = (rowData) => {
+    const [firstAction] = actionOptions(rowData)
+    firstAction?.command()
+  }
+
+  const optionsOneAction = (rowData) => {
+    const [firstAction] = actionOptions(rowData)
+    return {
+      icon: firstAction?.icon,
+      disabled: firstAction?.disabled
+    }
+  }
 
   const stateClassRules = (row) => {
     if (selectedItems.value.find((item) => item.id === row.id)) {
@@ -372,6 +797,13 @@
     }
   }
 
+  const changeNumberOfLinesPerPage = (event) => {
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
+    emit('page', event)
+  }
+
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
@@ -389,161 +821,200 @@
     emit('update:newFolderName', event.target.value)
   }
 
-  const showActions = (rowData) => {
-    return (
-      !rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder && !rowData.isSkeletonRow
-    )
+  const loadLastModifiedToggleState = () => {
+    const saved = localStorage.getItem('lastModifiedToggled')
+    if (saved !== null) {
+      lastModifiedToggled.value = JSON.parse(saved)
+    }
   }
 
-  const getRowIcon = (rowData) => {
-    if (!rowData || !rowData.name) return 'mdi mdi-file text-gray-500'
-    return getFileIcon(rowData)
+  const saveLastModifiedToggleState = () => {
+    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
   }
 
-  const breadcrumbItems = computed(() => {
-    if (!props.selectedBucket) return []
+  const toggleLastModifiedDisplay = () => {
+    lastModifiedToggled.value = !lastModifiedToggled.value
+    saveLastModifiedToggleState()
+  }
 
-    const items = [
-      {
-        label: props.selectedBucket.name,
-        index: 0,
-        icon: 'pi pi-cloud'
+  const setupCellEventHandlers = () => {
+    setTimeout(() => {
+      const columnsWithQuickActions = props.columns
+        .map((col, index) => ({ ...col, index }))
+        .filter((col) => col.quickActions === true)
+
+      if (columnsWithQuickActions.length === 0) {
+        return
       }
-    ]
 
-    if (props.folderPath) {
-      const folders = props.folderPath.split('/').filter((folder) => folder.trim() !== '')
-      folders.forEach((folder, index) => {
-        items.push({
-          label: folder + '/',
-          index: index + 1,
-          icon: 'pi pi-folder'
+      let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('.p-datatable-tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('table tbody tr')
+      }
+
+      rows.forEach((row, rowIndex) => {
+        columnsWithQuickActions.forEach((column) => {
+          const cell = row.children[column.index + 1]
+          if (cell && !cell.classList.contains('p-frozen-column')) {
+            cell.addEventListener('mouseenter', onCellMouseEnter)
+            cell.addEventListener('mouseleave', onCellMouseLeave)
+            cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', rowIndex)
+          }
         })
       })
-    }
+    }, 500)
+  }
+  const showActions = (rowData) => {
+    return !rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder
+  }
 
-    return items
-  })
+  const onScroll = () => {
+    if (cellQuickActions.value.visible) {
+      cellQuickActions.value.visible = false
 
-  const availableWidth = computed(() => {
-    if (props.containerWidth === 0) {
-      return 1000
-    }
-
-    const buttonsWidth = props.buttonsContainer ? props.buttonsContainer.offsetWidth : 400
-    const gap = 16
-    return Math.max(200, props.containerWidth - buttonsWidth - gap)
-  })
-
-  const displayedBreadcrumbItems = computed(() => {
-    const items = breadcrumbItems.value
-    const width = availableWidth.value
-
-    if (items.length <= 1) {
-      return items
-    }
-
-    const estimatedItemWidth = 120
-    const separatorWidth = 32
-    const ellipsisWidth = 40
-
-    const calculateBreadcrumbWidth = (itemsToShow) => {
-      const totalItems = itemsToShow.length
-      const hasEllipsis = itemsToShow.some((item) => item.label === '...')
-
-      let totalWidth = totalItems * estimatedItemWidth + (totalItems - 1) * separatorWidth
-      if (hasEllipsis) {
-        totalWidth = totalWidth - estimatedItemWidth + ellipsisWidth
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
       }
 
-      return totalWidth
-    }
-
-    if (calculateBreadcrumbWidth(items) <= width) {
-      return items
-    }
-
-    if (items.length === 2) {
-      return items
-    }
-
-    let currentItems = [...items]
-
-    while (currentItems.length > 2) {
-      const testItems = [currentItems[0], { label: '...' }, ...currentItems.slice(2)]
-
-      if (calculateBreadcrumbWidth(testItems) <= width) {
-        return testItems
+      if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
       }
 
-      currentItems.splice(1, 1)
-    }
+      if (hideTimeout.value) {
+        clearTimeout(hideTimeout.value)
+      }
 
-    return [items[0], { label: '...', disabled: true }, items[items.length - 1]]
-  })
-
-  const hiddenBreadcrumbItems = computed(() => {
-    const items = breadcrumbItems.value
-    const displayed = displayedBreadcrumbItems.value
-
-    const hasEllipsis = displayed.some((item) => item.label === '...')
-    if (!hasEllipsis) {
-      return []
-    }
-
-    const firstDisplayedIndex = displayed[0].index
-    const lastDisplayedItems = displayed.slice(-2)
-    const lastDisplayedIndex = lastDisplayedItems[0].index
-
-    return items.filter(
-      (item) => item.index > firstDisplayedIndex && item.index < lastDisplayedIndex
-    )
-  })
-
-  const setEllipsisPopup = (value) => {
-    if (!value) {
-      setTimeout(() => {
-        showEllipsisPopup.value = value
-      }, 500)
-    } else {
-      showEllipsisPopup.value = value
+      pendingCellElement.value = null
     }
   }
 
-  const scheduleHidePopup = () => {
-    if (hidePopupTimeout.value) {
-      clearTimeout(hidePopupTimeout.value)
+  const onCellMouseEnter = (event) => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
     }
-    hidePopupTimeout.value = setTimeout(() => {
-      showEllipsisPopup.value = false
-    }, 200)
-  }
-
-  const cancelHidePopup = () => {
-    if (hidePopupTimeout.value) {
-      clearTimeout(hidePopupTimeout.value)
-      hidePopupTimeout.value = null
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
     }
-    showEllipsisPopup.value = true
+
+    const cellElement = event.currentTarget
+
+    if (cellElement.classList.contains('p-frozen-column')) {
+      return
+    }
+
+    // Clear any existing active cell and popup
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+    }
+    cellQuickActions.value.visible = false
+
+    pendingCellElement.value = cellElement
+
+    hoverTimeout.value = setTimeout(() => {
+      if (pendingCellElement.value === cellElement) {
+        activeCellElement.value = cellElement
+
+        const rect = cellElement.getBoundingClientRect()
+        const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = parseInt(cellElement.getAttribute('data-row-index') || '0')
+        const currentRowData = data.value[rowIndex] || null
+
+        cellQuickActions.value = {
+          visible: true,
+          text: cellText,
+          posX: rect.left,
+          posY: rect.top - 28,
+          rowData: currentRowData
+        }
+
+        cellElement.classList.add('cell-active-hover')
+      }
+    }, 1000)
   }
 
-  const handleBreadcrumbClick = (item) => {
-    if (props.onBreadcrumbClick) {
-      props.onBreadcrumbClick(item)
+  const onCellMouseLeave = () => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+      hoverTimeout.value = null
+    }
+
+    pendingCellElement.value = null
+
+    hideTimeout.value = setTimeout(() => {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+    }, 150)
+  }
+
+  const onPopupMouseEnter = () => {
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.add('cell-active-hover')
     }
   }
 
-  const toggleColumnSelector = () => {
-    columnSelectorPanel.value.toggle(event)
+  const onPopupMouseLeave = () => {
+    cellQuickActions.value.visible = false
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+      activeCellElement.value = null
+    }
+  }
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(cellQuickActions.value.text)
+      .then(() => {
+        toast.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: 'Text copied to clipboard',
+          life: 3000
+        })
+        cellQuickActions.value.visible = false
+      })
+      .catch(() => {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to copy text',
+          life: 3000
+        })
+      })
   }
 
+  const quickActions = [
+    {
+      title: 'Copy to clipboard',
+      icon: 'pi pi-copy',
+      action: copyToClipboard
+    },
+    ...(props.cellQuickActionsItens || [])
+  ]
   watch(
-    () => [props.currentPage, minimumOfItemsPerPage.value, props.isPaginationLoading],
-    () => {
-      if (!props.isPaginationLoading) {
-        internalFirstItem.value = (props.currentPage - 1) * minimumOfItemsPerPage.value
+    () => data.value,
+    (newData) => {
+      if (newData && newData.length > 0) {
+        setupCellEventHandlers()
       }
-    }
+    },
+    { deep: true }
   )
 
   watch(data, (currentState) => {
@@ -556,329 +1027,48 @@
       loadData({ page: 1 })
     }
     selectedColumns.value = props.columns
+    loadLastModifiedToggleState()
+
+    window.addEventListener('scroll', onScroll, { passive: true })
   })
 
   onUnmounted(() => {
-    if (hidePopupTimeout.value) {
-      clearTimeout(hidePopupTimeout.value)
-    }
+    window.removeEventListener('scroll', onScroll)
   })
 </script>
-<template>
-  <div
-    class="max-w-full"
-    :class="{ 'mt-4': isTabs }"
-    data-testid="data-table-container"
-  >
-    <DataTable
-      ref="dataTableRef"
-      :data="filterData"
-      :loading="isLoading"
-      :paginator="paginator"
-      :rowsPerPageOptions="[10, 20, 50, 100]"
-      :rows="minimumOfItemsPerPage"
-      :first="firstItem"
-      :totalRecords="totalRecords"
-      :globalFilterFields="filterBy"
-      :rowClass="stateClassRules"
-      :pt="parsedDatatablePt"
-      :columns="columns"
-      :emptyListMessage="emptyListMessage"
-      @page="emit('page', $event)"
-      v-model:selection="selectedItems"
-      notShowEmptyBlock
-      :frozenValue="frozenRows"
-      isSelectable
-    >
-      <template #header>
-        <div class="flex flex-col gap-2 w-full">
-          <DataTable.Header :showDivider="props.folderPath">
-            <template #first-line>
-              <div class="flex justify-between gap-2 w-full">
-                <div class="flex gap-2 w-full">
-                  <slot name="search-slot" />
-                </div>
-                <div class="flex gap-2">
-                  <PrimeButton
-                    v-if="props.onRefresh"
-                    outlined
-                    icon="pi pi-refresh"
-                    size="small"
-                    @click="props.onRefresh"
-                    data-testid="data-table-actions-column-header-refresh"
-                  />
-                  <DataTable.Export @export="handleExportTableDataToCSV($event)" />
-                  <PrimeButton
-                    outlined
-                    icon="ai ai-column"
-                    size="small"
-                    @click="toggleColumnSelector"
-                    v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
-                    data-testid="data-table-actions-column-header-toggle-columns"
-                  />
-                  <OverlayPanel
-                    ref="columnSelectorPanel"
-                    :pt="{
-                      content: { class: 'p-0' }
-                    }"
-                    data-testid="data-table-actions-column-header-toggle-columns-panel"
-                  >
-                    <Listbox
-                      v-model="selectedColumns"
-                      multiple
-                      :options="[{ label: 'Available Columns', items: columns }]"
-                      class="hidden-columns-panel"
-                      optionLabel="header"
-                      optionGroupLabel="label"
-                      optionGroupChildren="items"
-                      data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-                    >
-                      <template #optiongroup="slotProps">
-                        <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                      </template>
-                    </Listbox>
-                  </OverlayPanel>
-                  <slot name="header-actions" />
-                </div>
-              </div>
-            </template>
-            <template #second-line>
-              <div class="flex justify-between items-center gap-2">
-                <div class="relative flex-1 min-w-0">
-                  <Breadcrumb
-                    :model="displayedBreadcrumbItems"
-                    class="text-color-primary overflow-hidden p-0 text-[12px] text-[var(--text-color-secondary)] hover:no-underline"
-                    :pt="{
-                      root: { class: 'overflow-hidden no-underline' },
-                      menu: { class: 'flex flex-nowrap overflow-hidden max-w-full' }
-                    }"
-                  >
-                    <template #item="{ item }">
-                      <div class="flex gap-2 items-center">
-                        <i
-                          class="hover:no-underline"
-                          :class="item.icon"
-                        ></i>
-                        <a
-                          class="cursor-pointer whitespace-nowrap hover:no-underline"
-                          @click="item.label === '...' ? null : handleBreadcrumbClick(item)"
-                          @mouseenter.stop="item.label === '...' && setEllipsisPopup(true)"
-                          @mouseleave.stop="item.label === '...' && scheduleHidePopup()"
-                        >
-                          {{ item.label }}
-                        </a>
-                      </div>
-                    </template>
-                  </Breadcrumb>
-                  <div
-                    class="absolute top-full left-20 mt-1 bg-[var(--menu-bg)] rounded-md z-[-50] opacity-0"
-                    @mouseleave="scheduleHidePopup()"
-                    @mouseenter="cancelHidePopup()"
-                    :class="{
-                      'opacity-100 transition-opacity duration-300 z-[50]': showEllipsisPopup
-                    }"
-                  >
-                    <div
-                      v-for="hiddenItem in hiddenBreadcrumbItems"
-                      :key="hiddenItem.index"
-                      class="px-3 py-2 hover:bg-[var(--surface-hover)] rounded-md cursor-pointer text-sm whitespace-nowrap text-[12px]"
-                      @click="handleBreadcrumbClick(hiddenItem)"
-                    >
-                      {{ hiddenItem.label }}
-                    </div>
-                  </div>
-                </div>
-                <div class="flex gap-2 flex-shrink-0">
-                  <slot name="second-line-actions" />
-                </div>
-              </div>
-            </template>
-          </DataTable.Header>
-        </div>
-      </template>
-      <DataTable.Column
-        :class="{ '!hover:cursor-pointer': !disabledList }"
-        headerStyle="width: 3rem"
-      >
-        <template #header>
-          <Checkbox
-            :model-value="isAllSelected"
-            @update:model-value="toggleSelectAll"
-            binary
-          />
-        </template>
-        <template #body="{ data: rowData }">
-          <div
-            class="cursor-pointer flex items-center justify-center w-6 h-8"
-            :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
-            @click="!rowData.isSkeletonRow && toggleRowSelection(rowData)"
-            data-testid="data-table-row-checkbox"
-          >
-            <Skeleton
-              v-if="rowData.isSkeletonRow"
-              width="1.5rem"
-              height="1.5rem"
-            />
-            <Checkbox
-              v-else-if="selectedItems.includes(rowData) && !rowData.isNewFolder"
-              :model-value="selectedItems.includes(rowData)"
-              @update:model-value="toggleRowSelection(rowData)"
-              @click.stop="toggleRowSelection(rowData)"
-              binary
-            />
-            <i
-              v-else
-              :key="`icon-${rowData.id}-${rowData.name}`"
-              class="text-xl"
-              :class="getRowIcon(rowData)"
-            ></i>
-          </div>
-        </template>
-      </DataTable.Column>
 
-      <DataTable.Column
-        :sortable="selectedItems.length > 0 ? false : !col.disableSort"
-        v-for="(col, index) of selectedColumns"
-        :key="col.field"
-        :field="col.field"
-        :header="selectedItems.length === 0 ? col.header : ''"
-        :sortField="selectedItems.length > 0 ? null : col?.sortField"
-        headerClass="relative w-[20rem]"
-        :class="{ 'hover:cursor-pointer ': !disabledList }"
-        data-testid="data-table-column"
-      >
-        <template
-          #header
-          v-if="selectedItems.length > 0 && index === 0"
-        >
-          <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
-            <span class="text-sm">{{ selectedItems.length }} files selected</span>
-            <div class="flex gap-2">
-              <PrimeButton
-                size="small"
-                outlined
-                :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
-                label="Download"
-                class="px-4"
-                :disabled="isDownloading"
-                @click="emit('download-selected-items')"
-              />
-              <PrimeButton
-                size="small"
-                icon="pi pi-trash"
-                label="Delete"
-                severity="danger"
-                class="px-4"
-                @click="emit('delete-selected-items')"
-              />
-            </div>
-          </div>
-        </template>
-        <template #body="{ data: rowData }">
-          <template v-if="rowData.isSkeletonRow">
-            <Skeleton
-              width="100%"
-              height="1rem"
-            />
-          </template>
-          <template v-else-if="rowData.isNewFolder && col.field === 'name'">
-            <div class="flex items-center gawp-2">
-              <InputText
-                :value="props.newFolderName"
-                @input="handleFolderNameInput"
-                @keyup.enter="emit('save-new-folder')"
-                @keyup.escape="emit('cancel-new-folder')"
-                placeholder="Enter folder name"
-                class="flex-1"
-                :class="{ 'p-invalid border-red-500': hasInvalidChars }"
-                autofocus
-                size="small"
-              />
-              <PrimeButton
-                icon="pi pi-check"
-                size="small"
-                outlined
-                @click="emit('save-new-folder')"
-                :disabled="!props.newFolderName.trim() || hasInvalidChars"
-              />
-              <PrimeButton
-                icon="pi pi-times"
-                size="small"
-                outlined
-                @click="emit('cancel-new-folder')"
-              />
-            </div>
-          </template>
-          <template v-else-if="col.type !== 'component'">
-            <div
-              :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
-              @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
-              v-html="rowData[col.field]"
-              :data-testid="`list-table-block__column__${col.field}__row`"
-            />
-          </template>
-          <template v-else>
-            <component
-              @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
-              :is="col.component(extractFieldValue(rowData, col.field))"
-              :data-testid="`list-table-block__column__${col.field}__row`"
-              :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
-            />
-          </template>
-        </template>
-      </DataTable.Column>
-
-      <DataTable.Column
-        :frozen="true"
-        :alignFrozen="'right'"
-        headerStyle="width: 13rem"
-        data-testid="data-table-actions-column"
-      >
-        <template
-          #body="{ data: rowData }"
-          v-if="isRenderActions"
-        >
-          <div
-            class="flex items-center gap-2 justify-end"
-            v-if="rowData.isSkeletonRow"
-          >
-            <Skeleton
-              width="1rem"
-              height="2rem"
-              class="mr-1"
-            />
-          </div>
-          <div
-            class="flex items-center gap-2 justify-end"
-            v-else-if="showActions(rowData)"
-          >
-            <DataTable.RowActions
-              :rowData="rowData"
-              :actions="actionOptions(rowData)"
-              :menuRefSetter="setMenuRefForRow"
-              :onMenuToggle="toggleActionsMenu"
-            />
-          </div>
-        </template>
-      </DataTable.Column>
-
-      <template #empty>
-        <slot name="noRecordsFound">
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
-            <p
-              class="text-md font-normal text-secondary"
-              data-testid="list-table-block__empty-message__text"
-            >
-              {{ emptyListMessage }}
-            </p>
-          </div>
-        </slot>
-      </template>
-    </DataTable>
-  </div>
-</template>
 <style scoped lang="scss">
-  :deep(.p-breadcrumb .p-breadcrumb-list .p-menuitem:hover) {
-    text-decoration: none !important;
+  .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
+    transition: color 0.2s ease;
+  }
+
+  .table-with-orange-borders.outline-visible
+    :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
+  .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
+    outline: 2px dashed #f97316 !important;
+    outline-offset: -2px;
+    transition-delay: 0.3s;
+    border-radius: 0 6px 6px 6px;
+  }
+  .popup-container {
+    background-color: #f97316;
+    color: white;
+    padding: 4px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    opacity: 0;
+    height: 30px;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease;
+    &.visible {
+      opacity: 1;
+      transform: scaleY(1);
+    }
   }
 </style>

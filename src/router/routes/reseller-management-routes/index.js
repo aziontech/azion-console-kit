@@ -64,9 +64,7 @@ export const resellerManagementRoutes = {
             to: '/reseller/management'
           },
           {
-            label: 'Edit Reseller',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Reseller'
           }
         ]
       }

@@ -40,8 +40,8 @@ const adapt = (httpResponse) => {
       labelActive: parseStatusData(edgeService.active),
       active: edgeService.active,
       lastEditor: edgeService.last_editor,
-      lastModify: convertToRelativeTime(edgeService.updated_at),
-      lastModified: edgeService.updated_at
+      lastModified: convertToRelativeTime(edgeService.updated_at),
+      lastModifiedDate: edgeService.updated_at
     }
   })
 

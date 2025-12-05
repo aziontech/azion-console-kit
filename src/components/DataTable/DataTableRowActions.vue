@@ -2,6 +2,21 @@
   <div class="flex items-center gap-2 justify-end">
     <div
       class="flex justify-end"
+      v-if="isSingleAction"
+      data-testid="data-table-actions-column-body-action"
+    >
+      <PrimeButton
+        size="small"
+        outlined
+        v-bind="singleActionProps"
+        @click="handleSingleAction"
+        class="cursor-pointer table-button"
+        data-testid="data-table-actions-column-body-action-button"
+      />
+    </div>
+    <div
+      class="flex justify-end"
+      v-else
       data-testid="data-table-actions-column-body-actions"
     >
       <PrimeMenu
@@ -14,11 +29,11 @@
       <PrimeButton
         v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
         size="small"
-        icon="pi pi-ellipsis-v"
+        icon="pi pi-ellipsis-h"
         outlined
         @click="handleMenuToggle"
+        class="cursor-pointer table-button"
         data-testid="data-table-actions-column-body-actions-menu-button"
-        class="table-button"
       />
     </div>
   </div>
@@ -38,6 +53,10 @@
       type: [Array, Function],
       required: true
     },
+    singleAction: {
+      type: [Object, Function],
+      default: null
+    },
     onActionExecute: {
       type: Function,
       default: () => {}
@@ -54,12 +73,27 @@
 
   const menuRef = ref(null)
 
+  const isSingleAction = computed(() => {
+    return props.singleAction !== null
+  })
+
+  const singleActionProps = computed(() => {
+    if (typeof props.singleAction === 'function') {
+      return props.singleAction(props.rowData)
+    }
+    return props.singleAction || {}
+  })
+
   const menuActions = computed(() => {
     if (typeof props.actions === 'function') {
       return props.actions(props.rowData)
     }
     return props.actions || []
   })
+
+  const handleSingleAction = () => {
+    props.onActionExecute(props.rowData)
+  }
 
   const handleMenuToggle = (event) => {
     props.onMenuToggle(event, props.rowData.id)

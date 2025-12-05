@@ -138,7 +138,6 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Billing"
-        description="View and manage invoices, payments, and subscription details."
         :isRightAlignment="true"
       >
         <template #default>
@@ -157,7 +156,7 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <div class="mb-2">
+      <div class="mb-4">
         <slot
           name="notification"
           v-bind="propsNotification()"
