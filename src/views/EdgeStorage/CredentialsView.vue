@@ -56,6 +56,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'credential',
       icon: 'pi pi-trash',
@@ -90,6 +91,20 @@
     {
       field: 'expirationDate',
       header: 'Expiration Date'
+    },
+    {
+      field: 'last_modified',
+      header: 'Last Modified',
+      sortField: 'last_modified',
+      filterPath: 'last_modified',
+      type: 'component',
+      component: (columnData, rowData, dependencies) => {
+        return columnBuilder({
+          data: rowData,
+          columnAppearance: 'last-modified',
+          dependencies
+        })
+      }
     }
   ]
 
@@ -107,6 +122,10 @@
     capabilities: [],
     expirationDate: null
   }
+
+  defineExpose({
+    openCreateDrawer: handleCreateCredential
+  })
 </script>
 
 <template>
@@ -121,15 +140,20 @@
       :editInDrawer="false"
       emptyListMessage="No credentials found"
       :paginator="false"
-      addButtonLabel="Credential"
       :enableEditClick="false"
+      :emptyBlock="{
+        title: 'No credentials found',
+        description: 'Create a new credential to get started'
+      }"
     >
-      <template #addButton>
+      <template #emptyBlockButton>
         <PrimeButton
           icon="pi pi-plus"
           label="Credential"
+          severity="secondary"
+          size="small"
           @click="handleCreateCredential"
-          data-testid="create_credential_button"
+          data-testid="create_credential_button_empty"
         />
       </template>
     </ListTableBlock>
