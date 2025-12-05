@@ -1,46 +1,5 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
-        :createPagePath="createDomainPath"
-        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
-        :listService="workloadService.listWorkloads"
-        :columns="getColumns"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
-        :actions="actions"
-        :apiFields="DOMAINS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-        :hiddenByDefault="columnsHiddenByDefault"
-      />
-      <EmptyResultsBlock
-        v-else
-        :title="titleEmptyPage"
-        :description="descriptionEmptyPage"
-        :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
-        :createPagePath="createDomainPath"
-        @click-to-create="handleTrackEvent"
-        :documentationService="documentationHandler"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
@@ -52,7 +11,8 @@
   import * as Helpers from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -74,10 +34,10 @@
 
   const columnsHiddenByDefault = ['lastEditor', 'protocols']
 
-  const hasContentToList = ref(true)
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
@@ -124,22 +84,23 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'id',
-        header: 'ID',
-        filterPath: 'id',
-        sortField: 'id'
-      },
-      {
         field: 'name',
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
+            data: columnData.text,
+            columnAppearance: 'text-format-with-popup'
           })
         }
+      },
+      {
+        field: 'id',
+        header: 'ID',
+        filterPath: 'id',
+        sortField: 'id'
       },
       {
         field: 'domains',
@@ -147,12 +108,13 @@
         filterPath: 'domains',
         disableSort: true,
         type: 'component',
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'expand-column',
+            data: Array.isArray(columnData) ? columnData : columnData?.content,
+            columnAppearance: 'text-array-with-popup',
             dependencies: {
-              showCopy: true
+              showCopy: Helpers.clipboardWrite
             }
           })
         }
@@ -163,12 +125,14 @@
         filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
+        style: 'max-width: 150px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
+            data: columnData.content,
+            columnAppearance: 'text-format-with-popup',
             dependencies: {
-              copyContentService: Helpers.clipboardWrite
+              copyContentService: Helpers.clipboardWrite,
+              showCopy: Helpers.clipboardWrite
             }
           })
         }
@@ -178,18 +142,6 @@
         header: 'Infrastructure',
         filterPath: 'infrastructure',
         sortField: 'infrastructure'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        filterPath: 'lastEditor',
-        sortField: 'lastEditor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        filterPath: 'lastModified',
-        sortField: 'lastModified'
       },
       {
         field: 'active',
@@ -202,18 +154,81 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })
-
-  function handleLoadData(event) {
-    hasContentToList.value = event
-  }
-
+  const allowedFilters = computed(() =>
+    getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
+  )
   const titleEmptyPage = computed(
     () => `No ${handleTextDomainWorkload.singularTitle} have been created`
   )
   const descriptionEmptyPage = computed(
     () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
   )
+
+  const pageDescription = computed(() => {
+    return isWorkload.value
+      ? 'Deploy and manage scalable workloads across the network.'
+      : 'Manage and secure domains for applications.'
+  })
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"
+        :description="pageDescription"
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            :label="handleTextDomainWorkload.singularTitle"
+            @click="handleTrackEvent"
+            :createPagePath="createDomainPath"
+            :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :createPagePath="createDomainPath"
+        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
+        :listService="workloadService.listWorkloads"
+        :columns="getColumns"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
+        :actions="actions"
+        :apiFields="DOMAINS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="columnsHiddenByDefault"
+        :frozenColumns="['name']"
+        exportFileName="Workload"
+        :allowedFilters="allowedFilters"
+        :emptyBlock="{
+          title: titleEmptyPage,
+          description: descriptionEmptyPage,
+          createButtonLabel: 'Workload',
+          documentationService: documentationHandler
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

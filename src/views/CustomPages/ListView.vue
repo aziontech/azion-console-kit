@@ -1,12 +1,12 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
+  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -50,23 +50,22 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        style: 'max-width: 300px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
+      },
+      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        sortField: 'lastModified',
-        header: 'Last Modified'
       },
       {
         field: 'active',
@@ -81,6 +80,20 @@
           })
         },
         disableSort: false
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        filterPath: 'last_modified',
+        type: 'component',
+        component: (columnData, rowData, dependencies) => {
+          return columnBuilder({
+            data: rowData,
+            columnAppearance: 'last-modified',
+            dependencies
+          })
+        }
       }
     ]
   })
@@ -98,17 +111,28 @@
 <template>
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Custom Pages"
-        data-testid="custom-pages-heading"
-      />
+      <PageHeadingBlock pageTitle="Custom Pages">
+        <template #default>
+          <PrimeButton
+            size="small"
+            link
+            @click="navigateToGetHelp"
+          >
+            Get Help
+          </PrimeButton>
+          <DataTableActionsButtons
+            size="small"
+            label="Custom Page"
+            createPagePath="custom-pages/create"
+            data-testid="create_CustomPage_button"
+            @click="handleTrackEvent"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         ref="listTableBlockRef"
-        v-if="hasContentToList"
-        addButtonLabel="Custom Page"
-        createPagePath="custom-pages/create"
         editPagePath="custom-pages/edit"
         :listService="customPageService.listCustomPagesService"
         :columns="getColumns"
@@ -120,20 +144,17 @@
         data-testid="custom-pages-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        exportFileName="Custom Pages"
+        :allowedFilters="getColumns"
+        :emptyBlock="{
+          title: 'No custom pages have been created',
+          description: 'Click the button below to create your first custom page.',
+          createPagePath: '/custom-pages/create',
+          createButtonLabel: 'Custom Page',
+          documentationService: props.documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No custom pages have been created"
-        description="Click the button below to create your first custom page."
-        createButtonLabel="Custom Page"
-        createPagePath="custom-pages/create"
-        :documentationService="props.documentationService"
-        data-testid="custom-pages-empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
