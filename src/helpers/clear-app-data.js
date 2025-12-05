@@ -2,8 +2,6 @@ export const clearAppData = () => {
   const itemsToClear = [
     // Account store
     'account',
-    // Theme
-    // 'theme',
     // Pinia persisted stores
     'tableDefinitions',
     'deploy',
