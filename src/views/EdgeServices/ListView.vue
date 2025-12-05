@@ -1,11 +1,12 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import Illustration from '@/assets/svg/illustration-layers'
+  import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import ContentBlock from '@/templates/content-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
-  import { computed, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { computed, ref, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -31,34 +32,27 @@
     }
   })
 
-  const csvMapper = (rowData) => {
-    return {
-      name: rowData.name,
-      id: rowData.id,
-      lastEditor: rowData.lastEditor,
-      lastModified: rowData.lastModified,
-      labelActive: rowData.data?.content
-    }
-  }
+  const hasContentToList = ref(true)
 
   const getColumns = computed(() => [
-    {
-      field: 'name',
-      header: 'Name',
-      type: 'component',
-      style: 'max-width: 300px',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-format-with-popup'
-        })
-      }
-    },
     {
       field: 'id',
       header: 'ID',
       sortField: 'id',
       filterPath: 'id'
+    },
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      sortField: 'lastModifiedDate',
+      header: 'Last Modified'
     },
     {
       field: 'labelActive',
@@ -70,22 +64,12 @@
           data: columnData,
           columnAppearance: 'tag'
         })
-    },
-    {
-      field: 'last_modified',
-      header: 'Last Modified',
-      sortField: 'last_modified',
-      filterPath: 'last_modified',
-      type: 'component',
-      component: (columnData, rowData, dependencies) => {
-        return columnBuilder({
-          data: rowData,
-          columnAppearance: 'last-modified',
-          dependencies
-        })
-      }
     }
   ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
 
   const actions = [
     {
@@ -137,7 +121,7 @@
 
   const handleTrackEventGoToEdit = () => {
     tracker.product.clickToEdit({
-      productName: 'Edge Services'
+      productName: 'Edge Service'
     })
   }
 </script>
@@ -145,25 +129,14 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Edge Services"
-        description="Deliver and manage services for applications."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Service"
-            @click="handleTrackEventGoToCreate"
-            createPagePath="edge-services/create"
-            data-testid="create_Service_button"
-          />
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edge Services"></PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
+        v-if="hasContentToList"
         :listService="listEdgeServiceServices"
         :columns="getColumns"
+        addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
@@ -172,16 +145,20 @@
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         :defaultOrderingFieldName="'-last_modified'"
-        exportFileName="Edge Services"
-        :csvMapper="csvMapper"
-        :emptyBlock="{
-          title: 'No services have been created',
-          description: 'Click the button below to create your first service.',
-          createButtonLabel: 'Service',
-          createPagePath: 'edge-services/create',
-          documentationService: documentationService
-        }"
       />
+
+      <EmptyResultsBlock
+        v-else
+        title="No services have been created"
+        description="Click the button below to create your first service."
+        createButtonLabel="Service"
+        createPagePath="edge-services/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

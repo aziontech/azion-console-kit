@@ -78,8 +78,8 @@ describe('EdgeServiceServices', () => {
           severity: 'success'
         },
         lastEditor: fixtures.edgeServiceMock.last_editor,
-        lastModify: '10 hours ago',
-        lastModified: new Date('2023-11-10T00:00:00.000Z')
+        lastModified: '10 hours ago',
+        lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
         id: fixtures.disabledEdgeServiceMock.id,
@@ -90,8 +90,8 @@ describe('EdgeServiceServices', () => {
           severity: 'danger'
         },
         lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
-        lastModify: 'Just now',
-        lastModified: new Date('2023-11-11T00:00:00.000Z')
+        lastModified: 'Just now',
+        lastModifiedDate: new Date('2023-11-11T00:00:00.000Z')
       }
     ])
   })

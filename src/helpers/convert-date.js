@@ -187,6 +187,7 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    weekday: 'long',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -316,14 +317,6 @@ const convertToRelativeTime = (date) => {
   return `${currentYear - targetYear} years ago`
 }
 
-const getOffset = (timeZone = 'UTC', date = new Date()) => {
-  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }))
-  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }))
-  const offset = (tzDate.getTime() - utcDate.getTime()) / (60 * 60 * 1000)
-  const sinal = offset > 0 ? '+' : ''
-  return `UTC${sinal}${offset}`
-}
-
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -337,6 +330,5 @@ export {
   formatDateToDayMonthYearHour,
   getRemainingDays,
   getCurrentDateTimeIntl,
-  convertToRelativeTime,
-  getOffset
+  convertToRelativeTime
 }

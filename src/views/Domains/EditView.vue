@@ -38,7 +38,6 @@
 
 <script setup>
   import { ref, inject } from 'vue'
-  import { useRoute } from 'vue-router'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -48,7 +47,6 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -110,8 +108,6 @@
       .track()
   }
 
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
   const digitalCertificates = ref([])
   const domainName = ref()
 
@@ -121,7 +117,6 @@
 
   const setDomainName = async (domain) => {
     domainName.value = domain.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, domain.name)
   }
 
   const validationSchema = yup.object({

@@ -162,9 +162,8 @@
       header: 'Description',
       filterPath: 'description.value',
       type: 'component',
-      class: 'max-w-[250px]',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' }),
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' }),
       disableSort: true
     },
     {
@@ -195,7 +194,6 @@
 
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'rule',
       icon: 'pi pi-trash',

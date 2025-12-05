@@ -59,9 +59,7 @@ export const customPagesRoutes = {
           },
           {
             label: 'Edit Page',
-            to: '/custom-pages/edit',
-            dynamic: true,
-            routeParam: 'id'
+            to: '/custom-pages/edit'
           }
         ],
         flag: 'checkout_access_without_flag'

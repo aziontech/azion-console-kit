@@ -1,12 +1,13 @@
 <script setup>
-  import { computed, inject } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CloneBlock from '@/templates/clone-block'
   import { wafService } from '@/services/v2/waf/waf-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -18,6 +19,7 @@
     }
   })
 
+  const hasContentToList = ref(true)
   const actions = [
     {
       type: 'dialog',
@@ -43,17 +45,6 @@
     }
   ]
 
-  const allowedFilters = [
-    {
-      header: 'Name',
-      field: 'name'
-    },
-    {
-      header: 'ID',
-      field: 'id'
-    }
-  ]
-
   const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
@@ -70,36 +61,21 @@
       .track()
   }
 
-  const csvMapper = (rowData) => {
-    return {
-      name: rowData.name,
-      id: rowData.id,
-      threatsConfiguration: rowData.threatsConfiguration,
-      lastEditor: rowData.lastEditor,
-      lastModified: rowData.lastModified,
-      active: rowData.data?.content || rowData.active
-    }
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 
   const getColumns = computed(() => {
     return [
       {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
-      },
-      {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
+      },
+      {
+        field: 'name',
+        header: 'Name'
       },
       {
         field: 'threatsConfiguration',
@@ -109,7 +85,15 @@
         filterPath: 'threats_configuration',
         disableSort: true,
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       },
       {
         field: 'active',
@@ -122,20 +106,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'last_modified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
-        filterPath: 'last_modified',
-        type: 'component',
-        component: (columnData, rowData, dependencies) => {
-          return columnBuilder({
-            data: rowData,
-            columnAppearance: 'last-modified',
-            dependencies
-          })
-        }
       }
     ]
   })
@@ -144,43 +114,35 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="WAF Rules"
-        description="Manage Web Application Firewall (WAF) rules for secure connections."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="WAF Rule"
-            createPagePath="waf/create"
-            @click="handleTrackClickToCreate"
-            data-testid="create_WAFRule_button"
-          />
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="WAF Rules" />
     </template>
     <template #content>
       <FetchListTableBlock
+        v-if="hasContentToList"
         :listService="wafService.listWafRules"
         :columns="getColumns"
+        addButtonLabel="WAF Rule"
+        createPagePath="waf/create"
         @on-before-go-to-edit="handleTrackClickToEdit"
         @on-before-go-to-add-page="handleTrackClickToCreate"
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        :frozenColumns="['name']"
-        exportFileName="WAF Rules"
-        :csvMapper="csvMapper"
-        :allowedFilters="allowedFilters"
-        :emptyBlock="{
-          title: 'No WAF rules have been created',
-          description: 'Click the button below to create your first WAF rule.',
-          createButtonLabel: 'WAF Rule',
-          createPagePath: 'waf/create',
-          documentationService: documentationService
-        }"
       />
+      <EmptyResultsBlock
+        v-else
+        title="No WAF rules have been created"
+        description="Click the button below to create your first WAF rule."
+        createButtonLabel="WAF Rule"
+        @click-to-create="handleTrackClickToEdit"
+        createPagePath="waf/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

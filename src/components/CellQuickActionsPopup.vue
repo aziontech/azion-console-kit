@@ -101,7 +101,7 @@
       icon: 'pi pi-copy',
       action: copyToClipboard
     },
-    ...(props?.cellQuickActionsItens || [])
+    ...(props.cellQuickActionsItens || [])
   ])
 
   function setupCellEventHandlers() {
