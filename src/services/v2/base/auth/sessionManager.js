@@ -48,6 +48,8 @@ export const sessionManager = {
 
   async switchAccount() {
     await clearAllCache()
+    await clearCacheSensitive()
+    clearAppData()
     ensure.lists()
   },
 
