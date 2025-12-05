@@ -1,20 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Data Stream"
-        description="Stream real-time data for analytics and insights."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Stream"
-            createPagePath="/data-stream/create"
-            :disabled="hasNoPermissionToCreateDataStream || disabledList"
-            data-testid="create_Stream_button"
-          />
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Data Stream" />
     </template>
     <template #content>
       <div class="flex flex-col gap-3 items-start">
@@ -38,6 +25,9 @@
         <div class="w-full">
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
+            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
+            v-if="hasContentToList"
+            addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
             :listService="dataStreamService.listDataStreamService"
@@ -47,19 +37,20 @@
             :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
             :defaultOrderingFieldName="'-last_modified'"
-            :frozenColumns="['name']"
-            exportFileName="Data Stream"
-            :csvMapper="csvMapper"
+          ></FetchListTableBlock>
+          <EmptyResultsBlock
+            v-else
+            title="No stream has been created"
+            description="Click the button below to create your first stream."
+            createButtonLabel="Stream"
+            createPagePath="data-stream/create"
             :documentationService="documentationService"
-            :allowedFilters="getFilters"
-            :emptyBlock="{
-              title: 'No stream has been created.',
-              description: 'Click the button below to create your first stream.',
-              createPagePath: '/data-stream/create',
-              createButtonLabel: 'Stream',
-              documentationService: documentationService
-            }"
-          />
+            :disabledList="isMaxDomainsReached"
+          >
+            <template #illustration>
+              <Illustration />
+            </template>
+          </EmptyResultsBlock>
         </div>
       </div>
     </template>
@@ -70,7 +61,9 @@
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { onBeforeRouteLeave } from 'vue-router'
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -78,8 +71,6 @@
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
-
   defineOptions({ name: 'data-stream-view' })
 
   defineProps({
@@ -129,7 +120,6 @@
   const hasContentToList = ref(true)
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'stream',
       icon: 'pi pi-trash',
@@ -161,38 +151,17 @@
     return isMaxDomainsReached.value || domainsLoading.value
   })
 
-  const csvMapper = (rowData) => {
-    return {
-      name: rowData.name,
-      id: rowData.id,
-      dataSource: rowData.dataSource,
-      templateName: rowData.templateName,
-      endpointType: rowData.endpointType,
-      lastEditor: rowData.lastEditor,
-      lastModified: rowData.lastModified,
-      active: rowData.data?.content || rowData.active
-    }
-  }
-
   const getColumns = computed(() => {
     return [
-      {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
-      },
       {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
+      },
+      {
+        field: 'name',
+        header: 'Name'
       },
       {
         field: 'dataSource',
@@ -210,6 +179,14 @@
         disableSort: true
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
+      },
+      {
         field: 'active',
         header: 'Status',
         type: 'component',
@@ -218,31 +195,8 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'last_modified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
-        filterPath: 'last_modified',
-        type: 'component',
-        component: (columnData, rowData, dependencies) => {
-          return columnBuilder({
-            data: rowData,
-            columnAppearance: 'last-modified',
-            dependencies
-          })
-        }
       }
     ]
-  })
-
-  const getFilters = computed(() => {
-    return getColumns.value.filter(
-      (column) =>
-        column.field !== 'dataSource' &&
-        column.field !== 'templateName' &&
-        column.field !== 'endpointType'
-    )
   })
 
   onBeforeRouteLeave((to, from, next) => {

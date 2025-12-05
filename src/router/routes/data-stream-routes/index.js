@@ -86,9 +86,7 @@ export const dataStreamRoutes = {
             to: '/data-stream'
           },
           {
-            label: 'Edit Stream',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Stream'
           }
         ]
       }

@@ -1,4 +1,6 @@
 <script setup>
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -11,8 +13,6 @@
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
   import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -113,13 +113,8 @@
       field: 'name',
       header: 'Description',
       type: 'component',
-      style: 'max-width: 300px',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-format-with-popup'
-        })
-      }
+      component: (columnData) =>
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
     },
 
     {
@@ -132,7 +127,15 @@
       type: 'component',
       disableSort: true,
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
     },
     {
       field: 'status',
@@ -144,26 +147,15 @@
           data: columnData,
           columnAppearance: 'tag'
         })
-    },
-    {
-      field: 'last_modified',
-      header: 'Last Modified',
-      sortField: 'last_modified',
-      filterPath: 'last_modified',
-      type: 'component',
-      component: (columnData, rowData, dependencies) => {
-        return columnBuilder({
-          data: rowData,
-          columnAppearance: 'last-modified',
-          dependencies
-        })
-      }
     }
   ])
 
   const reloadWafRulesAllowedList = () => {
+    if (hasContentToList.value) {
+      listAllowedRef.value.reload()
+      return
+    }
     hasContentToList.value = true
-    listAllowedRef.value.reload()
   }
 
   const handleLoadData = (event) => {
@@ -230,7 +222,6 @@
 
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'WAF allowed rule',
       icon: 'pi pi-trash',
@@ -242,6 +233,7 @@
 <template>
   <FetchListTableBlock
     ref="listAllowedRef"
+    v-if="hasContentToList"
     addButtonLabel="Allowed Rule"
     :editInDrawer="openEditDrawerWafRulesAllowed"
     :columns="wafRulesAllowedColumns"
@@ -251,16 +243,26 @@
     isTabs
     :actions="actions"
     :default-ordering-field-name="'id'"
-    exportFileName="WAF Rules Allowed"
-    :emptyBlock="{
-      title: 'No allowed rule has been created.',
-      description:
-        'Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule.',
-      createButtonLabel: 'Allowed Rule',
-      documentationService: props.documentationServiceAllowed
-    }"
   >
     <template #addButton>
+      <PrimeButton
+        icon="pi pi-plus"
+        label="Allowed Rule"
+        @click="openCreateDrawerWafAllowed"
+        data-testid="create_Allowed Rule_button"
+      />
+    </template>
+  </FetchListTableBlock>
+
+  <EmptyResultsBlock
+    v-else
+    title="No allowed rule has been created."
+    description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
+    createButtonLabel="Allowed Rule"
+    :documentationService="props.documentationServiceAllowed"
+    :inTabs="true"
+  >
+    <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
         severity="secondary"
@@ -278,38 +280,10 @@
         data-testid="create_Allowed Rule_button"
       />
     </template>
-    <template #emptyBlock>
-      <EmptyResultsBlock
-        title="No allowed rule has been created."
-        description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
-        createButtonLabel="Allowed Rule"
-        :documentationService="props.documentationServiceAllowed"
-        :inTabs="true"
-      >
-        <template #default>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            severity="secondary"
-            label="Create from Tuning"
-            outlined
-            @click="goToWafRulesTuning"
-          >
-          </PrimeButton>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            severity="secondary"
-            icon="pi pi-plus"
-            label="Allowed Rule"
-            @click="openCreateDrawerWafAllowed"
-            data-testid="create_Allowed Rule_button"
-          />
-        </template>
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
+    <template #illustration>
+      <Illustration />
     </template>
-  </FetchListTableBlock>
+  </EmptyResultsBlock>
 
   <CreateDrawerBlock
     v-if="showCreateWafRulesAllowedDrawer"

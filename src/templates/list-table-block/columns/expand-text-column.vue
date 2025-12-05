@@ -1,8 +1,5 @@
 <template>
-  <ul
-    class="flex flex-col gap-1"
-    :class="{ 'py-2': displayShowMore }"
-  >
+  <ul class="flex flex-col gap-1">
     <li
       class="whitespace-pre"
       data-testid="table-column-expand-text-column__value"

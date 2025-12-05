@@ -4,29 +4,18 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
-  import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const networkListName = ref('Network List')
 
   const props = defineProps({
     listCountriesService: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
-
-  const setNetworkListName = (networkList) => {
-    networkListName.value = networkList.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, networkList.name)
-  }
   const options = ref([
     { name: 'ASN', value: 'asn' },
     { name: 'Countries', value: 'countries' },
@@ -89,7 +78,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="networkListName"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -97,7 +86,6 @@
         :loadService="networkListsService.loadNetworkList"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
-        @loaded-service-object="setNetworkListName"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >

@@ -73,9 +73,10 @@ export const digitalCertificatesRoutes = {
           },
           {
             label: 'Edit Digital Certificate',
-            to: '/digital-certificates/edit',
             dynamic: true,
-            routeParam: 'id'
+            baseLabel: 'Edit Digital Certificate',
+            queryParam: 'certificate',
+            typeMapping: certificateTypeMapping
           }
         ]
       }

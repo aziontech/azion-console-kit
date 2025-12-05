@@ -1,10 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Real-Time Events"
-        description="Track and analyze events as they happen."
-      />
+      <PageHeadingBlock pageTitle="Real-Time Events" />
     </template>
     <template #content>
       <TabView

@@ -71,9 +71,7 @@ export const edgeServicesRoutes = {
             to: '/edge-services'
           },
           {
-            label: 'Edit Edge Service',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Edge Service'
           }
         ]
       }

@@ -2,24 +2,16 @@
 
 export const getFileIcon = (data) => {
   if (!data) return 'mdi mdi-file-document text-gray-500'
-
+  // Check for special cases first
   if (data.isParentNav) {
     return 'mdi mdi-folder-open text-grey-500'
   }
   if (data.isFolder) {
     return 'mdi mdi-folder text-grey-500'
   }
-
   const fileName = data.name || data
-  if (!fileName || typeof fileName !== 'string') {
-    return 'mdi mdi-file-document text-gray-500'
-  }
-
-  const trimmedFileName = fileName.trim()
-  if (!trimmedFileName) return 'mdi mdi-file-document text-gray-500'
-
-  const parts = trimmedFileName.toLowerCase().split('.')
-  const extension = parts.length > 1 ? parts[parts.length - 1] : ''
+  if (!fileName) return 'mdi mdi-file-document text-gray-500'
+  const extension = fileName.toLowerCase().split('.').pop()
   const iconMap = {
     // Images
     jpg: 'mdi mdi-image text-green-500',
@@ -189,12 +181,9 @@ export const getFileIcon = (data) => {
     folder: 'mdi mdi-folder text-blue-500'
   }
 
-  if (trimmedFileName.endsWith('/')) {
+  // Check if it's a folder (no extension or ends with /)
+  if (!extension || fileName.endsWith('/')) {
     return 'mdi mdi-folder text-blue-500'
-  }
-
-  if (!extension) {
-    return 'mdi mdi-file text-gray-500'
   }
 
   return iconMap[extension] || 'mdi mdi-file text-gray-500'

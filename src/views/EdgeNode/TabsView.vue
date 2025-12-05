@@ -1,7 +1,6 @@
 <script setup>
   import { ref, provide, watch, reactive } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabView from 'primevue/tabview'
@@ -28,7 +27,6 @@
 
   const route = useRoute()
   const router = useRouter()
-  const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
   const title = ref('')
@@ -63,7 +61,6 @@
     activeTab.value = services ? 1 : 0
     edgeNode.value = await getEdgeNodesData()
     title.value = edgeNode.value.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value.name)
   }
 
   const changeRouteByClickingOnTab = (event) => {
@@ -73,7 +70,6 @@
   const updateEdgeNodesValue = async (edgeNodeValues) => {
     title.value = edgeNodeValues.name
     edgeNode.value = await getEdgeNodesData()
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNodeValues.name)
   }
 
   const changeTab = (index) => {
@@ -115,10 +111,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="title"
-        :entityName="edgeNode?.name"
-      />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView

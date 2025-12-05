@@ -1,20 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Client Management">
-        <template #default>
-          <div class="flex justify-between gap-2 w-full">
-            <div class="flex gap-2">
-              <DataTableActionsButtons
-                size="small"
-                label="Client"
-                createPagePath="management/create"
-                data-testid="create_Client_button"
-              />
-            </div>
-          </div>
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Client Management" />
     </template>
     <template #content>
       <FetchListTableBlock
@@ -22,11 +9,11 @@
         :listService="listAccountsClientDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        addButtonLabel="Client"
+        createPagePath="management/create"
         emptyListMessage="No clients found."
         editPagePath="management/edit"
         enableEditClick
-        exportFileName="Client Management"
-        :csvMapper="csvMapper"
       />
 
       <EmptyResultsBlock
@@ -55,7 +42,6 @@
   import { useAccountStore } from '@/stores/account'
   import { useRouter } from 'vue-router'
   import { computed, ref, onBeforeMount } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'client-management-view' })
 
@@ -68,14 +54,6 @@
       router.push('/')
     }
   })
-
-  const csvMapper = (rowData) => {
-    return {
-      name: rowData.name,
-      company: rowData.company,
-      status: rowData.status?.content || rowData.status
-    }
-  }
 
   const getColumns = computed(() => {
     return [
@@ -99,20 +77,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'last_modified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
-        filterPath: 'last_modified',
-        type: 'component',
-        component: (columnData, rowData, dependencies) => {
-          return columnBuilder({
-            data: rowData,
-            columnAppearance: 'last-modified',
-            dependencies
-          })
-        }
       }
     ]
   })

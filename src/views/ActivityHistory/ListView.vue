@@ -1,10 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Activity History"
-        description="Track and review actions performed within the account."
-      />
+      <PageHeadingBlock pageTitle="Activity History"></PageHeadingBlock>
     </template>
     <template #content>
       <div v-if="hasContentToList">

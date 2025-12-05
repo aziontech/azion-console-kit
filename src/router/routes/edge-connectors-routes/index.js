@@ -55,9 +55,7 @@ export const edgeConnectorsRoutes = {
             to: '/connectors'
           },
           {
-            label: 'Edit Connector',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Connector'
           }
         ],
         flag: 'checkout_access_without_flag'

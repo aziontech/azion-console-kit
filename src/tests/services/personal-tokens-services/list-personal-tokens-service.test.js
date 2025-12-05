@@ -71,10 +71,9 @@ describe('PersonalTokensServices', () => {
         scope: 'Global',
         description: '',
         name: fixtures.personalTokenMock.name,
+        created: 'Friday, November 10, 2023',
         createdDate: 'Fri Nov 10 2023',
-        expiresAt: 'December 10, 2023 at 12:00:00 AM',
-        lastModified: 'Fri Nov 10 2023',
-        lastModify: '10 hours ago',
+        expiresAt: 'Sunday, December 10, 2023',
         expiresAtDate: 'Sun Dec 10 2023'
       }
     ])
