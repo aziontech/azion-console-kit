@@ -185,7 +185,6 @@
 
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'rule',
       icon: 'pi pi-trash',
@@ -246,10 +245,6 @@
   const handleNavigateToMainSettings = () => {
     props.navigateToApplicationAccelerator()
   }
-
-  defineExpose({
-    openCreateDrawer: openCreateRulesEngineDrawerByPhase
-  })
 </script>
 
 <template>

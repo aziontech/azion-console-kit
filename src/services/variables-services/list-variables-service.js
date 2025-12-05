@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeVariablesBaseUrl } from './make-variables-base-url'
-import { convertToRelativeTime } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const listVariablesService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -30,8 +30,8 @@ const adapt = (httpResponse) => {
           content: variable.value
         },
         lastEditor: variable.last_editor,
-        lastModified: variable.updated_at,
-        lastModify: convertToRelativeTime(variable.updated_at)
+        updatedAt: formatDateToDayMonthYearHour(variable.updated_at),
+        updatedAtDate: variable.updated_at
       }))
     : []
 

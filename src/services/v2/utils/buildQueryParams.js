@@ -8,54 +8,54 @@ const toSnakeCase = (str) => {
 
 /**
  * Builds a query parameter string from an object of parameters
- * @param {Object} paramsObject - The parameters to build the query string from
- * @param {string} paramsObject.fields - The fields to include in the query
- * @param {string} paramsObject.ordering - The ordering of the results
- * @param {number} paramsObject.page - The page number
- * @param {number} paramsObject.pageSize - The number of items per page
- * @param {string} paramsObject.search - The search query
- * @param {string} paramsObject.type - The type of the digital certificate
- * @param {boolean} paramsObject.active - The active status of the digital certificate
- * @param {boolean} paramsObject.isDefault - The default status of the digital certificate
+ * @param {Object} params - The parameters to build the query string from
+ * @param {string} params.fields - The fields to include in the query
+ * @param {string} params.ordering - The ordering of the results
+ * @param {number} params.page - The page number
+ * @param {number} params.pageSize - The number of items per page
+ * @param {string} params.search - The search query
+ * @param {string} params.type - The type of the digital certificate
+ * @param {boolean} params.active - The active status of the digital certificate
+ * @param {boolean} params.isDefault - The default status of the digital certificate
  * @returns {string} The query parameter string
  */
-export const buildQueryParams = (paramsObject = {}) => {
+export const buildQueryParams = ({
+  fields,
+  ordering,
+  page,
+  pageSize,
+  search,
+  type,
+  active,
+  isDefault,
+  group,
+  max_object_count,
+  prefix,
+  all_levels,
+  continuation_token,
+  bucket
+}) => {
   const params = new URLSearchParams()
-
-  const specialMappings = {
-    pageSize: 'page_size',
-    isDefault: 'is_default',
-    max_object_count: 'max_object_count',
-    continuation_token: 'continuation_token',
-    all_levels: 'all_levels'
+  const paramsMap = {
+    ...(ordering && { ordering: toSnakeCase(ordering) }),
+    ...(page && { page: page?.toString() }),
+    ...(pageSize && { page_size: pageSize?.toString() }),
+    ...(search && { search: search?.toString() }),
+    ...(type && { type }),
+    ...(active && { active }),
+    ...(isDefault && { is_default: isDefault }),
+    ...(fields && { fields }),
+    ...(group && { group }),
+    ...(all_levels !== undefined && { all_levels: all_levels }),
+    ...(max_object_count && { max_object_count: max_object_count?.toString() }),
+    ...(prefix && { prefix }),
+    ...(continuation_token && { continuation_token }),
+    ...(bucket && { bucket })
   }
 
-  const shouldConvertToString = ['page', 'pageSize', 'page_size', 'max_object_count', 'search']
-
-  Object.entries(paramsObject).forEach(([key, value]) => {
-    if (value === null || value === undefined) {
-      return
-    }
-
-    let paramKey = key
-    let paramValue = value
-
-    if (key === 'ordering' && value) {
-      paramValue = toSnakeCase(value)
-    }
-
-    if (specialMappings[key]) {
-      paramKey = specialMappings[key]
-    }
-
-    if (shouldConvertToString.includes(key) || shouldConvertToString.includes(paramKey)) {
-      paramValue = value?.toString()
-    }
-
-    if (paramValue !== null && paramValue !== undefined && paramValue !== '') {
-      params.set(paramKey.toLowerCase(), paramValue)
-    }
-  })
+  Object.entries(paramsMap)
+    .filter((entry) => entry[1] != null)
+    .forEach(([key, value]) => params.set(key, value))
 
   return params.toString()
 }

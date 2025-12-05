@@ -1,11 +1,52 @@
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Connectors"
+        data-testid="edge-connectors-heading"
+      />
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        v-if="hasContentToList"
+        :listService="edgeConnectorsService.listEdgeConnectorsService"
+        :columns="getColumns"
+        ref="refListTable"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No Connectors found."
+        :actions="actions"
+        addButtonLabel="Connector"
+        createPagePath="/connectors/create"
+        editPagePath="/connectors/edit"
+        data-testid="edge-connectors-list-table-block"
+        :apiFields="EDGE_CONNECTORS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No Connectors have been created"
+        description="Click the button below to create your first Connectors."
+        createButtonLabel="Connectors"
+        createPagePath="connectors/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
+</template>
+
 <script setup>
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'edge-connectors-view' })
 
@@ -21,7 +62,6 @@
 
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'Connector',
       icon: 'pi pi-trash',
@@ -35,38 +75,17 @@
 
   const EDGE_CONNECTORS_API_FIELDS = []
 
-  const csvMapper = (rowData) => {
-    return {
-      name: rowData.name,
-      id: rowData.id,
-      type: rowData.type,
-      header: rowData.header,
-      address: rowData.address,
-      lastEditor: rowData.lastEditor,
-      lastModified: rowData.lastModified,
-      active: rowData.data?.content || rowData.active
-    }
-  }
-
   const getColumns = computed(() => {
     return [
-      {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
-      },
       {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
+      },
+      {
+        field: 'name',
+        header: 'Name'
       },
       {
         field: 'type',
@@ -81,6 +100,14 @@
         header: 'Address'
       },
       {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
+      },
+      {
         field: 'active',
         header: 'Status',
         type: 'component',
@@ -90,65 +117,7 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'last_modified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
-        filterPath: 'last_modified',
-        type: 'component',
-        component: (columnData, rowData, dependencies) => {
-          return columnBuilder({
-            data: rowData,
-            columnAppearance: 'last-modified',
-            dependencies
-          })
-        }
       }
     ]
   })
 </script>
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Connectors"
-        description="Establish seamless connections with origins to retrieve and integrate data efficiently."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Connectors"
-            createPagePath="/connectors/create"
-            data-testid="create_Connectors_button"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        :listService="edgeConnectorsService.listEdgeConnectorsService"
-        :columns="getColumns"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No Connectors found."
-        :actions="actions"
-        createPagePath="/connectors/create"
-        editPagePath="/connectors/edit"
-        data-testid="edge-connectors-list-table-block"
-        :apiFields="EDGE_CONNECTORS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
-        exportFileName="Connectors"
-        :csvMapper="csvMapper"
-        :emptyBlock="{
-          title: 'No Connectors have been created',
-          description: 'Click the button below to create your first Connectors.',
-          createButtonLabel: 'Connectors',
-          createPagePath: 'connectors/create',
-          documentationService: documentationService
-        }"
-      />
-    </template>
-  </ContentBlock>
-</template>

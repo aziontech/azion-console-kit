@@ -7,7 +7,6 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -15,13 +14,6 @@
   const emit = defineEmits(['handleWafRulesUpdated'])
 
   const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const wafRuleName = ref('Edit WAF Rule')
-
-  const setWafRuleName = (wafRule) => {
-    wafRuleName.value = wafRule.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, wafRule.name)
-  }
 
   const handleTrackSuccessEdit = () => {
     tracker.product
@@ -94,7 +86,6 @@
   <EditFormBlock
     :editService="submitEditWafRules"
     :loadService="loadWaf"
-    @loaded-service-object="setWafRuleName"
     :schema="validationSchema"
     @on-edit-success="handleTrackSuccessEdit"
     @on-edit-fail="handleTrackFailEdit"

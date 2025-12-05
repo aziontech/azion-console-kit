@@ -1,4 +1,6 @@
 <script setup>
+  import Illustration from '@/assets/svg/illustration-layers'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
@@ -27,25 +29,18 @@
 
   const drawerDeviceGroups = ref('')
   const listDeviceGroupsEdgeApplicationsRef = ref('')
+  const hasContentToList = ref(true)
 
   const reloadList = () => {
-    listDeviceGroupsEdgeApplicationsRef.value.reload()
+    if (hasContentToList.value) {
+      listDeviceGroupsEdgeApplicationsRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 
   const getColumns = computed(() => {
     return [
-      {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
-      },
       {
         field: 'deviceId',
         header: 'ID',
@@ -63,16 +58,19 @@
         }
       },
       {
-        field: 'userAgent',
-        header: 'User Agent',
+        field: 'name',
+        header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
+            data: { value: columnData },
+            columnAppearance: 'expand-text-column'
           })
         }
+      },
+      {
+        field: 'userAgent',
+        header: 'User Agent'
       }
     ]
   })
@@ -91,6 +89,10 @@
     drawerDeviceGroups.value.openDrawerEdit(item.id)
   }
 
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
   const listDeviceGroupsWithDecorator = async (params) => {
     return await deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)
   }
@@ -103,7 +105,6 @@
 
   const actions = [
     {
-      label: 'Delete',
       type: 'delete',
       title: 'device group',
       icon: 'pi pi-trash',
@@ -125,10 +126,6 @@
       })
       .track()
   }
-
-  defineExpose({
-    openCreateDrawer: openCreateDeviceGroupDrawer
-  })
 </script>
 
 <template>
@@ -140,29 +137,38 @@
     :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
     :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
   />
-  <FetchListTableBlock
-    ref="listDeviceGroupsEdgeApplicationsRef"
-    :listService="listDeviceGroupsWithDecorator"
-    :editInDrawer="openEditDeviceGroupDrawer"
-    :columns="getColumns"
-    :defaultOrderingFieldName="'name'"
-    :apiFields="DEVICE_GROUP_API_FIELDS"
-    @on-before-go-to-edit="handleTrackClickToEdit"
-    emptyListMessage="No device groups found."
-    :actions="actions"
-    isTabs
-    :frozen-columns="['name']"
-    exportFileName="Device Groups"
-    hideLastModifiedColumn
-    :emptyBlock="{
-      title: 'No device groups have been created',
-      description: 'Click the button below to create your first device group.',
-      createButtonLabel: 'Device Group',
-      createPagePath: '/edge-applications/device-groups/create',
-      documentationService: props.documentationService
-    }"
+  <div v-if="hasContentToList">
+    <FetchListTableBlock
+      ref="listDeviceGroupsEdgeApplicationsRef"
+      :listService="listDeviceGroupsWithDecorator"
+      :editInDrawer="openEditDeviceGroupDrawer"
+      :columns="getColumns"
+      :defaultOrderingFieldName="'name'"
+      :apiFields="DEVICE_GROUP_API_FIELDS"
+      @on-load-data="handleLoadData"
+      @on-before-go-to-edit="handleTrackClickToEdit"
+      emptyListMessage="No device groups found."
+      :actions="actions"
+      isTabs
+    >
+      <template #addButton>
+        <PrimeButton
+          @click="openCreateDeviceGroupDrawer"
+          icon="pi pi-plus"
+          label="Device Group"
+        />
+      </template>
+    </FetchListTableBlock>
+  </div>
+  <EmptyResultsBlock
+    v-else
+    title="No device groups have been created"
+    description="Click the button below to create your first device group."
+    createButtonLabel="Device Group"
+    :documentationService="props.documentationService"
+    :inTabs="true"
   >
-    <template #emptyBlockButton>
+    <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
         data-testid="create-device-group-button"
@@ -172,5 +178,8 @@
         label="Device Group"
       />
     </template>
-  </FetchListTableBlock>
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>

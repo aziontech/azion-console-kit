@@ -63,9 +63,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Edit Team',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Team'
           }
         ]
       }

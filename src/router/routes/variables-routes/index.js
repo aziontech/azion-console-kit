@@ -64,9 +64,7 @@ export const variablesRoutes = {
             to: '/variables'
           },
           {
-            label: 'Edit Variable',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Variable'
           }
         ]
       }

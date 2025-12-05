@@ -71,9 +71,7 @@ export const usersListsRoutes = {
             to: '/users'
           },
           {
-            label: 'Edit User',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit User'
           }
         ]
       }
