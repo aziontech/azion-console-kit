@@ -52,9 +52,7 @@ export const sessionManager = {
   },
 
   async logout() {
-    // Clear all TanStack Query cache
     await clearAllCache()
-    // Clear localStorage and sessionStorage
     clearAppData()
   },
 
