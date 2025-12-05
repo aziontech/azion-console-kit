@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="resellerName" />
+      <PageHeadingBlock pageTitle="Edit Reseller" />
     </template>
     <template #content>
       <EditFormBlock
@@ -9,7 +9,6 @@
         :loadService="props.loadAccountService"
         :schema="validationSchema"
         :updatedRedirect="props.updatedRedirect"
-        @loaded-service-object="setResellerName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -42,21 +41,11 @@
   import FormFieldsCreateResellers from './FormFields/FormFieldsCreateResellers.vue'
 
   import * as yup from 'yup'
-  import { inject, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const resellerName = ref('Edit Reseller')
-
-  const setResellerName = (reseller) => {
-    resellerName.value = reseller.name || reseller.company_name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, resellerName.value)
-  }
 
   const props = defineProps({
     loadAccountService: {

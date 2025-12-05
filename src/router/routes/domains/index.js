@@ -75,9 +75,7 @@ export const domainsRoutes = {
             to: '/domains'
           },
           {
-            label: 'Edit Domain',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Domain'
           }
         ]
       }

@@ -5,12 +5,10 @@
   import EditView from '@/views/EdgeServices/EditView'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
-  import { ref, watch, provide, reactive, computed } from 'vue'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { ref, watch, provide, reactive } from 'vue'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useToast } from 'primevue/usetoast'
-  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -29,15 +27,12 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const breadcrumbs = useBreadcrumbs()
 
   const activeTab = ref(0)
   const edgeServiceId = ref(route.params.id)
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
-
-  const componentsRefs = ref(null)
 
   const defaultTabs = {
     main_settings: 0,
@@ -46,58 +41,10 @@
 
   const title = ref('')
 
-  const tabs = ref([
-    {
-      header: 'Main Settings',
-      component: EditView,
-      condition: true,
-      show: () => mapTabs.value.main_settings === activeTab.value,
-      props: () => ({
-        hiddenActionBar: !activeTab.value,
-        loadEdgeService: props.loadEdgeService,
-        editEdgeService: props.editEdgeService,
-        updatedRedirect: props.updatedRedirect,
-        isTab: true
-      })
-    },
-    {
-      header: 'Resources',
-      component: ListViewTabResources,
-      condition: true,
-      show: () => mapTabs.value.resources === activeTab.value,
-      showAddButtonTab: true,
-      props: () => ({
-        edgeServiceId: edgeServiceId.value,
-        createResourcesServices: props.createResourcesServices,
-        editResourcesServices: props.editResourcesServices,
-        loadResourcesServices: props.loadResourcesServices,
-        listResourcesServices: props.listResourcesServices,
-        deleteResourcesServices: props.deleteResourcesServices,
-        documentationServiceResource: props.documentationServiceResource
-      })
-    }
-  ])
-
-  const filteredTabs = computed(() => {
-    return tabs.value.filter((tab) => {
-      return typeof tab.condition === 'function' ? tab.condition() : tab.condition
-    })
-  })
-
-  const addButtonController = computed(() => {
-    const tab = filteredTabs.value[activeTab.value]
-    return {
-      showAddButtonTab: !!tab?.showAddButtonTab,
-      label: tab?.header || 'Create',
-      click: () => componentsRefs.value[0].openCreateDrawer?.()
-    }
-  })
-
   const getEdgeService = async () => {
     try {
       const result = await props.loadEdgeService({ id: edgeServiceId.value })
       title.value = result.name
-      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, result.name)
     } catch (error) {
       toast.add({
         closable: true,
@@ -110,7 +57,6 @@
 
   const updateEdgeServiceValue = (value) => {
     title.value = value.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, value.name)
   }
 
   const mapTabs = ref({ ...defaultTabs })
@@ -164,64 +110,46 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="title"
-        :entityName="title"
-      />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
-      <div class="h-full w-full">
-        <div class="flex align-center justify-between relative">
-          <TabView
-            :activeIndex="activeTab"
-            @tab-click="changeRouteByClickingOnTab"
-            class="flex-1"
-          >
-            <TabPanel
-              v-for="(tab, index) in filteredTabs"
-              :pt="{
-                headerAction: {
-                  id: `tab_${index}`
-                },
-                root: {
-                  'data-testid': `edge-service-details-tab-panel__${tab.header}__tab`,
-                  id: `${tab.header}`
-                }
-              }"
-              :key="index"
-              :header="tab.header"
-            >
-            </TabPanel>
-          </TabView>
-          <div
-            v-if="addButtonController.showAddButtonTab"
-            class="flex ml-4 items-center"
-          >
-            <PrimeButton
-              :label="addButtonController.label"
-              size="small"
-              icon="pi pi-plus"
-              @click="addButtonController.click"
-              data-testid="data-table-actions-column-body-actions-menu-button"
-            />
-          </div>
-        </div>
-
-        <div>
-          <template
-            v-for="(tab, index) in filteredTabs"
-            :key="index"
-          >
-            <component
-              ref="componentsRefs"
-              :is="tab.component"
-              v-if="tab.show()"
-              @handleEdgeServiceUpdated="updateEdgeServiceValue"
-              v-bind="tab.props()"
-            />
-          </template>
-        </div>
-      </div>
+      <TabView
+        :activeIndex="activeTab"
+        @tab-click="changeRouteByClickingOnTab"
+        class="w-full h-full"
+      >
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: { 'data-testid': 'edge-service-tabs__tab__main-settings' }
+          }"
+        >
+          <EditView
+            v-if="mapTabs.main_settings === activeTab"
+            :hiddenActionBar="!activeTab"
+            :loadEdgeService="props.loadEdgeService"
+            :editEdgeService="props.editEdgeService"
+            @handleEdgeServiceUpdated="updateEdgeServiceValue"
+            :updatedRedirect="props.updatedRedirect"
+            :isTab="true"
+          />
+        </TabPanel>
+        <TabPanel
+          header="Resources"
+          :pt="{ root: { 'data-testid': 'edge-service-tabs__tab__resources' } }"
+        >
+          <ListViewTabResources
+            v-if="mapTabs.resources === activeTab"
+            :edgeServiceId="edgeServiceId"
+            :createResourcesServices="props.createResourcesServices"
+            :editResourcesServices="props.editResourcesServices"
+            :loadResourcesServices="props.loadResourcesServices"
+            :listResourcesServices="props.listResourcesServices"
+            :deleteResourcesServices="props.deleteResourcesServices"
+            :documentationServiceResource="props.documentationServiceResource"
+          />
+        </TabPanel>
+      </TabView>
     </template>
   </ContentBlock>
 </template>

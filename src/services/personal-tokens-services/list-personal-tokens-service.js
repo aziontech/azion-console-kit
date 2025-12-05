@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 import { sortDate } from '@/utils/date-sort'
-import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const listPersonalTokens = async ({ pageSize = 200, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -23,10 +22,9 @@ const adapt = async (httpResponse) => {
       id: item.uuid,
       name: item.name,
       description: item.description || '',
-      lastModified: creationDate,
-      lastModify: convertToRelativeTime(creationDate),
+      created: formatExhibitionDate(creationDate),
       createdDate: creationDate,
-      expiresAt: formatDateToDayMonthYearHour(expirationDate),
+      expiresAt: formatExhibitionDate(expirationDate),
       expiresAtDate: expirationDate,
       scope: 'Global'
     }
@@ -43,4 +41,10 @@ const makeSearchParams = ({ pageSize, search }) => {
   searchParams.set('page_size', pageSize)
   searchParams.set('search', search)
   return searchParams
+}
+
+const formatExhibitionDate = (dateString) => {
+  return new Intl.DateTimeFormat('us', { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(dateString)
+  )
 }

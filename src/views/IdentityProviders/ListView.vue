@@ -1,16 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="SSO Management">
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Identity Provider"
-            createPagePath="identity-providers/create"
-            data-testid="create_IdentityProvider_button"
-          />
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="SSO Management" />
     </template>
     <template #content>
       <ListTableBlock
@@ -19,6 +10,8 @@
         :listService="listIdentityProvidersService"
         :columns="getColumns"
         :actions="actionsRow"
+        addButtonLabel="Identity Provider"
+        createPagePath="identity-providers/create"
         @on-load-data="handleLoadData"
         @on-row-click-edit-redirect="handleEditRedirect"
         enableEditCustomRedirect
@@ -28,6 +21,7 @@
         v-else
         title="No identity providers has been created"
         description="Click the button below to create your first identity provider."
+        createButtonLabel="Identity Provider"
         createPagePath="identity-providers/create"
       >
         <template #illustration>
@@ -43,7 +37,6 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'

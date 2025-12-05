@@ -3,7 +3,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ObjectStorageCredentialsListView from './ObjectStorageCredentials/ListView.vue'
@@ -13,7 +12,6 @@
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
-  const componentsRefs = ref(null)
 
   const mapTabs = ref({
     'object-storage': 0
@@ -23,15 +21,6 @@
   const showTabs = {
     objectStorage: showTab('object-storage')
   }
-
-  const addButtonController = computed(() => {
-    const tab = tabs.value[activeTab.value]
-    return {
-      showAddButtonTab: !!tab?.showAddButtonTab,
-      label: 'Credential',
-      click: () => componentsRefs.value[0].handleCreateCredential?.()
-    }
-  })
 
   const getTabFromIndex = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
@@ -67,8 +56,7 @@
     {
       header: 'Object Storage',
       component: ObjectStorageCredentialsListView,
-      show: showTabs.objectStorage,
-      showAddButtonTab: true
+      show: showTabs.objectStorage
     }
   ])
 
@@ -84,54 +72,31 @@
       />
     </template>
     <template #content>
-      <div class="flex align-center justify-between relative">
-        <TabView
-          :activeIndex="activeTab"
-          @tab-click="({ index = 0 }) => changeTab(index)"
-          class="flex-1"
-        >
-          <TabPanel
-            v-for="(tab, index) in tabs"
-            :pt="{
-              headerAction: {
-                id: `tab_${index}`
-              },
-              root: {
-                'data-testid': `credentials-tab-panel__${tab.header}__tab`,
-                id: `${tab.header}`
-              }
-            }"
-            :key="index"
-            :header="tab.header"
-          >
-          </TabPanel>
-        </TabView>
-        <div
-          v-if="addButtonController.showAddButtonTab"
-          class="flex ml-4 items-center"
-        >
-          <PrimeButton
-            :label="addButtonController.label"
-            size="small"
-            icon="pi pi-plus"
-            @click="addButtonController.click"
-            data-testid="data-table-actions-column-body-actions-menu-button"
-          />
-        </div>
-      </div>
-
-      <div>
-        <template
+      <TabView
+        :activeIndex="activeTab"
+        @tab-click="({ index = 0 }) => changeTab(index)"
+        class="w-full h-full"
+      >
+        <TabPanel
           v-for="(tab, index) in tabs"
+          :pt="{
+            headerAction: {
+              id: `tab_${index}`
+            },
+            root: {
+              'data-testid': `credentials-tab-panel__${tab.header}__tab`,
+              id: `${tab.header}`
+            }
+          }"
           :key="index"
+          :header="tab.header"
         >
           <component
-            ref="componentsRefs"
             :is="tab.component"
             v-if="tab.show"
           />
-        </template>
-      </div>
+        </TabPanel>
+      </TabView>
     </template>
   </ContentBlock>
 </template>

@@ -1,11 +1,11 @@
 <template>
   <span
-    class="flex flex-row p-input-icon-left items-center w-full max-w-[32rem]"
+    class="flex flex-row p-input-icon-left items-center max-sm:w-full"
     data-testid="data-table-search"
   >
     <i class="pi pi-search" />
     <InputText
-      class="h-8 w-full"
+      class="h-8 w-full md:min-w-[20rem]"
       :modelValue="modelValue"
       @update:modelValue="handleInput"
       data-testid="data-table-search-input"
@@ -33,7 +33,7 @@
     },
     placeholder: {
       type: String,
-      default: 'Search keywords...'
+      default: 'Search'
     },
     debounce: {
       type: Number,

@@ -58,9 +58,7 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Edit Workload`,
-            dynamic: true,
-            routeParam: 'id'
+            label: `Edit Workload`
           }
         ]
       }

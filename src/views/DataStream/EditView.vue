@@ -1,6 +1,5 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import { useRoute } from 'vue-router'
 
   // Import the components
   import FormFieldsDataStream from './FormFields/FormFieldsDataStream'
@@ -12,7 +11,6 @@
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { validationSchema } from './FormFields/composables/validation'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
     updatedRedirect: {
@@ -22,14 +20,6 @@
   })
 
   const validation = validationSchema(true)
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const streamName = ref('Edit Stream')
-
-  const setStreamName = (dataStream) => {
-    streamName.value = dataStream.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, dataStream.name)
-  }
 
   const store = useAccountStore()
   const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
@@ -52,7 +42,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="streamName" />
+      <PageHeadingBlock pageTitle="Edit Stream" />
     </template>
     <template #content>
       <EditFormBlock
@@ -60,7 +50,6 @@
         :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validation"
-        @loaded-service-object="setStreamName"
       >
         <template #form>
           <FormFieldsDataStream isEdit />

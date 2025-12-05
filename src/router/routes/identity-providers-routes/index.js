@@ -80,9 +80,7 @@ export const identityProvidersRoutes = {
             to: '/identity-providers'
           },
           {
-            label: 'Edit Identity Provider',
-            dynamic: true,
-            routeParam: 'id'
+            label: 'Edit Identity Provider'
           }
         ]
       }
