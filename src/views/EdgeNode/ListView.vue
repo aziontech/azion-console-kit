@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
@@ -40,7 +40,7 @@
       header: 'Group',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     },
     {
       field: 'status',
@@ -51,6 +51,20 @@
           data: columnData,
           columnAppearance: 'tag'
         })
+    },
+    {
+      field: 'last_modified',
+      header: 'Last Modified',
+      sortField: 'last_modified',
+      filterPath: 'last_modified',
+      type: 'component',
+      component: (columnData, rowData, dependencies) => {
+        return columnBuilder({
+          data: rowData,
+          columnAppearance: 'last-modified',
+          dependencies
+        })
+      }
     }
   ])
 
@@ -86,7 +100,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edge Nodes"
+        description="Monitor and manage nodes for optimal performance."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
