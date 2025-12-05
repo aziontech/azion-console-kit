@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:w-64 w-full">
+  <div class="sm:w-64 w-full h-full flex flex-col">
     <div
       class="flex justify-between items-center sm:w-64 w-full"
       v-if="!showCheckbox"
@@ -74,7 +74,7 @@
       />
     </div>
 
-    <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
+    <div class="mt-4 overflow-y-auto sm:h-full h-36">
       <div
         v-if="isLoading"
         class="flex flex-col gap-3"
@@ -99,7 +99,7 @@
       </div>
       <div
         v-else
-        class="mt-4"
+        class="space-y-2"
       >
         <div
           v-for="table in filteredTables"
