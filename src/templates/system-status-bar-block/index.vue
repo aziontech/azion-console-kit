@@ -1,20 +1,3 @@
-<template>
-  <PrimeButton
-    outlined
-    class="surface-section min-w-fit hover:surface-hover whitespace-nowrap"
-    icon="pi pi-circle-fill"
-    size="small"
-    :label="label"
-    :loading="!label"
-    :pt="{
-      root: { class: 'h-8 flex-row items-center' },
-      label: { class: 'font-normal text-sm min-w-[9rem]' },
-      icon: { style: colorStatus, class: 'text-xs' }
-    }"
-    @click="redirectToLink"
-  />
-</template>
-
 <script>
   import {
     loadStatusPageService,
@@ -50,6 +33,7 @@
     },
     data() {
       return {
+        error: false,
         status: '',
         label: '',
         link: 'https://status.azion.com',
@@ -79,11 +63,9 @@
           const status = await this.getStatus(hasImpactedComponent)
           this.updateSystemStatus(status)
         } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
+          this.error = true
+          // eslint-disable-next-line no-console
+          console.error(error)
         }
       },
       async getStatus(checkStatusPage) {
@@ -109,3 +91,21 @@
     }
   }
 </script>
+
+<template>
+  <PrimeButton
+    outlined
+    class="surface-section min-w-fit hover:surface-hover whitespace-nowrap"
+    icon="pi pi-circle-fill"
+    size="small"
+    v-show="!error"
+    :label="label"
+    :loading="!label"
+    :pt="{
+      root: { class: 'h-8 flex-row items-center' },
+      label: { class: 'font-normal text-sm min-w-[9rem]' },
+      icon: { style: colorStatus, class: 'text-xs' }
+    }"
+    @click="redirectToLink"
+  />
+</template>
