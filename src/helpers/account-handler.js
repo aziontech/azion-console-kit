@@ -54,11 +54,8 @@ export class AccountHandler {
    */
   async switchAccountAndRedirect(accountId) {
     const accountStore = useAccountStore()
-    
-    // Clear current account data immediately
     accountStore.resetAccount()
     
-    // Clear cache and switch account
     await sessionManager.switchAccount()
     const { firstLogin } = await this.switchAccountService(accountId)
 
