@@ -174,7 +174,7 @@
       title: 'Personal Account',
       id: accountStore.account.id,
       data: {
-        deleteConfirmationText: accountStore.account.full_name,
+        deleteConfirmationText: accountStore.account.name,
         entityDeleteMessage: ENTITY_DELETE_MESSAGE
       },
       deleteService: decorateDeleteService,
