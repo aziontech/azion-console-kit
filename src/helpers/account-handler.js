@@ -55,7 +55,7 @@ export class AccountHandler {
   async switchAccountAndRedirect(accountId) {
     const accountStore = useAccountStore()
     accountStore.resetAccount()
-    
+
     await sessionManager.switchAccount()
     const { firstLogin } = await this.switchAccountService(accountId)
 
