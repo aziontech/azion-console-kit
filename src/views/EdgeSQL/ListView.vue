@@ -158,7 +158,13 @@
       label: 'Delete',
       title: 'database',
       icon: 'pi pi-trash',
-      service: deleteDatabase
+      service: deleteDatabase,
+      disabled: (data) => {
+        if (data.status.content === 'deleting' || data.status.content === 'creating') {
+          return true
+        }
+        return false
+      }
     }
   ]
 

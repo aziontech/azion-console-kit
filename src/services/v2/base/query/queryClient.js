@@ -13,7 +13,6 @@ export const queryClient = new QueryClient({
   }
 })
 
-// Sync multi-tab
 broadcastQueryClient({
   queryClient,
   broadcastChannel: 'app-azion-sync'
