@@ -201,7 +201,9 @@
               :field="field"
               :value="data[field]"
             >
-              {{ data[field] }}
+              <span v-tooltip.top="isTruncatedValue(data[field]) ? String(data[field]) : null">
+                {{ formatCellValue(data[field]) }}
+              </span>
             </slot>
           </template>
           <template #editor="{ data, field }">
@@ -644,6 +646,20 @@
     }
     return list
   })
+
+  const MAX_CELL_LENGTH = 100
+
+  const formatCellValue = (value) => {
+    if (value == null) return value
+    const stringValue = String(value)
+    if (stringValue.length <= MAX_CELL_LENGTH) return stringValue
+    return `${stringValue.slice(0, MAX_CELL_LENGTH)}...`
+  }
+
+  const isTruncatedValue = (value) => {
+    if (value == null) return false
+    return String(value).length > MAX_CELL_LENGTH
+  }
 
   const insertColumnSplitEvent = async () => {
     selectedView.value = {
