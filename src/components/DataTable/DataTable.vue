@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, provide, useSlots } from 'vue'
+  import { ref, computed, provide, useSlots, watch } from 'vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import Skeleton from 'primevue/skeleton'
@@ -327,6 +327,10 @@
     isSelectable: {
       type: Boolean,
       default: false
+    },
+    searchValue: {
+      type: String,
+      default: ''
     }
   })
 
@@ -350,12 +354,44 @@
   const dataTableRef = ref(null)
   const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
+  const hadPreviousSearch = ref(false)
+
+  const hasActiveSearch = computed(() => {
+    return (
+      (props.searchValue && props.searchValue.trim().length > 0) ||
+      (props.filters?.global?.value && props.filters.global.value.trim().length > 0)
+    )
+  })
+
+  watch(hasActiveSearch, (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      hadPreviousSearch.value = true
+    }
+    if (props.data.length > 0) {
+      hadPreviousSearch.value = false
+    }
+  })
+
+  watch(
+    () => props.data.length,
+    (newLength) => {
+      if (newLength > 0) {
+        hadPreviousSearch.value = false
+      }
+    }
+  )
 
   const shouldRenderTable = computed(() => {
     if (props.notShowEmptyBlock) {
       return true
     }
-    return props.data.length || props.loading || props.appliedFilters.length
+    return (
+      !!props.data.length ||
+      !!props.loading ||
+      !!props.appliedFilters.length ||
+      !!hasActiveSearch.value ||
+      hadPreviousSearch.value
+    )
   })
 
   const hasHeaderSlot = computed(() => !!slots.header)
@@ -533,6 +569,9 @@
     cursor: auto;
   }
   :deep(.p-frozen-column) {
-    z-index: 50;
+    z-index: 1;
+  }
+  :deep(.p-datatable-thead) {
+    z-index: 2;
   }
 </style>

@@ -79,7 +79,7 @@
         columnBuilder({
           data: columnData,
           columnAppearance: 'text-format-with-popup',
-          dependencies: { showCopy: props.clipboardWrite }
+          dependencies: { showCopy: !!props.clipboardWrite }
         })
     },
     {

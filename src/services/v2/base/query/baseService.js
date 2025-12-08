@@ -25,9 +25,14 @@ export class BaseService {
       }
     }
 
-    const { persist = true, cacheType = this.cacheType.GLOBAL, ...restOptions } = options || {}
+    const {
+      persist = true,
+      cacheType = this.cacheType.GLOBAL,
+      skipCache = false,
+      ...restOptions
+    } = options || {}
 
-    const queryOptions = { meta: { persist, cacheType }, ...getCacheOptions(cacheType) }
+    const queryOptions = { meta: { persist, cacheType, skipCache }, ...getCacheOptions(cacheType) }
 
     return { ...queryOptions, ...(restOptions || {}) }
   }
@@ -128,11 +133,16 @@ export class BaseService {
   async _ensureQueryData(queryKey, queryFn, options = {}) {
     try {
       const queryOptions = this.#getQueryOptions(options)
+      const finalKey = createFinalKey(queryKey)
 
       await waitForPersistenceRestore()
 
+      if (queryOptions.meta?.skipCache) {
+        return await queryFn()
+      }
+
       return this.queryClient.ensureQueryData({
-        queryKey: createFinalKey(queryKey),
+        queryKey: finalKey,
         queryFn,
         ...queryOptions
       })

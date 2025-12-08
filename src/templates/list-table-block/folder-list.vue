@@ -4,8 +4,6 @@
   import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
   import Breadcrumb from 'primevue/breadcrumb'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Listbox from 'primevue/listbox'
   import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
@@ -13,6 +11,7 @@
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import { getFileIcon } from '@/utils/icons'
   import DataTable from '@/components/DataTable'
+  import DataTableColumnSelector from '@/components/DataTable/DataTableColumnSelector.vue'
 
   defineOptions({ name: 'list-table-block-new' })
   const emit = defineEmits([
@@ -155,7 +154,6 @@
   const selectedColumns = ref([])
   const menuRef = ref({})
   const toast = useToast()
-  const columnSelectorPanel = ref(null)
   const showEllipsisPopup = ref(false)
   const hidePopupTimeout = ref(null)
 
@@ -533,10 +531,6 @@
     }
   }
 
-  const toggleColumnSelector = () => {
-    columnSelectorPanel.value.toggle(event)
-  }
-
   watch(
     () => [props.currentPage, minimumOfItemsPerPage.value, props.isPaginationLoading],
     () => {
@@ -582,7 +576,7 @@
       :globalFilterFields="filterBy"
       :rowClass="stateClassRules"
       :pt="parsedDatatablePt"
-      :columns="columns"
+      :columns="selectedColumns"
       :emptyListMessage="emptyListMessage"
       @page="emit('page', $event)"
       v-model:selection="selectedItems"
@@ -592,7 +586,7 @@
     >
       <template #header>
         <div class="flex flex-col gap-2 w-full">
-          <DataTable.Header :showDivider="props.folderPath">
+          <DataTable.Header showDivider>
             <template #first-line>
               <div class="flex justify-between gap-2 w-full">
                 <div class="flex gap-2 w-full">
@@ -608,36 +602,10 @@
                     data-testid="data-table-actions-column-header-refresh"
                   />
                   <DataTable.Export @export="handleExportTableDataToCSV($event)" />
-                  <PrimeButton
-                    outlined
-                    icon="ai ai-column"
-                    size="small"
-                    @click="toggleColumnSelector"
-                    v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
-                    data-testid="data-table-actions-column-header-toggle-columns"
+                  <DataTableColumnSelector
+                    :columns="columns"
+                    v-model:selectedColumns="selectedColumns"
                   />
-                  <OverlayPanel
-                    ref="columnSelectorPanel"
-                    :pt="{
-                      content: { class: 'p-0' }
-                    }"
-                    data-testid="data-table-actions-column-header-toggle-columns-panel"
-                  >
-                    <Listbox
-                      v-model="selectedColumns"
-                      multiple
-                      :options="[{ label: 'Available Columns', items: columns }]"
-                      class="hidden-columns-panel"
-                      optionLabel="header"
-                      optionGroupLabel="label"
-                      optionGroupChildren="items"
-                      data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-                    >
-                      <template #optiongroup="slotProps">
-                        <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                      </template>
-                    </Listbox>
-                  </OverlayPanel>
                   <slot name="header-actions" />
                 </div>
               </div>

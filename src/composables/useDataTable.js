@@ -147,12 +147,19 @@ export function useDataTable(props, emit) {
     if (!savedOrdering.value && props.defaultOrderingFieldName) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
+
+    const hasActiveFilters = appliedFilters.value.length > 0 || query.hasFilter
+
     const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
       fields: props.apiFields || [],
       ordering: savedOrdering.value,
       ...query
+    }
+
+    if (hasActiveFilters) {
+      commonParams.hasFilter = true
     }
 
     if (props.lazy) {
@@ -332,6 +339,9 @@ export function useDataTable(props, emit) {
     appliedFilters.value.forEach((filter) => {
       filterParams[filter.field] = filter.value
     })
+    if (appliedFilters.value.length > 0) {
+      filterParams.hasFilter = true
+    }
     return filterParams
   }
 
@@ -687,6 +697,7 @@ export function useDataTable(props, emit) {
     popupPosition,
     popupData,
     hoverTimeout,
+    savedSearch,
 
     // Computed properties
     isRenderActions,

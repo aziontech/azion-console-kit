@@ -28,7 +28,18 @@
         data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
       >
         <template #optiongroup="slotProps">
-          <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+          <p class="text-sm font-medium">
+            {{ slotProps.option.label }}
+          </p>
+        </template>
+        <template #option="slotProps">
+          <div
+            :class="{
+              'opacity-50 pointer-events-none': slotProps.option.field === 'name'
+            }"
+          >
+            {{ slotProps.option.header }}
+          </div>
         </template>
       </Listbox>
     </OverlayPanel>
@@ -58,7 +69,13 @@
 
   const selectedColumns = computed({
     get: () => props.selectedColumns,
-    set: (value) => emit('update:selectedColumns', value)
+    set: (value) => {
+      const nameColumn = props.columns.find((col) => col.field === 'name')
+      if (nameColumn && !value.some((col) => col.field === 'name')) {
+        value = [nameColumn, ...value]
+      }
+      emit('update:selectedColumns', value)
+    }
   })
 
   const toggleColumnSelector = (event) => {

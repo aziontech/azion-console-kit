@@ -83,7 +83,7 @@
             data: columnData.content,
             columnAppearance: 'text-format-with-popup',
             dependencies: {
-              showCopy: props.clipboardWrite
+              showCopy: !!props.clipboardWrite
             }
           })
         }

@@ -114,7 +114,7 @@
             data: Array.isArray(columnData) ? columnData : columnData?.content,
             columnAppearance: 'text-array-with-popup',
             dependencies: {
-              showCopy: Helpers.clipboardWrite
+              showCopy: !!Helpers.clipboardWrite
             }
           })
         }
@@ -132,7 +132,7 @@
             columnAppearance: 'text-format-with-popup',
             dependencies: {
               copyContentService: Helpers.clipboardWrite,
-              showCopy: Helpers.clipboardWrite
+              showCopy: !!Helpers.clipboardWrite
             }
           })
         }
@@ -225,7 +225,7 @@
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,
-          createButtonLabel: 'Workload',
+          createButtonLabel: handleTextDomainWorkload.singularTitle,
           documentationService: documentationHandler
         }"
       />

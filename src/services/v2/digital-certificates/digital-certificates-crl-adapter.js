@@ -1,5 +1,6 @@
-import { getCurrentTimezone, checkIfFieldExist } from '@/helpers'
+import { checkIfFieldExist } from '@/helpers'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 
 export const DigitalCertificatesCRLAdapter = {
   transformCreateDigitalCertificateCRL(payload) {
@@ -20,7 +21,8 @@ export const DigitalCertificatesCRLAdapter = {
           status: parseStatusData(item.active ? 'ACTIVE' : 'INACTIVE')
         },
         lastEditor: item?.last_editor || '-',
-        lastModified: item?.last_modified ? getCurrentTimezone(item.last_modified) : '-'
+        lastModified: item?.last_modified ? item.last_modified : '-',
+        lastModify: item?.last_modified ? convertToRelativeTime(item.last_modified) : '-'
       }
     })
 

@@ -1,9 +1,8 @@
 <script setup>
   import { computed, ref, useSlots } from 'vue'
   import DataTable from '@/components/DataTable'
+  import DataTableColumnSelector from '@/components/DataTable/DataTableColumnSelector.vue'
   import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Listbox from 'primevue/listbox'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table-block-new' })
@@ -149,7 +148,6 @@
     data,
     selectedColumns,
     dataTableRef,
-    columnSelectorPanel,
     filters,
     filtersDynamically,
     appliedFilters,
@@ -163,6 +161,7 @@
     showPopup,
     popupPosition,
     popupData,
+    savedSearch,
 
     // Computed properties
     isRenderActions,
@@ -178,7 +177,6 @@
     optionsOneAction,
     toggleActionsMenu,
     setMenuRefForRow,
-    toggleColumnSelector,
     changeNumberOfLinesPerPage,
     fetchOnSort,
     fetchOnSearch,
@@ -247,7 +245,7 @@
       :first="firstItemIndex"
       :rowClass="getRowClass"
       :emptyListMessage="emptyListMessage"
-      :columns="columns"
+      :columns="selectedColumns"
       @rowReorder="onRowReorder"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
@@ -255,6 +253,7 @@
       :emptyBlock="emptyBlock"
       :hasEmptyBlockSlot="!!slots.emptyBlock"
       :appliedFilters="appliedFilters"
+      :searchValue="savedSearch"
     >
       <template
         #header
@@ -262,7 +261,7 @@
       >
         <slot name="header">
           <div class="flex flex-col gap-2 w-full">
-            <DataTable.Header :showDivider="appliedFilters.length">
+            <DataTable.Header :showDivider="!!appliedFilters.length">
               <template #first-line>
                 <div class="flex justify-between gap-2 w-full">
                   <div class="flex gap-2 w-[400px]">
@@ -292,36 +291,10 @@
                       data-testid="data-table-actions-column-header-refresh"
                     />
                     <DataTable.Export @export="handleExportTableDataToCSV($event)" />
-                    <PrimeButton
-                      outlined
-                      icon="ai ai-column"
-                      size="small"
-                      @click="toggleColumnSelector"
-                      v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
-                      data-testid="data-table-actions-column-header-toggle-columns"
+                    <DataTableColumnSelector
+                      :columns="columns"
+                      v-model:selectedColumns="selectedColumns"
                     />
-                    <OverlayPanel
-                      ref="columnSelectorPanel"
-                      :pt="{
-                        content: { class: 'p-0' }
-                      }"
-                      data-testid="data-table-actions-column-header-toggle-columns-panel"
-                    >
-                      <Listbox
-                        v-model="selectedColumns"
-                        multiple
-                        :options="[{ label: 'Available Columns', items: columns }]"
-                        class="hidden-columns-panel"
-                        optionLabel="header"
-                        optionGroupLabel="label"
-                        optionGroupChildren="items"
-                        data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-                      >
-                        <template #optiongroup="slotProps">
-                          <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                        </template>
-                      </Listbox>
-                    </OverlayPanel>
                   </div>
                 </div>
               </template>

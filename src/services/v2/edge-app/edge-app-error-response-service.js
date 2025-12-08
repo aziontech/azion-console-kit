@@ -42,12 +42,13 @@ export class EdgeAppErrorResponseService extends BaseService {
   listEdgeApplicationsErrorResponseService = async ({ params = {}, edgeApplicationId }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = errorResponseKeys.lists(edgeApplicationId)
+    const queryKey = [...errorResponseKeys.lists(edgeApplicationId), params]
+    const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
-      { persist: true }
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
   }
 
