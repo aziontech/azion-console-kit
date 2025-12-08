@@ -26,7 +26,8 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.results.map((domain) => ({
         domain: domain.domain,
         id: domain.id,
-        name: domain.name
+        name: domain.name,
+        cnames: domain.cnames
       }))
     : []
 

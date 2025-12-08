@@ -2,7 +2,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import DialogAllowRule from './Dialog'
+  import DrawerAllowRule from './Drawer/allowedRules.vue'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
 
@@ -20,6 +20,8 @@
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import { wafRulesTuningGqlService } from '@/services/v2/waf-rules-tunning/waf-rules-tuning-gql-service'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
@@ -73,7 +75,7 @@
   const totalRecordsFound = ref(0)
   const selectedDomainsNames = ref([])
   const isLoadingAllowed = ref(null)
-  const showDialogAllowRule = ref(false)
+  const showDrawerAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
@@ -170,24 +172,28 @@
       header: 'Hits'
     },
     {
-      field: 'pathCount',
-      header: 'Paths'
-    },
-    {
-      field: 'ipCount',
-      header: 'IPs'
-    },
-    {
-      field: 'countryCount',
-      header: 'Countries'
-    },
-    {
       field: 'topIps',
-      header: 'Top 10 IP Addresses'
+      header: 'Top 10 IP Addresses',
+      type: 'component',
+      disableSort: true,
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     },
     {
       field: 'topCountries',
-      header: 'Top 10 Countries'
+      header: 'Top 10 Countries',
+      disableSort: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'expand-column',
+          dependencies: { showMore: true }
+        })
     }
   ])
 
@@ -196,7 +202,7 @@
   })
 
   const listService = async (params) => {
-    const response = await props.listWafRulesTuningService(params)
+    const response = await wafRulesTuningGqlService.listWafRulesTuning(params)
     totalRecordsFound.value = response.recordsFound
     return response.data
   }
@@ -271,7 +277,18 @@
     selectedDomainsNames.value = domainsOptions.value.options
       .filter((item) => selectedDomainIds.value.includes(item.id))
       .map((domain) => domain.name)
-    selectedFilter.value.domains = selectedDomainIds.value || []
+
+    selectedFilter.value.domains =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .map((domain) => domain.domain) || []
+
+    const cnames =
+      domainsOptions.value.options
+        .filter((item) => selectedDomainIds.value.includes(item.id))
+        .flatMap((domain) => domain.cnames) || []
+
+    selectedFilter.value.domains = [...selectedFilter.value.domains, ...cnames]
     filterTuning()
   }
 
@@ -289,7 +306,7 @@
   }
 
   const openDialog = (origin = 'page') => {
-    showDialogAllowRule.value = true
+    showDrawerAllowRule.value = true
     allowRuleOrigin.value = origin
     tracker.wafRules.clickedToAllowRules({ origin }).track()
   }
@@ -300,7 +317,7 @@
 
   const closeDialog = () => {
     isLoadingAllowed.value = null
-    showDialogAllowRule.value = false
+    showDrawerAllowRule.value = false
     allowedByAttacks.value = []
   }
 
@@ -313,7 +330,8 @@
     router.push({ name: `list-${handleTextDomainWorkload.pluralLabel}` })
   }
 
-  const handleSubmitAllowRules = async (nameAttack) => {
+  const handleSubmitAllowRules = async (data) => {
+    const { name, pathRegex } = data
     let attackEvents = []
     if (allowedByAttacks.value.length) {
       attackEvents = [...allowedByAttacks.value]
@@ -325,20 +343,21 @@
       const [{ status, reason, value }] = await wafService.createWafRulesAllowedTuning({
         attackEvents,
         wafId: wafRuleId.value,
-        name: nameAttack
+        name,
+        pathRegex
       })
 
       if (status === 'rejected') {
         throw new Error(reason.message || reason)
       }
 
-      showToast(value.feedback, 'Success', 'success')
       filterSearch()
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
       showDetailsOfAttack.value = false
       handleTrackAllowRule()
+      return value
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
@@ -396,22 +415,6 @@
     listServiceWafTunningRef.value.reload(queryFields)
   }
 
-  const setNetWorkListOptions = async () => {
-    try {
-      const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
-      netWorkListOptions.value.options = response
-    } catch (error) {
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        const errorMessage = error?.message || error
-        showToast(errorMessage, 'error', 'error')
-      }
-    } finally {
-      netWorkListOptions.value.done = false
-    }
-  }
-
   const listDomainsOptions = async () => {
     try {
       domainsOptions.value.done = false
@@ -425,7 +428,9 @@
   }
 
   const handleListNetworkListDropdown = async ({ id }) => {
-    return await networkListsService.listNetworkLists({ id }, true)
+    const response = await networkListsService.listNetworkLists({ id }, true)
+    netWorkListOptions.value.options = response
+    return response
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
@@ -433,7 +438,6 @@
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions()
     await listDomainsOptions()
   })
 </script>
@@ -597,11 +601,13 @@
   >
   </MoreDetailsDrawer>
 
-  <DialogAllowRule
-    v-model:visible="showDialogAllowRule"
+  <DrawerAllowRule
+    v-model:visible="showDrawerAllowRule"
     :isLoading="isLoadingAllowed"
-    @closeDialog="closeDialog"
+    :allowedByAttacks="allowedByAttacks"
+    :handleSubmitAllowRules="handleSubmitAllowRules"
+    @closeDrawer="closeDialog"
     @handleDescriptionOfAttack="handleSubmitAllowRules"
   >
-  </DialogAllowRule>
+  </DrawerAllowRule>
 </template>
