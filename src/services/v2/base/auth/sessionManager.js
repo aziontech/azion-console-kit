@@ -1,9 +1,8 @@
-import { clearAllCache, clearCacheSensitive, clearCacheByType } from '../query/queryClient'
+import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { clearAppData } from '@/helpers/clear-app-data'
-import { CACHE_TYPE } from './../query/queryOptions'
 
 const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
@@ -49,10 +48,6 @@ export const sessionManager = {
 
   async switchAccount() {
     await clearAllCache()
-    await clearCacheByType(CACHE_TYPE.GLOBAL)
-    await clearCacheSensitive()
-    clearAppData()
-    ensure.lists()
   },
 
   async logout() {
