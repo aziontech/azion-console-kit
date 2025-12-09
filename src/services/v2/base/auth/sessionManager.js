@@ -2,7 +2,6 @@ import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
-import { clearAppData } from '@/helpers/clear-app-data'
 
 const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
@@ -15,10 +14,6 @@ const getPageSizeFromStorage = () => {
     return DEFAULT_PAGE_SIZE
   }
 }
-
-// ============================================================================
-// Ensure Cache Strategies
-// ============================================================================
 
 const ensure = {
   async solutions() {
@@ -36,10 +31,6 @@ const ensure = {
   }
 }
 
-// ============================================================================
-// Session Manager
-// ============================================================================
-
 export const sessionManager = {
   async afterLogin() {
     await ensure.solutions()
@@ -48,12 +39,10 @@ export const sessionManager = {
 
   async switchAccount() {
     await clearAllCache()
-    ensure.lists()
   },
 
   async logout() {
     await clearAllCache()
-    clearAppData()
   },
 
   async clearSensitive() {
