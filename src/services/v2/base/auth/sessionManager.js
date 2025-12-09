@@ -16,10 +16,6 @@ const getPageSizeFromStorage = () => {
   }
 }
 
-// ============================================================================
-// Ensure Cache Strategies
-// ============================================================================
-
 const ensure = {
   async solutions() {
     const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
@@ -36,10 +32,6 @@ const ensure = {
   }
 }
 
-// ============================================================================
-// Session Manager
-// ============================================================================
-
 export const sessionManager = {
   async afterLogin() {
     await ensure.solutions()
@@ -48,7 +40,6 @@ export const sessionManager = {
 
   async switchAccount() {
     await clearAllCache()
-    ensure.lists()
   },
 
   async logout() {

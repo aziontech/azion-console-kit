@@ -37,7 +37,7 @@ export const EdgeStorageAdapter = {
     }))
     return {
       files,
-      continuation_token: data.continuation_token || null
+      continuation_token: data?.continuation_token || null
     }
   },
 
