@@ -353,17 +353,16 @@
   defineOptions({ name: 'profile-block' })
 
   const { startLoading } = useLoadingStore()
-  const user = useAccountStore().accountData
-  const { currentTheme } = storeToRefs(useAccountStore())
-  const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
-  const setTheme = useAccountStore().setTheme
+  const accountStore = useAccountStore()
+  const { accountData: user, currentTheme, hasAccessToSSOManagement } = storeToRefs(accountStore)
+  const setTheme = accountStore.setTheme
 
   const hasAccessToActivityHistory = computed(() => {
-    return user.kind === 'client'
+    return user.value.kind === 'client'
   })
 
   onBeforeMount(() => {
-    switch (user.kind) {
+    switch (user.value.kind) {
       case 'brand':
         profileMenuDefault.push({
           label: 'Resellers Management',
@@ -476,7 +475,7 @@
 
   const profileMenuItems = computed(() => {
     const switchAccount =
-      user && !user.is_client_only
+      user.value && !user.value.is_client_only
         ? [
             {
               label: 'Switch Account',
