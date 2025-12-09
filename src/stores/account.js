@@ -131,7 +131,6 @@ export const useAccountStore = defineStore({
     },
     resetAccount() {
       this.account = {}
-      this.identifySignUpProvider = ''
     },
     setTheme(theme) {
       this.account.colorTheme = theme
