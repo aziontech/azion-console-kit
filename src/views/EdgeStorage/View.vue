@@ -8,6 +8,7 @@
   import CredentialsView from './CredentialsView.vue'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import PrimeButton from 'primevue/button'
   import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
@@ -35,6 +36,17 @@
   const mapTabs = ref({
     'main-settings': 0,
     credentials: 1
+  })
+
+  const credentialsViewRef = ref(null)
+
+  const addButtonController = computed(() => {
+    const showButton = activeTab.value === mapTabs.value.credentials
+    return {
+      showAddButtonTab: showButton,
+      label: 'Credential',
+      click: () => credentialsViewRef.value?.openCreateDrawer?.()
+    }
   })
 
   const getTabFromIndex = (selectedTabIndex) => {
@@ -189,14 +201,36 @@
       </CreateFormBlock>
 
       <!-- Edit Mode with Tabs -->
-      <TabView
+      <div
         v-else
-        :activeIndex="activeTab"
-        @tab-click="({ index = 0 }) => changeTab(index)"
-        class="w-full h-full"
+        class="h-full w-full"
       >
-        <TabPanel header="Main Settings">
+        <div class="flex align-center justify-between relative">
+          <TabView
+            :activeIndex="activeTab"
+            @tab-click="({ index = 0 }) => changeTab(index)"
+            class="flex-1"
+          >
+            <TabPanel header="Main Settings"></TabPanel>
+            <TabPanel header="Credentials"></TabPanel>
+          </TabView>
+          <div
+            v-if="addButtonController.showAddButtonTab"
+            class="flex ml-4 items-center"
+          >
+            <PrimeButton
+              :label="addButtonController.label"
+              size="small"
+              icon="pi pi-plus"
+              @click="addButtonController.click"
+              data-testid="create-credential-button"
+            />
+          </div>
+        </div>
+
+        <div>
           <EditFormBlock
+            v-if="activeTab === mapTabs['main-settings']"
             @on-edit-success="handleResponse"
             @on-response="handleResponse"
             v-bind="editFormProps"
@@ -217,12 +251,14 @@
               />
             </template>
           </EditFormBlock>
-        </TabPanel>
 
-        <TabPanel header="Credentials">
-          <CredentialsView :bucket-id="route.params.id" />
-        </TabPanel>
-      </TabView>
+          <CredentialsView
+            v-if="activeTab === mapTabs['credentials']"
+            ref="credentialsViewRef"
+            :bucket-id="route.params.id"
+          />
+        </div>
+      </div>
     </template>
   </ContentBlock>
 </template>

@@ -1,4 +1,4 @@
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { convertToRelativeTime } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const parseName = (data) => {
@@ -22,7 +22,8 @@ const transformMap = {
   name: (value) => parseName(value),
   jsonArgs: (value) => JSON.stringify(value.args, null, '\t'),
   lastEditor: (value) => value.last_editor,
-  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified)
+  lastModified: (value) => value.last_modified,
+  lastModifiedFormatted: (value) => convertToRelativeTime(value.last_modified)
 }
 
 export const EdgeApplicationFunctionsAdapter = {

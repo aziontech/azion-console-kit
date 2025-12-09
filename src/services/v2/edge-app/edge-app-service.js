@@ -73,7 +73,7 @@ export class EdgeAppService extends BaseService {
     }
 
     await this._ensureQueryData(edgeAppKeys.list(params), () => this.#fetchList(params), {
-      persist: true
+      persist: !params.search
     })
   }
 
@@ -116,10 +116,14 @@ export class EdgeAppService extends BaseService {
   /** @deprecated Use listEdgeApplicationsService with useQuery */
   listEdgeApplicationsService = async (params) => {
     const paramsValue = toValue(params)
+    const hasFilter = paramsValue?.hasFilter || false
     return await this._ensureQueryData(
       () => edgeAppKeys.list(paramsValue),
       () => this.#fetchList(paramsValue),
-      { persist: paramsValue?.page === 1 && !paramsValue?.search }
+      {
+        persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
+        skipCache: hasFilter
+      }
     )
   }
 

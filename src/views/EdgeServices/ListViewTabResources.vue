@@ -1,10 +1,9 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'list-edge-service-resources-tab' })
 
@@ -61,8 +60,18 @@
       header: 'Last Editor'
     },
     {
-      field: 'lastModified',
-      header: 'Last Modified'
+      field: 'last_modified',
+      header: 'Last Modified',
+      sortField: 'last_modified',
+      filterPath: 'last_modified',
+      type: 'component',
+      component: (columnData, rowData, dependencies) => {
+        return columnBuilder({
+          data: rowData,
+          columnAppearance: 'last-modified',
+          dependencies
+        })
+      }
     }
   ])
 
@@ -106,6 +115,10 @@
       service: deleteResourcesServicesWithDecorator
     }
   ]
+
+  defineExpose({
+    openCreateDrawer: openCreateServiceDrawer
+  })
 </script>
 
 <template>
@@ -118,36 +131,32 @@
       :editResourcesServices="props.editResourcesServices"
       @onSuccess="reloadResourcesList"
     />
-    <div v-if="hasContentToList">
-      <ListTableBlock
-        ref="listResourcesEdgeServiceRef"
-        :listService="listResourcesServicesWithDecorator"
-        :columns="getColumns"
-        :editInDrawer="openEditServiceDrawer"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No resources found."
-        :actions="actions"
-        isTabs
-      >
-        <template #addButton>
-          <PrimeButton
-            icon="pi pi-plus"
-            label="Resource"
-            @click="openCreateServiceDrawer"
-            data-testid="list-table-block__create-resource-button"
-          />
-        </template>
-      </ListTableBlock>
-    </div>
-    <EmptyResultsBlock
-      v-else
-      title="No resources have been created"
-      description="Click the button below to create a resource for the service to run."
-      createButtonLabel="Resource"
-      :documentationService="props.documentationServiceResource"
-      :inTabs="true"
+    <ListTableBlock
+      ref="listResourcesEdgeServiceRef"
+      :listService="listResourcesServicesWithDecorator"
+      :columns="getColumns"
+      :editInDrawer="openEditServiceDrawer"
+      @on-load-data="handleLoadData"
+      emptyListMessage="No resources found."
+      :actions="actions"
+      isTabs
+      class="mt-0"
+      :empty-block="{
+        title: 'No resources have been created',
+        description: 'Click the button below to create a resource for the service to run.',
+        createButtonLabel: 'Resource',
+        documentationService: props.documentationServiceResource
+      }"
     >
-      <template #default>
+      <template #addButton>
+        <PrimeButton
+          icon="pi pi-plus"
+          label="Resource"
+          @click="openCreateServiceDrawer"
+          data-testid="edge-service-resources-list__create-resource-button"
+        />
+      </template>
+      <template #emptyBlockButton>
         <PrimeButton
           class="max-md:w-full w-fit"
           severity="secondary"
@@ -157,9 +166,6 @@
           data-testid="list-table-block__create-resource-button"
         />
       </template>
-      <template #illustration>
-        <Illustration />
-      </template>
-    </EmptyResultsBlock>
+    </ListTableBlock>
   </div>
 </template>

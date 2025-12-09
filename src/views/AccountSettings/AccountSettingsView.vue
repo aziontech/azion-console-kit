@@ -98,7 +98,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Account Settings" />
+      <PageHeadingBlock
+        pageTitle="Account Settings"
+        description="Manage account details, preferences, and security configurations."
+      />
     </template>
     <template #content>
       <EditFormBlock

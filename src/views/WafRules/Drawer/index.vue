@@ -292,7 +292,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     },
     {
       field: 'topCountries',
@@ -300,7 +300,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     },
     {
       field: 'topPaths',
@@ -308,7 +308,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     }
   ]
 

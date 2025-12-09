@@ -45,12 +45,13 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = deviceGroupsKeys.lists(edgeApplicationId)
+    const queryKey = [...deviceGroupsKeys.lists(edgeApplicationId), params]
+    const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchList(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
   }
 

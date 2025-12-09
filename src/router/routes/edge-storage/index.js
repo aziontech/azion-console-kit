@@ -30,7 +30,9 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Edit Bucket'
+            label: 'Edit Bucket',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

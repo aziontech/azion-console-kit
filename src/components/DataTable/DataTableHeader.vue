@@ -1,17 +1,26 @@
 <template>
   <div
-    class="flex flex-wrap justify-between gap-2 w-full"
+    class="flex flex-col w-full"
     data-testid="data-table-header"
+    :class="{ 'gap-3': showDivider }"
   >
-    <slot />
+    <div class="px-3">
+      <slot name="first-line" />
+    </div>
+    <Divider v-if="showDivider" />
+    <div class="px-3.5">
+      <slot name="second-line" />
+    </div>
   </div>
 </template>
 
 <script setup>
+  import Divider from 'primevue/divider'
+
   defineProps({
-    class: {
-      type: [String, Object, Array],
-      default: ''
+    showDivider: {
+      type: Boolean,
+      default: true
     }
   })
 </script>

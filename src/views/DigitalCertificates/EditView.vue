@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Digital Certificate"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="certificateName"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +9,7 @@
         :loadService="loadServiceRender"
         :schema="validationSchema"
         updatedRedirect="list-digital-certificates"
+        @loaded-service-object="setCertificateName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -38,14 +39,24 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEditDigitalCertificates from './FormFields/FormFieldsEditDigitalCertificates.vue'
   import * as yup from 'yup'
-  import { inject, computed } from 'vue'
+  import { inject, computed, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const certificateName = ref('Edit Digital Certificate')
+
+  const setCertificateName = (certificate) => {
+    certificateName.value = certificate.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, certificate.name)
+  }
 
   const props = defineProps({
     clipboardWrite: {

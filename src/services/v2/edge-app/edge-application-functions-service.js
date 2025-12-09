@@ -93,12 +93,13 @@ export class EdgeApplicationFunctionService extends BaseService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
-    const queryKey = edgeAppFunctionsKeys.lists(edgeApplicationId)
+    const queryKey = [...edgeAppFunctionsKeys.lists(edgeApplicationId), params]
+    const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
   }
 
