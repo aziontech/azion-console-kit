@@ -131,14 +131,6 @@ export const useAccountStore = defineStore({
     },
     resetAccount() {
       this.account = {}
-      this.identifySignUpProvider = ''
-
-      try {
-        localStorage.removeItem('account')
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error removing account from localStorage:', error)
-      }
     },
     setTheme(theme) {
       this.account.colorTheme = theme
