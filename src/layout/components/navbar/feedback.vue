@@ -82,6 +82,7 @@
 
 <script setup>
   import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import { createFeedbackServices } from '@/services/feedback-services'
   import { useToast } from 'primevue/usetoast'
@@ -106,7 +107,7 @@
     }
   })
 
-  const account = useAccountStore().accountData
+  const { accountData: account } = storeToRefs(useAccountStore())
   const toast = useToast()
 
   const visible = ref(false)
@@ -130,10 +131,10 @@
       loading.value = true
       const payload = {
         type: selectedIssueType.value,
-        account_id: account.id,
-        client_id: account.client_id,
-        name: account.name,
-        email: account.email,
+        account_id: account.value.id,
+        client_id: account.value.client_id,
+        name: account.value.name,
+        email: account.value.email,
         description: report.value
       }
       await createFeedbackServices(payload)
