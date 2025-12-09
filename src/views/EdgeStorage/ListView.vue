@@ -363,28 +363,31 @@
         selectedBucket.value.name,
         false,
         folderPath.value,
-        selectedBucket.value.continuation_token
+        selectedBucket.value?.continuation_token
       )
-      selectedBucket.value.continuation_token = continuation_token
-      const filterFiles = files.map((file) => ({
-        ...file,
-        name: file.name.replace(folderPath.value, '')
-      }))
-      if (folderPath.value && !isPaginationLoading.value) {
-        filterFiles.unshift({
-          id: '..',
-          name: '..',
-          isParentNav: true,
-          isFolder: true
-        })
+      if (selectedBucket.value) {
+        selectedBucket.value.continuation_token = continuation_token || null
+        const filterFiles = files.map((file) => ({
+          ...file,
+          name: file.name.replace(folderPath.value, '')
+        }))
+        if (folderPath.value && !isPaginationLoading.value) {
+          filterFiles.unshift({
+            id: '..',
+            name: '..',
+            isParentNav: true,
+            isFolder: true
+          })
+        }
+        if (isPaginationLoading.value) {
+          selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
+        } else {
+          selectedBucket.value.files = filterFiles
+        }
+        filesTableNeedRefresh.value = false
       }
-      if (isPaginationLoading.value) {
-        selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
-      } else {
-        selectedBucket.value.files = filterFiles
-      }
-      filesTableNeedRefresh.value = false
     }
+
     showDragAndDrop.value = !selectedBucket.value?.files?.length
     return selectedBucket.value?.files
   }
