@@ -18,13 +18,6 @@ export const parseCriteria = (criteria) => {
 export const parseBehaviors = (behaviors) => {
   const parsedBehaviors = behaviors.map((behavior) => {
     switch (behavior.name) {
-      case 'tag_event':
-        return {
-          type: behavior.name,
-          attributes: {
-            value: behavior.tag_event
-          }
-        }
       case 'run_function':
         return {
           type: behavior.name,
@@ -108,12 +101,6 @@ export const parseBehaviorsLoad = (behaviors) => {
         return {
           name: behavior.type,
           functionId: parseInt(behavior.attributes.value)
-        }
-
-      case 'tag_event':
-        return {
-          name: behavior.type,
-          tag_event: behavior.attributes.value
         }
 
       case 'set_waf':
