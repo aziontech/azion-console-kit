@@ -30,21 +30,6 @@ export const queryPlugin = {
       rejectRestore = reject
     })
 
-    // const persister = createIDBPersister(
-    //   {
-    //     idbName: PERSISTENCE_CONFIG.IDB_NAME,
-    //     storeName: PERSISTENCE_CONFIG.IDB_STORE_NAME,
-    //     cacheKey: PERSISTENCE_CONFIG.CACHE_KEY
-    //   },
-    //   (error) => {
-    //     if (error) {
-    //       rejectRestore(error)
-    //     } else {
-    //       resolveRestore()
-    //     }
-    //   }
-    // )
-
     persistQueryClient({
       queryClient,
       persister,
