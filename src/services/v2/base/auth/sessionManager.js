@@ -1,10 +1,16 @@
 import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
+import { persister } from '../query/queryPlugin'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 
 const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
+
+const clearAll = async () => {
+  await clearAllCache()
+  await persister.removeClient()
+}
 
 const getPageSizeFromStorage = () => {
   try {
@@ -24,9 +30,7 @@ const ensure = {
 
   async lists() {
     const pageSize = getPageSizeFromStorage()
-
     const promises = [edgeAppService.ensureList(pageSize), workloadService.ensureList(pageSize)]
-
     Promise.allSettled(promises)
   }
 }
@@ -36,15 +40,12 @@ export const sessionManager = {
     await ensure.solutions()
     ensure.lists()
   },
-
   async switchAccount() {
-    await clearAllCache()
+    await clearAll()
   },
-
   async logout() {
-    await clearAllCache()
+    await clearAll()
   },
-
   async clearSensitive() {
     await clearCacheSensitive()
   }
