@@ -2,7 +2,6 @@ import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
-import { clearAppData } from '@/helpers/clear-app-data'
 
 const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
@@ -44,7 +43,6 @@ export const sessionManager = {
 
   async logout() {
     await clearAllCache()
-    clearAppData()
   },
 
   async clearSensitive() {
