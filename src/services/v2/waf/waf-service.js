@@ -113,23 +113,12 @@ export class WafService extends BaseService {
   createWafRulesAllowedTuning = async ({ attackEvents, wafId, name, pathRegex }) => {
     const pathToPayload = pathRegex ?? null
     const requests = attackEvents.flatMap((attack) => {
-      if (!attack?.paths?.length) {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
-          attack,
-          name,
-          pathToPayload
-        )
-        return [this._createTuningRequest({ wafId, payload })]
-      }
-
-      return attack.paths.map(() => {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
-          attack,
-          name,
-          pathToPayload
-        )
-        return this._createTuningRequest({ wafId, payload })
-      })
+      const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
+        attack,
+        name,
+        pathToPayload
+      )
+      return [this._createTuningRequest({ wafId, payload })]
     })
 
     return Promise.allSettled(requests)
