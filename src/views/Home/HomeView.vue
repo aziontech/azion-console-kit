@@ -358,7 +358,7 @@
           >
             <div class="text-lg font-medium">Get Assistance</div>
             <div class="text-sm text-color-secondary">
-              Access personalized support for all your queries, suggestions, or incident reports
+              Access personalized support for all your queries, suggestions, or incident reports.
             </div>
           </button>
         </div>
