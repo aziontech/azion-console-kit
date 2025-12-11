@@ -2,30 +2,25 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
 import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 import { buildCertificateNames } from '@/services/utils/domain-names'
-
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { workloadKeys } from '@/services/v2/workload/workload-service'
 import * as Errors from '@/services/axios/errors'
 
-/** using centralized utility: buildCertificateNames */
-
 export const createDomainService = async (payload) => {
-  // build request body from payload (pure transformation + async certificate resolution)
   const body = await buildRequestBody(payload)
-
-  // API call
   const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}`,
     method: 'POST',
     body
   })
 
-  // response handling
+  queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+
   return handleHttpResponse(httpResponse)
 }
 
-// split and sanitize cnames string input
 const splitCnames = (cnames) => cnames.split('\n').filter((item) => item !== '')
 
-// decide and resolve the certificate id (may create Let's Encrypt certs)
 const resolveCertificateId = async ({ edgeCertificate, name, cnames }) => {
   if (!edgeCertificate || edgeCertificate === 0) return null
 
@@ -45,7 +40,6 @@ const resolveCertificateId = async ({ edgeCertificate, name, cnames }) => {
   return id
 }
 
-// normalize payload and assemble API body
 const buildRequestBody = async (payload) => {
   const cnames = splitCnames(payload.cnames)
 
