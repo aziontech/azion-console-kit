@@ -348,7 +348,6 @@
       !props.hasEdgeFunctionsProductAccess
     return [
       { value: 'deny', label: 'Deny (403 Forbidden)' },
-      { value: 'tag_event', label: 'Tag Event' },
       { value: 'drop', label: 'Drop (Close Without Response)' },
       { value: 'set_rate_limit', label: 'Set Rate Limit' },
       {
@@ -406,10 +405,6 @@
 
   const isWafBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
-  }
-
-  const isTagEvent = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
   }
 
   const isRateLimitBehavior = (behaviorItemIndex) => {
@@ -586,7 +581,7 @@
           </div>
 
           <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
-            <div class="flex flex-col h-fit sm:max-w-lg w-full">
+            <div class="flex flex-col h-fit sm:max-w-[15.625rem] w-full">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -608,7 +603,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
               <FieldDropdown
                 :options="
                   getOperatorsOptionsByCriteriaVariable({
@@ -626,7 +621,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
               <FieldText
                 v-if="showArgumentBySelectedOperator({ criteriaIndex, criteriaInnerRowIndex })"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
@@ -842,17 +837,6 @@
                   </ul>
                 </template>
               </FieldDropdownLazyLoader>
-            </template>
-
-            <template v-if="isTagEvent(behaviorItemIndex)">
-              <FieldText
-                class="w-full"
-                id="`behaviors[${behaviorItemIndex}].tag_event`"
-                :key="`${behaviorItem.key}-tag_event`"
-                placeholder="Tag Event"
-                :value="behaviors[behaviorItemIndex].value.tag_event"
-                :name="`behaviors[${behaviorItemIndex}].tag_event`"
-              />
             </template>
 
             <template v-if="isWafBehavior(behaviorItemIndex)">

@@ -76,7 +76,6 @@
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
-  const netWorkListOptions = ref({ options: [], done: true })
   const domainsOptions = ref({ options: [], done: false })
   const tuningSelected = ref(null)
   const allowedByAttacks = ref([])
@@ -396,22 +395,6 @@
     listServiceWafTunningRef.value.reload(queryFields)
   }
 
-  const setNetWorkListOptions = async () => {
-    try {
-      const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
-      netWorkListOptions.value.options = response
-    } catch (error) {
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-      } else {
-        const errorMessage = error?.message || error
-        showToast(errorMessage, 'error', 'error')
-      }
-    } finally {
-      netWorkListOptions.value.done = false
-    }
-  }
-
   const listDomainsOptions = async () => {
     try {
       domainsOptions.value.done = false
@@ -424,8 +407,8 @@
     }
   }
 
-  const handleListNetworkListDropdown = async ({ id }) => {
-    return await networkListsService.listNetworkLists({ id }, true)
+  const handleListNetworkListDropdown = async (params) => {
+    return await networkListsService.listNetworkLists(params, true)
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
@@ -433,7 +416,6 @@
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions()
     await listDomainsOptions()
   })
 </script>

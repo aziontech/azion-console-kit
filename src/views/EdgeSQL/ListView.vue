@@ -127,7 +127,13 @@
       label: 'Delete',
       title: 'database',
       icon: 'pi pi-trash',
-      service: deleteDatabase
+      service: deleteDatabase,
+      disabled: (data) => {
+        if (data.status.content === 'deleting' || data.status.content === 'creating') {
+          return true
+        }
+        return false
+      }
     }
   ]
 
@@ -152,6 +158,24 @@
         startDeletePolling(deletedDatabase)
       } else {
         stopDeletePolling()
+      }
+    },
+    { immediate: true }
+  )
+
+  watch(
+    () => fetchListRef.value?.data,
+    (data) => {
+      if (Array.isArray(data) && data.length) {
+        const databaseCreating = data.find((database) => {
+          const statusContent =
+            typeof database.status === 'string' ? database.status : database.status?.content
+          return statusContent === 'creating'
+        })
+
+        if (databaseCreating?.id) {
+          startPolling(databaseCreating.id)
+        }
       }
     },
     { immediate: true }

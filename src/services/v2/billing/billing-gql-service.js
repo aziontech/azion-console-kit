@@ -9,11 +9,8 @@ export class BillingGqlService extends BaseService {
     this.baseURL = 'v4/billing/graphql'
   }
 
-  #getLastBill = async (dateCreated) => {
-    const dateRange = {
-      from_date: dateCreated,
-      to_date: getCurrentMonthStartEnd().dateFinal
-    }
+  async #fetchLastBill(dateCreated) {
+    const dateRange = { from_date: dateCreated, to_date: getCurrentMonthStartEnd().dateFinal }
 
     const { data } = await this.http.request({
       method: 'POST',
@@ -43,7 +40,7 @@ export class BillingGqlService extends BaseService {
     return data
   }
 
-  #getLastCreditAndExpirationDate = async () => {
+  async #fetchLastCreditAndExpirationDate() {
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}`,
@@ -65,7 +62,7 @@ export class BillingGqlService extends BaseService {
               clientId
               entryType
               expirationDate
-            }            
+            }
           }
         `
       }
@@ -73,32 +70,32 @@ export class BillingGqlService extends BaseService {
     return data
   }
 
-  getCreditAndExpirationDate = async () => {
+  async fetchCreditAndExpirationDate() {
     try {
-      const { data: lastCredit } = await this.#getLastCreditAndExpirationDate()
+      const { data: lastCredit } = await this.#fetchLastCreditAndExpirationDate()
 
       const { amount, lastRecordGenerationDate, days } =
         this.adapter.transformCreditAndExpirationDate(lastCredit)
       if (!amount || !days) return {}
 
-      const { data: lastBill } = await this.#getLastBill(lastRecordGenerationDate)
+      const { data: lastBill } = await this.#fetchLastBill(lastRecordGenerationDate)
       const { credit, formatCredit } = this.adapter.transformMessageCreditAndExpirationDate(
         lastBill.bill,
         amount
       )
 
-      return {
-        credit,
-        formatCredit,
-        days
-      }
+      return { credit, formatCredit, days }
     } catch (error) {
-      return {
-        credit: 0,
-        formatCredit: '0,00',
-        days: 0
-      }
+      return { credit: 0, formatCredit: '0,00', days: 0 }
     }
+  }
+
+  async getCreditAndExpirationDate() {
+    return await this._ensureQueryData(
+      ['billing', 'credit-expiration'],
+      () => this.fetchCreditAndExpirationDate(),
+      { cacheType: this.cacheType.SENSITIVE }
+    )
   }
 }
 

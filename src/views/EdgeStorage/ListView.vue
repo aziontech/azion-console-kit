@@ -91,14 +91,15 @@
                     outlined
                     class="px-4 py-1 flex items-center justify-center"
                   />
-                  <PrimeButton
+                  <!-- hide new folder button -->
+                  <!-- <PrimeButton
                     icon="pi pi-folder-plus"
                     size="small"
                     @click="handleNewFolder"
                     :label="isGreaterThanXL ? 'New Folder' : ''"
                     outlined
                     class="px-4 py-1 flex items-center justify-center"
-                  />
+                  /> -->
                 </template>
                 <SplitButton
                   size="small"
@@ -516,28 +517,31 @@
         selectedBucket.value.name,
         false,
         folderPath.value,
-        { continuation_token: selectedBucket.value.continuation_token }
+        selectedBucket.value?.continuation_token
       )
-      selectedBucket.value.continuation_token = continuation_token
-      const filterFiles = files.map((file) => ({
-        ...file,
-        name: file.name.replace(folderPath.value, '')
-      }))
-      if (folderPath.value && !isPaginationLoading.value) {
-        filterFiles.unshift({
-          id: '..',
-          name: '..',
-          isParentNav: true,
-          isFolder: true
-        })
+      if (selectedBucket.value) {
+        selectedBucket.value.continuation_token = continuation_token || null
+        const filterFiles = files.map((file) => ({
+          ...file,
+          name: file.name.replace(folderPath.value, '')
+        }))
+        if (folderPath.value && !isPaginationLoading.value) {
+          filterFiles.unshift({
+            id: '..',
+            name: '..',
+            isParentNav: true,
+            isFolder: true
+          })
+        }
+        if (isPaginationLoading.value) {
+          selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
+        } else {
+          selectedBucket.value.files = filterFiles
+        }
+        filesTableNeedRefresh.value = false
       }
-      if (isPaginationLoading.value) {
-        selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
-      } else {
-        selectedBucket.value.files = filterFiles
-      }
-      filesTableNeedRefresh.value = false
     }
+
     showDragAndDrop.value = !selectedBucket.value?.files?.length
     return selectedBucket.value?.files
   }
@@ -590,11 +594,11 @@
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
-
-  const handleNewFolder = () => {
-    isCreatingNewFolder.value = true
-    newFolderName.value = ''
-  }
+  //  comment handleNewFolder for hide new folder button
+  // const handleNewFolder = () => {
+  //   isCreatingNewFolder.value = true
+  //   newFolderName.value = ''
+  // }
 
   const handleSaveNewFolder = () => {
     const folderName = newFolderName.value.trim()

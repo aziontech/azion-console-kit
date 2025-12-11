@@ -1,47 +1,69 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { useAccountStore } from '@/stores/account'
+
+export const solutionsKeys = {
+  all: ['solutions'],
+  lists: () => [...solutionsKeys.all, 'list'],
+  list: (group, type) => [...solutionsKeys.lists(), group, type]
+}
 
 export class SolutionService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'marketplace/solution/'
-  }
+  baseUrl = 'marketplace/solution/'
 
-  getListSolutions = async ({ group, type }) => {
+  async getListSolutions({ group, type }) {
     const response = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
-      config: {
-        baseURL: '/api',
-        headers: {
-          'Mktp-Api-Context': type
-        }
-      },
+      url: this.baseUrl,
+      config: { baseURL: '/api', headers: { 'Mktp-Api-Context': type } },
       params: { group }
     })
 
     return this.#adaptResponse(response)
   }
 
-  useListSolutions({ group, type }, options = {}) {
-    return this.useQuery({
-      key: ['solutions', 'list', group, type],
-      queryFn: () => this.getListSolutions({ group, type }),
-      cache: this.cacheType.GLOBAL,
-      overrides: {
-        staleTime: this.cacheTime.THIRTY_DAYS,
-        refetchInterval: false,
-        ...options
-      }
+  useListSolutions(params) {
+    const { group, type } = params
+    return this._createQuery(solutionsKeys.list(group, type), () => this.getListSolutions(params), {
+      staleTime: this.toMilliseconds({ days: 30 }),
+      refetchInterval: false
     })
   }
 
+  /**
+   * Ensure solutions data is cached for faster initial load
+   * Called by sessionManager after login/switch account
+   *
+   * @param {boolean} isFlagBlockApiV4 - flag to determine template type
+   */
+  async ensureList(isFlagBlockApiV4 = false) {
+    const accountStore = useAccountStore()
+    const { jobRole } = accountStore.account
+
+    const prefetchConfigs = [
+      { group: 'templates', type: isFlagBlockApiV4 ? 'onboarding' : 'onboarding-v4' },
+      { group: 'githubImport', type: 'import-from-github' }
+    ]
+
+    if (jobRole) {
+      prefetchConfigs.unshift({
+        group: 'recommended',
+        type: isFlagBlockApiV4 ? jobRole : `${jobRole}-v4`
+      })
+    }
+
+    await Promise.all(
+      prefetchConfigs.map(({ group, type }) =>
+        this._ensureQueryData(
+          solutionsKeys.list(group, type),
+          () => this.getListSolutions({ group, type }),
+          { staleTime: this.toMilliseconds({ days: 30 }) }
+        )
+      )
+    )
+  }
+
   async invalidateSolutionsCache() {
-    await this.queryClient.invalidateQueries({
-      predicate: (query) =>
-        query.queryKey[0] === this.cacheType.GLOBAL &&
-        query.queryKey.includes('solutions') &&
-        query.queryKey.includes('list')
-    })
+    await this.queryClient.invalidateQueries({ queryKey: solutionsKeys.lists() })
   }
 
   #adaptResponse(response) {
