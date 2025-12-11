@@ -7,7 +7,7 @@ export class VcsService extends BaseService {
     this.baseURL = 'v4/vcs'
   }
 
-  listIntegrations = async (params = { pageSize: 200 }) => {
+  listIntegrations = async (params = { pageSize: 100 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/integrations`,
@@ -24,7 +24,7 @@ export class VcsService extends BaseService {
     return this.adapter?.transformListPlatforms?.(data.results) ?? data.results
   }
 
-  listRepositories = async (id, params = { pageSize: 200, ordering: 'name' }) => {
+  listRepositories = async (id, params = { pageSize: 100, ordering: 'name' }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/integrations/${id}/repositories`,

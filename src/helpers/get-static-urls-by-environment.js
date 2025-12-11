@@ -18,8 +18,8 @@ const urls = {
     production: 'https://api.azion.com/v4/events/graphql'
   },
   helpCenter: {
-    stage: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/',
-    production: 'https://storage.googleapis.com/gcs-docs-help-center/console/'
+    stage: 'https://stage-console.azion.com/gcs-docs-help-center-stage/console/',
+    production: 'https://console.azion.com/gcs-docs-help-center/console/'
   }
 }
 

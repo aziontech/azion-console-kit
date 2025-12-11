@@ -61,11 +61,11 @@
     <div
       v-for="(filter, index) in processedFilters"
       :key="index"
-      class="inline-flex items-center gap-1 p-1 px-2 rounded-md border text-sm font-medium surface-border transition-colors"
+      class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-md border text-sm surface-border transition-colors"
       @click="handleClickFilter(filter)"
     >
-      <span class="text-[--series-three-color]">{{ filter.field }}</span>
-      <span class="text-[--series-two-color]">{{ labelOperator(filter) }}</span>
+      <span class="text-color font-normal">{{ filter.field }}</span>
+      <span class="text-color font-medium">{{ labelOperator(filter) }}:</span>
       <span v-if="filter.operator === 'Range'">
         ({{ filter.value.begin }},{{ filter.value.end }})
       </span>
@@ -74,7 +74,7 @@
       </span>
       <span v-else>{{ filter.value }}</span>
       <i
-        class="pl-1 pi pi-times cursor-pointer text-xs"
+        class="pl-1 pi pi-times-circle cursor-pointer text-sm"
         @click="removeFilter(index)"
       />
     </div>

@@ -9,12 +9,12 @@ import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
 const getDeleteConfirmationText = (data) =>
   !data
     ? 'delete'
-    : data.deleteConfirmationText ??
+    : (data.deleteConfirmationText ??
       data.name?.text ??
       data.name ??
       data.key ??
       (data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined) ??
-      'delete'
+      'delete')
 
 /**
  * Composable for opening delete confirmation dialogs.
@@ -33,6 +33,7 @@ export const useDeleteDialog = () => {
    * @param {Function} [config.closeCallback] - Callback when closing.
    * @param {Function} [config.successCallback] - Callback when deletion is successful.
    * @param {boolean} [config.bypassConfirmation] - Bypass confirmation.
+   * @param {boolean} [config.showToast] - Show toast notification on success/error.
    */
   const openDeleteDialog = ({
     title,
@@ -41,7 +42,8 @@ export const useDeleteDialog = () => {
     deleteService,
     closeCallback,
     successCallback,
-    bypassConfirmation = false
+    bypassConfirmation = false,
+    showToast = true
   }) => {
     dialog.open(DeleteDialog, {
       data: {
@@ -52,7 +54,8 @@ export const useDeleteDialog = () => {
         bypassConfirmation,
         deleteService,
         rerender: Math.random(),
-        deleteConfirmationText: getDeleteConfirmationText(data)
+        deleteConfirmationText: getDeleteConfirmationText(data),
+        showToast
       },
       onClose: closeCallback,
       onSuccess: successCallback

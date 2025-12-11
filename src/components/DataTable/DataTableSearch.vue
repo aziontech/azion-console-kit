@@ -11,6 +11,7 @@
       data-testid="data-table-search-input"
       :placeholder="placeholder"
       @keyup.enter="handleEnter"
+      :disabled="disabled"
     />
     <div
       v-if="hasSlot"
@@ -37,6 +38,10 @@
     debounce: {
       type: Number,
       default: 0
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   })
 

@@ -1,26 +1,26 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 
+export const accountSettingsKeys = {
+  all: ['account-settings'],
+  jobRole: () => [...accountSettingsKeys.all, 'job-role']
+}
+
 export class AccountSettingsService extends BaseService {
-  constructor() {
-    super()
-    this.baseURL = 'v4/iam/account'
-  }
+  baseUrl = 'v4/iam/account'
 
   async fetchAccountJobRole() {
     const response = await this.http.request({
       method: 'GET',
-      url: this.baseURL,
+      url: this.baseUrl,
       config: { baseURL: '/api' }
     })
     return this._adaptJobRole(response.data)
   }
 
-  async getAccountJobRole(options = {}) {
-    return await this.queryAsync({
-      key: ['account', 'job-role'],
-      queryFn: () => this.fetchAccountJobRole(),
-      cache: this.cacheType.SENSITIVE,
-      overrides: { ...options }
+  async getAccountJobRole() {
+    const queryKey = accountSettingsKeys.jobRole()
+    return await this._ensureQueryData(queryKey, async () => this.fetchAccountJobRole(), {
+      cacheType: this.cacheType.SENSITIVE
     })
   }
 
@@ -28,9 +28,7 @@ export class AccountSettingsService extends BaseService {
     const payload = response?.data
     if (!payload) return { jobRole: 'other' }
 
-    return {
-      jobRole: this._replaceLegacyJobRoles(payload.job_function)
-    }
+    return { jobRole: this._replaceLegacyJobRoles(payload.job_function) }
   }
 
   _replaceLegacyJobRoles(currentAccountJobRoleName) {

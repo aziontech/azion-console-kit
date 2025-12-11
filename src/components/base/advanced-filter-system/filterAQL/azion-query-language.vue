@@ -12,6 +12,8 @@
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
+          @keydown.esc.prevent="showSuggestionsFocusInput = false"
+          @keydown.ctrl.space.prevent="openSuggestions"
           @external-link="handleExternalLink"
           @search="handleSearch"
           :handleQuery="handleQuery"
@@ -181,6 +183,13 @@
     }
   }
 
+  const openSuggestions = () => {
+    handleQuery()
+    if (filteredSuggestions.value.length) {
+      showSuggestionsFocusInput.value = true
+    }
+  }
+
   const handleQuery = () => {
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
       query.value,
@@ -231,7 +240,8 @@
 
   const confirmSelection = () => {
     const suggestion = filteredSuggestions.value[highlightedIndex.value]
-    if (suggestion) {
+
+    if (suggestion && showSuggestionsFocusInput.value) {
       const restoreCursorInLastOffset = true
 
       selectSuggestion(suggestion)

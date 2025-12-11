@@ -11,7 +11,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
 
   import { useField } from 'vee-validate'
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   const props = defineProps({
@@ -51,7 +51,8 @@
 
   const EDGE_CERTIFICATE = 'edge_certificate'
   const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
-
+  const moreOptions = ['authority', 'status']
+  const isLetEncrypt = ref(false)
   const digitalCertificateDrawerRef = ref('')
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
@@ -62,6 +63,8 @@
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+  const { value: authorityCertificate } = useField('authorityCertificate')
+
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
   const hasEdgeFirewallAccess = ref(true)
@@ -129,6 +132,10 @@
     }
   ])
 
+  const isRequiredCname = computed(() => {
+    return cnameAccessOnly.value || isLetEncrypt.value
+  })
+
   watch(edgeCertificate, async (newEdgeCertificate) => {
     setEdgeCertificate(newEdgeCertificate)
   })
@@ -144,7 +151,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id', 'name'],
+      fields: ['id', 'name', 'authority'],
       ...queryParams
     })
   }
@@ -158,6 +165,12 @@
   }
 
   const emit = defineEmits(['edgeApplicationCreated'])
+
+  const selectCertificate = ({ authority, value }) => {
+    authorityCertificate.value = authority
+    isLetEncrypt.value =
+      value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
+  }
 </script>
 
 <template>
@@ -297,7 +310,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="CNAME"
-          :required="cnameAccessOnly"
+          :required="isRequiredCname"
           name="cnames"
           data-testid="domains-form__cnames-field"
           rows="2"
@@ -316,8 +329,11 @@
           optionValue="value"
           :value="edgeCertificate"
           :defaultPosition="1"
+          enableWorkaroundLabelToDisabledOptions
           appendTo="self"
           placeholder="Select a certificate"
+          :moreOptions="moreOptions"
+          @onSelectOption="selectCertificate"
           showGroup
           optionGroupLabel="group"
           optionGroupChildren="items"

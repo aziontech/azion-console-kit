@@ -37,7 +37,36 @@ export const EdgeStorageAdapter = {
     }))
     return {
       files,
-      continuation_token: data.continuation_token || null
+      continuation_token: data?.continuation_token || null
+    }
+  },
+
+  transformListEdgeStorageCredentials(data) {
+    const { results, count } = data
+
+    const capabilitiesMap = {
+      listFiles: 'List Files',
+      readFiles: 'Read Files',
+      writeFiles: 'Write Files',
+      deleteFiles: 'Delete Files',
+      listAllBucketNames: 'List All Bucket Names',
+      listBuckets: 'List Buckets'
+    }
+
+    const adaptParsed = results.map((credential) => ({
+      id: credential.id,
+      name: credential.name,
+      accessKey: credential.access_key,
+      capabilities: credential.capabilities.map(
+        (capability) => capabilitiesMap[capability] || capability
+      ),
+      createDate: formatDateToDayMonthYearHour(credential.last_modified),
+      expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
+      bucket: credential.bucket
+    }))
+    return {
+      count,
+      body: adaptParsed
     }
   }
 }

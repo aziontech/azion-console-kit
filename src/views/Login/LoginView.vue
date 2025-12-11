@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col sm:py-20 pt-4 pb-8 px-3">
+  <div class="flex flex-col sm:py-20 pt-4 pb-8 px-3 h-full justify-center items-center">
     <SignInBlock
       v-if="!showForgotPasswordStep"
       @goToForgotPassword="(value) => (showForgotPasswordStep = value)"
@@ -22,6 +22,7 @@
   import SignInBlock from '@/templates/sign-in-block'
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { sessionManager } from '@/services/v2/base/auth'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -53,7 +54,8 @@
 
   const showForgotPasswordStep = ref(false)
 
-  onMounted(() => {
+  onMounted(async () => {
+    await sessionManager.logout()
     const { email, activated } = route.query
     const isActivatedEmail = !!email && !activated
 

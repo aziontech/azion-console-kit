@@ -334,8 +334,106 @@ export function useDataTable(props, emit) {
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 
-  const handleExportTableDataToCSV = () => {
-    dataTableRef.value?.exportCSV()
+  // (moved below to allow using helpers)
+
+  // Centralized JSON and XLSX Export
+  const getVisibleFields = (columnsArg = null) => {
+    const cols = Array.isArray(columnsArg) ? columnsArg : selectedColumns.value
+    const normalized = Array.isArray(cols) ? cols : []
+    return normalized
+      .map((column) => (typeof column === 'string' ? { field: column, header: column } : column))
+      .filter((column) => column?.field && column.field !== 'actions')
+  }
+
+  const buildExportRows = (rowsArg = null, columnsArg = null) => {
+    const rowsSource = Array.isArray(rowsArg) ? rowsArg : data.value
+    const rows = Array.isArray(rowsSource) ? rowsSource : []
+    const fields = getVisibleFields(columnsArg).map((column) => column.field)
+    return rows.map((row) => {
+      const out = {}
+      for (const fieldName of fields) out[fieldName] = row?.[fieldName]
+      return out
+    })
+  }
+
+  const triggerDownload = (content, mime, filename) => {
+    const blob = content instanceof Blob ? content : new Blob([content], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const anchorEl = document.createElement('a')
+    anchorEl.href = url
+    anchorEl.download = filename
+    document.body.appendChild(anchorEl)
+    anchorEl.click()
+    document.body.removeChild(anchorEl)
+    URL.revokeObjectURL(url)
+  }
+
+  const toCsv = (rows, fields) => {
+    const escapeCsv = (val) => {
+      if (val == null) return ''
+      const str = String(val)
+      if (/[",\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"'
+      return str
+    }
+    const header = fields.map(escapeCsv).join(',')
+    const body = rows
+      .map((row) => fields.map((field) => escapeCsv(row?.[field])).join(','))
+      .join('\n')
+    return header + '\n' + body
+  }
+
+  const handleExportTableDataToCSV = (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
+    // Try built-in export if available
+    if (dataTableRef.value && typeof dataTableRef.value.exportCSV === 'function') {
+      dataTableRef.value.exportCSV()
+      return
+    }
+    // Fallback: generate CSV from current data and visible columns
+    const rows = buildExportRows(rowsArg, columnsArg)
+    const fields = getVisibleFields(columnsArg).map((column) => column.field)
+    const csv = toCsv(rows, fields)
+    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.csv`
+    triggerDownload(csv, 'text/csv;charset=utf-8;', name)
+  }
+
+  const exportTableAsJSON = (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
+    const rows = buildExportRows(rowsArg, columnsArg)
+    const json = JSON.stringify(rows, null, 2)
+    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.json`
+    triggerDownload(json, 'application/json;charset=utf-8;', name)
+  }
+
+  const exportTableAsXLSX = async (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
+    const rows = buildExportRows(rowsArg, columnsArg)
+    const fields = getVisibleFields(columnsArg).map((column) => column.field)
+
+    const nonEmptyRows = rows.filter((row) =>
+      fields.some((fieldName) => {
+        const value = row?.[fieldName]
+        return value !== null && value !== undefined && value !== ''
+      })
+    )
+
+    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.xlsx`
+    try {
+      const mod = await import('xlsx')
+      const XLSX = mod.default ?? mod
+      const headerRow = fields
+      const dataRows = nonEmptyRows.map((row) => fields.map((fieldName) => row?.[fieldName]))
+      const worksheetData = [headerRow, ...dataRows]
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.aoa_to_sheet(worksheetData)
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+      const arrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const blob = new Blob([arrayBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      triggerDownload(blob, blob.type, name)
+    } catch (err) {
+      // Fallback to CSV via built-in exporter
+      handleExportTableDataToCSV()
+    }
   }
 
   // Utility functions
@@ -491,6 +589,10 @@ export function useDataTable(props, emit) {
     toggleLastModifiedDisplay,
     exportFunctionMapper,
     handleExportTableDataToCSV,
+    // alias for clarity
+    exportTableAsCSV: handleExportTableDataToCSV,
+    exportTableAsJSON,
+    exportTableAsXLSX,
     extractFieldValue,
     getObjectPath,
     moveItem,

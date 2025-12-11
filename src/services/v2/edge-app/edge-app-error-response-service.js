@@ -1,5 +1,19 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
+import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+
+export const errorResponseKeys = {
+  all: (edgeAppId) => {
+    if (!edgeAppId) {
+      // eslint-disable-next-line no-console
+      console.warn('[errorResponseKeys] Invalid edgeAppId provided:', edgeAppId)
+      return ['error-responses', '__invalid_edge_app_id__']
+    }
+    return ['error-responses', edgeAppId]
+  },
+  lists: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'list'],
+  details: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'detail']
+}
 
 export class EdgeAppErrorResponseService extends BaseService {
   constructor() {
@@ -12,7 +26,7 @@ export class EdgeAppErrorResponseService extends BaseService {
     return `${this.baseURL}/${edgeApplicationId}/error_responses${id ? `/${id}` : ''}`
   }
 
-  listEdgeApplicationsErrorResponseService = async ({ params, edgeApplicationId }) => {
+  #fetchList = async ({ params, edgeApplicationId }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getBaseUrl(edgeApplicationId),
@@ -25,6 +39,18 @@ export class EdgeAppErrorResponseService extends BaseService {
     return body
   }
 
+  listEdgeApplicationsErrorResponseService = async ({ params = {}, edgeApplicationId }) => {
+    await waitForPersistenceRestore()
+
+    const queryKey = errorResponseKeys.lists(edgeApplicationId)
+
+    return await this._ensureQueryData(
+      () => queryKey,
+      () => this.#fetchList({ params, edgeApplicationId }),
+      { persist: true }
+    )
+  }
+
   editEdgeApplicationErrorResponseService = async (payload, edgeApplicationId) => {
     const body = this.adapter?.transformPayloadEditEdgeAppErrorResponse?.(payload) ?? payload
     await this.http.request({
@@ -32,6 +58,9 @@ export class EdgeAppErrorResponseService extends BaseService {
       url: this.#getBaseUrl(edgeApplicationId, payload.id),
       body
     })
+
+    // Remove list queries from cache (including IndexedDB) after editing
+    this.queryClient.removeQueries({ queryKey: errorResponseKeys.all(edgeApplicationId) })
 
     return 'Your Error Responses has been edited'
   }

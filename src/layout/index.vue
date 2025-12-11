@@ -16,7 +16,7 @@
       :style="{ transition: 'margin-right 0.2s' }"
     >
       <router-view class="flex flex-1 flex-col" />
-      <AppFooter v-if="!showLoading" />
+      <AppFooter v-show="!showLoading" />
     </main>
   </div>
 </template>

@@ -3,6 +3,7 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import Sidebar from 'primevue/sidebar'
+  import Skeleton from 'primevue/skeleton'
   import ShareUrl from '@/layout/components/navbar/share-url'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import ActionBarBlock from '@/templates/action-bar-block'
@@ -206,18 +207,45 @@
         </div>
       </template>
       <div class="pb-16 w-full space-y-8">
-        <form
-          @submit.prevent="handleSubmit"
-          class="w-full flex flex-col gap-8"
+        <div
+          v-if="loading"
+          class="w-full flex flex-col gap-8 z-5"
         >
-          <slot
-            name="formFields"
-            :errors="errors"
-            :disabledFields="isLoading"
-          />
-        </form>
+          <fieldset
+            v-for="n in 3"
+            :key="n"
+            class="flex max-w-screen-2xl-test mx-auto gap-8 w-full surface-section px-8 py-8 rounded-md flex-wrap min-w-[2rem] border surface-border"
+          >
+            <!-- Title and Description Skeleton -->
+            <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]">
+              <Skeleton class="h-7 w-32" />
+              <Skeleton class="h-4 w-full max-w-sm" />
+            </div>
+            <!-- Inputs Skeleton -->
+            <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <Skeleton class="h-5 w-32" />
+                <Skeleton class="h-10 w-full" />
+                <Skeleton class="h-3 w-full max-w-xs" />
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <!-- Form Content -->
+        <div v-show="!loading">
+          <form
+            @submit.prevent="handleSubmit"
+            class="w-full flex flex-col gap-8"
+          >
+            <slot
+              name="formFields"
+              :errors="errors"
+              :disabledFields="isLoading"
+            />
+          </form>
+        </div>
       </div>
-      <div class="w-full fixed left-0 bottom-0 z-60">
+      <div class="w-full fixed left-0 bottom-0 z-1">
         <slot
           name="action-bar"
           :onSubmit="onSubmit"
