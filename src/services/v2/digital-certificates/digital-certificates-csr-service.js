@@ -4,7 +4,7 @@ import { DigitalCertificatesCSRAdapter } from '@/services/v2/digital-certificate
 export class DigitalCertificatesCSRService extends BaseService {
   constructor() {
     super()
-    this.baseURL = 'v4/digital_certificates/csr'
+    this.baseURL = 'v4/workspace/tls/csr'
     this.adapter = DigitalCertificatesCSRAdapter
   }
 

@@ -5,7 +5,7 @@ export class EdgeStorageService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeStorageAdapter
-    this.baseURL = 'v4/edge_storage'
+    this.baseURL = 'v4/workspace/storage'
   }
 
   listEdgeStorageBuckets = async (params = {}) => {

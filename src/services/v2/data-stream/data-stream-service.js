@@ -6,8 +6,8 @@ export class DataStreamService extends BaseService {
   constructor() {
     super()
     this.adapter = DataStreamAdapter
-    this.baseURL = 'v4/data_stream/streams'
-    this.dataSetsEndpoint = 'v4/data_stream/templates'
+    this.baseURL = 'v4/workspace/stream/streams'
+    this.dataSetsEndpoint = 'v4/workspace/stream/templates'
     this.workloadEndpoint = 'v4/workspace/workloads'
   }
 

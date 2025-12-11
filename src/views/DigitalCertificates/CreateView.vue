@@ -100,8 +100,7 @@
   }
 
   const handleToast = (response) => {
-    const label =
-      certificateTypeList.value === 'Certificates' ? 'View Edge Certificate' : 'View CRL'
+    const label = certificateTypeList.value === 'Certificates' ? 'View Certificate' : 'View CRL'
 
     const toast = {
       feedback: 'Your digital certificate has been created!',
