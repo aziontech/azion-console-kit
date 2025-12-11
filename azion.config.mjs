@@ -153,6 +153,12 @@ const config = {
       type: 'single_origin',
       hostHeader: `automate.azion.net`,
       addresses: [`automate.azion.net`]
+    },
+    {
+      name: 'origin-help-center',
+      type: 'single_origin',
+      hostHeader: 'storage.googleapis.com',
+      addresses: ['storage.googleapis.com']
     }
   ],
   cache: [
@@ -230,6 +236,33 @@ const config = {
         }
       },
       {
+        name: 'Set Origin for Help Center',
+        description: 'Sets the origin for help center requests.',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/gcs-docs-help-center(-stage)?/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'matches',
+            inputValue: '.(html|md)$'
+          }
+        ],
+        behavior: {
+          setOrigin: {
+            name: 'origin-help-center',
+            type: 'single_origin'
+          },
+          setCache: 'Statics - Cache',
+          enableGZIP: true,
+          deliver: true
+        }
+      },
+      {
         name: 'Set Cache for Static Assets',
         description:
           'Sets the cache for all requests using the default object storage.',
@@ -243,7 +276,7 @@ const config = {
       {
         name: 'Set Storage Origin for All Requests',
         description: 'Sets the default object storage as the origin for all requests.',
-        match: '^\\/',
+        match: '^/',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',

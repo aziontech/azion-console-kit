@@ -1,6 +1,6 @@
 <template>
   <PrimeButton
-    @click="openCreateModalToggle()"
+    @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"
     class="h-8 w-8 md:w-fit text-white border-header"
@@ -17,14 +17,15 @@
   />
 
   <PrimeDialog
+    v-if="!isMobile"
     :draggable="false"
     v-model:visible="createModalIsOpen"
     modal
     header="New"
     :pt="{
-      root: { class: 'hidden w-full max-w-screen-2xl h-screen sm:flex' },
+      root: { class: 'w-full max-w-screen-2xl h-screen flex' },
       content: { class: 'h-full' },
-      mask: { class: 'hidden sm:flex' }
+      mask: { class: 'flex' }
     }"
     position="center"
     :dismissableMask="true"
@@ -32,7 +33,6 @@
   >
     <div>
       <MakeCreateModalBlock
-        v-if="!isMobile"
         :solutions="solutions"
         :loading="loading"
         @closeModal="closeCreateModalStore()"
@@ -41,14 +41,15 @@
   </PrimeDialog>
 
   <Sidebar
+    v-else
     v-model:visible="createModalIsOpen"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
     :pt="{
-      root: { class: 'h-[80%] flex p-0 sm:hidden' },
+      root: { class: 'h-[80%] flex p-0' },
       headerContent: { class: 'w-full' },
-      mask: { class: 'flex sm:hidden' }
+      mask: { class: 'flex' }
     }"
   >
     <template #header>
@@ -68,7 +69,6 @@
       </div>
     </template>
     <MakeCreateModalBlock
-      v-if="isMobile"
       :solutions="solutions"
       :loading="loading"
       @closeModal="closeCreateModalStore()"

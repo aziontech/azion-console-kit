@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:w-64 w-full">
+  <div class="sm:w-64 w-full h-full flex flex-col">
     <div
       class="flex justify-between items-center sm:w-64 w-full"
       v-if="!showCheckbox"
@@ -14,6 +14,7 @@
           @click="$emit('reload-tables')"
           data-testid="reload-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
+          v-tooltip.top="{ value: 'Reload Tables' }"
         />
         <PrimeButton
           icon="pi pi-plus"
@@ -22,6 +23,7 @@
           @click="$emit('create-table')"
           data-testid="create-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
+          v-tooltip.top="{ value: 'Create Table' }"
         />
       </div>
     </div>
@@ -72,7 +74,7 @@
       />
     </div>
 
-    <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
+    <div class="mt-4 overflow-y-auto sm:h-full h-36">
       <div
         v-if="isLoading"
         class="flex flex-col gap-3"
@@ -97,7 +99,7 @@
       </div>
       <div
         v-else
-        class="mt-4"
+        class="space-y-2"
       >
         <div
           v-for="table in filteredTables"
@@ -126,12 +128,12 @@
             </div>
 
             <PrimeButton
-              icon="pi pi-ellipsis-v"
+              icon="pi pi-ellipsis-h"
               size="small"
               outlined
               @click.stop="$emit('show-table-menu', $event, table)"
               data-testid="table-menu-button"
-              class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              class="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             />
           </div>
         </div>

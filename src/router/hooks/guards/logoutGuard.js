@@ -1,6 +1,6 @@
 import { logoutService } from '@/services/auth-services'
 import { useLoadingStore } from '@/stores/loading'
-import { clearAllCache } from '@/services/v2/base/query/queryClient'
+import { sessionManager } from '@/services/v2/base/auth'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function logoutGuard({ to, accountStore, tracker }) {
@@ -13,9 +13,9 @@ export async function logoutGuard({ to, accountStore, tracker }) {
 
   if (to.path === '/logout' || to.query.ref === 'logout') {
     tracker.reset()
-    await clearAllCache()
+    await sessionManager.logout()
     await logoutService()
-    accountStore.setAccountData({})
+    accountStore.resetAccount()
     return { name: 'login' }
   }
 }

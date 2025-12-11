@@ -5,25 +5,23 @@ import { buildCertificateNames } from '@/services/utils/domain-names'
 import { hasAnyFieldChanged } from '@/services/v2/utils/hasAnyFieldChanged'
 import { DigitalCertificatesAdapter } from '@/services/v2/digital-certificates/digital-certificates-adapter'
 const keysToCheck = ['common_name', 'alternative_names']
-
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { workloadKeys } from '@/services/v2/workload/workload-service'
 import * as Errors from '@/services/axios/errors'
 
 export const editDomainService = async (payload) => {
-  // Build request body from payload (pure + certificate resolution)
   const body = await buildRequestBody(payload)
-
-  // API call
   const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}/${payload.id}`,
     method: 'PATCH',
     body
   })
 
-  // Response handling
+  queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+
   return handleHttpResponse(httpResponse)
 }
 
-// Utilities
 const splitCnames = (cnames) => cnames.split('\n').filter((item) => item !== '')
 
 const buildLetsEncryptBase = (name, cnames, edgeCertificate) => {
@@ -40,7 +38,6 @@ const buildLetsEncryptBase = (name, cnames, edgeCertificate) => {
   }
 }
 
-// Decide and resolve certificate id (including change detection)
 const resolveCertificateId = async (payload, cnames) => {
   const edgeCertificate = payload.edgeCertificate
 
@@ -77,7 +74,6 @@ const resolveCertificateId = async (payload, cnames) => {
     return null
   }
 
-  // If user selected Let's Encrypt directly, ensure a new certificate is created
   if (edgeCertificate === 'lets_encrypt' || edgeCertificate === 'lets_encrypt_http') {
     const letEncryptBase = buildLetsEncryptBase(payload.name, cnames, edgeCertificate)
     const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
@@ -86,11 +82,9 @@ const resolveCertificateId = async (payload, cnames) => {
     return id
   }
 
-  // Otherwise, use the provided certificate id (or null)
   return null
 }
 
-// Normalize payload and assemble API body
 const buildRequestBody = async (payload) => {
   const cnames = splitCnames(payload.cnames)
 

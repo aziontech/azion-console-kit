@@ -76,7 +76,7 @@
 
   const deleteDatabase = async () => {
     await edgeSQLService.deleteDatabase(route.params.id)
-    router.push({ name: 'sql-database' })
+    router.push({ path: '/sql-database' })
   }
 
   const openDeleteDialog = () => {
