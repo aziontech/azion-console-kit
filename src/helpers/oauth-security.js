@@ -1,6 +1,8 @@
 const OAUTH_SECURITY_CONFIG = {
   blockedSchemes: ['file:', 'data:', 'javascript:', 'vbscript:', 'about:'],
 
+  trustedOrigins: ['https://github.com', 'https://api.github.com'],
+
   monitoringInterval: 1000,
 
   maxBlockAttempts: 3
@@ -74,8 +76,10 @@ class OAuthSecurityGuard {
         return true
       }
     } catch (error) {
-      this.handleAttack()
-      return true
+      // Cross-origin opener (like OAuth flows) will throw here
+      // This is expected behavior - not necessarily an attack
+      // Only handle as attack if we can detect malicious patterns
+      return false
     }
 
     return false
@@ -137,7 +141,14 @@ class OAuthSecurityGuard {
       if (targetOrigin && targetOrigin !== '*') {
         try {
           const targetUrl = new URL(targetOrigin)
-          if (targetUrl.origin !== window.location.origin) {
+          const isTrustedOrigin = OAUTH_SECURITY_CONFIG.trustedOrigins.some(
+            (trusted) => targetUrl.origin === trusted || targetUrl.origin.endsWith(trusted)
+          )
+          const isSameOrigin = targetUrl.origin === window.location.origin
+
+          if (!isSameOrigin && !isTrustedOrigin) {
+            // eslint-disable-next-line no-console
+            console.warn('Blocked postMessage to untrusted origin:', targetUrl.origin)
             return
           }
         } catch {

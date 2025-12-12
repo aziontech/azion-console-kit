@@ -197,8 +197,7 @@ function createStoreItems() {
       label: 'Object Storage',
       to: '/object-storage',
       icon: 'ai ai-edge-storage',
-      id: 'object-storage',
-      tag: 'Preview'
+      id: 'object-storage'
     },
     {
       label: 'SQL Database',
