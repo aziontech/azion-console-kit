@@ -168,7 +168,7 @@
 
 <script setup>
   import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
-  import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
+  import { authService } from '@/services/v2/auth/auth-service'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
@@ -275,7 +275,7 @@
         captcha: 'default'
       }
 
-      await props.authenticationLoginService(loginData)
+      await authService.loginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
       tracker.signIn.userSignedIn()
       if (twoFactor) {
@@ -313,8 +313,9 @@
   const checkLoginMethod = async () => {
     if (errors.value.email || !email.value) return
     try {
-      const res = await verifyLoginMethodService(email.value)
-      if (res.loginMethod === 'federated') {
+      const res = await authService.verifyLoginMethodService(email.value)
+
+      if (res.method === 'sso') {
         const encodedEmail = encodeURIComponent(email.value)
         const redirectUrl = `${res.loginUrl}?email=${encodedEmail}&console=true`
 
