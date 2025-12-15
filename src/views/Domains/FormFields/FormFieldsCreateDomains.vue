@@ -329,6 +329,7 @@
           optionValue="value"
           :value="edgeCertificate"
           :defaultPosition="1"
+          enableWorkaroundLabelToDisabledOptions
           appendTo="self"
           placeholder="Select a certificate"
           :moreOptions="moreOptions"

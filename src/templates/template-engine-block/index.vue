@@ -4,6 +4,7 @@
   <div
     class="w-full grow flex flex-col gap-8 max-md:gap-6"
     v-else
+    @keydown.enter.stop.prevent="handleSubmit"
   >
     <FormHorizontal
       v-if="inputSchema.fields"
@@ -81,7 +82,7 @@
                 ref="oauthGithubRef"
                 @onCallbackUrl="
                   (uri) => {
-                    setCallbackUrl(uri.value)
+                    setCallbackUrl(uri)
                   }
                 "
                 :loading="isIntegrationsLoading"

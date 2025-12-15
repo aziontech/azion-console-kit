@@ -698,9 +698,7 @@
 
 <style scoped>
   /* Style for row hover when disabledList is true */
-  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
-    .p-frozen-column {
-      background: var(--surface-section) !important;
-    }
+  :deep(.disabled-list .p-datatable-tbody > tr:hover .p-frozen-column) {
+    background: var(--table-body-row-even-bg) !important;
   }
 </style>

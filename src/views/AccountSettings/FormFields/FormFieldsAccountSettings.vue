@@ -466,7 +466,7 @@
             ref="oauthGithubRef"
             @onCallbackUrl="
               (uri) => {
-                setCallbackUrl(uri.value)
+                setCallbackUrl(uri)
               }
             "
             :loading="isGithubConnectLoading"
