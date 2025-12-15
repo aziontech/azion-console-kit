@@ -29,6 +29,9 @@
         ref="listPurgeRef"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
+        disabledList
+        addButtonLabel="Purge"
+        createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         :isGraphql="true"

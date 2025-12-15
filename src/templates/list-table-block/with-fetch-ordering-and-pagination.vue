@@ -147,7 +147,6 @@
     isLoading,
     data,
     selectedColumns,
-    dataTableRef,
     filters,
     filtersDynamically,
     appliedFilters,
@@ -205,6 +204,10 @@
   const columns = computed(() => props.columns)
 
   defineExpose({ reload, handleExportTableDataToCSV })
+
+  const filterWithoutLastModified = computed(() => {
+    return props.allowedFilters.filter((filter) => filter.field !== 'last_modified')
+  })
 
   const rowClick = (event, col, rowData) => {
     if (!props.frozenColumns.length) {
@@ -416,7 +419,7 @@
     <DataTable.Filter
       v-if="allowedFilters.length"
       ref="filterPanel"
-      :filters="allowedFilters"
+      :filters="filterWithoutLastModified"
       @apply="handleApplyFilter"
     />
   </div>

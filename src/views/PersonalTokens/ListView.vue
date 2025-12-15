@@ -20,6 +20,10 @@
       <ListTableBlock
         :listService="listPersonalTokensService"
         :columns="getColumns"
+        disabledList
+        addButtonLabel="Personal Token"
+        createPagePath="personal-tokens/create"
+        @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         :enableEditClick="false"
         :actions="actions"

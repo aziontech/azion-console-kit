@@ -413,6 +413,8 @@
   </div>
 </template>
 <script setup>
+  import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
@@ -423,12 +425,11 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import InputNumber from 'primevue/inputnumber'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import structuredClone from '@/helpers/structured-clone'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -807,7 +808,7 @@
         const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
-        data.value = body
+        data.value = structuredClone(body)
         totalRecords.value = count
       } catch (error) {
         const errorMessage = error.message || error

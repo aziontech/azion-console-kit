@@ -14,6 +14,7 @@
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
+  import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from 'primevue/divider'
@@ -219,6 +220,7 @@
   const drawerRef = ref('')
   const drawerOriginRef = ref('')
   const drawerFunctionRef = ref('')
+  const drawerConnectorRef = ref('')
   const activeAccordions = ref([0])
   const behaviorIndexSelect = ref(null)
 
@@ -386,6 +388,11 @@
     drawerFunctionRef.value.openDrawerCreate()
   }
 
+  const openDrawerConnector = (index) => {
+    behaviorIndexSelect.value = index
+    drawerConnectorRef.value.openCreateDrawer()
+  }
+
   const addNewCriteria = () => {
     activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
@@ -494,6 +501,14 @@
       }
     }
   )
+
+  watch(
+    () => drawerConnectorRef.value.showCreateDrawer,
+    () => {
+      emit('toggleDrawer', drawerConnectorRef.value.showCreateDrawer)
+    }
+  )
+
   watch(
     () => drawerRef.value.showCreateDrawer,
     () => {
@@ -536,6 +551,12 @@
     behaviorIndexSelect.value = null
   }
 
+  const successCreateConnector = ({ id }) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.edgeConnectorId = id
+    behaviorIndexSelect.value = null
+  }
+
   const navigateToMainSettings = () => {
     emit('navigate-to-main-settings')
   }
@@ -549,6 +570,10 @@
     data-testid="rule-form-general"
   >
     <template #inputs>
+      <ConnectorDrawer
+        ref="drawerConnectorRef"
+        @onSuccess="successCreateConnector"
+      />
       <Drawer
         ref="drawerRef"
         @onSuccess="handleSuccess"
@@ -893,7 +918,27 @@
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.edgeConnectorId"
                 :data-testid="`edge-application-rule-form__edge-connector-item[${behaviorIndex}]`"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-applications-rules-engine-form__create-connector-button"
+                        text
+                        @click="openDrawerConnector(behaviorIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Connector"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
