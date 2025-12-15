@@ -3,7 +3,7 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 export class DigitalCertificateService extends BaseService {
   constructor() {
     super()
-    this.baseURL = 'v4/digital_certificates/crls'
+    this.baseURL = 'v4/workspace/tls/crls'
   }
 
   listDigitalCertificatesCRL = async (params) => {

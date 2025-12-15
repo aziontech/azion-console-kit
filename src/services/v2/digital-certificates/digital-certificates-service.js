@@ -6,7 +6,7 @@ export class DigitalCertificatesService extends BaseService {
   constructor() {
     super()
     this.adapter = DigitalCertificatesAdapter
-    this.baseURL = 'v4/digital_certificates/certificates'
+    this.baseURL = 'v4/workspace/tls/certificates'
   }
 
   createDigitalCertificate = async (payload) => {
