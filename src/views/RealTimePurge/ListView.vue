@@ -17,6 +17,7 @@
         v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
+        disabledList
         addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
