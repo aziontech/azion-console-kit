@@ -23,6 +23,10 @@
       data-testid="data-table"
       rowHover
       :rowClass="stateClassRules"
+      :class="[
+        'overflow-clip rounded-md table-with-orange-borders',
+        { 'outline-visible': !cellQuickActions.rowData?.isFolder && cellQuickActions.visible }
+      ]"
     >
       <template
         #header
@@ -170,15 +174,34 @@
       >
         <template #header>
           <div
-            class="flex justify-end w-full"
+            class="flex items-center gap-2 justify-end w-full"
             data-testid="data-table-actions-column-header"
           >
+            <span
+              @click="sortByLastModified"
+              v-if="showLastModified"
+              class="cursor-pointer select-none flex items-center gap-2 group"
+              data-testid="last-modified-header-sort"
+            >
+              <i
+                v-if="sortFieldValue === 'lastModified'"
+                :class="{
+                  'pi pi-sort-amount-up-alt': sortOrderValue === 1,
+                  'pi pi-sort-amount-down': sortOrderValue === -1
+                }"
+              />
+              <i
+                v-else
+                class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+              Last Modified
+            </span>
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
-              v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              v-tooltip.top="{ value: 'Available Columns', showDelay: 200 }"
               data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
@@ -192,7 +215,7 @@
               <Listbox
                 v-model="selectedColumns"
                 multiple
-                :options="[{ label: 'Hidden Columns', items: columns }]"
+                :options="[{ label: 'Available Columns', items: columns }]"
                 class="hidden-columns-panel"
                 optionLabel="header"
                 optionGroupLabel="label"
@@ -211,46 +234,70 @@
           v-if="isRenderActions"
         >
           <div
-            class="flex justify-end"
-            v-if="isRenderOneOption"
-            data-testid="data-table-actions-column-body-action"
+            class="flex items-center gap-2 justify-end"
+            v-if="!rowData.isFolder && !rowData.isParentNav"
           >
-            <PrimeButton
-              size="small"
-              outlined
-              v-bind="optionsOneAction(rowData)"
-              @click="executeCommand(rowData)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-action-button"
-            />
-          </div>
-          <div
-            class="flex justify-end disabled:opacity-50"
-            v-else-if="!rowData.isFolder && !rowData.isParentNav"
-            data-testid="data-table-actions-column-body-actions"
-          >
-            <PrimeMenu
-              :ref="setMenuRefForRow(rowData.id)"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-              :disabled="rowData.isFolder"
-              data-testid="data-table-actions-column-body-actions-menu"
-              :pt="{
-                menuitem: ({ context }) => ({
-                  'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
-                })
-              }"
-            />
-            <PrimeButton
-              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-              size="small"
-              icon="pi pi-ellipsis-h"
-              outlined
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-actions-menu-button"
-            />
+            <div
+              v-if="showLastModified"
+              :data-testid="`list-table-block__column__lastModify__row`"
+              class="cursor-pointer"
+              @click.stop="toggleLastModifiedDisplay"
+            >
+              <div
+                v-if="!lastModifiedToggled"
+                v-html="rowData.lastModify || rowData.lastModified"
+                v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
+              />
+              <div
+                v-else
+                v-html="rowData.lastModified"
+                v-tooltip.top="{
+                  value: rowData.lastModify || rowData.lastModified,
+                  showDelay: 300
+                }"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-if="isRenderOneOption"
+              data-testid="data-table-actions-column-body-action"
+            >
+              <PrimeButton
+                size="small"
+                outlined
+                v-bind="optionsOneAction(rowData)"
+                @click="executeCommand(rowData)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-action-button"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-else
+              data-testid="data-table-actions-column-body-actions"
+            >
+              <PrimeMenu
+                :ref="setMenuRefForRow(rowData.id)"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+                data-testid="data-table-actions-column-body-actions-menu"
+                :pt="{
+                  menuitem: ({ context }) => ({
+                    'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
+                  })
+                }"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                outlined
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-actions-menu-button"
+              />
+            </div>
           </div>
         </template>
       </Column>
@@ -330,6 +377,30 @@
         </template>
       </Column>
     </DataTable>
+    <div
+      :style="{
+        position: 'fixed',
+        top: cellQuickActions.posY + 'px',
+        left: cellQuickActions.posX + 'px',
+        zIndex: 9999
+      }"
+      class="popup-container"
+      @mouseenter="onPopupMouseEnter"
+      @mouseleave="onPopupMouseLeave"
+      :class="{
+        visible: !cellQuickActions.rowData?.isFolder && cellQuickActions.visible
+      }"
+    >
+      <button
+        v-for="item in quickActions"
+        :key="item"
+        @click="item.action(cellQuickActions.rowData)"
+        :title="item.title"
+        class="px-2"
+      >
+        <i :class="item.icon"></i>
+      </button>
+    </div>
   </div>
 </template>
 <script setup>
@@ -343,7 +414,7 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
@@ -436,6 +507,14 @@
       type: String,
       default: () => ''
     },
+    showLastModified: {
+      type: Boolean,
+      default: false
+    },
+    celllQuickActionsItens: {
+      type: Array,
+      default: () => []
+    },
     isPaginationLoading: {
       type: Boolean,
       default: false
@@ -462,6 +541,20 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const toast = useToast()
+
+  const lastModifiedToggled = ref(false)
+  const hoverTimeout = ref(null)
+  const hideTimeout = ref(null)
+  const activeCellElement = ref(null)
+  const pendingCellElement = ref(null)
+  const cellQuickActions = ref({
+    visible: false,
+    text: '',
+    posX: 0,
+    posY: 0,
+    rowData: null
+  })
+
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
@@ -667,8 +760,251 @@
     return [...filters, ...filtersPath]
   })
 
+  const loadLastModifiedToggleState = () => {
+    const saved = localStorage.getItem('lastModifiedToggled')
+    if (saved !== null) {
+      lastModifiedToggled.value = JSON.parse(saved)
+    }
+  }
+
+  const saveLastModifiedToggleState = () => {
+    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
+  }
+
+  const toggleLastModifiedDisplay = () => {
+    lastModifiedToggled.value = !lastModifiedToggled.value
+    saveLastModifiedToggleState()
+  }
+
+  const setupCellEventHandlers = () => {
+    setTimeout(() => {
+      const columnsWithQuickActions = props.columns
+        .map((col, index) => ({ ...col, index }))
+        .filter((col) => col.quickActions === true)
+
+      if (columnsWithQuickActions.length === 0) {
+        return
+      }
+
+      let rows = document.querySelectorAll('.table-with-orange-borders .p-datatable-tbody tr')
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('[data-testid="data-table"] tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('.p-datatable-tbody tr')
+      }
+      if (rows.length === 0) {
+        rows = document.querySelectorAll('table tbody tr')
+      }
+
+      rows.forEach((row, rowIndex) => {
+        columnsWithQuickActions.forEach((column) => {
+          const cell = row.children[column.index + 1]
+          if (cell && !cell.classList.contains('p-frozen-column')) {
+            cell.addEventListener('mouseenter', onCellMouseEnter)
+            cell.addEventListener('mouseleave', onCellMouseLeave)
+            cell.setAttribute('data-quick-actions', 'true')
+            cell.setAttribute('data-row-index', rowIndex)
+          }
+        })
+      })
+    }, 500)
+  }
+
+  const onScroll = () => {
+    if (cellQuickActions.value.visible) {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+
+      if (hoverTimeout.value) {
+        clearTimeout(hoverTimeout.value)
+        hoverTimeout.value = null
+      }
+
+      if (hideTimeout.value) {
+        clearTimeout(hideTimeout.value)
+      }
+
+      pendingCellElement.value = null
+    }
+  }
+
+  const onCellMouseEnter = (event) => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+    }
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    const cellElement = event.currentTarget
+
+    if (cellElement.classList.contains('p-frozen-column')) {
+      return
+    }
+
+    // Clear any existing active cell and popup
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+    }
+    cellQuickActions.value.visible = false
+
+    pendingCellElement.value = cellElement
+
+    hoverTimeout.value = setTimeout(() => {
+      if (pendingCellElement.value === cellElement) {
+        activeCellElement.value = cellElement
+
+        const rect = cellElement.getBoundingClientRect()
+        const cellText = cellElement.textContent?.trim() || 'N/A'
+        const rowIndex = parseInt(cellElement.getAttribute('data-row-index') || '0')
+        const currentRowData = data.value[rowIndex] || null
+
+        cellQuickActions.value = {
+          visible: true,
+          text: cellText,
+          posX: rect.left,
+          posY: rect.top - 28,
+          rowData: currentRowData
+        }
+
+        cellElement.classList.add('cell-active-hover')
+      }
+    }, 1000)
+  }
+
+  const onCellMouseLeave = () => {
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+      hoverTimeout.value = null
+    }
+
+    pendingCellElement.value = null
+
+    hideTimeout.value = setTimeout(() => {
+      cellQuickActions.value.visible = false
+
+      if (activeCellElement.value) {
+        activeCellElement.value.classList.remove('cell-active-hover')
+        activeCellElement.value = null
+      }
+    }, 150)
+  }
+
+  const onPopupMouseEnter = () => {
+    if (hideTimeout.value) {
+      clearTimeout(hideTimeout.value)
+    }
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.add('cell-active-hover')
+    }
+  }
+
+  const onPopupMouseLeave = () => {
+    cellQuickActions.value.visible = false
+
+    if (activeCellElement.value) {
+      activeCellElement.value.classList.remove('cell-active-hover')
+      activeCellElement.value = null
+    }
+  }
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(cellQuickActions.value.text)
+      .then(() => {
+        toast.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: 'Text copied to clipboard',
+          life: 3000
+        })
+        cellQuickActions.value.visible = false
+      })
+      .catch(() => {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to copy text',
+          life: 3000
+        })
+      })
+  }
+
+  const quickActions = [
+    {
+      title: 'Copy to clipboard',
+      icon: 'pi pi-copy',
+      action: copyToClipboard
+    },
+    ...(props.cellQuickActionsItens || [])
+  ]
+  watch(
+    () => data.value,
+    (newData) => {
+      if (newData && newData.length > 0) {
+        setupCellEventHandlers()
+      }
+    },
+    { deep: true }
+  )
+
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
+
+  onMounted(() => {
+    if (!props.lazyLoad) {
+      loadData({ page: 1 })
+    }
+    selectedColumns.value = props.columns
+    loadLastModifiedToggleState()
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', onScroll)
+  })
 </script>
+
+<style scoped lang="scss">
+  .table-with-orange-borders :deep(.p-datatable-tbody > tr > td) {
+    transition: color 0.2s ease;
+  }
+
+  .table-with-orange-borders.outline-visible
+    :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
+  .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
+    outline: 2px dashed #f97316 !important;
+    outline-offset: -2px;
+    transition-delay: 0.3s;
+    border-radius: 0 6px 6px 6px;
+  }
+  .popup-container {
+    background-color: #f97316;
+    color: white;
+    padding: 4px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    opacity: 0;
+    height: 30px;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease;
+    &.visible {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+</style>
