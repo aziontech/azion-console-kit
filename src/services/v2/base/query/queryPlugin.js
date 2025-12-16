@@ -55,11 +55,10 @@ export const waitForPersistenceRestore = () => restorePromise || Promise.resolve
 
 export const pauseQueryPersistence = () => {
   if (!unsubscribePersistence) return
-
-  unsubscribePersistence = null
   if (typeof unsubscribePersistence === 'function') {
     unsubscribePersistence()
   }
+  unsubscribePersistence = null
 }
 
 export const resumeQueryPersistence = () => {
