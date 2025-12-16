@@ -447,8 +447,11 @@ export function useDataTable(props, emit) {
         lastEditor: rowData.last_editor || rowData.lastEditor,
         lastModified: rowData.last_modified || rowData.lastModified
       }
-
-      showPopup.value = true
+      showPopup.value =
+        (rowData.last_editor && rowData.last_editor !== '-') ||
+        (rowData.lastModified && rowData.lastModified !== '-') ||
+        (rowData.last_editor && rowData.last_editor !== '-') ||
+        (rowData.lastModified && rowData.lastModified !== '-')
     }, 1000)
   }
 
