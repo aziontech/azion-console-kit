@@ -85,7 +85,7 @@
       },
       {
         field: 'name',
-        header: 'Origin Name'
+        header: 'Name'
       },
       {
         field: 'browserCache',
