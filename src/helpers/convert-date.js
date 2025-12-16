@@ -243,6 +243,7 @@ function getRemainingDays(dateStr) {
 }
 
 const convertToRelativeTime = (date) => {
+  if (!date) return '-'
   const now = new Date()
   const targetDate = new Date(date)
   const diffMs = now.getTime() - targetDate.getTime()
