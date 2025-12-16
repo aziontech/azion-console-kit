@@ -1,11 +1,11 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
+  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-edge-node' })
 
@@ -96,6 +96,12 @@
       }
     }
   ]
+  function downloadOrchestrator() {
+    window.open(
+      'https://www.azion.com/en/documentation/products/guides/deploy/install-orchestrator-agent/',
+      '_blank'
+    )
+  }
 </script>
 <template>
   <ContentBlock>
@@ -107,19 +113,29 @@
     </template>
     <template #content>
       <ListTableBlock
-        v-if="hasContentToList"
         :listService="listEdgeNodeService"
         :columns="getColumns"
         editPagePath="/edge-node/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge nodes found."
         :actions="actions"
-      />
-      <EmptyEdgeNode
-        v-else
-        :documentationService="documentationService"
+        :emptyBlock="{
+          title: 'No edge nodes have been added',
+          description:
+            'To begin the Edge Node installation process, download the appropriate Orchestrator installation binary.',
+          documentationService: documentationService,
+          emptyListMessage: 'No edge nodes found.'
+        }"
       >
-      </EmptyEdgeNode>
+        <template #emptyBlockButton>
+          <PrimeButton
+            severity="secondary"
+            icon="pi pi-download"
+            label="Orchestrator"
+            @click="downloadOrchestrator"
+          />
+        </template>
+      </ListTableBlock>
     </template>
   </ContentBlock>
 </template>
