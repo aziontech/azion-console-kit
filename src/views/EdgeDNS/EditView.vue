@@ -115,7 +115,8 @@
         const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
         return domainRegex.test(value)
       }),
-    isActive: yup.boolean().required()
+    isActive: yup.boolean().required(),
+    dnssec: yup.boolean()
   })
 
   const validationSchemaEDNSRecords = yup.object({
@@ -375,6 +376,14 @@
   const loadEdgeDNS = async (id) => {
     const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
     edgeDNSName.value = edgeDNS.name
+
+    try {
+      const dnssecData = await edgeDNSService.loadEdgeDNSZoneDNSSEC(edgeDNS.id)
+      edgeDNS.dnssec = dnssecData?.enabled ?? false
+    } catch {
+      edgeDNS.dnssec = false
+    }
+
     return edgeDNS
   }
 </script>

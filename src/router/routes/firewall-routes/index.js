@@ -52,7 +52,7 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService,
         edgeFirewallServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewall,
-          updatedRedirect: 'list-firewall'
+          updatedRedirect: 'list-firewalls'
         },
         rulesEngineServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine

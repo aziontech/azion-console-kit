@@ -33,7 +33,6 @@
   const loadEdgeDNSSEC = async (DNSZone) => {
     const data = await edgeDNSService.loadEdgeDNSZoneDNSSEC(DNSZone)
     if (!data) return
-    dnssec.value = data.enabled
 
     if (!data.enabled) return
 
@@ -103,7 +102,7 @@
         >
           <div class="sm:max-w-xs w-full">
             <FieldTextIcon
-              :name="`name-${index}`"
+              :name="`nameserver-${index}`"
               :value="nameserver"
               data-testid="edge-dns-form__nameserver"
               disabled
@@ -153,7 +152,7 @@
               :label="entry.label"
               required
               :name="entry.name"
-              v-model="entry.value"
+              :value="entry.value"
               :data-testid="`edge-dns-form__${entry.name}`"
               :description="entry.description"
               disabled

@@ -106,7 +106,7 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
-    props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
+    await props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>
 
