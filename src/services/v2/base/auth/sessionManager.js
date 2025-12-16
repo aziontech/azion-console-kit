@@ -1,5 +1,5 @@
 import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
-import { persister } from '../query/queryPlugin'
+import { persister, pauseQueryPersistence } from '../query/queryPlugin'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
@@ -8,6 +8,7 @@ const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
 
 const clearAll = async () => {
+  pauseQueryPersistence()
   await clearAllCache()
   await persister.removeClient()
 }
@@ -25,20 +26,20 @@ const ensure = {
   async solutions() {
     const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
     await solutionService.invalidateSolutionsCache()
-    solutionService.ensureList(hasFlagBlockApiV4)
+    await solutionService.ensureList(hasFlagBlockApiV4)
   },
 
   async lists() {
     const pageSize = getPageSizeFromStorage()
     const promises = [edgeAppService.ensureList(pageSize), workloadService.ensureList(pageSize)]
-    Promise.allSettled(promises)
+    await Promise.allSettled(promises)
   }
 }
 
 export const sessionManager = {
   async afterLogin() {
     await ensure.solutions()
-    ensure.lists()
+    await ensure.lists()
   },
   async switchAccount() {
     await clearAll()

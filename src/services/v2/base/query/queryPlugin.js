@@ -7,6 +7,7 @@ import { PERSISTENCE_CONFIG } from './config'
 let restorePromise = null
 let resolveRestore = null
 let rejectRestore = null
+let unsubscribePersistence = null
 
 export const persister = createIDBPersister(
   {
@@ -23,6 +24,17 @@ export const persister = createIDBPersister(
   }
 )
 
+const loadConfig = () => {
+  return {
+    queryClient,
+    persister,
+    maxAge: PERSISTENCE_CONFIG.MAX_AGE,
+    buster: PERSISTENCE_CONFIG.VERSION,
+    dehydrateOptions: PERSISTENCE_CONFIG.DEHYDRATE_OPTIONS,
+    hydrateOptions: PERSISTENCE_CONFIG.HYDRATE_OPTIONS
+  }
+}
+
 export const queryPlugin = {
   install(app) {
     restorePromise = new Promise((resolve, reject) => {
@@ -30,14 +42,8 @@ export const queryPlugin = {
       rejectRestore = reject
     })
 
-    persistQueryClient({
-      queryClient,
-      persister,
-      maxAge: PERSISTENCE_CONFIG.MAX_AGE,
-      buster: PERSISTENCE_CONFIG.VERSION,
-      dehydrateOptions: PERSISTENCE_CONFIG.DEHYDRATE_OPTIONS,
-      hydrateOptions: PERSISTENCE_CONFIG.HYDRATE_OPTIONS
-    })
+    const [unsubscribe] = persistQueryClient(loadConfig())
+    unsubscribePersistence = unsubscribe
 
     app.use(VueQueryPlugin, {
       queryClient
@@ -46,5 +52,21 @@ export const queryPlugin = {
 }
 
 export const waitForPersistenceRestore = () => restorePromise || Promise.resolve()
+
+export const pauseQueryPersistence = () => {
+  if (!unsubscribePersistence) return
+
+  unsubscribePersistence = null
+  if (typeof unsubscribePersistence === 'function') {
+    unsubscribePersistence()
+  }
+}
+
+export const resumeQueryPersistence = () => {
+  if (unsubscribePersistence) return
+
+  const [unsubscribe] = persistQueryClient(loadConfig())
+  unsubscribePersistence = unsubscribe
+}
 
 export default queryPlugin
