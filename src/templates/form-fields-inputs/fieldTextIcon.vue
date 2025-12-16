@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, toRef } from 'vue'
+  import { computed, toRef, ref } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
@@ -49,14 +49,20 @@
 
   const nameInput = toRef(props, 'name')
 
-  const {
-    value: inputValue,
-    errorMessage,
-    handleBlur,
-    handleChange
-  } = useField(nameInput, undefined, {
-    initialValue: props.value
-  })
+  const inputValue = ref(props.value)
+  const errorMessage = ref('')
+  let handleBlur = () => {}
+  let handleChange = () => {}
+
+  if (!props.disabled) {
+    const field = useField(nameInput, undefined, {
+      initialValue: props.value
+    })
+    inputValue.value = field.value
+    errorMessage.value = field.errorMessage
+    handleBlur = field.handleBlur
+    handleChange = field.handleChange
+  }
 
   const iconPositionClass = computed(() => {
     return props.icon ? `p-input-icon-${props.iconPosition}` : ''
