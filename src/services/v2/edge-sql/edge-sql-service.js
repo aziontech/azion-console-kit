@@ -15,7 +15,7 @@ export class EdgeSQLService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeSQLAdapter
-    this.baseURL = 'v4/edge_sql/databases'
+    this.baseURL = 'v4/workspace/sql/databases'
     this.SCHEMA_CACHE_TTL_MS = 5 * 60 * 60 * 1000 // 5 hours
   }
 
