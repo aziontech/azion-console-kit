@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeTeamPermissionBaseUrl } from './make-team-permission-base-url'
+import { teamsService } from '@/services/users-services/list-teams-service'
 
 export const createTeamPermissionsService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -9,7 +10,9 @@ export const createTeamPermissionsService = async (payload) => {
     body: adapt(payload)
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+  await teamsService.invalidateTeamsCache()
+  return result
 }
 
 const adapt = (payload) => {
