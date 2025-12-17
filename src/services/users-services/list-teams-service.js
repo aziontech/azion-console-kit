@@ -39,18 +39,6 @@ class TeamsService extends BaseService {
 
   useListTeams = async () => {
     const queryKey = teamsKeys.all
-    const queryState = this.queryClient.getQueryState(queryKey)
-    const isStaleOrInvalidated =
-      !queryState || queryState.isInvalidated || queryState.dataUpdatedAt === 0
-
-    if (isStaleOrInvalidated) {
-      return this.queryClient.fetchQuery({
-        queryKey,
-        queryFn: () => this.listTeams(),
-        staleTime: this.toMilliseconds({ minutes: 3 }),
-        gcTime: this.toMilliseconds({ minutes: 5 })
-      })
-    }
 
     return this._ensureQueryData(queryKey, () => this.listTeams(), {
       cacheType: this.cacheType.SENSITIVE,
@@ -59,7 +47,7 @@ class TeamsService extends BaseService {
   }
 
   invalidateTeamsCache = async () => {
-    await this.queryClient.invalidateQueries({ queryKey: teamsKeys.all })
+    await this.queryClient.removeQueries({ queryKey: teamsKeys.all })
   }
 }
 
