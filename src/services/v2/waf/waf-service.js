@@ -4,7 +4,7 @@ export class WafService extends BaseService {
   constructor() {
     super()
     this.adapter = WafAdapter
-    this.baseURL = 'v4/edge_firewall/wafs'
+    this.baseURL = 'v4/workspace/wafs'
   }
 
   listWafRules = async (

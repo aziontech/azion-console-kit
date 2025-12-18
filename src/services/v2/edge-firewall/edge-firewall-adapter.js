@@ -1,10 +1,11 @@
 import { convertToRelativeTime } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const transformMap = {
   id: (value) => value.id,
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   debugRules: (value) => value.debug_rules,
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
@@ -19,13 +20,13 @@ export const EdgeFirewallAdapter = {
   transformListEdgeFirewallDropdown(data) {
     return data.map((edgeFirewall) => ({
       id: edgeFirewall.id,
-      name: edgeFirewall.name
+      name: sanitizeHtml(edgeFirewall.name)
     }))
   },
   transformLoadEdgeFirewall({ data }) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       isActive: data.active,
       edgeFunctionsEnabled: data.modules.functions.enabled,
       networkProtectionEnabled: data.modules.network_protection.enabled,

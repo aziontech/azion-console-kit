@@ -11,7 +11,7 @@ const fixtures = {
     timezone: 'GMT',
     language: 'en',
     email: 'test.test@azion.com',
-    countryCallCode: 'AL - 355',
+    countryCallCode: '355',
     mobile: 12312312,
     isAccountOwner: false,
     teamsIds: [1580],

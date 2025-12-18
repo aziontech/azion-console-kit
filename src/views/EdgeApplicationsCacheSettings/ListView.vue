@@ -70,7 +70,7 @@
     return [
       {
         field: 'name',
-        header: 'Origin Name',
+        header: 'Name',
         type: 'component',
         style: 'max-width: 300px',
         component: (columnData) => {

@@ -62,7 +62,7 @@ export const EdgeStorageAdapter = {
       ),
       createDate: formatDateToDayMonthYearHour(credential.last_modified),
       expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
-      bucket: credential.bucket
+      bucket: credential.buckets[0]
     }))
     return {
       count,

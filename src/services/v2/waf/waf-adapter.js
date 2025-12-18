@@ -3,7 +3,8 @@ import {
   transformSnakeToCamel
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { defaultConditions } from '@/views/WafRules/Config'
-import { convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -39,7 +40,7 @@ const parseThreatTypes = (threatsConfiguration) => {
 const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => value.last_modified,
@@ -105,7 +106,7 @@ export const WafAdapter = {
 
     return {
       id: response.id,
-      name: response.name,
+      name: sanitizeHtml(response.name),
       active: response.active,
       ...threatsConfiguration
     }
@@ -197,7 +198,7 @@ export const WafAdapter = {
             (condition) => defaultConditions.find((match) => match.value === condition.match)?.title
           ),
           path: waf.path,
-          name: waf.name,
+          name: sanitizeHtml(waf.name),
           ruleId: waf.rule_id,
           status: parseStatusData(waf.active),
           operator: waf.operator
@@ -230,7 +231,7 @@ export const WafAdapter = {
       id: waf.id,
       conditions: formatConditions,
       path: waf.path,
-      name: waf.name,
+      name: sanitizeHtml(waf.name),
       ruleId: waf.rule_id,
       status: waf.active,
       operator: waf.operator === 'regex'
