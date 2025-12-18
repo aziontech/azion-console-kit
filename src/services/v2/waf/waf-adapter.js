@@ -4,6 +4,7 @@ import {
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { defaultConditions } from '@/views/WafRules/Config'
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -39,7 +40,7 @@ const parseThreatTypes = (threatsConfiguration) => {
 const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   lastEditor: (value) => value.last_editor,
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
@@ -104,7 +105,7 @@ export const WafAdapter = {
 
     return {
       id: response.id,
-      name: response.name,
+      name: sanitizeHtml(response.name),
       active: response.active,
       ...threatsConfiguration
     }
@@ -195,7 +196,7 @@ export const WafAdapter = {
             (condition) => defaultConditions.find((match) => match.value === condition.match)?.title
           ),
           path: waf.path,
-          name: waf.name,
+          name: sanitizeHtml(waf.name),
           ruleId: waf.rule_id,
           status: parseStatusData(waf.active),
           operator: waf.operator
@@ -228,7 +229,7 @@ export const WafAdapter = {
       id: waf.id,
       conditions: formatConditions,
       path: waf.path,
-      name: waf.name,
+      name: sanitizeHtml(waf.name),
       ruleId: waf.rule_id,
       status: waf.active,
       operator: waf.operator === 'regex'

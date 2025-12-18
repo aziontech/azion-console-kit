@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bottom-0 chat-input flex sticky flex-col gap-2 text-center mx-auto md:max-w-3xl w-full"
+    class="bottom-0 surface-section chat-input flex sticky flex-col gap-2 text-center mx-auto md:max-w-3xl w-full"
   >
     <div class="flex w-full">
       <Textarea
@@ -36,8 +36,8 @@
         />
       </div>
     </div>
-    <div>
-      <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 mx-2">
+    <div class="pb-3">
+      <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 pb-8 mx-2">
         Azion Copilot may make mistakes. Consider verifying important information.
       </small>
     </div>

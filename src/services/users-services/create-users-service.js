@@ -21,7 +21,8 @@ const adapt = (payload) => {
     email: payload.email,
     language: payload.language,
     timezone: payload.timezone,
-    country_call_code: payload.countryCallCode,
+    country_call_code:
+      payload.countryCallCode?.split(' - ').slice(1).join('-') || payload.countryCallCode,
     mobile: payload.mobile?.toString(),
     is_account_owner: payload.isAccountOwner,
     teams_ids: payload.teamsIds,
@@ -48,7 +49,7 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.InvalidApiTokenError().message
     case 400:
       const apiError = getFirstApiError(httpResponse.body)
-      throw new Error(apiError).message
+      throw new Error(apiError?.detail || apiError).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
