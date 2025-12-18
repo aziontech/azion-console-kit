@@ -43,7 +43,7 @@ const transformMap = {
   name: (value) => sanitizeHtml(value.name),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
-  lastModified: (value) => value.last_modified,
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
@@ -192,7 +192,7 @@ export const WafAdapter = {
       ? data.results.map((waf) => ({
           id: waf.id,
           lastEditor: waf.last_editor,
-          lastModified: waf.last_modified,
+          lastModified: formatDateToDayMonthYearHour(waf.last_modified),
           lastModify: convertToRelativeTime(waf.last_modified),
           conditions: waf.conditions.map(
             (condition) => defaultConditions.find((match) => match.value === condition.match)?.title

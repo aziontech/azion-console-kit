@@ -171,6 +171,10 @@ const formatDateToMonthYear = (date) => {
 const formatDateToDayMonthYearHour = (date, timezone) => {
   if (!date) return null
 
+  if (typeof date === 'string' && date.match(/^[A-Z][a-z]+\s+\d+,\s+\d{4}/)) {
+    return date
+  }
+
   let userTimezone = timezone || 'UTC'
 
   if (!timezone) {
@@ -182,7 +186,18 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
     }
   }
 
-  return new Date(date).toLocaleString('en-US', {
+  let normalizedDate = date
+  if (typeof date === 'string' && date.includes('.')) {
+    normalizedDate = date.replace(/(\.\d{3})\d+/, '$1')
+  }
+
+  const dateObject = new Date(normalizedDate)
+
+  if (isNaN(dateObject.getTime())) {
+    return null
+  }
+
+  return dateObject.toLocaleString('en-US', {
     timeZone: userTimezone,
     year: 'numeric',
     month: 'long',

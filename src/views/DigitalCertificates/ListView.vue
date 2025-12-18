@@ -168,18 +168,16 @@
             })
         },
         {
-          field: 'last_modified',
+          field: 'lastEditor',
+          header: 'Last Editor',
+          sortField: 'last_editor',
+          filterPath: 'last_editor'
+        },
+        {
+          field: 'lastModified',
           header: 'Last Modified',
-          sortField: 'last_modified',
-          filterPath: 'last_modified',
-          type: 'component',
-          component: (columnData, rowData, dependencies) => {
-            return columnBuilder({
-              data: rowData,
-              columnAppearance: 'last-modified',
-              dependencies
-            })
-          }
+          sortField: 'lastModified',
+          filterPath: 'lastModified'
         }
       ]
     }
@@ -269,18 +267,16 @@
         sortField: 'key_algorithm'
       },
       {
-        field: 'last_modified',
+        field: 'lastEditor',
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        filterPath: 'last_editor'
+      },
+      {
+        field: 'lastModified',
         header: 'Last Modified',
-        sortField: 'last_modified',
-        filterPath: 'last_modified',
-        type: 'component',
-        component: (columnData, rowData, dependencies) => {
-          return columnBuilder({
-            data: rowData,
-            columnAppearance: 'last-modified',
-            dependencies
-          })
-        }
+        sortField: 'lastModified',
+        filterPath: 'lastModified'
       }
     ]
   })

@@ -73,7 +73,7 @@ describe('PersonalTokensServices', () => {
         name: fixtures.personalTokenMock.name,
         createdDate: 'Fri Nov 10 2023',
         expiresAt: 'December 10, 2023 at 12:00:00 AM',
-        lastModified: 'Fri Nov 10 2023',
+        lastModified: 'November 10, 2023 at 12:00:00 AM',
         lastModify: '10 hours ago',
         expiresAtDate: 'Sun Dec 10 2023'
       }

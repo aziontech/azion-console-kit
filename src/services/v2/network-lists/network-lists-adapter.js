@@ -15,7 +15,7 @@ export const NetworkListsAdapter = {
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
         lastModify: formatDateToDayMonthYearHour(element.last_modified),
-        lastModified: element.last_modified
+        lastModified: formatDateToDayMonthYearHour(element.last_modified)
       })) || []
     )
   },

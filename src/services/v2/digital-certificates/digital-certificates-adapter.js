@@ -1,7 +1,7 @@
 import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-utils'
-import { convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
@@ -97,7 +97,7 @@ export const DigitalCertificatesAdapter = {
         authority: checkIfFieldExist(item?.authority),
         keyAlgorithm: checkIfFieldExist(item?.key_algorithm),
         lastEditor: checkIfFieldExist(item?.last_editor),
-        lastModified: item?.last_modified ? item.last_modified : '-',
+        lastModified: item?.last_modified ? formatDateToDayMonthYearHour(item.last_modified) : '-',
         lastModify: item?.last_modified ? convertToRelativeTime(item.last_modified) : '-',
         managed: item?.managed,
         status: {

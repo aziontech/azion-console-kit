@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
-import { convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const listEdgeServiceServices = async ({
   orderBy = 'last_modified',
@@ -41,7 +41,7 @@ const adapt = (httpResponse) => {
       active: edgeService.active,
       lastEditor: edgeService.last_editor,
       lastModify: convertToRelativeTime(edgeService.updated_at),
-      lastModified: edgeService.updated_at
+      lastModified: formatDateToDayMonthYearHour(edgeService.updated_at)
     }
   })
 

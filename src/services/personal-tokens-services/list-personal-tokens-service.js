@@ -18,12 +18,11 @@ const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
     const [creationDate] = item.created.split('T')
     const [expirationDate] = item.expires_at.split('T')
-
     return {
       id: item.uuid,
       name: item.name,
       description: item.description || '',
-      lastModified: creationDate,
+      lastModified: formatDateToDayMonthYearHour(creationDate),
       lastModify: convertToRelativeTime(creationDate),
       createdDate: creationDate,
       expiresAt: formatDateToDayMonthYearHour(expirationDate),
