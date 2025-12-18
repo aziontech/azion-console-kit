@@ -39,16 +39,23 @@ export class EdgeAppErrorResponseService extends BaseService {
     return body
   }
 
-  listEdgeApplicationsErrorResponseService = async ({ params = {}, edgeApplicationId }) => {
+  listEdgeApplicationsErrorResponseService = async ({
+    params = { page: 1, pageSize: 10 },
+    edgeApplicationId
+  }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = errorResponseKeys.lists(edgeApplicationId)
+    const queryKey = [...errorResponseKeys.lists(edgeApplicationId), params]
 
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
       { persist: true }
     )
+  }
+
+  prefetchEdgeApplicationsErrorResponseList = async (edgeApplicationId) => {
+    return await this.listEdgeApplicationsErrorResponseService({ edgeApplicationId })
   }
 
   editEdgeApplicationErrorResponseService = async (payload, edgeApplicationId) => {
