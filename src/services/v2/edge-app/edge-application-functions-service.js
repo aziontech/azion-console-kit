@@ -93,7 +93,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
-    const queryKey = edgeAppFunctionsKeys.lists(edgeApplicationId)
+    const queryKey = [...edgeAppFunctionsKeys.lists(edgeApplicationId), params]
 
     return await this._ensureQueryData(
       () => queryKey,

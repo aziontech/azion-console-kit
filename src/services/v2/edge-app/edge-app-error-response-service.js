@@ -42,7 +42,7 @@ export class EdgeAppErrorResponseService extends BaseService {
   listEdgeApplicationsErrorResponseService = async ({ params = {}, edgeApplicationId }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = errorResponseKeys.lists(edgeApplicationId)
+    const queryKey = [...errorResponseKeys.lists(edgeApplicationId), params]
 
     return await this._ensureQueryData(
       () => queryKey,

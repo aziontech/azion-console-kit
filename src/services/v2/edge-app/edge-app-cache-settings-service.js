@@ -45,7 +45,7 @@ export class CacheSettingsService extends BaseService {
   listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = cacheSettingsKeys.lists(edgeApplicationId)
+    const queryKey = [...cacheSettingsKeys.lists(edgeApplicationId), params]
 
     return await this._ensureQueryData(
       () => queryKey,

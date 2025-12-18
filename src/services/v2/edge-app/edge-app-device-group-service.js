@@ -45,7 +45,7 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = deviceGroupsKeys.lists(edgeApplicationId)
+    const queryKey = [...deviceGroupsKeys.lists(edgeApplicationId), params]
 
     return await this._ensureQueryData(
       () => queryKey,
