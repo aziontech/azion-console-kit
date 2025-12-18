@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, toRef, ref } from 'vue'
+  import { computed, toRef, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
@@ -62,6 +62,13 @@
     errorMessage.value = field.errorMessage
     handleBlur = field.handleBlur
     handleChange = field.handleChange
+  } else {
+    watch(
+      () => props.value,
+      (newValue) => {
+        inputValue.value = newValue
+      }
+    )
   }
 
   const iconPositionClass = computed(() => {

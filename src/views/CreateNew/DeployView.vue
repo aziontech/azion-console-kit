@@ -7,9 +7,9 @@
       <div class="flex flex-col w-full gap-8">
         <PrimeCard class="w-full">
           <template #content>
-            <div class="flex flex-col p-3 md:p-8 gap-8">
+            <div class="flex flex-col p-4 md:p-8 gap-4 md:gap-8">
               <div class="flex flex-col gap-2">
-                <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
+                <div class="flex flex-col xl:flex-row gap-4 w-full">
                   <div class="flex gap-3">
                     <Tag
                       v-if="isSuccessfullyFinished"
@@ -18,60 +18,24 @@
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
-                      class="text-primary text-xl whitespace-nowrap font-medium"
+                      class="text-primary text-xl font-medium"
                       v-if="isUnfinished"
                     >
                       Project is being created
                     </span>
 
                     <span
-                      class="text-primary text-xl whitespace-nowrap font-medium"
+                      class="text-primary text-xl font-medium"
                       v-else-if="isSuccessfullyFinished"
                     >
                       {{ results.edgeApplication.name }}
                     </span>
                     <span
-                      class="text-primary text-xl font-medium whitespace-nowrap"
+                      class="text-primary text-xl font-medium"
                       v-else-if="deployFailed"
                     >
                       Creation failed
                     </span>
-                  </div>
-                  <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row">
-                    <PrimeButton
-                      v-if="isSuccessfullyFinished"
-                      link
-                      :pt="{
-                        root: { class: 'justify-center' },
-                        label: { class: 'grow-0 truncate' }
-                      }"
-                      class="px-0 py-1"
-                      :label="results.domain.url"
-                      @click="goToUrl"
-                      icon="pi pi-external-link"
-                      iconPos="right"
-                    />
-                    <PrimeButton
-                      v-if="isSuccessfullyFinished"
-                      severity="secondary"
-                      @click="goToEdgeApplicationEditView"
-                      label="Manage"
-                    />
-                    <div class="md:ml-auto flex">
-                      <PrimeButton
-                        v-if="deployFailed"
-                        @click="retry"
-                        severity="secondary"
-                        :pt="{
-                          root: { class: 'justify-center' },
-                          label: { class: 'grow-0' }
-                        }"
-                        class="md:ml-auto w-full"
-                        label="Back"
-                        icon="pi pi-chevron-left"
-                        iconPos="left"
-                      />
-                    </div>
                   </div>
                 </div>
                 <span
@@ -87,6 +51,51 @@
                 :executionId="executionId"
                 @onFinish.once="handleFinish"
               />
+
+              <div class="flex w-full justify-end">
+                <div class="flex sm:flex-row flex-col gap-3 md:gap-4">
+                  <PrimeButton
+                    v-if="isSuccessfullyFinished"
+                    link
+                    icon="pi pi-external-link"
+                    iconPos="right"
+                    size="small"
+                    class="px-0 py-1"
+                    :label="results.domain.url"
+                    :pt="{
+                      root: { class: 'justify-center' },
+                      label: { class: 'grow-0 truncate' }
+                    }"
+                    @click="goToUrl"
+                  />
+                  <div class="flex justify-end">
+                    <PrimeButton
+                      v-if="isSuccessfullyFinished"
+                      label="Manage"
+                      severity="secondary"
+                      size="small"
+                      @click="goToEdgeApplicationEditView"
+                    />
+                  </div>
+                  <div
+                    v-if="deployFailed"
+                    class="md:ml-auto flex"
+                  >
+                    <PrimeButton
+                      @click="retry"
+                      severity="secondary"
+                      :pt="{
+                        root: { class: 'justify-center' },
+                        label: { class: 'grow-0' }
+                      }"
+                      class="md:ml-auto w-full"
+                      label="Back"
+                      icon="pi pi-chevron-left"
+                      iconPos="left"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </template>
         </PrimeCard>
