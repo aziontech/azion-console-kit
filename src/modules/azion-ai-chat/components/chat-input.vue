@@ -36,7 +36,7 @@
         />
       </div>
     </div>
-    <div class="pb-6">
+    <div class="pb-3">
       <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 pb-8 mx-2">
         Azion Copilot may make mistakes. Consider verifying important information.
       </small>
