@@ -54,6 +54,10 @@ export const listOriginsService = async ({
   })
 }
 
+export const prefetchOriginsList = async (edgeApplicationId) => {
+  return await listOriginsService({ id: edgeApplicationId, page: 1, pageSize: 200 })
+}
+
 const adapt = (httpResponse) => {
   const originTypeFormat = {
     single_origin: 'Single Origin',

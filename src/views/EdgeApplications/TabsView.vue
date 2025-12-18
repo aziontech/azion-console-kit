@@ -23,10 +23,10 @@
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
-  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -120,46 +120,25 @@
 
     if (hasFlagBlockApiV4()) {
       preloadPromises.push(
-        props.originsServices.listOriginsService({
-          id: edgeApplicationId.value,
-          pageSize: 200
-        })
+        props.originsServices.prefetchOriginsList(edgeApplicationId.value)
       )
 
       preloadPromises.push(
-        edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
-          edgeApplicationId: edgeApplicationId.value,
-          params: {}
-        })
+        edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(edgeApplicationId.value)
       )
     }
 
-    preloadPromises.push(
-      deviceGroupService.listDeviceGroupService(edgeApplicationId.value, { pageSize: 10, page: 1 })
-    )
+    preloadPromises.push(deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value))
 
-    preloadPromises.push(
-      cacheSettingsService.listCacheSettingsService(edgeApplicationId.value, {
-        pageSize: 100,
-        page: 1
-      })
-    )
+    preloadPromises.push(cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value))
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
       preloadPromises.push(
-        edgeApplicationFunctionService.listEdgeApplicationFunctions(edgeApplicationId.value, {
-          pageSize: 10,
-          page: 1
-        })
+        edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value)
       )
     }
 
-    preloadPromises.push(
-      rulesEngineService.listRulesEngineRequestAndResponsePhase({
-        edgeApplicationId: edgeApplicationId.value,
-        params: {}
-      })
-    )
+    preloadPromises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
 
     await Promise.allSettled(preloadPromises)
   }
