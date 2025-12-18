@@ -192,7 +192,16 @@ export class RulesEngineService extends BaseService {
    */
   prefetchRulesEngineList = async (edgeApplicationId) => {
     const defaultParams = {
-      fields: ['id', 'name', 'description', 'phase', 'active', 'order', 'last_modified', 'last_editor'],
+      fields: [
+        'id',
+        'name',
+        'description',
+        'phase',
+        'active',
+        'order',
+        'last_modified',
+        'last_editor'
+      ],
       ordering: ''
     }
 

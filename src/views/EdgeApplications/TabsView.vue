@@ -119,12 +119,12 @@
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
     if (hasFlagBlockApiV4()) {
-      preloadPromises.push(
-        props.originsServices.prefetchOriginsList(edgeApplicationId.value)
-      )
+      preloadPromises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
 
       preloadPromises.push(
-        edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(edgeApplicationId.value)
+        edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(
+          edgeApplicationId.value
+        )
       )
     }
 
