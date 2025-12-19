@@ -72,6 +72,7 @@ export const edgeApplicationRoutes = {
           },
           originsServices: {
             listOriginsService: OriginsService.listOriginsService,
+            prefetchOriginsList: OriginsService.prefetchOriginsList,
             deleteOriginsService: OriginsService.deleteOriginsService,
             createOriginService: OriginsService.createOriginService,
             editOriginService: OriginsService.editOriginService,
