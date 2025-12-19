@@ -93,13 +93,33 @@ export class EdgeApplicationFunctionService extends BaseService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
-    const queryKey = edgeAppFunctionsKeys.lists(edgeApplicationId)
-
+    const queryKey = [
+      ...edgeAppFunctionsKeys.lists(edgeApplicationId),
+      params.page,
+      params.pageSize,
+      params.fields,
+      params.ordering,
+      params.search
+    ]
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      { persist: params.page === 1 && !params.search }
     )
+  }
+
+  /**
+   * Prefetches the first page of functions instances to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchFunctionsList = async (edgeApplicationId) => {
+    return await this.listEdgeApplicationFunctions(edgeApplicationId, {
+      pageSize: 10,
+      page: 1,
+      ordering: 'name',
+      fields: ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor']
+    })
   }
 
   #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
