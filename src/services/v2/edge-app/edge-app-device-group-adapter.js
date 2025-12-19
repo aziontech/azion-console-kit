@@ -16,7 +16,7 @@ export const DeviceGroupAdapter = {
             content: deviceGroup.id
           },
           name: sanitizeHtml(deviceGroup.name),
-          userAgent: deviceGroup.user_agent
+          userAgent: sanitizeHtml(deviceGroup.user_agent)
         }
       }) || []
     )
