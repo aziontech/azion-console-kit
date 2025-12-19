@@ -1,3 +1,5 @@
+import { sanitizeHtml } from '@/helpers/sanitize-html'
+
 const CACHE_BEHAVIOR_LABELS = {
   honor: 'Honor Origin Cache Headers',
   override: 'Override Cache Settings',
@@ -12,7 +14,7 @@ const parseTextToArray = (text) => text?.split('\n') ?? []
 export const CacheSettingsAdapter = {
   requestPayload(payload) {
     const result = {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       browser_cache: {
         behavior: payload.browserCacheSettings || 'honor',
         max_age: payload.browserCacheSettingsMaximumTtl || 0
@@ -107,7 +109,7 @@ export const CacheSettingsAdapter = {
   transformListCacheSetting(data) {
     return data.map((item) => ({
       id: String(item.id),
-      name: item.name,
+      name: sanitizeHtml(item.name),
       browserCache: formatCacheBehavior(item.browser_cache?.behavior || 'honor'),
       cdnCache: formatCacheBehavior(item.modules?.cache?.behavior || 'honor')
     }))
@@ -141,7 +143,7 @@ export const CacheSettingsAdapter = {
 
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       browserCacheSettings: browserCache.behavior || 'honor',
       browserCacheSettingsMaximumTtl: browserCache.max_age || 0,
       cdnCacheSettings: edge.behavior || 'honor',

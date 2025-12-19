@@ -6,6 +6,7 @@ import {
 } from '../utils/adapter/rule-engine-utils'
 import { convertToRelativeTime } from '@/helpers/convert-date'
 import { getCurrentTimezone } from '@/helpers'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const STATUS_AS_TAG = {
   true: {
@@ -24,7 +25,7 @@ export const EdgeFirewallRulesEngineAdapter = {
       data?.map((rules, index) => {
         return {
           id: rules.id,
-          name: rules.name,
+          name: sanitizeHtml(rules.name),
           description: rules.description || '',
           lastModified: getCurrentTimezone(rules.last_modified),
           lastModify: convertToRelativeTime(rules.last_modified),
@@ -55,7 +56,7 @@ export const EdgeFirewallRulesEngineAdapter = {
   transformLoadEdgeFirewallRulesEngine(data) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       description: data.description,
       active: data.active,
       criteria: parseCriteriaLoad(data.criteria),

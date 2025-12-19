@@ -7,6 +7,7 @@ import {
 } from '@/helpers'
 import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
@@ -74,7 +75,7 @@ export const WorkloadAdapter = {
     }
 
     const payloadResquest = {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       active: payload.active,
       infrastructure: payload.infrastructure,
       tls: handleTls(payload),
@@ -141,7 +142,7 @@ export const WorkloadAdapter = {
     const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains)
     return {
       id: workload.id,
-      name: workload.name,
+      name: sanitizeHtml(workload.name),
       active: workload.active,
       workloadHostname: workload.workload_domain?.replace(/\.azion\.app$/, ''),
       workloadDeploymentId: workloadDeployment?.id,

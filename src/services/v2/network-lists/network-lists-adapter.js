@@ -1,4 +1,5 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 export const NetworkListsAdapter = {
   transformListNetworkLists(data) {
@@ -11,7 +12,7 @@ export const NetworkListsAdapter = {
       data?.map((element) => ({
         id: element.id,
         stringId: element.id.toString(),
-        name: element.name,
+        name: sanitizeHtml(element.name),
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
         lastModified: formatDateToDayMonthYearHour(element.last_modified),
@@ -21,7 +22,7 @@ export const NetworkListsAdapter = {
   },
   transformCreateNetworkList(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       type: payload.networkListType,
       items: payload.networkContentList
     }
@@ -31,7 +32,7 @@ export const NetworkListsAdapter = {
     const isCountriesType = type === 'countries'
 
     return {
-      name,
+      name: sanitizeHtml(name),
       id,
       stringId: id.toString(),
       lastEditor: last_editor,
@@ -48,7 +49,7 @@ export const NetworkListsAdapter = {
     const isCountriesType = networkListType === 'countries'
 
     return {
-      name,
+      name: sanitizeHtml(name),
       type: networkListType,
       items: isCountriesType ? itemsValuesCountry : itemsValues.trim().split('\n')
     }
@@ -65,7 +66,7 @@ export const NetworkListsAdapter = {
         disabledIP,
         disabledCountries
       },
-      name: element.name
+      name: sanitizeHtml(element.name)
     }
   },
   transformListNetworkListToDropdown(data) {
@@ -82,7 +83,7 @@ export const NetworkListsAdapter = {
               disabledCountries
             },
             id: element.id,
-            name: element.name
+            name: sanitizeHtml(element.name)
           }
         })
       : []

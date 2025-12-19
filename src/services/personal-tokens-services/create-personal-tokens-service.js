@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
 import * as Errors from '@/services/axios/errors'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 export const createPersonalToken = async (payload) => {
   const { name, description, expiresAt } = payload
@@ -10,7 +11,7 @@ export const createPersonalToken = async (payload) => {
     url: `${makePersonalTokensBaseUrl()}`,
     method: 'POST',
     body: {
-      name,
+      name: sanitizeHtml(name),
       description,
       expires_at: expiresAt
     }

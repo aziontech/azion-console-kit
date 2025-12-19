@@ -1,6 +1,7 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null : value)
 
@@ -29,7 +30,7 @@ const getPage = (page) => {
 
 const transformMap = {
   id: (value) => value.id,
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => formatDateToDayMonthYearHour(value.last_modified),
   lastModified: (value) => value.last_modified,
@@ -44,7 +45,7 @@ export const CustomPageAdapter = {
     const pages = payload.pages.filter((page) => page.type !== 'page_default')
 
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       active: payload.active,
       pages: [
         ...pages.map((page) => {
@@ -59,7 +60,7 @@ export const CustomPageAdapter = {
   transformLoadCustomPage({ data }) {
     const response = {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       last_editor: data.last_editor,
       last_modified: data.last_modified,
       active: data.active,

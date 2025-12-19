@@ -1,6 +1,7 @@
 import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-utils'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
@@ -38,7 +39,7 @@ export const DigitalCertificatesAdapter = {
     privateKey
   }) {
     return {
-      name: digitalCertificateName,
+      name: sanitizeHtml(digitalCertificateName),
       type: certificateType,
       ...(!!certificate?.trim() && { certificate }),
       ...(!!privateKey?.trim() && { private_key: privateKey })
@@ -47,7 +48,7 @@ export const DigitalCertificatesAdapter = {
 
   transformCreateDigitalCertificateLetEncrypt(payload, sourceCertificate) {
     const payloadRequest = {
-      name: `Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
+      name: sanitizeHtml(`Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`),
       certificate: null,
       private_key: null,
       type: 'edge_certificate',
@@ -88,7 +89,7 @@ export const DigitalCertificatesAdapter = {
 
       return {
         id: checkIfFieldExist(item?.id, null),
-        name: checkIfFieldExist(item?.name),
+        name: sanitizeHtml(checkIfFieldExist(item?.name)),
         issuer: checkIfFieldExist(item?.issuer),
         subjectName: subjectName.length ? subjectName : '-',
         type: checkIfFieldExist(typeMap[item?.type]),
@@ -116,7 +117,7 @@ export const DigitalCertificatesAdapter = {
     let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
-        name: item.name,
+        name: sanitizeHtml(item.name),
         authority: item?.authority,
         status: item?.status,
         icon: getIconByStatus(item?.status)
@@ -167,7 +168,7 @@ export const DigitalCertificatesAdapter = {
     let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
-        name: item.name,
+        name: sanitizeHtml(item.name),
         authority: item?.authority,
         status: item?.status,
         icon: getIconByStatus(item?.status)
@@ -233,7 +234,7 @@ export const DigitalCertificatesAdapter = {
 
     return {
       id,
-      name,
+      name: sanitizeHtml(name),
       type,
       csr: csr ?? undefined,
       managed,
@@ -251,7 +252,7 @@ export const DigitalCertificatesAdapter = {
 
   transformEditDigitalCertificate({ name, certificate, privateKey, type }) {
     return {
-      name,
+      name: sanitizeHtml(name),
       certificate: certificate || undefined,
       private_key: privateKey || undefined,
       type

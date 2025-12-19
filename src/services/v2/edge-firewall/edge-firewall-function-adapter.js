@@ -1,4 +1,5 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 export const EdgeFirewallFunctionAdapter = {
   transformPayloadFunction(data) {
@@ -18,7 +19,7 @@ export const EdgeFirewallFunctionAdapter = {
         return {
           id: edgeFirewall.id,
           edgeFunctionId: edgeFirewall.function,
-          name: edgeFirewall.name,
+          name: sanitizeHtml(edgeFirewall.name),
           lastEditor: edgeFirewall.last_editor,
           lastModified: edgeFirewall.last_modified,
           args: edgeFirewall.args,
@@ -30,7 +31,7 @@ export const EdgeFirewallFunctionAdapter = {
 
   transformListFunctionsDropdown(data) {
     return data.map((item) => ({
-      name: item.name,
+      name: sanitizeHtml(item.name),
       id: item.id
     }))
   },
@@ -38,7 +39,7 @@ export const EdgeFirewallFunctionAdapter = {
     return {
       id: data.id,
       edgeFunctionID: data.function,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       args: JSON.stringify(data.args, null, '\t'),
       azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
@@ -46,7 +47,7 @@ export const EdgeFirewallFunctionAdapter = {
   transformLoadEdgeFunction({ data }) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       version: data.version || '-'
     }
   },
@@ -55,7 +56,7 @@ export const EdgeFirewallFunctionAdapter = {
       data?.map((edgeFirewallFunction) => {
         return {
           id: edgeFirewallFunction.id,
-          name: edgeFirewallFunction.name,
+          name: sanitizeHtml(edgeFirewallFunction.name),
           functionInstanced: edgeFirewallFunction.functionInstanced,
           lastEditor: edgeFirewallFunction.lastEditor,
           active: parseStatusData(edgeFirewallFunction.active),

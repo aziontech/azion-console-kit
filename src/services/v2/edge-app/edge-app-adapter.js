@@ -1,6 +1,7 @@
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const LOCKED_VALUE = 'custom'
 
@@ -37,14 +38,14 @@ export const EdgeAppAdapter = {
   transformListDropdownEdgeApp(data) {
     return data.map((edgeApplication) => ({
       id: edgeApplication.id,
-      name: edgeApplication.name
+      name: sanitizeHtml(edgeApplication.name)
     }))
   },
 
   transformLoadEdgeApp({ data }) {
     return {
       id: data?.id,
-      name: data?.name,
+      name: sanitizeHtml(data?.name),
       edgeCacheEnabled: data?.modules?.cache.enabled,
       edgeFunctionsEnabled: data?.modules?.functions.enabled,
       applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
@@ -59,7 +60,7 @@ export const EdgeAppAdapter = {
 
   transformPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       modules: {
         cache: { enabled: payload.edgeCacheEnabled },
         functions: { enabled: payload.edgeFunctionsEnabled },
@@ -75,7 +76,7 @@ export const EdgeAppAdapter = {
   transformPayloadClone(payload) {
     return {
       id: payload.id,
-      name: payload.cloneName
+      name: sanitizeHtml(payload.cloneName)
     }
   }
 }

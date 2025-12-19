@@ -1,7 +1,9 @@
+import { sanitizeHtml } from '@/helpers/sanitize-html'
+
 export const DeviceGroupAdapter = {
   transformPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       user_agent: payload.userAgent
     }
   },
@@ -13,7 +15,7 @@ export const DeviceGroupAdapter = {
           deviceId: {
             content: deviceGroup.id
           },
-          name: deviceGroup.name,
+          name: sanitizeHtml(deviceGroup.name),
           userAgent: deviceGroup.user_agent
         }
       }) || []
@@ -22,7 +24,7 @@ export const DeviceGroupAdapter = {
   transformLoadDeviceGroup({ data }) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       userAgent: data.user_agent
     }
   }

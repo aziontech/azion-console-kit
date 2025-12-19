@@ -1,5 +1,6 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const parseName = (data) => {
   const nameProps = { text: data.name, tagProps: {} }
@@ -32,7 +33,7 @@ export const EdgeApplicationFunctionsAdapter = {
 
   transformListFunctionsDropdown(data) {
     return data.map((item) => ({
-      name: item.name,
+      name: sanitizeHtml(item.name),
       id: item.id
     }))
   },
@@ -42,7 +43,7 @@ export const EdgeApplicationFunctionsAdapter = {
     return {
       id: data.id,
       edgeFunctionID: data.function,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       args: JSON.stringify(data.args, null, '\t'),
       azionForm: JSON.stringify(data.azion_form, null, '\t')
     }
@@ -50,7 +51,7 @@ export const EdgeApplicationFunctionsAdapter = {
 
   transformPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
       active: true,
@@ -60,7 +61,7 @@ export const EdgeApplicationFunctionsAdapter = {
 
   transformEditPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       function: payload.edgeFunctionID,
       args: JSON.parse(payload.args),
       azion_form: JSON.parse(payload.azionForm)

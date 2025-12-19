@@ -2,10 +2,11 @@ import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataRe
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { formatBytes } from '@/helpers/format-bytes'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const transformMap = {
   id: (value) => value.name,
-  name: (value) => value.name || value.key,
+  name: (value) => sanitizeHtml(value.name || value.key),
   active: (value) => parseStatusData(value.active),
   edgeAccess: (value) => value.edge_access,
   lastEditor: (value) => value.last_editor || '-',
@@ -29,7 +30,7 @@ export const EdgeStorageAdapter = {
   transformListEdgeStorageFiles(data) {
     const files = data.results.map((file) => ({
       id: file.key,
-      name: file.key,
+      name: sanitizeHtml(file.key),
       lastModified: formatDateToDayMonthYearHour(file.last_modified) || '-',
       lastModify: file.last_modified ? convertToRelativeTime(file.last_modified) : '-',
       size: file.is_folder ? '-' : formatBytes(file.size),
@@ -55,7 +56,7 @@ export const EdgeStorageAdapter = {
 
     const adaptParsed = results.map((credential) => ({
       id: credential.id,
-      name: credential.name,
+      name: sanitizeHtml(credential.name),
       accessKey: credential.access_key,
       capabilities: credential.capabilities.map(
         (capability) => capabilitiesMap[capability] || capability

@@ -2,6 +2,7 @@ import { adaptBehavior, parsedBehavior } from '@/helpers/helper-behavior'
 import { adaptCriteria } from '@/helpers/helper-criteria'
 import { formatExhibitionDate, convertToRelativeTime } from '@/helpers/convert-date'
 import { capitalizeFirstLetter } from '@/helpers/capitalize-first-letter'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 export const RulesEngineAdapter = {
   transformListRulesEngine(data, phase) {
@@ -14,7 +15,7 @@ export const RulesEngineAdapter = {
       data?.map((rule, index) => ({
         id: rule.id,
         stringId: rule.id?.toString(),
-        name: rule.name,
+        name: sanitizeHtml(rule.name),
         phase: {
           content: capitalizeFirstLetter(phase),
           outlined: true,
@@ -42,7 +43,7 @@ export const RulesEngineAdapter = {
 
   transformCreateRulesEngine(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       phase: payload.phase,
       active: payload.isActive,
       behaviors: adaptBehavior(payload.behaviors),
@@ -57,7 +58,7 @@ export const RulesEngineAdapter = {
     }
     const { name, phase, behaviors, criteria, isActive, description } = payload
     return {
-      name,
+      name: sanitizeHtml(name),
       phase: phase?.content || phase,
       behaviors: adaptBehavior(behaviors),
       criteria: adaptCriteria(criteria),
@@ -85,7 +86,7 @@ export const RulesEngineAdapter = {
     return {
       id: rule.id,
       stringId: rule.id?.toString(),
-      name: rule.name,
+      name: sanitizeHtml(rule.name),
       phase,
       criteria: rule.criteria,
       behaviors: parsedBehavior(rule.behaviors),

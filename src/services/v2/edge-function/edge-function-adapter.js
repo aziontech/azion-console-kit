@@ -3,6 +3,7 @@ import {
   adaptServiceDataResponseToLoad
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const STATUS_AS_TAG = {
   true: {
@@ -63,7 +64,7 @@ const transformMap = {
   referenceCount: (value) => value.reference_count,
   azionForm: (value) => JSON.stringify(value.azion_form, null, 2),
   defaultArgs: (value) => JSON.stringify(value.default_args, null, 2),
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   code: (value) => value.code,
   version: (value) => value.version || '-',
   vendor: (value) => value.vendor || '-',
@@ -74,8 +75,8 @@ export const EdgeFunctionsAdapter = {
   transformLoadEdgeFunctionByEdgeApplicationFunction(edgeApplicationFunction, edgeFunction) {
     return {
       id: edgeApplicationFunction.id,
-      name: edgeApplicationFunction.name,
-      functionInstanced: edgeFunction.data.name,
+      name: sanitizeHtml(edgeApplicationFunction.name),
+      functionInstanced: sanitizeHtml(edgeFunction.data.name),
       lastEditor: edgeApplicationFunction.lastEditor,
       modified: edgeApplicationFunction.lastModified,
       version: edgeFunction.data.version
@@ -107,7 +108,7 @@ export const EdgeFunctionsAdapter = {
           executionEnvironment: edgeFunction.execution_environment,
           id: edgeFunction.id,
           lastEditor: parseLastEditor(edgeFunction),
-          name: parseName(edgeFunction),
+          name: sanitizeHtml(parseName(edgeFunction)),
           vendor: edgeFunction.vendor,
           referenceCount: edgeFunction.reference_count,
           lastModify: convertToRelativeTime(edgeFunction.last_modified),
@@ -120,7 +121,7 @@ export const EdgeFunctionsAdapter = {
   transformPayloadEdgeFunctions(payload) {
     const parsedArgs = JSON.parse(payload.defaultArgs)
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       code: payload.code,
       runtime: CODE_LANG[payload.runtime],
       execution_environment: payload.executionEnvironment,

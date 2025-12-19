@@ -1,5 +1,6 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
   return addresses.map((address) => {
@@ -184,7 +185,7 @@ export const EdgeConnectorsAdapter = {
       data?.map((edgeConnectors) => {
         return {
           id: edgeConnectors.id,
-          name: edgeConnectors.name,
+          name: sanitizeHtml(edgeConnectors.name),
           type: edgeConnectorsTypes[edgeConnectors?.type],
           header: edgeConnectors?.attributes?.connection_options?.host || '-',
           address: edgeConnectors?.attributes?.addresses
@@ -212,7 +213,7 @@ export const EdgeConnectorsAdapter = {
     const attributes = builder(payload)
 
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       type: payload.type,
       active: payload.active,
       attributes
@@ -225,7 +226,7 @@ export const EdgeConnectorsAdapter = {
 
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       type: data.type,
       active: data.active,
       ...attributes

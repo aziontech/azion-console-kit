@@ -1,6 +1,7 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import * as Errors from '@/services/axios/errors'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const mapDataSourceName = {
   http: 'Edge Applications',
@@ -260,7 +261,7 @@ export const DataStreamAdapter = {
 
         return {
           id: dataStream.id,
-          name: dataStream.name,
+          name: sanitizeHtml(dataStream.name),
           templateName: dataStream.templateName,
           dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
@@ -277,7 +278,7 @@ export const DataStreamAdapter = {
       data?.map((template) => {
         return {
           id: template.id,
-          name: template.name,
+          name: sanitizeHtml(template.name),
           dataSet: template?.data_set,
           custom: template?.custom,
           active: template?.active
@@ -290,7 +291,7 @@ export const DataStreamAdapter = {
     const selectedDomains = payload.domains[1] || []
 
     let parsedPayload = {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       inputs: [
         {
           type: 'raw_logs',
@@ -341,7 +342,7 @@ export const DataStreamAdapter = {
 
     return {
       id: payload.id,
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
       dataSet: payload?.data_set,
       dataSource: dataSourceInput?.attributes?.data_source,
@@ -356,14 +357,14 @@ export const DataStreamAdapter = {
   },
   transformPayloadTemplate(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       data_set: payload.dataSet
     }
   },
   transformLoadTemplate(payload) {
     return {
       id: payload.id,
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       dataSet: payload?.data_set
     }
   }

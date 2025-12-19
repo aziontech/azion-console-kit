@@ -5,6 +5,7 @@ import { buildCertificateNames } from '@/services/utils/domain-names'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { workloadKeys } from '@/services/v2/workload/workload-service'
 import * as Errors from '@/services/axios/errors'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 export const createDomainService = async (payload) => {
   const body = await buildRequestBody(payload)
@@ -44,7 +45,7 @@ const buildRequestBody = async (payload) => {
   const cnames = splitCnames(payload.cnames)
 
   const data = {
-    name: payload.name,
+    name: sanitizeHtml(payload.name),
     cnames,
     cname_access_only: payload.cnameAccessOnly,
     edge_application_id: payload.edgeApplication,

@@ -3,10 +3,11 @@ import {
   adaptServiceDataResponseToLoad
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const transformMap = {
   id: (value) => value.id,
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   active: (value) => parseStatusData(value.active),
   domain: (value) => {
     return {
@@ -17,7 +18,7 @@ const transformMap = {
 
 const transformLoadingMap = {
   id: (value) => value.id,
-  name: (value) => value.name,
+  name: (value) => sanitizeHtml(value.name),
   active: (value) => parseStatusData(value.active),
   domain: (value) => value.domain,
   nameservers: (value) => value.nameservers,
@@ -47,7 +48,7 @@ export const EdgeDNSAdapter = {
 
   transformPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       domain: payload.domain,
       active: payload.isActive
     }
@@ -55,7 +56,7 @@ export const EdgeDNSAdapter = {
 
   transformPayloadEdit(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       active: payload.isActive
     }
   }

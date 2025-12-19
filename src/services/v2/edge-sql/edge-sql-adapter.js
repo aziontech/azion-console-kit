@@ -1,6 +1,7 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { adaptSqlQuery } from '../utils/adapter/handleSqlCommand'
+import { sanitizeHtml } from '@/helpers/sanitize-html'
 
 const truncateString = (str, maxLength) => {
   return str.length > maxLength ? `${str.substring(0, maxLength - 3)}...` : str
@@ -175,7 +176,7 @@ export const EdgeSQLAdapter = {
   adaptDatabaseStatus({ data }) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       status: data.status
     }
   },
@@ -183,7 +184,7 @@ export const EdgeSQLAdapter = {
   adaptDatabaseList(databases) {
     return databases.map((database) => ({
       id: database.id,
-      name: database.name,
+      name: sanitizeHtml(database.name),
       status: {
         content: database.status,
         severity: getDatabaseStatusSeverity(database.status)
@@ -201,7 +202,7 @@ export const EdgeSQLAdapter = {
 
     return {
       id: database.id,
-      name: database.name,
+      name: sanitizeHtml(database.name),
       status: database.status || 'creating',
       active: database.active
     }
@@ -209,14 +210,14 @@ export const EdgeSQLAdapter = {
 
   adaptDatabaseCreatePayload(payload) {
     return {
-      name: payload.name
+      name: sanitizeHtml(payload.name)
     }
   },
 
   adaptDatabase({ data }) {
     return {
       id: data.id,
-      name: data.name,
+      name: sanitizeHtml(data.name),
       status: data.status,
       lastModified: data.last_modified,
       active: data.active

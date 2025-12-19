@@ -105,7 +105,7 @@ export const WafAdapter = {
 
     return {
       id: response.id,
-      name: sanitizeHtml(response.name),
+      name: response.name,
       active: response.active,
       ...threatsConfiguration
     }
@@ -123,7 +123,7 @@ export const WafAdapter = {
     const payloadReturn = {
       conditions: formatConditions,
       path: payload.path,
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       rule_id: payload.ruleId,
       active: payload.status,
       operator: payload.operator ? 'regex' : 'contains'
@@ -163,11 +163,13 @@ export const WafAdapter = {
     return {
       rule_id: attack.ruleId,
       ...(path && { path }),
-      name: name
-        .split('\n')
-        .filter((line) => line.trim() !== '')
-        .join(' ')
-        .trim(),
+      name: sanitizeHtml(
+        name
+          .split('\n')
+          .filter((line) => line.trim() !== '')
+          .join(' ')
+          .trim()
+      ),
       conditions: [
         {
           match: matchFormat,
@@ -211,7 +213,7 @@ export const WafAdapter = {
   transformCloneWafRule(payload) {
     return {
       id: payload.id,
-      name: payload.cloneName
+      name: sanitizeHtml(payload.cloneName)
     }
   },
   transformLoadWafRuleAllowed({ data: waf }) {

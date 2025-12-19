@@ -38,13 +38,13 @@ export const EdgeFirewallAdapter = {
   },
   transformCloneEdgeFirewall(payload) {
     return {
-      name: payload.cloneName,
+      name: sanitizeHtml(payload.cloneName),
       id: payload.id
     }
   },
   transformPayload(payload) {
     return {
-      name: payload.name,
+      name: sanitizeHtml(payload.name),
       active: payload.isActive,
       modules: {
         ddos_protection: {
