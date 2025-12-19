@@ -98,12 +98,13 @@ export class EdgeApplicationFunctionService extends BaseService {
       params.page,
       params.pageSize,
       params.fields,
-      params.ordering
+      params.ordering,
+      params.search
     ]
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      { persist: params.page === 1 && !params.search }
     )
   }
 
