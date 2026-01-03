@@ -1,11 +1,16 @@
 export default {
     createButton: '[data-testid="create_Workload_button"]',
-    nameInput: '[data-testid="domains-form__name-field__input"]',
+    // Name input in the General section - uses default testid from FieldText component
+  nameInput: '[data-testid="field-text__input"]',
     customHostname: '#customHostname',
     portHttp: '[data-testid="form-horizontal-delivery-settings-http-ports-multi-select"]',
     portHttps: '[data-testid="form-horizontal-delivery-settings-https-ports-multi-select"]',
-    useHttpsField: '[data-testid="domains-form__use-https-field"]',
-    useHttp3Field: '[data-testid="domains-form__use-http3-field"]',
+    // Protocol Settings section
+    protocolSettingsSection: '[data-testid="form-horizontal-protocol-settings"]',
+    // HTTPS - the switch element has the __switch suffix from FieldSwitchBlock
+    useHttpsSwitch: '[data-testid="domains-form__use-https-field__switch"]',
+    // HTTP/3 switch
+    useHttp3Switch: '[data-testid="domains-form__use-http3-field__switch"]',
     dropdownSelectPort: '.p-multiselect-items-wrapper ul',
     dropdownSelectTls: '.p-dropdown-items-wrapper #minimumTlsVersion_list',
     dropdownSelectCipher: '.p-dropdown-items-wrapper #supportedCiphers_list',
@@ -50,8 +55,8 @@ export default {
     letsEncryptDropdownOption: '#edgeCertificate_1',
     editPageTitle:
       '[data-testid="page-heading-block__breadcrumb__Edit Workload"] > .p-menuitem-link > .p-menuitem-text',
-    enableMtlsSwitch:
-      '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
+    enableMtlsSwitch: '[data-testid="domains-form__mtls-is-enabled-field__switch"]',
+    enableMtlsSelector: '[data-testid="domains-form__mtls-is-enabled-field__selector"]',
     dropdownTrustedCA:
       '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown"] > .p-dropdown-label',
     trustedCAFirstDropdownOption: '#mtlsTrustedCertificate_0',

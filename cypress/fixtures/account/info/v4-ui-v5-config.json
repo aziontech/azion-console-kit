@@ -1,0 +1,30 @@
+{
+  "id": 11,
+  "name": "QA Test Account V4-V5",
+  "client_id": "test-v4-v5",
+  "account_type": "client",
+  "status": "ONLINE",
+  "is_account_owner": true,
+  "first_login": false,
+  "utc_offset": "+0000",
+  "colorTheme": "light",
+  "client_flags": [
+    "allow_console",
+    "enable_ipv6",
+    "federated_auth",
+    "waf_mode",
+    "feature_edge_application",
+    "feature_edge_firewall",
+    "feature_digital_certificates",
+    "feature_workspace"
+  ],
+  "useV5Configurations": true,
+  "permissions": [
+    { "name": "Edit Data Stream" },
+    { "name": "View Data Stream" },
+    { "name": "Edit Edge Application" },
+    { "name": "View Edge Application" },
+    { "name": "Edit Edge Functions" },
+    { "name": "View Edge Functions" }
+  ]
+}

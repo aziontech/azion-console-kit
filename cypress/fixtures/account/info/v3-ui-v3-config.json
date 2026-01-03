@@ -1,0 +1,30 @@
+{
+  "id": 14,
+  "name": "QA Test Account V3-V3",
+  "client_id": "test-v3-v3",
+  "account_type": "client",
+  "status": "ONLINE",
+  "is_account_owner": true,
+  "first_login": false,
+  "utc_offset": "+0000",
+  "colorTheme": "light",
+  "client_flags": [
+    "allow_console",
+    "enable_ipv6",
+    "federated_auth",
+    "waf_mode",
+    "block_apiv4_incompatible_endpoints",
+    "feature_edge_application",
+    "feature_edge_firewall",
+    "feature_digital_certificates"
+  ],
+  "useV5Configurations": false,
+  "permissions": [
+    { "name": "Edit Data Stream" },
+    { "name": "View Data Stream" },
+    { "name": "Edit Edge Application" },
+    { "name": "View Edge Application" },
+    { "name": "Edit Edge Functions" },
+    { "name": "View Edge Functions" }
+  ]
+}

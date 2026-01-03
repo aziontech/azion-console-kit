@@ -95,5 +95,27 @@ export default {
   statusSlider: '[data-testid="data-stream-form__section__status"] input',
   list: {
     columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
-  }
+  },
+
+  // Form actions
+  formActions: {
+    saveButton: '[data-testid="form-actions-submit-button"]',
+    cancelButton: '[data-testid="form-actions-cancel-button"]'
+  },
+
+  // Actions menu
+  actions: {
+    singleActionButton: '[data-testid="data-table-actions-column-body-action-button"]',
+    menuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]'
+  },
+
+  // Delete dialog
+  deleteDialog: {
+    confirmInput: '[data-testid="delete-dialog-confirmation-input-field"]',
+    deleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
+    cancelButton: '[data-testid="delete-dialog-footer-cancel-button"]'
+  },
+
+  // Search
+  searchInput: '[data-testid="data-table-search-input"]'
 }

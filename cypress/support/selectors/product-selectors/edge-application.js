@@ -3,7 +3,7 @@ export default {
   edgeApplicationTable:
     '[data-testid="edge-applications-list-table-block"] [data-pc-section="bodyrow"]',
   mainSettings: {
-    createButton: '[data-testid="create_Edge Application_button"]',
+    createButton: '[data-testid="create_Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
     unsaved: '[data-testid="dialog-unsaved__leave-page"]',
@@ -153,5 +153,27 @@ export default {
     nameInput: '[data-testid="edge-application-function-instance-form__name-field__input"]',
     firstFilteredNameRow: '[data-testid="list-table-block__column__name__row"] > p',
     firstFilteredEdgeFunctionRow: '[data-testid="list-table-block__column__functionInstanced__row"]'
-  }
+  },
+
+  // Form actions
+  formActions: {
+    saveButton: '[data-testid="form-actions-submit-button"]',
+    cancelButton: '[data-testid="form-actions-cancel-button"]'
+  },
+
+  // Actions menu
+  actions: {
+    singleActionButton: '[data-testid="data-table-actions-column-body-action-button"]',
+    menuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]'
+  },
+
+  // Delete dialog
+  deleteDialog: {
+    confirmInput: '[data-testid="delete-dialog-confirmation-input-field"]',
+    deleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
+    cancelButton: '[data-testid="delete-dialog-footer-cancel-button"]'
+  },
+
+  // Search input
+  searchInput: '[data-testid="data-table-search-input"]'
 }

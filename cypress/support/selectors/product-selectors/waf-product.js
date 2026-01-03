@@ -1,5 +1,5 @@
 export default {
-  createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
+  createButton: '[data-testid="create_WAF Rule_button"]',
   nameInput: '[data-testid="waf-rules-form__name-field__input"]',
   threatTypeSwitch: (name) =>
     `[data-testid="field-group-switch__switch-${name}__switch"] > .p-inputswitch-slider`,

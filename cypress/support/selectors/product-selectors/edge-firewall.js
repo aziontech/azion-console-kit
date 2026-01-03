@@ -1,5 +1,8 @@
 export default {
-  createButton: '[data-testid="create_Edge Firewall_button"] > .p-button-label',
+  // List page
+  createButton: '[data-testid="create_Firewall_button"]',
+  table: '.p-datatable',
+  emptyState: '[data-testid*="empty"]',
   nameInput: '[data-testid="edge-firewall-form__name-field__input"]',
   edgeFunctionSwitch:
     '[data-testid="field-group-switch__switch-edgeFunctionsEnabled__switch"] > .p-inputswitch-slider',
@@ -88,5 +91,24 @@ export default {
     '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
   reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
   reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
-  saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
+  saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label',
+
+  // Form actions
+  formActions: {
+    saveButton: '[data-testid="form-actions-submit-button"]',
+    cancelButton: '[data-testid="form-actions-cancel-button"]'
+  },
+
+  // Actions menu
+  actions: {
+    singleActionButton: '[data-testid="data-table-actions-column-body-action-button"]',
+    menuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]'
+  },
+
+  // Delete dialog
+  deleteDialog: {
+    confirmInput: '[data-testid="delete-dialog-confirmation-input-field"]',
+    deleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
+    cancelButton: '[data-testid="delete-dialog-footer-cancel-button"]'
+  }
 }

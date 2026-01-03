@@ -1,5 +1,5 @@
 export default {
-  createButton: '[data-testid="create_Network List_button"] > .p-button-label',
+  createButton: '[data-testid="create_Network List_button"]',
   nameInput: '[data-testid="network-list-form__name__input"]',
   typeDropdown: '[data-testid="network-list-form__type__dropdown"]',
   asnTextarea: '[data-testid="network-list-form__asn-list__textarea"]',

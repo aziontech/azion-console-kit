@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress';
-import baseConfig from './cypress.config';
+import baseConfig from './cypress.config.js';
 
 const envOverride = {
   // TODO: remove this WORKAROUND for https://github.com/cypress-io/cypress/issues/20647,

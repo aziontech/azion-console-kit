@@ -94,6 +94,7 @@
     "cypress": "13.14.0",
     "cypress-plugin-tab": "^1.0.5",
     "cypress-real-events": "^1.13.0",
+    "cypress-split": "^1.24.25",
     "eslint": "^8.45.0",
     "eslint-plugin-cypress": "^2.13.3",
     "eslint-plugin-no-unsanitized": "^4.0.2",

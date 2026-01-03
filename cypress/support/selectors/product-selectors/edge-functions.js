@@ -1,5 +1,5 @@
 export default {
-  createButton: '[data-testid="create_Edge Function_button"] > .p-button-label',
+  createButton: '[data-testid="create_Function_button"]',
   nameInput: '[data-testid="field-text__input"]',
   saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
   cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',

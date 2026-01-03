@@ -10,8 +10,14 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
-      extends: ['plugin:cypress/recommended']
+      files: ['cypress/**/*.{js,ts,jsx,tsx}'],
+      extends: ['plugin:cypress/recommended'],
+      rules: {
+        'cypress/unsafe-to-chain-command': 'warn',
+        'cypress/no-unnecessary-waiting': 'warn',
+        'no-unused-vars': 'warn',
+        'id-length': 'off'
+      }
     }
   ],
   parserOptions: {

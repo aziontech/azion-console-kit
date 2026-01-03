@@ -4,14 +4,50 @@ import selectors from '../support/selectors'
 import 'cypress-real-events'
 
 /**
+ * Gets a unique session identifier for parallel test execution.
+ * Uses shard ID, run ID, or timestamp to ensure unique sessions per runner.
+ *
+ * @returns {string} Unique session suffix
+ */
+const getSessionSuffix = () => {
+  // GitHub Actions: GITHUB_RUN_ID + matrix index
+  const runId = Cypress.env('GITHUB_RUN_ID') || ''
+  const shardIndex = Cypress.env('SHARD_INDEX') || ''
+
+  // Cypress parallel: Use spec pattern or machine ID
+  const parallelId = Cypress.env('PARALLEL_ID') || ''
+
+  // Custom: Allow explicit session ID
+  const sessionId = Cypress.env('SESSION_ID') || ''
+
+  // Fallback: Use a stable ID for the test run (not timestamp to enable caching)
+  const stableId = runId || parallelId || sessionId
+
+  if (stableId) {
+    return shardIndex ? `${stableId}-shard${shardIndex}` : stableId
+  }
+
+  // No parallel ID: use empty string (single runner scenario)
+  return ''
+}
+
+/**
  * Performs login using provided email and password.
+ * IMPORTANT: Session key includes baseUrl and parallel ID to prevent cache issues.
  *
  * @param {string} email - The user's email address.
  * @param {string} password - The user's password.
  */
 const login = (email, password) => {
+  // Include baseUrl and parallel ID in session key
+  const baseUrl = Cypress.env('baseUrl') || 'unknown'
+  const sessionSuffix = getSessionSuffix()
+  const sessionKey = sessionSuffix
+    ? `${email}@${baseUrl}#${sessionSuffix}`
+    : `${email}@${baseUrl}`
+
   cy.session(
-    email,
+    sessionKey,
     () => {
       cy.visit('/login')
       cy.get(selectors.login.emailInput).type(email)
@@ -33,6 +69,23 @@ const login = (email, password) => {
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', () => {
   return false
+})
+
+/**
+ * Clear all saved sessions - useful when switching environments.
+ * Call this before cy.login() if you've changed baseUrl or environment.
+ */
+Cypress.Commands.add('clearAllSessions', () => {
+  Cypress.session.clearAllSavedSessions()
+})
+
+/**
+ * Logout the current user.
+ * Useful for cleaning up state at end of tests.
+ */
+Cypress.Commands.add('logout', () => {
+  cy.openItemThroughMenuAccount('Logout')
+  cy.url({ timeout: 15000 }).should('include', '/login')
 })
 
 /**
@@ -289,10 +342,11 @@ Cypress.Commands.overwrite('visit', (original, ...args) => {
 
 /**
  * Deletes a product based on its name and optional column name.
+ * IMPORTANT: The entityName is used both for searching AND for delete confirmation.
  *
- * @param {string} entityName - The entityname to delete.
- * @param {string} columnName - The name of the column containing the product name.
- * @param {string} productName - The name of product to access.
+ * @param {string} entityName - The entity name to delete (used in search and confirmation)
+ * @param {string} productName - The name of product to access
+ * @param {string} columnName - The name of the column containing the product name
  */
 const deleteEntityFromList = (entityName, productName, columnName) => {
   cy.openProduct(productName)
@@ -302,35 +356,50 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
 
   cy.get('body').then(($body) => {
     if ($body.find(selectors.list.actionsMenu.button).length) {
-      deleteEntityFromMultipleActionColumn()
+      deleteEntityFromMultipleActionColumn(entityName)
     } else {
-      deleteEntityFromSingleActionColumn()
+      deleteEntityFromSingleActionColumn(entityName)
     }
   })
 }
 
 /**
  * Deletes an entity from the loaded list. Used to avoid cy.visit an already loaded list.
+ * IMPORTANT: entityName is required for delete confirmation dialog.
+ *
+ * @param {string} entityName - The entity name/key to type in confirmation dialog
  */
-const deleteEntityFromLoadedList = () => {
+const deleteEntityFromLoadedList = (entityName) => {
   cy.get('body').then(($body) => {
     if ($body.find(selectors.list.actionsMenu.button).length) {
-      deleteEntityFromMultipleActionColumn()
+      deleteEntityFromMultipleActionColumn(entityName)
     } else {
-      deleteEntityFromSingleActionColumn()
+      deleteEntityFromSingleActionColumn(entityName)
     }
   })
 }
 
-const deleteEntityFromSingleActionColumn = () => {
+/**
+ * Deletes entity from single action button column.
+ * IMPORTANT: Delete confirmation requires the entity name/key, NOT literal "delete".
+ *
+ * @param {string} entityName - The entity name/key to type in confirmation dialog
+ */
+const deleteEntityFromSingleActionColumn = (entityName) => {
   cy.get(selectors.list.singleActionsMenu.button).click()
-  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type(`${entityName}{enter}`)
 }
 
-const deleteEntityFromMultipleActionColumn = () => {
+/**
+ * Deletes entity from multiple actions menu column.
+ * IMPORTANT: Delete confirmation requires the entity name/key, NOT literal "delete".
+ *
+ * @param {string} entityName - The entity name/key to type in confirmation dialog
+ */
+const deleteEntityFromMultipleActionColumn = (entityName) => {
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
-  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type(`${entityName}{enter}`)
 }
 
 /**
@@ -349,7 +418,13 @@ Cypress.Commands.add(
 
 /**
  * Deletes an entity from the loaded list.
- **/
-Cypress.Commands.add('deleteEntityFromLoadedList', () => {
-  deleteEntityFromLoadedList()
+ * IMPORTANT: entityName is required for delete confirmation dialog.
+ *
+ * @param {string} entityName - The entity name/key to type in confirmation dialog
+ */
+Cypress.Commands.add('deleteEntityFromLoadedList', (entityName) => {
+  if (!entityName) {
+    throw new Error('entityName is required for delete confirmation')
+  }
+  deleteEntityFromLoadedList(entityName)
 })
