@@ -1,0 +1,197 @@
+name: Cypress Tests (Per Module)
+
+on:
+  # Manual trigger only (for now)
+  workflow_dispatch:
+    inputs:
+      modules:
+        description: 'Modules to test (comma-separated, e.g., edge-functions,variables)'
+        required: false
+        default: 'all'
+        type: string
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - prod
+
+env:
+  HUSKY: 0
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  # Detect which modules need testing based on changed files
+  detect-modules:
+    name: Detect Changed Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.detect.outputs.modules }}
+      has_changes: ${{ steps.detect.outputs.has_changes }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect Changed Modules
+        id: detect
+        run: |
+          if [ "${{ github.event.inputs.modules }}" == "all" ] || [ -z "${{ github.event.inputs.modules }}" ]; then
+            # For manual runs with 'all' or scheduled runs, run all modules
+            if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+              if [ "${{ github.event.inputs.modules }}" == "all" ]; then
+                echo 'modules=["edge-functions","variables","edge-applications","edge-dns","edge-firewall","waf","network-lists","data-stream","digital-certificates","credentials","edge-sql","edge-storage","personal-tokens","sso-management","teams","users"]' >> $GITHUB_OUTPUT
+                echo "has_changes=true" >> $GITHUB_OUTPUT
+                exit 0
+              else
+                # Specific modules provided
+                MODULES=$(echo "${{ github.event.inputs.modules }}" | sed 's/,/","/g')
+                echo "modules=[\"${MODULES}\"]" >> $GITHUB_OUTPUT
+                echo "has_changes=true" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            fi
+
+            # For PRs, detect based on changed files
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "")
+
+            MODULES="[]"
+            HAS_CHANGES="false"
+
+            # Map changed paths to modules
+            declare -A PATH_MODULE_MAP=(
+              ["src/views/EdgeFunctions"]="edge-functions"
+              ["src/views/Variables"]="variables"
+              ["src/views/EdgeApplications"]="edge-applications"
+              ["src/views/EdgeDns"]="edge-dns"
+              ["src/views/EdgeFirewall"]="edge-firewall"
+              ["src/views/WafRules"]="waf"
+              ["src/views/NetworkLists"]="network-lists"
+              ["src/views/DataStream"]="data-stream"
+              ["src/views/DigitalCertificates"]="digital-certificates"
+              ["src/views/Credentials"]="credentials"
+              ["src/views/EdgeSql"]="edge-sql"
+              ["src/views/EdgeStorage"]="edge-storage"
+              ["src/views/PersonalTokens"]="personal-tokens"
+              ["src/views/IdentityProviders"]="sso-management"
+              ["src/views/Teams"]="teams"
+              ["src/views/Users"]="users"
+            )
+
+            DETECTED_MODULES=()
+            for path in "${!PATH_MODULE_MAP[@]}"; do
+              if echo "$CHANGED_FILES" | grep -q "$path"; then
+                DETECTED_MODULES+=("${PATH_MODULE_MAP[$path]}")
+                HAS_CHANGES="true"
+              fi
+            done
+
+            # Also check if cypress specs changed
+            for module in edge-functions variables edge-applications edge-dns edge-firewall waf network-lists data-stream digital-certificates credentials edge-sql edge-storage personal-tokens sso-management teams users; do
+              if echo "$CHANGED_FILES" | grep -q "cypress/specs/${module}"; then
+                if [[ ! " ${DETECTED_MODULES[*]} " =~ " ${module} " ]]; then
+                  DETECTED_MODULES+=("$module")
+                  HAS_CHANGES="true"
+                fi
+              fi
+            done
+
+            if [ ${#DETECTED_MODULES[@]} -eq 0 ]; then
+              echo 'modules=[]' >> $GITHUB_OUTPUT
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            else
+              # Convert array to JSON
+              MODULES_JSON=$(printf '%s\n' "${DETECTED_MODULES[@]}" | jq -R . | jq -s .)
+              echo "modules=${MODULES_JSON}" >> $GITHUB_OUTPUT
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Specific modules provided via input
+            MODULES=$(echo "${{ github.event.inputs.modules }}" | sed 's/,/","/g')
+            echo "modules=[\"${MODULES}\"]" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  e2e-module-tests:
+    name: E2E - ${{ matrix.module }}
+    needs: detect-modules
+    if: needs.detect-modules.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect-modules.outputs.modules) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Application
+        run: yarn build
+
+      - name: Determine Config File
+        id: config
+        run: |
+          ENV="${{ github.event.inputs.environment || 'stage' }}"
+          echo "config_file=cypress.config.${ENV}.js" >> $GITHUB_OUTPUT
+
+      - name: Run Module Tests
+        uses: cypress-io/github-action@v6
+        env:
+          STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
+          STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
+          PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
+          PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
+          CYPRESS_TEST_MODE: live
+          CYPRESS_TEST_PROFILE: V4_UI_V3_CONFIG
+        with:
+          start: yarn dev --logLevel=warn
+          browser: chrome
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
+          config-file: ${{ steps.config.outputs.config_file }}
+          spec: cypress/specs/${{ matrix.module }}/**/*.cy.js
+          env: environment=${{ github.event.inputs.environment || 'stage' }}
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.module }}
+          path: cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Videos on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-${{ matrix.module }}
+          path: cypress/videos
+          retention-days: 3
+          if-no-files-found: ignore
+
+  no-tests-needed:
+    name: No Tests Required
+    needs: detect-modules
+    if: needs.detect-modules.outputs.has_changes == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip Message
+        run: |
+          echo "No module changes detected - skipping E2E tests"
+          echo "## No E2E Tests Required" >> $GITHUB_STEP_SUMMARY
+          echo "No changes detected in module source files or test specs." >> $GITHUB_STEP_SUMMARY

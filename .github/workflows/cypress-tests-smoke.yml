@@ -1,0 +1,117 @@
+name: Cypress Smoke Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      shard_count:
+        description: 'Number of parallel shards'
+        required: false
+        default: '3'
+        type: choice
+        options:
+          - '1'
+          - '3'
+          - '5'
+
+env:
+  HUSKY: 0
+  NODE_OPTIONS: --max-old-space-size=4096
+
+# Cancel in-progress runs on same PR
+concurrency:
+  group: cypress-smoke-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Setup shards
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    # Skip if PR is draft
+    if: github.event.pull_request.draft == false
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      total_shards: ${{ steps.set-matrix.outputs.total_shards }}
+    steps:
+      - id: set-matrix
+        run: |
+          TOTAL="${{ github.event.inputs.shard_count || '3' }}"
+          # cypress-split uses 0-based indices (0, 1, 2, ...)
+          SHARDS=$(seq 0 $((TOTAL - 1)) | jq -s -c '.')
+          echo "matrix=${SHARDS}" >> $GITHUB_OUTPUT
+          echo "total_shards=${TOTAL}" >> $GITHUB_OUTPUT
+
+  # Parallel smoke tests
+  smoke-tests:
+    name: Smoke ${{ matrix.shard }}/${{ needs.setup.outputs.total_shards }}
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.setup.outputs.matrix) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Application
+        run: yarn build
+
+      - name: Run Smoke Tests
+        uses: cypress-io/github-action@v6
+        env:
+          STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
+          STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
+          CYPRESS_TEST_MODE: live
+          CYPRESS_TEST_PROFILE: V4_UI_V3_CONFIG
+          # cypress-split sharding
+          SPLIT: ${{ needs.setup.outputs.total_shards }}
+          SPLIT_INDEX: ${{ matrix.shard }}
+        with:
+          start: yarn dev --logLevel=warn
+          browser: chrome
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
+          config-file: cypress.config.stage.js
+          env: environment=stage,grepTags=@smoke
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots-shard-${{ matrix.shard }}
+          path: cypress/screenshots
+          retention-days: 3
+          if-no-files-found: ignore
+
+  # Summary
+  summary:
+    name: Summary
+    needs: [setup, smoke-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Summary
+        run: |
+          echo "## Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Shards:** ${{ needs.setup.outputs.total_shards }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.smoke-tests.result }}" == "success" ]; then
+            echo ":white_check_mark: All smoke tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo ":x: Smoke tests failed - check individual shards" >> $GITHUB_STEP_SUMMARY
+          fi

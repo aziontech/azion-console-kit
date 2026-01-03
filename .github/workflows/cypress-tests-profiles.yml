@@ -1,0 +1,207 @@
+name: Cypress Tests (4 Profiles Matrix)
+
+# Workflow para testar com as 4 combinações de profiles:
+# - V4_UI_V5_CONFIG: UI Moderna + Domínios massivos (default)
+# - V4_UI_V3_CONFIG: UI Moderna + Domínios padrão
+# - V3_UI_V5_CONFIG: UI Legacy + Domínios massivos
+# - V3_UI_V3_CONFIG: UI Legacy + Domínios padrão
+
+on:
+  # Manual trigger only - requires 4 accounts configured
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test against'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - prod
+      profiles:
+        description: 'Profiles to test (comma-separated or "all")'
+        required: false
+        default: 'all'
+        type: string
+      test_filter:
+        description: 'Grep filter for tests (e.g., @profiles, @crud)'
+        required: false
+        default: '@profiles'
+        type: string
+
+env:
+  HUSKY: 0
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  # Determine which profiles to run
+  setup:
+    name: Setup Profile Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      profiles: ${{ steps.set-matrix.outputs.profiles }}
+    steps:
+      - id: set-matrix
+        run: |
+          INPUT="${{ github.event.inputs.profiles || 'all' }}"
+          if [ "$INPUT" == "all" ]; then
+            echo 'profiles=["V4_UI_V5_CONFIG", "V4_UI_V3_CONFIG", "V3_UI_V5_CONFIG", "V3_UI_V3_CONFIG"]' >> $GITHUB_OUTPUT
+          else
+            # Convert comma-separated to JSON array
+            PROFILES=$(echo $INPUT | sed 's/,/","/g')
+            echo "profiles=[\"${PROFILES}\"]" >> $GITHUB_OUTPUT
+          fi
+
+  cypress-profiles:
+    name: Cypress - ${{ matrix.profile }}
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: ${{ fromJson(needs.setup.outputs.profiles) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Application
+        run: yarn build
+
+      - name: Determine Config and Credentials
+        id: config
+        run: |
+          ENV="${{ github.event.inputs.environment || 'stage' }}"
+          PROFILE="${{ matrix.profile }}"
+
+          echo "config_file=cypress.config.${ENV}.js" >> $GITHUB_OUTPUT
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+          echo "profile=${PROFILE}" >> $GITHUB_OUTPUT
+
+          # Determine credential suffix based on profile
+          case $PROFILE in
+            V4_UI_V5_CONFIG)
+              echo "credential_suffix=" >> $GITHUB_OUTPUT  # Default account
+              ;;
+            V4_UI_V3_CONFIG)
+              echo "credential_suffix=_V4V3" >> $GITHUB_OUTPUT
+              ;;
+            V3_UI_V5_CONFIG)
+              echo "credential_suffix=_V3V5" >> $GITHUB_OUTPUT
+              ;;
+            V3_UI_V3_CONFIG)
+              echo "credential_suffix=_V3V3" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Set Credentials - Stage V4_UI_V5_CONFIG
+        if: ${{ github.event.inputs.environment == 'stage' && matrix.profile == 'V4_UI_V5_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.STAGE_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.STAGE_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Stage V4_UI_V3_CONFIG
+        if: ${{ github.event.inputs.environment == 'stage' && matrix.profile == 'V4_UI_V3_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.STAGE_CYPRESS_EMAIL_V4V3 || secrets.STAGE_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.STAGE_CYPRESS_PASSWORD_V4V3 || secrets.STAGE_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Stage V3_UI_V5_CONFIG
+        if: ${{ github.event.inputs.environment == 'stage' && matrix.profile == 'V3_UI_V5_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.STAGE_CYPRESS_EMAIL_V3V5 || secrets.STAGE_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.STAGE_CYPRESS_PASSWORD_V3V5 || secrets.STAGE_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Stage V3_UI_V3_CONFIG
+        if: ${{ github.event.inputs.environment == 'stage' && matrix.profile == 'V3_UI_V3_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.STAGE_CYPRESS_EMAIL_V3V3 || secrets.STAGE_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.STAGE_CYPRESS_PASSWORD_V3V3 || secrets.STAGE_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Prod V4_UI_V5_CONFIG
+        if: ${{ github.event.inputs.environment == 'prod' && matrix.profile == 'V4_UI_V5_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.PROD_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.PROD_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Prod V4_UI_V3_CONFIG
+        if: ${{ github.event.inputs.environment == 'prod' && matrix.profile == 'V4_UI_V3_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.PROD_CYPRESS_EMAIL_V4V3 || secrets.PROD_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.PROD_CYPRESS_PASSWORD_V4V3 || secrets.PROD_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Prod V3_UI_V5_CONFIG
+        if: ${{ github.event.inputs.environment == 'prod' && matrix.profile == 'V3_UI_V5_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.PROD_CYPRESS_EMAIL_V3V5 || secrets.PROD_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.PROD_CYPRESS_PASSWORD_V3V5 || secrets.PROD_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Set Credentials - Prod V3_UI_V3_CONFIG
+        if: ${{ github.event.inputs.environment == 'prod' && matrix.profile == 'V3_UI_V3_CONFIG' }}
+        run: |
+          echo "CYPRESS_EMAIL=${{ secrets.PROD_CYPRESS_EMAIL_V3V3 || secrets.PROD_CYPRESS_EMAIL }}" >> $GITHUB_ENV
+          echo "CYPRESS_PASSWORD=${{ secrets.PROD_CYPRESS_PASSWORD_V3V3 || secrets.PROD_CYPRESS_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_EMAIL: ${{ env.CYPRESS_EMAIL }}
+          CYPRESS_PASSWORD: ${{ env.CYPRESS_PASSWORD }}
+          CYPRESS_TEST_PROFILE: ${{ matrix.profile }}
+          CYPRESS_TEST_MODE: live
+        with:
+          start: yarn dev --logLevel=warn
+          browser: chrome
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
+          config-file: ${{ steps.config.outputs.config_file }}
+          env: environment=${{ steps.config.outputs.environment }},grepTags=${{ github.event.inputs.test_filter || '@profiles' }},testProfile=${{ matrix.profile }}
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-${{ matrix.profile }}
+          path: cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Videos on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-${{ matrix.profile }}
+          path: cypress/videos
+          retention-days: 3
+          if-no-files-found: ignore
+
+  # Summary job
+  profile-summary:
+    name: Profile Test Summary
+    needs: cypress-profiles
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## Cypress Profile Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | Description | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| V4_UI_V5_CONFIG | UI Moderna + Domínios Massivos | ${{ needs.cypress-profiles.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| V4_UI_V3_CONFIG | UI Moderna + Domínios Padrão | ${{ needs.cypress-profiles.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| V3_UI_V5_CONFIG | UI Legacy + Domínios Massivos | ${{ needs.cypress-profiles.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| V3_UI_V3_CONFIG | UI Legacy + Domínios Padrão | ${{ needs.cypress-profiles.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.environment || 'stage' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Filter:** ${{ github.event.inputs.test_filter || '@profiles' }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,173 @@
+name: Cypress Tests (Sharded)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test against'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - prod
+      test_mode:
+        description: 'Test mode (live = real API, replay = fixtures)'
+        required: true
+        default: 'live'
+        type: choice
+        options:
+          - live
+          - replay
+          - record
+      test_filter:
+        description: 'Grep filter for tests (e.g., @smoke, @crud)'
+        required: false
+        default: ''
+        type: string
+      shard_count:
+        description: 'Number of parallel shards'
+        required: true
+        default: '3'
+        type: choice
+        options:
+          - '3'
+          - '5'
+          - '8'
+          - '10'
+      specific_shard:
+        description: 'Run only this shard (1-N, leave empty for all)'
+        required: false
+        default: ''
+        type: string
+
+env:
+  HUSKY: 0
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  # Setup job to determine shard matrix
+  setup:
+    name: Setup Shards
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      total_shards: ${{ steps.set-matrix.outputs.total_shards }}
+    steps:
+      - id: set-matrix
+        run: |
+          TOTAL="${{ github.event.inputs.shard_count || '3' }}"
+          SPECIFIC="${{ github.event.inputs.specific_shard }}"
+
+          if [ -n "$SPECIFIC" ]; then
+            echo "matrix=[${SPECIFIC}]" >> $GITHUB_OUTPUT
+          else
+            # cypress-split uses 0-based indices (0, 1, 2, ...)
+            SHARDS=$(seq 0 $((TOTAL - 1)) | jq -s -c '.')
+            echo "matrix=${SHARDS}" >> $GITHUB_OUTPUT
+          fi
+          echo "total_shards=${TOTAL}" >> $GITHUB_OUTPUT
+
+  # Parallel test execution
+  cypress-tests:
+    name: Shard ${{ matrix.shard }}/${{ needs.setup.outputs.total_shards }}
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.setup.outputs.matrix) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Application
+        run: yarn build
+
+      - name: Determine Config File
+        id: config
+        run: |
+          ENV="${{ github.event.inputs.environment || 'stage' }}"
+          echo "config_file=cypress.config.${ENV}.js" >> $GITHUB_OUTPUT
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+
+      - name: Determine Grep Tags
+        id: tags
+        run: |
+          FILTER="${{ github.event.inputs.test_filter }}"
+          if [ -n "$FILTER" ]; then
+            echo "grep_tags=${FILTER}" >> $GITHUB_OUTPUT
+          else
+            echo "grep_tags=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        env:
+          STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
+          STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
+          PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
+          PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
+          CYPRESS_TEST_MODE: ${{ github.event.inputs.test_mode || 'live' }}
+          CYPRESS_TEST_PROFILE: V4_UI_V3_CONFIG
+          # cypress-split sharding
+          SPLIT: ${{ needs.setup.outputs.total_shards }}
+          SPLIT_INDEX: ${{ matrix.shard }}
+        with:
+          start: yarn dev --logLevel=warn
+          browser: chrome
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
+          config-file: ${{ steps.config.outputs.config_file }}
+          env: environment=${{ steps.config.outputs.environment }},grepTags=${{ steps.tags.outputs.grep_tags }}
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-shard-${{ matrix.shard }}
+          path: cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Recorded Fixtures
+        if: ${{ github.event.inputs.test_mode == 'record' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixtures-shard-${{ matrix.shard }}
+          path: cypress/fixtures/recorded
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # Summary job
+  test-summary:
+    name: Test Summary
+    needs: [setup, cypress-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## Cypress Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Shards:** ${{ needs.setup.outputs.total_shards }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.environment || 'stage' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Mode:** ${{ github.event.inputs.test_mode || 'live' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Filter:** ${{ github.event.inputs.test_filter || 'all tests' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.cypress-tests.result }}" == "success" ]; then
+            echo ":white_check_mark: All shards passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo ":x: Some shards failed - check individual jobs" >> $GITHUB_STEP_SUMMARY
+          fi
