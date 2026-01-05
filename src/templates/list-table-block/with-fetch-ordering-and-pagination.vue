@@ -130,10 +130,11 @@
           <div class="flex items-center gap-2">
             <template v-if="col.type !== 'component'">
               <div
-                v-html="rowData[col.field]"
                 :data-testid="`list-table-block__column__${col.field}__row`"
                 class="overflow-hidden whitespace-nowrap text-ellipsis"
-              />
+              >
+                {{ rowData[col.field] }}
+              </div>
             </template>
             <template v-else>
               <component
@@ -233,17 +234,19 @@
             >
               <div
                 v-if="!lastModifiedToggled"
-                v-html="rowData.lastModify || rowData.lastModified"
                 v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
-              />
+              >
+                {{ rowData.lastModify || rowData.lastModified }}
+              </div>
               <div
                 v-else
-                v-html="rowData.lastModified"
                 v-tooltip.top="{
                   value: rowData.lastModify || rowData.lastModified,
                   showDelay: 300
                 }"
-              />
+              >
+                {{ rowData.lastModified }}
+              </div>
             </div>
             <div
               class="flex justify-end"
