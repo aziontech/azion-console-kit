@@ -24,7 +24,7 @@
       .filter((col) => col.header && col.header !== 'Last Modified')
       .map((col) => ({
         label: col.header,
-        value: col.field?.toLowerCase()
+        value: col.sortField || col.field?.toLowerCase()
       }))
 
     return filterOptions

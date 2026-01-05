@@ -20,15 +20,7 @@
 
   const handleInput = (value) => {
     emit('update:modelValue', value)
-
-    if (value) {
-      const isValid = validateEmail(value)
-      emailError.value = !isValid
-      emit('validation', isValid)
-    } else {
-      emailError.value = false
-      emit('validation', true)
-    }
+    emit('validation', true)
   }
 
   watch(
