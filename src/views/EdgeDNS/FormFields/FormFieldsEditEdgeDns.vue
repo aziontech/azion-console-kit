@@ -80,6 +80,7 @@
         <FieldTextIcon
           label="Domain Name"
           name="domain"
+          :value="domain"
           placeholder="mydomain.com"
           data-testid="edge-dns-form__domain"
           disabled

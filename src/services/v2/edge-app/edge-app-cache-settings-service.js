@@ -55,6 +55,20 @@ export class CacheSettingsService extends BaseService {
     )
   }
 
+  /**
+   * Prefetches the first page of cache settings to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchCacheSettingsList = async (edgeApplicationId) => {
+    return await this.listCacheSettingsService(edgeApplicationId, {
+      pageSize: 10,
+      page: 1,
+      fields: [],
+      ordering: 'id'
+    })
+  }
+
   #fetchCacheSetting = async (edgeApplicationId, cacheSettingId) => {
     const { data } = await this.http.request({
       method: 'GET',
