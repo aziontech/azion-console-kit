@@ -44,7 +44,7 @@ export const filterBuilder = ({ filterKey, filterValue, onUpdate, onValidation }
         placeholder: 'Select infrastructure'
       })
 
-    case 'last_editor':
+    case 'lasteditor':
       return h(EmailFilterField, {
         modelValue: filterValue,
         'onUpdate:modelValue': onUpdate,

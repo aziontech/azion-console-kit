@@ -21,13 +21,13 @@
 
   const filterOptions = computed(() => {
     const filterOptions = props.filters
-      .filter((col) => col.header)
+      .filter((col) => col.header && col.header !== 'Last Modified')
       .map((col) => ({
         label: col.header,
         value: col.field?.toLowerCase()
       }))
 
-    return [...filterOptions, { label: 'Last Editor', value: 'last_editor' }]
+    return filterOptions
   })
 
   const filterComponent = computed(() => {
