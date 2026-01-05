@@ -42,7 +42,7 @@
         >
           <label
             for="confirm-input"
-            class="font-semibold text-sm"
+            class="font-semibold text-sm whitespace-pre-wrap"
             data-testid="delete-dialog-confirmation-input-label"
             >To confirm, type "{{ data.deleteConfirmationText }}" in the box below:</label
           >
