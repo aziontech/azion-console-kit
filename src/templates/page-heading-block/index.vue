@@ -101,7 +101,7 @@
       >
         <div
           :data-testid="`page_title_${props.pageTitle}`"
-          class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl whitespace-pre-wrap"
           v-if="props.pageTitle"
           :class="{ 'flex gap-3 align-items-center': props.tag }"
         >
