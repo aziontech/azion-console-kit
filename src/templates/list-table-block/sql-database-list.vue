@@ -43,110 +43,130 @@
       }"
     >
       <template #header>
-        <DataTable.Header>
-          <div class="flex flex-col gap-2 w-full">
-            <div class="flex items-center gap-2 justify-between">
-              <div class="text-color text-lg font-medium">{{ props.title }}</div>
+        <DataTable.Header :showDivider="!!appliedFilters.length">
+          <template #first-line>
+            <div class="flex flex-col gap-2 w-full">
+              <div class="flex items-center gap-2 justify-between">
+                <div class="text-color text-lg font-medium">{{ props.title }}</div>
 
-              <SplitButton
-                icon="pi pi-plus"
-                size="small"
-                severity="secondary"
-                label="Insert"
-                @click="insertRow"
-                :disabled="disabledActionsJsonView || disabledAction"
-                :model="items"
-              />
-            </div>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
-              <div class="flex gap-2 items-center">
-                <DataTable.Search
-                  v-model="filters.global.value"
-                  :debounce="500"
-                  placeholder="Search..."
-                  @input="handleSearchValue"
-                  @search="fetchOnSearch"
-                  :disabled="disabledActionsJsonView"
+                <SplitButton
+                  icon="pi pi-plus"
+                  size="small"
+                  severity="secondary"
+                  label="Insert"
+                  @click="insertRow"
+                  :disabled="disabledActionsJsonView || disabledAction"
+                  :model="items"
                 />
               </div>
-              <DataTable.Actions>
-                <SelectButton
-                  v-model="selectedView"
-                  :options="options"
-                  optionLabel="value"
-                  dataKey="value"
-                  aria-labelledby="custom"
-                  @change="onViewChange"
-                >
-                  <template #option="slotProps">
-                    <div class="flex items-center gap-2">
-                      <i :class="slotProps.option.icon"></i>
-                      <span>{{ slotProps.option.label }}</span>
-                    </div>
-                  </template>
-                </SelectButton>
-                <PrimeButton
-                  icon="pi pi-refresh"
-                  @click="reloadTable"
-                  outlined
-                  iconOnly
-                  v-tooltip="{
-                    value: 'Reload',
-                    position: 'bottom'
-                  }"
-                  size="small"
-                />
-                <PrimeButton
-                  icon="pi pi-download"
-                  outlined
-                  iconOnly
-                  @click="toggleExportMenu($event)"
-                  v-tooltip.left="{ value: 'Export', showDelay: 200 }"
-                  size="small"
-                />
-                <Menu
-                  ref="exportMenuRef"
-                  :popup="true"
-                  :model="exportMenuItems"
-                />
-
-                <PrimeButton
-                  icon="ai ai-column"
-                  outlined
-                  iconOnly
-                  :disabled="disabledActionsJsonView"
-                  @click="toggleColumnSelector"
-                  v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
-                  data-testid="data-table-actions-column-header-toggle-columns"
-                />
-                <OverlayPanel
-                  ref="columnSelectorPanel"
-                  :pt="{ content: { class: 'p-0' } }"
-                  data-testid="data-table-actions-column-header-toggle-columns-panel"
-                >
-                  <Listbox
-                    v-model="selectedColumns"
-                    multiple
-                    :options="[
-                      {
-                        label: 'Available Columns',
-                        items: props.columns.filter((c) => c?.field !== 'actions')
-                      }
-                    ]"
-                    class="hidden-columns-panel"
-                    optionLabel="header"
-                    optionGroupLabel="label"
-                    optionGroupChildren="items"
-                    data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+                <div class="flex gap-2 items-center">
+                  <PrimeButton
+                    v-if="allowedFilters.length"
+                    outlined
+                    icon="pi pi-filter"
+                    size="small"
+                    @click="toggleFilter"
+                    :disabled="disabledActionsJsonView"
+                    data-testid="data-table-actions-column-header-toggle-filter"
+                  />
+                  <DataTable.Search
+                    v-model="filters.global.value"
+                    :debounce="500"
+                    placeholder="Search..."
+                    @input="handleSearchValue"
+                    @search="fetchOnSearch"
+                    :disabled="disabledActionsJsonView"
+                  />
+                </div>
+                <DataTable.Actions>
+                  <SelectButton
+                    v-model="selectedView"
+                    :options="options"
+                    optionLabel="value"
+                    dataKey="value"
+                    aria-labelledby="custom"
+                    @change="onViewChange"
                   >
-                    <template #optiongroup="slotProps">
-                      <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                    <template #option="slotProps">
+                      <div class="flex items-center gap-2">
+                        <i :class="slotProps.option.icon"></i>
+                        <span>{{ slotProps.option.label }}</span>
+                      </div>
                     </template>
-                  </Listbox>
-                </OverlayPanel>
-              </DataTable.Actions>
+                  </SelectButton>
+                  <PrimeButton
+                    icon="pi pi-refresh"
+                    @click="reloadTable"
+                    outlined
+                    iconOnly
+                    v-tooltip="{
+                      value: 'Reload',
+                      position: 'bottom'
+                    }"
+                    size="small"
+                  />
+                  <PrimeButton
+                    icon="pi pi-download"
+                    outlined
+                    iconOnly
+                    @click="toggleExportMenu($event)"
+                    v-tooltip.left="{ value: 'Export', showDelay: 200 }"
+                    size="small"
+                  />
+                  <Menu
+                    ref="exportMenuRef"
+                    :popup="true"
+                    :model="exportMenuItems"
+                  />
+
+                  <PrimeButton
+                    icon="ai ai-column"
+                    outlined
+                    iconOnly
+                    :disabled="disabledActionsJsonView"
+                    @click="toggleColumnSelector"
+                    v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
+                    data-testid="data-table-actions-column-header-toggle-columns"
+                  />
+                  <OverlayPanel
+                    ref="columnSelectorPanel"
+                    :pt="{ content: { class: 'p-0' } }"
+                    data-testid="data-table-actions-column-header-toggle-columns-panel"
+                  >
+                    <Listbox
+                      v-model="selectedColumns"
+                      multiple
+                      :options="[
+                        {
+                          label: 'Available Columns',
+                          items: props.columns.filter((c) => c?.field !== 'actions')
+                        }
+                      ]"
+                      class="hidden-columns-panel"
+                      optionLabel="header"
+                      optionGroupLabel="label"
+                      optionGroupChildren="items"
+                      data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                    >
+                      <template #optiongroup="slotProps">
+                        <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                      </template>
+                    </Listbox>
+                  </OverlayPanel>
+                </DataTable.Actions>
+              </div>
             </div>
-          </div>
+          </template>
+          <template
+            #second-line
+            v-if="appliedFilters.length"
+          >
+            <DataTable.AppliedFilters
+              :applied-filters="appliedFilters"
+              @remove="handleRemoveFilter"
+            />
+          </template>
         </DataTable.Header>
       </template>
       <template #empty>
@@ -297,11 +317,18 @@
       :model="computedMenuItems"
       :popup="true"
     />
+    <DataTable.Filter
+      v-if="allowedFilters.length"
+      ref="filterPanel"
+      :filters="allowedFilters"
+      @apply="handleApplyFilter"
+    />
   </div>
 </template>
 
 <script setup>
   import { ref, toRefs, watch, computed, nextTick } from 'vue'
+  import { FilterMatchMode } from 'primevue/api'
   import Column from 'primevue/column'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
@@ -376,6 +403,14 @@
   ]
 
   const dataTypeOptions = dataTypes.map((type) => ({ label: type, value: type }))
+  const allowedFilters = computed(() =>
+    (props.columns || [])
+      .filter((col) => col?.field && col.field !== 'actions')
+      .map((col) => ({
+        ...col,
+        sortField: col?.sortField ?? col?.field
+      }))
+  )
   const isSchemaView = computed(() => selectedView.value?.value === 'schema')
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
@@ -440,6 +475,62 @@
     value: 'table',
     icon: 'pi pi-table'
   })
+
+  const appliedFilters = ref([])
+  const filterPanel = ref(null)
+
+  const resetFilterState = () => {
+    appliedFilters.value = []
+    filters.value = {
+      global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+    }
+    filterPanel.value?.hide?.()
+  }
+
+  const toggleFilter = (event) => {
+    if (filterPanel.value) filterPanel.value.toggle(event)
+  }
+
+  const handleApplyFilter = (filterData) => {
+    const hasValue =
+      filterData?.value !== null && filterData?.value !== undefined && filterData?.value !== ''
+    if (!filterData?.field || !filterData?.label || !hasValue) return
+
+    const existingIndex = appliedFilters.value.findIndex(
+      (filterEntry) => filterEntry.field === filterData.field
+    )
+    const entry = {
+      field: filterData.field,
+      label: filterData.label,
+      value: filterData.value,
+      matchMode: 'contains'
+    }
+    if (existingIndex !== -1) {
+      appliedFilters.value[existingIndex] = entry
+    } else {
+      appliedFilters.value.push(entry)
+    }
+
+    filters.value[filterData.field] = {
+      value: filterData.value,
+      matchMode: FilterMatchMode.CONTAINS
+    }
+  }
+
+  const handleRemoveFilter = (field) => {
+    appliedFilters.value = appliedFilters.value.filter((filterEntry) => filterEntry.field !== field)
+    if (filters.value?.[field]) {
+      delete filters.value[field]
+    }
+  }
+
+  watch(
+    () => selectedView.value?.value,
+    (newValue, oldValue) => {
+      if (!oldValue || newValue === oldValue) return
+      resetFilterState()
+    }
+  )
 
   const {
     filters,
