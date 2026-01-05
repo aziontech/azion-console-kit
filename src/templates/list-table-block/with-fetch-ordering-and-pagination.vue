@@ -353,10 +353,11 @@
             >
               <template v-if="col.type !== 'component'">
                 <div
-                  v-html="rowData[col.field]"
                   :data-testid="`list-table-block__column__${col.field}__row`"
                   class="overflow-hidden whitespace-nowrap text-ellipsis"
-                />
+                >
+                  {{ rowData[col.field] }}
+                </div>
               </template>
               <template v-else>
                 <component

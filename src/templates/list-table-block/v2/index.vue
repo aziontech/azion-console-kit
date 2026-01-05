@@ -245,17 +245,19 @@
             >
               <div
                 v-if="!lastModifiedToggled"
-                v-html="rowData.lastModify || rowData.lastModified"
                 v-tooltip.top="{ value: rowData.lastModified, showDelay: 300 }"
-              />
+              >
+                {{ rowData.lastModify || rowData.lastModified }}
+              </div>
               <div
                 v-else
-                v-html="rowData.lastModified"
                 v-tooltip.top="{
                   value: rowData.lastModify || rowData.lastModified,
                   showDelay: 300
                 }"
-              />
+              >
+                {{ rowData.lastModified }}
+              </div>
             </div>
             <div
               class="flex justify-end"

@@ -781,9 +781,10 @@
             <div
               :class="{ 'pointer-events-none': rowData.isSkeletonRow }"
               @click="!rowData.isSkeletonRow && editItemSelected(rowData)"
-              v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
-            />
+            >
+              {{ rowData[col.field] }}
+            </div>
           </template>
           <template v-else>
             <component
