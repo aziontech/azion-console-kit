@@ -6,7 +6,7 @@ export const listTeamPermissionService = async ({
   fields = '',
   ordering = 'name',
   page = 1,
-  pageSize = 10,
+  pageSize = 100,
   search = ''
 } = {}) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
