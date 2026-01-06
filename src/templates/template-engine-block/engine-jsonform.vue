@@ -6,7 +6,7 @@
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
   import { InputTextControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlTester'
 
-  defineProps({
+  const props = defineProps({
     schema: {
       type: Object,
       required: true
@@ -17,7 +17,9 @@
     }
   })
 
-  const data = ref({})
+  let isValid = false
+  const formData = ref({})
+  const errors = ref([])
   const customRenderers = [
     {
       tester: InputTextControlTester,
@@ -27,8 +29,43 @@
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
 
   const onChangeAzionForm = (event) => {
-    data.value = event.data
+    formData.value = event.data
+    errors.value = event.errors
   }
+
+  const validateForm = () => {
+    isValid = errors.value.length === 0
+    return isValid
+  }
+
+  const getFormData = () => {
+    const data = []
+    const keys = Object.keys(formData.value)
+
+    keys.forEach((key) => {
+      const field = props.schema.properties[key]
+      
+      data.push(
+        parseData({
+          name: key,
+          value: formData.value[key],
+          instantiationDataPath: field.instantiation_data_path
+        })
+      )
+    })
+
+    return data
+  }
+
+  const parseData = (field) => {
+   return {
+      field: field.name,
+      value: field.value,
+      instantiation_data_path: field.instantiationDataPath
+    } 
+  }
+
+  defineExpose({ validateForm, getFormData })
 </script>
 
 <template>
@@ -40,7 +77,7 @@
       <template #inputs>
         <div class="sm:max-w-lg">
           <JsonForms
-            :data="data"
+            :data="formData"
             :schema="schema"
             :renderers="renderers"
             @change="onChangeAzionForm"

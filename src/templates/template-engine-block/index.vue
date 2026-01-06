@@ -78,13 +78,12 @@
           severity: 'error',
           summary: 'Engine not initialized'
         })
+
         return
       }
 
       const isValid = await activeEngine.validateForm()
-      if (!isValid) {
-        return
-      }
+      if (!isValid) return
 
       submitLoading.value = true
       emit('submitClick')
