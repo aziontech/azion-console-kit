@@ -43,6 +43,3 @@ jobs:
           VITE_SSO_IDP_SCIM_E2E: ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.STAGE_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
-      - name: Purge Cache
-        run: |
-          azion purge --wildcard "https://stage-console.azion.com/*" --layer edge_caching
