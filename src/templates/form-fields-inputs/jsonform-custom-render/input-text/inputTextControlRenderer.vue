@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
   import fieldText from '@/templates/form-fields-inputs/fieldText.vue'
 
@@ -18,8 +18,8 @@
     emit('change', value)
   }
 
-  const onBlur = (e) => {
-    const value = e.target?.value
+  const onBlur = (event) => {
+    const value = event.target?.value
     handleChange(path.value, value)
     emit('blur', value)
   }
