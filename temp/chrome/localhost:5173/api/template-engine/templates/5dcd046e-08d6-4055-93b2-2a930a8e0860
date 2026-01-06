@@ -1,0 +1,31 @@
+{
+  "template_type": "script-runner",
+  "uuid": "5dcd046e-08d6-4055-93b2-2a930a8e0860",
+  "name": "[INT] Edge Function Starter Kit",
+  "instantiation_data": "{\r\n    \"image\": \"azionedge/azion-script-builder:edge-builder-stage-latest\",\r\n    \"envs\": [\r\n        {\"key\": \"AZ_NAME\", \"value\": \"\", \"store\": false},\r\n        {\"key\": \"AZ_TASKS\", \"value\": \"HELLO_WORLD\", \"store\": false},\r\n        {\"key\": \"AZ_URL\", \"value\": \"https://api.azionapi.net\", \"store\": false},\r\n        {\"key\": \"AZ_ENV\", \"value\": \"production\", \"store\": false},\r\n        {\"key\": \"IAM_URL\", \"value\": \"https://api.azion.net\", \"store\": false},\r\n        {\"key\": \"DEBUG\", \"value\": \"true\", \"store\": false}\r\n    ]\r\n}",
+  "input_schema": {
+		"type": "object",
+		"title": "Edge Function Starter Kit",
+    "properties": {
+      "az_name": {
+        "type": "string",
+        "label": "Application Name",
+        "description": "Name of your Application",
+        "placeholder": "Enter a name for your new Application.",
+        "maxLength": 100,
+        "pattern": "^(?:[A-Za-z]+)(?:[A-Za-z0-9 _]*)$",
+        "error": "The use of accents and/or special characters is not allowed.",
+        "extensions": {
+          "instantiation_data_path": "envs.[0].value"
+        }
+      }
+    },
+    "required": [
+      "az_name"
+    ]
+  },
+  "is_active": true,
+  "created_at": "2025-02-11T13:00:46.337422Z",
+  "updated_at": "2025-03-06T11:28:46.243728Z",
+  "features": []
+}
