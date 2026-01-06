@@ -59,7 +59,7 @@
 
   const parseData = (field) => {
    return {
-      field: field.name,
+      name: field.name,
       value: field.value,
       instantiation_data_path: field.instantiationDataPath
     } 

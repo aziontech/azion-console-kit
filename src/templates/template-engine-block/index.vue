@@ -89,6 +89,9 @@
       emit('submitClick')
 
       const parsedInputSchema = activeEngine.getFormData()
+      
+      debugger
+
       const instantiateParsedPayload = parsedInputSchema.map((field) => {
         return {
           field: field.name,
