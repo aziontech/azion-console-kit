@@ -94,7 +94,21 @@
         v-if="props.pageTitle || props.description"
       >
         <div
-          class="text-color-secondary lg:max-w-[36rem] overflow-hidden lg:truncate lg:ml-[1.25px] !text-sm"
+          :data-testid="`page_title_${props.pageTitle}`"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl whitespace-pre-wrap"
+          v-if="props.pageTitle"
+          :class="{ 'flex gap-3 align-items-center': props.tag }"
+        >
+          {{ props.pageTitle
+          }}<PrimeTag
+            v-if="props.tag"
+            class="h-max"
+            v-bind="props.tag"
+            v-tooltip.bottom="props.tag?.tooltip"
+          />
+        </div>
+        <div
+          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7 max-md:text-base"
           v-if="props.description"
         >
           {{ props.description }}
