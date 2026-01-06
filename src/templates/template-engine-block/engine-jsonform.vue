@@ -44,7 +44,7 @@
 
     keys.forEach((key) => {
       const field = props.schema.properties[key]
-      
+
       data.push(
         parseData({
           name: key,
@@ -58,11 +58,11 @@
   }
 
   const parseData = (field) => {
-   return {
+    return {
       name: field.name,
       value: field.value,
       instantiation_data_path: field.instantiationDataPath
-    } 
+    }
   }
 
   defineExpose({ validateForm, getFormData })

@@ -10,8 +10,8 @@
   const label = computed(() => control.value.schema.label)
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
-  const error = computed(() => control.value.errors ? control.value.schema.error : '')
-  const errorMessage = computed(() => !error.value ? '' : error.value)
+  const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
+  const errorMessage = computed(() => (!error.value ? '' : error.value))
 
   const onChange = (value) => {
     handleChange(path.value, value)

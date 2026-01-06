@@ -110,7 +110,7 @@
     @blur="onBlur"
   />
   <small
-    v-if="aditionalError ||veeValidateErrorMessage"
+    v-if="aditionalError || veeValidateErrorMessage"
     class="p-error text-xs font-normal leading-tight"
     :data-testid="customTestId.error"
   >
