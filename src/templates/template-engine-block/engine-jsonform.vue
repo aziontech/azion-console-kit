@@ -75,6 +75,7 @@
       <template #inputs>
         <div class="sm:max-w-lg">
           <JsonForms
+            class="flex flex-col gap-8 max-md:gap-6"
             :data="formData"
             :schema="schema"
             :renderers="renderers"
