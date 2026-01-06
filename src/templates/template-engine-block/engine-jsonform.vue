@@ -17,7 +17,6 @@
     }
   })
 
-  let isValid = false
   const formData = ref({})
   const errors = ref([])
   const customRenderers = [
@@ -34,8 +33,7 @@
   }
 
   const validateForm = () => {
-    isValid = errors.value.length === 0
-    return isValid
+    return errors.value.length === 0
   }
 
   const getFormData = () => {
