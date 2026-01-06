@@ -1,5 +1,6 @@
 <script setup>
-  import { ref, inject } from 'vue'
+  import { ref, inject, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
 
   import ContentBlock from '@/templates/content-block'
@@ -15,6 +16,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
     updatedRedirect: {
@@ -23,6 +25,8 @@
     }
   })
 
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
   const isLoading = ref(false)
   const additionalErrors = ref([])
   const updateObject = ref({})
@@ -84,6 +88,12 @@
     await onSubmit()
     isLoading.value = false
   }
+
+  watch(name, (newName) => {
+    if (newName) {
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, newName)
+    }
+  })
 </script>
 
 <template>

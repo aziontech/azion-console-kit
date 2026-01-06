@@ -1,4 +1,4 @@
-import { convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
@@ -8,7 +8,7 @@ const transformMap = {
   debugRules: (value) => value.debug_rules,
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
-  lastModified: (value) => value.last_modified,
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   active: (value) => parseStatusData(value.active)
 }
 

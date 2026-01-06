@@ -1,7 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Real-Time Purge"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Real-Time Purge"
+        description="Invalidate manually cached content across the network."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Purge"
+            @click="handleTrackEvent"
+            createPagePath="real-time-purge/create"
+            data-testid="create_Purge_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <InlineMessage
@@ -14,7 +27,6 @@
       </InlineMessage>
       <ListTableBlock
         ref="listPurgeRef"
-        v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         disabledList
@@ -27,33 +39,27 @@
         emptyListMessage="No purge found."
         :actions="actionsRow"
         :defaultOrderingFieldName="'-last_modified'"
+        hide-last-modified-column
+        :empty-block="{
+          title: 'No purges have been added',
+          description: 'Click the button below to add your first purge.',
+          createButtonLabel: 'Purge',
+          createPagePath: 'real-time-purge/create',
+          documentationService: documentationService
+        }"
       >
       </ListTableBlock>
-      <EmptyResultsBlock
-        v-else
-        title="No purges have been added"
-        description="Click the button below to add your first purge."
-        createButtonLabel="Purge"
-        @click-to-create="handleTrackEvent"
-        createPagePath="real-time-purge/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { computed, ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2/purge/purge-service'
@@ -76,7 +82,6 @@
   const listPurgeRef = ref('')
   const route = useRoute()
   const router = useRouter()
-  const hasContentToList = ref(true)
   const isLoading = ref(null)
   const toast = useToast()
   const timeToReload = 9000
@@ -90,9 +95,8 @@
   const user = accountData
   const countPurge = ref(0)
 
-  const handleLoadData = async (event) => {
-    countPurge.value = listPurgeRef.value.data.filter((item) => item.user === user.email).length
-    hasContentToList.value = event
+  const handleLoadData = async () => {
+    countPurge.value = listPurgeRef.value.data?.filter((item) => item.user === user.email).length
     const { isPending } = route.query
     const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
     if (hasPendingMismatch) {
@@ -206,7 +210,7 @@
         filterPath: 'arguments.content',
         type: 'component',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     ]
   })

@@ -37,9 +37,9 @@ jobs:
           NODE_ENV: stage
           VITE_ENVIRONMENT: stage
           VITE_STAGE_SENTRY: ${{ secrets.STAGE_SENTRY }}
-          VITE_SSO_GITHUB:  ${{ secrets.STAGE_SSO_GITHUB }}
-          VITE_SSO_GOOGLE:  ${{ secrets.STAGE_SSO_GOOGLE }}
-          VITE_SSO_AZURE:  ${{ secrets.STAGE_SSO_AZURE }}
-          VITE_SSO_IDP_SCIM_E2E:  ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
+          VITE_SSO_GITHUB: ${{ secrets.STAGE_SSO_GITHUB }}
+          VITE_SSO_GOOGLE: ${{ secrets.STAGE_SSO_GOOGLE }}
+          VITE_SSO_AZURE: ${{ secrets.STAGE_SSO_AZURE }}
+          VITE_SSO_IDP_SCIM_E2E: ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.STAGE_SENTRY_AUTH_TOKEN }}
-          VITE_SENTRY_UPLOAD: true
+        VITE_SENTRY_UPLOAD: true
