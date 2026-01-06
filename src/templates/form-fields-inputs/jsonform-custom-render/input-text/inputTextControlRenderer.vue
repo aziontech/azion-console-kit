@@ -11,19 +11,16 @@
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
-  const errorMessage = computed(() => (!error.value || !isTouched.value ? '' : error.value))
-  const isTouched = ref(false)
+  const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
+  const isChanged = ref(false)
 
   const onChange = (value) => {
-    isTouched.value = true
-
+    isChanged.value = true
     handleChange(path.value, value)
     emit('change', value)
   }
 
   const onBlur = (event) => {
-    isTouched.value = true
-
     const value = event.target?.value
     handleChange(path.value, value)
     emit('blur', value)
