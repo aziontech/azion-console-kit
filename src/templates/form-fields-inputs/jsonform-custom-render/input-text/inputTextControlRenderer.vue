@@ -5,7 +5,7 @@
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
-  
+
   const { control, handleChange } = useJsonFormsControl(props)
   const isChanged = ref(false)
   const description = computed(() => control.value.description)
@@ -14,7 +14,7 @@
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
-  
+
   const onChange = (value) => {
     isChanged.value = true
     handleChange(path.value, value)
