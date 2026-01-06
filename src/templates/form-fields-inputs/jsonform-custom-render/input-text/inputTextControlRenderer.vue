@@ -1,5 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
   import fieldText from '@/templates/form-fields-inputs/fieldText.vue'
 
@@ -11,14 +11,19 @@
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
-  const errorMessage = computed(() => (!error.value ? '' : error.value))
+  const errorMessage = computed(() => (!error.value || !isTouched.value ? '' : error.value))
+  const isTouched = ref(false)
 
   const onChange = (value) => {
+    isTouched.value = true
+
     handleChange(path.value, value)
     emit('change', value)
   }
 
   const onBlur = (event) => {
+    isTouched.value = true
+
     const value = event.target?.value
     handleChange(path.value, value)
     emit('blur', value)
