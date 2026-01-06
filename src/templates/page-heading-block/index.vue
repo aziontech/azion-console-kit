@@ -88,18 +88,12 @@
           </span>
         </template>
       </Breadcrumb>
-
-      <div
-        class="flex flex-col justify-start gap-3 px-0.5"
-        v-if="props.pageTitle || props.description"
+      <span
+        class="text-[var(--text-color-secondary)] text-sm font-normal leading-7 max-md:text-base"
+        v-if="props.description"
       >
-        <div
-          class="text-color-secondary lg:max-w-[36rem] overflow-hidden lg:truncate lg:ml-[1.25px] !text-sm"
-          v-if="props.description"
-        >
-          {{ props.description }}
-        </div>
-      </div>
+        {{ props.description }}
+      </span>
     </div>
     <div
       v-if="hasDefaultSlot"

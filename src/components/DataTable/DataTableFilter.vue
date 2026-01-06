@@ -59,10 +59,6 @@
     overlayPanel.value.toggle(event)
   }
 
-  const hide = () => {
-    overlayPanel.value.hide()
-  }
-
   const handleCancel = () => {
     overlayPanel.value.hide()
     selectedField.value = null
@@ -95,7 +91,7 @@
     isEmailValid.value = true
   }
 
-  defineExpose({ toggle, hide })
+  defineExpose({ toggle })
 </script>
 <template>
   <OverlayPanel
