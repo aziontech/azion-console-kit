@@ -185,7 +185,7 @@
   }
   const changeRouteByTab = (tab) => {
     const params = { id: edgeApplicationId.value, tab }
-    router.push({ name: 'edit-application', params, query: route.query })
+    router.push({ name: 'edit-application', params, query: {} })
   }
   const changeTab = (index) => {
     verifyTab(edgeApplication.value)
