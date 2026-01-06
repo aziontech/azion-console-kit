@@ -120,6 +120,17 @@
             </div>
           </div>
         </div>
+        <div class="flex justify-end mt-2">
+          <PrimeButton
+            label="Clear"
+            icon="pi pi-times"
+            size="small"
+            outlined
+            class="w-20"
+            severity="secondary"
+            @click="resetToLastFiveMinutes"
+          />
+        </div>
       </TabPanel>
       <TabPanel header="Relative">
         <div class="flex flex-col gap-4">
@@ -201,6 +212,7 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    COMMON_DATE_RANGES,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -252,7 +264,7 @@
   const selectedMonth = ref(new Date().getMonth())
   const selectedYear = ref(new Date().getFullYear())
 
-  const relativeValue = ref(15)
+  const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
   const relativeDirection = ref(getCurrentMonthLabel().toLowerCase())
 
@@ -386,6 +398,40 @@
       model.value.label = ''
       emit('select', model.value)
     }
+  }
+
+  const resetToLastFiveMinutes = () => {
+    const now = new Date()
+    const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
+      5,
+      'minutes',
+      'last',
+      now
+    )
+
+    activeTab.value = 1
+    relativeValue.value = 5
+    relativeUnit.value = 'minutes'
+    relativeDirection.value = getCurrentMonthLabel().toLowerCase()
+
+    selectedTime.value = ''
+    hasChanges.value = false
+    tempInputValue.value = ''
+
+    model.value = {
+      startDate: newStartDate,
+      endDate: newEndDate,
+      label: COMMON_DATE_RANGES.last_5_minutes.label,
+      relative: {
+        direction: 'last',
+        value: 5,
+        unit: 'minutes',
+        preset: 'last_5_minutes'
+      }
+    }
+
+    emit('select', model.value)
+    overlayPanel.value?.hide?.()
   }
 
   const setToNow = () => {
