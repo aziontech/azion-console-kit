@@ -104,7 +104,7 @@
     :readonly="readonly"
     :disabled="disabled"
     :placeholder="props.placeholder"
-    :class="[{ 'p-invalid': aditionalError || errorMessage }, props.class]"
+    :class="[{ 'p-invalid': aditionalError || veeValidateErrorMessage }, props.class]"
     @input="onChange"
     @keypress.enter.prevent
     @blur="onBlur"
