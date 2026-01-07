@@ -7,6 +7,7 @@
 
   import { useAccountStore } from '@/stores/account'
   import { ref, onMounted, defineModel } from 'vue'
+  import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
 
@@ -33,7 +34,35 @@
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
 
+  const parseRelativeFromLabel = (label) => {
+    if (!label || typeof label !== 'string') return null
+
+    const match = label.trim().match(/^(last|next)\s+(\d+)\s+([a-zA-Z]+)$/i)
+    if (!match) return null
+
+    const direction = match[1].toLowerCase()
+    const value = Number(match[2])
+    const unit = match[3].toLowerCase()
+
+    if (!Number.isFinite(value) || value <= 0) return null
+
+    return { direction, value, unit }
+  }
+
   const updatedTime = () => {
+    const parsed = parseRelativeFromLabel(filterDataRange.value.label)
+    if (parsed) {
+      const { startDate, endDate } = createRelativeRange(
+        parsed.value,
+        parsed.unit,
+        parsed.direction,
+        new Date()
+      )
+
+      filterDataRange.value.startDate = startDate
+      filterDataRange.value.endDate = endDate
+    }
+
     const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(
       filterDataRange.value.startDate,
       filterDataRange.value.endDate,

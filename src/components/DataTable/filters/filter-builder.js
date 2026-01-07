@@ -23,8 +23,27 @@ const CERTIFICATE_TYPE_OPTIONS = [
   { label: 'Trusted CA Certificate', value: 'trusted_ca_certificate' }
 ]
 
-export const filterBuilder = ({ filterKey, filterValue, onUpdate, onValidation }) => {
-  const normalizedKey = filterKey.toLowerCase()
+const DATA_TYPES_OPTIONS = [
+  {
+    label: 'INTEGER',
+    value: 'INTEGER'
+  },
+  { label: 'BIGINT', value: 'BIGINT' },
+  { label: 'DECIMAL', value: 'DECIMAL' },
+  { label: 'FLOAT', value: 'FLOAT' },
+  { label: 'VARCHAR', value: 'VARCHAR' },
+  { label: 'TEXT', value: 'TEXT' },
+  { label: 'BOOLEAN', value: 'BOOLEAN' },
+  { label: 'DATE', value: 'DATE' },
+  { label: 'DATETIME', value: 'DATETIME' },
+  { label: 'TIMESTAMP', value: 'TIMESTAMP' },
+  { label: 'JSON', value: 'JSON' },
+  { label: 'UUID', value: 'UUID' }
+]
+
+export const filterBuilder = ({ filterKey, filterHeader, filterValue, onUpdate, onValidation }) => {
+  const normalizedKey = String(filterKey || '').toLowerCase()
+  const normalizedHeader = String(filterHeader || '').toLowerCase()
 
   switch (normalizedKey) {
     case 'active':
@@ -58,12 +77,15 @@ export const filterBuilder = ({ filterKey, filterValue, onUpdate, onValidation }
         placeholder: 'Select managed'
       })
     case 'type':
+      const isCertificate = normalizedHeader.includes('certificate')
+
       return h(DropdownFilterField, {
         modelValue: filterValue,
         'onUpdate:modelValue': onUpdate,
-        options: CERTIFICATE_TYPE_OPTIONS,
+        options: isCertificate ? CERTIFICATE_TYPE_OPTIONS : DATA_TYPES_OPTIONS,
         placeholder: 'Select type'
       })
+
     default:
       return h(TextFilterField, {
         modelValue: filterValue,
