@@ -464,14 +464,13 @@
     }
 
     if (shouldShowFullSkeleton.value && props.columns.length) {
-      const teste = Array.from({ length: props.rows }, (aux, index) => {
+      return Array.from({ length: props.rows }, (aux, index) => {
         const row = { id: index }
         props.columns.forEach((col) => {
           row[col.field] = null
         })
         return row
       })
-      return teste
     }
     return props.data
   })
