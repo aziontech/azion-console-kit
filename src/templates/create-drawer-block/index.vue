@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, provide } from 'vue'
+  import { computed, ref, provide, nextTick, watch } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
@@ -67,6 +67,7 @@
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
+  const isInitializing = ref(true)
   const formDrawerHasUpdated = ref(false)
   const isExpanded = ref(props.expandedDefault)
 
@@ -78,6 +79,8 @@
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
+
+  const isDirty = useIsFormDirty()
 
   const visibleDrawer = computed({
     get: () => props.visible,
@@ -92,9 +95,21 @@
   })
 
   const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
+    return blockViewRedirection.value && isDirty.value && !isInitializing.value
   })
+
+  watch(
+    () => props.visible,
+    async (isVisible) => {
+      if (isVisible) {
+        isInitializing.value = true
+        await nextTick()
+        setTimeout(() => {
+          isInitializing.value = false
+        }, 100)
+      }
+    }
+  )
 
   const changeVisibleDrawer = (isVisible, isResetForm) => {
     emit('update:visible', isVisible)
@@ -145,7 +160,12 @@
           blockViewRedirection.value = true
           return
         }
+        isInitializing.value = true
         formContext.resetForm()
+        await nextTick()
+        setTimeout(() => {
+          isInitializing.value = false
+        }, 100)
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true

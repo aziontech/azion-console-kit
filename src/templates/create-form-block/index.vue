@@ -2,7 +2,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, nextTick, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
@@ -52,10 +52,18 @@
   const router = useRouter()
   const toast = useToast()
   const blockViewRedirection = ref(props.unSaved)
+  const isInitializing = ref(true)
+  const isDirty = useIsFormDirty()
 
   const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
+    return blockViewRedirection.value && isDirty.value && !isInitializing.value
+  })
+
+  onMounted(async () => {
+    await nextTick()
+    setTimeout(() => {
+      isInitializing.value = false
+    }, 100)
   })
 
   const classForm = computed(() => {

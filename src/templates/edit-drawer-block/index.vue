@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onBeforeMount, ref, provide } from 'vue'
+  import { computed, ref, provide, nextTick, watch } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import Sidebar from 'primevue/sidebar'
@@ -68,9 +68,11 @@
   const { scrollToErrorInDrawer } = useScrollToError()
   const toast = useToast()
   const blockViewRedirection = ref(true)
+  const isInitializing = ref(true)
   const formDrawerHasUpdated = ref(false)
   const loading = ref(false)
   const showGoBack = ref(false)
+  const isDirty = useIsFormDirty()
 
   const isLoading = computed(() => {
     return isSubmitting.value || loading.value
@@ -89,8 +91,7 @@
   })
 
   const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
+    return blockViewRedirection.value && isDirty.value && !isInitializing.value
   })
 
   const changeVisibleDrawer = (isVisible, isResetForm) => {
@@ -124,6 +125,7 @@
       loading.value = true
       const initialValues = await props.loadService({ id: props.id })
       resetForm({ values: initialValues })
+      await nextTick()
     } catch (error) {
       emit('onError', error)
       showToast('error', error)
@@ -147,7 +149,12 @@
           blockViewRedirection.value = false
           return
         }
+        isInitializing.value = true
         formContext.resetForm()
+        await nextTick()
+        setTimeout(() => {
+          isInitializing.value = false
+        }, 100)
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true
@@ -173,9 +180,19 @@
     toggleDrawerVisibility(false)
   }
 
-  onBeforeMount(async () => {
-    await loadInitialData()
-  })
+  watch(
+    () => props.visible,
+    async (isVisible) => {
+      if (isVisible) {
+        isInitializing.value = true
+        await loadInitialData()
+        setTimeout(() => {
+          isInitializing.value = false
+        }, 100)
+      }
+    },
+    { immediate: true }
+  )
 
   provide('drawerUnsaved', {
     changeVisibleDrawer,

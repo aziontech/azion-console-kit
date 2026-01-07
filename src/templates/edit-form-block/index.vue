@@ -2,7 +2,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref, watch, inject } from 'vue'
+  import { computed, ref, watch, inject, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -56,6 +56,7 @@
   const route = useRoute()
   const toast = useToast()
   const blockViewRedirection = ref(true)
+  const isInitializing = ref(true)
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
     validationSchema: props.schema,
@@ -73,7 +74,7 @@
   const isDirty = useIsFormDirty()
 
   const formHasChanges = computed(() => {
-    return blockViewRedirection.value && isDirty.value
+    return blockViewRedirection.value && isDirty.value && !isInitializing.value
   })
 
   watch(formHasChanges, () => {
@@ -113,12 +114,20 @@
         const initialValues = props.initialValues
         emit('loaded-service-object', initialValues)
         resetForm({ values: initialValues })
+        await nextTick()
+        setTimeout(() => {
+          isInitializing.value = false
+        }, 100)
         return
       }
       const { id } = route.params
       const initialValues = await props.loadService({ id })
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
+      await nextTick()
+      setTimeout(() => {
+        isInitializing.value = false
+      }, 100)
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
@@ -140,7 +149,12 @@
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
         if (props.disableRedirect) {
+          isInitializing.value = true
           resetForm({ values })
+          await nextTick()
+          setTimeout(() => {
+            isInitializing.value = false
+          }, 100)
           blockViewRedirection.value = true
           return
         }

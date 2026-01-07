@@ -31,25 +31,15 @@
   const redirectToUnsaved = ref(currentRouter)
   const unsavedDisabled = ref(false)
 
-  let changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved
+  const unsavedStatus = props.isTabs ? inject('unsaved') : null
+  const drawerUnsavedStatus = props.isDrawer ? inject('drawerUnsaved') : null
 
-  if (props.isTabs) {
-    const unsavedStatus = inject('unsaved')
+  const changeTab = unsavedStatus?.changeTab
+  const tabHasUpdate = unsavedStatus?.tabHasUpdate
+  const visibleOnSaved = unsavedStatus?.visibleOnSaved
 
-    changeTab = unsavedStatus.changeTab
-    tabHasUpdate = unsavedStatus.tabHasUpdate
-    formHasUpdated = unsavedStatus.formHasUpdated
-    visibleOnSaved = unsavedStatus.visibleOnSaved
-  }
-
-  let changeVisibleDrawer, formDrawerHasUpdated
-
-  if (props.isDrawer) {
-    const unsavedStatus = inject('drawerUnsaved')
-
-    changeVisibleDrawer = unsavedStatus.changeVisibleDrawer
-    formDrawerHasUpdated = unsavedStatus.formDrawerHasUpdated
-  }
+  const changeVisibleDrawer = drawerUnsavedStatus?.changeVisibleDrawer
+  const formDrawerHasUpdated = drawerUnsavedStatus?.formDrawerHasUpdated
 
   const visibleDialog = computed({
     get: () => showDialog.value,
@@ -99,17 +89,19 @@
     return next()
   })
 
-  watch(
-    tabHasUpdate,
-    () => {
-      if (formHasUpdated.value) {
-        visibleOnSaved.value = true
-        openDialogUnsaved(true)
-        changeTab(tabHasUpdate.oldTab)
-      }
-    },
-    { deep: true }
-  )
+  if (unsavedStatus) {
+    watch(
+      () => unsavedStatus.tabHasUpdate.updated,
+      () => {
+        if (unsavedStatus.formHasUpdated.value) {
+          unsavedStatus.visibleOnSaved.value = true
+          openDialogUnsaved(true)
+          unsavedStatus.changeTab(unsavedStatus.tabHasUpdate.oldTab)
+        }
+      },
+      { flush: 'sync' }
+    )
+  }
 
   watch(formDrawerHasUpdated, () => {
     openDialogUnsaved(true)
