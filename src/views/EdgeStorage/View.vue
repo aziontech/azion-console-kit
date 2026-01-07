@@ -139,7 +139,7 @@
 
     return {
       name: bucket?.name,
-      edge_access: bucket?.edgeAccess
+      workloads_access: bucket?.workloadsAccess
     }
   }
 

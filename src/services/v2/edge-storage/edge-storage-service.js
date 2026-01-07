@@ -59,7 +59,7 @@ export class EdgeStorageService extends BaseService {
     await this.http.request({
       method: 'PATCH',
       url: `${this.baseURL}/buckets/${bucket.name}`,
-      body: { edge_access: bucket.edge_access }
+      body: { workloads_access: bucket.workloads_access }
     })
 
     return `Bucket "${bucket.name}" has been updated successfully`

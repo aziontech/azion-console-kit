@@ -20,11 +20,11 @@
   defineEmits(['delete-bucket'])
 
   const { value: name } = useField('name')
-  const { value: edge_access } = useField('edge_access', undefined, {
+  const { value: workloads_access } = useField('workloads_access', undefined, {
     initialValue: 'read_write'
   })
 
-  const edgeAccessOptions = [
+  const workloadsAccessOptions = [
     { label: 'Read & Write', value: 'read_write' },
     { label: 'Read Only', value: 'read_only' },
     { label: 'Restricted', value: 'restricted' }
@@ -60,9 +60,9 @@
         <div class="flex flex-col max-w-sm gap-2">
           <FieldDropdown
             label="Workloads Access"
-            name="edge_access"
-            :value="edge_access"
-            :options="edgeAccessOptions"
+            name="workloads_access"
+            :value="workloads_access"
+            :options="workloadsAccessOptions"
             optionLabel="label"
             optionValue="value"
             description="Set the access level for Workloads to interact with this bucket. Choose whether they can read, write, or restrict access entirely."
