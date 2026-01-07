@@ -7,6 +7,8 @@
   import { InputTextControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlTester'
   import InputPasswordControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-password/inputPasswordControlRenderer.vue'
   import { InputPasswordControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-password/inputPasswordControlTester'
+  import InputNumberControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlRenderer.vue'
+  import { InputNumberControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlTester'
 
   const props = defineProps({
     schema: {
@@ -29,6 +31,10 @@
     {
       tester: InputPasswordControlTester,
       renderer: InputPasswordControlRenderer
+    },
+    {
+      tester: InputNumberControlTester,
+      renderer: InputNumberControlRenderer
     }
   ]
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])

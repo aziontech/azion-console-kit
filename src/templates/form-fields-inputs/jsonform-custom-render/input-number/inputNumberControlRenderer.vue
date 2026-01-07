@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldTextPassword from '@/templates/form-fields-inputs/fieldTextPassword.vue'
+  import fieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
@@ -14,6 +14,11 @@
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
+  const min = computed(() => control.value.schema.minimum)
+  const max = computed(() => control.value.schema.maximum)
+  const step = computed(() => control.value.schema.multipleOf || 1)
+  const showButtons = computed(() => control.value.schema.showButtons ?? true)
+  const useGrouping = computed(() => control.value.schema.useGrouping ?? true)
 
   const onChange = (value) => {
     isChanged.value = true
@@ -30,12 +35,17 @@
 
 <template>
   <div class="flex flex-col gap-2">
-    <fieldTextPassword
+    <fieldNumber
       :name="path"
       :label="label"
       :description="description"
       :required="required"
       :aditionalError="errorMessage"
+      :min="min"
+      :max="max"
+      :step="step"
+      :showButtons="showButtons"
+      :useGrouping="useGrouping"
       @blur="onBlur"
       @input="onChange"
     />
