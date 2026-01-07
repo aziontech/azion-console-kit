@@ -5,6 +5,9 @@
  * @returns {number} Time in milliseconds
  */
 export const getTimeInMs = (value, unit) => {
+  const normalizedUnit = (unit || '').toLowerCase().endsWith('s')
+    ? (unit || '').toLowerCase()
+    : `${(unit || '').toLowerCase()}s`
   const multipliers = {
     seconds: 1000,
     minutes: 60 * 1000,
@@ -15,7 +18,7 @@ export const getTimeInMs = (value, unit) => {
     years: 365 * 24 * 60 * 60 * 1000
   }
 
-  return value * (multipliers[unit] || 1000)
+  return value * (multipliers[normalizedUnit] || 1000)
 }
 
 /**
