@@ -290,7 +290,7 @@
                       outlined
                       icon="pi pi-refresh"
                       size="small"
-                      @click="reload"
+                      @click="reload({ page: 1, skipCache: true })"
                       v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                       data-testid="data-table-actions-column-header-refresh"
                     />

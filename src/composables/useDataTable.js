@@ -139,6 +139,30 @@ export function useDataTable(props, emit) {
         emit('on-load-data', !!hasData)
       }
       firstLoadData.value = false
+      if (query.skipCache) {
+        const event = {
+          originalEvent: {
+            page: 0,
+            first: 0,
+            rows: 10,
+            pageCount: 39
+          },
+          first: 0,
+          rows: 10,
+          sortField: null,
+          sortOrder: null,
+          multiSortMeta: [],
+          filters: {},
+          pageCount: 39,
+          page: 0,
+          skipReload: true
+        }
+        const numberOfLinesPerPage = event.rows
+        tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+        itemsByPage.value = numberOfLinesPerPage
+        minimumOfItemsPerPage.value = numberOfLinesPerPage
+        firstItemIndex.value = event.first
+      }
     }
   }
 
@@ -146,7 +170,6 @@ export function useDataTable(props, emit) {
     if (!savedOrdering.value && props.defaultOrderingFieldName) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
-
     const hasActiveFilters = appliedFilters.value.length > 0 || query.hasFilter
 
     const commonParams = {
@@ -154,7 +177,7 @@ export function useDataTable(props, emit) {
       pageSize: itemsByPage.value,
       fields: props.apiFields || [],
       ordering: savedOrdering.value,
-      skipCache: true,
+      skipCache: query.skipCache,
       ...query
     }
 
