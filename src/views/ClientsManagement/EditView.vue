@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Client" />
+      <PageHeadingBlock :pageTitle="clientName" />
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +9,7 @@
         :loadService="props.loadAccountService"
         :schema="validationSchema"
         :updatedRedirect="props.updatedRedirect"
+        @loaded-service-object="setClientName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -41,11 +42,21 @@
   import FormFieldsCreateClients from './FormFields/FormFieldsCreateClients.vue'
 
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const clientName = ref('Edit Client')
+
+  const setClientName = (client) => {
+    clientName.value = client.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, client.name)
+  }
 
   const props = defineProps({
     loadAccountService: {

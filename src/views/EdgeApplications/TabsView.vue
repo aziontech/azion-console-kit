@@ -13,13 +13,14 @@
   import { useToast } from 'primevue/usetoast'
   import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import EditView from './EditView.vue'
   import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
+  import PrimeButton from 'primevue/button'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
-
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
@@ -56,6 +57,7 @@
   const toast = useToast()
   const route = useRoute()
   const router = useRouter()
+  const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
@@ -63,6 +65,17 @@
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
+
+  const componentsRefs = ref(null)
+
+  const addButtonController = computed(() => {
+    const tab = filteredTabs.value[activeTab.value]
+    return {
+      showAddButtonTab: !!tab?.showAddButtonTab,
+      label: tab?.header || 'Create',
+      click: () => componentsRefs.value[0].openCreateDrawer?.()
+    }
+  })
 
   const handleTrackClickToEditErrorResponses = () => {
     tracker.product.clickToEdit({ productName: 'Error Responses' }).track()
@@ -152,6 +165,7 @@
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
 
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
     preloadTabData()
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
@@ -257,6 +271,7 @@
       component: EdgeApplicationsOriginsListView,
       condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
+      showAddButtonTab: true,
       props: () => ({
         ...props.originsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -268,6 +283,7 @@
       component: EdgeApplicationsDeviceGroupsListView,
       condition: true,
       show: showTabs.deviceGroups,
+      showAddButtonTab: true,
       props: () => ({
         ...props.deviceGroupsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -289,6 +305,7 @@
       component: EdgeApplicationsCacheSettingsListView,
       condition: true,
       show: showTabs.cacheSettings,
+      showAddButtonTab: true,
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isTieredCacheEnabled: true,
@@ -300,6 +317,7 @@
       component: EdgeApplicationsFunctionsListView,
       condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
+      showAddButtonTab: true,
       props: () => ({
         ...props.functionsServices,
         ...props.edgeFunctionsServices,
@@ -366,28 +384,52 @@
       <PageHeadingBlock
         :pageTitle="tabTitle"
         :tag="tagLocked"
+        :entityName="edgeApplication?.name"
         data-testid="edge-application-details-heading"
       />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="({ index = 0 }) => changeTab(index)"
-        class="w-full h-full"
+      <div
+        class="h-full w-full"
         v-if="edgeApplication"
       >
-        <TabPanel
-          v-for="(tab, index) in filteredTabs"
-          :pt="{
-            headerAction: { id: `tab_${index}` },
-            root: {
-              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
-              id: `${tab.header}`
-            }
-          }"
-          :key="index"
-          :header="tab.header"
-        >
+        <div class="flex align-center justify-between relative">
+          <TabView
+            :activeIndex="activeTab"
+            @tab-click="({ index = 0 }) => changeTab(index)"
+            class="flex-1"
+          >
+            <TabPanel
+              v-for="(tab, index) in filteredTabs"
+              :pt="{
+                headerAction: {
+                  id: `tab_${index}`
+                },
+                root: {
+                  'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
+                  id: `${tab.header}`
+                }
+              }"
+              :key="index"
+              :header="tab.header"
+            >
+            </TabPanel>
+          </TabView>
+          <div
+            v-if="addButtonController.showAddButtonTab"
+            class="flex ml-4 items-center"
+          >
+            <PrimeButton
+              :label="addButtonController.label"
+              size="small"
+              icon="pi pi-plus"
+              @click="addButtonController.click"
+              data-testid="data-table-actions-column-body-actions-menu-button"
+            />
+          </div>
+        </div>
+
+        <div>
           <InlineMessage
             class="mt-4 w-full"
             severity="warn"
@@ -396,14 +438,20 @@
             <b>Warning</b>
             {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
           </InlineMessage>
-          <component
-            :is="tab.component"
-            v-if="tab.show"
-            @updatedApplication="updatedApplication"
-            v-bind="tab.props()"
-          />
-        </TabPanel>
-      </TabView>
+          <template
+            v-for="(tab, index) in filteredTabs"
+            :key="index"
+          >
+            <component
+              ref="componentsRefs"
+              :is="tab.component"
+              v-if="tab.show"
+              @updatedApplication="updatedApplication"
+              v-bind="tab.props()"
+            />
+          </template>
+        </div>
+      </div>
     </template>
   </ContentBlock>
 </template>

@@ -71,7 +71,7 @@
         header: 'Address',
         type: 'component',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
       {
         field: 'originKey',
@@ -80,10 +80,10 @@
         filterPath: 'originKey.content',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
+            data: columnData.content,
+            columnAppearance: 'text-format-with-popup',
             dependencies: {
-              copyContentService: props.clipboardWrite
+              showCopy: !!props.clipboardWrite
             }
           })
         }
@@ -130,8 +130,13 @@
     hasContentToList.value = true
   }
 
+  defineExpose({
+    openCreateDrawer: openCreateOriginDrawer
+  })
+
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'origin',
       icon: 'pi pi-trash',

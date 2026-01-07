@@ -101,10 +101,11 @@ export class EdgeApplicationFunctionService extends BaseService {
       params.ordering,
       params.search
     ]
+    const hasFilter = params?.hasFilter || false
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
-      { persist: params.page === 1 && !params.search }
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
   }
 

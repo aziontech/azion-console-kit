@@ -1,12 +1,11 @@
 <script setup>
-  import { computed, ref, inject } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -20,21 +19,17 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'network list',
       icon: 'pi pi-trash',
       service: networkListsService.deleteNetworkList
     }
   ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -48,17 +43,35 @@
     })
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      listType: rowData.listType,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified
+    }
+  }
+
   const getColumns = computed(() => {
     return [
+      {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        style: 'max-width: 300px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
+      },
       {
         field: 'id',
         header: 'ID',
         sortField: 'id',
         filterPath: 'id'
-      },
-      {
-        field: 'name',
-        header: 'Name'
       },
       {
         field: 'listType',
@@ -67,50 +80,71 @@
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor'
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
-        sortField: 'last_modified',
-        header: 'Last Modified'
+        header: 'Last Modified',
+        sortField: 'lastModified',
+        filterPath: 'lastModified'
       }
     ]
   })
+
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    }
+  ]
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Network Lists"
+        description="Organize and manage IP and network lists securely."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Network List"
+            createPagePath="network-lists/create"
+            @click="handleCreateTrackEvent"
+            data-testid="create_NetworkList_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
-        addButtonLabel="Network List"
-        createPagePath="network-lists/create"
-        editPagePath="network-lists/edit"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleCreateTrackEvent"
+        editPagePath="/network-lists/edit"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No network lists found."
         :actions="actions"
         :apiFields="NETWORK_LIST_API_FIELDS"
+        :frozen-columns="['name']"
+        exportFileName="Network Lists"
+        :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
+        :emptyBlock="{
+          title: 'No network lists have been added',
+          description:
+            'Click the button below to add a network list based on ASNs, countries, or IP addresses.',
+          createButtonLabel: 'Network List',
+          createPagePath: 'network-lists/create',
+          documentationService: documentationService
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No network lists have been added"
-        description="Click the button below to add a network list based on ASNs, countries, or IP addresses."
-        createButtonLabel="Network List"
-        @click-to-create="handleCreateTrackEvent"
-        createPagePath="network-lists/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
