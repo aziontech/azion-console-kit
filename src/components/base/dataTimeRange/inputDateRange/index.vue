@@ -120,17 +120,6 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end mt-2">
-          <PrimeButton
-            label="Clear"
-            icon="pi pi-times"
-            size="small"
-            outlined
-            class="w-20"
-            severity="secondary"
-            @click="resetToLastFiveMinutes"
-          />
-        </div>
       </TabPanel>
       <TabPanel header="Relative">
         <div class="flex flex-col gap-4">
@@ -176,6 +165,14 @@
             @keydown.enter="updateRange"
           />
           <template v-if="activeTab === 0">
+            <PrimeButton
+              label="Clear"
+              size="small"
+              outlined
+              class="w-20"
+              severity="secondary"
+              @click="resetToLastFiveMinutes"
+            />
             <PrimeButton
               v-if="hasChanges"
               icon="pi pi-check"
