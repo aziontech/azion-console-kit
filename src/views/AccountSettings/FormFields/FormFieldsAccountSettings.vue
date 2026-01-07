@@ -166,7 +166,8 @@
   }
 
   const decorateDeleteService = async () => {
-    return await deleteAccountService(accountStore.account.id)
+    await deleteAccountService(accountStore.account.id)
+    logout()
   }
 
   const openDeleteDialog = () => {
@@ -177,8 +178,7 @@
         deleteConfirmationText: accountStore.account.name,
         entityDeleteMessage: ENTITY_DELETE_MESSAGE
       },
-      deleteService: decorateDeleteService,
-      successCallback: logout
+      deleteService: decorateDeleteService
     })
   }
 
