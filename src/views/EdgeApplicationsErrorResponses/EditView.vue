@@ -67,8 +67,8 @@
         yup.object().shape({
           code: yup.string().required(),
           timeout: yup.number().required().label('Response TTL'),
-          uri: yup.string().nullable(true),
-          customStatusCode: yup.string().nullable(true)
+          uri: yup.string().notRequired().default(''),
+          customStatusCode: yup.string().notRequired().default('')
         })
       )
       .default([]),

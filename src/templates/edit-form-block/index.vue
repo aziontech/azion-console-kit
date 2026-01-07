@@ -108,10 +108,18 @@
     toast.add(options)
   }
 
+  const normalizeInitialValues = (values) => {
+    try {
+      return props.schema.cast(values, { stripUnknown: false, assert: false })
+    } catch (error) {
+      return values
+    }
+  }
+
   const loadInitialData = async () => {
     try {
       if (props.initialValues && Object.keys(props.initialValues).length > 0) {
-        const initialValues = props.initialValues
+        const initialValues = normalizeInitialValues(props.initialValues)
         emit('loaded-service-object', initialValues)
         resetForm({ values: initialValues })
         await nextTick()
@@ -121,7 +129,8 @@
         return
       }
       const { id } = route.params
-      const initialValues = await props.loadService({ id })
+      const loadedValues = await props.loadService({ id })
+      const initialValues = normalizeInitialValues(loadedValues)
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
       await nextTick()
