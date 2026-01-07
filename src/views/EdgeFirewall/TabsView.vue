@@ -63,6 +63,7 @@
       condition: () => edgeFirewall.value?.edgeFunctionsEnabled,
       show: () => activeTab.value === mapTabs.value.functions,
       showAddButtonTab: true,
+      addButtonLabel: 'Function',
       props: () => ({
         ...props.edgeFirewallServices,
         edgeFirewallID: edgeFirewallId.value
@@ -72,6 +73,8 @@
       header: 'Rules Engine',
       component: EdgeFirewallRulesEngineListView,
       condition: true,
+      showAddButtonTab: true,
+      addButtonLabel: 'Rule',
       show: () => activeTab.value === mapTabs.value.rulesEngine,
       props: () => ({
         edgeFirewallId: edgeFirewallId.value,
@@ -90,7 +93,7 @@
     const tab = filteredTabs.value[activeTab.value]
     return {
       showAddButtonTab: !!tab?.showAddButtonTab,
-      label: tab?.header || 'Create',
+      label: tab?.addButtonLabel || tab?.header || 'Create',
       click: () => componentsRefs.value[0].openCreateDrawer?.()
     }
   })

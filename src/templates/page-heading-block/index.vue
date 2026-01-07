@@ -53,7 +53,7 @@
     <div class="w-full md:w-auto flex flex-col">
       <Breadcrumb
         :model="breadcrumbs.items"
-        class="overflow-auto w-full px-0"
+        class="overflow-auto w-full p-0"
         :pt="{
           label: { class: 'whitespace-nowrap text-[18px]' },
           menuItem: ({ props }) => ({
@@ -89,7 +89,7 @@
         </template>
       </Breadcrumb>
       <span
-        class="text-[var(--text-color-secondary)] text-sm font-normal leading-7 max-md:text-base"
+        class="text-[var(--text-color-secondary)] text-sm font-normal leading-7 max-md:text-base px-0.5"
         v-if="props.description"
       >
         {{ props.description }}

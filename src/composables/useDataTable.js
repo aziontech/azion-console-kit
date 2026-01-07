@@ -155,6 +155,7 @@ export function useDataTable(props, emit) {
       pageSize: itemsByPage.value,
       fields: props.apiFields || [],
       ordering: savedOrdering.value,
+      skipCache: true,
       ...query
     }
 

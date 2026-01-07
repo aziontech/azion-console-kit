@@ -26,48 +26,58 @@ Modular component system for creating data tables with advanced features, based 
 
 ### Optional
 
-| Prop                    | Type                  | Default                                                | Values                   | Description                                          |
-| ----------------------- | --------------------- | ------------------------------------------------------ | ------------------------ | ---------------------------------------------------- |
-| `data`                  | `Array`               | `[]`                                                   | -                        | Data array to display in the table                   |
-| `columns`               | `Array`               | `[]`                                                   | -                        | Column configuration (used for skeleton loading)     |
-| `lazy`                  | `Boolean`             | `false`                                                | `true`, `false`          | Enables lazy loading mode for server-side pagination |
-| `loading`               | `Boolean`             | `false`                                                | `true`, `false`          | Loading state (displays skeleton)                    |
-| `dataKey`               | `String`              | `'id'`                                                 | -                        | Unique identifier field for each record              |
-| `rowHover`              | `Boolean`             | `true`                                                 | `true`, `false`          | Enables hover effect on rows                         |
-| `paginator`             | `Boolean`             | `false`                                                | `true`, `false`          | Enables pagination                                   |
-| `rows`                  | `Number`              | `10`                                                   | -                        | Number of rows per page                              |
-| `rowsPerPageOptions`    | `Array`               | `[10, 25, 50, 100]`                                    | -                        | Options for number of rows per page                  |
-| `totalRecords`          | `Number`              | `0`                                                    | -                        | Total number of records (used in lazy mode)          |
-| `first`                 | `Number`              | `0`                                                    | -                        | Index of the first visible record                    |
-| `containerClass`        | `String/Object/Array` | `''`                                                   | -                        | CSS classes for the main container                   |
-| `tableClass`            | `String/Object/Array` | `'overflow-clip rounded-md table-with-orange-borders'` | -                        | CSS classes for the table                            |
-| `pt`                    | `Object`              | `{}`                                                   | -                        | PrimeVue PassThrough props                           |
-| `filters`               | `Object`              | `{}`                                                   | -                        | Filters object                                       |
-| `sortField`             | `String`              | `''`                                                   | -                        | Initial sorting field                                |
-| `sortOrder`             | `Number`              | `1`                                                    | `1`, `-1`                | Sort direction (1: ASC, -1: DESC)                    |
-| `globalFilterFields`    | `Array`               | `[]`                                                   | -                        | Fields to apply global filter                        |
-| `selection`             | `Object/Array`        | `null`                                                 | -                        | Selected records                                     |
-| `exportFilename`        | `String`              | `'export'`                                             | -                        | CSV export filename                                  |
-| `exportFunction`        | `Function`            | `null`                                                 | -                        | Custom export function                               |
-| `rowClass`              | `Function`            | `null`                                                 | -                        | Function to return CSS classes per row               |
-| `groupRowsBy`           | `String`              | `''`                                                   | -                        | Field to group records by                            |
-| `sortMode`              | `String`              | `'single'`                                             | `'single'`, `'multiple'` | Sorting mode                                         |
-| `expandedRowGroups`     | `Array`               | `[]`                                                   | -                        | Expanded groups (v-model)                            |
-| `skeletonRows`          | `Number`              | `5`                                                    | -                        | Number of skeleton rows during loading               |
-| `emptyListMessage`      | `String`              | `'No data available'`                                  | -                        | Message when there's no data                         |
-| `cellQuickActionsItens` | `Array`               | `[]`                                                   | -                        | Array of custom actions for cell quick actions       |
-| `emptyBlock`            | `Object`              | `false`                                                | -                        | Configuration for EmptyResultsBlock component        |
+| Prop                     | Type                  | Default                                                                           | Values                   | Description                                          |
+| ------------------------ | --------------------- | --------------------------------------------------------------------------------- | ------------------------ | ---------------------------------------------------- |
+| `data`                   | `Array`               | `[]`                                                                              | -                        | Data array to display in the table                   |
+| `columns`                | `Array`               | `[]`                                                                              | -                        | Column configuration (used for skeleton loading)     |
+| `lazy`                   | `Boolean`             | `false`                                                                           | `true`, `false`          | Enables lazy loading mode for server-side pagination |
+| `loading`                | `Boolean`             | `false`                                                                           | `true`, `false`          | Loading state (displays skeleton)                    |
+| `dataKey`                | `String`              | `'id'`                                                                            | -                        | Unique identifier field for each record              |
+| `rowHover`               | `Boolean`             | `true`                                                                            | `true`, `false`          | Enables hover effect on rows                         |
+| `paginator`              | `Boolean`             | `false`                                                                           | `true`, `false`          | Enables pagination                                   |
+| `rows`                   | `Number`              | `10`                                                                              | -                        | Number of rows per page                              |
+| `rowsPerPageOptions`     | `Array`               | `[10, 25, 50, 100]`                                                               | -                        | Options for number of rows per page                  |
+| `totalRecords`           | `Number`              | `0`                                                                               | -                        | Total number of records (used in lazy mode)          |
+| `first`                  | `Number`              | `0`                                                                               | -                        | Index of the first visible record                    |
+| `containerClass`         | `String/Object/Array` | `''`                                                                              | -                        | CSS classes for the main container                   |
+| `tableClass`             | `String/Object/Array` | `'overflow-clip rounded-md table-with-orange-borders'`                            | -                        | CSS classes for the table                            |
+| `pt`                     | `Object`              | `{}`                                                                              | -                        | PrimeVue PassThrough props                           |
+| `filters`                | `Object`              | `{}`                                                                              | -                        | Filters object                                       |
+| `sortField`              | `String`              | `''`                                                                              | -                        | Initial sorting field                                |
+| `sortOrder`              | `Number`              | `1`                                                                               | `1`, `-1`                | Sort direction (1: ASC, -1: DESC)                    |
+| `globalFilterFields`     | `Array`               | `[]`                                                                              | -                        | Fields to apply global filter                        |
+| `selection`              | `Object/Array`        | `null`                                                                            | -                        | Selected records                                     |
+| `exportFilename`         | `String`              | `'export'`                                                                        | -                        | CSV export filename                                  |
+| `exportFunction`         | `Function`            | `null`                                                                            | -                        | Custom export function                               |
+| `rowClass`               | `Function`            | `null`                                                                            | -                        | Function to return CSS classes per row               |
+| `groupRowsBy`            | `String`              | `''`                                                                              | -                        | Field to group records by                            |
+| `sortMode`               | `String`              | `'single'`                                                                        | `'single'`, `'multiple'` | Sorting mode                                         |
+| `expandedRowGroups`      | `Array`               | `[]`                                                                              | -                        | Expanded groups (v-model)                            |
+| `skeletonRows`           | `Number`              | `5`                                                                               | -                        | Number of skeleton rows during loading               |
+| `emptyListMessage`       | `String`              | `'No data available'`                                                             | -                        | Message when there's no data                         |
+| `emptyBlock`             | `Object`              | `{ title, description, createButtonLabel, createPagePath, documentationService }` | -                        | Configuration for EmptyResultsBlock component        |
+| `scrollable`             | `Boolean`             | `true`                                                                            | `true`, `false`          | Enables table scrolling                              |
+| `scrollHeight`           | `String`              | `'calc(100vh - 300px)'`                                                           | -                        | Height of scrollable area                            |
+| `showLastModifiedColumn` | `Boolean`             | `true`                                                                            | `true`, `false`          | Shows Last Modified column                           |
+| `hasEmptyBlockSlot`      | `Boolean`             | `false`                                                                           | `true`, `false`          | Indicates if emptyBlock slot is used                 |
+| `appliedFilters`         | `Array`               | `[]`                                                                              | -                        | Array of currently applied filters                   |
+| `notShowEmptyBlock`      | `Boolean`             | `false`                                                                           | `true`, `false`          | Forces table render even when empty                  |
+| `frozenValue`            | `Array`               | `[]`                                                                              | -                        | Array of frozen rows                                 |
+| `isSelectable`           | `Boolean`             | `false`                                                                           | `true`, `false`          | Enables row selection                                |
+| `searchValue`            | `String`              | `''`                                                                              | -                        | Current search value                                 |
 
 ---
 
 ## Slots
 
-| Slot      | Description                            | Scope |
-| --------- | -------------------------------------- | ----- |
-| `default` | Table columns (DataTable.Column)       | -     |
-| `header`  | Custom table header                    | -     |
-| `footer`  | Custom table footer                    | -     |
-| `empty`   | Content displayed when there's no data | -     |
+| Slot          | Description                            | Scope               |
+| ------------- | -------------------------------------- | ------------------- |
+| `default`     | Table columns (DataTable.Column)       | -                   |
+| `header`      | Custom table header                    | -                   |
+| `footer`      | Custom table footer                    | -                   |
+| `empty`       | Content displayed when there's no data | -                   |
+| `emptyBlock`  | Custom empty state block               | -                   |
+| `groupheader` | Custom group header template           | `{ data: rowData }` |
 
 ## Events
 
@@ -81,6 +91,11 @@ Modular component system for creating data tables with advanced features, based 
 | `update:sortField`         | `String` | Updates sorting field (v-model)                |
 | `update:sortOrder`         | `Number` | Updates sort direction (v-model)               |
 | `update:expandedRowGroups` | `Array`  | Updates expanded groups (v-model)              |
+| `update:selection`         | `Array`  | Updates selected items (v-model)               |
+| `update:editingRows`       | `Array`  | Updates editing rows (v-model)                 |
+| `rowEditSave`              | `event`  | Emitted when saving row edit                   |
+| `rowEditCancel`            | `event`  | Emitted when canceling row edit                |
+| `click-to-create`          | -        | Emitted when clicking create in empty state    |
 
 ---
 
@@ -88,11 +103,16 @@ Modular component system for creating data tables with advanced features, based 
 
 ### DataTable.Header
 
-Flexible container for organizing header elements with responsive layout.
+Flexible container for organizing header elements with responsive layout. Provides two-line structure with optional divider.
 
 **Props:**
 
-- `class` (String/Object/Array): Additional CSS classes
+- `showDivider` (Boolean, default: `true`): Shows divider between first and second line
+
+**Slots:**
+
+- `first-line`: Content for the first line (top section)
+- `second-line`: Content for the second line (bottom section)
 
 ### DataTable.Actions
 
@@ -109,8 +129,9 @@ Search field with icon, optional debounce and optimized events.
 **Props:**
 
 - `modelValue` (String): Field value (v-model)
-- `placeholder` (String): Input placeholder
-- `debounce` (Number): Debounce time in ms
+- `placeholder` (String, default: 'Search keywords...'): Input placeholder
+- `debounce` (Number, default: 0): Debounce time in ms
+- `disabled` (Boolean, default: false): Disables the search input
 
 **Events:**
 
@@ -128,44 +149,104 @@ CSV export button integrated with the table.
 
 **Props:**
 
-- `label` (String): Button label
+- `label` (String, default: ''): Button label
 - `tooltipText` (String, default: 'Export to CSV'): Tooltip text
-- `buttonClass` (String/Object/Array): CSS classes
-- `disabled` (Boolean): Disables the button
-- `loading` (Boolean): Loading state
-- `customExport` (Function): Custom export function
+- `buttonClass` (String/Object/Array, default: 'max-sm:w-full ml-auto'): CSS classes
+- `testId` (String, default: 'export_button'): Test ID for the button
+- `disabled` (Boolean, default: false): Disables the button
+- `loading` (Boolean, default: false): Loading state
 
 **Events:**
 
 - `export`: Emitted after export
 - `click`: Emitted on click
 
-### DataTable.AddButton
+### DataTable.ActionsButtons
 
-Styled button for adding new records.
+Action buttons group with create button, help links, and optional other actions.
 
 **Props:**
 
-- `label` (String, required): Button label
-- `disabled` (Boolean): Disables the button
-- `buttonClass` (String/Object/Array): CSS classes
+- `label` (String, required): Create button label
+- `disabled` (Boolean, default: false): Disables the create button
+- `buttonClass` (String/Object/Array, default: ''): CSS classes for create button
+- `testId` (String, default: null): Test ID for create button
+- `createPagePath` (String, default: null): Path to navigate on create click
+- `otherLink` (String, default: null): Path for "Other Link" button
+- `getHelpLink` (String, default: null): Path for "Get Help" button (defaults to copilot)
+- `otherActions` (Boolean, default: false): Shows "Other Actions" button
 
 **Events:**
 
-- `click`: Emitted on click
+- `click`: Emitted when create button is clicked
+- `other-actions`: Emitted when other actions button is clicked
 
 ### DataTable.RowActions
 
-Manages row actions with dropdown menu or single button.
+Manages row actions with dropdown menu.
 
 **Props:**
 
 - `rowData` (Object, required): Row data
 - `actions` (Array/Function, required): List of actions or function that returns actions
-- `singleAction` (Object/Function): Single action (displays button instead of menu)
-- `onActionExecute` (Function): Callback for single action
-- `onMenuToggle` (Function): Callback when opening menu
-- `menuRefSetter` (Function): Function to set menu reference
+- `onMenuToggle` (Function, default: () => {}): Callback when opening menu
+- `menuRefSetter` (Function, default: null): Function to set menu reference
+
+### DataTable.ColumnSelector
+
+Column visibility selector with overlay panel.
+
+**Props:**
+
+- `columns` (Array, required): Array of all available columns
+- `selectedColumns` (Array, required): Array of currently visible columns
+
+**Events:**
+
+- `update:selectedColumns`: Emitted when column selection changes
+
+**Exposed Methods:**
+
+- `toggleColumnSelector(event)`: Toggles the column selector panel
+
+### DataTable.Filter
+
+Advanced filter panel with dynamic filter components.
+
+**Props:**
+
+- `filters` (Array, default: []): Array of filterable columns
+
+**Events:**
+
+- `apply`: Emitted when filter is applied with `{ field, label, value }`
+
+**Exposed Methods:**
+
+- `toggle(event)`: Toggles the filter panel
+
+### DataTable.AppliedFilters
+
+Displays currently applied filters with remove capability.
+
+**Props:**
+
+- `appliedFilters` (Array, default: []): Array of applied filters
+
+**Events:**
+
+- `remove`: Emitted when removing a filter with field name
+
+### DataTable.LastModifiedPopup
+
+Popup displaying last modified information on hover.
+
+**Props:**
+
+- `visible` (Boolean, default: false): Controls popup visibility
+- `lastEditor` (String, required): Name of last editor
+- `lastModified` (String, required): Last modified timestamp
+- `position` (Object, default: { posX: 0, posY: 0 }): Popup position coordinates
 
 ### DataTable.Column
 
@@ -186,10 +267,12 @@ Alias for PrimeVue Column component (primevue/column).
 
 ### Internal
 
-- `@/components/CellQuickActionsPopup`
 - `@/templates/empty-results-block`
 - `@/assets/svg/illustration-layers.vue`
 - `@/composables/useDataTable`
+- `@/composables/use-layout`
+- `@/stores/account`
+- `@/helpers/convert-date`
 
 ---
 
@@ -206,17 +289,21 @@ Alias for PrimeVue Column component (primevue/column).
   >
     <template #header>
       <DataTable.Header>
-        <DataTable.Search
-          v-model="searchTerm"
-          placeholder="Search items..."
-        />
-        <DataTable.Actions>
-          <DataTable.AddButton
-            label="New Item"
-            @click="handleCreate"
+        <template #first-line>
+          <DataTable.Search
+            v-model="searchTerm"
+            placeholder="Search items..."
           />
-          <DataTable.Export />
-        </DataTable.Actions>
+        </template>
+        <template #second-line>
+          <DataTable.Actions>
+            <DataTable.ActionsButtons
+              label="New Item"
+              @click="handleCreate"
+            />
+            <DataTable.Export />
+          </DataTable.Actions>
+        </template>
       </DataTable.Header>
     </template>
 
@@ -272,20 +359,24 @@ Alias for PrimeVue Column component (primevue/column).
   >
     <template #header>
       <DataTable.Header>
-        <DataTable.Search
-          v-model="filters.global.value"
-          :debounce="500"
-          placeholder="Search applications..."
-          @input="handleSearchValue"
-          @search="fetchOnSearch"
-        />
-        <DataTable.Actions>
-          <DataTable.AddButton
-            label="Application"
-            @click="navigateToAddPage"
+        <template #first-line>
+          <DataTable.Search
+            v-model="filters.global.value"
+            :debounce="500"
+            placeholder="Search applications..."
+            @input="handleSearchValue"
+            @search="fetchOnSearch"
           />
-          <DataTable.Export />
-        </DataTable.Actions>
+        </template>
+        <template #second-line>
+          <DataTable.Actions>
+            <DataTable.ActionsButtons
+              label="Application"
+              @click="navigateToAddPage"
+            />
+            <DataTable.Export />
+          </DataTable.Actions>
+        </template>
       </DataTable.Header>
     </template>
 
@@ -415,18 +506,22 @@ Alias for PrimeVue Column component (primevue/column).
   >
     <template #header>
       <DataTable.Header>
-        <DataTable.Search
-          v-model="filters.global.value"
-          @input="handleSearchValue"
-          @search="fetchOnSearch"
-        />
-        <DataTable.Actions>
-          <DataTable.AddButton
-            label="New Record"
-            @click="navigateToAddPage"
+        <template #first-line>
+          <DataTable.Search
+            v-model="filters.global.value"
+            @input="handleSearchValue"
+            @search="fetchOnSearch"
           />
-          <DataTable.Export @export="handleExportTableDataToCSV" />
-        </DataTable.Actions>
+        </template>
+        <template #second-line>
+          <DataTable.Actions>
+            <DataTable.ActionsButtons
+              label="New Record"
+              @click="navigateToAddPage"
+            />
+            <DataTable.Export @export="handleExportTableDataToCSV" />
+          </DataTable.Actions>
+        </template>
       </DataTable.Header>
     </template>
 
@@ -712,24 +807,68 @@ The `useDataTable` composable centralizes all common table logic, including:
 
 ```javascript
 {
+  // Reactive variables
   ;(data,
     isLoading,
     totalRecords,
     filters,
+    filtersDynamically,
+    appliedFilters,
     selectedColumns,
     itemsByPage,
     firstItemIndex,
+    sortFieldValue,
+    sortOrderValue,
+    lastModifiedToggled,
+    expandedGroups,
+    selectedItems,
+    isAllSelected,
+    showPopup,
+    popupPosition,
+    popupData,
+    savedSearch,
+    // Computed properties
+    isRenderActions,
+    isRenderOneOption,
+    hasExportToCsvMapper,
+    filterBy,
+    getRowClass,
+    // Functions
+    loadData,
+    reload,
     navigateToAddPage,
     editItemSelected,
     actionOptions,
+    executeCommand,
+    optionsOneAction,
     toggleActionsMenu,
     setMenuRefForRow,
+    toggleColumnSelector,
     changeNumberOfLinesPerPage,
+    updateDataTablePagination,
     fetchOnSort,
-    handleSearchValue,
+    sortByLastModified,
     fetchOnSearch,
+    handleSearchValue,
+    toggleFilter,
+    handleApplyFilter,
+    handleRemoveFilter,
+    toggleLastModifiedDisplay,
+    handleMouseEnter,
+    handleMouseLeave,
+    exportFunctionMapper,
     handleExportTableDataToCSV,
-    reload)
+    exportTableAsCSV,
+    exportTableAsJSON,
+    exportTableAsXLSX,
+    extractFieldValue,
+    getObjectPath,
+    moveItem,
+    onRowReorder,
+    toggleRowSelection,
+    toggleSelectAll,
+    toggleGroup,
+    stateClassRules)
 }
 ```
 
@@ -875,16 +1014,20 @@ The component automatically determines which empty state to show:
   >
     <template #header>
       <DataTable.Header>
-        <DataTable.Search
-          v-model="searchTerm"
-          placeholder="Search applications..."
-        />
-        <DataTable.Actions>
-          <DataTable.AddButton
-            label="Application"
-            @click="navigateToCreate"
+        <template #first-line>
+          <DataTable.Search
+            v-model="searchTerm"
+            placeholder="Search applications..."
           />
-        </DataTable.Actions>
+        </template>
+        <template #second-line>
+          <DataTable.Actions>
+            <DataTable.ActionsButtons
+              label="Application"
+              @click="navigateToCreate"
+            />
+          </DataTable.Actions>
+        </template>
       </DataTable.Header>
     </template>
 
@@ -928,145 +1071,8 @@ The component automatically determines which empty state to show:
     router.push('/edge-applications/create')
   }
 </script>
+
+--- ## Related Links - [PrimeVue DataTable Documentation](https://v3.primevue.org/datatable/) -
+[Component Implementation](./DataTable.vue) - [Export Module](./index.js) -
+[Composable](../../composables/useDataTable.js)
 ```
-
----
-
-## Cell Quick Actions
-
-Cell Quick Actions are action buttons that appear when hovering over specific table cells. By default, all cells have a "Copy to clipboard" button to copy the cell content.
-
-### Basic Configuration
-
-To enable Quick Actions on a column, add the `quickActions: true` property to the column configuration:
-
-```javascript
-const columns = [
-  { field: 'name', header: 'Name', quickActions: true },
-  { field: 'id', header: 'ID' },
-  { field: 'status', header: 'Status', quickActions: true }
-]
-```
-
-### Custom Actions
-
-Add custom actions through the `cellQuickActionsItens` prop. Each action must contain:
-
-- `title` (String): Action title (tooltip)
-- `icon` (String): Icon class (PrimeIcons)
-- `action` (Function): Function executed on click (receives rowData as parameter)
-
-**Example:**
-
-```vue
-<template>
-  <DataTable
-    :data="items"
-    :columns="columns"
-    :cellQuickActionsItens="customQuickActions"
-  >
-    <DataTable.Column
-      field="name"
-      header="Name"
-    />
-    <DataTable.Column
-      field="id"
-      header="ID"
-    />
-  </DataTable>
-</template>
-
-<script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import DataTable from '@/components/DataTable'
-
-  const router = useRouter()
-
-  const columns = ref([
-    { field: 'name', header: 'Name', quickActions: true },
-    { field: 'id', header: 'ID', quickActions: true }
-  ])
-
-  const customQuickActions = [
-    {
-      title: 'Edit',
-      icon: 'pi pi-pencil',
-      action: (rowData) => {
-        router.push(`/edit/${rowData.id}`)
-      }
-    },
-    {
-      title: 'View Details',
-      icon: 'pi pi-eye',
-      action: (rowData) => {
-        console.log('View details:', rowData)
-      }
-    },
-    {
-      title: 'Delete',
-      icon: 'pi pi-trash',
-      action: (rowData) => {
-        if (confirm(`Delete ${rowData.name}?`)) {
-          deleteItem(rowData.id)
-        }
-      }
-    }
-  ]
-
-  const items = ref([
-    { id: 1, name: 'Item 1' },
-    { id: 2, name: 'Item 2' }
-  ])
-</script>
-```
-
-### Behavior
-
-- **Hover Delay**: Quick actions appear after 1 second of hovering over the cell
-- **Visual Feedback**: Active cell receives orange outline
-- **Copy Default**: "Copy to clipboard" action is always present by default
-- **Scroll Handling**: Quick actions are automatically hidden when scrolling
-- **Popup Persistence**: Popup remains visible when hovering over it
-- **Auto-hide**: Quick actions disappear 150ms after leaving the cell or popup
-
-### Styling
-
-Quick actions use Azion's default orange color (#f97316):
-
-```css
-.popup-container {
-  background-color: #f97316;
-  color: white;
-  padding: 4px;
-  border-radius: 6px 6px 0 0;
-  height: 30px;
-}
-```
-
-Cells with active quick actions receive outline:
-
-```css
-.table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
-  outline: 2px solid #f97316 !important;
-  outline-offset: -2px;
-  border-radius: 0 6px 6px 6px;
-}
-```
-
-### Limitations
-
-- Quick actions don't appear on folder rows (rows with `isFolder: true`)
-- Quick actions don't appear on frozen columns (`p-frozen-column`)
-- Maximum recommended of 4 custom actions for better UX
-- Actions are executed synchronously (consider using loading states for asynchronous operations)
-
----
-
-## Related Links
-
-- [PrimeVue DataTable Documentation](https://v3.primevue.org/datatable/)
-- [Component Implementation](./DataTable.vue)
-- [Export Module](./index.js)
-- [Composable](../../composables/useDataTable.js)
-- [Cell Quick Actions](../CellQuickActionsPopup.vue)
