@@ -13,11 +13,7 @@
       :dataKey="dataKey"
       :showGridlines="showGridlines"
       :pt="pt"
-      :class="[
-        tableClass,
-        'overflow-clip rounded-md table-with-orange-borders',
-        { 'outline-visible': cellQuickActionsVisible }
-      ]"
+      :class="[tableClass, 'overflow-clip rounded-md table-with-orange-borders']"
       v-model:filters="internalFilters"
       v-model:sortField="internalSortField"
       v-model:sortOrder="internalSortOrder"
@@ -85,6 +81,17 @@
       <template #paginatorstart>
         <div class="flex-1"></div>
       </template>
+
+      <template
+        v-if="hasGroupHeaderSlot"
+        #groupheader="slotProps"
+      >
+        <slot
+          name="groupheader"
+          :data="slotProps.data"
+        />
+      </template>
+
       <template
         v-if="hasFooterSlot"
         #footer
@@ -109,14 +116,6 @@
           </p>
         </div>
       </template>
-
-      <CellQuickActionsPopup
-        :columns="columns"
-        :data="data"
-        :cellQuickActionsItens="cellQuickActionsItens"
-        :tableRef="dataTableRef"
-        @quick-actions-visible="(event) => (cellQuickActionsVisible = event)"
-      />
     </DataTable>
     <template v-else>
       <div v-if="hasEmptyBlockSlot"><slot name="emptyBlock" /></div>
@@ -145,7 +144,6 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import Skeleton from 'primevue/skeleton'
-  import CellQuickActionsPopup from '../CellQuickActionsPopup.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
 
@@ -282,10 +280,6 @@
       type: String,
       default: 'No data available'
     },
-    cellQuickActionsItens: {
-      type: Array,
-      default: () => []
-    },
     emptyBlock: {
       type: Object,
       default: () => ({
@@ -352,7 +346,6 @@
 
   const slots = useSlots()
   const dataTableRef = ref(null)
-  const cellQuickActionsVisible = ref(false)
   const hasEmptySlot = computed(() => !!slots.empty)
   const hadPreviousSearch = ref(false)
 
@@ -395,6 +388,7 @@
   })
 
   const hasHeaderSlot = computed(() => !!slots.header)
+  const hasGroupHeaderSlot = computed(() => !!slots.groupheader)
 
   const internalFilters = computed({
     get: () => props.filters,
@@ -412,7 +406,12 @@
   })
 
   const internalExpandedGroups = computed({
-    get: () => props.expandedRowGroups,
+    get: () => {
+      if (props.loading && props.expandableRowGroups && props.groupRowsBy) {
+        return ['Request', 'Response']
+      }
+      return props.expandedRowGroups
+    },
     set: (value) => emit('update:expandedRowGroups', value)
   })
 
@@ -433,12 +432,38 @@
   })
 
   const shouldShowFullSkeleton = computed(() => {
+    if (props.expandableRowGroups && props.groupRowsBy) {
+      return false
+    }
     return props.loading && !hasSkeletonRows.value
   })
 
   const displayData = computed(() => {
+    if (props.loading && props.expandableRowGroups && props.groupRowsBy && props.columns.length) {
+      const skeletonGroups = []
+      const groups = ['Request', 'Response']
+
+      groups.forEach((groupName) => {
+        for (let counter = 0; counter < 3; counter++) {
+          const row = {
+            id: `${groupName}-skeleton-${counter}`,
+            isSkeletonRow: true,
+            phase: {
+              content: groupName
+            }
+          }
+          row[props.groupRowsBy] = groupName
+          props.columns.forEach((col) => {
+            row[col.field] = null
+          })
+          skeletonGroups.push(row)
+        }
+      })
+
+      return skeletonGroups
+    }
+
     if (shouldShowFullSkeleton.value && props.columns.length) {
-      // eslint-disable-next-line no-unused-vars
       return Array.from({ length: props.rows }, (aux, index) => {
         const row = { id: index }
         props.columns.forEach((col) => {
@@ -484,7 +509,6 @@
     transition: color 0.2s ease !important;
     height: 44px;
     padding: 0 14px;
-    // font-size: 12px;
   }
 
   .table-with-orange-borders :deep(.p-datatable-tbody > tr) {
@@ -493,15 +517,6 @@
 
   .table-with-orange-borders :deep(.p-datatable-thead > tr) {
     height: 44px;
-  }
-
-  .table-with-orange-borders.outline-visible
-    :deep(.p-datatable-tbody > tr > td:hover:not(.p-frozen-column)),
-  .table-with-orange-borders.outline-visible :deep(.p-datatable-tbody > tr > td.cell-active-hover) {
-    outline: 2px solid #f97316 !important;
-    outline-offset: -2px;
-    transition-delay: 0.3s;
-    border-radius: 0 6px 6px 6px;
   }
 
   /* Paginator styling */

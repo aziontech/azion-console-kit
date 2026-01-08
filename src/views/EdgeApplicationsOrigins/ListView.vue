@@ -1,7 +1,6 @@
 <script setup>
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
@@ -48,7 +47,6 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const listOriginsEdgeApplicationsRef = ref('')
   const drawerOriginsRef = ref('')
 
@@ -91,10 +89,6 @@
     ]
   })
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const listOriginsWithDecorator = async () => {
     return await props.listOriginsService({ id: props.edgeApplicationId })
   }
@@ -123,11 +117,7 @@
   }
 
   const reloadList = () => {
-    if (hasContentToList.value) {
-      listOriginsEdgeApplicationsRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listOriginsEdgeApplicationsRef.value.reload()
   }
 
   defineExpose({
@@ -158,47 +148,31 @@
       :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
       @onSuccess="reloadList"
     />
-    <div v-if="hasContentToList">
-      <ListTableBlock
-        ref="listOriginsEdgeApplicationsRef"
-        :listService="listOriginsWithDecorator"
-        :columns="getColumns"
-        pageTitleDelete="origin"
-        :editInDrawer="openEditOriginDrawer"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No origins found."
-        :actions="actions"
-        isTabs
-      >
-        <template #addButton>
-          <PrimeButton
-            icon="pi pi-plus"
-            label="Origin"
-            data-testid="origins__add-button"
-            @click="openCreateOriginDrawer"
-            class="w-full sm:w-auto"
-          />
-        </template>
-      </ListTableBlock>
-    </div>
-    <EmptyResultsBlock
-      v-else
-      title="No origins have been created"
-      description="Click the button below to create your first origin."
-      createButtonLabel="Origin"
-      :documentationService="props.documentationService"
-      :inTabs="true"
+    <ListTableBlock
+      ref="listOriginsEdgeApplicationsRef"
+      :listService="listOriginsWithDecorator"
+      :columns="getColumns"
+      :editInDrawer="openEditOriginDrawer"
+      emptyListMessage="No origins found."
+      :actions="actions"
+      :lazy="false"
+      isTabs
+      :emptyBlock="{
+        title: 'No origins have been created',
+        description: 'Click the button below to create your first origin.'
+      }"
     >
-      <template #default>
+      <template #emptyBlockButton>
         <PrimeButton
           class="max-md:w-full w-fit"
           severity="secondary"
           icon="pi pi-plus"
           label="Origin"
           @click="openCreateOriginDrawer"
+          data-testid="origins__add-button"
         />
       </template>
-    </EmptyResultsBlock>
+    </ListTableBlock>
   </div>
   <div
     v-else

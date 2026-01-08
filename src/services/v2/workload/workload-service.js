@@ -178,7 +178,7 @@ export class WorkloadService extends BaseService {
       () => this.#fetchList(paramsValue),
       {
         persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
-        skipCache: hasFilter
+        skipCache: paramsValue?.skipCache || hasFilter
       }
     )
   }
