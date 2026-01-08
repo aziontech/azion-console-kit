@@ -185,7 +185,10 @@
     try {
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
-      error.showErrors(toast)
+      error.showWithOptions(toast, (error) => ({
+        summary: `GitHub integration failed: ${error.detail}`,
+        severity: 'error'
+      }))
     } finally {
       await listIntegrations()
     }
