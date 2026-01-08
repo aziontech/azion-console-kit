@@ -51,7 +51,7 @@
 
   const EDGE_CERTIFICATE = 'edge_certificate'
   const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
-  const moreOptions = ['authority', 'status']
+  const moreOptions = ['authority', 'status', 'subjectName']
   const isLetEncrypt = ref(false)
   const digitalCertificateDrawerRef = ref('')
   const edgeCertificate = ref(0)
@@ -64,6 +64,7 @@
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
   const { value: authorityCertificate } = useField('authorityCertificate')
+  const { value: subjectNameCertificate } = useField('subjectNameCertificate')
 
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
@@ -151,7 +152,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id', 'name', 'authority'],
+      fields: ['id', 'name', 'authority', 'subject_name'],
       ...queryParams
     })
   }
@@ -166,10 +167,11 @@
 
   const emit = defineEmits(['edgeApplicationCreated'])
 
-  const selectCertificate = ({ authority, value }) => {
+  const selectCertificate = ({ authority, value, subjectName }) => {
     authorityCertificate.value = authority
     isLetEncrypt.value =
       value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
+    subjectNameCertificate.value = subjectName
   }
 </script>
 

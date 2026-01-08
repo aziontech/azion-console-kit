@@ -189,6 +189,7 @@
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
     authorityCertificate: yup.string().nullable(),
+    subjectNameCertificate: yup.array().nullable(),
     mtlsTrustedCertificate: yup
       .string()
       .when('mtlsIsEnabled', {

@@ -2,6 +2,14 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { editDomainService } from '@/services/domains-services'
 import { describe, expect, it, vi } from 'vitest'
 
+vi.mock('@/services/v2/digital-certificates/digital-certificates-service', () => {
+  return {
+    digitalCertificatesService: {
+      createDigitalCertificateLetEncrypt: vi.fn()
+    }
+  }
+})
+
 const fixtures = {
   domainMock: {
     id: 72638,
@@ -59,6 +67,38 @@ describe('DomainsServices', () => {
     const feedbackMessage = await sut(fixtures.domainMock)
 
     expect(feedbackMessage).toBe('Your domain has been edited')
+  })
+
+  it("should not recreate Let's Encrypt certificate when existing certificate is wildcard and new hostnames are not covered", async () => {
+    const { digitalCertificatesService } = await import(
+      '@/services/v2/digital-certificates/digital-certificates-service'
+    )
+
+    digitalCertificatesService.createDigitalCertificateLetEncrypt.mockResolvedValueOnce({ id: 999 })
+
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+
+    await sut({
+      ...fixtures.domainMock,
+      authorityCertificate: 'lets_encrypt',
+      edgeCertificate: 'lets_encrypt',
+      oldDomains: ['a.example.com'],
+      cnames: 'a.example.com\nb.other.com',
+      subjectNameCertificate: ['*.example.com']
+    })
+
+    expect(digitalCertificatesService.createDigitalCertificateLetEncrypt).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          digital_certificate_id: 999
+        })
+      })
+    )
   })
 
   it('should return a success message even when not provided a digital certificate', async () => {
