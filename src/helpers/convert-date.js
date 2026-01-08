@@ -200,7 +200,7 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
   return dateObject.toLocaleString('en-US', {
     timeZone: userTimezone,
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
