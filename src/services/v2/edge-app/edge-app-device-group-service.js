@@ -45,13 +45,29 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = deviceGroupsKeys.lists(edgeApplicationId)
+    const queryKey = [...deviceGroupsKeys.lists(edgeApplicationId), params]
+    const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
       () => queryKey,
       () => this.#fetchList(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
+  }
+
+  /**
+   * Prefetches the first page of device groups to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchDeviceGroupsList = async (edgeApplicationId) => {
+    const defaultParams = {
+      page: 1,
+      pageSize: 10,
+      fields: ['id', 'name', 'user_agent'],
+      ordering: 'name'
+    }
+    return await this.listDeviceGroupService(edgeApplicationId, defaultParams)
   }
 
   #fetchDeviceGroup = async (edgeApplicationId, deviceGroupId) => {

@@ -54,11 +54,15 @@ export const queryPlugin = {
 export const waitForPersistenceRestore = () => restorePromise || Promise.resolve()
 
 export const pauseQueryPersistence = () => {
-  if (!unsubscribePersistence) return
-  if (typeof unsubscribePersistence === 'function') {
-    unsubscribePersistence()
+  if (unsubscribePersistence && typeof unsubscribePersistence === 'function') {
+    try {
+      unsubscribePersistence()
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to pause query persistence:', error)
+    }
+    unsubscribePersistence = null
   }
-  unsubscribePersistence = null
 }
 
 export const resumeQueryPersistence = () => {

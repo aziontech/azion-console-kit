@@ -1,8 +1,6 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
@@ -23,6 +21,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -42,7 +41,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const hasContentToList = ref(true)
+  const breadcrumbs = useBreadcrumbs()
   const showCreateRecordDrawer = ref(false)
   const showEditRecordDrawer = ref(false)
   const listEDNSResourcesRef = ref('')
@@ -51,12 +50,20 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
-      field: 'id',
-      header: 'ID'
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      style: 'max-width: 300px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
-      field: 'name',
-      header: 'Name'
+      field: 'id',
+      header: 'ID'
     },
     {
       field: 'type',
@@ -69,7 +76,11 @@
       filterPath: 'value.content',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup',
+          dependencies: { showCopy: !!props.clipboardWrite }
+        })
     },
     {
       field: 'ttl',
@@ -178,11 +189,7 @@
   }
 
   const reloadResourcesList = () => {
-    if (hasContentToList.value) {
-      listEDNSResourcesRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listEDNSResourcesRef.value.reload()
   }
 
   const handleTrackEditEvent = () => {
@@ -243,10 +250,6 @@
       severity: 'success',
       summary: 'Successfully copied!'
     })
-  }
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
   }
 
   const showEditFormWithActionTab = computed(() => {
@@ -311,6 +314,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'record',
       icon: 'pi pi-trash',
@@ -376,6 +380,7 @@
   const loadEdgeDNS = async (id) => {
     const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
     edgeDNSName.value = edgeDNS.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeDNS.name)
 
     try {
       const dnssecData = await edgeDNSService.loadEdgeDNSZoneDNSSEC(edgeDNS.id)
@@ -440,18 +445,26 @@
           <div v-if="showRecords">
             <FetchListTableBlock
               ref="listEDNSResourcesRef"
-              v-if="hasContentToList"
               addButtonLabel="Record"
-              defaultOrderingFieldName="entry"
+              defaultOrderingFieldName="id"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
-              @on-load-data="handleLoadData"
               emptyListMessage="No records found."
               :actions="actions"
               isTabs
               :apiFields="EDGE_DNS_RECORDS_FIELDS"
+              exportFileName="Edge DNS Records"
               @on-before-go-to-edit="handleTrackEventGoToEdit"
+              hideLastModifiedColumn
+              :emptyBlock="{
+                title: 'No record has been created',
+                description: 'Click the button below to create your first record.',
+                createButtonLabel: 'Record',
+                createPagePath: 'records/create',
+                documentationService: documentationService,
+                inTabs: true
+              }"
             >
               <template #addButton>
                 <PrimeButton
@@ -461,18 +474,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-            </FetchListTableBlock>
-
-            <EmptyResultsBlock
-              v-else
-              title="No record has been created"
-              description=" Click the button below to create your first record."
-              createButtonLabel="Record"
-              createPagePath="records/create"
-              :documentationService="documentationService"
-              :inTabs="true"
-            >
-              <template #default>
+              <template #emptyBlockButton>
                 <PrimeButton
                   class="max-md:w-full w-fit"
                   severity="secondary"
@@ -482,10 +484,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-              <template #illustration>
-                <Illustration />
-              </template>
-            </EmptyResultsBlock>
+            </FetchListTableBlock>
 
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"

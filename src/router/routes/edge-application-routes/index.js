@@ -72,6 +72,7 @@ export const edgeApplicationRoutes = {
           },
           originsServices: {
             listOriginsService: OriginsService.listOriginsService,
+            prefetchOriginsList: OriginsService.prefetchOriginsList,
             deleteOriginsService: OriginsService.deleteOriginsService,
             createOriginService: OriginsService.createOriginService,
             editOriginService: OriginsService.editOriginService,
@@ -103,7 +104,9 @@ export const edgeApplicationRoutes = {
             to: '/applications'
           },
           {
-            label: 'Edit Application'
+            label: 'Edit Application',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

@@ -1,6 +1,6 @@
 import { adaptBehavior, parsedBehavior } from '@/helpers/helper-behavior'
 import { adaptCriteria } from '@/helpers/helper-criteria'
-import { formatExhibitionDate, convertToRelativeTime } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { capitalizeFirstLetter } from '@/helpers/capitalize-first-letter'
 
 export const RulesEngineAdapter = {
@@ -33,7 +33,7 @@ export const RulesEngineAdapter = {
         },
         description: rule.description || '-',
         lastEditor: rule.last_editor || '-',
-        lastModified: formatExhibitionDate(rule.last_modified, 'full'),
+        lastModified: formatDateToDayMonthYearHour(rule.last_modified),
         lastModify: convertToRelativeTime(rule.last_modified)
       })) || []
 

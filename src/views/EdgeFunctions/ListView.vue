@@ -1,51 +1,11 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Functions" />
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="edgeFunctionService.listEdgeFunctionsService"
-        :columns="getColumns"
-        addButtonLabel="Function"
-        createPagePath="functions/create?origin=list"
-        editPagePath="functions/edit"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleCreateTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Functions found."
-        :actions="actions"
-        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
-        :defaultOrderingFieldName="'-last_modified'"
-        showLastModified
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No Functions have been created"
-        description="Click the button below to create your first Function."
-        createButtonLabel="Function"
-        createPagePath="functions/create"
-        @click-to-create="handleCreateTrackEvent"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, inject } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -57,7 +17,6 @@
     }
   })
 
-  let hasContentToList = ref(true)
   const EDGE_FUNCTIONS_API_FIELDS = [
     'id',
     'name',
@@ -71,6 +30,7 @@
   ]
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'Function',
       icon: 'pi pi-trash',
@@ -90,16 +50,49 @@
     })
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.data?.text || rowData.name,
+      id: rowData.id,
+      version: rowData.version,
+      referenceCount: rowData.referenceCount,
+      vendor: rowData.data?.vendor,
+      runtime: rowData.data?.content,
+      executionEnvironment: rowData.data?.executionEnvironment,
+      lastEditor: rowData.data?.lastEditor,
+      lastModified: rowData.data?.lastModified,
+      status: rowData.data?.content
+    }
+  }
+  const allowedFilters = [
+    {
+      header: 'Name',
+      field: 'name'
+    },
+    {
+      header: 'ID',
+      field: 'id'
+    },
+    {
+      header: 'Initiator Type',
+      field: 'execution_environment'
+    },
+    {
+      header: 'Status',
+      field: 'active'
+    }
+  ]
   const getColumns = computed(() => [
     {
       field: 'name',
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
+      style: 'max-width: 300px',
       component: (columnData) => {
         return columnBuilder({
-          data: { text: columnData.text },
-          columnAppearance: 'text-format'
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
         })
       }
     },
@@ -148,14 +141,6 @@
       header: 'Initiator Type'
     },
     {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified'
-    },
-    {
       field: 'status',
       header: 'Status',
       sortField: 'status.content',
@@ -167,10 +152,64 @@
           columnAppearance: 'tag'
         })
       }
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      sortField: 'lastModified',
+      filterPath: 'lastModified'
     }
   ])
-
-  function handleLoadData(event) {
-    hasContentToList.value = event
-  }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Functions"
+        description="Manage serverless functions for applications."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Function"
+            @click="handleCreateTrackEvent"
+            createPagePath="functions/create?origin=list"
+            data-testid="create_Function_button"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="edgeFunctionService.listEdgeFunctionsService"
+        :columns="getColumns"
+        createPagePath="functions/create?origin=list"
+        editPagePath="/functions/edit"
+        @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
+        emptyListMessage="No Functions found."
+        :actions="actions"
+        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
+        :frozen-columns="['name']"
+        exportFileName="Functions"
+        :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
+        :emptyBlock="{
+          title: 'No Functions have been created',
+          description: 'Click the button below to create your first Function.',
+          createButtonLabel: 'Function',
+          createPagePath: 'functions/create?origin=list',
+          documentationService: documentationService
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

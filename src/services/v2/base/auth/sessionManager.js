@@ -3,12 +3,15 @@ import { persister, pauseQueryPersistence } from '../query/queryPlugin'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
+import { useAccountStore } from '@/stores/account'
 
 const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
 
 const clearAll = async () => {
+  const accountStore = useAccountStore()
   pauseQueryPersistence()
+  accountStore.resetAccount()
   await clearAllCache()
   await persister.removeClient()
 }

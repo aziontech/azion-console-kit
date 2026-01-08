@@ -1,71 +1,6 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Certificate Manager"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="listService"
-        :columns="getColumns"
-        editPagePath="digital-certificates/edit"
-        addButtonLabel="Certificate Manager"
-        createPagePath="digital-certificates/create"
-        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No digital certificates found."
-        :actions="actions"
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        ref="listTableBlock"
-        :defaultOrderingFieldName="'-last_modified'"
-        :hiddenByDefault="hiddenColumns"
-        :firstLoadData="firstLoadData"
-      >
-        <template #select-buttons>
-          <div class="flex flex-row gap-2">
-            <SelectButton
-              v-model="digitalCertificateTypeSelected"
-              :options="optionsSelectButton"
-              aria-labelledby="basic"
-              class="h-9 p-1"
-            />
-          </div>
-        </template>
-        <template #addButton>
-          <CreateMenuBlock
-            addButtonLabel="Certificate Manager"
-            :items="items"
-          />
-        </template>
-      </FetchListTableBlock>
-
-      <EmptyResultsBlock
-        v-else
-        title="No digital certificate has been added"
-        description="Click the button below to add your first digital certificate."
-        :documentationService="documentationCatalog.digitalCertificates"
-      >
-        <template #default>
-          <CreateMenuBlock
-            addButtonLabel="Certificate Manager"
-            :items="items"
-            severity="secondary"
-          />
-        </template>
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { ref, computed, inject, watch } from 'vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
@@ -91,7 +26,6 @@
     setFirstLoadData
   } = useDigitalCertificate()
 
-  const hasContentToList = ref(true)
   const DIGITAL_CERTIFICATE_API_FIELDS = [
     'id',
     'name',
@@ -138,16 +72,14 @@
   const actions = computed(() => [
     {
       type: 'delete',
+      label: 'Delete',
       title: certificateTypeList.value === 'CRL' ? 'CRL' : 'digital certificate',
       icon: 'pi pi-trash',
       service: deleteService.value
     }
   ])
 
-  const handleLoadData = (event) => {
-    if (firstLoadData.value) {
-      hasContentToList.value = event
-    }
+  const handleLoadData = () => {
     setFirstLoadData(false)
   }
 
@@ -170,9 +102,50 @@
     return ['managed', 'challenge', 'authority', 'keyAlgorithm']
   })
 
+  const csvMapper = (rowData) => {
+    if (certificateTypeList.value === 'CRL') {
+      return {
+        name: rowData.name,
+        id: rowData.id,
+        issuer: rowData.issuer,
+        lastEditor: rowData.lastEditor,
+        lastModified: rowData.lastModified,
+        status: rowData.data.status?.content || rowData.status
+      }
+    }
+    return {
+      name: rowData.name,
+      id: rowData.id,
+      subjectName: rowData.subjectName,
+      issuer: rowData.issuer,
+      type: rowData.type,
+      validity: rowData.validity,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      status: rowData.data.status?.content || rowData.status,
+      managed: rowData.managed,
+      challenge: rowData.challenge,
+      authority: rowData.authority,
+      keyAlgorithm: rowData.keyAlgorithm
+    }
+  }
+
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
+        {
+          field: 'name',
+          header: 'Name',
+          type: 'component',
+          sortField: 'name',
+          style: 'max-width: 300px',
+          component: (columnData) => {
+            return columnBuilder({
+              data: columnData,
+              columnAppearance: 'text-format-with-popup'
+            })
+          }
+        },
         {
           field: 'id',
           header: 'ID',
@@ -180,33 +153,9 @@
           filterPath: 'id'
         },
         {
-          field: 'name',
-          header: 'Name',
-          type: 'component',
-          sortField: 'name',
-          component: (columnData) =>
-            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-        },
-        {
           field: 'issuer',
           header: 'Issuer',
           sortField: 'issuer'
-        },
-        {
-          field: 'lastEditor',
-          header: 'Last Editor',
-          sortField: 'last_editor',
-          type: 'component',
-          component: (columnData) =>
-            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-        },
-        {
-          field: 'lastModified',
-          header: 'Last Modified',
-          sortField: 'last_modified',
-          type: 'component',
-          component: (columnData) =>
-            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
         },
         {
           field: 'status',
@@ -218,10 +167,35 @@
               data: { ...columnData.status, tooltipText: columnData.statusDetail },
               columnAppearance: 'tag-with-tooltip'
             })
+        },
+        {
+          field: 'lastEditor',
+          header: 'Last Editor',
+          sortField: 'last_editor',
+          filterPath: 'last_editor'
+        },
+        {
+          field: 'lastModified',
+          header: 'Last Modified',
+          sortField: 'lastModified',
+          filterPath: 'lastModified'
         }
       ]
     }
     return [
+      {
+        field: 'name',
+        header: 'Name',
+        type: 'component',
+        sortField: 'name',
+        style: 'max-width: 300px',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
+      },
       {
         field: 'id',
         header: 'ID',
@@ -229,20 +203,13 @@
         filterPath: 'id'
       },
       {
-        field: 'name',
-        header: 'Name',
-        type: 'component',
-        sortField: 'name',
-        component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-      },
-      {
         field: 'subjectName',
         header: 'Subject Names',
         sortField: 'subject_name',
         type: 'component',
+        style: 'max-width: 300px',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
       {
         field: 'issuer',
@@ -259,24 +226,9 @@
         header: 'Expiration Date',
         sortField: 'validity',
         type: 'component',
+        style: 'max-width: 300px',
         component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        sortField: 'last_modified',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
       },
       {
         field: 'status',
@@ -314,6 +266,51 @@
         field: 'keyAlgorithm',
         header: 'Key Algorithm',
         sortField: 'key_algorithm'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        filterPath: 'last_editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        sortField: 'lastModified',
+        filterPath: 'lastModified'
+      }
+    ]
+  })
+
+  const allowedFilters = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return [
+        {
+          header: 'Name',
+          field: 'name'
+        },
+        {
+          header: 'ID',
+          field: 'id'
+        }
+      ]
+    }
+    return [
+      {
+        header: 'Name',
+        field: 'name'
+      },
+      {
+        header: 'ID',
+        field: 'id'
+      },
+      {
+        header: 'Type',
+        field: 'type'
+      },
+      {
+        header: 'Managed',
+        field: 'managed'
       }
     ]
   })
@@ -366,3 +363,56 @@
     }
   )
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Certificate Manager"
+        description="Manage SSL/TLS certificates for secure connections."
+      >
+        <template #default>
+          <SelectButton
+            v-model="digitalCertificateTypeSelected"
+            :options="optionsSelectButton"
+            aria-labelledby="basic"
+            class="h-9 p-1"
+          />
+          <CreateMenuBlock
+            addButtonLabel="Certificate"
+            :items="items"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        :listService="listService"
+        :columns="getColumns"
+        editPagePath="/digital-certificates/edit"
+        createPagePath="digital-certificates/create"
+        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No digital certificates found."
+        :actions="actions"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
+        ref="listTableBlock"
+        :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="hiddenColumns"
+        :firstLoadData="firstLoadData"
+        :frozenColumns="['name']"
+        exportFileName="Certificate Manager"
+        :csvMapper="csvMapper"
+        :allowedFilters="allowedFilters"
+        :emptyBlock="{
+          title: 'No digital certificate has been added',
+          description: 'Click the button below to add your first digital certificate.',
+          createPagePath: 'digital-certificates/create',
+          createButtonLabel: 'Certificate Manager',
+          documentationService: documentationCatalog.digitalCertificates
+        }"
+      >
+      </FetchListTableBlock>
+    </template>
+  </ContentBlock>
+</template>

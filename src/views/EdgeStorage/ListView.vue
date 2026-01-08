@@ -3,7 +3,32 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="selectedBucket?.name ? selectedBucket.name : 'Object Storage'"
-      />
+        :description="
+          !selectedBucket?.name
+            ? 'Store and retrieve objects with high availability and performance.'
+            : ''
+        "
+      >
+        <template #default>
+          <DataTable.ActionsButtons
+            v-if="!selectedBucket"
+            size="small"
+            label="Bucket"
+            @click="handleCreateBucketTrackEvent"
+            createPagePath="/object-storage/create"
+            data-testid="create_Bucket_button"
+          />
+          <PrimeButton
+            v-else
+            icon="pi pi-cog"
+            size="small"
+            @click="handleSettingsTrackEvent"
+            :label="isGreaterThanMD ? 'Settings' : ''"
+            outlined
+            class="px-4 py-1 flex items-center justify-center"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <BucketListTable v-if="!selectedBucket" />
@@ -17,107 +42,10 @@
             class="flex flex-col"
           >
             <div
-              class="flex justify-between items-start mb-4 pt-1 relative"
+              class="hidden"
               ref="headerContainer"
             >
-              <div
-                v-if="isGreaterThanMD"
-                class="flex-shrink min-w-0 overflow-hidden"
-              >
-                <Breadcrumb
-                  :model="displayedBreadcrumbItems"
-                  class="text-color-primary overflow-hidden"
-                  :pt="{
-                    root: { class: 'overflow-hidden' },
-                    menu: { class: 'flex flex-nowrap overflow-hidden max-w-full' }
-                  }"
-                >
-                  <template #item="{ item }">
-                    <a
-                      class="cursor-pointer whitespace-nowrap"
-                      @click="item.label === '...' ? null : handleBreadcrumbClick(item)"
-                      @mouseenter.stop="item.label === '...' && setEllipsisPopup(true)"
-                      @mouseleave.stop="item.label === '...' && scheduleHidePopup()"
-                    >
-                      {{ item.label }}
-                    </a>
-                  </template>
-                </Breadcrumb>
-                <div
-                  class="absolute top-full left-20 mt-1 bg-[var(--menu-bg)] rounded-md z-[-50] opacity-0"
-                  @mouseleave="scheduleHidePopup()"
-                  @mouseenter="cancelHidePopup()"
-                  :class="{
-                    'opacity-100 transition-opacity duration-300 z-[50]': showEllipsisPopup
-                  }"
-                >
-                  <div
-                    v-for="hiddenItem in hiddenBreadcrumbItems"
-                    :key="hiddenItem.index"
-                    class="px-3 py-2 hover:bg-[var(--surface-hover)] rounded-md cursor-pointer text-sm whitespace-nowrap"
-                    @click="handleBreadcrumbClick(hiddenItem)"
-                  >
-                    {{ hiddenItem.label }}
-                  </div>
-                </div>
-              </div>
-              <div
-                class="flex w-full md:w-auto items-center gap-2.5"
-                ref="buttonsContainer"
-              >
-                <div class="p-input-icon-left w-full md:w-64">
-                  <i class="pi pi-search" />
-                  <InputText
-                    v-model="fileSearchTerm"
-                    placeholder="Search in folder"
-                    class="w-full"
-                    @input="handleFileSearch"
-                  />
-                </div>
-                <template v-if="isGreaterThanMD">
-                  <PrimeButton
-                    icon="pi pi-refresh"
-                    size="small"
-                    outlined
-                    :label="isGreaterThanXL ? 'Refresh' : ''"
-                    class="px-4 py-1 flex items-center justify-center"
-                    @click="handleRefresh"
-                  />
-                  <PrimeButton
-                    icon="pi pi-cog"
-                    size="small"
-                    @click="handleSettingsTrackEvent"
-                    :label="isGreaterThanXL ? 'Settings' : ''"
-                    outlined
-                    class="px-4 py-1 flex items-center justify-center"
-                  />
-                  <!-- hide new folder button -->
-                  <!-- <PrimeButton
-                    icon="pi pi-folder-plus"
-                    size="small"
-                    @click="handleNewFolder"
-                    :label="isGreaterThanXL ? 'New Folder' : ''"
-                    outlined
-                    class="px-4 py-1 flex items-center justify-center"
-                  /> -->
-                </template>
-                <SplitButton
-                  size="small"
-                  label="Add to files"
-                  @click="openFileSelector"
-                  :model="uploadMenuItems"
-                  primary
-                  class="whitespace-nowrap"
-                  :disabled="isProcessing"
-                  :menuButtonProps="{
-                    class: 'rounded-l-none',
-                    style: { color: 'var(--primary-text-color) !important' }
-                  }"
-                  :pt="{
-                    root: { class: 'h-[2rem]' }
-                  }"
-                />
-              </div>
+              <div ref="buttonsContainer"></div>
             </div>
             <ProgressCard />
 
@@ -138,7 +66,6 @@
                 :columns="getColumns"
                 :selected-bucket="selectedBucket"
                 v-model:selectedItensData="selectedFiles"
-                hiddenHeader
                 paginator
                 enableEditClickFolder
                 :actions="fileActions"
@@ -148,6 +75,12 @@
                 :currentPage="currentPage"
                 :isCreatingNewFolder="isCreatingNewFolder"
                 :newFolderName="newFolderName"
+                :folderPath="folderPath"
+                :onBreadcrumbClick="handleBreadcrumbClick"
+                :onRefresh="handleRefresh"
+                :headerContainer="headerContainer"
+                :buttonsContainer="buttonsContainer"
+                :containerWidth="containerWidth"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
@@ -158,7 +91,42 @@
                 @cancel-new-folder="handleCancelNewFolder"
                 @update:newFolderName="newFolderName = $event"
                 class="w-full"
-              />
+              >
+                <template #search-slot>
+                  <DataTable.Search
+                    v-model="fileSearchTerm"
+                    placeholder="Search in folder"
+                    @input="handleFileSearch"
+                  />
+                </template>
+                <template #second-line-actions>
+                  <!-- comment button for hide to users -->
+                  <!-- <PrimeButton
+                    icon="pi pi-folder-plus"
+                    size="small"
+                    @click="handleNewFolder"
+                    :label="isGreaterThanMD ? 'New Folder' : ''"
+                    outlined
+                    class="px-4 py-1 flex items-center justify-center"
+                  /> -->
+                  <SplitButton
+                    size="small"
+                    label="Add to files"
+                    @click="openFileSelector"
+                    :model="uploadMenuItems"
+                    primary
+                    class="whitespace-nowrap"
+                    :disabled="isProcessing"
+                    :menuButtonProps="{
+                      class: 'rounded-l-none',
+                      style: { color: 'var(--primary-text-color) !important' }
+                    }"
+                    :pt="{
+                      root: { class: 'h-[2rem]' }
+                    }"
+                  />
+                </template>
+              </ListTableBlock>
 
               <div class="flex items-center gap-3 text-center">
                 <i class="pi pi-cloud-upload text-xl text-color-secondary"></i>
@@ -191,10 +159,8 @@
   import BucketListTable from './components/BucketListTable.vue'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
-  import InputText from 'primevue/inputtext'
-  import Breadcrumb from 'primevue/breadcrumb'
   import DragAndDrop from './components/DragAndDrop.vue'
-  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -202,7 +168,9 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import ProgressCard from './components/ProgressCard.vue'
+  import DataTable from '@/components/DataTable'
 
+  const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
@@ -219,7 +187,7 @@
     folderPath,
     isProcessing
   } = useEdgeStorage()
-  const { isGreaterThanMD, isGreaterThanXL } = useResize()
+  const { isGreaterThanMD } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
   const fileActions = [
@@ -248,7 +216,7 @@
       header: 'Size'
     },
     {
-      field: 'last_modified',
+      field: 'lastModified',
       header: 'Last Modified'
     }
   ]
@@ -271,136 +239,10 @@
   const headerContainer = ref(null)
   const buttonsContainer = ref(null)
   const containerWidth = ref(0)
-  const showEllipsisPopup = ref(false)
-  const hidePopupTimeout = ref(null)
   const currentPage = ref(1)
   const isCreatingNewFolder = ref(false)
   const newFolderName = ref('')
 
-  const breadcrumbItems = computed(() => {
-    if (!selectedBucket.value) return []
-
-    const items = [
-      {
-        label: selectedBucket.value.name,
-        index: 0
-      }
-    ]
-
-    if (folderPath.value) {
-      const folders = folderPath.value.split('/').filter((folder) => folder.trim() !== '')
-      folders.forEach((folder, index) => {
-        items.push({
-          label: folder,
-          index: index + 1
-        })
-      })
-    }
-
-    return items
-  })
-
-  const availableWidth = computed(() => {
-    if (!isGreaterThanMD.value || containerWidth.value === 0) {
-      return 1000
-    }
-
-    const buttonsWidth = buttonsContainer.value ? buttonsContainer.value.offsetWidth : 400
-    const gap = 16
-    return Math.max(200, containerWidth.value - buttonsWidth - gap)
-  })
-
-  const displayedBreadcrumbItems = computed(() => {
-    const items = breadcrumbItems.value
-    const width = availableWidth.value
-
-    if (items.length <= 1) {
-      return items
-    }
-
-    const estimatedItemWidth = 120
-    const separatorWidth = 32
-    const ellipsisWidth = 40
-
-    const calculateBreadcrumbWidth = (itemsToShow) => {
-      const totalItems = itemsToShow.length
-      const hasEllipsis = itemsToShow.some((item) => item.label === '...')
-
-      let totalWidth = totalItems * estimatedItemWidth + (totalItems - 1) * separatorWidth
-      if (hasEllipsis) {
-        totalWidth = totalWidth - estimatedItemWidth + ellipsisWidth
-      }
-
-      return totalWidth
-    }
-
-    if (calculateBreadcrumbWidth(items) <= width) {
-      return items
-    }
-
-    if (items.length === 2) {
-      return items
-    }
-
-    let currentItems = [...items]
-
-    while (currentItems.length > 2) {
-      const testItems = [currentItems[0], { label: '...' }, ...currentItems.slice(2)]
-
-      if (calculateBreadcrumbWidth(testItems) <= width) {
-        return testItems
-      }
-
-      currentItems.splice(1, 1)
-    }
-
-    return [items[0], { label: '...', disabled: true }, items[items.length - 1]]
-  })
-
-  const hiddenBreadcrumbItems = computed(() => {
-    const items = breadcrumbItems.value
-    const displayed = displayedBreadcrumbItems.value
-
-    const hasEllipsis = displayed.some((item) => item.label === '...')
-    if (!hasEllipsis) {
-      return []
-    }
-
-    const firstDisplayedIndex = displayed[0].index
-    const lastDisplayedItems = displayed.slice(-2)
-    const lastDisplayedIndex = lastDisplayedItems[0].index
-
-    return items.filter(
-      (item) => item.index > firstDisplayedIndex && item.index < lastDisplayedIndex
-    )
-  })
-
-  const setEllipsisPopup = (value) => {
-    if (!value) {
-      setTimeout(() => {
-        showEllipsisPopup.value = value
-      }, 500)
-    } else {
-      showEllipsisPopup.value = value
-    }
-  }
-
-  const scheduleHidePopup = () => {
-    if (hidePopupTimeout.value) {
-      clearTimeout(hidePopupTimeout.value)
-    }
-    hidePopupTimeout.value = setTimeout(() => {
-      showEllipsisPopup.value = false
-    }, 200)
-  }
-
-  const cancelHidePopup = () => {
-    if (hidePopupTimeout.value) {
-      clearTimeout(hidePopupTimeout.value)
-      hidePopupTimeout.value = null
-    }
-    showEllipsisPopup.value = true
-  }
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
   })
@@ -424,12 +266,18 @@
       const pathToFolder = folders.slice(0, item.index).join('/')
       folderPath.value = `${pathToFolder}/`
     }
-
+    selectedBucket.value.continuation_token = null
     currentPage.value = 1
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
+  const handleCreateBucketTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Bucket'
+    })
+  }
+
   const handleSettingsTrackEvent = () => {
     router.push(`/object-storage/${selectedBucket.value.id}/edit/main-settings`)
   }
@@ -467,32 +315,34 @@
     input.click()
   }
 
-  const handleEditFolder = (item) => {
+  const handleEditFolder = async (item) => {
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
       folderPath.value += item.name
       router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-      currentPage.value = 1
       filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
+      await listServiceFilesRef.value?.reload()
+      currentPage.value = 1
     }
   }
 
-  const goBackToBucket = () => {
+  const goBackToBucket = async () => {
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    selectedBucket.value.continuation_token = null
     router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    currentPage.value = 1
     filesTableNeedRefresh.value = true
-    listServiceFilesRef.value?.reload()
+    await listServiceFilesRef.value?.reload()
+    currentPage.value = 1
   }
   const handleMultipleDelete = () => {
     Promise.resolve().then(async () => {
       await deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
       filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
+      await listServiceFilesRef.value?.reload()
+      currentPage.value = 1
     })
   }
   const handleDeleteSelectedItems = () => {
@@ -553,13 +403,18 @@
   const handlePaginationChange = async (event) => {
     const { page, pageCount } = event
     const isLastPage = page >= pageCount - 1
+
+    if (isPaginationLoading.value && page === 0) {
+      return
+    }
+
     currentPage.value = page + 1
 
-    if (isLastPage && selectedBucket.value?.continuation_token) {
+    if (isLastPage && selectedBucket.value?.continuation_token && !isPaginationLoading.value) {
       try {
         isPaginationLoading.value = true
         filesTableNeedRefresh.value = true
-        await listServiceFilesRef.value?.loadData({ page: page + 1, keepCurrentPage: true })
+        await listServiceFilesRef.value?.loadData()
       } finally {
         isPaginationLoading.value = false
       }
@@ -610,7 +465,9 @@
       const newPath = folderPath.value + folderName + '/'
       folderPath.value = newPath
       router.replace({ query: { folderPath: newPath } })
-      currentPage.value = 1
+      if (!isPaginationLoading.value) {
+        currentPage.value = 1
+      }
       filesTableNeedRefresh.value = true
       listServiceFilesRef.value?.reload()
     }
@@ -654,15 +511,7 @@
     }
   )
 
-  watch(
-    breadcrumbItems,
-    () => {
-      setTimeout(updateContainerWidth, 50)
-    },
-    { deep: true }
-  )
-
-  watch(isGreaterThanMD, () => {
+  watch(folderPath, () => {
     setTimeout(updateContainerWidth, 50)
   })
 

@@ -166,12 +166,54 @@ export class RulesEngineService extends BaseService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
+    const hasFilter = params?.hasFilter || false
+    const skipCache = params?.skipCache || false
+
     return await this._ensureQueryData(
       () => rulesEngineKeys.all(edgeApplicationId),
       async () => {
         const [requestRules, responseRules] = await Promise.all([
           this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
           this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
+        ])
+
+        const responseBody = [...requestRules, ...responseRules]
+
+        return {
+          count: responseBody.length,
+          body: responseBody
+        }
+      },
+      { persist: !hasFilter, skipCache }
+    )
+  }
+
+  /**
+   * Prefetches all rules engine entries to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchRulesEngineList = async (edgeApplicationId) => {
+    const defaultParams = {
+      fields: [
+        'id',
+        'name',
+        'description',
+        'phase',
+        'active',
+        'order',
+        'last_modified',
+        'last_editor'
+      ],
+      ordering: ''
+    }
+
+    return await this._prefetchQuery(
+      () => rulesEngineKeys.all(edgeApplicationId),
+      async () => {
+        const [requestRules, responseRules] = await Promise.all([
+          this._fetchAllRulesForPhase(edgeApplicationId, 'request', defaultParams),
+          this._fetchAllRulesForPhase(edgeApplicationId, 'response', defaultParams)
         ])
 
         const responseBody = [...requestRules, ...responseRules]

@@ -1,47 +1,37 @@
 <template>
-  <EmptyResultsBlock
-    v-if="showEmptyResults"
-    title="No buckets created"
-    description="Create your first bucket here"
-    createButtonLabel="Bucket"
-    @click-to-create="handleCreateTrackEvent"
-    :documentationService="documentationGuideProducts.edgeStorage"
-  >
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
   <ListTableBlock
-    v-else
     ref="listServiceRef"
     :listService="loadBuckets"
     :columns="columns"
     :actions="actions"
     :apiFields="fields"
-    addButtonLabel="Bucket"
     defaultOrderingFieldName="-lastModified"
-    createPagePath="/object-storage/create"
     enableEditClick
     editPagePath="/object-storage"
     exportFileName="buckets"
     class="w-full"
     :isLoading="isLoading"
+    :emptyBlock="{
+      title: 'No buckets created',
+      description: 'Create your first bucket here',
+      createButtonLabel: 'Bucket',
+      createPagePath: '/object-storage/create',
+      documentationService: documentationGuideProducts.edgeStorage
+    }"
     @force-update="bucketTableNeedRefresh = true"
   />
 </template>
 
 <script setup>
-  import { inject, ref, computed } from 'vue'
+  import { ref } from 'vue'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
   import { useRouter, useRoute } from 'vue-router'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
   const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
@@ -50,7 +40,15 @@
     {
       field: 'name',
       header: 'Name',
-      sortable: true
+      sortable: true,
+      type: 'component',
+      style: 'max-width: 300px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
       field: 'size',
@@ -60,22 +58,20 @@
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      sortable: true
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      sortable: true
+      sortField: 'lastModified',
+      filterPath: 'lastModified'
     }
   ]
 
   const listServiceRef = ref(null)
 
   const isLoading = ref(true)
-
-  const showEmptyResults = computed(() => {
-    return !buckets.value.length && !isLoading.value
-  })
 
   const handleEdit = (bucket) => {
     selectedBucket.value = bucket
@@ -105,55 +101,43 @@
   const loadBuckets = async (params) => {
     try {
       isLoading.value = true
-      let bucketCount = 0
-      if (!buckets.value.length || bucketTableNeedRefresh.value) {
-        const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
-        buckets.value = listBucketsResponse.body
-        bucketCount = listBucketsResponse.count
+      const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
-        buckets.value.forEach((bucket) => {
-          bucket.size = '-'
-        })
+      buckets.value = listBucketsResponse.body
+      const bucketCount = listBucketsResponse.count
 
-        edgeStorageService
-          .getEdgeStorageMetrics()
-          .then((metricsResponse) => {
-            buckets.value.forEach((bucket) => {
-              const size = metricsResponse.find(
-                (metric) => metric.bucketName === bucket.name
-              )?.storedGb
-              bucket.size = size ? `${size} GB` : '-'
-            })
-          })
-          .catch(() => {
-            buckets.value.forEach((bucket) => {
-              bucket.size = '-'
-            })
-          })
+      buckets.value.forEach((bucket) => {
+        bucket.size = '-'
+      })
 
-        bucketTableNeedRefresh.value = false
-        if (route.params?.id) {
-          const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
-          if (bucketName) {
-            selectedBucket.value = bucketName
-          }
+      bucketTableNeedRefresh.value = false
+
+      if (route.params?.id) {
+        const bucketName = buckets.value.find((bucket) => bucket.name === route.params.id)
+        if (bucketName) {
+          selectedBucket.value = bucketName
         }
       }
+
+      edgeStorageService
+        .getEdgeStorageMetrics()
+        .then((metricsResponse) => {
+          buckets.value.forEach((bucket) => {
+            const size = metricsResponse.find(
+              (metric) => metric.bucketName === bucket.name
+            )?.storedGb
+            bucket.size = size ? `${size} GB` : '-'
+          })
+        })
+        .catch(() => {})
+
       return {
         body: buckets.value,
-        count: bucketCount || buckets.value.length
+        count: bucketCount
       }
     } finally {
       isLoading.value = false
     }
-  }
-
-  const handleCreateTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Edge Storage'
-    })
-    bucketTableNeedRefresh.value = true
-    router.push('/object-storage/create')
   }
 </script>
