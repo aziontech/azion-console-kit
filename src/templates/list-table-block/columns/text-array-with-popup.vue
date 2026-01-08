@@ -92,7 +92,7 @@
 
   const handleTagMouseEnter = () => {
     hoverTimeout.value = setTimeout(() => {
-      const rect = tagElement.value.getBoundingClientRect()
+      const rect = tagElement.value?.getBoundingClientRect()
       const popupWidth = 320
       const viewportWidth = window.innerWidth
 

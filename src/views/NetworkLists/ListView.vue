@@ -136,6 +136,7 @@
         exportFileName="Network Lists"
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
+        defaultOrderingFieldName="-last_modified"
         :emptyBlock="{
           title: 'No network lists have been added',
           description:
