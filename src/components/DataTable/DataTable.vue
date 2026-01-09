@@ -589,4 +589,8 @@
   :deep(.p-datatable-thead) {
     z-index: 2;
   }
+  :deep(.p-column-resizer:hover) {
+    background-color: #f3652b !important;
+    width: 2px !important;
+  }
 </style>
