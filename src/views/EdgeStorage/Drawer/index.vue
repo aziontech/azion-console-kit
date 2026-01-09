@@ -22,7 +22,7 @@
 
   const initialValues = {
     name: '',
-    edge_access: 'read_write'
+    workloads_access: 'read_write'
   }
 
   const closeCreateDrawer = () => {
