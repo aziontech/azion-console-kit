@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
-  import InputText from 'primevue/inputtext'
+  import Password from 'primevue/password'
   import LabelBlock from '@/templates/label-block'
 
   const emit = defineEmits(['blur', 'input'])
@@ -46,7 +46,7 @@
       default: ''
     }
   })
-  const inputRef = ref(null)
+  const inputPasswordRef = ref(null)
   const name = toRef(props, 'name')
   const slots = useSlots()
   const attrs = useAttrs()
@@ -82,7 +82,7 @@
     emit('input', event.target.value)
   }
 
-  defineExpose({ inputRef })
+  defineExpose({ inputPasswordRef })
 </script>
 
 <template>
@@ -93,20 +93,19 @@
     :label="props.label"
     :isRequired="attrs.required"
   />
-  <InputText
-    v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
+  <Password
+    toggleMask
+    ref="inputPasswordRef"
     v-model="inputValue"
-    ref="inputRef"
-    type="text"
-    :data-testid="customTestId.input"
     :id="name"
     :name="name"
     :readonly="readonly"
     :disabled="disabled"
     :placeholder="props.placeholder"
     :class="[{ 'p-invalid': aditionalError || veeValidateErrorMessage }, props.class]"
+    :feedback="false"
+    :data-testid="customTestId.input"
     @input="onChange"
-    @keypress.enter.prevent
     @blur="onBlur"
   />
   <small

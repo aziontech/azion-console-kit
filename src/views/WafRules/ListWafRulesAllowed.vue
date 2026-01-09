@@ -235,6 +235,9 @@
       service: handleDeleteWafRulesAllowedService
     }
   ]
+  defineExpose({
+    openCreateDrawer: openCreateDrawerWafAllowed
+  })
 </script>
 
 <template>

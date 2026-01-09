@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEventsListBaseUrl } from './make-events-list-service'
 import graphQLApi from '../axios/makeEventsApi'
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const listRealTimePurgeService = async (
   apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
@@ -98,7 +98,7 @@ const adapt = (httpResponse) => {
       layer: data?.layer ? MAPLAYER[data.layer] : DEFAULT_VALUE,
       user: item.authorEmail,
       disabled: !data,
-      time: formatExhibitionDate(item.ts, 'full', 'short'),
+      time: formatDateToDayMonthYearHour(item.ts),
       ts: item.ts
     }
   })

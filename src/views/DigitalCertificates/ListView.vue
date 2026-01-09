@@ -72,6 +72,7 @@
   const actions = computed(() => [
     {
       type: 'delete',
+      label: 'Delete',
       title: certificateTypeList.value === 'CRL' ? 'CRL' : 'digital certificate',
       icon: 'pi pi-trash',
       service: deleteService.value

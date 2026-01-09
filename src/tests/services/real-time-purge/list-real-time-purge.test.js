@@ -24,7 +24,7 @@ const fixtures = {
     arguments: ['www.vicva.com'],
     disabled: false,
     layer: 'cache',
-    time: 'Wednesday, December 13, 2023 at 6:02 PM',
+    time: 'Dec 13, 2023, 06:02:49 PM',
     type: 'url',
     user: 'azion+teste1@azion.com',
     ts: '2023-12-13T18:02:49Z'
@@ -147,7 +147,7 @@ describe('ListRealTimePurgeService', () => {
       layer: 'Cache',
       user: 'azion+teste1@azion.com',
       disabled: false,
-      time: 'Wednesday, December 13, 2023 at 6:02 PM',
+      time: 'Dec 13, 2023, 06:02:49 PM',
       ts: '2023-12-13T18:02:49Z'
     }
 
