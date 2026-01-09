@@ -15,6 +15,7 @@
         class="text-xs bg-[var(--surface-section)] px-2 py-1 rounded-md border border-[var(--surface-border)] cursor-pointer"
         @mouseenter="handleTagMouseEnter"
         @mouseleave="handleTagMouseLeave"
+        @click.stop="handleTagClick"
       >
         +{{ items.length - 1 }}
       </span>
@@ -49,7 +50,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   const props = defineProps({
@@ -70,6 +71,7 @@
   const hoverTimeout = ref(null)
   const popupHovered = ref(false)
   const isCellHovered = ref(false)
+  const isPopupFixed = ref(false)
 
   const popupStyle = computed(() => ({
     left: `${popupPosition.value.posX}px`,
@@ -90,23 +92,39 @@
     return props.items.join('\n')
   })
 
+  const updatePopupPosition = () => {
+    const rect = tagElement.value?.getBoundingClientRect()
+    if (!rect) return
+    const popupWidth = 320
+    const viewportWidth = window.innerWidth
+
+    let posX = rect.right + 6
+
+    if (posX + popupWidth > viewportWidth) {
+      posX = rect.left - popupWidth - 6
+    }
+
+    popupPosition.value = {
+      posX: posX,
+      posY: rect.top
+    }
+  }
+
+  const handleTagClick = () => {
+    isPopupFixed.value = !isPopupFixed.value
+    if (isPopupFixed.value) {
+      updatePopupPosition()
+      showPopup.value = true
+    } else {
+      showPopup.value = false
+    }
+  }
+
   const handleTagMouseEnter = () => {
+    if (isPopupFixed.value) return
+
     hoverTimeout.value = setTimeout(() => {
-      const rect = tagElement.value?.getBoundingClientRect()
-      if (!rect) return
-      const popupWidth = 320
-      const viewportWidth = window.innerWidth
-
-      let posX = rect.right + 6
-
-      if (posX + popupWidth > viewportWidth) {
-        posX = rect.left - popupWidth - 6
-      }
-
-      popupPosition.value = {
-        posX: posX,
-        posY: rect.top
-      }
+      updatePopupPosition()
       showPopup.value = true
     }, 1000)
   }
@@ -116,6 +134,9 @@
       clearTimeout(hoverTimeout.value)
       hoverTimeout.value = null
     }
+
+    if (isPopupFixed.value) return
+
     setTimeout(() => {
       if (!popupHovered.value) {
         showPopup.value = false
@@ -129,7 +150,9 @@
 
   const handlePopupMouseLeave = () => {
     popupHovered.value = false
-    showPopup.value = false
+    if (!isPopupFixed.value) {
+      showPopup.value = false
+    }
   }
 
   const handleCellMouseEnter = () => {
@@ -139,6 +162,29 @@
   const handleCellMouseLeave = () => {
     isCellHovered.value = false
   }
+
+  const handleClickOutside = (event) => {
+    if (!isPopupFixed.value) return
+
+    const clickedInsideTag = tagElement.value?.contains(event.target)
+    const clickedInsidePopup = popupElement.value?.contains(event.target)
+
+    if (!clickedInsideTag && !clickedInsidePopup) {
+      isPopupFixed.value = false
+      showPopup.value = false
+    }
+  }
+
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+  })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
+    if (hoverTimeout.value) {
+      clearTimeout(hoverTimeout.value)
+    }
+  })
 </script>
 
 <style scoped lang="scss">
