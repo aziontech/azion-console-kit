@@ -597,6 +597,7 @@
                     v-if="props.onRefresh"
                     outlined
                     icon="pi pi-refresh"
+                    v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     size="small"
                     @click="props.onRefresh"
                     data-testid="data-table-actions-column-header-refresh"

@@ -148,7 +148,9 @@
       service: deleteFunctionsWithDecorator
     }
   ]
-
+  defineExpose({
+    openCreateDrawer: openCreateFunctionDrawer
+  })
   onMounted(() => {
     openDrawerById({ id: route.query.id })
   })

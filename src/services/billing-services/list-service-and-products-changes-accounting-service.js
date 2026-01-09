@@ -103,7 +103,8 @@ const PRODUCT_NAMES = {
   support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
   tiered_cache: 'Tiered Cache',
-  edge_storage: 'Object Storage'
+  edge_storage: 'Object Storage',
+  connector: 'Connectors'
 }
 
 const METRIC_SLUGS = {
@@ -136,7 +137,9 @@ const METRIC_SLUGS = {
   edge_storage_class_a_operations: { title: 'Class A Operations' },
   edge_storage_class_b_operations: { title: 'Class B Operations' },
   edge_storage_class_c_operations: { title: 'Class C Operations' },
-  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
+  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' },
+  connector_load_balancer_data_transfer: { title: 'Data Transfered (GB)', unit: 'GB' },
+  connector_shielded_connectors: { title: 'Shielded Connectors' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {

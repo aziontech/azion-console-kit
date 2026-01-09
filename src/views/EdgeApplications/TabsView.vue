@@ -72,7 +72,7 @@
     const tab = filteredTabs.value[activeTab.value]
     return {
       showAddButtonTab: !!tab?.showAddButtonTab,
-      label: tab?.header || 'Create',
+      label: tab?.addButtonLabel || tab?.header || 'Create',
       click: () => componentsRefs.value[0].openCreateDrawer?.()
     }
   })
@@ -199,7 +199,7 @@
   }
   const changeRouteByTab = (tab) => {
     const params = { id: edgeApplicationId.value, tab }
-    router.push({ name: 'edit-application', params, query: route.query })
+    router.push({ name: 'edit-application', params, query: {} })
   }
   const changeTab = (index) => {
     verifyTab(edgeApplication.value)
@@ -272,6 +272,7 @@
       condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
       showAddButtonTab: true,
+      addButtonLabel: 'Origin',
       props: () => ({
         ...props.originsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -284,6 +285,7 @@
       condition: true,
       show: showTabs.deviceGroups,
       showAddButtonTab: true,
+      addButtonLabel: 'Device',
       props: () => ({
         ...props.deviceGroupsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -306,6 +308,7 @@
       condition: true,
       show: showTabs.cacheSettings,
       showAddButtonTab: true,
+      addButtonLabel: 'Cache',
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isTieredCacheEnabled: true,
@@ -318,6 +321,7 @@
       condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
       showAddButtonTab: true,
+      addButtonLabel: 'Function',
       props: () => ({
         ...props.functionsServices,
         ...props.edgeFunctionsServices,
@@ -329,6 +333,8 @@
       component: EdgeApplicationsRulesEngineListView,
       condition: true,
       show: showTabs.rulesEngine,
+      showAddButtonTab: true,
+      addButtonLabel: 'Rule',
       props: () => ({
         ...props.rulesEngineServices,
         isImageOptimizationEnabled: isModuleEnabled(imageProcessorEnabled.value).value,

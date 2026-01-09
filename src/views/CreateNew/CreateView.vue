@@ -1,3 +1,130 @@
+<script setup>
+  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+
+  import PrimeButton from 'primevue/button'
+  import PrimeDialog from 'primevue/dialog'
+  import Sidebar from 'primevue/sidebar'
+  import Skeleton from 'primevue/skeleton'
+  import { useToast } from 'primevue/usetoast'
+
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import TemplateEngineBlock from '@/templates/template-engine-block'
+  import FormLoading from '@/templates/template-engine-block/form-loading.vue'
+
+  import { useLoadingStore } from '@/stores/loading'
+  import { useSolutionStore } from '@/stores/solution-create'
+
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  const isLoading = ref(false)
+  const showDetails = ref(false)
+  const solution = ref({})
+  const solutionTrackerData = ref({})
+  const router = useRouter()
+  const route = useRoute()
+  const toast = useToast()
+
+  const store = useLoadingStore()
+
+  const props = defineProps({
+    getTemplateService: {
+      type: Function,
+      required: true
+    },
+    instantiateTemplateService: {
+      type: Function,
+      required: true
+    },
+    loadSolutionService: {
+      type: Function,
+      required: true
+    },
+    windowOpen: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const solutionStore = useSolutionStore()
+
+  const loadSolutionByVendor = async () => {
+    try {
+      store.startLoading()
+      isLoading.value = true
+
+      solution.value = await props.loadSolutionService({
+        vendor: route.params.vendor,
+        solution: route.params.solution
+      })
+
+      solutionTrackerData.value = {
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
+      }
+      solutionStore.setSolution(solutionTrackerData.value)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
+      store.finishLoading()
+    }
+  }
+
+  const handleCancel = () => {
+    router.push('/')
+  }
+
+  const goToVendorPage = () => {
+    props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openDetails = () => {
+    tracker.create.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
+    showDetails.value = true
+  }
+
+  const handleInstantiate = ({ result }) => {
+    router.push({
+      path: `/create/deploy/${result.uuid}`
+    })
+  }
+
+  const handleSubmitClick = () => {
+    tracker.create
+      .eventClickedToDeploy({
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
+      })
+      .track()
+  }
+
+  onMounted(async () => {
+    await loadSolutionByVendor()
+  })
+
+  watchEffect(() => {
+    if (!route.params.vendor || !route.params.solution) {
+      return
+    }
+    loadSolutionByVendor()
+  })
+</script>
+
 <template>
   <ContentBlock>
     <template #heading>
@@ -251,124 +378,3 @@
     </template>
   </ContentBlock>
 </template>
-<script setup>
-  import { useLoadingStore } from '@/stores/loading'
-  import { useSolutionStore } from '@/stores/solution-create'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import TemplateEngineBlock from '@/templates/template-engine-block'
-  import FormLoading from '@/templates/template-engine-block/form-loading.vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
-  import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
-  import { inject, onMounted, ref, watchEffect } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
-
-  const isLoading = ref(false)
-  const showDetails = ref(false)
-  const solution = ref({})
-  const solutionTrackerData = ref({})
-  const router = useRouter()
-  const route = useRoute()
-  const toast = useToast()
-
-  const store = useLoadingStore()
-
-  const props = defineProps({
-    getTemplateService: {
-      type: Function,
-      required: true
-    },
-    instantiateTemplateService: {
-      type: Function,
-      required: true
-    },
-    loadSolutionService: {
-      type: Function,
-      required: true
-    },
-    windowOpen: {
-      type: Function,
-      required: true
-    }
-  })
-
-  const solutionStore = useSolutionStore()
-
-  const loadSolutionByVendor = async () => {
-    try {
-      store.startLoading()
-      isLoading.value = true
-
-      solution.value = await props.loadSolutionService({
-        vendor: route.params.vendor,
-        solution: route.params.solution
-      })
-
-      solutionTrackerData.value = {
-        isv: solution.value.vendor.slug,
-        version: solution.value.version,
-        versionId: solution.value.latestVersionInstallTemplate,
-        solutionId: solution.value.id,
-        templateName: solution.value.name
-      }
-      solutionStore.setSolution(solutionTrackerData.value)
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      isLoading.value = false
-      store.finishLoading()
-    }
-  }
-
-  const handleCancel = () => {
-    router.push('/')
-  }
-
-  const goToVendorPage = () => {
-    props.windowOpen(solution.value.vendor.url, '_blank')
-  }
-
-  const openDetails = () => {
-    tracker.create.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
-    showDetails.value = true
-  }
-
-  const handleInstantiate = ({ result }) => {
-    router.push({
-      path: `/create/deploy/${result.uuid}`
-    })
-  }
-
-  const handleSubmitClick = () => {
-    tracker.create
-      .eventClickedToDeploy({
-        isv: solution.value.vendor.slug,
-        version: solution.value.version,
-        versionId: solution.value.latestVersionInstallTemplate,
-        solutionId: solution.value.id,
-        templateName: solution.value.name
-      })
-      .track()
-  }
-
-  onMounted(async () => {
-    await loadSolutionByVendor()
-  })
-
-  watchEffect(() => {
-    if (!route.params.vendor || !route.params.solution) {
-      return
-    }
-    loadSolutionByVendor()
-  })
-</script>

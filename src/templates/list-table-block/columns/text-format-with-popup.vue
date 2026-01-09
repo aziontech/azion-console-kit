@@ -70,7 +70,8 @@
     if (!isTextTruncated()) return
 
     hoverTimeout.value = setTimeout(() => {
-      const rect = textElement.value.getBoundingClientRect()
+      const rect = textElement.value?.getBoundingClientRect()
+      if (!rect) return
       const popupWidth = 320
       const viewportWidth = window.innerWidth
 

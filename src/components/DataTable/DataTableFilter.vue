@@ -33,8 +33,11 @@
   const filterComponent = computed(() => {
     if (!selectedField.value) return null
 
+    const selectedOption = filterOptions.value.find((opt) => opt.value === selectedField.value)
+
     return filterBuilder({
       filterKey: selectedField.value,
+      filterHeader: selectedOption?.label,
       filterValue: filterValue.value,
       onUpdate: (value) => {
         filterValue.value = value

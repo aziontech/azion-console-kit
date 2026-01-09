@@ -27,7 +27,6 @@ export function useDataTable(props, emit) {
   const savedSearch = ref('')
   const savedOrdering = ref('')
   const firstItemIndex = ref(0)
-  const lastModifiedToggled = ref(false)
   const expandedGroups = ref(props.expandedRowGroups || [])
 
   // Last Modified Popup state
@@ -140,6 +139,30 @@ export function useDataTable(props, emit) {
         emit('on-load-data', !!hasData)
       }
       firstLoadData.value = false
+      if (query.skipCache) {
+        const event = {
+          originalEvent: {
+            page: 0,
+            first: 0,
+            rows: 10,
+            pageCount: 39
+          },
+          first: 0,
+          rows: 10,
+          sortField: null,
+          sortOrder: null,
+          multiSortMeta: [],
+          filters: {},
+          pageCount: 39,
+          page: 0,
+          skipReload: true
+        }
+        const numberOfLinesPerPage = event.rows
+        tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+        itemsByPage.value = numberOfLinesPerPage
+        minimumOfItemsPerPage.value = numberOfLinesPerPage
+        firstItemIndex.value = event.first
+      }
     }
   }
 
@@ -147,7 +170,6 @@ export function useDataTable(props, emit) {
     if (!savedOrdering.value && props.defaultOrderingFieldName) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
-
     const hasActiveFilters = appliedFilters.value.length > 0 || query.hasFilter
 
     const commonParams = {
@@ -155,6 +177,7 @@ export function useDataTable(props, emit) {
       pageSize: itemsByPage.value,
       fields: props.apiFields || [],
       ordering: savedOrdering.value,
+      skipCache: query.skipCache,
       ...query
     }
 
@@ -165,7 +188,6 @@ export function useDataTable(props, emit) {
     if (props.lazy) {
       commonParams.search = savedSearch.value
     }
-
     return await loadData(commonParams, listService)
   }
 
@@ -303,23 +325,6 @@ export function useDataTable(props, emit) {
     sortOrderValue.value = sortOrder
   }
 
-  const sortByLastModified = () => {
-    const currentField = sortFieldValue.value
-    const currentOrder = sortOrderValue.value
-
-    if (currentField === 'lastModified') {
-      sortOrderValue.value = currentOrder === 1 ? -1 : 1
-    } else {
-      sortFieldValue.value = 'lastModified'
-      sortOrderValue.value = 1
-    }
-
-    fetchOnSort({
-      sortField: sortFieldValue.value,
-      sortOrder: sortOrderValue.value
-    })
-  }
-
   // Search
   const fetchOnSearch = () => {
     if (!props.lazy) return
@@ -413,51 +418,6 @@ export function useDataTable(props, emit) {
     const firstPage = 1
     firstItemIndex.value = firstPage
     reload(filterParams)
-  }
-
-  // Last Modified Toggle
-  const loadLastModifiedToggleState = () => {
-    const saved = localStorage.getItem('lastModifiedToggled')
-    if (saved !== null) {
-      lastModifiedToggled.value = JSON.parse(saved)
-    }
-  }
-
-  const saveLastModifiedToggleState = () => {
-    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
-  }
-
-  const toggleLastModifiedDisplay = () => {
-    lastModifiedToggled.value = !lastModifiedToggled.value
-    saveLastModifiedToggleState()
-  }
-
-  // Last Modified Popup functions
-  const handleMouseEnter = (event, rowData) => {
-    clearTimeout(hoverTimeout.value)
-
-    hoverTimeout.value = setTimeout(() => {
-      const rect = event.target.getBoundingClientRect()
-      popupPosition.value = {
-        posX: rect.right,
-        posY: rect.top - 30
-      }
-
-      popupData.value = {
-        lastEditor: rowData.last_editor || rowData.lastEditor,
-        lastModified: rowData.last_modified || rowData.lastModified
-      }
-      showPopup.value =
-        (rowData.last_editor && rowData.last_editor !== '-') ||
-        (rowData.lastModified && rowData.lastModified !== '-') ||
-        (rowData.last_editor && rowData.last_editor !== '-') ||
-        (rowData.lastModified && rowData.lastModified !== '-')
-    }, 1000)
-  }
-
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout.value)
-    showPopup.value = false
   }
 
   // CSV Export
@@ -654,8 +614,6 @@ export function useDataTable(props, emit) {
 
     const columns = Array.isArray(props.columns) ? props.columns : props.columns?.value || []
     selectedColumns.value = columns.filter((col) => !props.hiddenByDefault?.includes(col.field))
-
-    loadLastModifiedToggleState()
   })
 
   // Watchers
@@ -692,7 +650,6 @@ export function useDataTable(props, emit) {
     minimumOfItemsPerPage,
     sortFieldValue,
     sortOrderValue,
-    lastModifiedToggled,
     expandedGroups,
     selectedItems,
     isAllSelected,
@@ -723,15 +680,11 @@ export function useDataTable(props, emit) {
     changeNumberOfLinesPerPage,
     updateDataTablePagination,
     fetchOnSort,
-    sortByLastModified,
     fetchOnSearch,
     handleSearchValue,
     toggleFilter,
     handleApplyFilter,
     handleRemoveFilter,
-    toggleLastModifiedDisplay,
-    handleMouseEnter,
-    handleMouseLeave,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     // alias for clarity

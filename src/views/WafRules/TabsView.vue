@@ -7,7 +7,8 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { ref, provide, reactive, watch } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { ref, provide, reactive, watch, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { wafService } from '@/services/v2/waf/waf-service'
@@ -35,6 +36,17 @@
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
+
+  const componentsRefs = ref(null)
+
+  const addButtonController = computed(() => {
+    const isAllowedRulesTab = activeTab.value === mapTabs.value.allowed
+    return {
+      showAddButtonTab: isAllowedRulesTab,
+      label: 'Allowed Rule',
+      click: () => componentsRefs.value?.openCreateDrawer?.()
+    }
+  })
 
   const getWafDat = async () => {
     try {
@@ -122,58 +134,78 @@
       <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
-        class="w-full h-full"
+      <div
+        class="flex align-center justify-between relative"
         v-if="waf"
       >
-        <TabPanel
-          header="Main Settings"
-          :pt="{
-            root: { 'data-testid': 'waf-rules-tabs__tab__main-settings' }
-          }"
+        <TabView
+          :activeIndex="activeTab"
+          @tab-click="changeRouteByClickingOnTab"
+          class="flex-1"
         >
-          <EditView
-            v-if="activeTab === mapTabs.mainSettings"
-            :updatedRedirect="props.wafServices.updatedRedirect"
-            :waf="waf"
-            :showActionBar="activeTab === mapTabs.mainSettings"
-            @handleWafRulesUpdated="updateWafRulesValue"
-            :isTab="true"
-          />
-        </TabPanel>
-        <TabPanel
-          header="Tuning"
-          :pt="{
-            root: { 'data-testid': 'waf-rules-tabs__tab__tuning' }
-          }"
+          <TabPanel
+            header="Main Settings"
+            :pt="{
+              root: { 'data-testid': 'waf-rules-tabs__tab__main-settings' }
+            }"
+          >
+          </TabPanel>
+          <TabPanel
+            header="Tuning"
+            :pt="{
+              root: { 'data-testid': 'waf-rules-tabs__tab__tuning' }
+            }"
+          >
+          </TabPanel>
+          <TabPanel
+            header="Allowed Rules"
+            :pt="{
+              root: { 'data-testid': 'waf-rules-tabs__tab__allowed-rules' }
+            }"
+          >
+          </TabPanel>
+        </TabView>
+        <div
+          v-if="addButtonController.showAddButtonTab"
+          class="flex ml-4 items-center"
         >
-          <ListWafRulesTuning
-            v-if="activeTab === mapTabs.tuning"
-            :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
-            :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
-            :listCountriesService="props.wafTuning.listCountriesService"
-            :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
-            :listDomainsService="props.wafTuning.listDomainsService"
-            :showActionBar="activeTab === mapTabs.tuning"
-            :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
-            :loadDomainService="props.wafTuning.loadDomainService"
+          <PrimeButton
+            :label="addButtonController.label"
+            size="small"
+            icon="pi pi-plus"
+            @click="addButtonController.click"
+            data-testid="waf-rules-allowed-add-button"
           />
-        </TabPanel>
-        <TabPanel
-          header="Allowed Rules"
-          :pt="{
-            root: { 'data-testid': 'waf-rules-tabs__tab__allowed-rules' }
-          }"
-        >
-          <ListWafRulesAllowed
-            v-if="activeTab === mapTabs.allowed"
-            :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
-            @handle-go-to-tuning="changeRouteByClickingOnTab"
-          />
-        </TabPanel>
-      </TabView>
+        </div>
+      </div>
+
+      <div v-if="waf">
+        <EditView
+          v-if="activeTab === mapTabs.mainSettings"
+          :updatedRedirect="props.wafServices.updatedRedirect"
+          :waf="waf"
+          :showActionBar="activeTab === mapTabs.mainSettings"
+          @handleWafRulesUpdated="updateWafRulesValue"
+          :isTab="true"
+        />
+        <ListWafRulesTuning
+          v-if="activeTab === mapTabs.tuning"
+          :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
+          :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
+          :listCountriesService="props.wafTuning.listCountriesService"
+          :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
+          :listDomainsService="props.wafTuning.listDomainsService"
+          :showActionBar="activeTab === mapTabs.tuning"
+          :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
+          :loadDomainService="props.wafTuning.loadDomainService"
+        />
+        <ListWafRulesAllowed
+          ref="componentsRefs"
+          v-if="activeTab === mapTabs.allowed"
+          :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
+          @handle-go-to-tuning="changeRouteByClickingOnTab"
+        />
+      </div>
     </template>
   </ContentBlock>
 </template>
