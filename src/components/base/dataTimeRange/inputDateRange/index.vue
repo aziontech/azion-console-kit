@@ -41,7 +41,7 @@
     <TabView
       v-model:activeIndex="activeTab"
       :pt="{
-        navcontent: { class: 'mb-2 pb-1 border-b surface-border' }
+        navcontent: { class: 'mb-2 pb-1' }
       }"
     >
       <TabPanel header="Absolute">
