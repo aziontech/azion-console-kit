@@ -111,7 +111,7 @@
     const toastConfig = {
       severity: 'success',
       summary: 'Success',
-      detail: `Bucket "${response.data.name}" has been ${
+      detail: `Bucket "${response.data?.name}" has been ${
         isCreatePage.value ? 'created' : 'updated'
       } successfully`,
       life: 5000
@@ -139,7 +139,7 @@
 
     return {
       name: bucket?.name,
-      edge_access: bucket?.edgeAccess
+      workloads_access: bucket?.workloadsAccess
     }
   }
 
