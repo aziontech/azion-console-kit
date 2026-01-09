@@ -348,7 +348,7 @@
               class="flex items-center gap-2"
               :class="{
                 'cursor-pointer hover:underline': frozenColumns.includes(col.field),
-                'cursor-pointer': !frozenColumns.length
+                'cursor-pointer': !frozenColumns.length && enableEditClick
               }"
               @click="(event) => rowClick(event, col, rowData)"
             >
