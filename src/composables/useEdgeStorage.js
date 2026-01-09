@@ -73,10 +73,10 @@ const validationSchema = yup.object({
     .test('name', 'Invalid name format', (value) => nameRegex.test(value)),
   workloads_access: yup
     .string()
-    .label('Edge Access')
+    .label('Workload Access')
     .required()
     .default('read_write')
-    .test('workloads_access', 'Invalid edge access format', (value) =>
+    .test('workloads_access', 'Invalid workload access format', (value) =>
       workloadsAccess.includes(value)
     )
 })
