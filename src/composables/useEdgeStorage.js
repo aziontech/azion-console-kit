@@ -217,7 +217,7 @@ export const useEdgeStorage = () => {
             handleToast(
               'error',
               'Upload Failed',
-              `All ${failureCount} file${failureCount > 1 && 's'} failed to upload`
+              `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`
             )
           }
         }
