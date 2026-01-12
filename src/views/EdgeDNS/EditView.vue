@@ -396,7 +396,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="edgeDNSName" />
+      <PageHeadingBlock :pageTitle="edgeDNSName" description="Configure DNS records and zone settings used for authoritative domain resolution." />
     </template>
     <template #content>
       <TabView

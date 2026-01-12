@@ -111,7 +111,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Zones"
-        description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
+        description="Host authoritative DNS zones and serve authoritative DNS responses used to resolve domain names."
       >
         <template #default>
           <copyBlock
@@ -125,6 +125,9 @@
             @click="handleTrackEvent"
             createPagePath="edge-dns/create"
             data-testid="create_Zone_button"
+            :viewDocumentationIsVisible="true"
+            :getHelpLinkIsVisible="false"
+            :documentation-service="documentationService"
           />
         </template>
       </PageHeadingBlock>
@@ -148,8 +151,8 @@
         :csvMapper="csvMapper"
         :allowedFilters="getFilters"
         :emptyBlock="{
-          title: 'No zone has been added',
-          description: 'Click the button below to add your first zone.',
+          title: 'No DNS Zones yet.',
+          description: 'Create your first DNS zone to host authoritative records and control domain name resolution.',
           createButtonLabel: 'Zone',
           createPagePath: 'edge-dns/create',
           documentationService: documentationService

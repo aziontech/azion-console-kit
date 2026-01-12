@@ -38,7 +38,10 @@ export const edgeDnsRoutes = {
             to: '/edge-dns'
           },
           {
-            label: 'Create Zone',
+            label: 'Zone'
+          },
+          {
+            label: 'Create',
             to: '/edge-dns/create'
           }
         ]
@@ -58,6 +61,9 @@ export const edgeDnsRoutes = {
           {
             label: 'Edge DNS',
             to: '/edge-dns'
+          },
+          {
+            label: 'Zone'
           },
           {
             label: 'Edit Zone',
