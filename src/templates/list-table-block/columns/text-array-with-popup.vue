@@ -30,7 +30,7 @@
       <div
         v-if="showPopup"
         ref="popupElement"
-        class="absolute z-50 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)] overflow-y-auto"
+        class="absolute z-[9999] w-fit rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)] overflow-y-auto"
         :style="popupStyle"
         @mouseenter="handlePopupMouseEnter"
         @mouseleave="handlePopupMouseLeave"
@@ -76,7 +76,7 @@
   const popupStyle = computed(() => ({
     left: `${popupPosition.value.posX}px`,
     top: `${popupPosition.value.posY}px`,
-    width: '320px',
+    maxWidth: '320px',
     maxHeight: '216px'
   }))
 
