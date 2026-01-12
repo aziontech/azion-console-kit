@@ -4,6 +4,7 @@
       <PageHeadingBlock
         pageTitle="Create Application"
         data-testid="create-edge-application-heading"
+        description="Configure application logic, function execution, caching settings, and Connectors used to reach origins."
       />
     </template>
     <template #content>
