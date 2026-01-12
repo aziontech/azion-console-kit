@@ -64,7 +64,7 @@ export const dataStreamRoutes = {
             to: '/data-stream'
           },
           {
-            label: 'Create Stream',
+            label: 'Create',
             to: '/data-stream/create'
           }
         ]
