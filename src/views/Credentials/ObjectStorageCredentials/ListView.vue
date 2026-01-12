@@ -127,6 +127,7 @@
       @on-failed-to-delete="handleFailedToDelete"
       emptyListMessage="No credentials found."
       isTabs
+      exportFileName="Object Storage Credentials"
     />
     <CredentialDrawer
       ref="credentialDrawerRef"

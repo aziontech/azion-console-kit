@@ -26,6 +26,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :enableEditClick="false"
         :actions="actions"
+        exportFileName="Personal Tokens"
         :emptyBlock="{
           title: 'No personal tokens have been generated',
           description: 'Click the button below to generate your first personal token.',

@@ -438,13 +438,40 @@ export function useDataTable(props, emit) {
       .filter((column) => column?.field && column.field !== 'actions')
   }
 
+  const generateExportFilename = (baseName, extension) => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const cleanBaseName = String(baseName || 'data').trim()
+    return `${cleanBaseName} - ${year}-${month}-${day}.${extension}`
+  }
+
+  const getExportValue = (value) => {
+    if (value === null || value === undefined) return ''
+    if (Array.isArray(value)) {
+      return value.map((item) => getExportValue(item)).join(', ')
+    }
+    if (typeof value === 'object') {
+      if (value instanceof Date) return value.toISOString()
+      if (Object.prototype.hasOwnProperty.call(value, 'content')) return value.content
+      if (Object.prototype.hasOwnProperty.call(value, 'name')) return value.name
+      if (Object.prototype.hasOwnProperty.call(value, 'label')) return value.label
+      if (Object.prototype.hasOwnProperty.call(value, 'text')) return value.text
+      if (Object.prototype.hasOwnProperty.call(value, 'value')) return value.value
+    }
+    return value
+  }
+
   const buildExportRows = (rowsArg = null, columnsArg = null) => {
     const rowsSource = Array.isArray(rowsArg) ? rowsArg : data.value
     const rows = Array.isArray(rowsSource) ? rowsSource : []
     const fields = getVisibleFields(columnsArg).map((column) => column.field)
     return rows.map((row) => {
       const out = {}
-      for (const fieldName of fields) out[fieldName] = row?.[fieldName]
+      for (const fieldName of fields) {
+        out[fieldName] = getExportValue(row?.[fieldName])
+      }
       return out
     })
   }
@@ -475,28 +502,34 @@ export function useDataTable(props, emit) {
     return header + '\n' + body
   }
 
-  const handleExportTableDataToCSV = (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
-    // Try built-in export if available
-    if (dataTableRef.value && typeof dataTableRef.value.exportCSV === 'function') {
-      dataTableRef.value.exportCSV()
-      return
-    }
-    // Fallback: generate CSV from current data and visible columns
+  const handleExportTableDataToCSV = (
+    filenameBase = props.exportFileName ?? 'data',
+    rowsArg = null,
+    columnsArg = null
+  ) => {
     const rows = buildExportRows(rowsArg, columnsArg)
     const fields = getVisibleFields(columnsArg).map((column) => column.field)
     const csv = toCsv(rows, fields)
-    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.csv`
+    const name = generateExportFilename(filenameBase, 'csv')
     triggerDownload(csv, 'text/csv;charset=utf-8;', name)
   }
 
-  const exportTableAsJSON = (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
+  const exportTableAsJSON = (
+    filenameBase = props.exportFileName ?? 'data',
+    rowsArg = null,
+    columnsArg = null
+  ) => {
     const rows = buildExportRows(rowsArg, columnsArg)
     const json = JSON.stringify(rows, null, 2)
-    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.json`
+    const name = generateExportFilename(filenameBase, 'json')
     triggerDownload(json, 'application/json;charset=utf-8;', name)
   }
 
-  const exportTableAsXLSX = async (filenameBase = 'data', rowsArg = null, columnsArg = null) => {
+  const exportTableAsXLSX = async (
+    filenameBase = props.exportFileName ?? 'data',
+    rowsArg = null,
+    columnsArg = null
+  ) => {
     const rows = buildExportRows(rowsArg, columnsArg)
     const fields = getVisibleFields(columnsArg).map((column) => column.field)
 
@@ -507,7 +540,7 @@ export function useDataTable(props, emit) {
       })
     )
 
-    const name = `${String(filenameBase).replace(/\s+/g, '_').toLowerCase()}.xlsx`
+    const name = generateExportFilename(filenameBase, 'xlsx')
     try {
       const mod = await import('xlsx')
       const XLSX = mod.default ?? mod
