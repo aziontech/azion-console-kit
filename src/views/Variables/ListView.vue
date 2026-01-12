@@ -115,7 +115,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Variables"
-        description="Store and manage environment variables for solutions."
+        description="Define and manage variables that store configuration values across Azion’s products."
       >
         <template #default>
           <DataTableActionsButtons
@@ -124,6 +124,9 @@
             @click="handleTrackEvent"
             createPagePath="variables/create"
             data-testid="create_Variable_button"
+            :documentationService="documentationService"
+            :viewDocumentationIsVisible="true"
+            :getHelpLinkIsVisible="false"
           />
         </template>
       </PageHeadingBlock>
@@ -147,8 +150,8 @@
           }
         ]"
         :empty-block="{
-          title: 'No variables have been created',
-          description: 'Click the button below to create your first variable.',
+          title: 'No Variables yet',
+          description: 'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
           createPagePath: 'variables/create',
           documentationService: props.documentationService
