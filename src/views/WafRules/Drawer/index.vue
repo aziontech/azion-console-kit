@@ -445,6 +445,8 @@
                 v-model:selectedItensData="selectedAttack"
                 :columns="tableColumns"
                 :listService="listAttacks"
+                disabledList
+                disableEditOnClick
                 :hasListService="true"
                 hiddenHeader
               />
