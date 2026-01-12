@@ -173,16 +173,18 @@
     getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
   )
   const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.singularTitle} have been created`
+    () => `No ${handleTextDomainWorkload.pluralLabel} yet`
   )
   const descriptionEmptyPage = computed(
-    () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
+    () => isWorkload.value ? 
+    `Create your first Workload to configure domains, protocols, security, and application execution for incoming traffic.` : 
+    `Create your first Domain to configure firewalls and applications execution for incoming traffic.`
   )
 
   const pageDescription = computed(() => {
     return isWorkload.value
-      ? 'Deploy and manage scalable workloads across the network.'
-      : 'Manage and secure domains for applications.'
+      ? "Deploy and manage workloads that bind domains, protocols, security, and application on Azion's global infrastructure."
+      : "Deploy and manage domains that execute firewalls and applications on Azion's global infrastructure."
   })
 </script>
 
@@ -198,6 +200,9 @@
             size="small"
             :label="handleTextDomainWorkload.singularTitle"
             @click="handleTrackEvent"
+            :documentationService="documentationHandler"
+            :viewDocumentationIsVisible="true"
+            :getHelpLinkIsVisible="false"
             :createPagePath="createDomainPath"
             :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
           />

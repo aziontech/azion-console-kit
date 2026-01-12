@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="workloadName" />
+      <PageHeadingBlock :pageTitle="workloadName" description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload." />
     </template>
     <template #content>
       <EditFormBlock
