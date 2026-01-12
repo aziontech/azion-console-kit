@@ -174,7 +174,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock :pageTitle="title"  description="Configure bucket settings and access controls parameters."/>
     </template>
     <template #content>
       <!-- Create Mode -->
