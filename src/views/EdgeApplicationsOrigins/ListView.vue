@@ -157,6 +157,7 @@
       :actions="actions"
       :lazy="false"
       isTabs
+      exportFileName="Application Origins"
       :emptyBlock="{
         title: 'No origins have been created',
         description: 'Click the button below to create your first origin.'

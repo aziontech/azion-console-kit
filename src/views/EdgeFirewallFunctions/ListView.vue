@@ -177,7 +177,7 @@
     isTabs
     :apiFields="EDGE_FIREWALL_FUNCTIONS_API_FIELDS"
     :frozen-columns="['name']"
-    exportFileName="Edge Firewall Functions"
+    exportFileName="Firewall Functions"
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',

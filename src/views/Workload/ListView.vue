@@ -218,7 +218,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColumns="['name']"
-        exportFileName="Workload"
+        :exportFileName="handleTextDomainWorkload.singularTitle"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: titleEmptyPage,

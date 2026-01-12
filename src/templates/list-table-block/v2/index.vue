@@ -139,7 +139,8 @@
     executeCommand,
     toggleActionsMenu,
     setMenuRefForRow,
-    extractFieldValue
+    extractFieldValue,
+    handleExportTableDataToCSV
   } = useDataTable(props, emit)
 
   const expandedGroups = ref(props.expandedRowGroups)
@@ -431,6 +432,7 @@
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
                   />
+                  <DataTable.Export @export="handleExportTableDataToCSV(exportFileName)" />
                   <DataTable.ColumnSelector
                     :columns="columns"
                     v-model:selectedColumns="selectedColumns"

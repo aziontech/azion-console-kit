@@ -117,6 +117,7 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No edge nodes found."
         :actions="actions"
+        exportFileName="Edge Nodes"
         :emptyBlock="{
           title: 'No edge nodes have been added',
           description:

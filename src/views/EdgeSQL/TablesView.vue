@@ -63,6 +63,7 @@
         @view-change="handleViewChange"
         :title-delete-dialog="titleDeleteDialog"
         @click-to-create="createTable"
+        :exportFileName="tableName || 'Table Data'"
         :empty-block="{
           title: 'No tables have been created',
           description: 'Create your first table to store your data at the edge.',

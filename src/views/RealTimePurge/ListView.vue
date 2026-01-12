@@ -40,6 +40,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         hide-last-modified-column
         :paginator="false"
+        exportFileName="Real-Time Purge"
         :empty-block="{
           title: 'No purges have been added',
           description: 'Click the button below to add your first purge.',
