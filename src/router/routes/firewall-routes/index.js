@@ -38,7 +38,7 @@ export const edgeFirewallRoutes = {
             to: '/firewalls'
           },
           {
-            label: 'Create Firewall',
+            label: 'Create',
             to: '/firewalls/create'
           }
         ]

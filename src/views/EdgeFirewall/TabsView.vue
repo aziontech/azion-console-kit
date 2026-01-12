@@ -201,6 +201,7 @@
       <PageHeadingBlock
         :pageTitle="title"
         :entityName="edgeFirewall?.name"
+        description="Configure security logic and enforcement settings applied to incoming workload requests."
       />
     </template>
     <template #content>

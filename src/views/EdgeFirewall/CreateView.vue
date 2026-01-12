@@ -69,7 +69,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Firewall"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Firewall" description="Configure security logic and enforcement settings applied to incoming workload requests."></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
