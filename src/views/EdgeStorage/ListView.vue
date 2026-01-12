@@ -5,7 +5,7 @@
         :pageTitle="selectedBucket?.name ? selectedBucket.name : 'Object Storage'"
         :description="
           !selectedBucket?.name
-            ? 'Store and retrieve objects with high availability and performance.'
+            ? 'Define and manage buckets that store and serve object data.'
             : ''
         "
       >
@@ -17,6 +17,9 @@
             @click="handleCreateBucketTrackEvent"
             createPagePath="/object-storage/create"
             data-testid="create_Bucket_button"
+            :viewDocumentationIsVisible="true"
+            :documentationService="documentationService"
+            :getHelpLinkIsVisible="false"
           />
           <PrimeButton
             v-else
@@ -169,6 +172,13 @@
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import ProgressCard from './components/ProgressCard.vue'
   import DataTable from '@/components/DataTable'
+
+  defineProps({
+    documentationService: {
+      required: true,
+      type: Function
+    }
+  })
 
   const tracker = inject('tracker')
   const router = useRouter()

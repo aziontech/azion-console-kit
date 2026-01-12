@@ -12,8 +12,8 @@
     class="w-full"
     :isLoading="isLoading"
     :emptyBlock="{
-      title: 'No buckets created',
-      description: 'Create your first bucket here',
+      title: 'No Buckets yet.',
+      description: 'Create your first bucket to store, organize, and access data.',
       createButtonLabel: 'Bucket',
       createPagePath: '/object-storage/create',
       documentationService: documentationGuideProducts.edgeStorage
