@@ -3,8 +3,7 @@ import {
   transformSnakeToCamel
 } from '@/services/v2/utils/adaptServiceDataResponse'
 import { defaultConditions } from '@/views/WafRules/Config'
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import { sanitizeHtml } from '@/helpers/sanitize-html'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -40,8 +39,9 @@ const parseThreatTypes = (threatsConfiguration) => {
 const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
-  name: (value) => sanitizeHtml(value.name),
+  name: (value) => value.name,
   lastEditor: (value) => value.last_editor,
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
@@ -105,7 +105,7 @@ export const WafAdapter = {
 
     return {
       id: response.id,
-      name: sanitizeHtml(response.name),
+      name: response.name,
       active: response.active,
       ...threatsConfiguration
     }
@@ -192,11 +192,12 @@ export const WafAdapter = {
           id: waf.id,
           lastEditor: waf.last_editor,
           lastModified: formatDateToDayMonthYearHour(waf.last_modified),
+          lastModify: convertToRelativeTime(waf.last_modified),
           conditions: waf.conditions.map(
             (condition) => defaultConditions.find((match) => match.value === condition.match)?.title
           ),
           path: waf.path,
-          name: sanitizeHtml(waf.name),
+          name: waf.name,
           ruleId: waf.rule_id,
           status: parseStatusData(waf.active),
           operator: waf.operator
@@ -229,7 +230,7 @@ export const WafAdapter = {
       id: waf.id,
       conditions: formatConditions,
       path: waf.path,
-      name: sanitizeHtml(waf.name),
+      name: waf.name,
       ruleId: waf.rule_id,
       status: waf.active,
       operator: waf.operator === 'regex'

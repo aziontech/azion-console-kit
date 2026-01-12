@@ -171,6 +171,10 @@ const formatDateToMonthYear = (date) => {
 const formatDateToDayMonthYearHour = (date, timezone) => {
   if (!date) return null
 
+  if (typeof date === 'string' && date.match(/^[A-Z][a-z]+\s+\d+,\s+\d{4}/)) {
+    return date
+  }
+
   let userTimezone = timezone || 'UTC'
 
   if (!timezone) {
@@ -182,12 +186,22 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
     }
   }
 
-  return new Date(date).toLocaleString('en-US', {
+  let normalizedDate = date
+  if (typeof date === 'string' && date.includes('.')) {
+    normalizedDate = date.replace(/(\.\d{3})\d+/, '$1')
+  }
+
+  const dateObject = new Date(normalizedDate)
+
+  if (isNaN(dateObject.getTime())) {
+    return null
+  }
+
+  return dateObject.toLocaleString('en-US', {
     timeZone: userTimezone,
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    weekday: 'long',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -244,6 +258,7 @@ function getRemainingDays(dateStr) {
 }
 
 const convertToRelativeTime = (date) => {
+  if (!date) return '-'
   const now = new Date()
   const targetDate = new Date(date)
   const diffMs = now.getTime() - targetDate.getTime()
@@ -317,6 +332,14 @@ const convertToRelativeTime = (date) => {
   return `${currentYear - targetYear} years ago`
 }
 
+const getOffset = (timeZone = 'UTC', date = new Date()) => {
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }))
+  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }))
+  const offset = (tzDate.getTime() - utcDate.getTime()) / (60 * 60 * 1000)
+  const sinal = offset > 0 ? '+' : ''
+  return `UTC${sinal}${offset}`
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -330,5 +353,6 @@ export {
   formatDateToDayMonthYearHour,
   getRemainingDays,
   getCurrentDateTimeIntl,
-  convertToRelativeTime
+  convertToRelativeTime,
+  getOffset
 }

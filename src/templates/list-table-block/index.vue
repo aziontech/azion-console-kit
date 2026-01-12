@@ -101,10 +101,9 @@
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
-            <div
-              v-html="rowData[col.field]"
-              :data-testid="`list-table-block__column__${col.field}__row`"
-            />
+            <div :data-testid="`list-table-block__column__${col.field}__row`">
+              {{ rowData[col.field] }}
+            </div>
           </template>
 
           <template v-else>

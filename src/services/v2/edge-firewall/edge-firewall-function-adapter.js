@@ -1,3 +1,4 @@
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 export const EdgeFirewallFunctionAdapter = {
@@ -20,7 +21,8 @@ export const EdgeFirewallFunctionAdapter = {
           edgeFunctionId: edgeFirewall.function,
           name: edgeFirewall.name,
           lastEditor: edgeFirewall.last_editor,
-          lastModified: edgeFirewall.last_modified,
+          lastModified: formatDateToDayMonthYearHour(edgeFirewall.last_modified),
+          lastModify: convertToRelativeTime(edgeFirewall.last_modified),
           args: edgeFirewall.args,
           active: edgeFirewall.active
         }
@@ -59,9 +61,8 @@ export const EdgeFirewallFunctionAdapter = {
           functionInstanced: edgeFirewallFunction.functionInstanced,
           lastEditor: edgeFirewallFunction.lastEditor,
           active: parseStatusData(edgeFirewallFunction.active),
-          modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-            new Date(edgeFirewallFunction.lastModified)
-          )
+          lastModified: formatDateToDayMonthYearHour(edgeFirewallFunction.lastModified),
+          lastModify: convertToRelativeTime(edgeFirewallFunction.lastModified)
         }
       }) || []
     )

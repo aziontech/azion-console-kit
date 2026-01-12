@@ -56,13 +56,13 @@ export class EdgeStorageService extends BaseService {
   }
 
   updateEdgeStorageBucket = async (bucket = {}) => {
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'PATCH',
-      url: `${this.baseURL}/buckets/${bucket.name}`,
-      body: { edge_access: bucket.edge_access }
+      url: `${this.baseURL}/buckets/${bucket?.name}`,
+      body: { workloads_access: bucket.workloads_access }
     })
 
-    return `Bucket "${bucket.name}" has been updated successfully`
+    return data
   }
 
   deleteEdgeStorageBucket = async (bucketName = '') => {

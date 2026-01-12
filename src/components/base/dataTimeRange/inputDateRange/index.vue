@@ -4,7 +4,7 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
     >
       <InputText
-        class="w-min cursor-pointer"
+        class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none ml-0.5"
         :value="startDateInput"
         readonly
         @click="selectStartDate"
@@ -14,7 +14,7 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="w-min cursor-pointer"
+        class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
         :value="endDateInput"
         readonly
         @click="selectEndDate"
@@ -25,7 +25,7 @@
   <InputText
     v-else
     :value="model.label"
-    class="cursor-pointer"
+    class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
     @click="selectStartDate"
     readonly
   />
@@ -41,7 +41,7 @@
     <TabView
       v-model:activeIndex="activeTab"
       :pt="{
-        navcontent: { class: 'mb-2 pb-1 border-b surface-border' }
+        navcontent: { class: 'mb-2 pb-1' }
       }"
     >
       <TabPanel header="Absolute">
@@ -166,6 +166,14 @@
           />
           <template v-if="activeTab === 0">
             <PrimeButton
+              label="Clear"
+              size="small"
+              outlined
+              class="w-20"
+              severity="secondary"
+              @click="resetToLastFiveMinutes"
+            />
+            <PrimeButton
               v-if="hasChanges"
               icon="pi pi-check"
               size="small"
@@ -201,6 +209,7 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    COMMON_DATE_RANGES,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -252,7 +261,7 @@
   const selectedMonth = ref(new Date().getMonth())
   const selectedYear = ref(new Date().getFullYear())
 
-  const relativeValue = ref(15)
+  const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
   const relativeDirection = ref(getCurrentMonthLabel().toLowerCase())
 
@@ -386,6 +395,40 @@
       model.value.label = ''
       emit('select', model.value)
     }
+  }
+
+  const resetToLastFiveMinutes = () => {
+    const now = new Date()
+    const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
+      5,
+      'minutes',
+      'last',
+      now
+    )
+
+    activeTab.value = 1
+    relativeValue.value = 5
+    relativeUnit.value = 'minutes'
+    relativeDirection.value = getCurrentMonthLabel().toLowerCase()
+
+    selectedTime.value = ''
+    hasChanges.value = false
+    tempInputValue.value = ''
+
+    model.value = {
+      startDate: newStartDate,
+      endDate: newEndDate,
+      label: COMMON_DATE_RANGES.last_5_minutes.label,
+      relative: {
+        direction: 'last',
+        value: 5,
+        unit: 'minutes',
+        preset: 'last_5_minutes'
+      }
+    }
+
+    emit('select', model.value)
+    overlayPanel.value?.hide?.()
   }
 
   const setToNow = () => {

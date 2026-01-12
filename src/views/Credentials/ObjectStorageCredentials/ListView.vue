@@ -45,6 +45,18 @@
     {
       field: 'expirationDate',
       header: 'Expiration Date'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      sortField: 'lastModified',
+      filterPath: 'lastModified'
     }
   ])
 
@@ -87,6 +99,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'credential',
       icon: 'pi pi-trash',
@@ -94,6 +107,10 @@
       showOnlyOnHover: true
     }
   ]
+
+  defineExpose({
+    handleCreateCredential
+  })
 </script>
 
 <template>

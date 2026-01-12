@@ -61,7 +61,7 @@ const processStatus = computed(() => {
   }
 })
 const nameRegex = /^[A-Za-z0-9_-]+$/
-const edgeAccess = ['read_write', 'read_only', 'restricted']
+const workloadsAccess = ['read_write', 'read_only', 'restricted']
 
 const validationSchema = yup.object({
   name: yup
@@ -71,12 +71,14 @@ const validationSchema = yup.object({
     .min(6)
     .max(63)
     .test('name', 'Invalid name format', (value) => nameRegex.test(value)),
-  edge_access: yup
+  workloads_access: yup
     .string()
-    .label('Edge Access')
+    .label('Workload Access')
     .required()
     .default('read_write')
-    .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
+    .test('workloads_access', 'Invalid workload access format', (value) =>
+      workloadsAccess.includes(value)
+    )
 })
 
 export const useEdgeStorage = () => {
@@ -215,7 +217,7 @@ export const useEdgeStorage = () => {
             handleToast(
               'error',
               'Upload Failed',
-              `All ${failureCount} file${failureCount > 1 && 's'} failed to upload`
+              `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`
             )
           }
         }

@@ -166,6 +166,9 @@ export class RulesEngineService extends BaseService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
+    const hasFilter = params?.hasFilter || false
+    const skipCache = params?.skipCache || false
+
     return await this._ensureQueryData(
       () => rulesEngineKeys.all(edgeApplicationId),
       async () => {
@@ -181,7 +184,7 @@ export class RulesEngineService extends BaseService {
           body: responseBody
         }
       },
-      { persist: true }
+      { persist: !hasFilter, skipCache }
     )
   }
 

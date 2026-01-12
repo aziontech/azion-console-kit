@@ -90,7 +90,7 @@ export class WorkloadService extends BaseService {
     }
 
     await this._ensureQueryData(workloadKeys.list(params), () => this.#fetchList(params), {
-      persist: true
+      persist: !params.search
     })
   }
 
@@ -172,10 +172,14 @@ export class WorkloadService extends BaseService {
 
   listWorkloads = async (params) => {
     const paramsValue = toValue(params)
+    const hasFilter = paramsValue?.hasFilter || false
     return await this._ensureQueryData(
       () => workloadKeys.list(paramsValue),
       () => this.#fetchList(paramsValue),
-      { persist: paramsValue?.page === 1 && !paramsValue?.search }
+      {
+        persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
+        skipCache: paramsValue?.skipCache || hasFilter
+      }
     )
   }
 

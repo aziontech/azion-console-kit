@@ -19,6 +19,12 @@ export const loadActivityHistory = async (filter) => {
   return adaptResponse(response)
 }
 
+const getSummaryValueByKey = (summary, key, fallback = '') => {
+  if (!Array.isArray(summary) || !key) return fallback
+  const entry = summary.find((item) => item?.key === key)
+  return entry?.value ?? fallback
+}
+
 const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
@@ -46,7 +52,8 @@ const adapt = (filter) => {
     fields: filter.fields,
     and: {
       userIdEq: filter.userId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      titleEq: getSummaryValueByKey(filter.summary, 'title')
     }
   }
   return convertGQL(formatFilter, table)

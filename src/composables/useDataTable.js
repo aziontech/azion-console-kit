@@ -27,13 +27,21 @@ export function useDataTable(props, emit) {
   const savedSearch = ref('')
   const savedOrdering = ref('')
   const firstItemIndex = ref(0)
-  const lastModifiedToggled = ref(false)
   const expandedGroups = ref(props.expandedRowGroups || [])
+
+  // Last Modified Popup state
+  const showPopup = ref(false)
+  const popupPosition = ref({ posX: 0, posY: 0 })
+  const popupData = ref({ lastEditor: '', lastModified: '' })
+  const hoverTimeout = ref(null)
 
   // Filters
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
+
+  const appliedFilters = ref([])
+  const filterPanel = ref(null)
 
   // Pagination
   const getSpecificPageCount = computed(() => {
@@ -110,6 +118,7 @@ export function useDataTable(props, emit) {
         data.value = Array.isArray(result) ? result : body
         totalRecords.value = count
       }
+      return true
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
@@ -122,6 +131,7 @@ export function useDataTable(props, emit) {
           detail: errorMessage
         })
       }
+      return false
     } finally {
       isLoading.value = false
       if (firstLoadData.value) {
@@ -129,6 +139,30 @@ export function useDataTable(props, emit) {
         emit('on-load-data', !!hasData)
       }
       firstLoadData.value = false
+      if (query.skipCache) {
+        const event = {
+          originalEvent: {
+            page: 0,
+            first: 0,
+            rows: 10,
+            pageCount: 39
+          },
+          first: 0,
+          rows: 10,
+          sortField: null,
+          sortOrder: null,
+          multiSortMeta: [],
+          filters: {},
+          pageCount: 39,
+          page: 0,
+          skipReload: true
+        }
+        const numberOfLinesPerPage = event.rows
+        tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+        itemsByPage.value = numberOfLinesPerPage
+        minimumOfItemsPerPage.value = numberOfLinesPerPage
+        firstItemIndex.value = event.first
+      }
     }
   }
 
@@ -136,20 +170,25 @@ export function useDataTable(props, emit) {
     if (!savedOrdering.value && props.defaultOrderingFieldName) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
+    const hasActiveFilters = appliedFilters.value.length > 0 || query.hasFilter
 
     const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
       fields: props.apiFields || [],
       ordering: savedOrdering.value,
+      skipCache: query.skipCache,
       ...query
+    }
+
+    if (hasActiveFilters) {
+      commonParams.hasFilter = true
     }
 
     if (props.lazy) {
       commonParams.search = savedSearch.value
     }
-
-    await loadData(commonParams, listService)
+    return await loadData(commonParams, listService)
   }
 
   // Navigation
@@ -158,14 +197,20 @@ export function useDataTable(props, emit) {
     router.push(props.createPagePath || '/')
   }
 
-  const editItemSelected = (event) => {
-    const item = event.data || event
+  const editItemSelected = (event, item) => {
     emit('on-before-go-to-edit', item)
 
     if (props.editInDrawer) {
       props.editInDrawer(item)
     } else if (props.enableEditClick !== false && !item?.disableEditClick) {
-      router.push({ path: `${props.editPagePath}/${item.id}` })
+      const editPath = `${props.editPagePath}/${item.id}`
+
+      if (event.ctrlKey || event.metaKey) {
+        const fullUrl = `${window.location.origin}${editPath}`
+        window.open(fullUrl, '_blank')
+      } else {
+        router.push({ path: editPath })
+      }
     }
   }
 
@@ -280,23 +325,6 @@ export function useDataTable(props, emit) {
     sortOrderValue.value = sortOrder
   }
 
-  const sortByLastModified = () => {
-    const currentField = sortFieldValue.value
-    const currentOrder = sortOrderValue.value
-
-    if (currentField === 'lastModified') {
-      sortOrderValue.value = currentOrder === 1 ? -1 : 1
-    } else {
-      sortFieldValue.value = 'lastModified'
-      sortOrderValue.value = 1
-    }
-
-    fetchOnSort({
-      sortField: sortFieldValue.value,
-      sortOrder: sortOrderValue.value
-    })
-  }
-
   // Search
   const fetchOnSearch = () => {
     if (!props.lazy) return
@@ -310,21 +338,86 @@ export function useDataTable(props, emit) {
     savedSearch.value = search
   }
 
-  // Last Modified Toggle
-  const loadLastModifiedToggleState = () => {
-    const saved = localStorage.getItem('lastModifiedToggled')
-    if (saved !== null) {
-      lastModifiedToggled.value = JSON.parse(saved)
+  // Applied Filters Management
+  const buildFilterParams = () => {
+    const filterParams = {}
+    appliedFilters.value.forEach((filter) => {
+      filterParams[filter.field] = filter.value
+    })
+    if (appliedFilters.value.length > 0) {
+      filterParams.hasFilter = true
+    }
+    return filterParams
+  }
+
+  const toggleFilter = (event) => {
+    if (filterPanel.value) {
+      filterPanel.value.toggle(event)
     }
   }
 
-  const saveLastModifiedToggleState = () => {
-    localStorage.setItem('lastModifiedToggled', JSON.stringify(lastModifiedToggled.value))
+  const handleApplyFilter = async (filterData) => {
+    const hasValue =
+      filterData.value !== null && filterData.value !== undefined && filterData.value !== ''
+
+    if (filterData.label && hasValue) {
+      const existingFilterIndex = appliedFilters.value.findIndex(
+        (filter) => filter.field === filterData.field
+      )
+
+      const previousFilter =
+        existingFilterIndex !== -1 ? { ...appliedFilters.value[existingFilterIndex] } : null
+      const isNewFilter = existingFilterIndex === -1
+
+      if (existingFilterIndex !== -1) {
+        appliedFilters.value[existingFilterIndex] = {
+          field: filterData.field,
+          label: filterData.label,
+          value: filterData.value,
+          matchMode: filterData.label === 'name' ? 'contains' : 'is'
+        }
+      } else {
+        appliedFilters.value.push({
+          field: filterData.field,
+          label: filterData.label,
+          value: filterData.value,
+          matchMode: filterData.label === 'name' ? 'contains' : 'is'
+        })
+      }
+
+      const filterParams = buildFilterParams()
+      const firstPage = 1
+      firstItemIndex.value = firstPage
+
+      const success = await reload(filterParams)
+
+      if (!success) {
+        if (isNewFilter) {
+          appliedFilters.value = appliedFilters.value.filter(
+            (filter) => filter.field !== filterData.field
+          )
+        } else if (previousFilter) {
+          const currentIndex = appliedFilters.value.findIndex(
+            (filter) => filter.field === filterData.field
+          )
+          if (currentIndex !== -1) {
+            appliedFilters.value[currentIndex] = previousFilter
+          }
+        }
+      }
+    }
   }
 
-  const toggleLastModifiedDisplay = () => {
-    lastModifiedToggled.value = !lastModifiedToggled.value
-    saveLastModifiedToggleState()
+  const handleRemoveFilter = (field) => {
+    appliedFilters.value = appliedFilters.value.filter((filter) => filter.field !== field)
+    if (filters.value[field]) {
+      delete filters.value[field]
+    }
+
+    const filterParams = buildFilterParams()
+    const firstPage = 1
+    firstItemIndex.value = firstPage
+    reload(filterParams)
   }
 
   // CSV Export
@@ -521,8 +614,6 @@ export function useDataTable(props, emit) {
 
     const columns = Array.isArray(props.columns) ? props.columns : props.columns?.value || []
     selectedColumns.value = columns.filter((col) => !props.hiddenByDefault?.includes(col.field))
-
-    loadLastModifiedToggleState()
   })
 
   // Watchers
@@ -551,16 +642,22 @@ export function useDataTable(props, emit) {
     menuRef,
     filters,
     filtersDynamically,
+    appliedFilters,
+    filterPanel,
     totalRecords,
     firstItemIndex,
     itemsByPage,
     minimumOfItemsPerPage,
     sortFieldValue,
     sortOrderValue,
-    lastModifiedToggled,
     expandedGroups,
     selectedItems,
     isAllSelected,
+    showPopup,
+    popupPosition,
+    popupData,
+    hoverTimeout,
+    savedSearch,
 
     // Computed properties
     isRenderActions,
@@ -583,10 +680,11 @@ export function useDataTable(props, emit) {
     changeNumberOfLinesPerPage,
     updateDataTablePagination,
     fetchOnSort,
-    sortByLastModified,
     fetchOnSearch,
     handleSearchValue,
-    toggleLastModifiedDisplay,
+    toggleFilter,
+    handleApplyFilter,
+    handleRemoveFilter,
     exportFunctionMapper,
     handleExportTableDataToCSV,
     // alias for clarity

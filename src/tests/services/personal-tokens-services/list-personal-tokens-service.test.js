@@ -47,7 +47,7 @@ describe('PersonalTokensServices', () => {
     await sut({ pageSize: 400, search: 'search_text' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/personal_tokens?page_size=400&search=search_text`,
+      url: `${version}/iam/personal_tokens?page=1&page_size=400&search=search_text`,
       method: 'GET'
     })
   })
@@ -71,9 +71,10 @@ describe('PersonalTokensServices', () => {
         scope: 'Global',
         description: '',
         name: fixtures.personalTokenMock.name,
-        created: 'Friday, November 10, 2023',
         createdDate: 'Fri Nov 10 2023',
-        expiresAt: 'Sunday, December 10, 2023',
+        expiresAt: 'Dec 10, 2023, 12:00:00 AM',
+        lastModified: 'Nov 10, 2023, 12:00:00 AM',
+        lastModify: '10 hours ago',
         expiresAtDate: 'Sun Dec 10 2023'
       }
     ])

@@ -34,6 +34,9 @@ export class VcsService extends BaseService {
   }
 
   postCallbackUrl = async (path, body) => {
+    if (!path) {
+      throw new Error('the integration callback URL was not received. Please try connecting again')
+    }
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}${path}`,

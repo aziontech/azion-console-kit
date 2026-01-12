@@ -4,6 +4,7 @@
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
 
+  const emit = defineEmits(['blur', 'input'])
   const props = defineProps({
     value: {
       type: String,
@@ -39,6 +40,10 @@
     sensitive: {
       type: Boolean,
       default: false
+    },
+    aditionalError: {
+      type: String,
+      default: ''
     }
   })
   const inputRef = ref(null)
@@ -46,8 +51,6 @@
   const slots = useSlots()
   const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
-
-  const emit = defineEmits(['blur'])
 
   const customTestId = computed(() => {
     const id = attrs['data-testid'] || 'field-text'
@@ -62,21 +65,24 @@
 
   const {
     value: inputValue,
-    errorMessage,
+    errorMessage: veeValidateErrorMessage,
     handleBlur,
     handleChange
   } = useField(name, undefined, {
     initialValue: props.value
   })
 
-  defineExpose({
-    inputRef
-  })
-
   const onBlur = (event) => {
     handleBlur(event)
     emit('blur', event)
   }
+
+  const onChange = (event) => {
+    handleChange(event)
+    emit('input', event.target.value)
+  }
+
+  defineExpose({ inputRef })
 </script>
 
 <template>
@@ -88,31 +94,31 @@
     :isRequired="attrs.required"
   />
   <InputText
-    :data-testid="customTestId.input"
-    ref="inputRef"
-    :id="name"
+    v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
     v-model="inputValue"
+    ref="inputRef"
+    type="text"
+    :data-testid="customTestId.input"
+    :id="name"
     :name="name"
     :readonly="readonly"
     :disabled="disabled"
-    type="text"
-    @keypress.enter.prevent
     :placeholder="props.placeholder"
-    @input="handleChange"
-    :class="[{ 'p-invalid': errorMessage }, props.class]"
+    :class="[{ 'p-invalid': aditionalError || veeValidateErrorMessage }, props.class]"
+    @input="onChange"
+    @keypress.enter.prevent
     @blur="onBlur"
-    v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
   />
   <small
-    v-if="errorMessage"
-    :data-testid="customTestId.error"
+    v-if="aditionalError || veeValidateErrorMessage"
     class="p-error text-xs font-normal leading-tight"
+    :data-testid="customTestId.error"
   >
-    {{ errorMessage }}
+    {{ aditionalError || veeValidateErrorMessage }}
   </small>
   <small
-    class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description || hasDescriptionSlot"
+    class="text-xs text-color-secondary font-normal leading-5"
     :data-testid="customTestId.description"
   >
     <slot name="description">
