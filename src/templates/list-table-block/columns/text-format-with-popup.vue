@@ -21,7 +21,7 @@
     <Teleport to="body">
       <div
         v-if="showPopup"
-        class="absolute z-50 max-w-80 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)]"
+        class="absolute z-[9999] max-w-80 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)]"
         :style="popupStyle"
         @mouseenter="handlePopupMouseEnter"
         @mouseleave="handlePopupMouseLeave"
