@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="connectorName"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="connectorName" description="Configure addresses, protocols, and traffic distribution used to connect to origins and external services."></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

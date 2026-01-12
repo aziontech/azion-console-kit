@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Connectors" />
+      <PageHeadingBlock pageTitle="Create Connectors" description="Configure addresses, protocols, and traffic distribution used to connect to origins and external services." />
     </template>
     <template #content>
       <CreateFormBlock

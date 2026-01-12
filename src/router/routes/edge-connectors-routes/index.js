@@ -36,7 +36,7 @@ export const edgeConnectorsRoutes = {
             to: '/connectors'
           },
           {
-            label: 'Create Connectors',
+            label: 'Create',
             to: '/connectors/create'
           }
         ],
