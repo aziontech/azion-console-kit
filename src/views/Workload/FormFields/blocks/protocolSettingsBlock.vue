@@ -117,8 +117,7 @@
       loadInitialTls.certificate = newTls.certificate
       loadInitialTls.ciphers = newTls.ciphers
       loadInitialTls.minimumVersion = newTls.minimumVersion
-    }
-    if (!newTls) {
+    } else {
       tls.value = loadInitialTls
     }
   })
