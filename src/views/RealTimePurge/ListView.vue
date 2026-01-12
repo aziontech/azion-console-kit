@@ -29,7 +29,6 @@
         ref="listPurgeRef"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        disabledList
         addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
@@ -40,6 +39,7 @@
         :actions="actionsRow"
         :defaultOrderingFieldName="'-last_modified'"
         hide-last-modified-column
+        :paginator="false"
         :empty-block="{
           title: 'No purges have been added',
           description: 'Click the button below to add your first purge.',

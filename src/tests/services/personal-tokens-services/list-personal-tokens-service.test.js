@@ -47,7 +47,7 @@ describe('PersonalTokensServices', () => {
     await sut({ pageSize: 400, search: 'search_text' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/personal_tokens?page_size=400&search=search_text`,
+      url: `${version}/iam/personal_tokens?page=1&page_size=400&search=search_text`,
       method: 'GET'
     })
   })

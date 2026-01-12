@@ -139,6 +139,10 @@
     allowedFilters: {
       type: Array,
       default: () => []
+    },
+    paginator: {
+      type: Boolean,
+      default: true
     }
   })
   // Use the composable for all data table functionality
@@ -194,7 +198,6 @@
   const slots = useSlots()
 
   // Additional computed properties specific to this component
-  const havePagination = ref(true)
   const classActions = computed(() =>
     isRenderActions.value
       ? ''
@@ -237,7 +240,7 @@
       v-model:filters="filtersDynamically"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
-      :paginator="havePagination"
+      :paginator="paginator"
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="itemsByPage"
       :globalFilterFields="filterBy"
@@ -348,7 +351,7 @@
               class="flex items-center gap-2"
               :class="{
                 'cursor-pointer hover:underline': frozenColumns.includes(col.field),
-                'cursor-pointer': !frozenColumns.length
+                'cursor-pointer': !frozenColumns.length && enableEditClick
               }"
               @click="(event) => rowClick(event, col, rowData)"
             >
