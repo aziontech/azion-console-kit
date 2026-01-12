@@ -78,7 +78,7 @@
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
-          label="Learn more"
+          label="View Documentation"
           link
           size="small"
           @click="openDocumentation"

@@ -123,10 +123,7 @@
             label="Variable"
             @click="handleTrackEvent"
             createPagePath="variables/create"
-            data-testid="create_Variable_button"
-            :documentationService="documentationService"
-            :viewDocumentationIsVisible="true"
-            :getHelpLinkIsVisible="false"
+            data-testid="create_Variable_button"            
           />
         </template>
       </PageHeadingBlock>

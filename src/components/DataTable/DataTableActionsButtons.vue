@@ -9,20 +9,11 @@
       Other Link
     </PrimeButton>
     <PrimeButton
-      v-if="getHelpLinkIsVisible"
       size="small"
       link
       @click="navigateToGetHelp"
     >
       Get Help
-    </PrimeButton>
-    <PrimeButton
-      v-if="viewDocumentationIsVisible"
-      size="small"
-      link
-      @click="documentationService()"
-    >
-      View Documentation
     </PrimeButton>
     <PrimeButton
       v-if="otherActions"
@@ -85,18 +76,6 @@
       type: Boolean,
       default: false
     },
-    getHelpLinkIsVisible: {
-      type: Boolean,
-      default: true
-    },
-    viewDocumentationIsVisible: {
-      type: Boolean,
-      default: false
-    },
-    documentationService: {
-      type: Function,
-      default: null
-    }
   })
 
   const emit = defineEmits(['click', 'other-actions'])

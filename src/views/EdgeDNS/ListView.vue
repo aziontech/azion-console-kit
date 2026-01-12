@@ -125,8 +125,8 @@
             @click="handleTrackEvent"
             createPagePath="edge-dns/create"
             data-testid="create_Zone_button"
-            :viewDocumentationIsVisible="true"
-            :getHelpLinkIsVisible="false"
+            
+            
             :documentation-service="documentationService"
           />
         </template>

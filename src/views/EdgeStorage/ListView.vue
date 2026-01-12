@@ -17,9 +17,6 @@
             @click="handleCreateBucketTrackEvent"
             createPagePath="/object-storage/create"
             data-testid="create_Bucket_button"
-            :viewDocumentationIsVisible="true"
-            :documentationService="documentationService"
-            :getHelpLinkIsVisible="false"
           />
           <PrimeButton
             v-else

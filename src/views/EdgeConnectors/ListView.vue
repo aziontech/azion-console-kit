@@ -119,9 +119,6 @@
             label="Connectors"
             createPagePath="/connectors/create"
             data-testid="create_Connectors_button"
-            :viewDocumentationIsVisible="true"
-            :getHelpLinkIsVisible="false"
-            :documentationService="documentationService"
           />
         </template>
       </PageHeadingBlock>

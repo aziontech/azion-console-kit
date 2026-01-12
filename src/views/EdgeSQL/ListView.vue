@@ -230,9 +230,6 @@
             label="Database"
             @click="handleTrackEvent"
             createPagePath="/sql-database/create"
-            :viewDocumentationIsVisible="true"
-            :documentationService="Helpers.documentationGuideProducts.edgeSQL"
-            :getHelpLinkIsVisible="false"
             data-testid="create_Database_button"
           />
         </template>

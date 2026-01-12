@@ -200,9 +200,6 @@
             size="small"
             :label="handleTextDomainWorkload.singularTitle"
             @click="handleTrackEvent"
-            :documentationService="documentationHandler"
-            :viewDocumentationIsVisible="true"
-            :getHelpLinkIsVisible="false"
             :createPagePath="createDomainPath"
             :data-testid="`create_${handleTextDomainWorkload.singularTitle}_button`"
           />

@@ -148,9 +148,6 @@
             size="small"
             label="Application"
             @click="handleTrackEvent"
-            :viewDocumentationIsVisible="true"
-            :documentationService="documentationService"
-            :getHelpLinkIsVisible="false"
             createPagePath="/applications/create?origin=list"
             data-testid="create_Application_button"
           />
