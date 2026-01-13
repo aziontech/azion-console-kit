@@ -81,6 +81,7 @@
                 :headerContainer="headerContainer"
                 :buttonsContainer="buttonsContainer"
                 :containerWidth="containerWidth"
+                exportFileName="Files"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"

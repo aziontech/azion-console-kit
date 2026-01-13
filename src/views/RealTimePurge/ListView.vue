@@ -29,7 +29,6 @@
         ref="listPurgeRef"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        disabledList
         addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
@@ -40,6 +39,8 @@
         :actions="actionsRow"
         :defaultOrderingFieldName="'-last_modified'"
         hide-last-modified-column
+        :paginator="false"
+        exportFileName="Real-Time Purge"
         :empty-block="{
           title: 'No Purge requests yet',
           description: 'Create your first purge request to remove cached content.',

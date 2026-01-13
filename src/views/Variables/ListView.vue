@@ -146,6 +146,7 @@
             header: 'Key'
           }
         ]"
+        exportFileName="Variables"
         :empty-block="{
           title: 'No Variables yet',
           description: 'Create your first variable to define reusable configuration values for platform resources.',

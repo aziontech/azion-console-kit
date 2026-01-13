@@ -140,6 +140,7 @@
         createButtonLabel: 'Credential',
         documentationService: documentationService
       }"
+      exportFileName="Object Storage Credentials"
     />
     <CredentialDrawer
       ref="credentialDrawerRef"

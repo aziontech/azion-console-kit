@@ -8,7 +8,7 @@
     defaultOrderingFieldName="-lastModified"
     enableEditClick
     editPagePath="/object-storage"
-    exportFileName="buckets"
+    exportFileName="Buckets"
     class="w-full"
     :isLoading="isLoading"
     :emptyBlock="{

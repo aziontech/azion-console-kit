@@ -26,6 +26,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :enableEditClick="false"
         :actions="actions"
+        exportFileName="Personal Tokens"
         :emptyBlock="{
           title: 'No Personal Tokens yet',
           description: 'Create your first Personal Token to securely access your account via API.',

@@ -23,6 +23,7 @@
         @on-row-click-edit-redirect="handleEditRedirect"
         enableEditCustomRedirect
         emptyListMessage="No identity providers found."
+        exportFileName="Identity Providers"
       />
       <EmptyResultsBlock
         v-else

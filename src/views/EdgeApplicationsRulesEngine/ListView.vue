@@ -260,6 +260,7 @@
     :actions="actions"
     :apiFields="RULES_ENGINE_API_FIELDS"
     groupColumn="phase.content"
+    exportFileName="Application Rules Engine"
     :expandedRowGroups="['Default', 'Request', 'Response']"
     :empty-block="{
       title: 'No rules engine have been created',
