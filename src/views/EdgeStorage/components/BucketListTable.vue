@@ -12,7 +12,7 @@
     class="w-full"
     :isLoading="isLoading"
     :emptyBlock="{
-      title: 'No Buckets yet.',
+      title: 'No Buckets yet',
       description: 'Create your first bucket to store, organize, and access data.',
       createButtonLabel: 'Bucket',
       createPagePath: '/object-storage/create',

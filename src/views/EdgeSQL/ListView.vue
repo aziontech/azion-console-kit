@@ -263,7 +263,7 @@
         exportFileName="SQL Database"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No SQL Databases yet.',
+          title: 'No SQL Databases yet',
           description: 'Create your first database to store relational data and run SQL queries.',
           createButtonLabel: 'Database',
           createPagePath: '/sql-database/create',

@@ -53,7 +53,7 @@
             :documentationService="documentationService"
             :allowedFilters="getFilters"
             :emptyBlock="{
-              title: 'No Data Streams yet.',
+              title: 'No Data Streams yet',
               description: 'Create your first stream to route events and log data to internal and external destinations.',
               createPagePath: '/data-stream/create',
               createButtonLabel: 'Stream',

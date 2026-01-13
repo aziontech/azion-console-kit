@@ -118,7 +118,7 @@
         emptyListMessage="No edge nodes found."
         :actions="actions"
         :emptyBlock="{
-          title: 'No Edge Nodes yet.',
+          title: 'No Edge Nodes yet',
           description:
             'Create your first edge node and register it as an execution target for Edge Services.',
           documentationService: documentationService,

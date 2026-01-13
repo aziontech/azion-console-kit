@@ -405,7 +405,7 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No Certificates yet.',
+          title: 'No Certificates yet',
           description: 'Create your first certificate to secure application traffic with TLS.',
           createPagePath: 'digital-certificates/create',
           createButtonLabel: 'Certificate Manager',

@@ -19,7 +19,7 @@ export const usersListsRoutes = {
         title: 'Users',
         breadCrumbs: [
           {
-            label: 'Users',
+            label: 'Users Management',
             to: '/users'
           }
         ]
@@ -40,11 +40,11 @@ export const usersListsRoutes = {
         title: 'Create User',
         breadCrumbs: [
           {
-            label: 'Users',
+            label: 'Users Management',
             to: '/users'
           },
           {
-            label: 'Create User',
+            label: 'Create',
             to: '/users/create'
           }
         ]
@@ -67,11 +67,11 @@ export const usersListsRoutes = {
         title: 'Edit User',
         breadCrumbs: [
           {
-            label: 'Users',
+            label: 'Users Management',
             to: '/users'
           },
           {
-            label: 'Edit User',
+            label: 'Edit',
             dynamic: true,
             routeParam: 'id'
           }

@@ -172,7 +172,7 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No WAF Rules yet.',
+          title: 'No WAF Rules yet',
           description: 'Create your first WAF rule to inspect and control incoming requests.',
           createButtonLabel: 'WAF Rule',
           createPagePath: 'waf/create',

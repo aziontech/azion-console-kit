@@ -146,7 +146,7 @@
         exportFileName="Custom Pages"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No Custom Pages yet.',
+          title: 'No Custom Pages yet',
           description: 'Create your first custom page to control responses for defined conditions.',
           createPagePath: '/custom-pages/create',
           createButtonLabel: 'Custom Page',

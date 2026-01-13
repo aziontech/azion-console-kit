@@ -41,7 +41,7 @@
         :defaultOrderingFieldName="'-last_modified'"
         hide-last-modified-column
         :empty-block="{
-          title: 'No Purge requests yet.',
+          title: 'No Purge requests yet',
           description: 'Create your first purge request to remove cached content.',
           createButtonLabel: 'Purge',
           createPagePath: 'real-time-purge/create',

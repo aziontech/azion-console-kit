@@ -149,7 +149,7 @@
         exportFileName="Firewalls"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No Firewalls yet.',
+          title: 'No Firewalls yet',
           description: 'Create your first firewall to define security modules and enforcement behavior for incoming traffic.',
           createButtonLabel: 'Firewall',
           createPagePath: '/firewalls/create',

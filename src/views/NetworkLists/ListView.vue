@@ -138,7 +138,7 @@
         :allowedFilters="allowedFilters"
         defaultOrderingFieldName="-last_modified"
         :emptyBlock="{
-          title: 'No Network Lists yet.',
+          title: 'No Network Lists yet',
           description:
             'Create your first WAF rule to inspect and control incoming requests.',
           createButtonLabel: 'Network List',

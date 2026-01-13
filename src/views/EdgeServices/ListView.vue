@@ -173,7 +173,7 @@
         exportFileName="Edge Services"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No Edge Services yet.',
+          title: 'No Edge Services yet',
           description: 'Create your first network list to control traffic and security behavior.',
           createButtonLabel: 'Service',
           createPagePath: 'edge-services/create',

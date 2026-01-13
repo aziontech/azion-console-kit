@@ -203,7 +203,7 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No Functions yet.',
+          title: 'No Functions yet',
           description: 'Create your first function to execute code at Azion\'s global infrastructure.',
           createButtonLabel: 'Function',
           createPagePath: 'functions/create?origin=list',
