@@ -34,7 +34,8 @@ export const documentationCatalog = {
   edgeConnectors: () => openSearchResult('Origins'),
   workload: () => openSearchResult('workload'),
   edgeSQL: () => openSearchResult('edge-sql'),
-  edgeStorage: () => openSearchResult('edge storage')
+  edgeStorage: () => openSearchResult('edge storage'),
+  credentials: () => openSearchResult('credentials')
 }
 
 export const documentationGuideProducts = {

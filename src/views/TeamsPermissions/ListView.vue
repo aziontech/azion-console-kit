@@ -89,7 +89,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Teams"
-        description="Configure and assign permissions for team collaboration."
+        description="Define and manage permissions for team collaboration."
       >
         <template #default>
           <DataTableActionsButtons
@@ -118,8 +118,8 @@
         :csvMapper="csvMapper"
         hideLastModifiedColumn
         :emptyBlock="{
-          title: 'No teams have been created',
-          description: 'Click the button below to create your first team and add permissions.',
+          title: 'No Team Permissions yet',
+          description: 'Create your first team to define and assign permissions to users.',
           createButtonLabel: 'Team',
           createPagePath: 'teams-permission/create',
           documentationService: documentationService

@@ -39,7 +39,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Create Team',
+            label: 'Create',
             to: '/teams-permission/create'
           }
         ]

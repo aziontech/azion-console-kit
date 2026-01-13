@@ -10,6 +10,13 @@
 
   defineOptions({ name: 'tabs-credentials' })
 
+  defineProps({
+    documentationService: {
+      required: true,
+      type: Function
+    }
+  })
+
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -80,6 +87,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Credentials"
+        description="Define and manage credentials used to access Azion's Object Storage."
         data-testid="credentials-heading"
       />
     </template>
@@ -129,6 +137,7 @@
             ref="componentsRefs"
             :is="tab.component"
             v-if="tab.show"
+            :documentationService="documentationService"
           />
         </template>
       </div>
