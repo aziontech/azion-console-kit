@@ -128,8 +128,6 @@
             @click="handleTrackEvent"
             createPagePath="/firewalls/create"
             data-testid="create_Firewall_button"
-            
-            
             :documentation-service="documentationService"
           />
         </template>

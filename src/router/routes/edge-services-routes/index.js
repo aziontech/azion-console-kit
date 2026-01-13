@@ -42,7 +42,7 @@ export const edgeServicesRoutes = {
             to: '/edge-services'
           },
           {
-            label: 'Create Edge Service',
+            label: 'Create',
             to: '/edge-services/create'
           }
         ]

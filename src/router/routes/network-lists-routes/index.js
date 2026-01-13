@@ -39,7 +39,7 @@ export const networkListsRoutes = {
             to: '/network-lists'
           },
           {
-            label: 'Create Network List',
+            label: 'Create',
             to: '/network-lists/create'
           }
         ]

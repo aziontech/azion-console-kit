@@ -145,7 +145,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Services"
-        description="Deliver and manage services for applications."
+        description="Define and manage lists of IP addresses and CIDR ranges used by security and traffic controls."
       >
         <template #default>
           <DataTableActionsButtons
@@ -173,8 +173,8 @@
         exportFileName="Edge Services"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No services have been created',
-          description: 'Click the button below to create your first service.',
+          title: 'No Edge Services yet.',
+          description: 'Create your first network list to control traffic and security behavior.',
           createButtonLabel: 'Service',
           createPagePath: 'edge-services/create',
           documentationService: documentationService
