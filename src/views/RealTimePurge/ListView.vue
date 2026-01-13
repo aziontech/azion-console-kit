@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Real-Time Purge"
-        description="Invalidate manually cached content across the network."
+        description="Invalidate cached content to control content freshness across Azion’s global infrastructure."
       >
         <template #default>
           <DataTableActionsButtons
@@ -41,8 +41,8 @@
         :defaultOrderingFieldName="'-last_modified'"
         hide-last-modified-column
         :empty-block="{
-          title: 'No purges have been added',
-          description: 'Click the button below to add your first purge.',
+          title: 'No Purge requests yet.',
+          description: 'Create your first purge request to remove cached content.',
           createButtonLabel: 'Purge',
           createPagePath: 'real-time-purge/create',
           documentationService: documentationService

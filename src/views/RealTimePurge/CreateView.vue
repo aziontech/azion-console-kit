@@ -57,7 +57,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Real-Time Purge"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Real-Time Purge" description="Define purge targets and execution parameters for cache invalidation."></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

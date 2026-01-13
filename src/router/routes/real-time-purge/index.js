@@ -39,7 +39,7 @@ export const realTimePurgeRoutes = {
             to: '/real-time-purge'
           },
           {
-            label: 'Create Purge',
+            label: 'Create',
             to: '/real-time-purge/create'
           }
         ]

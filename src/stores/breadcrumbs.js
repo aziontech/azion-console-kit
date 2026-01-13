@@ -17,16 +17,25 @@ export const useBreadcrumbs = defineStore({
           const paramValue = route.query[item.queryParam]
 
           if (paramValue && item.typeMapping && item.typeMapping[paramValue]) {
+            const mappedValue = item.typeMapping[paramValue][item.baseLabel]
+            
+            if (mappedValue) {
+              return {
+                ...item,
+                label: mappedValue
+              }
+            }
+            
             const routeType = item.baseLabel.toLowerCase().includes('create') ? 'create' : 'edit'
             return {
               ...item,
-              label: item.typeMapping[paramValue][routeType]
+              label: item.typeMapping[paramValue][routeType] || item.label || item.baseLabel
             }
           }
 
           return {
             ...item,
-            label: paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel
+            label: item.label || (paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel)
           }
         }
 

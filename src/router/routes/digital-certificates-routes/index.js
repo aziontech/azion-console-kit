@@ -2,17 +2,20 @@ import * as Helpers from '@/helpers'
 
 const certificateTypeMapping = {
   certificateRevogationList: {
-    create: 'Create Certificate Revogation List',
-    edit: 'Edit Certificate Revogation List'
+    label: 'Certificate Revocation List',
+    create: 'Import',
+    edit: 'Edit'
   },
   trusted_ca_certificate: {
-    create: 'Importing Trusted Certificate',
-    edit: 'Edit Trusted Certificate'
+    label: 'Trusted Certificate',
+    create: 'Import',
+    edit: 'Edit'
   },
   edge_certificate: {
-    create: 'Create Server Certificate',
-    edit: 'Edit Server Certificate'
-  }
+    label: 'Server Certificate',
+    create: 'Create',
+    edit: 'Edit'
+  },
 }
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -46,12 +49,19 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            label: 'Create Digital Certificate',
+            to: '/digital-certificates',
+            baseLabel: 'label',
+            label: 'Digital Certificate',
+            typeMapping: certificateTypeMapping,
+            dynamic: true
+          },
+          {
             to: '/digital-certificates/create',
-            dynamic: true,
-            baseLabel: 'Create Digital Certificate',
+            baseLabel: 'create',
+            label: 'Create',
+            typeMapping: certificateTypeMapping,
             queryParam: 'certificate',
-            typeMapping: certificateTypeMapping
+            dynamic: true
           }
         ]
       }
@@ -72,7 +82,13 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            label: 'Edit Digital Certificate',
+            to: '/digital-certificates',
+            baseLabel: 'label',
+            typeMapping: certificateTypeMapping,
+            label: 'Digital Certificate',
+            dynamic: true
+          },
+          {
             to: '/digital-certificates/edit',
             dynamic: true,
             routeParam: 'id'
