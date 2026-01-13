@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Group" />
+      <PageHeadingBlock pageTitle="Create Group" description="Configure a group and assign permissions for resource access." />
     </template>
     <template #content>
       <CreateFormBlock

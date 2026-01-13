@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Client" />
+      <PageHeadingBlock pageTitle="Create Client" description="Configure a client account and its settings."/>
     </template>
     <template #content>
       <CreateFormBlock

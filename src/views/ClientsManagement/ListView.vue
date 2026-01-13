@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Client Management">
+      <PageHeadingBlock pageTitle="Client Management" description="Manage client accounts and their configurations.">
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">
@@ -31,8 +31,8 @@
 
       <EmptyResultsBlock
         v-if="!hasContentToList"
-        title="No clients have been created"
-        description="Click the button below to create your first client account."
+        title="No Clients yet"
+        description="Create your first client account to manage configurations."
         createButtonLabel="Client"
         createPagePath="management/create"
       >

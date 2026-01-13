@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="providerName"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="providerName" description="Configure an identity provider for single sign-on authentication."></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

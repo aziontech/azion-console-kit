@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Identity Provider"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Identity Provider" description="Configure an identity provider for single sign-on authentication."></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

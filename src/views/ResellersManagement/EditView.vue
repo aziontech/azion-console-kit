@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="resellerName" />
+      <PageHeadingBlock :pageTitle="resellerName" description="Configure a reseller account." />
     </template>
     <template #content>
       <EditFormBlock

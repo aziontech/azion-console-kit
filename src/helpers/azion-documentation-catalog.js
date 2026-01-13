@@ -70,3 +70,7 @@ export const documentationGuideProducts = {
 export const documentationStoreProducts = {
   bucket: () => openDocumentationProducts('store/storage/create-bucket/')
 }
+
+export const documentationAccountsProducts = {
+  accounts: () => openDocumentationProducts('accounts/accounts/')
+}

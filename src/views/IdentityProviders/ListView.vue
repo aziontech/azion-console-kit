@@ -26,8 +26,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No identity providers has been created"
-        description="Click the button below to create your first identity provider."
+        title="No Identity Provider yet"
+        description="Create your first identity provider to enable single sign-on authentication."
         createPagePath="identity-providers/create"
       >
         <template #illustration>

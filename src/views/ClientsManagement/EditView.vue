@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="clientName" />
+      <PageHeadingBlock :pageTitle="clientName" description="Configure a client account and its settings."/>
     </template>
     <template #content>
       <EditFormBlock

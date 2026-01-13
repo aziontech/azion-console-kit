@@ -1,5 +1,6 @@
 import * as AccountSettingsServices from '@/services/account-settings-services'
 import * as AccountManagementServices from '@/services/accounts-management-services'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const clientManagementRoutes = {
@@ -10,6 +11,9 @@ export const clientManagementRoutes = {
       path: '',
       name: 'list-client-management',
       component: () => import('@views/ClientsManagement/ListView.vue'),
+      props: {
+        documentationService: documentationAccountsProducts
+      },
       meta: {
         breadCrumbs: [
           {
@@ -18,7 +22,6 @@ export const clientManagementRoutes = {
           }
         ]
       },
-      props: {}
     },
     {
       path: 'create',

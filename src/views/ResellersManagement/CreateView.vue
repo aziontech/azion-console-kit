@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Reseller" />
+      <PageHeadingBlock pageTitle="Create Reseller" description="Configure a reseller account." />
     </template>
     <template #content>
       <CreateFormBlock

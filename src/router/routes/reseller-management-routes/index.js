@@ -39,7 +39,7 @@ export const resellerManagementRoutes = {
             to: '/reseller/management'
           },
           {
-            label: 'Create Reseller',
+            label: 'Create',
             to: '/reseller/management/create'
           }
         ]

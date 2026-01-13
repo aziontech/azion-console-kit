@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="groupName"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="groupName" description="Configure a group and assign permissions for resource access."></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
