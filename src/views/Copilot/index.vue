@@ -52,6 +52,7 @@
         class="px-8 pt-4"
         :isRightAlignment="true"
         :tag="tagProps"
+        description="Provide AI-assisted insights and guidance across Azion’s products."
       >
       </PageHeadingBlock>
     </template>

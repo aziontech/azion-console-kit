@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Personal Tokens"
-        description="Generate and manage personal tokens for secure access to your account."
+        description="Define and manage personal access tokens used for API authentication."
       >
         <template #default>
           <DataTableActionsButtons
@@ -27,8 +27,8 @@
         :enableEditClick="false"
         :actions="actions"
         :emptyBlock="{
-          title: 'No personal tokens have been generated',
-          description: 'Click the button below to generate your first personal token.',
+          title: 'No Personal Tokens yet',
+          description: 'Create your first Personal Token to securely access your account via API.',
           documentationService: props.documentationService,
           emptyListMessage: 'No personal tokens found.'
         }"

@@ -149,7 +149,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Import from GitHub" />
+      <PageHeadingBlock pageTitle="Import from GitHub" description="Import repositories and configurations from GitHub to your account." />
     </template>
     <template #content>
       <CreateFormBlock

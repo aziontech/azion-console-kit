@@ -42,7 +42,7 @@ export const personalTokensRoutes = {
             to: '/personal-tokens'
           },
           {
-            label: 'Create Personal Token',
+            label: 'Create',
             to: '/personal-tokens/create'
           }
         ]
