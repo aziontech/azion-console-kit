@@ -146,6 +146,7 @@
             header: 'Key'
           }
         ]"
+        exportFileName="Variables"
         :empty-block="{
           title: 'No variables have been created',
           description: 'Click the button below to create your first variable.',
