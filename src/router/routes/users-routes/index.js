@@ -1,5 +1,6 @@
-import * as Helpers from '@/helpers'
 import * as UsersService from '@/services/users-services'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
+
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const usersListsRoutes = {
@@ -13,7 +14,7 @@ export const usersListsRoutes = {
       props: {
         listUsersService: UsersService.listUsersService,
         deleteUsersService: UsersService.deleteUsersService,
-        documentationService: Helpers.documentationCatalog.users
+        documentationService: documentationAccountsProducts.usersManagement
       },
       meta: {
         title: 'Users',

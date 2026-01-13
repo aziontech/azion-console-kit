@@ -1,5 +1,5 @@
-import * as Helpers from '@/helpers'
 import * as RealTimePurgeService from '@/services/real-time-purge'
+import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimePurgeRoutes = {
@@ -12,7 +12,7 @@ export const realTimePurgeRoutes = {
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
         listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
-        documentationService: Helpers.documentationCatalog.realTimePurge
+        documentationService: documentationBuildProducts.realTimePurge
       },
       meta: {
         title: 'Real-Time Purge',

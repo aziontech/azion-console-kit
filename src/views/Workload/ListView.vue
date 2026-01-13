@@ -8,7 +8,7 @@
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
-  import * as Helpers from '@/helpers'
+  import { documentationSecureProducts, documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
@@ -54,9 +54,9 @@
 
   const documentationHandler = () => {
     if (isWorkload.value) {
-      Helpers.documentationCatalog.workload()
+      documentationSecureProducts.workload()
     } else {
-      Helpers.documentationCatalog.domains()
+      documentationBuildProducts.domains()
     }
   }
 

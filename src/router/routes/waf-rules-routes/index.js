@@ -1,4 +1,5 @@
 import * as Helpers from '@/helpers'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 import * as WafRulesService from '@/services/waf-rules-services'
 import * as DomainsService from '@/services/domains-services'
 
@@ -14,7 +15,7 @@ export const wafRulesRoutes = {
       name: 'list-waf-rules',
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.waf
+        documentationService: documentationSecureProducts.wafRules
       },
       meta: {
         title: 'WAF Rules',

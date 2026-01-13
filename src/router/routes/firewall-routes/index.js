@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
@@ -11,7 +12,7 @@ export const edgeFirewallRoutes = {
       name: 'list-firewalls',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.edgeFirewall
+        documentationService: documentationSecureProducts.firewall
       },
       meta: {
         title: 'Firewall',

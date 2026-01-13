@@ -1,6 +1,5 @@
 import * as NetworkListsService from '@/services/network-lists-services'
-
-import * as Helpers from '@/helpers'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const networkListsRoutes = {
@@ -12,7 +11,7 @@ export const networkListsRoutes = {
       name: 'list-network-list',
       component: () => import('@views/NetworkLists/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.networkLists
+        documentationService: documentationSecureProducts.networkLists
       },
       meta: {
         title: 'Network Lists',

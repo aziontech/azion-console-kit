@@ -1,4 +1,5 @@
 import * as Helpers from '@/helpers'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeConnectorsRoutes = {
@@ -10,7 +11,7 @@ export const edgeConnectorsRoutes = {
       name: 'list-connectors',
       component: () => import('@views/EdgeConnectors/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.edgeConnectors,
+        documentationService: documentationSecureProducts.connectors,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
