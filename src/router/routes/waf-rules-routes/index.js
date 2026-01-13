@@ -38,7 +38,7 @@ export const wafRulesRoutes = {
             to: '/waf'
           },
           {
-            label: 'Create WAF Rule',
+            label: 'Create',
             to: '/waf/create'
           }
         ]
