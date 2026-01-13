@@ -35,7 +35,7 @@ export const customPagesRoutes = {
             to: '/custom-pages'
           },
           {
-            label: 'Create Page',
+            label: 'Create',
             to: '/custom-pages/create'
           }
         ],

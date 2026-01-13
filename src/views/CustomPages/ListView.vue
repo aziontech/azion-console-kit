@@ -109,7 +109,7 @@
 <template>
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Custom Pages">
+      <PageHeadingBlock pageTitle="Custom Pages" description="Define custom response pages returned by Workloads when specific criteria are met.">
         <template #default>
           <PrimeButton
             size="small"
@@ -146,8 +146,8 @@
         exportFileName="Custom Pages"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No custom pages have been created',
-          description: 'Click the button below to create your first custom page.',
+          title: 'No Custom Pages yet.',
+          description: 'Create your first custom page to control responses for defined conditions.',
           createPagePath: '/custom-pages/create',
           createButtonLabel: 'Custom Page',
           documentationService: props.documentationService
