@@ -81,8 +81,7 @@ export const documentationSecureProducts = {
   firewall: () => openDocumentationProducts('secure/firewall/'),
   customPages: () => openDocumentationProducts('secure/custom-pages/'),
   networkLists: () => openDocumentationProducts('secure/edge-firewall/network-layer-protection/network-lists/'),
-  wafRules: () => openDocumentationProducts('secure/firewall/web-application-firewall/'),
-  customPages: () => openDocumentationProducts('secure/custom-pages/'),
+  wafRules: () => openDocumentationProducts('secure/firewall/web-application-firewall/')
 }
 
 export const documentationBuildProducts = {
