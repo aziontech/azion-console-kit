@@ -119,7 +119,7 @@
         hideLastModifiedColumn
         :emptyBlock="{
           title: 'No Team Permissions yet',
-          description: 'Create your first team to define and assign permissions to users.',
+        description: 'Create your first team to define and assign permissions to users.',
           createButtonLabel: 'Team',
           createPagePath: 'teams-permission/create',
           documentationService: documentationService
