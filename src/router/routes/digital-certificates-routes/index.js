@@ -51,8 +51,9 @@ export const digitalCertificatesRoutes = {
           {
             to: '/digital-certificates',
             baseLabel: 'label',
-            label: 'Digital Certificate',
+            label: 'Server Certificate',
             typeMapping: certificateTypeMapping,
+            queryParam: 'certificate',
             dynamic: true
           },
           {
@@ -85,7 +86,8 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates',
             baseLabel: 'label',
             typeMapping: certificateTypeMapping,
-            label: 'Digital Certificate',
+            queryParam: 'certificate',
+            label: 'Server Certificate',
             dynamic: true
           },
           {
