@@ -111,13 +111,6 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Custom Pages" description="Define custom response pages returned by Workloads when specific criteria are met.">
         <template #default>
-          <PrimeButton
-            size="small"
-            link
-            @click="navigateToGetHelp"
-          >
-            Get Help
-          </PrimeButton>
           <DataTableActionsButtons
             size="small"
             label="Custom Page"

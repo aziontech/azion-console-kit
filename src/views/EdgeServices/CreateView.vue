@@ -74,7 +74,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Service"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Edge Service" description="Configure variables and resources to orchestrate to your Edge Node."></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

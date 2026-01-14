@@ -145,12 +145,12 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Services"
-        description="Define and manage lists of IP addresses and CIDR ranges used by security and traffic controls."
+        description="Manage reusable variables and resources that are orchestrated to your Edge Nodes."
       >
         <template #default>
           <DataTableActionsButtons
             size="small"
-            label="Service"
+            label="Edge Service"
             @click="handleTrackEventGoToCreate"
             createPagePath="edge-services/create"
             data-testid="create_Service_button"
@@ -174,8 +174,8 @@
         :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No Edge Services yet',
-          description: 'Create your first network list to control traffic and security behavior.',
-          createButtonLabel: 'Service',
+          description: 'Create your first service to orchestrate variables and resources to your Edge Nodes.',
+          createButtonLabel: 'Edge Service',
           createPagePath: 'edge-services/create',
           documentationService: documentationService
         }"
