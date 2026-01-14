@@ -173,7 +173,7 @@
     getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
   )
   const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.pluralLabel} yet`
+    () => `No ${handleTextDomainWorkload.pluralTitle} yet`
   )
   const descriptionEmptyPage = computed(
     () => isWorkload.value ? 
@@ -225,6 +225,7 @@
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,
+          createPagePath: 'workloads/create',
           createButtonLabel: handleTextDomainWorkload.singularTitle,
           documentationService: documentationHandler
         }"

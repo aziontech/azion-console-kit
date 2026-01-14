@@ -150,7 +150,7 @@
         :allowedFilters="getFilters"
         :emptyBlock="{
           title: 'No DNS Zones yet',
-          description: 'Create your first DNS zone to host authoritative records and control domain name resolution.',
+          description: 'Configure DNS records and zone settings used for authoritative domain resolution.',
           createButtonLabel: 'Zone',
           createPagePath: 'edge-dns/create',
           documentationService: documentationService

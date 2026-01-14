@@ -18,7 +18,7 @@ export const edgeFirewallRoutes = {
         title: 'Firewall',
         breadCrumbs: [
           {
-            label: 'Firewall',
+            label: 'Firewalls',
             to: '/firewalls'
           }
         ]
