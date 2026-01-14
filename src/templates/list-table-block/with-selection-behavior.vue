@@ -78,7 +78,7 @@
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
-              @click="editItemSelected(rowData)"
+              @click="!disableEditOnClick && editItemSelected($event, rowData)"
               :data-testid="`list-table-block__column__${col.field}__row`"
             >
               {{ rowData[col.field] }}
@@ -86,7 +86,7 @@
           </template>
           <template v-else>
             <component
-              @click="editItemSelected(rowData)"
+              @click="!disableEditOnClick && editItemSelected($event, rowData)"
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
@@ -157,6 +157,10 @@
     disabledList: {
       type: Boolean
     },
+    disableEditOnClick: {
+      type: Boolean,
+      default: false
+    },
     hiddenHeader: {
       type: Boolean
     },
@@ -201,6 +205,12 @@
     selectedItensData: {
       type: Array,
       default: () => []
+    },
+    exportFileName: {
+      type: String
+    },
+    csvMapper: {
+      type: Function
     },
     pt: {
       type: Object,

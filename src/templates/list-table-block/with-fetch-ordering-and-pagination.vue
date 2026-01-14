@@ -297,7 +297,7 @@
                       v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                       data-testid="data-table-actions-column-header-refresh"
                     />
-                    <DataTable.Export @export="handleExportTableDataToCSV($event)" />
+                    <DataTable.Export @export="handleExportTableDataToCSV(exportFileName)" />
                     <DataTableColumnSelector
                       :columns="columns"
                       v-model:selectedColumns="selectedColumns"

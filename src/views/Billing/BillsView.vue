@@ -206,6 +206,7 @@
     @on-before-go-to-edit="goToEnvoiceDetails"
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
+    exportFileName="Payment History"
   />
 
   <EmptyResultsBlock
