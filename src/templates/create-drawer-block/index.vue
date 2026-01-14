@@ -214,8 +214,6 @@
       </template>
 
       <div class="flex w-full">
-        {{ errors }}
-
         <form
           @submit.prevent="handleSubmit"
           class="pb-16 w-full space-y-8"
