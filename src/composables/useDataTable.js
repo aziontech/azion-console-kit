@@ -342,7 +342,30 @@ export function useDataTable(props, emit) {
   const buildFilterParams = () => {
     const filterParams = {}
     appliedFilters.value.forEach((filter) => {
-      filterParams[filter.field] = filter.value
+      let fieldName = filter.field
+
+      if (fieldName === 'lastmodified') {
+        fieldName = 'last_modified'
+      }
+
+      if (
+        typeof filter.value === 'object' &&
+        filter.value !== null &&
+        filter.value.operator === 'range'
+      ) {
+        if (filter.value.value?.start) {
+          const key = `${fieldName}__gte`
+          filterParams[key] = filter.value.value.start
+        }
+        if (filter.value.value?.end) {
+          const key = `${fieldName}__lte`
+          filterParams[key] = filter.value.value.end
+        }
+      } else if (Array.isArray(filter.value)) {
+        filterParams[fieldName] = filter.value.join(',')
+      } else {
+        filterParams[fieldName] = filter.value
+      }
     })
     if (appliedFilters.value.length > 0) {
       filterParams.hasFilter = true
@@ -386,6 +409,7 @@ export function useDataTable(props, emit) {
       }
 
       const filterParams = buildFilterParams()
+
       const firstPage = 1
       firstItemIndex.value = firstPage
 

@@ -1,8 +1,7 @@
 <script setup>
-  import { ref, watch } from 'vue'
   import InputText from 'primevue/inputtext'
 
-  const props = defineProps({
+  defineProps({
     modelValue: {
       type: String,
       default: ''
@@ -11,28 +10,10 @@
 
   const emit = defineEmits(['update:modelValue', 'validation'])
 
-  const emailError = ref(false)
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
-
   const handleInput = (value) => {
     emit('update:modelValue', value)
     emit('validation', true)
   }
-
-  watch(
-    () => props.modelValue,
-    (newValue) => {
-      if (!newValue) {
-        emailError.value = false
-      }
-    }
-  )
-
-  defineExpose({ validateEmail, emailError })
 </script>
 
 <template>
@@ -40,16 +21,9 @@
     <InputText
       :modelValue="modelValue"
       @update:modelValue="handleInput"
-      placeholder="Enter email"
-      type="email"
+      placeholder="Search by email"
+      type="text"
       class="w-full"
-      :class="{ 'p-invalid': emailError }"
     />
-    <small
-      v-if="emailError"
-      class="text-red-500"
-    >
-      Please enter a valid email address
-    </small>
   </div>
 </template>

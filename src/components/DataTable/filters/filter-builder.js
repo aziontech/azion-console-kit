@@ -2,6 +2,8 @@ import { h } from 'vue'
 import DropdownFilterField from './dropdown-filter-field.vue'
 import EmailFilterField from './email-filter-field.vue'
 import TextFilterField from './text-filter-field.vue'
+import DateTimeRangeWrapper from './date-time-range-wrapper.vue'
+import MultiValueFilterField from './multi-value-filter-field.vue'
 
 const STATUS_OPTIONS = [
   { label: 'Active', value: true },
@@ -46,6 +48,12 @@ export const filterBuilder = ({ filterKey, filterHeader, filterValue, onUpdate, 
   const normalizedHeader = String(filterHeader || '').toLowerCase()
 
   switch (normalizedKey) {
+    case 'id':
+      return h(MultiValueFilterField, {
+        modelValue: filterValue,
+        'onUpdate:modelValue': onUpdate,
+        placeholder: 'Enter values (comma or Enter to separate)'
+      })
     case 'active':
     case 'status':
       return h(DropdownFilterField, {
@@ -85,7 +93,13 @@ export const filterBuilder = ({ filterKey, filterHeader, filterValue, onUpdate, 
         options: isCertificate ? CERTIFICATE_TYPE_OPTIONS : DATA_TYPES_OPTIONS,
         placeholder: 'Select type'
       })
-
+    case 'last_modified':
+    case 'lastmodified':
+      return h(DateTimeRangeWrapper, {
+        modelValue: filterValue,
+        'onUpdate:modelValue': onUpdate,
+        onValidation: onValidation
+      })
     default:
       return h(TextFilterField, {
         modelValue: filterValue,
