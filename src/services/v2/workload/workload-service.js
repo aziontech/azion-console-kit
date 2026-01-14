@@ -247,17 +247,14 @@ export class WorkloadService extends BaseService {
     return false
   }
 
-  #getWildcardBaseDomains = (subjctName) => {
-    const names = Array.isArray(subjctName) ? subjctName : [subjctName]
-
-    return names
-      .filter((name) => typeof name === 'string')
-      .map((name) => name.trim())
-      .filter((name) => name.startsWith('*'))
-      .map((name) => name.replace(/^\*\.?/, ''))
-      .map((name) => name.replace(/^\.+/, ''))
-      .filter((name) => name.length > 0)
-  }
+  #getWildcardBaseDomains = (subjectName) =>
+    (Array.isArray(subjectName) ? subjectName : [subjectName]).reduce((acc, name) => {
+      if (typeof name === 'string') {
+        const domain = name.trim().slice(1).replace(/^\.+/, '')
+        if (name.trim().startsWith('*') && domain) acc.push(domain)
+      }
+      return acc
+    }, [])
 
   #hostnameIsSubdomainOf = (hostname, baseDomain) => {
     if (typeof hostname !== 'string' || typeof baseDomain !== 'string') return false
