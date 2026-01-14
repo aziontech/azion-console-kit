@@ -18,7 +18,7 @@ export const edgeNodeRoutes = {
         documentationService: documentationDeployProducts.edgeNode
       },
       meta: {
-        title: 'Edge Node',
+        title: 'Edge Nodes',
         breadCrumbs: [
           {
             label: 'Edge Node',

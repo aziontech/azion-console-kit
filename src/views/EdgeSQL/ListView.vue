@@ -265,7 +265,7 @@
         :emptyBlock="{
           title: 'No SQL Databases yet',
           description: 'Create your first database to store relational data and run SQL queries.',
-          createButtonLabel: 'Database',
+          createButtonLabel: 'SQL Database',
           createPagePath: '/sql-database/create',
           documentationService: Helpers.documentationGuideProducts.edgeSQL
         }"

@@ -20,7 +20,11 @@ export const edgeStorageRoutes = {
           {
             label: 'Object Storage',
             to: '/object-storage'
-          }
+          },
+          {
+            label: 'Buckets',
+            to: '/object-storage'
+          },
         ]
       }
     },
@@ -35,7 +39,7 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Bucket',
+            label: 'Buckets',
             to: '/object-storage'
           },
           {
@@ -57,7 +61,7 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Bucket',
+            label: 'Buckets',
             to: '/object-storage'
           },
           {
@@ -78,7 +82,11 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Edit Bucket',
+            label: 'Buckets',
+            to: '/object-storage'
+          },
+          {
+            label: 'Buckets',
             to: '/object-storage/:id',
             dynamic: true,
             routeParam: 'id'
