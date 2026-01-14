@@ -529,6 +529,7 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     hiddenHeader
+    exportFileName="WAF Rules Tuning"
     :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
   />
 

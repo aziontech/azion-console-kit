@@ -384,6 +384,9 @@
           icon: 'ai ai-layers'
         }
       ]
+    },
+    exportFileName: {
+      type: String
     }
   })
 
