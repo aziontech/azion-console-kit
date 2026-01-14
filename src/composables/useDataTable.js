@@ -410,8 +410,7 @@ export function useDataTable(props, emit) {
 
       const filterParams = buildFilterParams()
 
-      const firstPage = 1
-      firstItemIndex.value = firstPage
+      firstItemIndex.value = 0
 
       const success = await reload(filterParams)
 
@@ -439,8 +438,7 @@ export function useDataTable(props, emit) {
     }
 
     const filterParams = buildFilterParams()
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    firstItemIndex.value = 0
     reload(filterParams)
   }
 
