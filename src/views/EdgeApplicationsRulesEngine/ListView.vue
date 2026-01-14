@@ -116,11 +116,13 @@
       {
         field: 'lastEditor',
         header: 'Last Editor',
+        filterPath: 'last_editor',
         disableSort: true
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
+        filterPath: 'last_modified',
         disableSort: true
       }
     ]

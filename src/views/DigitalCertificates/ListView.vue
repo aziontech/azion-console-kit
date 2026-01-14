@@ -178,7 +178,7 @@
           field: 'lastModified',
           header: 'Last Modified',
           sortField: 'lastModified',
-          filterPath: 'lastModified'
+          filterPath: 'last_modified'
         }
       ]
     }
@@ -277,7 +277,7 @@
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified'
+        filterPath: 'last_modified'
       }
     ]
   })

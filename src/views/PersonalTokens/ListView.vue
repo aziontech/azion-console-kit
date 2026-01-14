@@ -100,7 +100,7 @@
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified'
+      filterPath: 'last_modified'
     }
   ])
 

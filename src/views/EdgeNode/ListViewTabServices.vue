@@ -43,11 +43,13 @@
     },
     {
       field: 'lastEditor',
-      header: 'Last Editor'
+      header: 'Last Editor',
+      filterPath: 'last_editor'
     },
     {
       field: 'lastModified',
-      header: 'Last Modified'
+      header: 'Last Modified',
+      filterPath: 'last_modified'
     }
   ])
 

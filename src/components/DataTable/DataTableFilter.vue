@@ -57,7 +57,23 @@
     isEmailValid.value = true
   }
 
+  const initializeDefaultFilter = () => {
+    const lastModifiedOption = filterOptions.value.find(
+      (opt) => opt.value === 'last_modified' || opt.value === 'lastmodified'
+    )
+    const nameOption = filterOptions.value.find((opt) => opt.value === 'name')
+
+    if (lastModifiedOption) {
+      selectedField.value = lastModifiedOption.value
+    } else if (nameOption) {
+      selectedField.value = nameOption.value
+    }
+  }
+
   const toggle = (event) => {
+    if (!selectedField.value) {
+      initializeDefaultFilter()
+    }
     overlayPanel.value.toggle(event)
   }
 
@@ -132,7 +148,7 @@
       @keydown="handleKeyDown"
     >
       <div
-        class="flex items-center justify-between px-6 py-4 border-b border-[var(--surface-border)]"
+        class="flex items-center justify-between px-6 py-2 border-b border-[var(--surface-border)]"
       >
         <h3 class="text-lg font-semibold">Filter</h3>
         <PrimeButton
@@ -180,7 +196,7 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-end gap-2 px-6 py-4 border-t border-[var(--surface-border)]">
+      <div class="flex justify-end gap-2 px-6 py-2 border-t border-[var(--surface-border)]">
         <PrimeButton
           label="Cancel"
           outlined

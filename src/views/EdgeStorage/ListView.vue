@@ -218,6 +218,7 @@
     },
     {
       field: 'lastModified',
+      filterPath: 'last_modified',
       header: 'Last Modified'
     }
   ]
