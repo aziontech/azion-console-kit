@@ -12,7 +12,7 @@ export const groupsManagementRoutes = {
       name: 'list-groups-management',
       component: () => import('@views/GroupsManagement/ListView.vue'),
       props: {
-        documentationService: documentationAccountsProducts
+        documentationService: documentationAccountsProducts.accounts
       },
       meta: {
         title: 'Groups Management',

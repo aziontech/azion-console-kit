@@ -11,10 +11,10 @@ export const resellerManagementRoutes = {
       name: 'list-reseller-management',
       component: () => import('@views/ResellersManagement/ListView.vue'),
       meta: {
-        title: 'Reseller Management',
+        title: 'Resellers Management',
         breadCrumbs: [
           {
-            label: 'Reseller Management',
+            label: 'Resellers Management',
             to: '/reseller/management'
           }
         ]

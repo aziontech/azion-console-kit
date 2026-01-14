@@ -49,7 +49,7 @@
       <PageHeadingBlock
         pageTitle="Azion Copilot"
         data-testid="Copilot-heading"
-        class="px-8 pt-4"
+        class="px-8 pt-8 mb-4"
         :isRightAlignment="true"
         :tag="tagProps"
         description="Provide AI-assisted insights and guidance across Azion’s products."

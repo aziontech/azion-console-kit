@@ -31,7 +31,9 @@
           title: 'No Personal Tokens yet',
           description: 'Create your first Personal Token to securely access your account via API.',
           documentationService: props.documentationService,
-          emptyListMessage: 'No personal tokens found.'
+          emptyListMessage: 'No personal tokens found.',
+          createPagePath: 'personal-tokens/create',
+          createButtonLabel: 'Personal Token',
         }"
       />
     </template>

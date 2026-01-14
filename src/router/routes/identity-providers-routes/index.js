@@ -1,5 +1,6 @@
 import * as idpService from '@/services/identity-providers-services'
 import { useAccountStore } from '@/stores/account'
+import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
 
 function checkSSOAccess(to, from, next) {
   const accountStore = useAccountStore()
@@ -20,6 +21,9 @@ export const identityProvidersRoutes = {
       path: '',
       name: 'list-identity-providers',
       component: () => import('@views/IdentityProviders/ListView.vue'),
+      props: {
+        documentationService: documentationGuideProducts.sso
+      },
       beforeEnter: checkSSOAccess,
       meta: {
         title: 'SSO Management',

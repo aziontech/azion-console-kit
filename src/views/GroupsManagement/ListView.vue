@@ -103,7 +103,8 @@
           title: 'No groups yet',
           description: 'Create your first group to manage permissions for resource access.',
           createButtonLabel: 'Group',
-          createPagePath: 'management/create'
+          createPagePath: 'management/create',
+          documentationService: documentationService
         }"
       />
     </template>

@@ -87,7 +87,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Credentials"
-        description="Define and manage credentials used to access Azion's Object Storage."
+        description="Define and manage credentials used to access Azion's resources."
         data-testid="credentials-heading"
       />
     </template>
