@@ -30,7 +30,7 @@
       name: credentialData.name,
       capabilities: credentialData.capabilities,
       expiration_date: credentialData.expirationDate,
-      bucket: selectedBucket.value.name
+      bucket: [selectedBucket.value.name]
     }
     const result = await edgeStorageService.createCredential(body)
     return result
@@ -60,6 +60,10 @@
       type: 'delete',
       title: 'credential',
       icon: 'pi pi-trash',
+      warningMessage:
+        "This credential affect all buckets. Once confirmed, this action can't be reversed. ",
+      description:
+        'The selected credential will be deleted. Check the Help Center for more details.',
       service: (credentialId) => edgeStorageService.deleteCredential(credentialId)
     }
   ]
@@ -71,17 +75,19 @@
     },
     {
       field: 'accessKey',
-      header: 'Access Key'
+      header: 'Access Key',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
+      }
     },
     {
       field: 'capabilities',
       header: 'Capabilities',
       type: 'component',
+      style: 'max-width: 300px',
       component: (columnData) => {
-        return columnBuilder({
-          data: { value: columnData },
-          columnAppearance: 'expand-text-column'
-        })
+        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     },
     {
@@ -99,10 +105,10 @@
       filterPath: 'last_editor'
     },
     {
-      field: 'lastModified',
+      field: 'lastModify',
       header: 'Last Modified',
-      sortField: 'lastModified',
-      filterPath: 'lastModified'
+      sortField: 'lastModify',
+      filterPath: 'lastModify'
     }
   ]
 
@@ -118,7 +124,8 @@
   const initialValues = {
     name: '',
     capabilities: [],
-    expirationDate: null
+    expirationDate: null,
+    bucket: []
   }
 
   defineExpose({

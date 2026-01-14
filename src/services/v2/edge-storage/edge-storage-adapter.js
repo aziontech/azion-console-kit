@@ -62,11 +62,23 @@ export const EdgeStorageAdapter = {
       ),
       createDate: formatDateToDayMonthYearHour(credential.last_modified),
       expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
-      bucket: credential.buckets[0]
+      bucket: credential.buckets,
+      lastEditor: credential.last_editor,
+      lastModify: convertToRelativeTime(credential.last_modified)
     }))
+
     return {
       count,
       body: adaptParsed
+    }
+  },
+
+  transformCreateEdgeStorageBucket(data) {
+    return {
+      name: data.name,
+      capabilities: data.capabilities,
+      expiration_date: data.expirationDate,
+      buckets: data.bucket[0] === '__ALL_BUCKETS__' ? null : data.bucket
     }
   }
 }

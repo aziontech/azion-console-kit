@@ -549,6 +549,14 @@
                 title: action.title,
                 id: rowData.id,
                 data: rowData,
+                description:
+                  typeof action.description === 'function'
+                    ? action.description(rowData)
+                    : action.description,
+                warningMessage:
+                  typeof action.warningMessage === 'function'
+                    ? action.warningMessage(rowData)
+                    : action.warningMessage,
                 deleteService: action.service,
                 deleteConfirmationText: undefined,
                 closeCallback: (opt) => {

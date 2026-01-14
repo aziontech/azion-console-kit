@@ -21,7 +21,7 @@
           :closable="false"
           data-testid="delete-dialog-warning-message"
         >
-          Once confirmed, this action can't be reversed.
+          {{ warningMessage }}
         </Message>
 
         <p
@@ -171,6 +171,10 @@
     resetForm()
     dialogRef.value.close({ updated: false })
   }
+
+  const warningMessage = computed(() => {
+    return data.warningMessage || "Once confirmed, this action can't be reversed."
+  })
 
   const getLoadingIcon = computed(() => {
     return loading.value ? 'pi pi-spin pi-spinner' : ''

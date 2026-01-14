@@ -234,8 +234,16 @@ export function useDataTable(props, emit) {
                 title: action.title,
                 id: rowData.id,
                 data: rowData,
+                description:
+                  typeof action.description === 'function'
+                    ? action.description(rowData)
+                    : action.description,
                 deleteService: action.service,
                 deleteConfirmationText: undefined,
+                warningMessage:
+                  typeof action.warningMessage === 'function'
+                    ? action.warningMessage(rowData)
+                    : action.warningMessage,
                 closeCallback: (opt) => {
                   if (opt.data.updated) {
                     reload()

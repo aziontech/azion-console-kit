@@ -5,7 +5,9 @@
   import { ref } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
+  import CopyCredentialDialog from '@/views/EdgeStorage/Dialog/CopyCredentialDialog.vue'
 
   defineOptions({
     name: 'credential-drawer'
@@ -13,6 +15,7 @@
 
   const emit = defineEmits(['onSuccess'])
   const toast = useToast()
+  const dialog = useDialog()
 
   const validationSchema = yup.object({
     name: yup
@@ -20,7 +23,7 @@
       .label('Name')
       .required()
       .matches(/^[a-zA-Z0-9-]+$/, 'Name must contain only letters, numbers, and hyphens'),
-    bucket: yup.string().label('Bucket').required(),
+    bucket: yup.array().label('Bucket').min(1, 'At least one bucket is required'),
     capabilities: yup.array().label('Capabilities').min(1, 'At least one capability is required'),
     expirationDate: yup.date().label('Expiration Date').required()
   })
@@ -32,7 +35,7 @@
 
   const initialValues = {
     name: '',
-    bucket: '',
+    bucket: ['__ALL_BUCKETS__'],
     capabilities: [],
     expirationDate: null
   }
@@ -52,8 +55,22 @@
       detail: `Credential "${credentialResponse.data.name}" has been created successfully`,
       life: 5000
     })
-    emit('onSuccess')
     closeCreateDrawer()
+
+    dialog.open(CopyCredentialDialog, {
+      props: {
+        header: 'Credential has been created',
+        modal: true,
+        blockScroll: true,
+        style: { width: '32rem' }
+      },
+      data: {
+        credential: credentialResponse.data
+      },
+      onClose: () => {
+        emit('onSuccess')
+      }
+    })
   }
 
   defineExpose({
