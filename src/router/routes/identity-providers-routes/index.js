@@ -21,9 +21,6 @@ export const identityProvidersRoutes = {
       path: '',
       name: 'list-identity-providers',
       component: () => import('@views/IdentityProviders/ListView.vue'),
-      props: {
-        documentationService: documentationGuideProducts.sso
-      },
       beforeEnter: checkSSOAccess,
       meta: {
         title: 'SSO Management',
@@ -35,6 +32,7 @@ export const identityProvidersRoutes = {
         ]
       },
       props: {
+        documentationService: documentationGuideProducts.sso,
         listIdentityProvidersService: idpService.listIdentityProvidersService,
         deleteSAMLIdentityProviderService: idpService.deleteSAMLIdentityProviderService,
         deleteOIDCIdentityProviderService: idpService.deleteOIDCIdentityProviderService,

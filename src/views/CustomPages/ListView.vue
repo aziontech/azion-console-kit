@@ -6,7 +6,6 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
   import { DataTableActionsButtons } from '@/components/DataTable'
-  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

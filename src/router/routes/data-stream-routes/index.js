@@ -1,4 +1,3 @@
-import * as Helpers from '@/helpers'
 import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
 import { useAccountStore } from '@/stores/account'
 import { documentationObserveProducts } from '@/helpers/azion-documentation-catalog'
