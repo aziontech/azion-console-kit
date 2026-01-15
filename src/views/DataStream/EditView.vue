@@ -52,7 +52,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="streamName" description="Configure data sources, delivery destinations, and delivery behavior for event and log data." />
+      <PageHeadingBlock
+        :pageTitle="streamName"
+        description="Configure data sources, delivery destinations, and delivery behavior for event and log data."
+      />
     </template>
     <template #content>
       <EditFormBlock

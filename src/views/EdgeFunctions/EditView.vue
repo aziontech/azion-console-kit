@@ -99,7 +99,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="name" description="Configure function code, triggers, and execution settings.">
+      <PageHeadingBlock
+        :pageTitle="name"
+        description="Configure function code, triggers, and execution settings."
+      >
         <MobileCodePreview
           :updateObject="updateObject"
           :runtime="runtime"

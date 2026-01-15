@@ -18,14 +18,14 @@ export const useBreadcrumbs = defineStore({
 
           if (paramValue && item.typeMapping && item.typeMapping[paramValue]) {
             const mappedValue = item.typeMapping[paramValue][item.baseLabel]
-            
+
             if (mappedValue) {
               return {
                 ...item,
                 label: mappedValue
               }
             }
-            
+
             const routeType = item.baseLabel.toLowerCase().includes('create') ? 'create' : 'edit'
             return {
               ...item,

@@ -411,7 +411,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="edgeDNSName" description="Configure DNS records and zone settings used for authoritative domain resolution." />
+      <PageHeadingBlock
+        :pageTitle="edgeDNSName"
+        description="Configure DNS records and zone settings used for authoritative domain resolution."
+      />
     </template>
     <template #content>
       <div class="flex align-center justify-between relative">

@@ -4,12 +4,15 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import * as Helpers from '@/helpers';
+  import * as Helpers from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
-  import { documentationSecureProducts, documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
+  import {
+    documentationSecureProducts,
+    documentationBuildProducts
+  } from '@/helpers/azion-documentation-catalog'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
@@ -173,13 +176,11 @@
   const allowedFilters = computed(() =>
     getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
   )
-  const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.pluralTitle} yet`
-  )
-  const descriptionEmptyPage = computed(
-    () => isWorkload.value ? 
-    `Create your first Workload to configure domains, protocols, security, and application execution for incoming traffic.` : 
-    `Create your first Domain to configure firewalls and applications execution for incoming traffic.`
+  const titleEmptyPage = computed(() => `No ${handleTextDomainWorkload.pluralTitle} yet`)
+  const descriptionEmptyPage = computed(() =>
+    isWorkload.value
+      ? `Create your first Workload to configure domains, protocols, security, and application execution for incoming traffic.`
+      : `Create your first Domain to configure firewalls and applications execution for incoming traffic.`
   )
 
   const pageDescription = computed(() => {

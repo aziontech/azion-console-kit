@@ -24,7 +24,7 @@ export const edgeStorageRoutes = {
           {
             label: 'Buckets',
             to: '/object-storage'
-          },
+          }
         ]
       }
     },

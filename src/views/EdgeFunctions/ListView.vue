@@ -204,7 +204,8 @@
         :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Functions yet',
-          description: 'Create your first function to execute code at Azion\'s global infrastructure.',
+          description:
+            'Create your first function to execute code at Azion\'s global infrastructure.',
           createButtonLabel: 'Function',
           createPagePath: 'functions/create?origin=list',
           documentationService: documentationService

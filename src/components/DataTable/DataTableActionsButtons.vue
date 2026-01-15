@@ -75,7 +75,7 @@
     otherActions: {
       type: Boolean,
       default: false
-    },
+    }
   })
 
   const emit = defineEmits(['click', 'other-actions'])

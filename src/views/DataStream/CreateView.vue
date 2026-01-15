@@ -44,7 +44,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Stream" description="Configure data sources, delivery destinations, and delivery behavior for event and log data." />
+      <PageHeadingBlock
+        pageTitle="Create Stream"
+        description="Configure data sources, delivery destinations, and delivery behavior for event and log data."
+      />
     </template>
     <template #content>
       <CreateFormBlock

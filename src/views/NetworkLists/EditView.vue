@@ -89,7 +89,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="networkListName" description="Configure IP addresses and ranges used by security rules."></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="networkListName"
+        description="Configure IP addresses and ranges used by security rules."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

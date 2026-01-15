@@ -77,7 +77,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Resellers" description="Manage reseller accounts and configurations.">
+      <PageHeadingBlock
+        pageTitle="Resellers"
+        description="Manage reseller accounts and configurations."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"

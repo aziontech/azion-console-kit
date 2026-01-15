@@ -172,7 +172,8 @@
         :allowedFilters="getColumns"
         :emptyBlock="{
           title: 'No Applications yet',
-          description: 'Create your first application to define how requests are processed, routed, and handled.',
+          description:
+            'Create your first application to define how requests are processed, routed, and handled.',
           createButtonLabel: 'Application',
           createPagePath: '/applications/create?origin=list',
           documentationService: props.documentationService,

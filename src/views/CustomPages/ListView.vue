@@ -108,7 +108,10 @@
 <template>
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Custom Pages" description="Define custom response pages returned by Workloads when specific criteria are met.">
+      <PageHeadingBlock
+        pageTitle="Custom Pages"
+        description="Define custom response pages returned by Workloads when specific criteria are met."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"

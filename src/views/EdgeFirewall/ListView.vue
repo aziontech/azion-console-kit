@@ -150,7 +150,8 @@
         :allowedFilters="getColumns"
         :emptyBlock="{
           title: 'No Firewalls yet',
-          description: 'Create your first firewall to define security modules and enforcement behavior for incoming traffic.',
+          description:
+            'Create your first firewall to define security modules and enforcement behavior for incoming traffic.',
           createButtonLabel: 'Firewall',
           createPagePath: '/firewalls/create',
           documentationService: documentationService

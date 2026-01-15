@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="domainName" description="Configure domains, certificates, and select the security and application settings executed by this Domain."></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="domainName"
+        description="Configure domains, certificates, and select the security and application settings executed by this Domain."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

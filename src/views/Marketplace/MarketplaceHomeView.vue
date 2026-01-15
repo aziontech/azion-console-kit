@@ -9,7 +9,8 @@
             Accelerate your workflow with Azion Marketplace
           </div>
           <div class="text-sm sm:text-xl text-color-secondary">
-            Take advantage of templates, libraries, and integrations to build and compose modern workloads.
+            Take advantage of templates, libraries, and integrations to build and compose modern
+            workloads.
           </div>
         </div>
       </div>

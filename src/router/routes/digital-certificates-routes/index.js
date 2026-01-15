@@ -15,7 +15,7 @@ const certificateTypeMapping = {
     label: 'Server Certificate',
     create: 'Create',
     edit: 'Edit'
-  },
+  }
 }
 
 /** @type {import('vue-router').RouteRecordRaw} */

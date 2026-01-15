@@ -1,7 +1,6 @@
 import * as UsersService from '@/services/users-services'
 import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const usersListsRoutes = {
   path: '/users',

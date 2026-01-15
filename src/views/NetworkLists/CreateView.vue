@@ -87,7 +87,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Network List" description="Configure IP addresses and ranges used by security rules."></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Network List"
+        description="Configure IP addresses and ranges used by security rules."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

@@ -78,7 +78,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Groups" description="Manage groups and assign permissions for resource access.">
+      <PageHeadingBlock
+        pageTitle="Groups"
+        description="Manage groups and assign permissions for resource access."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Client Management" description="Manage client accounts and their configurations.">
+      <PageHeadingBlock
+        pageTitle="Client Management"
+        description="Manage client accounts and their configurations."
+      >
         <template #default>
           <div class="flex justify-between gap-2 w-full">
             <div class="flex gap-2">

@@ -65,13 +65,13 @@ export const documentationGuideProducts = {
   customPages: () => openDocumentationProducts('guides/customizing-error-response-page'),
   edgeStorage: () => openDocumentationProducts('store/edge-storage'),
   edgeSQL: () => openDocumentationProducts('store/edge-sql'),
-  sso: () => openDocumentationProducts('guides/sso/'),
+  sso: () => openDocumentationProducts('guides/sso/')
 }
 
 export const documentationStoreProducts = {
   bucket: () => openDocumentationProducts('store/storage/create-bucket/'),
   objectStorage: () => openDocumentationProducts('store/object-storage/'),
-  sqlDatabase: () => openDocumentationProducts('store/sql-database/'),
+  sqlDatabase: () => openDocumentationProducts('store/sql-database/')
 }
 
 export const documentationSecureProducts = {
@@ -80,7 +80,8 @@ export const documentationSecureProducts = {
   edgeDNS: () => openDocumentationProducts('secure/edge-dns/'),
   firewall: () => openDocumentationProducts('secure/firewall/'),
   customPages: () => openDocumentationProducts('secure/custom-pages/'),
-  networkLists: () => openDocumentationProducts('secure/edge-firewall/network-layer-protection/network-lists/'),
+  networkLists: () =>
+    openDocumentationProducts('secure/edge-firewall/network-layer-protection/network-lists/'),
   wafRules: () => openDocumentationProducts('secure/firewall/web-application-firewall/')
 }
 
@@ -88,7 +89,7 @@ export const documentationBuildProducts = {
   domains: () => openDocumentationProducts('build/applications/domains'),
   applications: () => openDocumentationProducts('build/applications'),
   realTimePurge: () => openDocumentationProducts('build/applications/real-time-purge'),
-  certificateManager: () => openDocumentationProducts('build/applications/certificate-manager'),
+  certificateManager: () => openDocumentationProducts('build/applications/certificate-manager')
 }
 
 export const documentationAccountsProducts = {
@@ -97,12 +98,12 @@ export const documentationAccountsProducts = {
   billing: () => openDocumentationProducts('accounts/billing-and-subscriptions/'),
   teamPermissions: () => openDocumentationProducts('accounts/teams-permissions/'),
   personalTokens: () => openDocumentationProducts('accounts/personal-tokens/'),
-  mfaManagement: () => openDocumentationProducts('accounts/multi-factor-authentication/'),
+  mfaManagement: () => openDocumentationProducts('accounts/multi-factor-authentication/')
 }
 
 export const documentationDeployProducts = {
   edgeNode: () => openDocumentationProducts('deploy/orchestrator/edge-node/'),
-  edgeServices: () => openDocumentationProducts('deploy/orchestrator/edge-services/'),
+  edgeServices: () => openDocumentationProducts('deploy/orchestrator/edge-services/')
 }
 
 export const documentationObserveProducts = {

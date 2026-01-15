@@ -73,7 +73,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Variables" description="Configure variable names, values, and settings for use across Azion’s products." />
+      <PageHeadingBlock
+        pageTitle="Create Variables"
+        description="Configure variable names, values, and settings for use across Azion’s products."
+      />
     </template>
     <template #content>
       <CreateFormBlock

@@ -139,8 +139,7 @@
         defaultOrderingFieldName="-last_modified"
         :emptyBlock="{
           title: 'No Network Lists yet',
-          description:
-            'Create your first network list to control traffic and security behavior.',
+          description: 'Create your first network list to control traffic and security behavior.',
           createButtonLabel: 'Network List',
           createPagePath: 'network-lists/create',
           documentationService: documentationService

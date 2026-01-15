@@ -123,7 +123,7 @@
             label="Variable"
             @click="handleTrackEvent"
             createPagePath="variables/create"
-            data-testid="create_Variable_button"            
+            data-testid="create_Variable_button"
           />
         </template>
       </PageHeadingBlock>
@@ -149,7 +149,8 @@
         exportFileName="Variables"
         :empty-block="{
           title: 'No Variables yet',
-          description: 'Create your first variable to define reusable configuration values for platform resources.',
+          description:
+            'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
           createPagePath: 'variables/create',
           documentationService: props.documentationService

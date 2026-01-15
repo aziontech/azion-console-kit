@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="SSO Management" description="Manage identity providers for single sign-on authentication.">
+      <PageHeadingBlock
+        pageTitle="SSO Management"
+        description="Manage identity providers for single sign-on authentication."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"

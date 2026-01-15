@@ -69,7 +69,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Multi-Factor Authentication Management" description="Define and manage multi-factor authentication settings for account security." />
+      <PageHeadingBlock
+        pageTitle="Multi-Factor Authentication Management"
+        description="Define and manage multi-factor authentication settings for account security."
+      />
     </template>
     <template #content>
       <FetchListTableBlock

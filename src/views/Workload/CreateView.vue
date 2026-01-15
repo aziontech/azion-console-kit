@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Workload" description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Workload"
+        description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

@@ -33,7 +33,7 @@
           documentationService: props.documentationService,
           emptyListMessage: 'No personal tokens found.',
           createPagePath: 'personal-tokens/create',
-          createButtonLabel: 'Personal Token',
+          createButtonLabel: 'Personal Token'
         }"
       />
     </template>

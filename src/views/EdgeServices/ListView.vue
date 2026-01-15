@@ -174,7 +174,8 @@
         :csvMapper="csvMapper"
         :emptyBlock="{
           title: 'No Edge Services yet',
-          description: 'Create your first service to orchestrate variables and resources to your Edge Nodes.',
+          description:
+            'Create your first service to orchestrate variables and resources to your Edge Nodes.',
           createButtonLabel: 'Edge Service',
           createPagePath: 'edge-services/create',
           documentationService: documentationService

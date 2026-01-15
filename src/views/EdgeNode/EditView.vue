@@ -57,7 +57,10 @@
     :isTabs="true"
   >
     <template #form>
-      <PageHeadingBlock :pageTitle="nodeName" description="Configure general settings and Edge Services for this Edge Node." />
+      <PageHeadingBlock
+        :pageTitle="nodeName"
+        description="Configure general settings and Edge Services for this Edge Node."
+      />
       <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">

@@ -21,7 +21,7 @@ export const clientManagementRoutes = {
             to: '/client/management'
           }
         ]
-      },
+      }
     },
     {
       path: 'create',
