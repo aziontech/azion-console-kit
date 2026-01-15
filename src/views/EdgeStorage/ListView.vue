@@ -6,7 +6,7 @@
         :description="
           !selectedBucket?.name
             ? 'Define and manage buckets that store and serve object data.'
-            : 'Configure bucket settings and access controls parameters.'
+            : 'Browse, upload, and manage objects stored in this bucket.'
         "
       >
         <template #default>
