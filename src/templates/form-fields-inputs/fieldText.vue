@@ -46,7 +46,7 @@
       default: ''
     }
   })
-  const inputRef = ref(null)
+  const textareaRef = ref(null)
   const name = toRef(props, 'name')
   const slots = useSlots()
   const attrs = useAttrs()
@@ -82,7 +82,7 @@
     emit('input', event.target.value)
   }
 
-  defineExpose({ inputRef })
+  defineExpose({ textareaRef })
 </script>
 
 <template>
@@ -96,7 +96,7 @@
   <InputText
     v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
     v-model="inputValue"
-    ref="inputRef"
+    ref="textareaRef"
     type="text"
     :data-testid="customTestId.input"
     :id="name"
