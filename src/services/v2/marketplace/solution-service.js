@@ -1,11 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { useAccountStore } from '@/stores/account'
-
-export const solutionsKeys = {
-  all: ['solutions'],
-  lists: () => [...solutionsKeys.all, 'list'],
-  list: (group, type) => [...solutionsKeys.lists(), group, type]
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class SolutionService extends BaseService {
   baseUrl = 'marketplace/solution/'
@@ -23,9 +18,8 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(solutionsKeys.list(group, type), () => this.getListSolutions(params), {
-      staleTime: this.toMilliseconds({ days: 30 }),
-      refetchInterval: false
+    return this._createQuery(queryKeys.solutions.list(group, type), () => this.getListSolutions(params), {
+      cacheType: this.cacheType.STATIC
     })
   }
 
@@ -54,16 +48,16 @@ export class SolutionService extends BaseService {
     await Promise.all(
       prefetchConfigs.map(({ group, type }) =>
         this._ensureQueryData(
-          solutionsKeys.list(group, type),
+          queryKeys.solutions.list(group, type),
           () => this.getListSolutions({ group, type }),
-          { staleTime: this.toMilliseconds({ days: 30 }) }
+          { cacheType: this.cacheType.STATIC }
         )
       )
     )
   }
 
   async invalidateSolutionsCache() {
-    await this.queryClient.invalidateQueries({ queryKey: solutionsKeys.lists() })
+    await this.queryClient.invalidateQueries({ queryKey: queryKeys.solutions.lists() })
   }
 
   #adaptResponse(response) {

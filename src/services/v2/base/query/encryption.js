@@ -56,19 +56,23 @@ function getEncryptionSecret() {
 }
 
 /**
- * Generates a unique encryption key for the session
- * Uses a combination of user session data and a stored secret
+ * Generates a persistent encryption key
+ * Uses a stable identifier to ensure data can be decrypted across sessions
  * @returns {Promise<CryptoKey>} The encryption key
  */
 async function getEncryptionKey() {
-  // Use a combination of session storage and a secret
-  // Session ID provides uniqueness per session
-  const sessionId = sessionStorage.getItem('sessionId') || crypto.randomUUID()
   const secret = getEncryptionSecret()
 
-  // Create a salt from session ID for key derivation
+  // Use localStorage instead of sessionStorage to persist across browser restarts
+  let persistentId = localStorage.getItem('azion-cache-key-id')
+  if (!persistentId) {
+    persistentId = crypto.randomUUID()
+    localStorage.setItem('azion-cache-key-id', persistentId)
+  }
+
+  // Create a salt from persistent ID for key derivation
   const encoder = new TextEncoder()
-  const salt = await crypto.subtle.digest('SHA-256', encoder.encode(sessionId))
+  const salt = await crypto.subtle.digest('SHA-256', encoder.encode(persistentId))
 
   return deriveKey(secret, new Uint8Array(salt))
 }

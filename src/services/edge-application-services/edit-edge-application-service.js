@@ -25,8 +25,7 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { edgeAppV3Keys } from './load-edge-application-service'
-import { edgeAppKeys } from '@/services/v2/edge-app/edge-app-service'
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 /**
  * Edits an edge application.
@@ -42,9 +41,9 @@ export const editEdgeApplicationService = async (payload) => {
 
   const result = parseHttpResponse(httpResponse)
 
-  await queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
-  await queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
-  await queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
+  await queryClient.removeQueries({ queryKey: queryKeys.edgeAppV3.all })
+  await queryClient.removeQueries({ queryKey: queryKeys.edgeAppV3.details() })
+  await queryClient.removeQueries({ queryKey: queryKeys.edgeApp.lists() })
 
   return result
 }

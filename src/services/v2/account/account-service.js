@@ -1,7 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
-
-export const accountKeys = { all: ['account'], info: () => [...accountKeys.all, 'info'] }
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class AccountService extends BaseService {
   baseUrl = 'account/info'
@@ -16,10 +15,8 @@ export class AccountService extends BaseService {
   }
 
   async getAccountInfo() {
-    const queryKey = accountKeys.info()
-    return await this._ensureQueryData(queryKey, async () => this.fetchAccountInfo(), {
-      cacheType: this.cacheType.SENSITIVE
-    })
+    const queryKey = queryKeys.account.info()
+    return await this._ensureQueryData(queryKey, async () => this.fetchAccountInfo())
   }
 
   _adaptAccountInfo(response) {

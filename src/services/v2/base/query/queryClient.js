@@ -1,6 +1,9 @@
 import { QueryClient } from '@tanstack/vue-query'
 import { broadcastQueryClient } from '@tanstack/query-broadcast-client-experimental'
 import { getCacheOptions, CACHE_TYPE } from './queryOptions'
+import { isProduction } from '@/helpers/get-environment'
+
+const isProductionEnvironment = isProduction()
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,10 +16,9 @@ export const queryClient = new QueryClient({
   }
 })
 
-broadcastQueryClient({
-  queryClient,
-  broadcastChannel: 'app-azion-sync'
-})
+const broadcastChannel = isProductionEnvironment ? 'app-azion-sync' : 'app-azion-sync-stage'
+
+broadcastQueryClient({ queryClient, broadcastChannel })
 
 export const clearAllCache = () => {
   return queryClient.clear()
@@ -30,6 +32,6 @@ export const clearCacheByType = async (cacheType) => {
   })
 }
 
-export const clearCacheSensitive = async () => {
-  await clearCacheByType(CACHE_TYPE.SENSITIVE)
+export const clearCacheGlobal = async () => {
+  await clearCacheByType(CACHE_TYPE.GLOBAL)
 }

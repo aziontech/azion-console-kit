@@ -1,10 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-
-export const contractKeys = {
-  all: ['contract'],
-  servicePlans: () => [...contractKeys.all, 'service-plan'],
-  servicePlan: (clientId) => [...contractKeys.servicePlans(), clientId]
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class ContractService extends BaseService {
   baseUrl = 'v3/contract'
@@ -19,11 +14,10 @@ export class ContractService extends BaseService {
   }
 
   async getContractServicePlan(clientId) {
-    const queryKey = contractKeys.servicePlan(clientId)
+    const queryKey = queryKeys.contract.servicePlan(clientId)
     return await this._ensureQueryData(
       queryKey,
-      async () => this.fetchContractServicePlan(clientId),
-      { cacheType: this.cacheType.SENSITIVE }
+      async () => this.fetchContractServicePlan(clientId)
     )
   }
 

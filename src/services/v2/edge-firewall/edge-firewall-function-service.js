@@ -1,6 +1,7 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallFunctionAdapter } from './edge-firewall-function-adapter'
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class EdgeFirewallFunctionService extends BaseService {
   constructor() {
@@ -46,12 +47,14 @@ export class EdgeFirewallFunctionService extends BaseService {
     }
   }
 
-  listEdgeFirewallFunctionsService = async (edgeFirewallId, query = { pageSize: 10 }) => {
+  #fetchEdgeFirewallFunctions = async (edgeFirewallId, params) => {
+    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
     const { body: functionInstances, count } = await this.listFunctionsService(
       edgeFirewallId,
-      query
+      params
     )
     this.countFunctions = count
+    if (!count) return []
 
     const enrichedFunctions = await enrichByMatchingReference({
       items: functionInstances,
@@ -68,6 +71,45 @@ export class EdgeFirewallFunctionService extends BaseService {
       body: this.#getTransformed('transformFunction', enrichedFunctions),
       count
     }
+  }
+
+  listEdgeFirewallFunctionsService = async (
+    edgeFirewallId,
+    params = { pageSize: 10, fields: [], page: 1 }
+  ) => {
+    // Normalize fields to match what will actually be used in the fetch
+    // This ensures cache hit regardless of what fields are passed
+    const normalizedFields = ['id', 'name', 'last_editor', 'last_modified', 'function']
+    const fieldsKey = normalizedFields.sort().join(',')
+
+    const queryKey = [
+      ...queryKeys.edgeFirewallFunctions.lists(edgeFirewallId),
+      params.page,
+      params.pageSize,
+      fieldsKey,
+      params.ordering,
+      params.search
+    ].filter((item) => item !== undefined && item !== '' && item !== null)
+
+    const hasFilter = params?.hasFilter || false
+    return await this._ensureQueryData(
+      queryKey,
+      () => this.#fetchEdgeFirewallFunctions(edgeFirewallId, params),
+      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
+    )
+  }
+
+  /**
+   * Prefetches the first page of functions instances to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeFirewallId - The edge firewall ID
+   */
+  prefetchFunctionsList = async (edgeFirewallId) => {
+    return await this.listEdgeFirewallFunctionsService(edgeFirewallId, {
+      pageSize: 10,
+      page: 1,
+      ordering: 'id'
+    })
   }
 
   #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
@@ -89,6 +131,8 @@ export class EdgeFirewallFunctionService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewallFunctions.all(payload.id) })
+
     return { feedback: 'Your Function has been created', id: data.data.id }
   }
 
@@ -101,10 +145,17 @@ export class EdgeFirewallFunctionService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeFirewallFunctions.all(payload.edgeFirewallID)
+    })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeFirewallFunctions.details(payload.edgeFirewallID)
+    })
+
     return 'Function successfully updated'
   }
 
-  loadFunctionsService = async (edgeFirewallId, functionId) => {
+  #fetchEdgeFirewallFunction = async ({ edgeFirewallId, functionId }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
@@ -113,11 +164,36 @@ export class EdgeFirewallFunctionService extends BaseService {
     return this.#getTransformed('transformLoadEdgeFirewallFunction', data.data)
   }
 
+  loadFunctionsService = async (edgeFirewallId, functionId) => {
+    const cachedQueries = this.queryClient.getQueriesData({
+      queryKey: queryKeys.edgeFirewallFunctions.details(edgeFirewallId)
+    })
+
+    const hasDifferentId = cachedQueries.some(([key]) => {
+      const cachedId = key[key.length - 1]
+      return cachedId && cachedId !== functionId
+    })
+
+    if (hasDifferentId) {
+      await this.queryClient.removeQueries({
+        queryKey: queryKeys.edgeFirewallFunctions.details(edgeFirewallId)
+      })
+    }
+
+    return await this._ensureQueryData(
+      queryKeys.edgeFirewallFunctions.detail(edgeFirewallId, functionId),
+      () => this.#fetchEdgeFirewallFunction({ edgeFirewallId, functionId }),
+      { persist: true }
+    )
+  }
+
   deleteEdgeFirewallFunctionService = async (functionId, edgeFirewallId) => {
     await this.http.request({
       method: 'DELETE',
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewallFunctions.all(edgeFirewallId) })
 
     return 'Function successfully deleted'
   }

@@ -1,9 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-
-export const accountSettingsKeys = {
-  all: ['account-settings'],
-  jobRole: () => [...accountSettingsKeys.all, 'job-role']
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class AccountSettingsService extends BaseService {
   baseUrl = 'v4/iam/account'
@@ -18,10 +14,8 @@ export class AccountSettingsService extends BaseService {
   }
 
   async getAccountJobRole() {
-    const queryKey = accountSettingsKeys.jobRole()
-    return await this._ensureQueryData(queryKey, async () => this.fetchAccountJobRole(), {
-      cacheType: this.cacheType.SENSITIVE
-    })
+    const queryKey = queryKeys.accountSettings.jobRole()
+    return await this._ensureQueryData(queryKey, async () => this.fetchAccountJobRole())
   }
 
   _adaptJobRole(response) {

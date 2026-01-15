@@ -1,8 +1,9 @@
-import { clearAllCache, clearCacheSensitive } from '../query/queryClient'
+import { clearAllCache, clearCacheGlobal } from '../query/queryClient'
 import { persister, pauseQueryPersistence } from '../query/queryPlugin'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
+import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 import { useAccountStore } from '@/stores/account'
 
 const DEFAULT_PAGE_SIZE = 10
@@ -34,7 +35,11 @@ const ensure = {
 
   async lists() {
     const pageSize = getPageSizeFromStorage()
-    const promises = [edgeAppService.ensureList(pageSize), workloadService.ensureList(pageSize)]
+    const promises = [
+      edgeAppService.ensureList(pageSize),
+      workloadService.ensureList(pageSize),
+      edgeFirewallService.ensureList(pageSize)
+    ]
     await Promise.allSettled(promises)
   }
 }
@@ -50,7 +55,7 @@ export const sessionManager = {
   async logout() {
     await clearAll()
   },
-  async clearSensitive() {
-    await clearCacheSensitive()
+  async clearCacheGlobal() {
+    await clearCacheGlobal()
   }
 }
