@@ -1,5 +1,6 @@
 import * as idpService from '@/services/identity-providers-services'
 import { useAccountStore } from '@/stores/account'
+import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
 
 function checkSSOAccess(to, from, next) {
   const accountStore = useAccountStore()
@@ -22,7 +23,7 @@ export const identityProvidersRoutes = {
       component: () => import('@views/IdentityProviders/ListView.vue'),
       beforeEnter: checkSSOAccess,
       meta: {
-        title: 'Identity Providers',
+        title: 'SSO Management',
         breadCrumbs: [
           {
             label: 'Identity Providers',
@@ -31,6 +32,7 @@ export const identityProvidersRoutes = {
         ]
       },
       props: {
+        documentationService: documentationGuideProducts.sso,
         listIdentityProvidersService: idpService.listIdentityProvidersService,
         deleteSAMLIdentityProviderService: idpService.deleteSAMLIdentityProviderService,
         deleteOIDCIdentityProviderService: idpService.deleteOIDCIdentityProviderService,
@@ -50,11 +52,11 @@ export const identityProvidersRoutes = {
         title: 'Create Identity Provider',
         breadCrumbs: [
           {
-            label: 'Identity Providers',
+            label: 'Identity Provider',
             to: '/identity-providers'
           },
           {
-            label: 'Create Identity Provider',
+            label: 'Create',
             to: '/identity-providers/create'
           }
         ]
@@ -76,7 +78,7 @@ export const identityProvidersRoutes = {
         title: 'Edit Identity Provider',
         breadCrumbs: [
           {
-            label: 'Identity Providers',
+            label: 'Identity Provider',
             to: '/identity-providers'
           },
           {

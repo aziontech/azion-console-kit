@@ -173,7 +173,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Functions"
-        description="Manage serverless functions for applications."
+        description="Define and manage functions that execute code in response to firewall or application events."
       >
         <template #default>
           <DataTableActionsButtons
@@ -203,8 +203,9 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No Functions have been created',
-          description: 'Click the button below to create your first Function.',
+          title: 'No Functions yet',
+          description:
+            'Create your first function to execute code at Azion\'s global infrastructure.',
           createButtonLabel: 'Function',
           createPagePath: 'functions/create?origin=list',
           documentationService: documentationService

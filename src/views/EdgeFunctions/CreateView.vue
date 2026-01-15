@@ -116,7 +116,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Function">
+      <PageHeadingBlock
+        pageTitle="Create Function"
+        description="Configure function code, triggers, and execution settings."
+      >
         <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>

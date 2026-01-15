@@ -211,7 +211,7 @@
 
   <EmptyResultsBlock
     v-else
-    title="No payment activity has been recorded"
+    title="No payment activity found."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
     createButtonLabel="Add Credit"

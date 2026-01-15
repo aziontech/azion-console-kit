@@ -125,6 +125,7 @@
         :description="emptyBlock.description"
         :createButtonLabel="emptyBlock.createButtonLabel"
         :createPagePath="emptyBlock.createPagePath"
+        :onClickCreate="emptyBlock.onClickCreate"
         :documentationService="emptyBlock.documentationService"
         data-testid="edge-applications-empty-results-block"
       >

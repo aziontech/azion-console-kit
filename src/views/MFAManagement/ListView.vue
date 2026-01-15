@@ -69,7 +69,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Multi-Factor Authentication Management" />
+      <PageHeadingBlock
+        pageTitle="Multi-Factor Authentication Management"
+        description="Define and manage multi-factor authentication settings for account security."
+      />
     </template>
     <template #content>
       <FetchListTableBlock
@@ -83,8 +86,8 @@
         :csvMapper="csvMapper"
         hideLastModifiedColumn
         :emptyBlock="{
-          title: 'No MFA Management found.',
-          description: '',
+          title: 'No MFA configurations yet',
+          description: 'Create your first MFA configuration to enhance account security.',
           documentationService: documentationService
         }"
       />

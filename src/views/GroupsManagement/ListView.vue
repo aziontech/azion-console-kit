@@ -78,7 +78,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Groups">
+      <PageHeadingBlock
+        pageTitle="Groups"
+        description="Manage groups and assign permissions for resource access."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"
@@ -100,10 +103,11 @@
         :csvMapper="csvMapper"
         hideLastModifiedColumn
         :emptyBlock="{
-          title: 'No groups have been created',
-          description: 'Click the button below to create your first group account.',
+          title: 'No groups yet',
+          description: 'Create your first group to manage permissions for resource access.',
           createButtonLabel: 'Group',
-          createPagePath: 'management/create'
+          createPagePath: 'management/create',
+          documentationService: documentationService
         }"
       />
     </template>

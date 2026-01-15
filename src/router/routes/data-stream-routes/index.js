@@ -1,6 +1,6 @@
-import * as Helpers from '@/helpers'
 import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
 import { useAccountStore } from '@/stores/account'
+import { documentationObserveProducts } from '@/helpers/azion-documentation-catalog'
 
 async function checkDomainsLimit(to, from, next) {
   const accountStore = useAccountStore()
@@ -39,7 +39,7 @@ export const dataStreamRoutes = {
       name: 'list-data-stream',
       component: () => import('@views/DataStream/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.dataStream
+        documentationService: documentationObserveProducts.dataStream
       },
       meta: {
         title: 'Data Stream',
@@ -64,7 +64,7 @@ export const dataStreamRoutes = {
             to: '/data-stream'
           },
           {
-            label: 'Create Stream',
+            label: 'Create',
             to: '/data-stream/create'
           }
         ]

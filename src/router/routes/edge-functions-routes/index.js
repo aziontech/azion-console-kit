@@ -34,7 +34,7 @@ export const edgeFunctionsRoutes = {
             to: '/functions'
           },
           {
-            label: 'Create Function',
+            label: 'Create',
             to: '/functions/create'
           }
         ]
