@@ -93,18 +93,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor',
-        filterPath: 'last_editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        sortField: 'lastModified',
-        filterPath: 'lastModified'
       }
     ]
   })
