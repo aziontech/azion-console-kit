@@ -375,7 +375,7 @@
             v-model="digitalCertificateTypeSelected"
             :options="optionsSelectButton"
             aria-labelledby="basic"
-            class="h-9 p-1"
+            class="h-9 p-1 w-fit"
           />
           <CreateMenuBlock
             addButtonLabel="Certificate"
