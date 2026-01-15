@@ -168,6 +168,7 @@
     active: yup.boolean(),
     environment: yup.string(),
     oldDomains: yup.array().of(yup.string()).optional(),
-    authorityCertificate: yup.string().nullable()
+    authorityCertificate: yup.string().nullable(),
+    subjectNameCertificate: yup.array().nullable()
   })
 </script>
