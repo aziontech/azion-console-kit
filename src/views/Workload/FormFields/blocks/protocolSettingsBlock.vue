@@ -113,12 +113,12 @@
   }
 
   watch(tls, (newTls) => {
-    if (newTls) {
+    if (!newTls) {
+      tls.value = loadInitialTls
+    } else {
       loadInitialTls.certificate = newTls.certificate
       loadInitialTls.ciphers = newTls.ciphers
       loadInitialTls.minimumVersion = newTls.minimumVersion
-    } else {
-      tls.value = loadInitialTls
     }
   })
 </script>
