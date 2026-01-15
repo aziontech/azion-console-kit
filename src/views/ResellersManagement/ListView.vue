@@ -77,7 +77,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Resellers">
+      <PageHeadingBlock
+        pageTitle="Resellers"
+        description="Manage reseller accounts and configurations."
+      >
         <template #default>
           <DataTableActionsButtons
             size="small"
@@ -100,8 +103,8 @@
         :csvMapper="csvMapper"
         hideLastModifiedColumn
         :emptyBlock="{
-          title: 'No resellers have been created',
-          description: 'Click the button below to create your first reseller account.',
+          title: 'No Resellers yet',
+          description: 'Create your first reseller account.',
           createButtonLabel: 'Reseller',
           createPagePath: 'management/create',
           documentationService: documentationService

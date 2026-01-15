@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Your Settings"
-        description="Adjust personal preferences and account-specific configurations."
+        description="Define and manage personal account preferences and profile configuration."
       />
     </template>
     <template #content>

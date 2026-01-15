@@ -1,6 +1,7 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
 import * as ServiceEdgeNode from '@/services/edge-node-service-services'
 import * as Helpers from '@/helpers'
+import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeNodeRoutes = {
@@ -14,13 +15,13 @@ export const edgeNodeRoutes = {
       props: {
         listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
         deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
-        documentationService: Helpers.documentationCatalog.edgeNodes
+        documentationService: documentationDeployProducts.edgeNode
       },
       meta: {
-        title: 'Edge Node',
+        title: 'Edge Nodes',
         breadCrumbs: [
           {
-            label: 'Edge Node',
+            label: 'Edge Nodes',
             to: '/edge-node'
           }
         ]
@@ -46,7 +47,7 @@ export const edgeNodeRoutes = {
         title: 'Edit Edge Node',
         breadCrumbs: [
           {
-            label: 'Edge Node',
+            label: 'Edge Nodes',
             to: '/edge-node'
           },
           {

@@ -145,12 +145,12 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Services"
-        description="Deliver and manage services for applications."
+        description="Manage reusable variables and resources that are orchestrated to your Edge Nodes."
       >
         <template #default>
           <DataTableActionsButtons
             size="small"
-            label="Service"
+            label="Edge Service"
             @click="handleTrackEventGoToCreate"
             createPagePath="edge-services/create"
             data-testid="create_Service_button"
@@ -173,9 +173,10 @@
         exportFileName="Edge Services"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No services have been created',
-          description: 'Click the button below to create your first service.',
-          createButtonLabel: 'Service',
+          title: 'No Edge Services yet',
+          description:
+            'Create your first service to orchestrate variables and resources to your Edge Nodes.',
+          createButtonLabel: 'Edge Service',
           createPagePath: 'edge-services/create',
           documentationService: documentationService
         }"

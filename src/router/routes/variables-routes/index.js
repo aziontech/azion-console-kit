@@ -41,7 +41,7 @@ export const variablesRoutes = {
             to: '/variables'
           },
           {
-            label: 'Create Variable',
+            label: 'Create',
             to: '/variables/create'
           }
         ]

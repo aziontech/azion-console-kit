@@ -6,7 +6,6 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
   import { DataTableActionsButtons } from '@/components/DataTable'
-  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -109,15 +108,11 @@
 <template>
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Custom Pages">
+      <PageHeadingBlock
+        pageTitle="Custom Pages"
+        description="Define custom response pages returned by Workloads when specific criteria are met."
+      >
         <template #default>
-          <PrimeButton
-            size="small"
-            link
-            @click="navigateToGetHelp"
-          >
-            Get Help
-          </PrimeButton>
           <DataTableActionsButtons
             size="small"
             label="Custom Page"
@@ -146,8 +141,8 @@
         exportFileName="Custom Pages"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No custom pages have been created',
-          description: 'Click the button below to create your first custom page.',
+          title: 'No Custom Pages yet',
+          description: 'Create your first custom page to control responses for defined conditions.',
           createPagePath: '/custom-pages/create',
           createButtonLabel: 'Custom Page',
           documentationService: props.documentationService

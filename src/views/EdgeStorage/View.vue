@@ -174,7 +174,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        description="Browse, upload, and manage objects stored in this bucket."
+      />
     </template>
     <template #content>
       <!-- Create Mode -->

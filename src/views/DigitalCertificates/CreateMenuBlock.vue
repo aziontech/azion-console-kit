@@ -1,7 +1,6 @@
 <template>
   <PrimeButton
     type="button"
-    class="max-sm:w-full"
     icon="pi pi-chevron-down"
     iconPos="right"
     :data-testid="`create_${addButtonLabel}_button`"

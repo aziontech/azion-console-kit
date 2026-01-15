@@ -89,7 +89,7 @@
         </template>
       </Breadcrumb>
       <span
-        class="text-[var(--text-color-secondary)] text-sm font-normal leading-7 max-md:text-base px-0.5"
+        class="text-[var(--text-color-secondary)] text-sm font-normal leading-7 px-0.5"
         v-if="props.description"
       >
         {{ props.description }}
@@ -97,7 +97,7 @@
     </div>
     <div
       v-if="hasDefaultSlot"
-      class="flex items-center gap-3 w-full md:w-auto md:justify-end"
+      class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end flex-shrink-0"
     >
       <slot name="default"></slot>
     </div>
