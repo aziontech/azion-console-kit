@@ -144,7 +144,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="WAF Rules"
-        description="Manage Web Application Firewall (WAF) rules for secure connections."
+        description="Define and manage firewall rules that inspect and control workload traffic."
       >
         <template #default>
           <DataTableActionsButtons
@@ -172,8 +172,8 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No WAF rules have been created',
-          description: 'Click the button below to create your first WAF rule.',
+          title: 'No WAF Rules yet',
+          description: 'Create your first WAF rule to inspect and control incoming requests.',
           createButtonLabel: 'WAF Rule',
           createPagePath: 'waf/create',
           documentationService: documentationService

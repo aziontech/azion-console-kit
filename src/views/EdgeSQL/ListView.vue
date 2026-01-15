@@ -222,12 +222,12 @@
       <PageHeadingBlock
         pageTitle="SQL Database"
         data-testid="edge-sql-heading"
-        description="Manage relational data with scalable and efficient SQL database solutions."
+        description="Deploy and manage SQL Databases to store and query structured relational data."
       >
         <template #default>
           <DataTableActionsButtons
             size="small"
-            label="Database"
+            label="SQL Database"
             @click="handleTrackEvent"
             createPagePath="/sql-database/create"
             data-testid="create_Database_button"
@@ -263,9 +263,9 @@
         exportFileName="SQL Database"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No Databases have been created',
-          description: 'Create your first SQL Database to store and query your data at the edge.',
-          createButtonLabel: 'Database',
+          title: 'No SQL Databases yet',
+          description: 'Create your first database to store relational data and run SQL queries.',
+          createButtonLabel: 'SQL Database',
           createPagePath: '/sql-database/create',
           documentationService: Helpers.documentationGuideProducts.edgeSQL
         }"

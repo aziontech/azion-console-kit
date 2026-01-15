@@ -144,5 +144,6 @@ export const validationSchema = yup.object({
     commonName: yup.string(),
     alternativeNames: yup.array()
   }),
-  authorityCertificate: yup.string().nullable()
+  authorityCertificate: yup.string().nullable(),
+  subjectNameCertificate: yup.array().nullable()
 })

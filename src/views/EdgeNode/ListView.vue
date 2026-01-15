@@ -106,7 +106,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Nodes"
-        description="Monitor and manage nodes for optimal performance."
+        description="Deploy and manage Edge Nodes on your infrastructure and orchestrate Edge Services to them."
       ></PageHeadingBlock>
     </template>
     <template #content>
@@ -119,9 +119,9 @@
         :actions="actions"
         exportFileName="Edge Nodes"
         :emptyBlock="{
-          title: 'No edge nodes have been added',
+          title: 'No Edge Nodes yet',
           description:
-            'To begin the Edge Node installation process, download the appropriate Orchestrator installation binary.',
+            'Create your first edge node and register it as an execution target for Edge Services.',
           documentationService: documentationService,
           emptyListMessage: 'No edge nodes found.'
         }"
@@ -130,7 +130,7 @@
           <PrimeButton
             severity="secondary"
             icon="pi pi-download"
-            label="Orchestrator"
+            label="Download Orchestrator"
             @click="downloadOrchestrator"
           />
         </template>

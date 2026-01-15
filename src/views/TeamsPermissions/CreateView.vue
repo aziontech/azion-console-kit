@@ -4,6 +4,7 @@
       <PageHeadingBlock
         pageTitle="Create Team"
         data-testid="teams-permissions__create-view__page-heading"
+        description="Configure permissions for team collaboration."
       />
     </template>
     <template #content>

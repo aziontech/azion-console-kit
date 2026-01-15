@@ -119,7 +119,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Firewall"
-        description="Protect applications with advanced security rules."
+        description="Define and manage firewalls that inspect and protect requests on Azion's global infrastructure."
       >
         <template #default>
           <DataTableActionsButtons
@@ -128,6 +128,7 @@
             @click="handleTrackEvent"
             createPagePath="/firewalls/create"
             data-testid="create_Firewall_button"
+            :documentation-service="documentationService"
           />
         </template>
       </PageHeadingBlock>
@@ -148,8 +149,9 @@
         exportFileName="Firewalls"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No Firewall has been created.',
-          description: 'Click the button below to create your first Firewall.',
+          title: 'No Firewalls yet',
+          description:
+            'Create your first firewall to define security modules and enforcement behavior for incoming traffic.',
           createButtonLabel: 'Firewall',
           createPagePath: '/firewalls/create',
           documentationService: documentationService

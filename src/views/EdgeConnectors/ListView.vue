@@ -111,7 +111,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Connectors"
-        description="Establish seamless connections with origins to retrieve and integrate data efficiently."
+        description="Define and manage connectors that control how applications connect to origins and external services."
       >
         <template #default>
           <DataTableActionsButtons
@@ -140,8 +140,9 @@
         exportFileName="Connectors"
         :csvMapper="csvMapper"
         :emptyBlock="{
-          title: 'No Connectors have been created',
-          description: 'Click the button below to create your first Connectors.',
+          title: 'No Connectors yet',
+          description:
+            'Create your first connector to define how traffic is routed from Azion to an origin or external service.',
           createButtonLabel: 'Connectors',
           createPagePath: 'connectors/create',
           documentationService: documentationService

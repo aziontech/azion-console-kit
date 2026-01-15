@@ -136,8 +136,8 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Users"
-        description="Manage users and define access levels."
+        pageTitle="Users Management"
+        description="Manage users with access to the account and control authentication and permissions."
       >
         <template #default>
           <DataTableActionsButtons
@@ -166,8 +166,8 @@
         :csvMapper="csvMapper"
         hideLastModifiedColumn
         :emptyBlock="{
-          title: 'No user has been created',
-          description: ' Click the button below to create your first user.',
+          title: 'No users yet',
+          description: 'Create your first additional user to grant access to the account.',
           createButtonLabel: 'User',
           createPagePath: 'users/create',
           documentationService: documentationService

@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import fieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
@@ -10,15 +10,11 @@
   const isChanged = ref(false)
   const description = computed(() => control.value.description)
   const label = computed(() => control.value.schema.label)
+  const options = computed(() => control.value.schema.options)
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
-  const min = computed(() => control.value.schema.minimum)
-  const max = computed(() => control.value.schema.maximum)
-  const step = computed(() => control.value.schema.multipleOf || 1)
-  const showButtons = computed(() => control.value.schema.showButtons ?? true)
-  const useGrouping = computed(() => (control.value.schema.type === 'number' ? true : false))
 
   const onChange = (value) => {
     isChanged.value = true
@@ -35,17 +31,13 @@
 
 <template>
   <div class="flex flex-col gap-2">
-    <fieldNumber
+    <fieldTextArea
       :name="path"
       :label="label"
       :description="description"
       :required="required"
       :aditionalError="errorMessage"
-      :min="min"
-      :max="max"
-      :step="step"
-      :showButtons="showButtons"
-      :useGrouping="useGrouping"
+      :rows="options?.rows || 20"
       @blur="onBlur"
       @input="onChange"
     />
