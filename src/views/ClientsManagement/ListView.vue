@@ -21,36 +21,27 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="listAccountsClientDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No clients found."
-        editPagePath="/management/edit"
+        editPagePath="/client/management/edit"
         enableEditClick
         exportFileName="Client Management"
         :csvMapper="csvMapper"
+        :empty-block="{
+          title: 'No Clients yet',
+          description: 'Create your first client account to manage configurations.',
+          createButtonLabel: 'Client',
+          createPagePath: '/client/management/create'
+        }"
       />
-
-      <EmptyResultsBlock
-        v-if="!hasContentToList"
-        title="No Clients yet"
-        description="Create your first client account to manage configurations."
-        createButtonLabel="Client"
-        createPagePath="management/create"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
