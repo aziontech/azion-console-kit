@@ -211,8 +211,8 @@
 
   <EmptyResultsBlock
     v-else
-    title="Add a payment method and start using services and products to view your activity."
-    description="No payment activity found."
+    title="No payment activity found."
+    description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
     createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"

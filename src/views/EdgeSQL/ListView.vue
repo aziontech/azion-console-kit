@@ -227,7 +227,7 @@
         <template #default>
           <DataTableActionsButtons
             size="small"
-            label="Database"
+            label="SQL Database"
             @click="handleTrackEvent"
             createPagePath="/sql-database/create"
             data-testid="create_Database_button"

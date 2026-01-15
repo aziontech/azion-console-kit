@@ -21,7 +21,7 @@ export const edgeNodeRoutes = {
         title: 'Edge Nodes',
         breadCrumbs: [
           {
-            label: 'Edge Node',
+            label: 'Edge Nodse',
             to: '/edge-node'
           }
         ]
@@ -47,7 +47,7 @@ export const edgeNodeRoutes = {
         title: 'Edit Edge Node',
         breadCrumbs: [
           {
-            label: 'Edge Node',
+            label: 'Edge Nodes',
             to: '/edge-node'
           },
           {

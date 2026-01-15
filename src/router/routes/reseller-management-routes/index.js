@@ -35,7 +35,7 @@ export const resellerManagementRoutes = {
         title: 'Create Reseller',
         breadCrumbs: [
           {
-            label: 'Reseller Management',
+            label: 'Resellers Management',
             to: '/reseller/management'
           },
           {
@@ -60,7 +60,7 @@ export const resellerManagementRoutes = {
         title: 'Edit Reseller',
         breadCrumbs: [
           {
-            label: 'Reseller Management',
+            label: 'Resellers Management',
             to: '/reseller/management'
           },
           {
