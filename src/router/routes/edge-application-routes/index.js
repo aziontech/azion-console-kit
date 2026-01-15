@@ -14,7 +14,7 @@ export const edgeApplicationRoutes = {
       name: 'list-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
-        documentationService: documentationBuildProducts.applications``
+        documentationService: documentationBuildProducts.applications
       },
       meta: {
         title: 'Applications',
