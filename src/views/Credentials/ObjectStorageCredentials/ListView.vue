@@ -138,6 +138,7 @@
         title: 'No Object Storage credentials yet',
         description: 'Create your first Object Storage credential to authenticate and control access to buckets.',
         createButtonLabel: 'Credential',
+        onClickCreate: () => handleCreateCredential(),
         documentationService: documentationService
       }"
       exportFileName="Object Storage Credentials"
