@@ -9,7 +9,7 @@
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   import {
@@ -30,7 +30,7 @@
 
   useField('tls.certificate', { initialValue: 0 })
   useField('tls.ciphers', { initialValue: 'Modern_v2025Q1' })
-  useField('tls.minimumVersion', { initialValue: 'tls_1_2' })
+  useField('tls.minimumVersion', { initialValue: 'tls_1_3' })
 
   const { errorMessage: httpPortError, value: httpPortValue } = useField('protocols.http.httpPorts')
   const { errorMessage: httpsPortError, value: httpsPortValue } = useField(
@@ -107,6 +107,22 @@
     'pi-times-circle': 'text-[var(--error-color)]',
     'pi-exclamation-triangle': 'text-[var(--p-tag-warning-color)]'
   }
+
+  const loadInitialTls = {
+    certificate: 0,
+    ciphers: 7,
+    minimumVersion: 'tls_1_3'
+  }
+
+  watch(tls, (newTls) => {
+    if (!newTls) {
+      tls.value = loadInitialTls
+    } else {
+      loadInitialTls.certificate = newTls.certificate
+      loadInitialTls.ciphers = newTls.ciphers
+      loadInitialTls.minimumVersion = newTls.minimumVersion
+    }
+  })
 </script>
 <template>
   <form-horizontal
@@ -185,7 +201,7 @@
             :loadService="loadDigitalCertificateDecorator"
             optionLabel="name"
             optionValue="value"
-            :value="tls.certificate"
+            :value="tls?.certificate"
             appendTo="self"
             placeholder="Select a certificate"
             enableCustomLabel
@@ -275,7 +291,7 @@
             :options="TLS_VERSIONS_OPTIONS"
             optionLabel="label"
             optionValue="value"
-            :value="tls.minimumVersion"
+            :value="tls?.minimumVersion"
             inputId="tls.minimumVersion"
             placeholder="Select a minimum TLS Version"
             description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
@@ -290,7 +306,7 @@
             :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
             optionLabel="label"
             optionValue="value"
-            :value="tls.ciphers"
+            :value="tls?.ciphers"
             inputId="tls.ciphers"
             placeholder="Select the supported cipher suite"
             description="Select which cipher suite the application supports. See the list of supported ciphers in the documentation."
