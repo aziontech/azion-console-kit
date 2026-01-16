@@ -59,7 +59,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="variableName" />
+      <PageHeadingBlock
+        :pageTitle="variableName"
+        description="Configure variable names, values, and settings for use across Azion’s products."
+      />
     </template>
     <template #content>
       <EditFormBlock

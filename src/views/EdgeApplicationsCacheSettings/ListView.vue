@@ -142,7 +142,7 @@
     isTabs
     :apiFields="CACHE_SETTING_API_FIELDS"
     :frozenColumns="['name']"
-    exportFileName="Cache Settings"
+    exportFileName="Application Cache Settings"
     hideLastModifiedColumn
     :emptyBlock="{
       title: 'No cache settings have been created',

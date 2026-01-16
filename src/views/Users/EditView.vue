@@ -127,6 +127,7 @@
       <PageHeadingBlock
         :pageTitle="userName"
         data-testid="users__edit-view__page-heading"
+        description="Configure user identity, access scope, and authentication settings."
       />
     </template>
     <template #content>

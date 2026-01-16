@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Pulse"
-        description="Monitor real user data performance in real time."
+        description="Collect and analyze real user monitoring data to measure user performance and experience across any application."
       ></PageHeadingBlock>
     </template>
     <template #content>

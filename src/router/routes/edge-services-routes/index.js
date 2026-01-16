@@ -1,5 +1,6 @@
 import * as EdgeServiceServices from '@/services/edge-service-services'
 import * as EdgeServiceResourcesServices from '@/services/edge-service-resources-services'
+import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -15,7 +16,7 @@ export const edgeServicesRoutes = {
         listEdgeServiceServices: EdgeServiceServices.listEdgeServiceServices,
         deleteEdgeServiceServices: EdgeServiceServices.deleteEdgeServiceServices,
         editEdgeServiceServices: EdgeServiceServices.editEdgeServiceServices,
-        documentationService: Helpers.documentationCatalog.edgeServices
+        documentationService: documentationDeployProducts.edgeServices
       },
       meta: {
         title: 'Edge Services',
@@ -42,7 +43,7 @@ export const edgeServicesRoutes = {
             to: '/edge-services'
           },
           {
-            label: 'Create Edge Service',
+            label: 'Create',
             to: '/edge-services/create'
           }
         ]

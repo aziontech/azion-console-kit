@@ -8,6 +8,13 @@
 
   defineOptions({ name: 'object-storage-credentials-list-view' })
 
+  defineProps({
+    documentationService: {
+      type: Function,
+      required: true
+    }
+  })
+
   const toast = useToast()
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
@@ -127,6 +134,15 @@
       @on-failed-to-delete="handleFailedToDelete"
       emptyListMessage="No credentials found."
       isTabs
+      :emptyBlock="{
+        title: 'No Object Storage credentials yet',
+        description:
+          'Create your first Object Storage credential to authenticate and control access to buckets.',
+        createButtonLabel: 'Credential',
+        onClickCreate: () => handleCreateCredential(),
+        documentationService: documentationService
+      }"
+      exportFileName="Object Storage Credentials"
     />
     <CredentialDrawer
       ref="credentialDrawerRef"

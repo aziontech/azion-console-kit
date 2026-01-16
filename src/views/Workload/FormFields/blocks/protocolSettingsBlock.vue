@@ -26,6 +26,7 @@
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
   const { value: authorityCertificate } = useField('authorityCertificate')
+  const { value: subjectNameCertificate } = useField('subjectNameCertificate')
 
   useField('tls.certificate', { initialValue: 0 })
   useField('tls.ciphers', { initialValue: 'Modern_v2025Q1' })
@@ -69,7 +70,7 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type: 'edge_certificate',
-      fields: ['id,name,status,authority,type'],
+      fields: ['id,name,status,authority,type,subject_name'],
       ...queryParams
     })
   }
@@ -94,11 +95,12 @@
     return ''
   })
 
-  const moreOptions = ['authority', 'icon', 'status']
+  const moreOptions = ['authority', 'icon', 'status', 'subjectName']
 
-  const selectCertificate = ({ status, authority }) => {
+  const selectCertificate = ({ status, authority, subjectName }) => {
     statusDigitalCertificate.value = status
     authorityCertificate.value = authority
+    subjectNameCertificate.value = subjectName
   }
 
   const iconColor = {

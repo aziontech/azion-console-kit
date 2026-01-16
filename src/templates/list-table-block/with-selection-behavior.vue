@@ -206,6 +206,12 @@
       type: Array,
       default: () => []
     },
+    exportFileName: {
+      type: String
+    },
+    csvMapper: {
+      type: Function
+    },
     pt: {
       type: Object,
       default: () => ({})

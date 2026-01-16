@@ -38,6 +38,61 @@ const buildLetsEncryptBase = (name, cnames, edgeCertificate) => {
   }
 }
 
+const certificateIsWildcard = (subjectName) => {
+  if (Array.isArray(subjectName)) {
+    return subjectName.some((name) => typeof name === 'string' && name.trim().startsWith('*'))
+  }
+
+  if (typeof subjectName === 'string') {
+    return subjectName.trim().startsWith('*')
+  }
+
+  return false
+}
+
+const getWildcardBaseDomains = (subjectName) =>
+  (Array.isArray(subjectName) ? subjectName : [subjectName]).reduce((acc, name) => {
+    if (typeof name === 'string') {
+      const domain = name.trim().slice(1).replace(/^\.+/, '')
+      if (name.trim().startsWith('*') && domain) acc.push(domain)
+    }
+    return acc
+  }, [])
+
+const hostnameIsSubdomainOf = (hostname, baseDomain) => {
+  if (typeof hostname !== 'string' || typeof baseDomain !== 'string') return false
+  const host = hostname.trim().toLowerCase()
+  const base = baseDomain.trim().toLowerCase()
+
+  if (!host || !base) return false
+  if (!host.endsWith(`.${base}`)) return false
+
+  return host.length > base.length + 1
+}
+
+const hasUncoveredHostnamesForWildcard = (subjectName, hostnames) => {
+  const bases = getWildcardBaseDomains(subjectName)
+  if (!bases.length) return []
+
+  const uncovered = (hostnames || []).filter((hostname) => {
+    return !bases.some((base) => hostnameIsSubdomainOf(hostname, base))
+  })
+
+  return !uncovered.length
+}
+
+const shouldSkipLetsEncryptRecreation = ({ changed, subjectNameCertificate, letEncryptBase }) => {
+  if (!changed) return false
+  if (!certificateIsWildcard(subjectNameCertificate)) return false
+
+  const hostnames = [
+    letEncryptBase.letEncrypt.commonName,
+    ...(letEncryptBase.letEncrypt.alternativeNames || [])
+  ]
+
+  return hasUncoveredHostnamesForWildcard(subjectNameCertificate, hostnames)
+}
+
 const resolveCertificateId = async (payload, cnames) => {
   const edgeCertificate = payload.edgeCertificate
 
@@ -62,6 +117,14 @@ const resolveCertificateId = async (payload, cnames) => {
       letEncryptBase,
       keysToCheck
     )
+
+    const skipRecreation = shouldSkipLetsEncryptRecreation({
+      changed,
+      subjectNameCertificate: payload.subjectNameCertificate,
+      letEncryptBase
+    })
+
+    if (skipRecreation) return null
 
     if (changed) {
       const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(

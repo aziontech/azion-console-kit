@@ -110,7 +110,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Network Lists"
-        description="Organize and manage IP and network lists securely."
+        description="Define and manage lists of IP addresses and CIDR ranges used by security and traffic controls."
       >
         <template #default>
           <DataTableActionsButtons
@@ -138,9 +138,8 @@
         :allowedFilters="allowedFilters"
         defaultOrderingFieldName="-last_modified"
         :emptyBlock="{
-          title: 'No network lists have been added',
-          description:
-            'Click the button below to add a network list based on ASNs, countries, or IP addresses.',
+          title: 'No Network Lists yet',
+          description: 'Create your first network list to control traffic and security behavior.',
           createButtonLabel: 'Network List',
           createPagePath: 'network-lists/create',
           documentationService: documentationService

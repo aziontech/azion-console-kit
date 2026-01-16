@@ -449,6 +449,7 @@
                 disableEditOnClick
                 :hasListService="true"
                 hiddenHeader
+                exportFileName="Possible Attacks"
               />
             </div>
           </div>

@@ -1,3 +1,5 @@
+import { documentationCatalog } from '@/helpers'
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeStorageRoutes = {
   path: '/object-storage',
@@ -10,10 +12,17 @@ export const edgeStorageRoutes = {
       path: '',
       name: 'object-storage-list',
       component: () => import('@views/EdgeStorage/ListView.vue'),
+      props: {
+        documentationService: documentationCatalog.edgeStorage
+      },
       meta: {
         breadCrumbs: [
           {
             label: 'Object Storage',
+            to: '/object-storage'
+          },
+          {
+            label: 'Buckets',
             to: '/object-storage'
           }
         ]
@@ -27,6 +36,10 @@ export const edgeStorageRoutes = {
         breadCrumbs: [
           {
             label: 'Object Storage',
+            to: '/object-storage'
+          },
+          {
+            label: 'Buckets',
             to: '/object-storage'
           },
           {
@@ -48,7 +61,11 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Create Bucket',
+            label: 'Buckets',
+            to: '/object-storage'
+          },
+          {
+            label: 'Create',
             to: '/object-storage/create'
           }
         ]
@@ -65,7 +82,11 @@ export const edgeStorageRoutes = {
             to: '/object-storage'
           },
           {
-            label: 'Edit Bucket',
+            label: 'Buckets',
+            to: '/object-storage'
+          },
+          {
+            label: 'Buckets',
             to: '/object-storage/:id',
             dynamic: true,
             routeParam: 'id'

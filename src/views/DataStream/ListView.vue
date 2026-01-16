@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Data Stream"
-        description="Stream real-time data for analytics and insights."
+        description="Configure streams that collect and deliver event and log data generated across Azion’s products."
       >
         <template #default>
           <DataTableActionsButtons
@@ -53,8 +53,9 @@
             :documentationService="documentationService"
             :allowedFilters="getFilters"
             :emptyBlock="{
-              title: 'No stream has been created.',
-              description: 'Click the button below to create your first stream.',
+              title: 'No Data Streams yet',
+              description:
+                'Create your first stream to route events and log data to internal and external destinations.',
               createPagePath: '/data-stream/create',
               createButtonLabel: 'Stream',
               documentationService: documentationService

@@ -131,7 +131,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        description="Configure threat detection types and allow rules evaluated by Firewall rules engine."
+      />
     </template>
     <template #content>
       <div

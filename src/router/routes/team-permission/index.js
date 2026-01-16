@@ -1,5 +1,6 @@
-import * as Helpers from '@/helpers'
 import * as TeamPermissionService from '@/services/team-permission'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const teamsPermissionRoutes = {
   path: '/teams-permission',
@@ -11,7 +12,7 @@ export const teamsPermissionRoutes = {
       props: {
         listTeamPermissionService: TeamPermissionService.listTeamPermissionService,
         deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService,
-        documentationService: Helpers.documentationCatalog.teamPermissions
+        documentationService: documentationAccountsProducts.teamPermissions
       },
       meta: {
         title: 'Teams Permissions',
@@ -39,7 +40,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Create Team',
+            label: 'Create',
             to: '/teams-permission/create'
           }
         ]
