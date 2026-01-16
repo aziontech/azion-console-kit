@@ -11,14 +11,15 @@
   import * as yup from 'yup'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-  const { selectedBucket } = useEdgeStorage()
+  const { getBucketSelected } = useEdgeStorage()
 
   const dialog = useDialog()
   const listTableBlockRef = ref()
   const showCreateCredentialDrawer = ref(false)
+  const bucketSelected = getBucketSelected()
 
   const listCredentialsService = async (params = {}) => {
-    return await edgeStorageService.listCredentials(selectedBucket.value?.name, params)
+    return await edgeStorageService.listCredentials(bucketSelected, params)
   }
 
   const handleCreateCredential = () => {
@@ -29,8 +30,8 @@
     const body = {
       name: credentialData.name,
       capabilities: credentialData.capabilities,
-      expiration_date: credentialData.expirationDate,
-      bucket: [selectedBucket.value.name]
+      expirationDate: credentialData.expirationDate,
+      bucket: [bucketSelected]
     }
     const result = await edgeStorageService.createCredential(body)
     return result

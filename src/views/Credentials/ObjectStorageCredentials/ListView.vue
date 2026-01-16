@@ -24,11 +24,7 @@
   const getColumns = computed(() => [
     {
       field: 'name',
-      header: 'Name',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
-      }
+      header: 'Name'
     },
     {
       field: 'accessKey',

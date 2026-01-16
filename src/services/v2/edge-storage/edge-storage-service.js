@@ -210,7 +210,7 @@ export class EdgeStorageService extends BaseService {
       method: 'GET',
       url: `${this.baseURL}/credentials`,
       params: {
-        bucket: bucketName,
+        buckets: bucketName,
         ...params
       }
     })
