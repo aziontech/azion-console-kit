@@ -144,9 +144,7 @@
     const preloadPromises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      preloadPromises.push(
-        edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value)
-      )
+      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value))
     }
 
     preloadPromises.push(

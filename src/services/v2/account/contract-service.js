@@ -15,9 +15,8 @@ export class ContractService extends BaseService {
 
   async getContractServicePlan(clientId) {
     const queryKey = queryKeys.contract.servicePlan(clientId)
-    return await this._ensureQueryData(
-      queryKey,
-      async () => this.fetchContractServicePlan(clientId)
+    return await this._ensureQueryData(queryKey, async () =>
+      this.fetchContractServicePlan(clientId)
     )
   }
 

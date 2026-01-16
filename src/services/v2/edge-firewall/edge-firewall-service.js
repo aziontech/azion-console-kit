@@ -10,10 +10,12 @@ export class EdgeFirewallService extends BaseService {
     this.baseURL = 'v4/workspace/firewalls'
   }
 
-  #fetchList = async (params = {
-    pageSize: 10,
-    fields: ['id', 'name', 'debug_rules', 'last_editor', 'last_modified', 'active']
-  }) => {
+  #fetchList = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name', 'debug_rules', 'last_editor', 'last_modified', 'active']
+    }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -36,13 +38,25 @@ export class EdgeFirewallService extends BaseService {
     const params = {
       page: 1,
       pageSize,
-      fields: ['id', 'name', 'debug_rules', 'last_editor', 'last_modified', 'last_modify', 'active'],
+      fields: [
+        'id',
+        'name',
+        'debug_rules',
+        'last_editor',
+        'last_modified',
+        'last_modify',
+        'active'
+      ],
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(queryKeys.edgeFirewall.list(params), () => this.#fetchList(params), {
-      persist: !params.search
-    })
+    await this._ensureQueryData(
+      queryKeys.edgeFirewall.list(params),
+      () => this.#fetchList(params),
+      {
+        persist: !params.search
+      }
+    )
   }
 
   listEdgeFirewallService = async (params) => {

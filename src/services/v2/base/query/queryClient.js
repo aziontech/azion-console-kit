@@ -5,7 +5,7 @@ import { isProduction } from '@/helpers/get-environment'
 
 const isProductionEnvironment = isProduction()
 
-export const queryClient = new QueryClient({
+const baseQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       ...getCacheOptions()
@@ -15,6 +15,8 @@ export const queryClient = new QueryClient({
     }
   }
 })
+
+export const queryClient = baseQueryClient
 
 const broadcastChannel = isProductionEnvironment ? 'app-azion-sync' : 'app-azion-sync-stage'
 
@@ -34,4 +36,8 @@ export const clearCacheByType = async (cacheType) => {
 
 export const clearCacheGlobal = async () => {
   await clearCacheByType(CACHE_TYPE.GLOBAL)
+}
+
+export const cancelAllQueries = async () => {
+  await queryClient.cancelQueries()
 }

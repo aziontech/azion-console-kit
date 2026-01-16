@@ -18,9 +18,13 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(queryKeys.solutions.list(group, type), () => this.getListSolutions(params), {
-      cacheType: this.cacheType.STATIC
-    })
+    return this._createQuery(
+      queryKeys.solutions.list(group, type),
+      () => this.getListSolutions(params),
+      {
+        cacheType: this.cacheType.STATIC
+      }
+    )
   }
 
   /**

@@ -163,7 +163,9 @@ export class WorkloadService extends BaseService {
   }
 
   loadWorkload = async ({ id }) => {
-    const cachedQueries = this.queryClient.getQueriesData({ queryKey: queryKeys.workload.details() })
+    const cachedQueries = this.queryClient.getQueriesData({
+      queryKey: queryKeys.workload.details()
+    })
 
     const hasDifferentId = cachedQueries.some(([key]) => {
       const cachedId = key[key.length - 1]

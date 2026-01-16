@@ -193,7 +193,9 @@ export class EdgeFirewallFunctionService extends BaseService {
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewallFunctions.all(edgeFirewallId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeFirewallFunctions.all(edgeFirewallId)
+    })
 
     return 'Function successfully deleted'
   }

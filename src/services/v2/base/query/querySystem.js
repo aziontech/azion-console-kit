@@ -1,18 +1,20 @@
 import { toValue, computed, isRef } from 'vue'
+import { logger } from '../logger'
+import { isProduction } from '@/helpers/get-environment'
 
 export function createFinalKey(queryKey) {
   if (queryKey === null || queryKey === undefined) {
-    console.error('[keyFactory] Invalid queryKey (null/undefined)')
+    logger.error('keyFactory', 'Invalid queryKey (null/undefined)')
     return ['__invalid_key__', Date.now()]
   }
 
   if (typeof queryKey === 'function') return queryKey
   if (!Array.isArray(queryKey)) queryKey = [queryKey]
 
-  if (process.env.NODE_ENV === 'development') {
+  if (!isProduction()) {
     const hasInvalidValues = queryKey.some((value) => value === null || value === undefined)
     if (hasInvalidValues) {
-      console.warn('[keyFactory] QueryKey contains null/undefined:', queryKey)
+      logger.warn('keyFactory', 'QueryKey contains null/undefined:', queryKey)
     }
   }
 
@@ -24,7 +26,7 @@ export function createFinalKey(queryKey) {
 
 const validateId = (id, context) => {
   if (id === null || id === undefined) {
-    console.warn(`[queryKeys] Invalid id in ${context}:`, id)
+    logger.warn('queryKeys', `Invalid id in ${context}:`, id)
     return '__invalid_id__'
   }
   return id

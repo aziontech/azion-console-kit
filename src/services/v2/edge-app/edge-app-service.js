@@ -92,7 +92,6 @@ export class EdgeAppService extends BaseService {
     return 'Resource successfully deleted'
   }
 
-  /** @deprecated Use listEdgeApplicationsService with useQuery */
   listEdgeApplicationsService = async (params) => {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
@@ -106,10 +105,8 @@ export class EdgeAppService extends BaseService {
     )
   }
 
-  /** @deprecated Use #fetchDropdown internally */
   listEdgeApplicationsServiceDropdown = this.#fetchDropdown
 
-  /** @deprecated Use #fetchOne internally */
   loadEdgeApplicationService = async (params) => {
     const cachedQueries = this.queryClient.getQueriesData({ queryKey: queryKeys.edgeApp.details() })
 
@@ -129,16 +126,12 @@ export class EdgeAppService extends BaseService {
     )
   }
 
-  /** @deprecated Use create() */
   createEdgeApplicationService = this.create
 
-  /** @deprecated Use clone() */
   cloneEdgeApplicationService = this.clone
 
-  /** @deprecated Use edit() */
   editEdgeApplicationService = this.edit
 
-  /** @deprecated Use delete() */
   deleteEdgeApplicationService = this.delete
 }
 
