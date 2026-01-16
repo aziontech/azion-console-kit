@@ -21,7 +21,7 @@
 
   const { value: name } = useField('name')
   const { value: workloads_access } = useField('workloads_access', undefined, {
-    initialValue: 'read_write'
+    initialValue: 'read_only'
   })
 
   const workloadsAccessOptions = [
