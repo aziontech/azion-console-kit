@@ -53,7 +53,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2/payment/payment-service'

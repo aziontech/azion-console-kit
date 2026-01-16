@@ -8,15 +8,15 @@
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       :class="{ 'disabled-list': disabledList }"
-      v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
       :scrollHeight="props.scrollHeight"
       removableSort
-      :value="data"
+      :data="data"
+      :columns="selectedColumns"
       dataKey="id"
-      @row-click="editItemSelected"
+      @rowClick="editItemSelected"
       :rowHover="!disabledList"
       v-model:filters="filters"
       :paginator="true"
@@ -28,6 +28,7 @@
       :exportFilename="exportFileName"
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
+      :notShowEmptyBlock="true"
       data-testid="data-table"
       :first="firstItemIndex"
       :rowClass="stateClass"
@@ -237,67 +238,6 @@
         </slot>
       </template>
     </DataTable>
-
-    <DataTable
-      v-else
-      :disabled="disabledList"
-      :value="Array(10)"
-      :pt="{
-        header: { class: '!border-t-0' }
-      }"
-      data-testid="data-table-skeleton"
-    >
-      <template
-        #header
-        v-if="!props.hiddenHeader"
-      >
-        <slot name="header">
-          <div
-            class="flex flex-wrap justify-between gap-2 w-full"
-            data-testid="data-table-skeleton-header"
-          >
-            <span
-              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
-              data-testid="data-table-skeleton-search"
-            >
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full h-8 md:min-w-[20rem]"
-                v-model="filters.global.value"
-                placeholder="Search"
-                data-testid="data-table-skeleton-search-input"
-              />
-            </span>
-            <slot
-              name="addButton"
-              data-testid="data-table-add-button"
-            >
-              <PrimeButton
-                class="max-sm:w-full"
-                :disabled="disabledAddButton"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                :label="addButtonLabel"
-                size="small"
-                v-if="addButtonLabel"
-                data-testid="data-table-skeleton-add-button"
-              />
-            </slot>
-          </div>
-        </slot>
-      </template>
-      <Column
-        v-for="col of columns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
-        data-testid="data-table-skeleton-column"
-      >
-        <template #body>
-          <Skeleton />
-        </template>
-      </Column>
-    </DataTable>
   </div>
 </template>
 
@@ -305,12 +245,10 @@
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
   import Column from 'primevue/column'
-  import DataTable from 'primevue/datatable'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
-  import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
@@ -319,6 +257,7 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import DataTable from '@/components/DataTable/DataTable.vue'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -326,6 +265,7 @@
     'on-load-data',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
+    'on-row-click-edit-redirect',
     'update:selectedItensData'
   ])
 
@@ -500,7 +440,7 @@
   }
 
   const handleExportTableDataToCSV = () => {
-    dataTableRef.value.exportCSV()
+    dataTableRef.value?.exportCSV?.()
   }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
