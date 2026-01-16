@@ -94,7 +94,8 @@
     emit('onSuccess', {
       type: certificateType.value,
       id: response.data.id,
-      authority: response.data.authority
+      authority: response.data.authority,
+      subjectName: response?.data?.subject_name || null
     })
     closeCreateDrawer()
   }

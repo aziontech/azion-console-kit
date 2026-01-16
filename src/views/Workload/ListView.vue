@@ -4,11 +4,15 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import * as Helpers from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
-  import * as Helpers from '@/helpers'
+  import {
+    documentationSecureProducts,
+    documentationBuildProducts
+  } from '@/helpers/azion-documentation-catalog'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
@@ -54,9 +58,9 @@
 
   const documentationHandler = () => {
     if (isWorkload.value) {
-      Helpers.documentationCatalog.workload()
+      documentationSecureProducts.workload()
     } else {
-      Helpers.documentationCatalog.domains()
+      documentationBuildProducts.domains()
     }
   }
 
@@ -172,17 +176,17 @@
   const allowedFilters = computed(() =>
     getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
   )
-  const titleEmptyPage = computed(
-    () => `No ${handleTextDomainWorkload.singularTitle} have been created`
-  )
-  const descriptionEmptyPage = computed(
-    () => `Click the button below to create your first ${handleTextDomainWorkload.singularTitle}.`
+  const titleEmptyPage = computed(() => `No ${handleTextDomainWorkload.pluralTitle} yet`)
+  const descriptionEmptyPage = computed(() =>
+    isWorkload.value
+      ? `Create your first Workload to configure domains, protocols, security, and application execution for incoming traffic.`
+      : `Create your first Domain to configure firewalls and applications execution for incoming traffic.`
   )
 
   const pageDescription = computed(() => {
     return isWorkload.value
-      ? 'Deploy and manage scalable workloads across the network.'
-      : 'Manage and secure domains for applications.'
+      ? "Deploy and manage workloads that bind domains, protocols, security, and application on Azion's global infrastructure."
+      : "Deploy and manage domains that execute firewalls and applications on Azion's global infrastructure."
   })
 </script>
 
@@ -218,11 +222,12 @@
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColumns="['name']"
-        exportFileName="Workload"
+        :exportFileName="handleTextDomainWorkload.singularTitle"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,
+          createPagePath: 'workloads/create',
           createButtonLabel: handleTextDomainWorkload.singularTitle,
           documentationService: documentationHandler
         }"

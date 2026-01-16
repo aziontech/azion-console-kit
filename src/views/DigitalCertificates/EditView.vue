@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="certificateName"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="certificateName"
+        description="Configure certificate data, validation methods, and lifecycle settings used to secure traffic."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

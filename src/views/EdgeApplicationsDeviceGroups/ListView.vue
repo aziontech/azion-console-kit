@@ -152,7 +152,7 @@
     :actions="actions"
     isTabs
     :frozen-columns="['name']"
-    exportFileName="Device Groups"
+    exportFileName="Application Device Groups"
     hideLastModifiedColumn
     :emptyBlock="{
       title: 'No device groups have been created',

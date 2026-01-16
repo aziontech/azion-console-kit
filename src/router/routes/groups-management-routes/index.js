@@ -1,5 +1,6 @@
 import * as AccountSettingsServices from '@/services/account-settings-services'
 import * as AccountManagementServices from '@/services/accounts-management-services'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const groupsManagementRoutes = {
@@ -10,6 +11,9 @@ export const groupsManagementRoutes = {
       path: '',
       name: 'list-groups-management',
       component: () => import('@views/GroupsManagement/ListView.vue'),
+      props: {
+        documentationService: documentationAccountsProducts.accounts
+      },
       meta: {
         title: 'Groups Management',
         breadCrumbs: [
@@ -18,8 +22,7 @@ export const groupsManagementRoutes = {
             to: '/groups-management'
           }
         ]
-      },
-      props: {}
+      }
     },
     {
       path: 'create',
@@ -39,7 +42,7 @@ export const groupsManagementRoutes = {
             to: '/group/management'
           },
           {
-            label: 'Create Group',
+            label: 'Create',
             to: '/group/management/create'
           }
         ]

@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Activity History"
-        description="Track and review actions performed within the account."
+        description="View recorded account actions and configuration changes."
       />
     </template>
     <template #content>
@@ -17,7 +17,7 @@
       <EmptyResultsBlock
         v-else
         title="No activity has been recorded"
-        description="Start using services and products to view your account activity."
+        description="No activities found."
         :documentationService="documentationService"
       >
         <template #illustration>

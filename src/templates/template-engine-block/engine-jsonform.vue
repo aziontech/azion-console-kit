@@ -12,6 +12,8 @@
   import { InputPasswordControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-password/inputPasswordControlTester'
   import InputNumberControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlRenderer.vue'
   import { InputNumberControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlTester'
+  import TextareaControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/textarea/textareaControlRenderer.vue'
+  import { TextareaControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/textarea/textareaControlTester'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import OAuthGithub from './oauth-github.vue'
 
@@ -48,6 +50,10 @@
     {
       tester: InputNumberControlTester,
       renderer: InputNumberControlRenderer
+    },
+    {
+      tester: TextareaControlTester,
+      renderer: TextareaControlRenderer
     }
   ]
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])

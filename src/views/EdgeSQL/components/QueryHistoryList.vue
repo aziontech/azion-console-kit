@@ -32,7 +32,7 @@
         class="text-left py-2"
       >
         <div class="text-color-secondary text-sm">
-          {{ searchTerm ? 'No queries found.' : 'No queries created yet.' }}
+          {{ searchTerm ? 'No queries found.' : 'No queries created yet' }}
         </div>
       </div>
 

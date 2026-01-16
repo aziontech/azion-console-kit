@@ -125,7 +125,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Personal Token"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Personal Token"
+        description="Create a personal token to securely access your account via API."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

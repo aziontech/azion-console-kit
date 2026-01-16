@@ -445,8 +445,11 @@
                 v-model:selectedItensData="selectedAttack"
                 :columns="tableColumns"
                 :listService="listAttacks"
+                disabledList
+                disableEditOnClick
                 :hasListService="true"
                 hiddenHeader
+                exportFileName="Possible Attacks"
               />
             </div>
           </div>

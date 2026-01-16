@@ -1,7 +1,8 @@
-import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -13,7 +14,7 @@ export const edgeApplicationRoutes = {
       name: 'list-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.edgeApplication
+        documentationService: documentationBuildProducts.applications
       },
       meta: {
         title: 'Applications',
@@ -47,7 +48,7 @@ export const edgeApplicationRoutes = {
             to: '/applications'
           },
           {
-            label: 'Create Application',
+            label: 'Create',
             to: '/applications/create'
           }
         ]

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="domainName"
+        description="Configure domains, certificates, and select the security and application settings executed by this Domain."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -168,6 +171,7 @@
     active: yup.boolean(),
     environment: yup.string(),
     oldDomains: yup.array().of(yup.string()).optional(),
-    authorityCertificate: yup.string().nullable()
+    authorityCertificate: yup.string().nullable(),
+    subjectNameCertificate: yup.array().nullable()
   })
 </script>

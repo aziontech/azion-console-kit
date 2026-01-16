@@ -139,6 +139,10 @@
     allowedFilters: {
       type: Array,
       default: () => []
+    },
+    paginator: {
+      type: Boolean,
+      default: true
     }
   })
   // Use the composable for all data table functionality
@@ -194,7 +198,6 @@
   const slots = useSlots()
 
   // Additional computed properties specific to this component
-  const havePagination = ref(true)
   const classActions = computed(() =>
     isRenderActions.value
       ? ''
@@ -237,7 +240,7 @@
       v-model:filters="filtersDynamically"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
-      :paginator="havePagination"
+      :paginator="paginator"
       :rowsPerPageOptions="rowsPerPageOptions"
       :rows="itemsByPage"
       :globalFilterFields="filterBy"
@@ -294,7 +297,7 @@
                       v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                       data-testid="data-table-actions-column-header-refresh"
                     />
-                    <DataTable.Export @export="handleExportTableDataToCSV($event)" />
+                    <DataTable.Export @export="handleExportTableDataToCSV(exportFileName)" />
                     <DataTableColumnSelector
                       :columns="columns"
                       v-model:selectedColumns="selectedColumns"

@@ -167,6 +167,7 @@
       <PageHeadingBlock
         :pageTitle="title"
         :entityName="title"
+        description="Configure variables and resources to orchestrate to your Edge Node."
       />
     </template>
     <template #content>

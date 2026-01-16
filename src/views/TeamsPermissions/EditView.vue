@@ -4,6 +4,7 @@
       <PageHeadingBlock
         :pageTitle="teamName"
         data-testid="teams-permissions__edit-view__page-heading"
+        description="Configure permissions for team collaboration."
       />
     </template>
     <template #content>

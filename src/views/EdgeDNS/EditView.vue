@@ -260,6 +260,21 @@
     return activeTab.value === mapTabs.value?.records
   })
 
+  const addButtonController = computed(() => {
+    if (activeTab.value === mapTabs.value.records) {
+      return {
+        showAddButtonTab: true,
+        label: 'Record',
+        click: openCreateDrawerEDNSResource
+      }
+    }
+    return {
+      showAddButtonTab: false,
+      label: '',
+      click: () => {}
+    }
+  })
+
   const loadRecordServiceWithEDNSIdDecorator = async (payload) => {
     return await edgeDNSRecordsService.loadRecord({
       id: payload.id,
@@ -396,129 +411,151 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="edgeDNSName" />
+      <PageHeadingBlock
+        :pageTitle="edgeDNSName"
+        description="Configure DNS records and zone settings used for authoritative domain resolution."
+      />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
-        class="w-full"
-      >
-        <TabPanel
-          header="Main Settings"
-          :pt="{
-            root: {
-              'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
-            }
-          }"
+      <div class="flex align-center justify-between relative">
+        <TabView
+          :activeIndex="activeTab"
+          @tab-click="changeRouteByClickingOnTab"
+          class="flex-1"
         >
-          <EditFormBlock
-            :editService="edgeDNSService.editEdgeDNSService"
-            :loadService="loadEdgeDNS"
-            :schema="validationSchemaEditEDNS"
-            :updatedRedirect="updatedRedirect"
-            :isTabs="true"
-            @on-edit-success="handleTrackEditEvent"
-            @on-edit-fail="handleTrackFailEditEvent"
+          <TabPanel
+            header="Main Settings"
+            :pt="{
+              root: {
+                'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
+              }
+            }"
           >
-            <template #form>
-              <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
-            </template>
-            <template #action-bar="{ onSubmit, onCancel, loading }">
-              <ActionBarTemplate
-                v-if="showEditFormWithActionTab"
-                @onSubmit="onSubmit"
-                @onCancel="onCancel"
-                :loading="loading"
+          </TabPanel>
+          <TabPanel
+            header="Records"
+            :pt="{
+              root: {
+                'data-testid': 'edge-dns-edit-view__records__tab-panel'
+              }
+            }"
+          >
+          </TabPanel>
+        </TabView>
+        <div
+          v-if="addButtonController.showAddButtonTab"
+          class="flex ml-4 items-center"
+        >
+          <PrimeButton
+            :label="addButtonController.label"
+            size="small"
+            icon="pi pi-plus"
+            @click="addButtonController.click"
+            data-testid="data-table-actions-column-body-actions-menu-button"
+          />
+        </div>
+      </div>
+
+      <div>
+        <EditFormBlock
+          v-if="showEditFormWithActionTab"
+          :editService="edgeDNSService.editEdgeDNSService"
+          :loadService="loadEdgeDNS"
+          :schema="validationSchemaEditEDNS"
+          :updatedRedirect="updatedRedirect"
+          :isTabs="true"
+          @on-edit-success="handleTrackEditEvent"
+          @on-edit-fail="handleTrackFailEditEvent"
+        >
+          <template #form>
+            <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
+          </template>
+          <template #action-bar="{ onSubmit, onCancel, loading }">
+            <ActionBarTemplate
+              v-if="showEditFormWithActionTab"
+              @onSubmit="onSubmit"
+              @onCancel="onCancel"
+              :loading="loading"
+            />
+          </template>
+        </EditFormBlock>
+
+        <div v-if="showRecords">
+          <FetchListTableBlock
+            ref="listEDNSResourcesRef"
+            addButtonLabel="Record"
+            defaultOrderingFieldName="id"
+            :editInDrawer="openEditDrawerEDNSResource"
+            :columns="recordListColumns"
+            :listService="listRecordsServiceEdgeDNSDecorator"
+            emptyListMessage="No records found."
+            :actions="actions"
+            isTabs
+            :apiFields="EDGE_DNS_RECORDS_FIELDS"
+            exportFileName="Edge DNS Records"
+            @on-before-go-to-edit="handleTrackEventGoToEdit"
+            hideLastModifiedColumn
+            :emptyBlock="{
+              title: 'No record has been created',
+              description: 'Click the button below to create your first record.',
+              createButtonLabel: 'Record',
+              createPagePath: 'records/create',
+              documentationService: documentationService,
+              inTabs: true
+            }"
+          >
+            <template #addButton>
+              <PrimeButton
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerEDNSResource"
+                data-testid="create_Record_button"
               />
             </template>
-          </EditFormBlock>
-        </TabPanel>
-        <TabPanel
-          header="Records"
-          :pt="{
-            root: {
-              'data-testid': 'edge-dns-edit-view__records__tab-panel'
-            }
-          }"
-        >
-          <div v-if="showRecords">
-            <FetchListTableBlock
-              ref="listEDNSResourcesRef"
-              addButtonLabel="Record"
-              defaultOrderingFieldName="id"
-              :editInDrawer="openEditDrawerEDNSResource"
-              :columns="recordListColumns"
-              :listService="listRecordsServiceEdgeDNSDecorator"
-              emptyListMessage="No records found."
-              :actions="actions"
-              isTabs
-              :apiFields="EDGE_DNS_RECORDS_FIELDS"
-              exportFileName="Edge DNS Records"
-              @on-before-go-to-edit="handleTrackEventGoToEdit"
-              hideLastModifiedColumn
-              :emptyBlock="{
-                title: 'No record has been created',
-                description: 'Click the button below to create your first record.',
-                createButtonLabel: 'Record',
-                createPagePath: 'records/create',
-                documentationService: documentationService,
-                inTabs: true
-              }"
-            >
-              <template #addButton>
-                <PrimeButton
-                  icon="pi pi-plus"
-                  label="Record"
-                  @click="openCreateDrawerEDNSResource"
-                  data-testid="create_Record_button"
-                />
-              </template>
-              <template #emptyBlockButton>
-                <PrimeButton
-                  class="max-md:w-full w-fit"
-                  severity="secondary"
-                  icon="pi pi-plus"
-                  label="Record"
-                  @click="openCreateDrawerEDNSResource"
-                  data-testid="create_Record_button"
-                />
-              </template>
-            </FetchListTableBlock>
+            <template #emptyBlockButton>
+              <PrimeButton
+                class="max-md:w-full w-fit"
+                severity="secondary"
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerEDNSResource"
+                data-testid="create_Record_button"
+              />
+            </template>
+          </FetchListTableBlock>
 
-            <CreateDrawerBlock
-              v-if="showCreateRecordDrawer"
-              v-model:visible="showCreateRecordDrawer"
-              :createService="edgeDNSRecordsService.createRecord"
-              :schema="validationSchemaEDNSRecords"
-              :initialValues="initialValuesCreateRecords"
-              @onSuccess="handleCreatedSuccessfully"
-              @onError="handleTrackFailCreated"
-              title="Create Record"
-            >
-              <template #formFields>
-                <FormFieldsRecords />
-              </template>
-            </CreateDrawerBlock>
+          <CreateDrawerBlock
+            v-if="showCreateRecordDrawer"
+            v-model:visible="showCreateRecordDrawer"
+            :createService="edgeDNSRecordsService.createRecord"
+            :schema="validationSchemaEDNSRecords"
+            :initialValues="initialValuesCreateRecords"
+            @onSuccess="handleCreatedSuccessfully"
+            @onError="handleTrackFailCreated"
+            title="Create Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </CreateDrawerBlock>
 
-            <EditDrawerBlock
-              v-if="showEditRecordDrawer"
-              :id="selectedEdgeDnsRecordToEdit"
-              v-model:visible="showEditRecordDrawer"
-              :loadService="loadRecordServiceWithEDNSIdDecorator"
-              :editService="editRecordServiceWithEDNSIdDecorator"
-              :schema="validationSchemaEDNSRecords"
-              @onSuccess="handleEditedSuccessfully"
-              @onError="handleTrackFailEdit"
-              title="Edit Record"
-            >
-              <template #formFields>
-                <FormFieldsRecords />
-              </template>
-            </EditDrawerBlock>
-          </div>
-        </TabPanel>
-      </TabView>
+          <EditDrawerBlock
+            v-if="showEditRecordDrawer"
+            :id="selectedEdgeDnsRecordToEdit"
+            v-model:visible="showEditRecordDrawer"
+            :loadService="loadRecordServiceWithEDNSIdDecorator"
+            :editService="editRecordServiceWithEDNSIdDecorator"
+            :schema="validationSchemaEDNSRecords"
+            @onSuccess="handleEditedSuccessfully"
+            @onError="handleTrackFailEdit"
+            title="Edit Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </EditDrawerBlock>
+        </div>
+      </div>
       <router-view></router-view>
     </template>
   </ContentBlock>
