@@ -87,7 +87,6 @@ export const edgeStorageRoutes = {
           },
           {
             label: 'Buckets',
-            to: '/object-storage/:id',
             dynamic: true,
             routeParam: 'id'
           },

@@ -264,10 +264,9 @@ const config = {
       },
       {
         name: 'Set Cache for Static Assets',
-        description:
-          'Sets the cache for all requests using the default object storage.',
+        description: 'Sets the cache for all requests using the default object storage.',
         match:
-          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
+          '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
         behavior: {
           enableGZIP: true,
           setCache: 'Statics - Cache'
@@ -289,7 +288,7 @@ const config = {
         description:
           'Sets the storage origin and deliver for all requests using the default object storage.',
         match:
-          '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
+          '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',
@@ -337,7 +336,8 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+            inputValue:
+              '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
           }
         ],
         behavior: {
@@ -541,8 +541,7 @@ const config = {
       },
       {
         name: 'Cache Controll to index.html',
-        description:
-          'Applies Cache-Control header to index.html',
+        description: 'Applies Cache-Control header to index.html',
         criteria: [
           {
             variable: '${uri}',
@@ -554,7 +553,7 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api' 
+            inputValue: '^/api'
           },
           {
             variable: '${uri}',
@@ -578,13 +577,16 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^(?!.*edge_storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+            inputValue:
+              '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
           }
         ],
         behavior: {
-          setHeaders: ['Cache-Control: no-cache, must-revalidate, max-age=0, stale-while-revalidate=30']
+          setHeaders: [
+            'Cache-Control: no-cache, must-revalidate, max-age=0, stale-while-revalidate=30'
+          ]
         }
-      },
+      }
     ]
   }
 }

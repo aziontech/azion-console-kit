@@ -22,7 +22,7 @@
 
   const initialValues = {
     name: '',
-    workloads_access: 'read_write',
+    workloads_access: 'read_only',
     bucket: [selectedBucket.value.name]
   }
 
