@@ -3,6 +3,8 @@ import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { formatBytes } from '@/helpers/format-bytes'
 
+const ALL_BUCKETS_VALUE = '__ALL_BUCKETS__'
+
 const transformMap = {
   id: (value) => value.name,
   name: (value) => value.name || value.key,
@@ -78,7 +80,7 @@ export const EdgeStorageAdapter = {
       name: data.name,
       capabilities: data.capabilities,
       expiration_date: data.expirationDate,
-      buckets: data.bucket[0] === '__ALL_BUCKETS__' ? null : data.bucket
+      buckets: data.bucket[0] === ALL_BUCKETS_VALUE ? null : data.bucket
     }
   }
 }
