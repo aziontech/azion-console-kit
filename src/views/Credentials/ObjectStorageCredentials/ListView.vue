@@ -34,16 +34,18 @@
       field: 'capabilities',
       header: 'Capabilities',
       type: 'component',
+      style: 'max-width: 300px',
       component: (columnData) => {
-        return columnBuilder({
-          data: { value: columnData },
-          columnAppearance: 'expand-text-column'
-        })
+        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     },
     {
       field: 'bucket',
-      header: 'Bucket'
+      header: 'Bucket',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+      }
     },
     {
       field: 'createDate',
@@ -60,10 +62,10 @@
       filterPath: 'last_editor'
     },
     {
-      field: 'lastModified',
+      field: 'lastModify',
       header: 'Last Modified',
-      sortField: 'lastModified',
-      filterPath: 'lastModified'
+      sortField: 'lastModify',
+      filterPath: 'lastModify'
     }
   ])
 
@@ -109,6 +111,10 @@
       label: 'Delete',
       type: 'delete',
       title: 'credential',
+      warningMessage:
+        "This credential affect all buckets. Once confirmed, this action can't be reversed. ",
+      description:
+        'The selected credential will be deleted. Check the Help Center for more details.',
       icon: 'pi pi-trash',
       service: deleteCredentialService,
       showOnlyOnHover: true
