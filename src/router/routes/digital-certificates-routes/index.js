@@ -2,16 +2,19 @@ import * as Helpers from '@/helpers'
 
 const certificateTypeMapping = {
   certificateRevogationList: {
-    create: 'Create Certificate Revogation List',
-    edit: 'Edit Certificate Revogation List'
+    label: 'Certificate Revocation List',
+    create: 'Import',
+    edit: 'Edit'
   },
   trusted_ca_certificate: {
-    create: 'Importing Trusted Certificate',
-    edit: 'Edit Trusted Certificate'
+    label: 'Trusted Certificate',
+    create: 'Import',
+    edit: 'Edit'
   },
   edge_certificate: {
-    create: 'Create Server Certificate',
-    edit: 'Edit Server Certificate'
+    label: 'Server Certificate',
+    create: 'Create',
+    edit: 'Edit'
   }
 }
 
@@ -46,12 +49,20 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            label: 'Create Digital Certificate',
-            to: '/digital-certificates/create',
-            dynamic: true,
-            baseLabel: 'Create Digital Certificate',
+            to: '/digital-certificates',
+            baseLabel: 'label',
+            label: 'Server Certificate',
+            typeMapping: certificateTypeMapping,
             queryParam: 'certificate',
-            typeMapping: certificateTypeMapping
+            dynamic: true
+          },
+          {
+            to: '/digital-certificates/create',
+            baseLabel: 'create',
+            label: 'Create',
+            typeMapping: certificateTypeMapping,
+            queryParam: 'certificate',
+            dynamic: true
           }
         ]
       }
@@ -72,7 +83,14 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            label: 'Edit Digital Certificate',
+            to: '/digital-certificates',
+            baseLabel: 'label',
+            typeMapping: certificateTypeMapping,
+            queryParam: 'certificate',
+            label: 'Server Certificate',
+            dynamic: true
+          },
+          {
             to: '/digital-certificates/edit',
             dynamic: true,
             routeParam: 'id'

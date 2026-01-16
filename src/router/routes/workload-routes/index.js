@@ -36,7 +36,7 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Create Workload`,
+            label: `Create`,
             to: `/workloads/create`
           }
         ]

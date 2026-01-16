@@ -94,7 +94,7 @@
         class="text-left py-2"
       >
         <div class="text-color-secondary text-sm">
-          {{ searchTerm ? 'No tables found.' : 'No tables created yet.' }}
+          {{ searchTerm ? 'No tables found.' : 'No tables created yet' }}
         </div>
       </div>
       <div

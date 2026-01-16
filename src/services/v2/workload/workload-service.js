@@ -65,7 +65,6 @@ export class WorkloadService extends BaseService {
     })
 
     const workloadDeployment = await this.workloadDeployment.listWorkloadDeployment(id)
-    this.initialDomains = data.data.domains
 
     return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
   }
@@ -195,11 +194,15 @@ export class WorkloadService extends BaseService {
       await this.queryClient.removeQueries({ queryKey: workloadKeys.details() })
     }
 
-    return await this._ensureQueryData(
+    const workload = await this._ensureQueryData(
       () => workloadKeys.detail(id),
       () => this.#fetchOne({ id }),
       { persist: true }
     )
+
+    this.initialDomains = workload.initialDomains || []
+
+    return workload
   }
 
   editWorkload = async (payload) => {
@@ -232,6 +235,56 @@ export class WorkloadService extends BaseService {
     payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
   }
 
+  #certificateIsWildcard = (subjctName) => {
+    if (Array.isArray(subjctName)) {
+      return subjctName.some((name) => typeof name === 'string' && name.trim().startsWith('*'))
+    }
+
+    if (typeof subjctName === 'string') {
+      return subjctName.trim().startsWith('*')
+    }
+
+    return false
+  }
+
+  #getWildcardBaseDomains = (subjectName) =>
+    (Array.isArray(subjectName) ? subjectName : [subjectName]).reduce((acc, name) => {
+      if (typeof name === 'string') {
+        const domain = name.trim().slice(1).replace(/^\.+/, '')
+        if (name.trim().startsWith('*') && domain) acc.push(domain)
+      }
+      return acc
+    }, [])
+
+  #hostnameIsSubdomainOf = (hostname, baseDomain) => {
+    if (typeof hostname !== 'string' || typeof baseDomain !== 'string') return false
+    const host = hostname.trim().toLowerCase()
+    const base = baseDomain.trim().toLowerCase()
+
+    if (!host || !base) return false
+    if (!host.endsWith(`.${base}`)) return false
+
+    // ensures there is at least one label before baseDomain
+    return host.length > base.length + 1
+  }
+
+  #hasUncoveredHostnamesForWildcard = (subjctName, hostnames) => {
+    const bases = this.#getWildcardBaseDomains(subjctName)
+    if (!bases.length) return []
+
+    const uncovered = (hostnames || []).filter((hostname) => {
+      return !bases.some((base) => this.#hostnameIsSubdomainOf(hostname, base))
+    })
+
+    return !uncovered.length
+  }
+
+  #shouldSkipLetsEncryptRecreation = ({ changed, subjctName, hostnames }) => {
+    if (!changed) return false
+    if (!this.#certificateIsWildcard(subjctName)) return false
+    return this.#hasUncoveredHostnamesForWildcard(subjctName, hostnames)
+  }
+
   #ensureCertificateForEdit = async (payload) => {
     const isNewCertificate = payload.tls.certificate === 1
     const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'
@@ -256,6 +309,17 @@ export class WorkloadService extends BaseService {
         payload,
         keysToCheck
       )
+
+      const hostnames = [payload.letEncrypt.commonName, ...payload.letEncrypt.alternativeNames]
+      const skipRecreation = this.#shouldSkipLetsEncryptRecreation({
+        changed,
+        subjctName: payload.subjctName,
+        hostnames
+      })
+
+      if (skipRecreation) {
+        return
+      }
       shouldCreate = changed
     }
 

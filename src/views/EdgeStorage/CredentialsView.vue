@@ -146,6 +146,7 @@
       emptyListMessage="No credentials found"
       :paginator="false"
       :enableEditClick="false"
+      exportFileName="Credentials"
       :emptyBlock="{
         title: 'No credentials found',
         description: 'Create a new credential to get started'

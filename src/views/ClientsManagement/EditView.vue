@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="clientName" />
+      <PageHeadingBlock
+        :pageTitle="clientName"
+        description="Configure a client account and its settings."
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -54,8 +57,8 @@
   const clientName = ref('Edit Client')
 
   const setClientName = (client) => {
-    clientName.value = client.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, client.name)
+    clientName.value = client.accountName
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, client.accountName)
   }
 
   const props = defineProps({

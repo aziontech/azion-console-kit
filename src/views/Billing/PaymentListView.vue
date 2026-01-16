@@ -11,6 +11,7 @@
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
+    exportFileName="Payment Methods"
   >
     <template #addButton>
       <div class="flex gap-4">

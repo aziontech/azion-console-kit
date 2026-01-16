@@ -243,6 +243,7 @@
     data-testid="rules-engine-list"
     :actions="actions"
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    exportFileName="Firewall Rules Engine"
     :emptyBlock="{
       title: 'No rule has been created',
       description: 'Click the button below to create your first rule.',

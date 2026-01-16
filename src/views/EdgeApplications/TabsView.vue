@@ -392,6 +392,7 @@
         :tag="tagLocked"
         :entityName="edgeApplication?.name"
         data-testid="edge-application-details-heading"
+        description="Configure application logic, function execution, caching settings, and Connectors used to reach origins."
       />
     </template>
     <template #content>

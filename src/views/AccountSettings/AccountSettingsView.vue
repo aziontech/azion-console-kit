@@ -100,7 +100,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Account Settings"
-        description="Manage account details, preferences, and security configurations."
+        description="Manage account-level settings that control identity, access, billing, and organization usage."
       />
     </template>
     <template #content>

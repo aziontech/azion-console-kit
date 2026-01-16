@@ -4,7 +4,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { documentationCatalog } from '@/helpers'
+  import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
   import SelectButton from 'primevue/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
@@ -368,14 +368,14 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Certificate Manager"
-        description="Manage SSL/TLS certificates for secure connections."
+        description="Manage TLS certificates used to secure traffic on Azion’s products."
       >
         <template #default>
           <SelectButton
             v-model="digitalCertificateTypeSelected"
             :options="optionsSelectButton"
             aria-labelledby="basic"
-            class="h-9 p-1"
+            class="h-9 p-1 w-fit"
           />
           <CreateMenuBlock
             addButtonLabel="Certificate"
@@ -405,11 +405,11 @@
         :csvMapper="csvMapper"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
-          title: 'No digital certificate has been added',
-          description: 'Click the button below to add your first digital certificate.',
+          title: 'No Certificates yet',
+          description: 'Create your first certificate to secure application traffic with TLS.',
           createPagePath: 'digital-certificates/create',
           createButtonLabel: 'Certificate Manager',
-          documentationService: documentationCatalog.digitalCertificates
+          documentationService: documentationBuildProducts.certificateManager
         }"
       >
       </FetchListTableBlock>

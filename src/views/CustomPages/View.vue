@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        description="Configure content and conditions for custom response pages."
+      />
     </template>
     <template #content>
       <component

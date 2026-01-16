@@ -146,6 +146,7 @@ export const WorkloadAdapter = {
       application: workloadDeployment?.application,
       firewall: workloadDeployment?.firewall,
       customPage: workloadDeployment?.customPage,
+      initialDomains: workload.domains,
       domains: cleanDomains,
       customDomain: azionAppSubdomains,
       useCustomDomain: !!azionAppSubdomains,

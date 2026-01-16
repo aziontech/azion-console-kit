@@ -105,6 +105,7 @@
               @view-change="handleViewChange"
               :options="resultsViewOptions"
               :title-delete-dialog="'Data'"
+              exportFileName="Query Results"
               :empty-block="{
                 title: 'Ready to execute',
                 description: 'Execute a query to see the results here'

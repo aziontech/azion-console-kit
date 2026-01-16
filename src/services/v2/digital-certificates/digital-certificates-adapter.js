@@ -120,6 +120,7 @@ export const DigitalCertificatesAdapter = {
         name: item.name,
         authority: item?.authority,
         status: item?.status,
+        subjectName: item?.subject_name,
         icon: getIconByStatus(item?.status)
       }
     })
@@ -171,6 +172,7 @@ export const DigitalCertificatesAdapter = {
         name: item.name,
         authority: item?.authority,
         status: item?.status,
+        subjectName: item?.subject_name,
         icon: getIconByStatus(item?.status)
       }
     })

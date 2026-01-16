@@ -225,6 +225,12 @@
 
     return filteredData
   })
+  const getExportFileName = computed(() => {
+    const date = new Date()
+    const formattedDate = date.toISOString().split('T')[0]
+    const bucketName = props.selectedBucket?.name || 'export'
+    return `${bucketName} - files - ${formattedDate}`
+  })
 
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
@@ -590,6 +596,7 @@
       v-model:selection="selectedItems"
       notShowEmptyBlock
       :frozenValue="frozenRows"
+      :export-filename="getExportFileName"
       isSelectable
     >
       <template #header>
@@ -610,7 +617,7 @@
                     @click="props.onRefresh"
                     data-testid="data-table-actions-column-header-refresh"
                   />
-                  <DataTable.Export @export="handleExportTableDataToCSV($event)" />
+                  <DataTable.Export @export="handleExportTableDataToCSV()" />
                   <DataTableColumnSelector
                     :columns="columns"
                     v-model:selectedColumns="selectedColumns"

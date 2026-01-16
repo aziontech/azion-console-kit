@@ -140,7 +140,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Applications"
-        description="Manage and optimize applications efficiently."
+        description="Define and manage applications that control request processing and application logic on Azion's global infrastructure."
         data-testid="edge-applications-heading"
       >
         <template #default>
@@ -171,12 +171,13 @@
         exportFileName="Applications"
         :allowedFilters="getColumns"
         :emptyBlock="{
-          title: 'No applications have been created',
-          description: 'Click the button below to create your first Application.',
+          title: 'No Applications yet',
+          description:
+            'Create your first application to define how requests are processed, routed, and handled.',
           createButtonLabel: 'Application',
           createPagePath: '/applications/create?origin=list',
           documentationService: props.documentationService,
-          emptyListMessage: 'No applications found.'
+          emptyListMessage: 'No Applications found.'
         }"
       />
     </template>
