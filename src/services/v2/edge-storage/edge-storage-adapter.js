@@ -1,5 +1,5 @@
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
-import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { parseStatusData, parseBucketString } from '@/services/v2/utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { formatBytes } from '@/helpers/format-bytes'
 
@@ -64,7 +64,7 @@ export const EdgeStorageAdapter = {
       ),
       createDate: formatDateToDayMonthYearHour(credential.last_modified),
       expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
-      bucket: credential.buckets,
+      bucket: parseBucketString(credential.buckets),
       lastEditor: credential.last_editor,
       lastModify: formatDateToDayMonthYearHour(credential.last_modified)
     }))

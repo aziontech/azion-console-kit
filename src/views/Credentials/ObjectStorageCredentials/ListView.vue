@@ -44,7 +44,15 @@
       header: 'Bucket',
       type: 'component',
       component: (columnData) => {
-        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+        if (Array.isArray(columnData)) {
+          return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+        }
+
+        if (columnData && typeof columnData === 'object' && 'content' in columnData) {
+          return columnBuilder({ data: columnData, columnAppearance: 'tag' })
+        }
+
+        return columnBuilder({ data: [], columnAppearance: 'text-array-with-popup' })
       }
     },
     {
