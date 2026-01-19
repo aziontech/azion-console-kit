@@ -9,12 +9,12 @@ export class HttpClient {
     axios.defaults.headers.common['Accept'] = config.accept ?? 'application/json; version=3'
     axios.defaults.headers.common['Content-Type'] =
       config.contentType ?? 'application/json; version=3'
-    axios.defaults.headers.common['withCredentials'] = config.withCredentials ?? true
 
     const requestConfig = {
       ...config,
       headers,
-      baseURL
+      baseURL,
+      withCredentials: config.withCredentials ?? true
     }
 
     return axios(requestConfig)
