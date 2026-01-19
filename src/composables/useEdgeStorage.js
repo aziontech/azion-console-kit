@@ -348,7 +348,7 @@ export const useEdgeStorage = () => {
 
   const getBucketSelected = () => {
     if (selectedBucket.value) {
-      return selectedBucket.value
+      return selectedBucket.value.name
     }
 
     const bucketName = route.params.id
