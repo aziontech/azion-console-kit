@@ -104,11 +104,11 @@ export class RulesEngineService extends BaseService {
     fields = '',
     search = '',
     ordering = '',
-    page = 1,
-    pageSize = 100
+    page = 1
   }) {
+    const PAGE_SIZE = 100
     const currentPhase = this.getCurrentPhase(phase)
-    const params = { fields, search, ordering, page, pageSize }
+    const params = { fields, search, ordering, page, pageSize: PAGE_SIZE }
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(edgeApplicationId, currentPhase),
@@ -198,23 +198,10 @@ export class RulesEngineService extends BaseService {
       ordering: ''
     }
 
-    return await this._prefetchQuery(
-      () => queryKeys.rulesEngine.all(edgeApplicationId),
-      async () => {
-        const [requestRules, responseRules] = await Promise.all([
-          this._fetchAllRulesForPhase(edgeApplicationId, 'request', defaultParams),
-          this._fetchAllRulesForPhase(edgeApplicationId, 'response', defaultParams)
-        ])
-
-        const responseBody = [...requestRules, ...responseRules]
-
-        return {
-          count: responseBody.length,
-          body: responseBody
-        }
-      },
-      { persist: true }
-    )
+    return await this.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId,
+      params: defaultParams
+    })
   }
 
   getCurrentPhase(phase) {
