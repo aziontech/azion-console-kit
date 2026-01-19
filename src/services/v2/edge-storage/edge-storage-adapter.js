@@ -66,7 +66,7 @@ export const EdgeStorageAdapter = {
       expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
       bucket: credential.buckets,
       lastEditor: credential.last_editor,
-      lastModify: convertToRelativeTime(credential.last_modified)
+      lastModify: formatDateToDayMonthYearHour(credential.last_modified)
     }))
 
     return {
@@ -80,7 +80,7 @@ export const EdgeStorageAdapter = {
       name: data.name,
       capabilities: data.capabilities,
       expiration_date: data.expirationDate,
-      buckets: data.bucket[0] === ALL_BUCKETS_VALUE ? null : data.bucket
+      buckets: data.bucket[0] === ALL_BUCKETS_VALUE ? [] : data.bucket
     }
   }
 }
