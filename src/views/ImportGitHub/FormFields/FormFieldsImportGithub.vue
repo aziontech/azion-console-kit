@@ -280,7 +280,6 @@
             placeholder="Select a repository"
             :options="repositoriesList"
             :disabled="!gitScope"
-            :more
             :value="repository"
             :loading="loadingRepositories"
             @onSelectOption="
