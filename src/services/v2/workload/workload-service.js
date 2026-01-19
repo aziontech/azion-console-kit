@@ -6,28 +6,7 @@ import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
-
-export const workloadKeys = {
-  all: ['workloads'],
-  lists: () => [...workloadKeys.all, 'list'],
-  list: ({ page, pageSize, fields, search, ordering }) => [
-    ...workloadKeys.lists(),
-    page,
-    pageSize,
-    fields,
-    search,
-    ordering
-  ],
-  details: () => [...workloadKeys.all, 'detail'],
-  detail: (id) => {
-    if (!id) {
-      // eslint-disable-next-line no-console
-      console.warn('[workloadKeys] Invalid id provided to detail():', id)
-      return [...workloadKeys.details(), '__invalid_id__']
-    }
-    return [...workloadKeys.details(), id]
-  }
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -88,7 +67,7 @@ export class WorkloadService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(workloadKeys.list(params), () => this.#fetchList(params), {
+    await this._ensureQueryData(queryKeys.workload.list(params), () => this.#fetchList(params), {
       persist: !params.search
     })
   }
@@ -158,7 +137,7 @@ export class WorkloadService extends BaseService {
     const workload = await this.#ensureWorkload(payload)
     await this.#ensureDeployment(payload, workload.id)
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
 
     return {
       feedback:
@@ -173,7 +152,7 @@ export class WorkloadService extends BaseService {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
     return await this._ensureQueryData(
-      () => workloadKeys.list(paramsValue),
+      queryKeys.workload.list(paramsValue),
       () => this.#fetchList(paramsValue),
       {
         persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
@@ -183,7 +162,9 @@ export class WorkloadService extends BaseService {
   }
 
   loadWorkload = async ({ id }) => {
-    const cachedQueries = this.queryClient.getQueriesData({ queryKey: workloadKeys.details() })
+    const cachedQueries = this.queryClient.getQueriesData({
+      queryKey: queryKeys.workload.details()
+    })
 
     const hasDifferentId = cachedQueries.some(([key]) => {
       const cachedId = key[key.length - 1]
@@ -191,11 +172,11 @@ export class WorkloadService extends BaseService {
     })
 
     if (hasDifferentId) {
-      await this.queryClient.removeQueries({ queryKey: workloadKeys.details() })
+      await this.queryClient.removeQueries({ queryKey: queryKeys.workload.details() })
     }
 
     const workload = await this._ensureQueryData(
-      () => workloadKeys.detail(id),
+      queryKeys.workload.detail(id),
       () => this.#fetchOne({ id }),
       { persist: true }
     )
@@ -214,8 +195,8 @@ export class WorkloadService extends BaseService {
       await this.#ensureDeployment(payload, payload.id)
     }
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
-    this.queryClient.removeQueries({ queryKey: workloadKeys.details() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.details() })
 
     return 'Your workload has been updated'
   }
@@ -364,7 +345,7 @@ export class WorkloadService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
 
     return `Workload successfully deleted.`
   }

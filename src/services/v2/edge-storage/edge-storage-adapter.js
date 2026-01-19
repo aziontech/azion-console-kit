@@ -1,7 +1,9 @@
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
-import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { parseStatusData, parseBucketString } from '@/services/v2/utils/adapter/parse-status-utils'
 import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 import { formatBytes } from '@/helpers/format-bytes'
+
+const ALL_BUCKETS_VALUE = '__ALL_BUCKETS__'
 
 const transformMap = {
   id: (value) => value.name,
@@ -62,11 +64,23 @@ export const EdgeStorageAdapter = {
       ),
       createDate: formatDateToDayMonthYearHour(credential.last_modified),
       expirationDate: formatDateToDayMonthYearHour(credential.expiration_date),
-      bucket: credential.buckets[0]
+      bucket: parseBucketString(credential.buckets),
+      lastEditor: credential.last_editor,
+      lastModify: formatDateToDayMonthYearHour(credential.last_modified)
     }))
+
     return {
       count,
       body: adaptParsed
+    }
+  },
+
+  transformCreateEdgeStorageBucket(data) {
+    return {
+      name: data.name,
+      capabilities: data.capabilities,
+      expiration_date: data.expirationDate,
+      buckets: data.bucket[0] === ALL_BUCKETS_VALUE ? [] : data.bucket
     }
   }
 }

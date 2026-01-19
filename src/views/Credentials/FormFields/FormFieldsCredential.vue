@@ -1,16 +1,18 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldMultiSelect from '@/templates/form-fields-inputs/fieldMultiSelect'
   import Calendar from 'primevue/calendar'
+  import MultiSelect from 'primevue/multiselect'
   import LabelBlock from '@/templates/label-block'
   import { useField } from 'vee-validate'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
+
+  const ALL_BUCKETS_VALUE = '__ALL_BUCKETS__'
 
   const capabilitiesOptions = [
     {
@@ -46,21 +48,67 @@
   ]
 
   const { value: expirationDate, errorMessage: expirationDateError } = useField('expirationDate')
+  const { value: bucket, setValue: setBucket } = useField('bucket')
 
-  const bucketOptions = ref([])
+  const selectedBucket = ref([])
+
+  const bucketOptions = ref([
+    {
+      label: 'All Buckets',
+      items: [
+        {
+          label: 'All Buckets',
+          value: ALL_BUCKETS_VALUE
+        }
+      ]
+    }
+  ])
   const loadingBuckets = ref(false)
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
+  const normalizeBucketValueFromUI = (value) => {
+    if (!Array.isArray(value) || value.length === 0) {
+      return []
+    }
+
+    if (value.includes(ALL_BUCKETS_VALUE)) {
+      return null
+    }
+
+    return Array.from(new Set(value))
+  }
+
+  const normalizeBucketValueToUI = (value) => {
+    if (value === null) {
+      return [ALL_BUCKETS_VALUE]
+    }
+
+    if (!Array.isArray(value)) {
+      return []
+    }
+
+    return value
+  }
+
   const loadBuckets = async () => {
     loadingBuckets.value = true
     try {
       const response = await edgeStorageService.listEdgeStorageBuckets()
-      bucketOptions.value = response.body.map((bucket) => ({
+
+      const buckets = response.body.map((bucket) => ({
         label: bucket.name,
         value: bucket.name
       }))
+
+      bucketOptions.value = [
+        ...bucketOptions.value,
+        {
+          label: 'Buckets',
+          items: buckets
+        }
+      ]
     } catch (error) {
       toast.add({
         severity: 'error',
@@ -75,6 +123,35 @@
 
   onMounted(() => {
     loadBuckets()
+  })
+
+  watch(
+    bucket,
+    (value) => {
+      const normalizedUI = normalizeBucketValueToUI(value)
+      const current = selectedBucket.value
+      if (Array.isArray(current) && current.length === normalizedUI.length) {
+        const normalizedSet = new Set(normalizedUI)
+        const isSame = current.every((item) => normalizedSet.has(item))
+        if (isSame) {
+          return
+        }
+      }
+      selectedBucket.value = normalizedUI
+    },
+    { immediate: true }
+  )
+
+  watch(selectedBucket, (value) => {
+    const uiValue = Array.isArray(value) ? value : []
+
+    if (uiValue.includes(ALL_BUCKETS_VALUE) && uiValue.length > 1) {
+      selectedBucket.value = [ALL_BUCKETS_VALUE]
+      return
+    }
+
+    const normalizedFieldValue = normalizeBucketValueFromUI(uiValue)
+    setBucket(normalizedFieldValue)
   })
 </script>
 
@@ -106,16 +183,22 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-6">
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldDropdown
+          <LabelBlock
             label="Bucket"
-            name="bucket"
+            isRequired
+          />
+          <MultiSelect
+            v-model="selectedBucket"
             :options="bucketOptions"
+            optionGroupLabel="label"
+            optionGroupChildren="items"
             optionLabel="label"
             optionValue="value"
             placeholder="Select a Bucket"
             data-testid="credential-form__bucket-field"
             :loading="loadingBuckets"
-            required
+            filter
+            class="w-full"
           />
         </div>
 

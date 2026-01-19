@@ -9,6 +9,8 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
+  import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -136,15 +138,36 @@
     mapTabs.value = { ...defaultTabs }
   }
 
+  const preloadTabData = async () => {
+    if (!edgeFirewall.value) return
+
+    const preloadPromises = []
+
+    if (edgeFirewall.value.edgeFunctionsEnabled) {
+      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value))
+    }
+
+    preloadPromises.push(
+      edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value)
+    )
+
+    await Promise.allSettled(preloadPromises)
+  }
+
   const renderTabCurrentRouter = async () => {
-    const { tab = 0 } = route.params
+    const { tab } = route.params
+
+    let selectedTab = tab
+    if (!selectedTab) selectedTab = 'mainSettings'
+
     edgeFirewall.value = await loaderEdgeFirewall()
     verifyTab(edgeFirewall.value)
-    const activeTabIndexByRoute = mapTabs.value[tab]
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
+    preloadTabData()
 
-    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
   }
 
   const title = computed(() => {

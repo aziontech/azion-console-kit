@@ -1,28 +1,7 @@
 import { toValue } from 'vue'
 import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
-
-export const edgeAppKeys = {
-  all: ['edge-apps'],
-  lists: () => [...edgeAppKeys.all, 'list'],
-  list: ({ page, pageSize, fields, search, ordering }) => [
-    ...edgeAppKeys.lists(),
-    page,
-    pageSize,
-    fields,
-    search,
-    ordering
-  ],
-  details: () => [...edgeAppKeys.all, 'detail'],
-  detail: (id) => {
-    if (!id) {
-      // eslint-disable-next-line no-console
-      console.warn('[edgeAppKeys] Invalid id provided to detail():', id)
-      return [...edgeAppKeys.details(), '__invalid_id__']
-    }
-    return [...edgeAppKeys.details(), id]
-  }
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class EdgeAppService extends BaseService {
   adapter = EdgeAppAdapter
@@ -72,7 +51,7 @@ export class EdgeAppService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(edgeAppKeys.list(params), () => this.#fetchList(params), {
+    await this._ensureQueryData(queryKeys.edgeApp.list(params), () => this.#fetchList(params), {
       persist: !params.search
     })
   }
@@ -80,7 +59,7 @@ export class EdgeAppService extends BaseService {
   create = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     const { data } = await this.http.request({ method: 'POST', url: this.baseURL, body })
-    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.lists() })
     return data
   }
 
@@ -91,7 +70,7 @@ export class EdgeAppService extends BaseService {
       url: `${this.baseURL}/${payload.id}/clone`,
       body
     })
-    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.lists() })
     return {
       feedback: 'Your Application has been cloned',
       urlToEditView: `/applications/edit/${data.data.id}`,
@@ -102,23 +81,22 @@ export class EdgeAppService extends BaseService {
   edit = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     await this.http.request({ method: 'PATCH', url: `${this.baseURL}/${payload.id}`, body })
-    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
-    this.queryClient.removeQueries({ queryKey: edgeAppKeys.details() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.details() })
     return 'Your application has been updated'
   }
 
   delete = async (id) => {
     await this.http.request({ method: 'DELETE', url: `${this.baseURL}/${id}` })
-    this.queryClient.removeQueries({ queryKey: edgeAppKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.lists() })
     return 'Resource successfully deleted'
   }
 
-  /** @deprecated Use listEdgeApplicationsService with useQuery */
   listEdgeApplicationsService = async (params) => {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
     return await this._ensureQueryData(
-      () => edgeAppKeys.list(paramsValue),
+      queryKeys.edgeApp.list(paramsValue),
       () => this.#fetchList(paramsValue),
       {
         persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
@@ -127,12 +105,10 @@ export class EdgeAppService extends BaseService {
     )
   }
 
-  /** @deprecated Use #fetchDropdown internally */
   listEdgeApplicationsServiceDropdown = this.#fetchDropdown
 
-  /** @deprecated Use #fetchOne internally */
   loadEdgeApplicationService = async (params) => {
-    const cachedQueries = this.queryClient.getQueriesData({ queryKey: edgeAppKeys.details() })
+    const cachedQueries = this.queryClient.getQueriesData({ queryKey: queryKeys.edgeApp.details() })
 
     const hasDifferentId = cachedQueries.some(([key]) => {
       const cachedId = key[key.length - 1]
@@ -140,26 +116,22 @@ export class EdgeAppService extends BaseService {
     })
 
     if (hasDifferentId) {
-      await this.queryClient.removeQueries({ queryKey: edgeAppKeys.details() })
+      await this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.details() })
     }
 
     return await this._ensureQueryData(
-      () => edgeAppKeys.detail(params.id),
+      queryKeys.edgeApp.detail(params.id),
       () => this.#fetchOne(params),
       { persist: true }
     )
   }
 
-  /** @deprecated Use create() */
   createEdgeApplicationService = this.create
 
-  /** @deprecated Use clone() */
   cloneEdgeApplicationService = this.clone
 
-  /** @deprecated Use edit() */
   editEdgeApplicationService = this.edit
 
-  /** @deprecated Use delete() */
   deleteEdgeApplicationService = this.delete
 }
 
