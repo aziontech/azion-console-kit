@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+yarn lint:naming
 yarn test:unit:coverage
 yarn lint
 yarn format

@@ -27,6 +27,8 @@
     "test:e2e:open:prod": "cypress open --e2e --config-file cypress.config.prod.js --env environment=prod,grepTags=-@dont_run_prod",
     "test:e2e:open:preview-prod": "cypress open --e2e --config-file cypress.config.preview-prod.js --env environment=preview-prod",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "lint:naming": "node scripts/validate-naming-convention.js",
+    "lint:naming:fix": "node scripts/validate-naming-convention.js --fix",
     "security-check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore --ignore-pattern 'cypress/**' --ignore-pattern 'cypress.config.*' --ignore-pattern '**/*.test.js' -c .eslintrc-security.cjs",
     "package-audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/",
