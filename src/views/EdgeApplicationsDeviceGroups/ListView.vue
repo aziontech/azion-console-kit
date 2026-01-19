@@ -55,10 +55,7 @@
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'text-with-clipboard',
-            dependencies: {
-              copyContentService: props.clipboardWrite
-            }
+            columnAppearance: 'text-with-clipboard'
           })
         }
       },
