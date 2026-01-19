@@ -483,7 +483,7 @@
     }
   }
 
-  const handleApplyFilter = (filterData) => {
+  const handleApplyFilter = (filterData = {}) => {
     const hasValue =
       filterData.value !== null && filterData.value !== undefined && filterData.value !== ''
 

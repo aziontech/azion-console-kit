@@ -3,9 +3,8 @@ import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
-import { formatDateToMonthYear } from '@/helpers/convert-date'
+import { formatDateToMonthYear, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { paymentService } from '@/services/v2/payment/payment-service'
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const PAGE_SIZE = 200
 const ACCOUNTING_LIST_LIMIT = 12
@@ -41,7 +40,8 @@ export const listPaymentHistoryService = async (params = {}) => {
   return parseHttpResponse(httpResponse)
 }
 
-const escapeGraphQLString = (value) => {
+const escapeGraphQLString = (value = '') => {
+  if (!value || !value.length) return ''
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
 
@@ -65,7 +65,7 @@ const buildAccountingDetailFilterBlock = (params = {}) => {
     return ''
   }
 
-  return `filter: {\n              ${lines.join(',\n              ')}\n            },`
+  return `filter: {\n ${lines.join(',\n ')}\n },`
 }
 
 const removeCurrentPayment = (payments) => {
