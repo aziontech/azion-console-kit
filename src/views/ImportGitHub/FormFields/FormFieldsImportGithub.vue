@@ -1,21 +1,18 @@
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import { ref, onMounted, computed } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useField } from 'vee-validate'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
-  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
-  import { ref, onMounted, computed } from 'vue'
-  import { useField } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
-  import { useRouter } from 'vue-router'
-  import { windowOpen } from '@/helpers'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
   import LabelBlock from '@/templates/label-block'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
-
-  const toast = useToast()
-  const router = useRouter()
+  import { windowOpen } from '@/helpers'
 
   const props = defineProps({
     listVulcanPresetsService: {
@@ -26,6 +23,14 @@
     }
   })
 
+  const callbackUrl = ref('')
+  const oauthGithubRef = ref(null)
+  const isGithubConnectLoading = ref(false)
+  const presetsList = ref([])
+  const integrationsList = ref([])
+  const repositoriesList = ref([])
+  const loadingRepositories = ref(false)
+
   const AZIONFORMSAMPLESLINK = ref('https://github.com/aziontech/azion-samples/fork')
   const { value: preset } = useField('preset')
   const { value: gitScope } = useField('gitScope')
@@ -34,6 +39,14 @@
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: installCommand } = useField('installCommand')
   const { value: newVariables } = useField('newVariables')
+
+  const toast = useToast()
+  const router = useRouter()
+
+  const hasIntegrations = computed(() => {
+    if (integrationsList?.value?.length > 0) return true
+    return false
+  })
 
   const addVariable = () => {
     if (!Array.isArray(newVariables.value)) {
@@ -49,13 +62,10 @@
     newVariables.value.splice(index, 1)
   }
 
-  const callbackUrl = ref('')
-  const isGithubConnectLoading = ref(false)
-  const presetsList = ref([])
-
   const setCallbackUrl = (uri) => {
     callbackUrl.value = uri
   }
+
   const saveIntegration = async (integration) => {
     try {
       isGithubConnectLoading.value = true
@@ -79,7 +89,6 @@
     })
   }
 
-  const integrationsList = ref([])
   const loadListIntegrations = async () => {
     try {
       isGithubConnectLoading.value = true
@@ -92,17 +101,11 @@
     }
   }
 
-  const hasIntegrations = computed(() => {
-    if (integrationsList?.value?.length > 0) return true
-    return false
-  })
-
-  const repositoriesList = ref([])
-  const loadingRepositories = ref(false)
   const setListRepositories = async () => {
+    repositoriesList.value = []
+    loadingRepositories.value = true
+
     try {
-      repositoriesList.value = []
-      loadingRepositories.value = true
       const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
@@ -141,7 +144,6 @@
     await detectAndSetFrameworkPreset(accountName, repositoryName)
   }
 
-  const oauthGithubRef = ref(null)
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
       oauthGithubRef.value.connectWithGithub()
@@ -162,15 +164,19 @@
     windowOpen(AZIONFORMSAMPLESLINK.value, '_blank')
   }
 
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
+  }
+
+  const setRepositoryValue = () => {
+    repository.value = repository.value
+  }
+
   onMounted(async () => {
     await loadListIntegrations()
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
-
-  const getPresetIconClass = (preset) => {
-    return `ai ai-${preset}`
-  }
 </script>
 
 <template>
@@ -265,19 +271,20 @@
         </div>
         <div class="flex flex-col sm:w-2/5 gap-2">
           <FieldDropdown
-            :options="repositoriesList"
-            optionLabel="name"
-            optionValue="url"
             filter
-            :disabled="!gitScope"
-            placeholder="Select a repository"
-            label="Repository"
             required
             name="repository"
+            label="Repository"
+            optionLabel="name"
+            optionValue="url"
+            placeholder="Select a repository"
+            :options="repositoriesList"
+            :disabled="!gitScope"
             :value="repository"
             :loading="loadingRepositories"
             @onSelectOption="
               (option) => {
+                setRepositoryValue()
                 setEdgeApplicationNameByRepository(option.name)
               }
             "
