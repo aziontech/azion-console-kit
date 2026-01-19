@@ -40,13 +40,7 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
 }
 
 const groupBy = (data, groupParams) => {
-  const shouldFilter =
-    groupParams.length === 2 &&
-    groupParams.includes('productSlug') &&
-    groupParams.includes('metricSlug')
-  const filteredData = shouldFilter ? data.filter((item) => item.accounted) : data
-
-  const groupedMap = filteredData.reduce((groupedData, item) => {
+  const groupedMap = data.reduce((groupedData, item) => {
     const key = groupParams.map((param) => item[param]).join('_')
     const valueGroup = groupedData[key] || {}
 
