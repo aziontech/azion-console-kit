@@ -1,11 +1,14 @@
 import { queryClient } from '../query/queryClient'
-import { activityHistoryService } from '@/services/v2/activity-history/activity-history-service'
+import {
+  activityHistoryService,
+  SYNC_INTERVAL_MINUTES
+} from '@/services/v2/activity-history/activity-history-service'
 import { getKeysForEvents } from './invalidation-map'
 import { toMilliseconds } from '../query/config'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
 import { logger } from '../logger'
 
-const POLL_INTERVAL = toMilliseconds({ minutes: 2 })
+const POLL_INTERVAL = toMilliseconds({ minutes: SYNC_INTERVAL_MINUTES })
 
 class CacheSyncService {
   constructor() {
@@ -19,16 +22,21 @@ class CacheSyncService {
     return this.tabCoordinator?.isPrimary ?? false
   }
 
-  invalidateQueries(eventTitles) {
+  async invalidateQueries(eventTitles) {
     const keysToInvalidate = getKeysForEvents(eventTitles)
+    const operations = keysToInvalidate.map(async (queryKey) => {
 
-    for (const queryKey of keysToInvalidate) {
-      queryClient.removeQueries({ queryKey })
-    }
+      await queryClient.invalidateQueries({ queryKey, exact: false, refetchType: 'none' })
+      
+      await queryClient.refetchQueries({
+        queryKey,
+        exact: false,
+        type: 'all',
+        predicate: (query) => typeof query?.options?.queryFn === 'function'
+      })
+    })
 
-    if (keysToInvalidate.length > 0) {
-      logger.log('CacheSync', 'Queries invalidated:', keysToInvalidate.length)
-    }
+    await Promise.all(operations)
   }
 
   async poll() {
@@ -36,11 +44,11 @@ class CacheSyncService {
 
     try {
       const eventTitles = await activityHistoryService.listRecentEvents({
-        intervalMinutes: 2
+        intervalMinutes: SYNC_INTERVAL_MINUTES
       })
 
       if (eventTitles.length > 0) {
-        this.invalidateQueries(eventTitles)
+        await this.invalidateQueries(eventTitles)
       }
     } catch (error) {
       logger.error('CacheSync', 'Poll failed:', error)
