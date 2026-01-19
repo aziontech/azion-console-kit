@@ -161,7 +161,7 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
 
     return {
       invoiceNumber: {
-        content: card.invoiceNumber || card.billId
+        content: card.billId
       },
       billId: card.billId,
       disabled: disabledOpenInvoice,
