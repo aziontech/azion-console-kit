@@ -1,6 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-
-export const userKeys = { all: ['user'], info: () => [...userKeys.all, 'info'] }
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class UserService extends BaseService {
   baseUrl = 'user/me'
@@ -15,10 +14,8 @@ export class UserService extends BaseService {
   }
 
   async getUserInfo() {
-    const queryKey = userKeys.info()
-    return await this._ensureQueryData(queryKey, async () => this.fetchUserInfo(), {
-      cacheType: this.cacheType.SENSITIVE
-    })
+    const queryKey = queryKeys.user.info()
+    return await this._ensureQueryData(queryKey, async () => this.fetchUserInfo())
   }
 }
 

@@ -1,22 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { createFinalKey } from '@/services/v2/base/query/keyFactory'
-import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
-export const originsKeys = {
-  all: (edgeAppId) => {
-    if (!edgeAppId) {
-      // eslint-disable-next-line no-console
-      console.warn('[originsKeys] Invalid edgeAppId provided:', edgeAppId)
-      return ['origins', '__invalid_edge_app_id__']
-    }
-    return ['origins', edgeAppId]
-  },
-  lists: (edgeAppId) => [...originsKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...originsKeys.all(edgeAppId), 'detail']
-}
+const baseService = new BaseService()
 
 const fetchList = async ({ id, orderBy, sort, page, pageSize }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
@@ -37,20 +23,11 @@ export const listOriginsService = async ({
   page = 1,
   pageSize = 200
 }) => {
-  await waitForPersistenceRestore()
-
   const params = { id, orderBy, sort, page, pageSize }
-  const queryKey = [...originsKeys.lists(id), orderBy, sort, page, pageSize]
+  const queryKey = [...baseService.queryKeys.origins.lists(id), orderBy, sort, page, pageSize]
 
-  const queryOptions = {
-    meta: { persist: page === 1, cacheType: CACHE_TYPE.GLOBAL },
-    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
-  }
-
-  return await queryClient.ensureQueryData({
-    queryKey: createFinalKey(queryKey),
-    queryFn: () => fetchList(params),
-    ...queryOptions
+  return await baseService._ensureQueryData(queryKey, () => fetchList(params), {
+    persist: page === 1
   })
 }
 

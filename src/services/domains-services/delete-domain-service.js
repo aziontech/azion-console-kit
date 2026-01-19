@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { workloadKeys } from '@/services/v2/workload/workload-service'
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export const deleteDomainService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -9,7 +9,7 @@ export const deleteDomainService = async (id) => {
     method: 'DELETE'
   })
 
-  queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+  queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
 
   return parseHttpResponse(httpResponse)
 }

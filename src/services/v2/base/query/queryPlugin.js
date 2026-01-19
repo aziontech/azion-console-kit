@@ -48,6 +48,10 @@ export const queryPlugin = {
     app.use(VueQueryPlugin, {
       queryClient
     })
+
+    if (typeof window !== 'undefined') {
+      window.__VUE_QUERY_CLIENT__ = queryClient
+    }
   }
 }
 
@@ -57,16 +61,17 @@ export const pauseQueryPersistence = () => {
   if (unsubscribePersistence && typeof unsubscribePersistence === 'function') {
     try {
       unsubscribePersistence()
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to pause query persistence:', error)
+    } catch {
+      // Ignore errors
     }
     unsubscribePersistence = null
   }
 }
 
 export const resumeQueryPersistence = () => {
-  if (unsubscribePersistence) return
+  if (unsubscribePersistence) {
+    return
+  }
 
   const [unsubscribe] = persistQueryClient(loadConfig())
   unsubscribePersistence = unsubscribe
