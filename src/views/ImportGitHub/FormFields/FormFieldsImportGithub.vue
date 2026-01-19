@@ -168,8 +168,8 @@
     return `ai ai-${preset}`
   }
 
-  const setRepositoryValue = () => {
-    repository.value = repository.value
+  const setRepositoryValue = (repositoryUrl) => {
+    repository.value = repositoryUrl
   }
 
   onMounted(async () => {
@@ -280,11 +280,12 @@
             placeholder="Select a repository"
             :options="repositoriesList"
             :disabled="!gitScope"
+            :more
             :value="repository"
             :loading="loadingRepositories"
             @onSelectOption="
               (option) => {
-                setRepositoryValue()
+                setRepositoryValue(option.url)
                 setEdgeApplicationNameByRepository(option.name)
               }
             "

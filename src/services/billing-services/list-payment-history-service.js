@@ -163,6 +163,7 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
       invoiceNumber: {
         content: card.invoiceNumber || card.billId
       },
+      billId: card.billId,
       disabled: disabledOpenInvoice,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
       paymentDate: formatDateToDayMonthYearHour(card.periodTo)
