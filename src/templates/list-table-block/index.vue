@@ -58,6 +58,21 @@
               />
             </span>
 
+            <PrimeButton
+              v-if="props.allowedFilters.length"
+              outlined
+              icon="pi pi-filter"
+              size="small"
+              @click="toggleFilter"
+              data-testid="data-table-actions-column-header-toggle-filter"
+            />
+
+            <DataTable.Filter
+              ref="filterPanel"
+              :filters="filterWithoutLastModified"
+              @apply="handleApplyFilter"
+            />
+
             <slot
               name="addButton"
               data-testid="data-table-add-button"
@@ -74,6 +89,12 @@
               />
             </slot>
           </div>
+
+          <DataTable.AppliedFilters
+            v-if="appliedFilters.length"
+            :applied-filters="appliedFilters"
+            @remove="handleRemoveFilter"
+          />
         </slot>
       </template>
 
@@ -257,7 +278,7 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import DataTable from '@/components/DataTable/DataTable.vue'
+  import DataTable from '@/components/DataTable'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -366,6 +387,10 @@
     isLoading: {
       type: Boolean,
       default: () => false
+    },
+    allowedFilters: {
+      type: Array,
+      default: () => []
     }
   })
   const firstItemIndex = ref(0)
@@ -382,6 +407,8 @@
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
+  const appliedFilters = ref([])
+  const filterPanel = ref(null)
   const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
@@ -444,6 +471,54 @@
   }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
+  }
+
+  const filterWithoutLastModified = computed(() => {
+    return props.allowedFilters.filter((filter) => filter.field !== 'last_modified')
+  })
+
+  const toggleFilter = (event) => {
+    if (filterPanel.value) {
+      filterPanel.value.toggle(event)
+    }
+  }
+
+  const handleApplyFilter = (filterData) => {
+    const hasValue =
+      filterData.value !== null && filterData.value !== undefined && filterData.value !== ''
+
+    if (!filterData.label || !hasValue) {
+      return
+    }
+
+    const existingFilterIndex = appliedFilters.value.findIndex(
+      (filter) => filter.field === filterData.field
+    )
+
+    const filterPayload = {
+      field: filterData.field,
+      label: filterData.label,
+      value: filterData.value,
+      matchMode: 'is'
+    }
+
+    if (existingFilterIndex !== -1) {
+      appliedFilters.value[existingFilterIndex] = filterPayload
+    } else {
+      appliedFilters.value.push(filterPayload)
+    }
+
+    filters.value[filterData.field] = {
+      value: filterData.value,
+      matchMode: FilterMatchMode.CONTAINS
+    }
+  }
+
+  const handleRemoveFilter = (field) => {
+    appliedFilters.value = appliedFilters.value.filter((filter) => filter.field !== field)
+    if (filters.value[field]) {
+      delete filters.value[field]
+    }
   }
 
   const onRowReorder = async (event) => {
