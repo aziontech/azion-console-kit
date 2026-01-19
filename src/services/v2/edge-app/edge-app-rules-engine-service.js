@@ -198,7 +198,10 @@ export class RulesEngineService extends BaseService {
       ordering: ''
     }
 
-    return await this.listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params: defaultParams })
+    return await this.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId,
+      params: defaultParams
+    })
   }
 
   getCurrentPhase(phase) {
