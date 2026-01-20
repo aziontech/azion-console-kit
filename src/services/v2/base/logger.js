@@ -22,5 +22,11 @@ export const logger = {
       // eslint-disable-next-line no-console
       console.warn(`[${prefix}]`, ...args)
     }
+  },
+  info(prefix, ...args) {
+    if (isEnabled) {
+      // eslint-disable-next-line no-console
+      console.info(`[${prefix}]`, ...args)
+    }
   }
 }

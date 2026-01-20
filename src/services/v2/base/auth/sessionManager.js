@@ -38,7 +38,6 @@ const getPageSizeFromStorage = () => {
 const ensure = {
   async solutions() {
     const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
-    await solutionService.invalidateSolutionsCache()
     await solutionService.ensureList(hasFlagBlockApiV4)
   },
 

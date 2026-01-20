@@ -1,6 +1,8 @@
 import { ActivityHistoryAdapter } from './activity-history-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 
+export const SYNC_INTERVAL_MINUTES = 1
+
 export class ActivityHistoryService extends BaseService {
   constructor() {
     super()
@@ -89,7 +91,7 @@ export class ActivityHistoryService extends BaseService {
     }
   }
 
-  listRecentEvents = async ({ intervalMinutes = 2 }) => {
+  listRecentEvents = async ({ intervalMinutes = SYNC_INTERVAL_MINUTES } = {}) => {
     const { offSetEnd, offSetStart } = this.#getOffsetDate({ intervalMinutes })
 
     const query = `

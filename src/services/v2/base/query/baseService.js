@@ -129,6 +129,7 @@ export class BaseService {
       return await this.queryClient.ensureQueryData({
         queryKey: finalKey,
         queryFn,
+        revalidateIfStale: true,
         ...queryOptions
       })
     } catch {
