@@ -64,8 +64,8 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2/purge/purge-service'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
+  // import { useRouter } from 'vue-router'
+  // import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
   import { capitalizeFirstLetter } from '@/helpers'
 
@@ -81,33 +81,33 @@
   })
 
   const listPurgeRef = ref('')
-  const route = useRoute()
-  const router = useRouter()
+  // const route = useRoute()
+  // const router = useRouter()
   const isLoading = ref(null)
   const toast = useToast()
-  const timeToReload = 9000
-  const { accountData } = useAccountStore()
+  // const timeToReload = 9000
+  // const { accountData } = useAccountStore()
   const purgeStore = usePurgeStore()
   const repurgesNeedingFocus = ref(0)
-  const feedbackPurge = ref(
-    'The purge has been successfully triggered and is now listed in the table.'
-  )
+  // const feedbackPurge = ref(
+  //   'The purge has been successfully triggered and is now listed in the table.'
+  // )
 
-  const user = accountData
+  // const user = accountData
   const countPurge = ref(0)
 
   const handleLoadData = async () => {
-    countPurge.value = listPurgeRef.value.data?.filter((item) => item.user === user.email).length
-    const { isPending } = route.query
-    const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
-    if (hasPendingMismatch) {
-      isLoading.value = true
-      countPurge.value++
-      repurgesNeedingFocus.value++
-      handleTimeLoad()
-    } else {
-      router.replace({ query: {} })
-    }
+    // countPurge.value = listPurgeRef.value.data?.filter((item) => item.user === user.email).length
+    // const { isPending } = route.query
+    // const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
+    // if (hasPendingMismatch) {
+    //   isLoading.value = true
+    //   countPurge.value++
+    //   repurgesNeedingFocus.value++
+    //   handleTimeLoad()
+    // } else {
+    //   router.replace({ query: {} })
+    // }
   }
 
   const handleTrackEvent = () => {
@@ -162,7 +162,7 @@
     repurgesNeedingFocus.value++
     try {
       await repurgeEvent(item)
-      await handleTimeLoad()
+      // await handleTimeLoad()
     } catch (error) {
       isLoading.value = false
     } finally {
@@ -216,34 +216,34 @@
     ]
   })
 
-  const applyFocus = (usersPurge, listPurge) => {
-    const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
-    const focusIds = newPurge.map((item) => item.id)
-    return listPurge.map((item) => ({
-      ...item,
-      focus: focusIds.includes(item.id)
-    }))
-  }
+  // const applyFocus = (usersPurge, listPurge) => {
+  //   const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
+  //   const focusIds = newPurge.map((item) => item.id)
+  //   return listPurge.map((item) => ({
+  //     ...item,
+  //     focus: focusIds.includes(item.id)
+  //   }))
+  // }
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-  const handleTimeLoad = async () => {
-    let totalOfUserPurges = 0
-    do {
-      await sleep(timeToReload)
-      const listPurge = await props.listRealTimePurgeService()
-      if (!repurgesNeedingFocus.value) return
-      const usersPurge = listPurge.filter((item) => item.user === user.email)
-      totalOfUserPurges = usersPurge.length
+  // const handleTimeLoad = async () => {
+  //   let totalOfUserPurges = 0
+  //   do {
+  //     await sleep(timeToReload)
+  //     const listPurge = await props.listRealTimePurgeService()
+  //     if (!repurgesNeedingFocus.value) return
+  //     const usersPurge = listPurge.filter((item) => item.user === user.email)
+  //     totalOfUserPurges = usersPurge.length
 
-      if (totalOfUserPurges === countPurge.value) {
-        listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
-        listPurgeRef.value.updateDataTablePagination()
-        router.replace({ query: {} })
-        showToast('success', feedbackPurge.value)
-      }
-    } while (totalOfUserPurges !== countPurge.value)
-    isLoading.value = false
-    repurgesNeedingFocus.value = 0
-  }
+  //     if (totalOfUserPurges === countPurge.value) {
+  //       listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
+  //       listPurgeRef.value.updateDataTablePagination()
+  //       router.replace({ query: {} })
+  //       showToast('success', feedbackPurge.value)
+  //     }
+  //   } while (totalOfUserPurges !== countPurge.value)
+  //   isLoading.value = false
+  //   repurgesNeedingFocus.value = 0
+  // }
 </script>
