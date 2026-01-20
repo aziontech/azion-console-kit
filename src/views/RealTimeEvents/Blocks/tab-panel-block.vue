@@ -167,6 +167,7 @@
         :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
         isGraphql
         frozenSize="3rem"
+        :showColumnSelector="false"
         ref="listTableBlockRef"
         :listService="listProvider"
         :columns="props.tabSelected.columns"
