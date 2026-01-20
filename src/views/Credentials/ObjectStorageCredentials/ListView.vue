@@ -28,7 +28,11 @@
     },
     {
       field: 'accessKey',
-      header: 'Access Key'
+      header: 'Access Key',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
+      }
     },
     {
       field: 'capabilities',
