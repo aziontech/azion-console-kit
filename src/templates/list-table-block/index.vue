@@ -153,7 +153,7 @@
               :exportTableCSV="handleExportTableDataToCSV"
             />
             <PrimeButton
-              v-if="hasExportToCsvMapper"
+              v-if="hasExportToCsvMapper && !hasActionsHeaderSlot"
               @click="handleExportTableDataToCSV"
               outlined
               class="max-sm:w-full"
@@ -270,11 +270,11 @@
   import Listbox from 'primevue/listbox'
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -404,6 +404,7 @@
     : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
+  const slots = useSlots()
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -415,6 +416,7 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
+  const hasActionsHeaderSlot = computed(() => !!slots['actions-header'])
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
