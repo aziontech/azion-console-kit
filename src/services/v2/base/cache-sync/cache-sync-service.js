@@ -9,6 +9,8 @@ import { BroadcastManager, TabCoordinator } from '../broadcast'
 import { logger } from '../logger'
 
 const POLL_INTERVAL = toMilliseconds({ minutes: SYNC_INTERVAL_MINUTES })
+// Cache sync polling disabled (prevents periodic activity-history requests).
+const CACHE_SYNC_POLLING_ENABLED = false
 
 class CacheSyncService {
   constructor() {
@@ -104,6 +106,7 @@ class CacheSyncService {
   }
 
   startPolling() {
+    if (!CACHE_SYNC_POLLING_ENABLED) return
     this.stopPolling()
     this.poll()
     this.pollIntervalId = setInterval(() => this.poll(), POLL_INTERVAL)
@@ -125,7 +128,10 @@ class CacheSyncService {
     this.broadcast.start()
 
     this.tabCoordinator = new TabCoordinator(this.broadcast, {
-      onBecomePrimary: () => this.startPolling(),
+      onBecomePrimary: () => {
+        if (!CACHE_SYNC_POLLING_ENABLED) return
+        this.startPolling()
+      },
       onLosePrimary: () => this.stopPolling()
     })
 

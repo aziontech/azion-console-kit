@@ -13,13 +13,11 @@ const DEFAULT_OPTIONS = {
 const CACHE_PRESETS = {
   [CACHE_TYPE.STATIC]: {
     staleTime: toMilliseconds({ minutes: 30 }),
-    gcTime: toMilliseconds({ days: 1 }),
-    retry: 3
+    gcTime: toMilliseconds({ days: 1 })
   },
   [CACHE_TYPE.GLOBAL]: {
     staleTime: toMilliseconds({ minutes: 3 }),
-    gcTime: toMilliseconds({ minutes: 5 }),
-    retry: 1
+    gcTime: toMilliseconds({ minutes: 5 })
   }
 }
 
