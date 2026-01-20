@@ -1,6 +1,8 @@
 import { ActivityHistoryAdapter } from './activity-history-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 
+export const SYNC_INTERVAL_MINUTES = 1
+
 export class ActivityHistoryService extends BaseService {
   constructor() {
     super()
@@ -8,11 +10,29 @@ export class ActivityHistoryService extends BaseService {
     this.baseURL = 'v4/events/graphql'
   }
 
-  #getOffsetDate = () => {
+  #getOffsetDate = ({ intervalDays, intervalMinutes } = {}) => {
     const offSetEnd = new Date()
-    const offSetStart = new Date(
-      Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
-    )
+
+    let offSetStart
+    if (intervalMinutes) {
+      offSetStart = new Date(
+        Date.UTC(
+          offSetEnd.getUTCFullYear(),
+          offSetEnd.getUTCMonth(),
+          offSetEnd.getUTCDate(),
+          offSetEnd.getUTCHours(),
+          offSetEnd.getUTCMinutes() - intervalMinutes,
+          offSetEnd.getUTCSeconds(),
+          offSetEnd.getUTCMilliseconds()
+        )
+      )
+    } else {
+      const daysBack = intervalDays ?? 30
+      offSetStart = new Date(
+        Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - daysBack)
+      )
+    }
+
     return { offSetEnd, offSetStart }
   }
 
@@ -68,6 +88,45 @@ export class ActivityHistoryService extends BaseService {
     return {
       body: parsedEvents,
       statusCode: httpResponse.statusCode
+    }
+  }
+
+  listRecentEvents = async ({ intervalMinutes = SYNC_INTERVAL_MINUTES } = {}) => {
+    const { offSetEnd, offSetStart } = this.#getOffsetDate({ intervalMinutes })
+
+    const query = `
+      query ActivityHistory($begin: DateTime!, $end: DateTime!) {
+        activityHistoryEvents(
+          limit: 1000,
+          filter: { tsRange: { begin: $begin, end: $end } },
+          orderBy: [ts_DESC]
+        ) {
+          ts
+          title
+          type
+        }
+      }`
+
+    const payload = {
+      operationName: 'ActivityHistory',
+      query,
+      variables: {
+        begin: offSetStart.toISOString(),
+        end: offSetEnd.toISOString()
+      }
+    }
+
+    try {
+      const httpResponse = await this.http.request({
+        url: this.baseURL,
+        method: 'POST',
+        body: payload
+      })
+
+      const events = httpResponse.data?.data?.activityHistoryEvents || []
+      return events.map((event) => event.title)
+    } catch {
+      return []
     }
   }
 

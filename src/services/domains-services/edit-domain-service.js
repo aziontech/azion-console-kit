@@ -6,7 +6,7 @@ import { hasAnyFieldChanged } from '@/services/v2/utils/hasAnyFieldChanged'
 import { DigitalCertificatesAdapter } from '@/services/v2/digital-certificates/digital-certificates-adapter'
 const keysToCheck = ['common_name', 'alternative_names']
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { workloadKeys } from '@/services/v2/workload/workload-service'
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 import * as Errors from '@/services/axios/errors'
 
 export const editDomainService = async (payload) => {
@@ -17,7 +17,7 @@ export const editDomainService = async (payload) => {
     body
   })
 
-  queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+  queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
 
   return handleHttpResponse(httpResponse)
 }

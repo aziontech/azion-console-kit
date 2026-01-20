@@ -1,27 +1,23 @@
 import { toMilliseconds } from './config'
 
-export const CACHE_TYPE = { GLOBAL: 'GLOBAL', SENSITIVE: 'SENSITIVE', PAGE_LIST: 'PAGE_LIST' }
+export const CACHE_TYPE = { STATIC: 'STATIC', GLOBAL: 'GLOBAL' }
 
 const DEFAULT_OPTIONS = {
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
+  refetchInterval: false,
   refetchOnMount: false,
   retry: 1
 }
 
 const CACHE_PRESETS = {
-  [CACHE_TYPE.GLOBAL]: {
+  [CACHE_TYPE.STATIC]: {
     staleTime: toMilliseconds({ minutes: 30 }),
     gcTime: toMilliseconds({ days: 1 }),
     retry: 3
   },
-  [CACHE_TYPE.SENSITIVE]: {
+  [CACHE_TYPE.GLOBAL]: {
     staleTime: toMilliseconds({ minutes: 3 }),
-    gcTime: toMilliseconds({ minutes: 5 }),
-    retry: 1
-  },
-  [CACHE_TYPE.PAGE_LIST]: {
-    staleTime: toMilliseconds({ minutes: 5 }),
     gcTime: toMilliseconds({ minutes: 5 }),
     retry: 1
   }

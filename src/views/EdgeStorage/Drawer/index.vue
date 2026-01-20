@@ -13,7 +13,7 @@
 
   const emit = defineEmits(['onSuccess'])
   const toast = useToast()
-  const { validationSchema } = useEdgeStorage()
+  const { validationSchema, selectedBucket } = useEdgeStorage()
 
   const showCreateEdgeStorageDrawer = ref(false)
   const debouncedDrawerAnimate = 300
@@ -22,7 +22,8 @@
 
   const initialValues = {
     name: '',
-    workloads_access: 'read_write'
+    workloads_access: 'read_only',
+    bucket: [selectedBucket.value.name]
   }
 
   const closeCreateDrawer = () => {

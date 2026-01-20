@@ -1,19 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-
-export const errorResponseKeys = {
-  all: (edgeAppId) => {
-    if (!edgeAppId) {
-      // eslint-disable-next-line no-console
-      console.warn('[errorResponseKeys] Invalid edgeAppId provided:', edgeAppId)
-      return ['error-responses', '__invalid_edge_app_id__']
-    }
-    return ['error-responses', edgeAppId]
-  },
-  lists: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'detail']
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class EdgeAppErrorResponseService extends BaseService {
   constructor() {
@@ -45,7 +33,7 @@ export class EdgeAppErrorResponseService extends BaseService {
   }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = [...errorResponseKeys.lists(edgeApplicationId), params]
+    const queryKey = [...queryKeys.errorResponse.lists(edgeApplicationId), params]
     const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
@@ -68,7 +56,7 @@ export class EdgeAppErrorResponseService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: errorResponseKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.errorResponse.all(edgeApplicationId) })
 
     return 'Your Error Responses has been edited'
   }

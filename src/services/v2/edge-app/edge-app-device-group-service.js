@@ -1,19 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-
-export const deviceGroupsKeys = {
-  all: (edgeAppId) => {
-    if (!edgeAppId) {
-      // eslint-disable-next-line no-console
-      console.warn('[deviceGroupsKeys] Invalid edgeAppId provided:', edgeAppId)
-      return ['device-groups', '__invalid_edge_app_id__']
-    }
-    return ['device-groups', edgeAppId]
-  },
-  lists: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'detail']
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class DeviceGroupService extends BaseService {
   constructor() {
@@ -45,7 +33,7 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = [...deviceGroupsKeys.lists(edgeApplicationId), params]
+    const queryKey = [...queryKeys.deviceGroups.lists(edgeApplicationId), params]
     const hasFilter = params?.hasFilter || false
 
     return await this._ensureQueryData(
@@ -81,7 +69,7 @@ export class DeviceGroupService extends BaseService {
 
   loadDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
     const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: deviceGroupsKeys.details(edgeApplicationId)
+      queryKey: queryKeys.deviceGroups.details(edgeApplicationId)
     })
 
     const hasDifferentId = cachedQueries.some(([key]) => {
@@ -91,14 +79,14 @@ export class DeviceGroupService extends BaseService {
 
     if (hasDifferentId) {
       await this.queryClient.removeQueries({
-        queryKey: deviceGroupsKeys.details(edgeApplicationId)
+        queryKey: queryKeys.deviceGroups.details(edgeApplicationId)
       })
     }
 
     await waitForPersistenceRestore()
 
     return await this._ensureQueryData(
-      () => [...deviceGroupsKeys.details(edgeApplicationId), deviceGroupId],
+      [...queryKeys.deviceGroups.details(edgeApplicationId), deviceGroupId],
       () => this.#fetchDeviceGroup(edgeApplicationId, deviceGroupId),
       { persist: true }
     )
@@ -116,7 +104,7 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.deviceGroups.all(edgeApplicationId) })
 
     return {
       id: result.data.data.id,
@@ -134,8 +122,8 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.details(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.deviceGroups.all(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.deviceGroups.details(edgeApplicationId) })
 
     return 'Device Group successfully updated'
   }
@@ -147,7 +135,7 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.deviceGroups.all(edgeApplicationId) })
 
     return 'Device Group successfully deleted'
   }

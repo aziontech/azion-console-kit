@@ -40,13 +40,7 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
 }
 
 const groupBy = (data, groupParams) => {
-  const shouldFilter =
-    groupParams.length === 2 &&
-    groupParams.includes('productSlug') &&
-    groupParams.includes('metricSlug')
-  const filteredData = shouldFilter ? data.filter((item) => item.accounted) : data
-
-  const groupedMap = filteredData.reduce((groupedData, item) => {
+  const groupedMap = data.reduce((groupedData, item) => {
     const key = groupParams.map((param) => item[param]).join('_')
     const valueGroup = groupedData[key] || {}
 
@@ -125,20 +119,20 @@ const METRIC_SLUGS = {
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
   edge_dns_queries: { title: 'Standard Queries' },
-  data_ingested: { title: 'Data Ingested (GB)', unit: 'GB' },
+  data_ingested: { title: 'Data Ingested', unit: 'GB' },
   plan_business: { title: 'Plan Business' },
   plan_enterprise: { title: 'Plan Enterprise' },
-  storage: { title: 'Storage (GB)', unit: 'GB' },
-  data_scan: { title: 'DataScan (GB)', unit: 'GB' },
+  storage: { title: 'Storage', unit: 'GB' },
+  data_scan: { title: 'Data Scan', unit: 'GB' },
   plan_missioncritical: { title: 'Plan Mission critical' },
   support_enterprise: { title: 'Total Days', unit: 'Days' },
   support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  data_stream_data_streamed: { title: 'Data Streamed', unit: 'GB' },
   edge_storage_class_a_operations: { title: 'Class A Operations' },
   edge_storage_class_b_operations: { title: 'Class B Operations' },
   edge_storage_class_c_operations: { title: 'Class C Operations' },
-  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' },
-  connector_load_balancer_data_transfer: { title: 'Data Transfered (GB)', unit: 'GB' },
+  edge_storage_data_stored: { title: 'Data Stored', unit: 'GB' },
+  connector_load_balancer_data_transfer: { title: 'Data Transfered', unit: 'GB' },
   connector_shielded_connectors: { title: 'Shielded Connectors' }
 }
 
@@ -190,6 +184,29 @@ const mapDescriptions = (product, productsGrouped, productsGroupedByRegion) => {
 }
 
 const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
+  const EPSILON = 1e-9
+
+  const hasNoRegionDuplicatingParent = productsGroupedByRegion.some((regionMetric) => {
+    if (
+      regionMetric.productSlug !== metric.productSlug ||
+      regionMetric.metricSlug !== metric.metricSlug
+    ) {
+      return false
+    }
+
+    if (regionMetric.regionName !== 'No Region') {
+      return false
+    }
+
+    const parentAccounted = Number(metric.accounted || 0)
+    const noRegionAccounted = Number(regionMetric.accounted || 0)
+    return Math.abs(noRegionAccounted - parentAccounted) <= EPSILON
+  })
+
+  if (hasNoRegionDuplicatingParent) {
+    return []
+  }
+
   return productsGroupedByRegion.reduce((list, regionMetric) => {
     if (
       regionMetric.productSlug === metric.productSlug &&

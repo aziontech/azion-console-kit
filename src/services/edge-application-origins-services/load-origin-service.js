@@ -1,11 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { createFinalKey } from '@/services/v2/base/query/keyFactory'
-import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
-import { originsKeys } from './list-origins-service'
+import { BaseService } from '@/services/v2/base/query/baseService'
+
+const baseService = new BaseService()
 
 const fetchOrigin = async ({ edgeApplicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -18,8 +16,8 @@ const fetchOrigin = async ({ edgeApplicationId, id }) => {
 }
 
 export const loadOriginService = async ({ edgeApplicationId, id }) => {
-  const cachedQueries = queryClient.getQueriesData({
-    queryKey: originsKeys.details(edgeApplicationId)
+  const cachedQueries = baseService.queryClient.getQueriesData({
+    queryKey: baseService.queryKeys.origins.details(edgeApplicationId)
   })
 
   const hasDifferentId = cachedQueries.some(([key]) => {
@@ -28,21 +26,18 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
   })
 
   if (hasDifferentId) {
-    await queryClient.removeQueries({ queryKey: originsKeys.details(edgeApplicationId) })
+    await baseService.queryClient.removeQueries({
+      queryKey: baseService.queryKeys.origins.details(edgeApplicationId)
+    })
   }
 
-  await waitForPersistenceRestore()
-
-  const queryOptions = {
-    meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
-    ...(getCacheOptions(CACHE_TYPE.GLOBAL) || {})
-  }
-
-  return await queryClient.ensureQueryData({
-    queryKey: createFinalKey([...originsKeys.details(edgeApplicationId), id]),
-    queryFn: () => fetchOrigin({ edgeApplicationId, id }),
-    ...queryOptions
-  })
+  return await baseService._ensureQueryData(
+    [...baseService.queryKeys.origins.details(edgeApplicationId), id],
+    () => fetchOrigin({ edgeApplicationId, id }),
+    {
+      persist: true
+    }
+  )
 }
 
 const adapt = (httpResponse) => {

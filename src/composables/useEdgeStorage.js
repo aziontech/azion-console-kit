@@ -4,6 +4,7 @@ import { useToast } from 'primevue/usetoast'
 import * as yup from 'yup'
 import { formatBytes } from '@/helpers/format-bytes'
 import JSZip from 'jszip'
+import { useRoute } from 'vue-router'
 
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
@@ -82,6 +83,7 @@ const validationSchema = yup.object({
 })
 
 export const useEdgeStorage = () => {
+  const route = useRoute()
   const toast = useToast()
   const handleToast = (severity, summary, message) => {
     toast.add({
@@ -344,6 +346,15 @@ export const useEdgeStorage = () => {
     }
   }
 
+  const getBucketSelected = () => {
+    if (selectedBucket.value) {
+      return selectedBucket.value.name
+    }
+
+    const bucketName = route.params.id
+    return bucketName
+  }
+
   const handleDownload = async (file) => {
     try {
       isDownloading.value = true
@@ -405,6 +416,7 @@ export const useEdgeStorage = () => {
     createFolder,
     removeFiles,
     deleteMultipleFiles,
+    getBucketSelected,
     bucketTableNeedRefresh,
     validationSchema,
     handleFileChange,

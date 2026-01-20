@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from './queryClient'
-import { createFinalKey } from './keyFactory'
+import { createFinalKey, queryKeys } from './querySystem'
 import { CACHE_TYPE, getCacheOptions } from './queryOptions'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { toMilliseconds } from './config'
@@ -9,6 +9,7 @@ import { toMilliseconds } from './config'
 export class BaseService {
   http = httpService
   queryClient = queryClient
+  queryKeys = queryKeys
   cacheType = CACHE_TYPE
   toMilliseconds = toMilliseconds
 
@@ -41,24 +42,11 @@ export class BaseService {
     try {
       const queryOptions = this.#getQueryOptions(options)
       const finalKey = createFinalKey(queryKey)
-
       return useQuery({ queryKey: finalKey, queryFn, ...queryOptions })
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('[TanStack Query] Error creating query:', error)
-      // eslint-disable-next-line no-console
-      console.error('[TanStack Query] Returning fallback query with empty data to prevent UI crash')
-
+    } catch {
       return useQuery({
         queryKey: ['__error_fallback__', Date.now()],
-        queryFn: async () => {
-          // eslint-disable-next-line no-console
-          console.warn(
-            '[TanStack Query] Using fallback empty data due to configuration error',
-            error
-          )
-          return null
-        },
+        queryFn: async () => null,
         initialData: null,
         staleTime: this.toMilliseconds({ seconds: 30 }),
         gcTime: this.toMilliseconds({ minutes: 1 }),
@@ -115,17 +103,14 @@ export class BaseService {
   async _prefetchQuery(queryKey, queryFn, options = {}) {
     try {
       const queryOptions = this.#getQueryOptions(options)
-
       await waitForPersistenceRestore()
 
-      return this.queryClient.prefetchQuery({
+      return await this.queryClient.prefetchQuery({
         queryKey: createFinalKey(queryKey),
         queryFn,
         ...queryOptions
       })
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('[TanStack Query] Error prefetching query:', error)
+    } catch {
       return Promise.resolve(null)
     }
   }
@@ -141,14 +126,13 @@ export class BaseService {
         return await queryFn()
       }
 
-      return this.queryClient.ensureQueryData({
+      return await this.queryClient.ensureQueryData({
         queryKey: finalKey,
         queryFn,
+        revalidateIfStale: true,
         ...queryOptions
       })
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('[TanStack Query] Error ensuring query data:', error)
+    } catch {
       return Promise.resolve(null)
     }
   }

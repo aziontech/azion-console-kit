@@ -168,8 +168,8 @@
     return `ai ai-${preset}`
   }
 
-  const setRepositoryValue = () => {
-    repository.value = repository.value
+  const setRepositoryValue = (repositoryUrl) => {
+    repository.value = repositoryUrl
   }
 
   onMounted(async () => {
@@ -284,7 +284,7 @@
             :loading="loadingRepositories"
             @onSelectOption="
               (option) => {
-                setRepositoryValue()
+                setRepositoryValue(option.url)
                 setEdgeApplicationNameByRepository(option.name)
               }
             "

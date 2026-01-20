@@ -1,27 +1,7 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeApplicationFunctionsAdapter } from './edge-application-functions-adapter'
-
-export const edgeAppFunctionsKeys = {
-  all: (edgeAppId) => {
-    if (!edgeAppId) {
-      // eslint-disable-next-line no-console
-      console.warn('[edgeAppFunctionsKeys] Invalid edgeAppId provided:', edgeAppId)
-      return ['edge-app-functions', '__invalid_edge_app_id__']
-    }
-    return ['edge-app-functions', edgeAppId]
-  },
-  lists: (edgeAppId) => [...edgeAppFunctionsKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...edgeAppFunctionsKeys.all(edgeAppId), 'detail'],
-  detail: (edgeAppId, functionId) => {
-    if (functionId === null || functionId === undefined) {
-      // eslint-disable-next-line no-console
-      console.warn('[edgeAppFunctionsKeys] Invalid functionId provided:', functionId)
-      return [...edgeAppFunctionsKeys.details(edgeAppId), '__invalid_function_id__']
-    }
-    return [...edgeAppFunctionsKeys.details(edgeAppId), functionId]
-  }
-}
+import { queryKeys } from '@/services/v2/base/query/querySystem'
 
 export class EdgeApplicationFunctionService extends BaseService {
   constructor() {
@@ -94,7 +74,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
     const queryKey = [
-      ...edgeAppFunctionsKeys.lists(edgeApplicationId),
+      ...queryKeys.edgeAppFunctions.lists(edgeApplicationId),
       params.page,
       params.pageSize,
       params.fields,
@@ -103,7 +83,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     ]
     const hasFilter = params?.hasFilter || false
     return await this._ensureQueryData(
-      () => queryKey,
+      queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
       { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
     )
@@ -144,7 +124,7 @@ export class EdgeApplicationFunctionService extends BaseService {
 
   loadEdgeApplicationFunction = async ({ edgeApplicationID, functionID }) => {
     const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: edgeAppFunctionsKeys.details(edgeApplicationID)
+      queryKey: queryKeys.edgeAppFunctions.details(edgeApplicationID)
     })
 
     const hasDifferentId = cachedQueries.some(([key]) => {
@@ -154,12 +134,12 @@ export class EdgeApplicationFunctionService extends BaseService {
 
     if (hasDifferentId) {
       await this.queryClient.removeQueries({
-        queryKey: edgeAppFunctionsKeys.details(edgeApplicationID)
+        queryKey: queryKeys.edgeAppFunctions.details(edgeApplicationID)
       })
     }
 
     return await this._ensureQueryData(
-      () => edgeAppFunctionsKeys.detail(edgeApplicationID, functionID),
+      queryKeys.edgeAppFunctions.detail(edgeApplicationID, functionID),
       () => this.#fetchEdgeApplicationFunction({ edgeApplicationID, functionID }),
       { persist: true }
     )
@@ -176,7 +156,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: edgeAppFunctionsKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeAppFunctions.all(edgeApplicationId) })
 
     return {
       feedback: 'Your Function has been created',
@@ -195,10 +175,10 @@ export class EdgeApplicationFunctionService extends BaseService {
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
     this.queryClient.removeQueries({
-      queryKey: edgeAppFunctionsKeys.all(payload.edgeApplicationID)
+      queryKey: queryKeys.edgeAppFunctions.all(payload.edgeApplicationID)
     })
     this.queryClient.removeQueries({
-      queryKey: edgeAppFunctionsKeys.details(payload.edgeApplicationID)
+      queryKey: queryKeys.edgeAppFunctions.details(payload.edgeApplicationID)
     })
 
     return 'Your Function has been updated'
@@ -211,7 +191,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: edgeAppFunctionsKeys.all(edgeApplicationID) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeAppFunctions.all(edgeApplicationID) })
 
     return 'Your Function successfully deleted'
   }
