@@ -23,7 +23,7 @@
   const initialValues = {
     name: '',
     workloads_access: 'read_only',
-    bucket: [selectedBucket.value.name]
+    bucket: [selectedBucket?.value?.name || '']
   }
 
   const closeCreateDrawer = () => {
