@@ -75,12 +75,19 @@ export const EdgeStorageAdapter = {
     }
   },
 
-  transformCreateEdgeStorageBucket(data) {
+  transformCreateEdgeStorageCredential(data) {
     return {
       name: data.name,
       capabilities: data.capabilities,
       expiration_date: data.expirationDate,
       buckets: data.bucket[0] === ALL_BUCKETS_VALUE ? [] : data.bucket
+    }
+  },
+
+  transformCreateStorageBucket(data) {
+    return {
+      name: data.name,
+      workloads_access: data.workloads_access
     }
   }
 }

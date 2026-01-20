@@ -26,7 +26,7 @@ export class EdgeStorageService extends BaseService {
   }
 
   createEdgeStorageBucket = async (bucket = {}) => {
-    const body = this.adapter?.transformCreateEdgeStorageBucket?.(bucket)
+    const body = this.adapter?.transformCreateStorageBucket?.(bucket)
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/buckets`,
@@ -218,7 +218,7 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageCredentials?.(data)
   }
   createCredential = async (credential = {}) => {
-    const body = this.adapter?.transformCreateEdgeStorageBucket?.(credential)
+    const body = this.adapter?.transformCreateEdgeStorageCredential?.(credential)
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/credentials`,
