@@ -74,7 +74,11 @@ class CacheSyncService {
 
     let patternIndex = 0
 
-    for (let queryIndex = 0; queryIndex < queryKey.length && patternIndex < pattern.length; queryIndex++) {
+    for (
+      let queryIndex = 0;
+      queryIndex < queryKey.length && patternIndex < pattern.length;
+      queryIndex++
+    ) {
       if (queryKey[queryIndex] === pattern[patternIndex]) {
         patternIndex++
       }

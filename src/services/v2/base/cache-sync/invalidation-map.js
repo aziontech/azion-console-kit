@@ -121,7 +121,9 @@ const INVALIDATION_MAP = [
 export function getKeysForEvents(eventTitles) {
   if (!Array.isArray(eventTitles) || eventTitles.length === 0) return []
 
-  const mappings = [...INVALIDATION_MAP].sort((aPrefix, bPrefix) => (bPrefix?.length ?? 0) - (aPrefix?.length ?? 0))
+  const mappings = [...INVALIDATION_MAP].sort(
+    (aPrefix, bPrefix) => (bPrefix?.length ?? 0) - (aPrefix?.length ?? 0)
+  )
   const processedGroups = new Set()
   const keysToInvalidate = []
   const addedKeys = new Set()
@@ -131,7 +133,9 @@ export function getKeysForEvents(eventTitles) {
     const normalizedTitle = String(title).trim().toLowerCase()
 
     for (const mapping of mappings) {
-      const prefix = String(mapping.prefix || '').trim().toLowerCase()
+      const prefix = String(mapping.prefix || '')
+        .trim()
+        .toLowerCase()
       if (!prefix) continue
       if (!normalizedTitle.startsWith(prefix)) continue
 
