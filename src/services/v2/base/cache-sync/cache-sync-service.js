@@ -24,19 +24,63 @@ class CacheSyncService {
 
   async invalidateQueries(eventTitles) {
     const keysToInvalidate = getKeysForEvents(eventTitles)
-    const operations = keysToInvalidate.map(async (queryKey) => {
 
-      await queryClient.invalidateQueries({ queryKey, exact: false, refetchType: 'none' })
-      
-      await queryClient.refetchQueries({
-        queryKey,
-        exact: false,
-        type: 'all',
-        predicate: (query) => typeof query?.options?.queryFn === 'function'
+    for (const pattern of keysToInvalidate) {
+      // Get ALL queries from cache
+      const allQueries = queryClient.getQueryCache().getAll()
+
+      // Manually filter queries that match the pattern
+      // Pattern: ['origins', 'list'] should match ['origins', '123', 'list', 1, 200]
+      const matchingQueries = allQueries.filter((query) => {
+        return this.#queryKeyMatchesPattern(query.queryKey, pattern)
       })
-    })
 
-    await Promise.all(operations)
+      // Remove each matching query from cache
+      for (const query of matchingQueries) {
+        const isPersisted = query.meta?.persist !== false
+
+        if (!isPersisted) {
+          continue
+        }
+
+        // Skip if query doesn't have data (was never fetched)
+        if (!query.state.data) {
+          continue
+        }
+
+        try {
+          await queryClient.removeQueries({ queryKey: query.queryKey, exact: true })
+          await queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
+          await queryClient.refetchQueries({ queryKey: query.queryKey, exact: true })
+        } catch (error) {
+          logger.error('CacheSync', 'Failed to remove query:', query.queryKey, error)
+        }
+      }
+    }
+  }
+
+  #queryKeyMatchesPattern(queryKey, pattern) {
+    if (!Array.isArray(queryKey) || !Array.isArray(pattern)) {
+      return false
+    }
+
+    if (pattern.length === 0) {
+      return false
+    }
+
+    if (queryKey.length < pattern.length) {
+      return false
+    }
+
+    let patternIndex = 0
+
+    for (let queryIndex = 0; queryIndex < queryKey.length && patternIndex < pattern.length; queryIndex++) {
+      if (queryKey[queryIndex] === pattern[patternIndex]) {
+        patternIndex++
+      }
+    }
+
+    return patternIndex === pattern.length
   }
 
   async poll() {
