@@ -161,37 +161,39 @@
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
-            <PrimeButton
-              outlined
-              icon="ai ai-column"
-              class="table-button"
-              @click="toggleColumnSelector"
-              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
-              data-testid="data-table-actions-column-header-toggle-columns"
-            >
-            </PrimeButton>
-            <OverlayPanel
-              ref="columnSelectorPanel"
-              :pt="{
-                content: { class: 'p-0' }
-              }"
-              data-testid="data-table-actions-column-header-toggle-columns-panel"
-            >
-              <Listbox
-                v-model="selectedColumns"
-                multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
-                class="hidden-columns-panel"
-                optionLabel="header"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+            <template v-if="showColumnSelector">
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
+                data-testid="data-table-actions-column-header-toggle-columns"
               >
-                <template #optiongroup="slotProps">
-                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                </template>
-              </Listbox>
-            </OverlayPanel>
+              </PrimeButton>
+              <OverlayPanel
+                ref="columnSelectorPanel"
+                :pt="{
+                  content: { class: 'p-0' }
+                }"
+                data-testid="data-table-actions-column-header-toggle-columns-panel"
+              >
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Available Columns', items: columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </template>
           </div>
         </template>
         <template
@@ -391,6 +393,10 @@
     allowedFilters: {
       type: Array,
       default: () => []
+    },
+    showColumnSelector: {
+      type: Boolean,
+      default: true
     }
   })
   const firstItemIndex = ref(0)
