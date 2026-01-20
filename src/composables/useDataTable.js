@@ -431,10 +431,42 @@ export function useDataTable(props, emit) {
     }
   }
 
-  const handleRemoveFilter = (field) => {
-    appliedFilters.value = appliedFilters.value.filter((filter) => filter.field !== field)
-    if (filters.value[field]) {
-      delete filters.value[field]
+  const handleUpdateFilter = async (updateData) => {
+    const { index, field, label, value } = updateData
+
+    if (index >= 0 && index < appliedFilters.value.length) {
+      const previousFilter = { ...appliedFilters.value[index] }
+
+      appliedFilters.value[index] = {
+        field,
+        label,
+        value,
+        matchMode: label === 'name' ? 'contains' : 'is'
+      }
+
+      const filterParams = buildFilterParams()
+      firstItemIndex.value = 0
+
+      const success = await reload(filterParams)
+
+      if (!success) {
+        appliedFilters.value[index] = previousFilter
+      }
+    }
+  }
+
+  const handleRemoveFilter = (fieldOrIndex) => {
+    if (typeof fieldOrIndex === 'number') {
+      const removedFilter = appliedFilters.value[fieldOrIndex]
+      appliedFilters.value.splice(fieldOrIndex, 1)
+      if (removedFilter && filters.value[removedFilter.field]) {
+        delete filters.value[removedFilter.field]
+      }
+    } else {
+      appliedFilters.value = appliedFilters.value.filter((filter) => filter.field !== fieldOrIndex)
+      if (filters.value[fieldOrIndex]) {
+        delete filters.value[fieldOrIndex]
+      }
     }
 
     const filterParams = buildFilterParams()
@@ -739,6 +771,7 @@ export function useDataTable(props, emit) {
     handleSearchValue,
     toggleFilter,
     handleApplyFilter,
+    handleUpdateFilter,
     handleRemoveFilter,
     exportFunctionMapper,
     handleExportTableDataToCSV,

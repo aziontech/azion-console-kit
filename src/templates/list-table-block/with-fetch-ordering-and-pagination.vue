@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, useSlots } from 'vue'
+  import { computed, nextTick, ref, useSlots } from 'vue'
   import DataTable from '@/components/DataTable'
   import DataTableColumnSelector from '@/components/DataTable/DataTableColumnSelector.vue'
   import PrimeButton from 'primevue/button'
@@ -184,8 +184,8 @@
     fetchOnSort,
     fetchOnSearch,
     handleSearchValue,
-    toggleFilter,
     handleApplyFilter,
+    handleUpdateFilter,
     handleRemoveFilter,
     handleMouseEnter,
     handleMouseLeave,
@@ -194,6 +194,22 @@
     extractFieldValue,
     onRowReorder
   } = useDataTable(props, emit)
+
+  const showFilterRow = ref(false)
+
+  const handleToggleFilter = async () => {
+    showFilterRow.value = !showFilterRow.value
+    if (showFilterRow.value) {
+      await nextTick()
+      filterPanel.value.handleStartAddFilter()
+    }
+  }
+
+  const handleClearFilters = () => {
+    appliedFilters.value = []
+    showFilterRow.value = false
+    reload({ page: 1 })
+  }
 
   const slots = useSlots()
 
@@ -267,17 +283,18 @@
       >
         <slot name="header">
           <div class="flex flex-col gap-2 w-full">
-            <DataTable.Header :showDivider="!!appliedFilters.length">
+            <DataTable.Header :showDivider="showFilterRow || appliedFilters.length">
               <template #first-line>
                 <div class="flex justify-between gap-2 w-full">
                   <div class="flex gap-2 w-[400px]">
                     <PrimeButton
                       v-if="allowedFilters.length"
-                      outlined
+                      :outlined="!showFilterRow && !appliedFilters.length"
                       icon="pi pi-filter"
                       size="small"
-                      @click="toggleFilter"
+                      @click="handleToggleFilter"
                       data-testid="data-table-actions-column-header-toggle-filter"
+                      :class="{ 'bg-[#292929]': showFilterRow || appliedFilters.length }"
                     />
 
                     <DataTable.Search
@@ -307,11 +324,17 @@
               </template>
               <template
                 #second-line
-                v-if="appliedFilters.length"
+                v-if="showFilterRow || appliedFilters.length"
               >
-                <DataTable.AppliedFilters
-                  :applied-filters="appliedFilters"
+                <DataTable.Filter
+                  ref="filterPanel"
+                  :filters="filterWithoutLastModified"
+                  :appliedFilters="appliedFilters"
+                  :visible="showFilterRow || appliedFilters.length"
+                  @apply="handleApplyFilter"
+                  @update="handleUpdateFilter"
                   @remove="handleRemoveFilter"
+                  @clear="handleClearFilters"
                 />
               </template>
             </DataTable.Header>
@@ -418,14 +441,6 @@
       :last-editor="popupData.lastEditor"
       :last-modified="popupData.lastModified"
       :position="popupPosition"
-    />
-
-    <!-- Filter Panel -->
-    <DataTable.Filter
-      v-if="allowedFilters.length"
-      ref="filterPanel"
-      :filters="filterWithoutLastModified"
-      @apply="handleApplyFilter"
     />
   </div>
 </template>

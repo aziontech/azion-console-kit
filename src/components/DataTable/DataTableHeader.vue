@@ -8,7 +8,7 @@
       <slot name="first-line" />
     </div>
     <Divider v-if="showDivider" />
-    <div class="px-3.5">
+    <div class="flex h-full justify-start gap-2 px-3">
       <slot name="second-line" />
     </div>
   </div>

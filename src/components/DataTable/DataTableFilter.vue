@@ -1,213 +1,212 @@
 <script setup>
-  import { ref, computed } from 'vue'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Dropdown from 'primevue/dropdown'
+  import { ref, computed, watch } from 'vue'
   import PrimeButton from 'primevue/button'
-  import { filterBuilder } from './filters/filter-builder'
+  import FilterRow from './FilterRow.vue'
 
   const props = defineProps({
     filters: {
       type: Array,
       default: () => []
+    },
+    appliedFilters: {
+      type: Array,
+      default: () => []
+    },
+    visible: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const emit = defineEmits(['apply'])
+  const emit = defineEmits(['apply', 'remove', 'clear', 'update:visible', 'update'])
 
-  const overlayPanel = ref(null)
-  const selectedField = ref(null)
-  const filterValue = ref('')
-  const isEmailValid = ref(true)
+  const isAddingFilter = ref(false)
+  const filterStates = ref([])
+  const hasChanges = ref(false)
 
-  const filterOptions = computed(() => {
-    const filterOptions = props.filters
-      .filter((col) => col.header)
-      .map((col) => ({
+  watch(
+    () => props.visible,
+    (newValue) => {
+      if (newValue) {
+        initializeFilterStates()
+        if (props.appliedFilters.length === 0 && !isAddingFilter.value) {
+          handleStartAddFilter()
+        }
+      }
+    }
+  )
+
+  watch(
+    () => props.appliedFilters,
+    () => {
+      if (props.visible) {
+        initializeFilterStates()
+      }
+    },
+    { deep: true }
+  )
+
+  const initializeFilterStates = () => {
+    filterStates.value = props.appliedFilters.map((filter) => ({
+      field: filter.field,
+      value: filter.value,
+      label: filter.label,
+      isValid: true
+    }))
+    hasChanges.value = false
+  }
+
+  const getFilterOptions = (excludeIndex = null) => {
+    const appliedFields = props.appliedFilters
+      .map((filter) => filter.field)
+      // eslint-disable-next-line no-unused-vars
+      .filter((field, index) => index !== excludeIndex)
+
+    return props.filters.map((col) => {
+      const value = col.filterPath.split('.')[0] || col.field?.toLowerCase()
+      return {
         label: col.header,
-        value: col.filterPath || col.sortField || col.field?.toLowerCase(),
-        multiValue: col.multiValue || false
-      }))
-
-    return filterOptions
-  })
-
-  const filterComponent = computed(() => {
-    if (!selectedField.value) return null
-
-    const selectedOption = filterOptions.value.find((opt) => opt.value === selectedField.value)
-
-    return filterBuilder({
-      filterKey: selectedField.value,
-      filterHeader: selectedOption?.label,
-      filterValue: filterValue.value,
-      multiValue: selectedOption?.multiValue,
-      onUpdate: (value) => {
-        filterValue.value = value
-      },
-      onValidation: (isValid) => {
-        isEmailValid.value = isValid
+        value,
+        multiValue: col.multiValue || false,
+        disabled: appliedFields.includes(value)
       }
     })
+  }
+
+  const filterOptions = computed(() => getFilterOptions())
+
+  const allFilters = computed(() => {
+    const filters = filterStates.value.map((state, index) => ({
+      field: state.field,
+      value: state.value,
+      label: state.label,
+      isApplied: index < props.appliedFilters.length
+    }))
+    return filters
   })
 
-  const isLastEditorField = computed(() => selectedField.value?.toLowerCase() === 'last_editor')
+  const canApply = computed(() => {
+    return hasChanges.value || isAddingFilter.value
+  })
 
-  const handleFieldChange = () => {
-    filterValue.value = ''
-    isEmailValid.value = true
-  }
-
-  const initializeDefaultFilter = () => {
-    const lastModifiedOption = filterOptions.value.find(
-      (opt) => opt.value === 'last_modified' || opt.value === 'lastmodified'
-    )
-    const nameOption = filterOptions.value.find((opt) => opt.value === 'name')
-
-    if (lastModifiedOption) {
-      selectedField.value = lastModifiedOption.value
-    } else if (nameOption) {
-      selectedField.value = nameOption.value
+  const handleStartAddFilter = () => {
+    const firstAvailableOption = filterOptions.value.find((opt) => !opt.disabled)
+    if (firstAvailableOption) {
+      filterStates.value.push({
+        field: firstAvailableOption.value,
+        value: '',
+        label: firstAvailableOption.label,
+        isValid: true
+      })
+      isAddingFilter.value = true
+      hasChanges.value = true
     }
   }
 
-  const toggle = (event) => {
-    if (!selectedField.value) {
-      initializeDefaultFilter()
+  const handleFilterChange = ({ index, field, label, value, isValid }) => {
+    if (filterStates.value[index]) {
+      filterStates.value[index] = { field, label, value, isValid }
+      hasChanges.value = true
     }
-    overlayPanel.value.toggle(event)
   }
 
-  const handleCancel = () => {
-    overlayPanel.value.hide()
-    selectedField.value = null
-    filterValue.value = ''
-    isEmailValid.value = true
-  }
+  const handleApplyFilters = () => {
+    if (!canApply.value) return
 
-  const handleApply = () => {
-    let hasValue = false
-
-    if (Array.isArray(filterValue.value)) {
-      hasValue = filterValue.value.length > 0
-    } else if (typeof filterValue.value === 'object' && filterValue.value !== null) {
-      hasValue = Object.keys(filterValue.value).length > 0
-    } else {
-      hasValue =
-        filterValue.value !== null && filterValue.value !== undefined && filterValue.value !== ''
-    }
-
-    if (!selectedField.value || !hasValue) {
-      return
-    }
-
-    if (isLastEditorField.value && !isEmailValid.value) {
-      return
-    }
-
-    const selectedOption = filterOptions.value.find((opt) => opt.value === selectedField.value)
-
-    let emitValue = filterValue.value
-    if (
-      typeof filterValue.value === 'object' &&
-      filterValue.value !== null &&
-      filterValue.value.operator
-    ) {
-      emitValue = filterValue.value
-    }
-
-    emit('apply', {
-      field: selectedField.value,
-      label: selectedOption.label,
-      value: emitValue
+    filterStates.value.forEach((state, index) => {
+      if (index >= props.appliedFilters.length) {
+        emit('apply', {
+          field: state.field,
+          label: state.label,
+          value: state.value,
+          operator: 'equals'
+        })
+      } else {
+        const original = props.appliedFilters[index]
+        if (original.field !== state.field || original.value !== state.value) {
+          emit('update', {
+            index,
+            field: state.field,
+            label: state.label,
+            value: state.value,
+            operator: 'equals'
+          })
+        }
+      }
     })
 
-    overlayPanel.value.hide()
-    selectedField.value = null
-    filterValue.value = ''
-    isEmailValid.value = true
+    isAddingFilter.value = false
+    hasChanges.value = false
   }
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      handleApply()
+  const handleRemoveFilter = (index) => {
+    if (index >= props.appliedFilters.length) {
+      filterStates.value.splice(index, 1)
+      isAddingFilter.value = false
+      hasChanges.value = filterStates.value.length !== props.appliedFilters.length
+      if (props.appliedFilters.length === 0 && filterStates.value.length === 0) {
+        emit('clear')
+      }
+    } else {
+      if (props.appliedFilters.length === 1) {
+        handleClearFilters()
+      } else {
+        emit('remove', index)
+      }
     }
   }
 
-  defineExpose({ toggle })
+  const handleClearFilters = () => {
+    emit('clear')
+    isAddingFilter.value = false
+    filterStates.value = []
+    hasChanges.value = false
+  }
+
+  defineExpose({ handleStartAddFilter })
 </script>
 <template>
-  <OverlayPanel
-    ref="overlayPanel"
-    :pt="{
-      root: { class: 'md:w-[600px] w-[400px]' },
-      content: { class: 'p-0' }
-    }"
-  >
-    <div
-      class="flex flex-col"
-      @keydown="handleKeyDown"
-    >
-      <div
-        class="flex items-center justify-between px-6 py-2 border-b border-[var(--surface-border)]"
-      >
-        <h3 class="text-lg font-semibold">Filter</h3>
-        <PrimeButton
-          outlined
-          icon="pi pi-times"
-          class="color-[var(--actionIconColor)]"
-          @click="handleCancel"
-        />
-      </div>
-
-      <div class="flex flex-col gap-4 p-0">
-        <div
-          class="flex flex-col gap-[14px] px-6 pt-5"
-          :class="{ 'py-6': !selectedField }"
-        >
-          <p class="text-sm text-color-secondary">
-            Each combination of operator can only be used once.
-          </p>
-          <label
-            for="filter-field"
-            class="text-sm font-medium"
-          >
-            Filter
-          </label>
-          <div class="flex w-full gap-4 pb-4">
-            <Dropdown
-              id="filter-field"
-              v-model="selectedField"
-              :options="filterOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select a field"
-              class="w-[30%]"
-              @change="handleFieldChange"
-            />
-            <div
-              v-if="selectedField"
-              class="w-[70%]"
-            >
-              <component
-                class="w-full"
-                :is="filterComponent"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 px-6 py-2 border-t border-[var(--surface-border)]">
-        <PrimeButton
-          label="Cancel"
-          outlined
-          @click="handleCancel"
-        />
-        <PrimeButton
-          label="Apply"
-          severity="secondary"
-          @click="handleApply"
-        />
-      </div>
+  <div class="flex flex-col h-full gap-3 items-start">
+    <div class="flex flex-col gap-2">
+      <FilterRow
+        v-for="(filter, index) in allFilters"
+        :key="`filter-${filter.field}-${index}`"
+        :filter="filter"
+        :index="index"
+        :filterOptions="getFilterOptions(index)"
+        @change="handleFilterChange"
+        @remove="handleRemoveFilter"
+      />
     </div>
-  </OverlayPanel>
+  </div>
+
+  <div class="flex items-start gap-2">
+    <div class="h-full w-px bg-[#404040]"></div>
+
+    <PrimeButton
+      v-if="canApply"
+      label="Apply"
+      size="small"
+      severity="secondary"
+      @click="handleApplyFilters"
+    />
+
+    <PrimeButton
+      v-if="!isAddingFilter"
+      outlined
+      size="small"
+      @click="handleStartAddFilter"
+    >
+      <i class="pi pi-plus mr-2"></i>
+      FILTER
+    </PrimeButton>
+
+    <PrimeButton
+      text
+      size="small"
+      @click="handleClearFilters"
+    >
+      CLEAR
+    </PrimeButton>
+  </div>
 </template>
