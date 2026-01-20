@@ -153,7 +153,7 @@
               :exportTableCSV="handleExportTableDataToCSV"
             />
             <PrimeButton
-              v-if="hasExportToCsvMapper"
+              v-if="hasExportToCsvMapper && !hasActionsHeaderSlot"
               @click="handleExportTableDataToCSV"
               outlined
               class="max-sm:w-full"
@@ -161,37 +161,39 @@
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
-            <PrimeButton
-              outlined
-              icon="ai ai-column"
-              class="table-button"
-              @click="toggleColumnSelector"
-              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
-              data-testid="data-table-actions-column-header-toggle-columns"
-            >
-            </PrimeButton>
-            <OverlayPanel
-              ref="columnSelectorPanel"
-              :pt="{
-                content: { class: 'p-0' }
-              }"
-              data-testid="data-table-actions-column-header-toggle-columns-panel"
-            >
-              <Listbox
-                v-model="selectedColumns"
-                multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
-                class="hidden-columns-panel"
-                optionLabel="header"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+            <template v-if="showColumnSelector">
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
+                data-testid="data-table-actions-column-header-toggle-columns"
               >
-                <template #optiongroup="slotProps">
-                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                </template>
-              </Listbox>
-            </OverlayPanel>
+              </PrimeButton>
+              <OverlayPanel
+                ref="columnSelectorPanel"
+                :pt="{
+                  content: { class: 'p-0' }
+                }"
+                data-testid="data-table-actions-column-header-toggle-columns-panel"
+              >
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Available Columns', items: columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </template>
           </div>
         </template>
         <template
@@ -270,11 +272,11 @@
   import Listbox from 'primevue/listbox'
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -391,6 +393,10 @@
     allowedFilters: {
       type: Array,
       default: () => []
+    },
+    showColumnSelector: {
+      type: Boolean,
+      default: true
     }
   })
   const firstItemIndex = ref(0)
@@ -404,6 +410,7 @@
     : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
+  const slots = useSlots()
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -415,6 +422,7 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
+  const hasActionsHeaderSlot = computed(() => !!slots['actions-header'])
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
