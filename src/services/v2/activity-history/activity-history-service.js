@@ -1,7 +1,7 @@
 import { ActivityHistoryAdapter } from './activity-history-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 
-export const SYNC_INTERVAL_MINUTES = 1
+export const SYNC_INTERVAL_MINUTES = 2
 
 export class ActivityHistoryService extends BaseService {
   constructor() {
