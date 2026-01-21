@@ -17,6 +17,8 @@
       ref="overlayPanel"
       class="min-w-[200px] max-w-[430px]"
       :showCloseIcon="false"
+      @show="onOverlayShow"
+      @hide="onOverlayHide"
       :pt="{
         content: { class: 'p-2' }
       }"
@@ -51,6 +53,7 @@
           <InputDateRange
             panelOnly
             mode="relative"
+            :isActive="activeTab === 2"
             :editingField="editingField"
             v-model="model"
             :maxDays="maxDays"
@@ -66,7 +69,7 @@
 <script setup>
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
-  import { defineModel, ref } from 'vue'
+  import { defineModel, nextTick, ref } from 'vue'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -85,6 +88,7 @@
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const editingField = ref('start')
+  const isOverlayOpen = ref(false)
 
   const model = defineModel({
     type: Object,
@@ -107,21 +111,34 @@
     }
   })
 
-  const openOverlay = (payload, tabIndex) => {
+  const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
-    if (tabIndex === 0) {
-      overlayPanel.value?.toggle?.(payload)
+
+    const event = tabIndex === 0 ? payload : payload?.event
+    const field = tabIndex === 0 ? undefined : payload?.field
+    if (field === 'start' || field === 'end') editingField.value = field
+
+    if (!event) return
+
+    if (isOverlayOpen.value) {
+      overlayPanel.value?.hide?.()
+      await nextTick()
+      overlayPanel.value?.show?.(event)
       return
     }
 
-    const { event, field } = payload || {}
-    if (field === 'start' || field === 'end') {
-      editingField.value = field
-    }
-    overlayPanel.value?.toggle?.(event)
+    overlayPanel.value?.show?.(event)
   }
 
   const closeOverlay = () => {
     overlayPanel.value?.hide?.()
+  }
+
+  const onOverlayShow = () => {
+    isOverlayOpen.value = true
+  }
+
+  const onOverlayHide = () => {
+    isOverlayOpen.value = false
   }
 </script>

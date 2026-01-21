@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed, defineModel, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
@@ -33,6 +33,10 @@
     mode: {
       type: String,
       default: 'absolute'
+    },
+    isActive: {
+      type: Boolean,
+      default: false
     },
     editingField: {
       type: String,
@@ -72,6 +76,20 @@
   const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
   const relativeDirection = ref('last')
+
+  const lastRelativeRequestKey = ref('')
+  const isSyncingRelativeFromModel = ref(false)
+
+  const parseRelativeFromLabel = (label) => {
+    if (!label || typeof label !== 'string') return null
+    const match = label.trim().match(/^(last|next)\s+(\d+)\s+([a-zA-Z]+)$/i)
+    if (!match) return null
+    return {
+      direction: match[1].toLowerCase(),
+      value: Number(match[2]),
+      unit: match[3].toLowerCase()
+    }
+  }
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
@@ -203,6 +221,15 @@
 
       const calculatedDate = relativeDirection.value === 'last' ? newStartDate : newEndDate
 
+      model.value.relative = {
+        direction: relativeDirection.value,
+        value: relativeValue.value,
+        unit: relativeUnit.value,
+        preset: model.value?.relative?.preset
+      }
+
+      model.value.label = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+
       // Apply relative calculation only to the active input (start/end)
       if (props.editingField === 'start') {
         model.value.startDate = calculatedDate
@@ -212,10 +239,50 @@
 
       hasChanges.value = false
       tempInputValue.value = ''
-      model.value.label = ''
       emitSelectIfValid()
     }
   }
+
+  watch(
+    () => props.isActive,
+    (isActive) => {
+      if (props.mode !== 'relative') return
+
+      if (!isActive) {
+        lastRelativeRequestKey.value = ''
+        return
+      }
+
+      const fromModel = model.value?.relative
+      const fromLabel = parseRelativeFromLabel(model.value?.label)
+      const source =
+        fromModel?.value && fromModel?.unit && fromModel?.direction ? fromModel : fromLabel
+
+      if (!source) return
+
+      isSyncingRelativeFromModel.value = true
+      relativeDirection.value = source.direction
+      relativeValue.value = source.value
+      relativeUnit.value = source.unit
+      isSyncingRelativeFromModel.value = false
+
+      const requestKey = `${props.editingField}|${relativeDirection.value}|${relativeValue.value}|${relativeUnit.value}`
+      if (lastRelativeRequestKey.value !== requestKey) {
+        lastRelativeRequestKey.value = requestKey
+        updateRelativeRange()
+      }
+    },
+    { immediate: true }
+  )
+
+  watch(
+    () => [relativeDirection.value, relativeValue.value, relativeUnit.value],
+    () => {
+      if (isSyncingRelativeFromModel.value) return
+      if (props.mode !== 'relative') return
+      lastRelativeRequestKey.value = `${props.editingField}|${relativeDirection.value}|${relativeValue.value}|${relativeUnit.value}`
+    }
+  )
 
   const resetToLastFiveMinutes = () => {
     const now = new Date()
