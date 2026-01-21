@@ -36,26 +36,14 @@
 <script setup>
   import { inject, ref } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import * as yup from 'yup'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsTeamPermissions from './FormFields/FormFieldsTeamPermissions.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-
-  import * as yup from 'yup'
-
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const teamName = ref('Edit Team Permission')
-
-  const setTeamName = (team) => {
-    teamName.value = team.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, team.name)
-  }
+  import FormFieldsTeamPermissions from '@views/TeamsPermissions/FormFields/FormFieldsTeamPermissions.vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
     editTeamPermissionService: {
@@ -76,7 +64,23 @@
     }
   })
 
+  const validationSchema = yup.object({
+    name: yup.string().required('Name is a required field'),
+    permissions: yup.array().required('Permission is a required field').min(1),
+    isActive: yup.boolean()
+  })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const teamName = ref('Edit Team Permission')
   const router = useRouter()
+
+  const setTeamName = (team) => {
+    teamName.value = team.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, team.name)
+  }
 
   const handleLoadFail = (error) => {
     const { fieldName, message } = handleTrackerError(error)
@@ -91,12 +95,6 @@
       .track()
   }
 
-  const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
-    permissions: yup.array().required('Permission is a required field').min(1),
-    isActive: yup.boolean()
-  })
-
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
@@ -104,6 +102,7 @@
       })
       .track()
   }
+
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product

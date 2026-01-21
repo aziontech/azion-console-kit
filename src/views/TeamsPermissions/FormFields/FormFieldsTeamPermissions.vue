@@ -1,11 +1,11 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { watch, ref, onMounted } from 'vue'
+  import PickList from 'primevue/picklist'
+  import { useField } from 'vee-validate'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import PickList from 'primevue/picklist'
-  import { useField } from 'vee-validate'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   const props = defineProps({
@@ -16,6 +16,7 @@
   })
 
   const permissionsList = ref([])
+  const formAlredyInitialized = ref(false)
 
   const { value: name } = useField('name')
   const { value: permissions, errorMessage: errorPermissions } = useField('permissions')
@@ -23,8 +24,6 @@
   const isAlreadySelected = ({ alreadySelectedPermissionsIds, id }) => {
     return alreadySelectedPermissionsIds.includes(id)
   }
-
-  const formAlredyInitialized = ref(false)
 
   const fetchPermissions = async () => {
     const teamPermissions = await props.listPermissionService()
@@ -44,10 +43,10 @@
   }
 
   watch(permissionsList, (newPermissions) => {
-    if (formAlredyInitialized.value) {
-      const selectedPermissions = newPermissions[1]
-      permissions.value = selectedPermissions
-    }
+    if (!formAlredyInitialized.value) return
+
+    const selectedPermissions = newPermissions[1]
+    permissions.value = selectedPermissions
   })
 
   onMounted(async () => {
@@ -74,6 +73,7 @@
       </div>
     </template>
   </FormHorizontal>
+
   <FormHorizontal
     data-testid="teams-permissions-form__section__permissions"
     title="Permissions"
@@ -153,6 +153,7 @@
       </div>
     </template>
   </FormHorizontal>
+
   <FormHorizontal
     title="Status"
     data-testid="teams-permissions-form__section__status"
