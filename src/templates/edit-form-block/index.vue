@@ -131,6 +131,8 @@
       } else {
         emit('on-load-fail', error)
         showToast('error', error)
+
+        blockViewRedirection.value = false
       }
 
       goBackToList()
@@ -141,19 +143,25 @@
     async (values) => {
       try {
         const feedback = await props.editService(values)
+
         if (!props.disableAfterCreateToastFeedback) {
           showToast('success', feedback || 'edited successfully')
         }
+
         blockViewRedirection.value = false
+
         emit('on-edit-success', feedback)
+
         if (props.disableRedirect) {
           resetForm({ values })
           blockViewRedirection.value = true
           return
         }
+
         goBackToList()
       } catch (error) {
-        blockViewRedirection.value = true
+        blockViewRedirection.value = false
+
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
@@ -176,6 +184,11 @@
 </script>
 
 <template>
+  <!-- <DialogUnsavedBlock
+    :blockRedirectUnsaved="formHasChanges"
+    :isTabs="isTabs"
+  /> -->
+
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
       @submit.prevent="handleSubmit"
@@ -193,11 +206,6 @@
       />
     </form>
   </div>
-
-  <DialogUnsavedBlock
-    :blockRedirectUnsaved="formHasChanges"
-    :isTabs="isTabs"
-  />
   <slot
     name="action-bar"
     :onSubmit="onSubmit"
