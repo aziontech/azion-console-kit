@@ -84,6 +84,18 @@
     return formatDateSimple(model.value.endDate)
   })
 
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+    if (!start || !end) return false
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
+  const emitSelectIfValid = () => {
+    if (isInvalidRange.value) return
+    emit('select', model.value)
+  }
+
   const openStart = (event) => {
     selectedTime.value = ''
     hasChanges.value = false
@@ -101,7 +113,7 @@
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const onMonthChange = () => {
@@ -110,7 +122,7 @@
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const onYearChange = () => {
@@ -119,7 +131,7 @@
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const previousMonth = () => {
@@ -132,7 +144,7 @@
     }
     onMonthChange()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const nextMonth = () => {
@@ -144,7 +156,7 @@
       selectedMonth.value++
     }
     onMonthChange()
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const selectTime = (time) => {
@@ -152,7 +164,7 @@
     selectedTime.value = time
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const updateSelectedDateTime = () => {
@@ -189,13 +201,19 @@
         now
       )
 
-      model.value.startDate = newStartDate
-      model.value.endDate = newEndDate
+      const calculatedDate = relativeDirection.value === 'last' ? newStartDate : newEndDate
+
+      // Apply relative calculation only to the active input (start/end)
+      if (props.editingField === 'start') {
+        model.value.startDate = calculatedDate
+      } else {
+        model.value.endDate = calculatedDate
+      }
 
       hasChanges.value = false
       tempInputValue.value = ''
       model.value.label = ''
-      emit('select', model.value)
+      emitSelectIfValid()
     }
   }
 
@@ -228,7 +246,7 @@
       }
     }
 
-    emit('select', model.value)
+    emitSelectIfValid()
     emit('close')
   }
 
@@ -248,7 +266,7 @@
     hasChanges.value = false
     tempInputValue.value = ''
     model.value.label = ''
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const updateRange = () => {
@@ -273,7 +291,7 @@
     hasChanges.value = false
     tempInputValue.value = ''
     model.value.label = ''
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   if (model.value.startDate) {
@@ -293,6 +311,7 @@
       >
         <InputText
           class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none ml-0.5"
+          :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
           :value="startDateInput"
           readonly
           @click="openStart"
@@ -303,6 +322,7 @@
         </div>
         <InputText
           class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
+          :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
           :value="endDateInput"
           readonly
           @click="openEnd"
@@ -314,6 +334,7 @@
       v-else
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
+      :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
       @click="openStart"
       readonly
     />
@@ -401,7 +422,8 @@
       <div class="flex flex-col gap-4">
         <InputNumber
           v-model="relativeValue"
-          @input="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
+          @value-change="updateRelativeRange"
           :min="1"
           showButtons
         />
@@ -410,12 +432,12 @@
           :options="RELATIVE_UNITS"
           optionLabel="label"
           optionValue="value"
-          @change="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
         />
         <Dropdown
           v-model="relativeDirection"
           :options="RELATIVE_DIRECTIONS"
-          @change="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
           optionLabel="label"
           optionValue="value"
           disabled
@@ -426,12 +448,12 @@
     <div class="mt-4 pt-4 border-t surface-border">
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-color">
-          {{ editingField === 'start' ? 'Start date' : 'End date' }}
+          {{ props.editingField === 'start' ? 'Start date' : 'End date' }}
         </label>
         <div class="flex items-center gap-2">
           <InputText
             v-model="inputValue"
-            :placeholder="editingField === 'start' ? startDateInput : endDateInput"
+            :placeholder="props.editingField === 'start' ? startDateInput : endDateInput"
             class="w-full"
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
