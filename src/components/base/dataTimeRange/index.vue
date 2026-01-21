@@ -27,7 +27,7 @@
           navcontent: { class: 'mb-2 pb-1' }
         }"
       >
-        <TabPanel header="Quick Select">
+        <TabPanel header="Quick">
           <QuickSelect
             panelOnly
             v-model="model"
@@ -70,6 +70,7 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
@@ -88,11 +89,22 @@
   const model = defineModel({
     type: Object,
     required: false,
-    default: () => ({
-      startDate: new Date(),
-      endDate: new Date(),
-      label: ''
-    })
+    default: () => {
+      const now = new Date()
+      const { startDate, endDate } = createRelativeRange(5, 'minutes', 'last', now)
+
+      return {
+        startDate,
+        endDate,
+        label: COMMON_DATE_RANGES.last_5_minutes.label,
+        relative: {
+          direction: 'last',
+          value: 5,
+          unit: 'minutes',
+          preset: 'last_5_minutes'
+        }
+      }
+    }
   })
 
   const openOverlay = (payload, tabIndex) => {

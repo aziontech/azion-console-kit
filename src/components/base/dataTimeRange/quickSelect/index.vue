@@ -11,8 +11,6 @@
   />
 
   <template v-else>
-    <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
-
     <div class="flex gap-2">
       <div class="flex gap-2 flex-1">
         <Dropdown

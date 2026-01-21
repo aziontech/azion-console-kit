@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, defineModel, onMounted } from 'vue'
+  import { ref, computed, defineModel } from 'vue'
   import PrimeButton from 'primevue/button'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
@@ -196,7 +196,6 @@
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
     TIME_SLOTS,
-    getCurrentMonthLabel,
     getCurrentHourAndMinute
   } from '@utils/date.js'
 
@@ -254,7 +253,7 @@
 
   const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
-  const relativeDirection = ref(getCurrentMonthLabel().toLowerCase())
+  const relativeDirection = ref('last')
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
@@ -393,7 +392,7 @@
 
     relativeValue.value = 5
     relativeUnit.value = 'minutes'
-    relativeDirection.value = getCurrentMonthLabel().toLowerCase()
+    relativeDirection.value = 'last'
 
     selectedTime.value = ''
     hasChanges.value = false
@@ -465,12 +464,6 @@
   if (model.value.endDate) {
     model.value.endDate = new Date(model.value.endDate)
   }
-
-  onMounted(() => {
-    if (props.mode === 'relative') {
-      updateRelativeRange()
-    }
-  })
 
   defineExpose({})
 </script>
