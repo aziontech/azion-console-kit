@@ -53,7 +53,6 @@
           <InputDateRange
             panelOnly
             mode="relative"
-            :isActive="activeTab === 2"
             :editingField="editingField"
             v-model="model"
             :maxDays="maxDays"
