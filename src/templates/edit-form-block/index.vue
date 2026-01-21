@@ -51,11 +51,12 @@
     'onError'
   ])
 
-  const { scrollToError } = useScrollToError()
+  const blockViewRedirection = ref(true)
+
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
-  const blockViewRedirection = ref(true)
+  const { scrollToError } = useScrollToError()
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
     validationSchema: props.schema,
@@ -66,6 +67,7 @@
 
   if (props.isTabs) {
     const unsavedStatus = inject('unsaved')
+
     formHasUpdated = unsavedStatus.formHasUpdated
     visibleOnSaved = unsavedStatus.visibleOnSaved
   }
@@ -78,6 +80,7 @@
 
   watch(formHasChanges, () => {
     if (!props.isTabs) return
+
     formHasUpdated.value = formHasChanges.value
     visibleOnSaved.value = false
   })
@@ -87,12 +90,11 @@
       router.push({ name: props.updatedRedirect })
       return
     }
+
     router.go(-1)
   }
 
-  const onCancel = () => {
-    goBackToList()
-  }
+  const onCancel = () => goBackToList()
 
   const showToast = (severity, detail) => {
     if (!detail) return
@@ -111,12 +113,16 @@
     try {
       if (props.initialValues && Object.keys(props.initialValues).length > 0) {
         const initialValues = props.initialValues
+
         emit('loaded-service-object', initialValues)
         resetForm({ values: initialValues })
+
         return
       }
+
       const { id } = route.params
       const initialValues = await props.loadService({ id })
+
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
@@ -126,6 +132,7 @@
         emit('on-load-fail', error)
         showToast('error', error)
       }
+
       goBackToList()
     }
   }

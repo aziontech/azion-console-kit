@@ -1,38 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        :pageTitle="teamName"
-        data-testid="teams-permissions__edit-view__page-heading"
-        description="Configure permissions for team collaboration."
-      />
-    </template>
-    <template #content>
-      <EditFormBlock
-        @on-load-fail="handleLoadFail"
-        :editService="props.editTeamPermissionService"
-        :loadService="props.loadTeamPermissionService"
-        :updatedRedirect="updatedRedirect"
-        :schema="validationSchema"
-        @loaded-service-object="setTeamName"
-        @on-edit-success="handleTrackSuccessEdit"
-        @on-edit-fail="handleTrackFailEdit"
-      >
-        <template #form>
-          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </EditFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { inject, ref } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
@@ -84,7 +49,9 @@
 
   const handleLoadFail = (error) => {
     const { fieldName, message } = handleTrackerError(error)
+
     router.push({ name: 'teams-permission' })
+
     tracker.product
       .failedToEdit({
         productName: 'Teams Permissions',
@@ -115,3 +82,37 @@
       .track()
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        :pageTitle="teamName"
+        data-testid="teams-permissions__edit-view__page-heading"
+        description="Configure permissions for team collaboration."
+      />
+    </template>
+    <template #content>
+      <EditFormBlock
+        @on-load-fail="handleLoadFail"
+        :editService="props.editTeamPermissionService"
+        :loadService="props.loadTeamPermissionService"
+        :updatedRedirect="updatedRedirect"
+        :schema="validationSchema"
+        @loaded-service-object="setTeamName"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
+      >
+        <template #form>
+          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
+</template>
