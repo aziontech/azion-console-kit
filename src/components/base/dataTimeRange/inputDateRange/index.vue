@@ -318,19 +318,30 @@
         class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
       >
         <InputText
-          class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none ml-0.5"
-          :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
+          class="w-min cursor-pointer"
+          :class="
+            isInvalidRange
+              ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+              : 'border-none'
+          "
           :value="startDateInput"
           readonly
           @click="openStart"
         />
-        <div class="flex items-center text-color-secondary text-sm">
+        <div
+          class="flex items-center text-color-secondary text-sm"
+          :class="isInvalidRange ? 'text-[var(--error-color)]' : ''"
+        >
           <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
           <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
         </div>
         <InputText
-          class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-          :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
+          class="w-min cursor-pointer"
+          :class="
+            isInvalidRange
+              ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+              : 'border-none'
+          "
           :value="endDateInput"
           readonly
           @click="openEnd"
@@ -342,7 +353,7 @@
       v-else
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-red-500' : ''"
+      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
       @click="openStart"
       readonly
     />
