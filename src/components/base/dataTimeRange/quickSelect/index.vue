@@ -1,19 +1,16 @@
 <template>
   <PrimeButton
+    v-if="!panelOnly"
     icon="pi pi-calendar"
     outlined
     size="small"
-    @click="toggleOverlayPanel"
+    @click="emit('open', $event)"
     :pt="{
       icon: { class: 'max-md:m-0' }
     }"
   />
 
-  <OverlayPanel
-    ref="overlayPanelQuickSelect"
-    :showCloseIcon="false"
-    class="max-w-[430px]"
-  >
+  <template v-else>
     <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
 
     <div class="flex gap-2">
@@ -63,13 +60,12 @@
         </PrimeButton>
       </div>
     </div>
-  </OverlayPanel>
+  </template>
 </template>
 
 <script setup>
   import { ref, defineModel } from 'vue'
   import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
   import {
@@ -82,7 +78,7 @@
     getCurrentMonthLabel
   } from '@utils/date.js'
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'open', 'close'])
 
   defineOptions({ name: 'QuickSelect' })
 
@@ -95,6 +91,10 @@
     maxDays: {
       type: Number,
       default: 0
+    },
+    panelOnly: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -105,12 +105,6 @@
   const quickSelectDirection = ref('last')
   const quickSelectValue = ref(15)
   const quickSelectUnit = ref('minutes')
-
-  const overlayPanelQuickSelect = ref(null)
-
-  const toggleOverlayPanel = (event) => {
-    overlayPanelQuickSelect.value.toggle(event)
-  }
 
   const applyQuickSelect = () => {
     const now = new Date()
@@ -126,7 +120,7 @@
       endDate: newEndDate
     }
     emit('select', model.value)
-    overlayPanelQuickSelect.value.hide()
+    emit('close')
   }
 
   const applyCommonRange = (range) => {
@@ -234,6 +228,6 @@
     }
 
     emit('select', model.value)
-    overlayPanelQuickSelect.value.hide()
+    emit('close')
   }
 </script>
