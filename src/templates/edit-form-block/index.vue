@@ -184,10 +184,10 @@
 </script>
 
 <template>
-  <!-- <DialogUnsavedBlock
+  <DialogUnsavedBlock
     :blockRedirectUnsaved="formHasChanges"
     :isTabs="isTabs"
-  /> -->
+  />
 
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
