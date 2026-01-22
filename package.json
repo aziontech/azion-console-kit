@@ -1,10 +1,6 @@
 {
   "name": "azion-console-kit",
-<<<<<<< HEAD
   "version": "1.49.16",
-=======
-  "version": "1.49.14",
->>>>>>> ea0dbc254 (fix: add value prop to runtime field in edge functions form (#3174))
   "private": false,
   "type": "module",
   "repository": {
