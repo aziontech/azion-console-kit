@@ -88,7 +88,7 @@
   const props = defineProps({
     maxDays: {
       type: Number,
-      default: 0
+      default: 365
     },
     panelOnly: {
       type: Boolean,
@@ -115,7 +115,10 @@
 
     model.value = {
       startDate: newStartDate,
-      endDate: newEndDate
+      endDate: newEndDate,
+      label: '',
+      labelStart: '',
+      labelEnd: ''
     }
     emit('select', model.value)
     emit('close')
@@ -222,7 +225,9 @@
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: range.label
+      label: range.label,
+      labelStart: '',
+      labelEnd: ''
     }
 
     emit('select', model.value)

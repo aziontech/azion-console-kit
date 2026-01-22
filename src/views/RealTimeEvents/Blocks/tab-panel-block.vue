@@ -1,6 +1,6 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block'
   import { computed, onBeforeMount, onMounted, ref } from 'vue'
+  import ListTableBlock from '@/templates/list-table-block'
   import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
@@ -142,7 +142,7 @@
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :filterDateRangeMaxDays="7"
+        :filterDateRangeMaxDays="365"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
