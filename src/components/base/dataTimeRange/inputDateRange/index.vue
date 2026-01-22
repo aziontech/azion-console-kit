@@ -288,34 +288,6 @@
     }
   }
 
-  const setToNow = () => {
-    const now = new Date()
-    if (props.editingField === 'start') {
-      model.value.startDate = now
-      model.value.labelStart = ''
-      if (props.mode === 'absolute') {
-        hasInitializedAbsoluteRange.value = true
-      }
-      if (model.value.endDate && now > model.value.endDate) {
-        model.value.endDate = now
-        model.value.labelEnd = ''
-      }
-    } else {
-      model.value.endDate = now
-      model.value.labelEnd = ''
-      if (props.mode === 'absolute') {
-        hasInitializedAbsoluteRange.value = true
-      }
-      if (model.value.startDate && now < model.value.startDate) {
-        model.value.startDate = now
-        model.value.labelStart = ''
-      }
-    }
-    hasChanges.value = false
-    tempInputValue.value = ''
-    emitSelectIfValid()
-  }
-
   const updateRange = () => {
     const parsedDate = parseDateSimple(tempInputValue.value)
 
@@ -530,23 +502,6 @@
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
           />
-          <template v-if="mode === 'absolute'">
-            <PrimeButton
-              v-if="hasChanges"
-              icon="pi pi-check"
-              size="small"
-              outlined
-              @click="updateRange"
-            />
-            <PrimeButton
-              v-else
-              label="Set today"
-              class="min-w-max"
-              size="small"
-              outlined
-              @click="setToNow"
-            />
-          </template>
         </div>
       </div>
     </div>
