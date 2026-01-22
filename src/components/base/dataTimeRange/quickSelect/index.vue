@@ -226,8 +226,8 @@
       startDate: newStartDate,
       endDate: newEndDate,
       label: range.label,
-      labelStart: range.label,
-      labelEnd: range.label
+      labelStart: '',
+      labelEnd: ''
     }
 
     emit('select', model.value)

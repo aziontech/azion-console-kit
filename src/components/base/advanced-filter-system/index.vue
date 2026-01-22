@@ -51,15 +51,37 @@
   }
 
   const updatedTime = () => {
-    const parsed = parseRelativeFromLabel(filterDataRange.value.label)
-    if (parsed) {
-      const { startDate, endDate } = createRelativeRange(
-        parsed.value,
-        parsed.unit,
-        parsed.direction,
+    const labelEndParsed = parseRelativeFromLabel(filterDataRange.value.labelEnd)
+    const labelStartParsed = parseRelativeFromLabel(filterDataRange.value.labelStart)
+    const labelParsed = parseRelativeFromLabel(filterDataRange.value.label)
+
+    if (labelEndParsed) {
+      const { startDate } = createRelativeRange(
+        labelEndParsed.value,
+        labelEndParsed.unit,
+        labelEndParsed.direction,
         new Date()
       )
+      filterDataRange.value.endDate = startDate
+    }
 
+    if (labelStartParsed) {
+      const { startDate } = createRelativeRange(
+        labelStartParsed.value,
+        labelStartParsed.unit,
+        labelStartParsed.direction,
+        new Date()
+      )
+      filterDataRange.value.startDate = startDate
+    }
+
+    if (labelParsed) {
+      const { startDate, endDate } = createRelativeRange(
+        labelParsed.value,
+        labelParsed.unit,
+        labelParsed.direction,
+        new Date()
+      )
       filterDataRange.value.startDate = startDate
       filterDataRange.value.endDate = endDate
     }
@@ -69,7 +91,6 @@
       filterDataRange.value.endDate,
       userUTC
     )
-
     filterData.value.tsRange = {
       tsRangeBegin,
       tsRangeEnd

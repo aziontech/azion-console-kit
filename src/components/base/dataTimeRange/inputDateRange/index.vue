@@ -258,9 +258,21 @@
       if (props.editingField === 'start') {
         model.value.startDate = calculatedDate
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeStart = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
       } else {
         model.value.endDate = calculatedDate
         model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeEnd = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
       }
 
       hasChanges.value = false
@@ -291,6 +303,18 @@
       endDate: newEndDate,
       labelStart: COMMON_DATE_RANGES.last_5_minutes.label,
       labelEnd: COMMON_DATE_RANGES.last_5_minutes.label,
+      relativeStart: {
+        direction: 'last',
+        value: 5,
+        unit: 'minutes',
+        preset: 'last_5_minutes'
+      },
+      relativeEnd: {
+        direction: 'last',
+        value: 5,
+        unit: 'minutes',
+        preset: 'last_5_minutes'
+      },
       relative: {
         direction: 'last',
         value: 5,
@@ -386,8 +410,8 @@
 <template>
   <template v-if="!panelOnly">
     <InputText
-      v-if="model.labelStart && model.labelEnd && model.labelStart === model.labelEnd"
-      :value="model.labelStart"
+      v-if="model.label"
+      :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
       :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
       @click="openStart"
