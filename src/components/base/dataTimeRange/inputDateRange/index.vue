@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed, defineModel, onMounted } from 'vue'
   import PrimeButton from 'primevue/button'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
@@ -102,6 +102,12 @@
     if (isInvalidRange.value) return
     emit('select', model.value)
   }
+
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      updateRelativeRange()
+    }
+  })
 
   const openStart = (event) => {
     selectedTime.value = ''

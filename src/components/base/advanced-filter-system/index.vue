@@ -192,7 +192,7 @@
         <PrimeButton
           v-else
           icon="pi pi-check"
-          outlined
+          severity="secondary"
           size="small"
           label="Updated"
           @click="applyFilters"

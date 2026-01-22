@@ -51,6 +51,7 @@
         </TabPanel>
         <TabPanel header="Relative">
           <InputDateRange
+            :key="`relative-${editingField}-${relativeMountKey}`"
             panelOnly
             mode="relative"
             :editingField="editingField"
@@ -68,7 +69,7 @@
 <script setup>
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
-  import { defineModel, nextTick, ref } from 'vue'
+  import { defineModel, nextTick, ref, watch } from 'vue'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -88,6 +89,7 @@
   const activeTab = ref(0)
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
+  const relativeMountKey = ref(0)
 
   const model = defineModel({
     type: Object,
@@ -130,6 +132,15 @@
 
     overlayPanel.value?.show?.(event)
   }
+
+  watch(
+    () => activeTab.value,
+    (nextTab) => {
+      if (nextTab === 2) {
+        relativeMountKey.value++
+      }
+    }
+  )
 
   const closeOverlay = () => {
     overlayPanel.value?.hide?.()
