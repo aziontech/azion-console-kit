@@ -30,6 +30,7 @@
   const filterData = defineModel('filterData')
 
   const filterDataRange = ref({})
+  const hasPendingDateUpdate = ref(false)
 
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
@@ -75,9 +76,14 @@
     }
   }
 
-  const filterSearch = () => {
+  const applyFilters = () => {
     updatedTime()
     emitUpdatedFilter()
+    hasPendingDateUpdate.value = false
+  }
+
+  const onDateRangeSelect = () => {
+    hasPendingDateUpdate.value = true
   }
 
   const emitUpdatedFilter = () => {
@@ -92,7 +98,7 @@
 
   const removeFilter = (index) => {
     filterData.value.fields.splice(index, 1)
-    filterSearch()
+    applyFilters()
   }
 
   const updatedTimeRange = (begin, end, userUTC) => {
@@ -111,6 +117,8 @@
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
       label: filterData.value.tsRange.label || ''
     }
+
+    hasPendingDateUpdate.value = false
   })
 </script>
 
@@ -138,7 +146,7 @@
           <DialogFilter
             v-model:filterAdvanced="filterData.fields"
             :fieldsInFilter="props.fieldsInFilter"
-            @applyFilter="filterSearch"
+            @applyFilter="applyFilters"
           />
           <AzionQueryLanguage
             :fieldsInFilter="props.fieldsInFilter"
@@ -150,14 +158,23 @@
           class="max-md:w-full"
           v-model="filterDataRange"
           :maxDays="props.filterDateRangeMaxDays"
-          @select="filterSearch"
+          @select="onDateRangeSelect"
         />
         <PrimeButton
+          v-if="!hasPendingDateUpdate"
           icon="pi pi-refresh"
           outlined
           size="small"
           label="Refresh"
-          @click="filterSearch"
+          @click="applyFilters"
+        />
+        <PrimeButton
+          v-else
+          icon="pi pi-check"
+          outlined
+          size="small"
+          label="Updated"
+          @click="applyFilters"
         />
       </div>
       <div class="flex flex-1 w-full">
