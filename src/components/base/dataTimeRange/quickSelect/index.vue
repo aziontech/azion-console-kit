@@ -115,7 +115,10 @@
 
     model.value = {
       startDate: newStartDate,
-      endDate: newEndDate
+      endDate: newEndDate,
+      label: '',
+      labelStart: '',
+      labelEnd: ''
     }
     emit('select', model.value)
     emit('close')
@@ -222,7 +225,9 @@
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: range.label
+      label: range.label,
+      labelStart: range.label,
+      labelEnd: range.label
     }
 
     emit('select', model.value)

@@ -100,6 +100,8 @@
         startDate,
         endDate,
         label: COMMON_DATE_RANGES.last_5_minutes.label,
+        labelStart: COMMON_DATE_RANGES.last_5_minutes.label,
+        labelEnd: COMMON_DATE_RANGES.last_5_minutes.label,
         relative: {
           direction: 'last',
           value: 5,

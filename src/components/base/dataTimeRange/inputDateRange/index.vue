@@ -62,6 +62,11 @@
     },
     set: (value) => {
       model.value.label = ''
+      if (props.editingField === 'start') {
+        model.value.labelStart = ''
+      } else {
+        model.value.labelEnd = ''
+      }
       tempInputValue.value = value
       hasChanges.value = true
     }
@@ -97,11 +102,6 @@
     emit('select', model.value)
   }
 
-  const debugLog = (...args) => {
-    const logger = typeof window !== 'undefined' ? window.__AZION_DTR_DEBUG__ : undefined
-    if (typeof logger === 'function') logger(...args)
-  }
-
   const openStart = (event) => {
     selectedTime.value = ''
     hasChanges.value = false
@@ -116,6 +116,11 @@
 
   const onDateSelect = (date) => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
@@ -124,6 +129,11 @@
 
   const onMonthChange = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
@@ -133,6 +143,11 @@
 
   const onYearChange = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
@@ -142,6 +157,11 @@
 
   const previousMonth = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     if (selectedMonth.value === 0) {
       selectedMonth.value = 11
       selectedYear.value--
@@ -155,6 +175,11 @@
 
   const nextMonth = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     if (selectedMonth.value === 11) {
       selectedMonth.value = 0
       selectedYear.value++
@@ -167,6 +192,11 @@
 
   const selectTime = (time) => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     selectedTime.value = time
     updateSelectedDateTime()
     hasChanges.value = false
@@ -180,29 +210,35 @@
       const newDate = new Date(selectedDate.value)
       newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
 
-      const selectedEnd = new Date(newDate)
-      const selectedStart = new Date(newDate.getTime() - 5 * 60 * 1000)
+      if (props.editingField === 'start') {
+        model.value.startDate = newDate
+        model.value.labelStart = ''
+        hasInitializedAbsoluteRange.value = true
+      } else {
+        const hasStart = Boolean(model.value.startDate)
+        const startEqualsCurrentEnd =
+          hasStart &&
+          Boolean(model.value.endDate) &&
+          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
 
-      model.value.endDate = selectedEnd
-      model.value.startDate = selectedStart
+        const shouldInitializeStartDate =
+          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
 
-      hasChanges.value = false
-      tempInputValue.value = ''
+        model.value.endDate = newDate
+        model.value.labelEnd = ''
+
+        if (shouldInitializeStartDate) {
+          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+          model.value.labelStart = ''
+          hasInitializedAbsoluteRange.value = true
+        }
+      }
     }
   }
 
   const updateRelativeRange = () => {
     if (props.mode === 'relative') {
       const now = new Date()
-      const safeField = props.editingField === 'end' ? 'end' : 'start'
-      debugLog('[InputDateRange] updateRelativeRange(before)', {
-        safeField,
-        relativeValue: relativeValue.value,
-        relativeUnit: relativeUnit.value,
-        relativeDirection: relativeDirection.value,
-        startDate: model.value?.startDate,
-        endDate: model.value?.endDate
-      })
       const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
         relativeValue.value,
         relativeUnit.value,
@@ -219,13 +255,12 @@
         preset: model.value?.relative?.preset
       }
 
-      model.value.label = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
-
-      // Apply relative calculation only to the active input (start/end)
       if (props.editingField === 'start') {
         model.value.startDate = calculatedDate
+        model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
       } else {
         model.value.endDate = calculatedDate
+        model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
       }
 
       hasChanges.value = false
@@ -254,7 +289,8 @@
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: COMMON_DATE_RANGES.last_5_minutes.label,
+      labelStart: COMMON_DATE_RANGES.last_5_minutes.label,
+      labelEnd: COMMON_DATE_RANGES.last_5_minutes.label,
       relative: {
         direction: 'last',
         value: 5,
@@ -275,24 +311,27 @@
     const now = new Date()
     if (props.editingField === 'start') {
       model.value.startDate = now
+      model.value.labelStart = ''
       if (props.mode === 'absolute') {
         hasInitializedAbsoluteRange.value = true
       }
       if (model.value.endDate && now > model.value.endDate) {
         model.value.endDate = now
+        model.value.labelEnd = ''
       }
     } else {
       model.value.endDate = now
+      model.value.labelEnd = ''
       if (props.mode === 'absolute') {
         hasInitializedAbsoluteRange.value = true
       }
       if (model.value.startDate && now < model.value.startDate) {
         model.value.startDate = now
+        model.value.labelStart = ''
       }
     }
     hasChanges.value = false
     tempInputValue.value = ''
-    model.value.label = ''
     emitSelectIfValid()
   }
 
@@ -302,28 +341,36 @@
     if (parsedDate) {
       if (props.editingField === 'start') {
         model.value.startDate = parsedDate
+        model.value.labelStart = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure end date is not before start date
         if (model.value.endDate && parsedDate > model.value.endDate) {
           model.value.endDate = parsedDate
+          model.value.labelEnd = ''
         }
       } else {
         model.value.endDate = parsedDate
+        model.value.labelEnd = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure start date is not after end date
         if (model.value.startDate && parsedDate < model.value.startDate) {
           model.value.startDate = parsedDate
+          model.value.labelStart = ''
         }
       }
     }
 
     hasChanges.value = false
     tempInputValue.value = ''
-    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     emitSelectIfValid()
   }
 
@@ -338,50 +385,39 @@
 </script>
 <template>
   <template v-if="!panelOnly">
-    <template v-if="!model.label">
+    <div
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
+    >
+      <InputText
+        class="w-min cursor-pointer"
+        :class="
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none'
+        "
+        :value="model.labelStart ? model.labelStart : startDateInput"
+        readonly
+        @click="openStart"
+      />
       <div
-        class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
+        class="flex items-center text-color-secondary text-sm"
+        :class="isInvalidRange ? 'text-[var(--error-color)]' : ''"
       >
-        <InputText
-          class="w-min cursor-pointer"
-          :class="
-            isInvalidRange
-              ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-              : 'border-none'
-          "
-          :value="startDateInput"
-          readonly
-          @click="openStart"
-        />
-        <div
-          class="flex items-center text-color-secondary text-sm"
-          :class="isInvalidRange ? 'text-[var(--error-color)]' : ''"
-        >
-          <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
-          <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
-        </div>
-        <InputText
-          class="w-min cursor-pointer"
-          :class="
-            isInvalidRange
-              ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-              : 'border-none'
-          "
-          :value="endDateInput"
-          readonly
-          @click="openEnd"
-        />
+        <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
+        <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
-    </template>
-
-    <InputText
-      v-else
-      :value="model.label"
-      class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
-      @click="openStart"
-      readonly
-    />
+      <InputText
+        class="w-min cursor-pointer"
+        :class="
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none'
+        "
+        :value="model.labelEnd ? model.labelEnd : endDateInput"
+        readonly
+        @click="openEnd"
+      />
+    </div>
   </template>
 
   <template v-else>
