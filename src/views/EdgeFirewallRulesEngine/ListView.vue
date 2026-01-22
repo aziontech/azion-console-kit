@@ -1,15 +1,14 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
-  import Drawer from './Drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
-  import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
+  import PrimeButton from 'primevue/button'
+  import Drawer from './Drawer'
+  import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -49,9 +48,6 @@
       required: true
     }
   })
-  const hasContentToList = ref(true)
-  const drawerRef = ref('')
-  const listTableBlockRef = ref('')
   const toast = useToast()
   const dialog = useDialog()
 
@@ -63,6 +59,68 @@
     'last_editor',
     'active'
   ]
+  const hasContentToList = ref(true)
+  const drawerRef = ref('')
+  const listTableBlockRef = ref('')
+  const isLoadingButtonOrder = ref(false)
+
+  const getColumns = computed(() => [
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
+      field: 'name',
+      header: 'Name',
+      disableSort: true
+    },
+    {
+      field: 'description',
+      header: 'Description',
+      filterPath: 'description.value',
+      type: 'component',
+      class: 'max-w-[400px]',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' }),
+      disableSort: true
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      disableSort: true
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      disableSort: true
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      sortField: 'status.content',
+      filterPath: 'status.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      },
+      disableSort: true
+    }
+  ])
+
+  const actions = computed(() => [
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'rule',
+      icon: 'pi pi-trash',
+      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
+    }
+  ])
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
     return await edgeFirewallRulesEngineService.listEdgeFirewallRulesEngineService({
@@ -131,66 +189,6 @@
       reload()
     }
   }
-
-  const getColumns = computed(() => [
-    {
-      field: 'id',
-      header: 'ID',
-      sortField: 'id',
-      filterPath: 'id'
-    },
-    {
-      field: 'name',
-      header: 'Name',
-      disableSort: true
-    },
-    {
-      field: 'description',
-      header: 'Description',
-      filterPath: 'description.value',
-      type: 'component',
-      class: 'max-w-[250px]',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' }),
-      disableSort: true
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor',
-      disableSort: true
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified',
-      disableSort: true
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      },
-      disableSort: true
-    }
-  ])
-
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'rule',
-      icon: 'pi pi-trash',
-      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
-    }
-  ]
-
-  const isLoadingButtonOrder = ref(false)
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {

@@ -1,11 +1,10 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import ContentBlock from '@/templates/content-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -25,28 +24,6 @@
     }
   })
 
-  const handleTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'User'
-    })
-  }
-
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'User'
-    })
-  }
-
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'user',
-      icon: 'pi pi-trash',
-      service: props.deleteUsersService
-    }
-  ]
-
   const USERS_API_FIELDS = [
     'id',
     'first_name',
@@ -59,17 +36,15 @@
     'last_modified'
   ]
 
-  const csvMapper = (rowData) => {
-    return {
-      firstName: rowData.firstName,
-      lastName: rowData.lastName,
-      email: rowData.email,
-      teams: rowData.teams,
-      mfa: rowData.mfa?.content || rowData.mfa,
-      owner: rowData.owner?.content || rowData.owner,
-      status: rowData.status?.content || rowData.status
+  const actions = computed(() => [
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'user',
+      icon: 'pi pi-trash',
+      service: props.deleteUsersService
     }
-  }
+  ])
 
   const getColumns = computed(() => [
     {
@@ -89,7 +64,14 @@
     {
       field: 'teams',
       header: 'Teams',
-      disableSort: true
+      disableSort: true,
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-array-with-popup'
+        })
+      }
     },
     {
       field: 'mfa',
@@ -130,6 +112,30 @@
       }
     }
   ])
+
+  const csvMapper = (rowData) => {
+    return {
+      firstName: rowData.firstName,
+      lastName: rowData.lastName,
+      email: rowData.email,
+      teams: rowData.teams,
+      mfa: rowData.mfa?.content || rowData.mfa,
+      owner: rowData.owner?.content || rowData.owner,
+      status: rowData.status?.content || rowData.status
+    }
+  }
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'User'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'User'
+    })
+  }
 </script>
 
 <template>

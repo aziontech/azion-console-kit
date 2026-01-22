@@ -52,7 +52,7 @@
   const isCellHovered = ref(false)
 
   const shouldShowCopy = computed(() => {
-    return props.showCopy && props.text
+    return props.showCopy && props?.text
   })
 
   const popupStyle = computed(() => ({

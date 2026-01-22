@@ -45,18 +45,12 @@ const OWNER_AS_TAG = {
 }
 
 const parseUser = (user) => {
-  const formatTeams = (teams) => {
-    return teams.length > 1
-      ? teams.map((team) => team.name).join(', ')
-      : teams.map((team) => team.name)
-  }
-
   return {
     id: user.id,
     firstName: user.first_name,
     lastName: user.last_name,
     email: user.email,
-    teams: formatTeams(user.teams),
+    teams: user.teams.map((team) => team.name),
     mfa: ACTIVE_AS_TAG[user.two_factor_enabled],
     status: ACTIVE_AS_TAG[user.is_active],
     owner: OWNER_AS_TAG[user.is_account_owner]
