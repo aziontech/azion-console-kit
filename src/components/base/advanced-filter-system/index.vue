@@ -6,7 +6,7 @@
   import PrimeButton from 'primevue/button'
 
   import { useAccountStore } from '@/stores/account'
-  import { ref, onMounted, defineModel } from 'vue'
+  import { ref, onMounted, defineModel, computed } from 'vue'
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
@@ -31,6 +31,13 @@
 
   const filterDataRange = ref({})
   const hasPendingDateUpdate = ref(false)
+
+  const isInvalidRange = computed(() => {
+    const start = filterDataRange.value?.startDate
+    const end = filterDataRange.value?.endDate
+    if (!start || !end) return false
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
 
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
@@ -187,6 +194,7 @@
           outlined
           size="small"
           label="Refresh"
+          :disabled="isInvalidRange"
           @click="applyFilters"
         />
         <PrimeButton
@@ -195,6 +203,7 @@
           severity="secondary"
           size="small"
           label="Updated"
+          :disabled="isInvalidRange"
           @click="applyFilters"
         />
       </div>
