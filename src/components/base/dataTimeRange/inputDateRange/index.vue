@@ -51,6 +51,16 @@
   const hasChanges = ref(false)
   const tempInputValue = ref('')
   const hasInitializedAbsoluteRange = ref(false)
+  const selectedMonth = ref(new Date().getMonth())
+  const selectedYear = ref(new Date().getFullYear())
+
+  const relativeValue = ref(5)
+  const relativeUnit = ref('minutes')
+  const relativeDirection = ref('last')
+  const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
   const inputValue = computed({
     get: () => {
@@ -71,17 +81,6 @@
       hasChanges.value = true
     }
   })
-
-  const selectedMonth = ref(new Date().getMonth())
-  const selectedYear = ref(new Date().getFullYear())
-
-  const relativeValue = ref(5)
-  const relativeUnit = ref('minutes')
-  const relativeDirection = ref('last')
-  const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
-
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
   const startDateInput = computed(() => {
     return formatDateSimple(model.value.startDate)
