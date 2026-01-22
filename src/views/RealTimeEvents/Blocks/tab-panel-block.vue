@@ -142,7 +142,7 @@
       <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
-        :filterDateRangeMaxDays="7"
+        :filterDateRangeMaxDays="365"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>

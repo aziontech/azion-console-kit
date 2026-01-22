@@ -88,7 +88,7 @@
   const props = defineProps({
     maxDays: {
       type: Number,
-      default: 0
+      default: 365
     },
     panelOnly: {
       type: Boolean,

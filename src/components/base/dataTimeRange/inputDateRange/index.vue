@@ -9,12 +9,12 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
-    COMMON_DATE_RANGES,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
     TIME_SLOTS,
-    getCurrentHourAndMinute
+    getCurrentHourAndMinute,
+    getCurrentMonthLabel
   } from '@utils/date.js'
 
   defineOptions({ name: 'InputDateRange' })
@@ -78,6 +78,7 @@
   const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
   const relativeDirection = ref('last')
+  const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
@@ -279,56 +280,6 @@
       tempInputValue.value = ''
       emitSelectIfValid()
     }
-  }
-
-  const resetToLastFiveMinutes = () => {
-    const now = new Date()
-    const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
-      5,
-      'minutes',
-      'last',
-      now
-    )
-
-    relativeValue.value = 5
-    relativeUnit.value = 'minutes'
-    relativeDirection.value = 'last'
-
-    selectedTime.value = ''
-    hasChanges.value = false
-    tempInputValue.value = ''
-
-    model.value = {
-      startDate: newStartDate,
-      endDate: newEndDate,
-      labelStart: COMMON_DATE_RANGES.last_5_minutes.label,
-      labelEnd: COMMON_DATE_RANGES.last_5_minutes.label,
-      relativeStart: {
-        direction: 'last',
-        value: 5,
-        unit: 'minutes',
-        preset: 'last_5_minutes'
-      },
-      relativeEnd: {
-        direction: 'last',
-        value: 5,
-        unit: 'minutes',
-        preset: 'last_5_minutes'
-      },
-      relative: {
-        direction: 'last',
-        value: 5,
-        unit: 'minutes',
-        preset: 'last_5_minutes'
-      }
-    }
-
-    if (props.mode === 'absolute') {
-      hasInitializedAbsoluteRange.value = true
-    }
-
-    emitSelectIfValid()
-    emit('close')
   }
 
   const setToNow = () => {
@@ -533,6 +484,7 @@
       </div>
     </template>
     <template v-else>
+      <!-- implement relative range -->
       <div class="flex flex-col gap-4">
         <InputNumber
           v-model="relativeValue"
@@ -549,7 +501,7 @@
           @update:modelValue="updateRelativeRange"
         />
         <Dropdown
-          v-model="relativeDirection"
+          v-model="relativePreset"
           :options="RELATIVE_DIRECTIONS"
           @update:modelValue="updateRelativeRange"
           optionLabel="label"
@@ -573,14 +525,6 @@
             @keydown.enter="updateRange"
           />
           <template v-if="mode === 'absolute'">
-            <PrimeButton
-              label="Clear"
-              size="small"
-              outlined
-              class="w-20"
-              severity="secondary"
-              @click="resetToLastFiveMinutes"
-            />
             <PrimeButton
               v-if="hasChanges"
               icon="pi pi-check"
