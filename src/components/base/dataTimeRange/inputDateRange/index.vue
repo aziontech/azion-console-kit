@@ -385,7 +385,17 @@
 </script>
 <template>
   <template v-if="!panelOnly">
+    <InputText
+      v-if="model.labelStart && model.labelEnd && model.labelStart === model.labelEnd"
+      :value="model.labelStart"
+      class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
+      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
+      @click="openStart"
+      readonly
+    />
+
     <div
+      v-else
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
     >
       <InputText
