@@ -41,8 +41,6 @@
     return new Date(start).getTime() > new Date(end).getTime()
   })
 
-  
-
   const parseRelativeFromLabel = (label) => {
     if (!label || typeof label !== 'string') return null
 
