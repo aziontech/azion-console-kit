@@ -10,7 +10,9 @@
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
+  const accountStore = useAccountStore()
 
+  const userUTC = accountStore.accountUtcOffset
   const emit = defineEmits(['updatedFilter'])
 
   const props = defineProps({
@@ -39,8 +41,7 @@
     return new Date(start).getTime() > new Date(end).getTime()
   })
 
-  const accountStore = useAccountStore()
-  const userUTC = accountStore.accountUtcOffset
+  
 
   const parseRelativeFromLabel = (label) => {
     if (!label || typeof label !== 'string') return null
