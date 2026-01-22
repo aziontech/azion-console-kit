@@ -50,6 +50,7 @@
   const selectedTime = ref('')
   const hasChanges = ref(false)
   const tempInputValue = ref('')
+  const hasInitializedAbsoluteRange = ref(false)
 
   const inputValue = computed({
     get: () => {
@@ -94,6 +95,11 @@
   const emitSelectIfValid = () => {
     if (isInvalidRange.value) return
     emit('select', model.value)
+  }
+
+  const debugLog = (...args) => {
+    const logger = typeof window !== 'undefined' ? window.__AZION_DTR_DEBUG__ : undefined
+    if (typeof logger === 'function') logger(...args)
   }
 
   const openStart = (event) => {
@@ -174,17 +180,11 @@
       const newDate = new Date(selectedDate.value)
       newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
 
-      if (props.editingField === 'start') {
-        model.value.startDate = newDate
-        // if (model.value.endDate && newDate > model.value.endDate) {
-        //   model.value.endDate = newDate
-        // }
-      } else {
-        model.value.endDate = newDate
-        // if (model.value.startDate && newDate < model.value.startDate) {
-        //   model.value.startDate = newDate
-        // }
-      }
+      const selectedEnd = new Date(newDate)
+      const selectedStart = new Date(newDate.getTime() - 5 * 60 * 1000)
+
+      model.value.endDate = selectedEnd
+      model.value.startDate = selectedStart
 
       hasChanges.value = false
       tempInputValue.value = ''
@@ -194,6 +194,15 @@
   const updateRelativeRange = () => {
     if (props.mode === 'relative') {
       const now = new Date()
+      const safeField = props.editingField === 'end' ? 'end' : 'start'
+      debugLog('[InputDateRange] updateRelativeRange(before)', {
+        safeField,
+        relativeValue: relativeValue.value,
+        relativeUnit: relativeUnit.value,
+        relativeDirection: relativeDirection.value,
+        startDate: model.value?.startDate,
+        endDate: model.value?.endDate
+      })
       const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
         relativeValue.value,
         relativeUnit.value,
@@ -254,6 +263,10 @@
       }
     }
 
+    if (props.mode === 'absolute') {
+      hasInitializedAbsoluteRange.value = true
+    }
+
     emitSelectIfValid()
     emit('close')
   }
@@ -262,11 +275,17 @@
     const now = new Date()
     if (props.editingField === 'start') {
       model.value.startDate = now
+      if (props.mode === 'absolute') {
+        hasInitializedAbsoluteRange.value = true
+      }
       if (model.value.endDate && now > model.value.endDate) {
         model.value.endDate = now
       }
     } else {
       model.value.endDate = now
+      if (props.mode === 'absolute') {
+        hasInitializedAbsoluteRange.value = true
+      }
       if (model.value.startDate && now < model.value.startDate) {
         model.value.startDate = now
       }
@@ -283,12 +302,18 @@
     if (parsedDate) {
       if (props.editingField === 'start') {
         model.value.startDate = parsedDate
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
         // Ensure end date is not before start date
         if (model.value.endDate && parsedDate > model.value.endDate) {
           model.value.endDate = parsedDate
         }
       } else {
         model.value.endDate = parsedDate
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
         // Ensure start date is not after end date
         if (model.value.startDate && parsedDate < model.value.startDate) {
           model.value.startDate = parsedDate
