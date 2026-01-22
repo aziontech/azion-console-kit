@@ -45,11 +45,11 @@
 </template>
 
 <script setup>
+  import { computed, onMounted, onUnmounted, ref, watch, inject } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import RealTimeMetricsModule from '@/modules/real-time-metrics'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, onMounted, onUnmounted, ref, watch, inject } from 'vue'
   import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRoute, useRouter } from 'vue-router'
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'

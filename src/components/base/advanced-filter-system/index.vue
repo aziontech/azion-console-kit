@@ -1,4 +1,5 @@
 <script setup>
+  import { ref, onMounted, defineModel, computed } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
@@ -6,7 +7,6 @@
   import PrimeButton from 'primevue/button'
 
   import { useAccountStore } from '@/stores/account'
-  import { ref, onMounted, defineModel, computed } from 'vue'
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })

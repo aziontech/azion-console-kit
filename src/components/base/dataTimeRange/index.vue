@@ -67,9 +67,9 @@
 </template>
 
 <script setup>
+  import { defineModel, nextTick, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
-  import { defineModel, nextTick, ref } from 'vue'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
