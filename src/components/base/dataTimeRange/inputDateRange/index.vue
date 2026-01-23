@@ -93,6 +93,12 @@
   const isInvalidRange = computed(() => {
     const start = model.value?.startDate
     const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
     if (!start || !end) return false
     return new Date(start).getTime() > new Date(end).getTime()
   })
@@ -229,8 +235,8 @@
           newDate.getDate() === currentEndDate.getDate() &&
           newDate.getHours() === currentEndDate.getHours() &&
           newDate.getMinutes() === currentEndDate.getMinutes()
-          
-        if (isSameHourAndMinuteAsEnd ) {
+
+        if (isSameHourAndMinuteAsEnd) {
           model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
         }
       } else {

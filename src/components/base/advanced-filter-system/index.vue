@@ -37,6 +37,18 @@
   const isInvalidRange = computed(() => {
     const start = filterDataRange.value?.startDate
     const end = filterDataRange.value?.endDate
+
+    const labelStart =
+      typeof filterDataRange.value?.labelStart === 'string'
+        ? filterDataRange.value.labelStart.trim()
+        : ''
+    const labelEnd =
+      typeof filterDataRange.value?.labelEnd === 'string'
+        ? filterDataRange.value.labelEnd.trim()
+        : ''
+
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
     if (!start || !end) return false
     return new Date(start).getTime() > new Date(end).getTime()
   })
