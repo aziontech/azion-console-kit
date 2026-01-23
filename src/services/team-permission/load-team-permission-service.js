@@ -25,8 +25,18 @@ const adapt = (httpResponse) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const error = httpResponse.body?.errors.length > 0 ? httpResponse.body?.errors[0] : null
-  return error.detail
+  const body = httpResponse?.body
+
+  if (typeof body?.error === 'string' && body.error) {
+    return body.error
+  }
+
+  const firstError = Array.isArray(body?.errors) && body.errors.length > 0 ? body.errors[0] : null
+  if (typeof firstError?.detail === 'string' && firstError.detail) {
+    return firstError.detail
+  }
+
+  return null
 }
 
 const parseHttpResponse = (httpResponse) => {
@@ -37,7 +47,7 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.InvalidApiTokenError().message
     case 403:
       const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
+      throw apiError || new Errors.UnexpectedError().message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
