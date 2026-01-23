@@ -1,6 +1,9 @@
 import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics } from './filter-connector-items'
+
 const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
@@ -56,13 +59,19 @@ const groupBy = (data, groupParams) => {
 const adapt = ({ body, statusCode }) => {
   const { accountingDetail } = body.data
 
-  const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
+  const shouldShowConnectors = !hasFlagBlockApiV4()
+
+  const filteredAccountingDetail = shouldShowConnectors
+    ? accountingDetail
+    : filterOutConnectorMetrics(accountingDetail)
+
+  const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
 
   const filteredProducts = productsGrouped.filter(
     (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
   )
 
-  const productsGroupedByRegion = groupBy(accountingDetail, [
+  const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
     'productSlug',
     'metricSlug',
     'regionName'
@@ -90,11 +99,6 @@ const PRODUCT_NAMES = {
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
   ddos_protection_unlimited: 'DDoS Protection Unlimited',
-  plan_business: 'Plan Business',
-  plan_enterprise: 'Plan Enterprise',
-  plan_missioncritical: 'Plan Mission Critical',
-  support_enterprise: 'Support Enterprise',
-  support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
   tiered_cache: 'Tiered Cache',
   edge_storage: 'Object Storage',
@@ -120,13 +124,8 @@ const METRIC_SLUGS = {
   hosted_zones: { title: 'Hosted Zones' },
   edge_dns_queries: { title: 'Standard Queries' },
   data_ingested: { title: 'Data Ingested', unit: 'GB' },
-  plan_business: { title: 'Plan Business' },
-  plan_enterprise: { title: 'Plan Enterprise' },
   storage: { title: 'Storage', unit: 'GB' },
   data_scan: { title: 'Data Scan', unit: 'GB' },
-  plan_missioncritical: { title: 'Plan Mission critical' },
-  support_enterprise: { title: 'Total Days', unit: 'Days' },
-  support_mission_critical: { title: 'Total Days', unit: 'Days' },
   data_stream_data_streamed: { title: 'Data Streamed', unit: 'GB' },
   edge_storage_class_a_operations: { title: 'Class A Operations' },
   edge_storage_class_b_operations: { title: 'Class B Operations' },

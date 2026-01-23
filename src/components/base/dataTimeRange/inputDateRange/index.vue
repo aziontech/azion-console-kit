@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed, defineModel, onMounted } from 'vue'
   import PrimeButton from 'primevue/button'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
@@ -9,12 +9,12 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
-    COMMON_DATE_RANGES,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
     TIME_SLOTS,
-    getCurrentHourAndMinute
+    getCurrentHourAndMinute,
+    getCurrentMonthLabel
   } from '@utils/date.js'
 
   defineOptions({ name: 'InputDateRange' })
@@ -50,6 +50,17 @@
   const selectedTime = ref('')
   const hasChanges = ref(false)
   const tempInputValue = ref('')
+  const hasInitializedAbsoluteRange = ref(false)
+  const selectedMonth = ref(new Date().getMonth())
+  const selectedYear = ref(new Date().getFullYear())
+
+  const relativeValue = ref(5)
+  const relativeUnit = ref('minutes')
+  const relativeDirection = ref('last')
+  const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
   const inputValue = computed({
     get: () => {
@@ -61,20 +72,15 @@
     },
     set: (value) => {
       model.value.label = ''
+      if (props.editingField === 'start') {
+        model.value.labelStart = ''
+      } else {
+        model.value.labelEnd = ''
+      }
       tempInputValue.value = value
       hasChanges.value = true
     }
   })
-
-  const selectedMonth = ref(new Date().getMonth())
-  const selectedYear = ref(new Date().getFullYear())
-
-  const relativeValue = ref(5)
-  const relativeUnit = ref('minutes')
-  const relativeDirection = ref('last')
-
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
   const startDateInput = computed(() => {
     return formatDateSimple(model.value.startDate)
@@ -82,6 +88,24 @@
 
   const endDateInput = computed(() => {
     return formatDateSimple(model.value.endDate)
+  })
+
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+    if (!start || !end) return false
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
+  const emitSelectIfValid = () => {
+    if (isInvalidRange.value) return
+    emit('select', model.value)
+  }
+
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      updateRelativeRange()
+    }
   })
 
   const openStart = (event) => {
@@ -98,32 +122,52 @@
 
   const onDateSelect = (date) => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const onMonthChange = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const onYearChange = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const previousMonth = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     if (selectedMonth.value === 0) {
       selectedMonth.value = 11
       selectedYear.value--
@@ -132,11 +176,16 @@
     }
     onMonthChange()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const nextMonth = () => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     if (selectedMonth.value === 11) {
       selectedMonth.value = 0
       selectedYear.value++
@@ -144,15 +193,20 @@
       selectedMonth.value++
     }
     onMonthChange()
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const selectTime = (time) => {
     model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
     selectedTime.value = time
     updateSelectedDateTime()
     hasChanges.value = false
-    emit('select', model.value)
+    emitSelectIfValid()
   }
 
   const updateSelectedDateTime = () => {
@@ -164,18 +218,27 @@
 
       if (props.editingField === 'start') {
         model.value.startDate = newDate
-        // if (model.value.endDate && newDate > model.value.endDate) {
-        //   model.value.endDate = newDate
-        // }
+        model.value.labelStart = ''
+        hasInitializedAbsoluteRange.value = true
       } else {
-        model.value.endDate = newDate
-        // if (model.value.startDate && newDate < model.value.startDate) {
-        //   model.value.startDate = newDate
-        // }
-      }
+        const hasStart = Boolean(model.value.startDate)
+        const startEqualsCurrentEnd =
+          hasStart &&
+          Boolean(model.value.endDate) &&
+          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
 
-      hasChanges.value = false
-      tempInputValue.value = ''
+        const shouldInitializeStartDate =
+          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
+
+        model.value.endDate = newDate
+        model.value.labelEnd = ''
+
+        if (shouldInitializeStartDate) {
+          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+          model.value.labelStart = ''
+          hasInitializedAbsoluteRange.value = true
+        }
+      }
     }
   }
 
@@ -189,66 +252,39 @@
         now
       )
 
-      model.value.startDate = newStartDate
-      model.value.endDate = newEndDate
+      const calculatedDate = relativeDirection.value === 'last' ? newStartDate : newEndDate
+
+      model.value.relative = {
+        direction: relativeDirection.value,
+        value: relativeValue.value,
+        unit: relativeUnit.value,
+        preset: model.value?.relative?.preset
+      }
+
+      if (props.editingField === 'start') {
+        model.value.startDate = calculatedDate
+        model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeStart = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
+      } else {
+        model.value.endDate = calculatedDate
+        model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeEnd = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
+      }
 
       hasChanges.value = false
       tempInputValue.value = ''
-      model.value.label = ''
-      emit('select', model.value)
+      emitSelectIfValid()
     }
-  }
-
-  const resetToLastFiveMinutes = () => {
-    const now = new Date()
-    const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
-      5,
-      'minutes',
-      'last',
-      now
-    )
-
-    relativeValue.value = 5
-    relativeUnit.value = 'minutes'
-    relativeDirection.value = 'last'
-
-    selectedTime.value = ''
-    hasChanges.value = false
-    tempInputValue.value = ''
-
-    model.value = {
-      startDate: newStartDate,
-      endDate: newEndDate,
-      label: COMMON_DATE_RANGES.last_5_minutes.label,
-      relative: {
-        direction: 'last',
-        value: 5,
-        unit: 'minutes',
-        preset: 'last_5_minutes'
-      }
-    }
-
-    emit('select', model.value)
-    emit('close')
-  }
-
-  const setToNow = () => {
-    const now = new Date()
-    if (props.editingField === 'start') {
-      model.value.startDate = now
-      if (model.value.endDate && now > model.value.endDate) {
-        model.value.endDate = now
-      }
-    } else {
-      model.value.endDate = now
-      if (model.value.startDate && now < model.value.startDate) {
-        model.value.startDate = now
-      }
-    }
-    hasChanges.value = false
-    tempInputValue.value = ''
-    model.value.label = ''
-    emit('select', model.value)
   }
 
   const updateRange = () => {
@@ -257,23 +293,37 @@
     if (parsedDate) {
       if (props.editingField === 'start') {
         model.value.startDate = parsedDate
+        model.value.labelStart = ''
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
         // Ensure end date is not before start date
         if (model.value.endDate && parsedDate > model.value.endDate) {
           model.value.endDate = parsedDate
+          model.value.labelEnd = ''
         }
       } else {
         model.value.endDate = parsedDate
+        model.value.labelEnd = ''
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
         // Ensure start date is not after end date
         if (model.value.startDate && parsedDate < model.value.startDate) {
           model.value.startDate = parsedDate
+          model.value.labelStart = ''
         }
       }
     }
 
     hasChanges.value = false
     tempInputValue.value = ''
-    model.value.label = ''
-    emit('select', model.value)
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    emitSelectIfValid()
   }
 
   if (model.value.startDate) {
@@ -287,36 +337,49 @@
 </script>
 <template>
   <template v-if="!panelOnly">
-    <template v-if="!model.label">
-      <div
-        class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
-      >
-        <InputText
-          class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none ml-0.5"
-          :value="startDateInput"
-          readonly
-          @click="openStart"
-        />
-        <div class="flex items-center text-color-secondary text-sm">
-          <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
-          <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
-        </div>
-        <InputText
-          class="w-min cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-          :value="endDateInput"
-          readonly
-          @click="openEnd"
-        />
-      </div>
-    </template>
-
     <InputText
-      v-else
+      v-if="model.label"
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
+      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
       @click="openStart"
       readonly
     />
+
+    <div
+      v-else
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
+    >
+      <InputText
+        class="w-min cursor-pointer"
+        :class="
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none'
+        "
+        :value="model.labelStart ? model.labelStart : startDateInput"
+        readonly
+        @click="openStart"
+      />
+      <div
+        class="flex items-center text-color-secondary text-sm"
+        :class="isInvalidRange ? 'text-[var(--error-color)]' : ''"
+      >
+        <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
+        <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
+      </div>
+      <InputText
+        class="w-min cursor-pointer"
+        :class="
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none'
+        "
+        :value="model.labelEnd ? model.labelEnd : endDateInput"
+        readonly
+        @click="openEnd"
+      />
+    </div>
   </template>
 
   <template v-else>
@@ -398,10 +461,12 @@
       </div>
     </template>
     <template v-else>
+      <!-- implement relative range -->
       <div class="flex flex-col gap-4">
         <InputNumber
           v-model="relativeValue"
-          @input="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
+          @value-change="updateRelativeRange"
           :min="1"
           showButtons
         />
@@ -410,12 +475,12 @@
           :options="RELATIVE_UNITS"
           optionLabel="label"
           optionValue="value"
-          @change="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
         />
         <Dropdown
-          v-model="relativeDirection"
+          v-model="relativePreset"
           :options="RELATIVE_DIRECTIONS"
-          @change="updateRelativeRange"
+          @update:modelValue="updateRelativeRange"
           optionLabel="label"
           optionValue="value"
           disabled
@@ -426,41 +491,16 @@
     <div class="mt-4 pt-4 border-t surface-border">
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-color">
-          {{ editingField === 'start' ? 'Start date' : 'End date' }}
+          {{ props.editingField === 'start' ? 'Start date' : 'End date' }}
         </label>
         <div class="flex items-center gap-2">
           <InputText
             v-model="inputValue"
-            :placeholder="editingField === 'start' ? startDateInput : endDateInput"
+            :placeholder="props.editingField === 'start' ? startDateInput : endDateInput"
             class="w-full"
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
           />
-          <template v-if="mode === 'absolute'">
-            <PrimeButton
-              label="Clear"
-              size="small"
-              outlined
-              class="w-20"
-              severity="secondary"
-              @click="resetToLastFiveMinutes"
-            />
-            <PrimeButton
-              v-if="hasChanges"
-              icon="pi pi-check"
-              size="small"
-              outlined
-              @click="updateRange"
-            />
-            <PrimeButton
-              v-else
-              label="Set today"
-              class="min-w-max"
-              size="small"
-              outlined
-              @click="setToNow"
-            />
-          </template>
         </div>
       </div>
     </div>
