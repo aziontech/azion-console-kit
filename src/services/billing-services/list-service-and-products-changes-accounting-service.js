@@ -59,7 +59,7 @@ const groupBy = (data, groupParams) => {
 const adapt = ({ body, statusCode }) => {
   const { accountingDetail } = body.data
 
-  const shouldShowConnectors = hasFlagBlockApiV4()
+  const shouldShowConnectors = !hasFlagBlockApiV4()
 
   const filteredAccountingDetail = shouldShowConnectors
     ? accountingDetail

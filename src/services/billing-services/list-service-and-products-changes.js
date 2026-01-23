@@ -245,7 +245,7 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  const shouldShowConnectors = hasFlagBlockApiV4()
+  const shouldShowConnectors = !hasFlagBlockApiV4()
 
   const productsFilteredByFlag = shouldShowConnectors
     ? products
