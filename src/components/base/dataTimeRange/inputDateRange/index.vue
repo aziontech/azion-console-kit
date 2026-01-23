@@ -220,6 +220,19 @@
         model.value.startDate = newDate
         model.value.labelStart = ''
         hasInitializedAbsoluteRange.value = true
+        const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
+
+        const isSameHourAndMinuteAsEnd =
+          Boolean(currentEndDate) &&
+          newDate.getFullYear() === currentEndDate.getFullYear() &&
+          newDate.getMonth() === currentEndDate.getMonth() &&
+          newDate.getDate() === currentEndDate.getDate() &&
+          newDate.getHours() === currentEndDate.getHours() &&
+          newDate.getMinutes() === currentEndDate.getMinutes()
+          
+        if (isSameHourAndMinuteAsEnd ) {
+          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+        }
       } else {
         const hasStart = Boolean(model.value.startDate)
         const startEqualsCurrentEnd =
