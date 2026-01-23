@@ -280,6 +280,7 @@
         preset: model.value?.relative?.preset
       }
 
+      const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
         model.value.startDate = calculatedDate
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -288,6 +289,13 @@
           value: relativeValue.value,
           unit: relativeUnit.value,
           preset: model.value?.relative?.preset
+        }
+
+
+        if (shouldSetDefaultRelativeRange) {
+          model.value.startDate = now
+          model.value.labelEnd = 'now'
+          model.value.label = ''
         }
       } else {
         model.value.endDate = calculatedDate

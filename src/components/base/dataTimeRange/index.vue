@@ -129,7 +129,6 @@
 
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
-
     const event = tabIndex === 0 ? payload : payload?.event
     const field = tabIndex === 0 ? undefined : payload?.field
     if (field === 'start' || field === 'end') editingField.value = field
