@@ -2,9 +2,9 @@
   import { computed, ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
+  import PrimeButton from 'primevue/button'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
-  import PrimeButton from 'primevue/button'
   import Drawer from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -13,6 +13,8 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const toast = useToast()
+  const dialog = useDialog()
 
   defineOptions({
     name: 'edge-firewall-rules-engine-list-view'
@@ -49,8 +51,6 @@
       required: true
     }
   })
-  const toast = useToast()
-  const dialog = useDialog()
 
   const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
     'id',
