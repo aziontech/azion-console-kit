@@ -57,6 +57,29 @@
   }
 
   const updatedTime = () => {
+    const now = new Date()
+
+    if (
+      typeof filterDataRange.value.labelEnd === 'string' &&
+      filterDataRange.value.labelEnd.trim() === 'now'
+    ) {
+      filterDataRange.value.endDate = now
+    }
+
+    if (
+      typeof filterDataRange.value.labelStart === 'string' &&
+      filterDataRange.value.labelStart.trim() === 'now'
+    ) {
+      filterDataRange.value.startDate = now
+    }
+
+    if (
+      typeof filterDataRange.value.label === 'string' &&
+      filterDataRange.value.label.trim() === 'now'
+    ) {
+      filterDataRange.value.endDate = now
+    }
+
     const labelEndParsed = parseRelativeFromLabel(filterDataRange.value.labelEnd)
     const labelStartParsed = parseRelativeFromLabel(filterDataRange.value.labelStart)
     const labelParsed = parseRelativeFromLabel(filterDataRange.value.label)
@@ -66,7 +89,7 @@
         labelEndParsed.value,
         labelEndParsed.unit,
         labelEndParsed.direction,
-        new Date()
+        now
       )
       filterDataRange.value.endDate = startDate
     }
@@ -76,7 +99,7 @@
         labelStartParsed.value,
         labelStartParsed.unit,
         labelStartParsed.direction,
-        new Date()
+        now
       )
       filterDataRange.value.startDate = startDate
     }
@@ -86,7 +109,7 @@
         labelParsed.value,
         labelParsed.unit,
         labelParsed.direction,
-        new Date()
+        now
       )
       filterDataRange.value.startDate = startDate
       filterDataRange.value.endDate = endDate
