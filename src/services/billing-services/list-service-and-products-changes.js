@@ -2,9 +2,8 @@ import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics, filterOutConnectorProducts } from './filter-connector-items'
 const BOT_MANAGER_SLUG = 'bot_manager'
-const CONNECTOR_PRODUCT_SLUG = 'connector'
-const CONNECTOR_METRIC_PREFIX = 'connector_'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -249,21 +248,20 @@ const adapt = ({ body, statusCode }) => {
 
   const productsFilteredByFlag = shouldShowConnectors
     ? products
-    : products.filter((item) => item.productSlug !== CONNECTOR_PRODUCT_SLUG)
+    : filterOutConnectorProducts(products)
 
-  const filterMetricsByFlag = (items) => {
-    if (shouldShowConnectors) return items
-    return items.filter((item) => {
-      if (item.productSlug === CONNECTOR_PRODUCT_SLUG) return false
-      if (
-        typeof item.metricSlug === 'string' &&
-        item.metricSlug.startsWith(CONNECTOR_METRIC_PREFIX)
-      ) {
-        return false
-      }
-      return true
-    })
-  }
+  const metricsValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsValue
+    : filterOutConnectorMetrics(productMetricsValue)
+  const metricsAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsAccounted
+    : filterOutConnectorMetrics(productMetricsAccounted)
+  const metricsRegionValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionValue
+    : filterOutConnectorMetrics(productMetricsRegionValue)
+  const metricsRegionAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionAccounted
+    : filterOutConnectorMetrics(productMetricsRegionAccounted)
 
   const filteredProducts = productsFilteredByFlag.filter(
     (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
@@ -273,15 +271,14 @@ const adapt = ({ body, statusCode }) => {
     return { body: filteredProducts, statusCode }
   }
 
-  const groupedMetrics = groupBy(
-    filterMetricsByFlag(productMetricsValue),
-    filterMetricsByFlag(productMetricsAccounted),
-    ['productSlug', 'metricSlug']
-  )
+  const groupedMetrics = groupBy(metricsValueFilteredByFlag, metricsAccountedFilteredByFlag, [
+    'productSlug',
+    'metricSlug'
+  ])
 
   const groupedRegionMetrics = groupBy(
-    filterMetricsByFlag(productMetricsRegionValue),
-    filterMetricsByFlag(productMetricsRegionAccounted),
+    metricsRegionValueFilteredByFlag,
+    metricsRegionAccountedFilteredByFlag,
     ['productSlug', 'metricSlug', 'regionName']
   )
 

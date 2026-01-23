@@ -2,9 +2,9 @@ import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics } from './filter-connector-items'
+
 const BOT_MANAGER_SLUG = 'bot_manager'
-const CONNECTOR_PRODUCT_SLUG = 'connector'
-const CONNECTOR_METRIC_PREFIX = 'connector_'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -63,16 +63,7 @@ const adapt = ({ body, statusCode }) => {
 
   const filteredAccountingDetail = shouldShowConnectors
     ? accountingDetail
-    : accountingDetail.filter((item) => {
-        if (item.productSlug === CONNECTOR_PRODUCT_SLUG) return false
-        if (
-          typeof item.metricSlug === 'string' &&
-          item.metricSlug.startsWith(CONNECTOR_METRIC_PREFIX)
-        ) {
-          return false
-        }
-        return true
-      })
+    : filterOutConnectorMetrics(accountingDetail)
 
   const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
 
