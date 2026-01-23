@@ -28,6 +28,8 @@ const selectedFiles = ref([])
 const isDownloading = ref(false)
 const showDragAndDrop = ref(false)
 const folderPath = ref('')
+const isFilesLoading = ref(false)
+const hadFilesBeforeLoading = ref(false)
 
 const processProgress = computed(() => {
   if (operationType.value === 'upload') {
@@ -195,6 +197,7 @@ export const useEdgeStorage = () => {
         if (successCount) {
           filesTableNeedRefresh.value = true
           showDragAndDrop.value = false
+          hadFilesBeforeLoading.value = true
           handleToast(
             failureCount > 0 ? 'warn' : 'success',
             failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
@@ -425,6 +428,8 @@ export const useEdgeStorage = () => {
     selectedFiles,
     isDownloading,
     showDragAndDrop,
-    folderPath
+    folderPath,
+    isFilesLoading,
+    hadFilesBeforeLoading
   }
 }

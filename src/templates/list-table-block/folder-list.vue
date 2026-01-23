@@ -335,9 +335,9 @@
     if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav || rowData.isNewFolder)
       return
 
-    const isSelected = selectedItems.value.includes(rowData)
+    const isSelected = selectedItems.value.some((item) => item.id === rowData.id)
     if (isSelected) {
-      selectedItems.value = selectedItems.value.filter((item) => item !== rowData)
+      selectedItems.value = selectedItems.value.filter((item) => item.id !== rowData.id)
     } else {
       selectedItems.value = [...selectedItems.value, rowData]
     }
@@ -358,13 +358,12 @@
     const selectableRows = filterData.value.filter(
       (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
     )
-    return (
-      selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
-    )
+    const selectedIds = selectedItems.value.map((item) => item.id)
+    return selectableRows.length > 0 && selectableRows.every((row) => selectedIds.includes(row.id))
   })
 
   const stateClassRules = (row) => {
-    if (selectedItems.value.find((item) => item.id === row.id)) {
+    if (selectedItems.value.some((item) => item.id === row.id)) {
       return 'bg-[var(--table-body-row-hover-bg)] bg-altered'
     }
     return ''
@@ -704,8 +703,10 @@
               height="1.5rem"
             />
             <Checkbox
-              v-else-if="selectedItems.includes(rowData) && !rowData.isNewFolder"
-              :model-value="selectedItems.includes(rowData)"
+              v-else-if="
+                selectedItems.some((item) => item.id === rowData.id) && !rowData.isNewFolder
+              "
+              :model-value="selectedItems.some((item) => item.id === rowData.id)"
               @update:model-value="toggleRowSelection(rowData)"
               @click.stop="toggleRowSelection(rowData)"
               binary
