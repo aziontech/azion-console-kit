@@ -7,6 +7,7 @@
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { DataTableActionsButtons } from '@/components/DataTable'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -62,7 +63,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -74,13 +75,15 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'domain',
         header: 'Domain',
         type: 'component',
         filterPath: 'domain.content',
+        style: columnStyles.priority(3, 200),
         component: (columnData) => {
           return columnBuilder({
             data: columnData.content,
@@ -96,6 +99,7 @@
         header: 'Status',
         type: 'component',
         sortField: 'active',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,

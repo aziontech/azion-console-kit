@@ -8,6 +8,7 @@
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
   import TableBlock from '@/templates/list-table-block/v2/index.vue'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -88,12 +89,21 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'name',
         header: 'Name',
-        disableSort: true
+        disableSort: true,
+        style: columnStyles.priority(1, 150),
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         field: 'status',
@@ -101,6 +111,7 @@
         type: 'component',
         filterPath: 'active',
         sortField: 'active',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -114,7 +125,7 @@
         header: 'Description',
         disableSort: true,
         type: 'component',
-        class: 'max-w-[400px]',
+        style: columnStyles.priority(5, 350, 400),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -125,12 +136,15 @@
       {
         field: 'lastEditor',
         header: 'Last Editor',
-        disableSort: true
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
-        disableSort: true
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
+        dynamicClass: (columnData) => (columnData === 'Not Available' ? 'text-color-secondary' : '')
       }
     ]
   })
