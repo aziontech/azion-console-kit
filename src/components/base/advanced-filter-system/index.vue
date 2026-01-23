@@ -228,16 +228,18 @@
           outlined
           size="small"
           label="Refresh"
+          class="w-[5.875rem]"
           :disabled="isInvalidRange"
           @click="applyFilters"
         />
         <PrimeButton
           v-else
-          icon="pi pi-check"
+          icon="pi pi-arrow-circle-right"
           severity="secondary"
           size="small"
-          label="Updated"
+          label="Update"
           :disabled="isInvalidRange"
+          class="w-[5.875rem]"
           @click="applyFilters"
         />
       </div>
