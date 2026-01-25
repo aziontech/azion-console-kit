@@ -6,6 +6,9 @@ This guide provides detailed information for developers working on Azion Console
 
 - [IDE Setup](#ide-setup)
 - [Project Architecture](#project-architecture)
+- [Composables](#composables)
+- [Modules](#modules)
+- [Plugins](#plugins)
 - [Creating a New Feature](#creating-a-new-feature)
 - [Theming](#theming)
 - [API Configuration](#api-configuration)
@@ -102,6 +105,174 @@ src/
 Below you can see a diagram showing how these files are organized and interconnect to implement a CRUDL module:
 
 ![Architecture Diagram](./docs/architecture-diagram.png)
+
+---
+
+## Composables
+
+Composables are reusable Vue 3 Composition API functions located in `src/composables/`. They encapsulate common logic that can be shared across components.
+
+### Available Composables
+
+| Composable | Description |
+|------------|-------------|
+| `useDataTable` | Complete data table logic including pagination, sorting, filtering, and CRUD operations |
+| `useDeleteDialog` | Opens standardized delete confirmation dialogs with customizable options |
+| `useTableQuery` | Handles table data fetching with support for pagination, sorting, and search |
+| `useEdgeStorage` | Manages Edge Storage bucket operations (upload, download, delete files) |
+| `useScrollToError` | Automatically scrolls to the first form validation error |
+| `useResize` | Handles element resize observations |
+| `useLayout` | Manages application layout state (sidebar, header, etc.) |
+| `useHelperCenter` | Integrates with the help center functionality |
+| `userFlag` | Handles feature flag checks |
+
+### Usage Examples
+
+**useDeleteDialog:**
+```javascript
+import { useDeleteDialog } from '@/composables/useDeleteDialog'
+
+const { openDeleteDialog } = useDeleteDialog()
+
+openDeleteDialog({
+  title: 'Delete Variable',
+  data: selectedItem,
+  deleteService: () => deleteVariableService(selectedItem.id),
+  successCallback: () => reloadTable()
+})
+```
+
+**useScrollToError:**
+```javascript
+import { useScrollToError } from '@/composables/useScrollToError'
+
+const { scrollToError, scrollToErrorInDrawer } = useScrollToError()
+
+// After form validation fails
+scrollToError(errors)
+
+// For forms inside drawers/sidebars
+scrollToErrorInDrawer(errors)
+```
+
+**useTableQuery:**
+```javascript
+import { useTableQuery } from '@/composables/useTableQuery'
+
+const {
+  isLoading,
+  data,
+  totalRecords,
+  reload,
+  updateSort,
+  updatePagination,
+  updateSearch
+} = useTableQuery({
+  listService: listVariablesService,
+  defaultOrderingFieldName: 'name',
+  itemsByPage: 10
+})
+```
+
+---
+
+## Modules
+
+Modules are self-contained feature packages located in `src/modules/`. Each module contains its own components, services, composables, and assets.
+
+### Available Modules
+
+| Module | Description |
+|--------|-------------|
+| `azion-ai-chat/` | AI-powered chat assistant integration |
+| `real-time-events/` | Real-time event streaming and display |
+| `real-time-metrics/` | Real-time metrics dashboard and visualizations |
+
+### Module Structure
+
+Each module follows a consistent structure:
+
+```
+src/modules/azion-ai-chat/
+├── assets/           # Module-specific static files
+├── components/       # Module-specific Vue components
+├── composables/      # Module-specific composables
+├── contextual-prompts/  # AI prompt configurations
+├── directives/       # Vue directives
+├── layout/           # Layout components
+└── services/         # API services for the module
+```
+
+### Using Modules
+
+Modules are typically imported and used as needed:
+
+```javascript
+import AzionAiChat from '@/modules/azion-ai-chat'
+```
+
+---
+
+## Plugins
+
+Plugins extend Vue's functionality and are located in `src/plugins/`. They are registered globally in `main.js`.
+
+### Available Plugins
+
+| Plugin | Description |
+|--------|-------------|
+| `AnalyticsTrackerAdapterPlugin` | Segment analytics integration for tracking user events |
+| `sentry/` | Sentry error tracking and session replay |
+
+### Analytics Plugin
+
+The analytics plugin provides a global `$tracker` instance for tracking user events:
+
+```javascript
+// In a component
+this.$tracker.track('button_clicked', { buttonName: 'submit' })
+
+// Using inject in Composition API
+import { inject } from 'vue'
+const tracker = inject('tracker')
+tracker.track('page_viewed', { pageName: 'Dashboard' })
+```
+
+### Sentry Plugin
+
+The Sentry plugin provides error tracking and session replay. It exposes methods via `$sentry`:
+
+```javascript
+// Capture an exception
+this.$sentry.captureException(error)
+
+// Capture a message
+this.$sentry.captureMessage('Something happened')
+
+// Set user context
+this.$sentry.setUser({ id: userId, email: userEmail })
+
+// Set custom tags
+this.$sentry.setTag('feature', 'edge-applications')
+```
+
+#### Sentry Configuration
+
+Configure Sentry via environment variables:
+
+```bash
+VITE_SENTRY_UPLOAD=true          # Enable source map uploads
+VITE_SENTRY_AUTH_TOKEN=sntrys_...  # Sentry auth token
+```
+
+#### Masking Sensitive Data
+
+Use `data-sentry-mask` attribute to mask sensitive content in session replays:
+
+```html
+<input type="password" data-sentry-mask />
+<div data-sentry-mask>Sensitive content</div>
+```
 
 ---
 
