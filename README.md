@@ -128,7 +128,8 @@ VITE_STRIPE_TOKEN_DEV=pk_test_yourDevApiKeyHere
 VITE_STRIPE_TOKEN_STAGE=pk_test_yourStageApiKeyHere
 VITE_STRIPE_TOKEN_PROD=pk_live_yourProductionApiKeyHere
 
-# Sentry Configuration
+# Sentry Configuration (replace with valid auth token)
+VITE_SENTRY_AUTH_TOKEN=sntrys_QsVsYXQiOjE3MDAwMDAwMDAuMDAkOllfMCJ1cmwiOiJodHRwczovL3NlbnRyeS5pbyIsInJlZ2lvbl91cmwiOiJodHRwczovL3Vz123456789195byIsIm9yZyI6InlvdXItb3JnYW5pemF0aW9uIn0_xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx
 VITE_SENTRY_UPLOAD=false
 
 # SSO Provider IDs (replace with valid keys from your SSO configuration)
@@ -145,6 +146,7 @@ VITE_SSO_GOOGLE=7c9e6679-7425-40de-944b-e07fc1f90ae7
 | `VITE_STRIPE_TOKEN_STAGE` | Stripe API key for staging environment |
 | `VITE_STRIPE_TOKEN_PROD` | Stripe API key for production |
 | `VITE_SENTRY_UPLOAD` | Enable/disable Sentry source map uploads (`true`/`false`) |
+| `VITE_SENTRY_AUTH_TOKEN` | Sentry authentication token for source map uploads |
 | `VITE_SSO_AZURE` | Azure AD SSO provider ID |
 | `VITE_SSO_IDP_SCIM_E2E` | SCIM E2E identity provider ID |
 | `VITE_SSO_GITHUB` | GitHub SSO provider ID |
