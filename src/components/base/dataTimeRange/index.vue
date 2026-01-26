@@ -23,58 +23,75 @@
         content: { class: 'p-2' }
       }"
     >
-      <TabView
-        v-model:activeIndex="activeTab"
-        :pt="{
-          navcontent: { class: 'mb-2 pb-1' }
-        }"
-      >
-        <TabPanel header="Quick">
-          <QuickSelect
-            panelOnly
-            v-model="model"
-            :maxDays="maxDays"
-            @select="emit('select', $event)"
-            @close="closeOverlay"
+      <div class="relative">
+        <div
+          v-if="activeTab === 0"
+          class="absolute right-0 top-0 z-10 flex items-center gap-1"
+        >
+          <PrimeButton
+            icon="pi pi-chevron-left"
+            size="small"
+            outlined
           />
-        </TabPanel>
-        <TabPanel header="Absolute">
-          <InputDateRange
-            panelOnly
-            mode="absolute"
-            :editingField="editingField"
-            v-model="model"
-            :maxDays="maxDays"
-            @select="emit('select', $event)"
-            @close="closeOverlay"
+          <PrimeButton
+            icon="pi pi-chevron-right"
+            size="small"
+            outlined
           />
-        </TabPanel>
-        <TabPanel header="Relative">
-          <InputDateRange
-            v-if="activeTab === 2"
-            panelOnly
-            mode="relative"
-            :editingField="editingField"
-            v-model="model"
-            :maxDays="maxDays"
-            @select="emit('select', $event)"
-            @close="closeOverlay"
-          />
-        </TabPanel>
-        <TabPanel header="Now">
-          <div class="flex flex-col gap-4 max-w-[300px] px-4 mb-2">
-            <div class="text-sm text-color-secondary">
-              Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
-            </div>
-            <PrimeButton
-              label="Set Now"
-              severity="secondary"
-              size="small"
-              @click="setNow"
+        </div>
+        <TabView
+          v-model:activeIndex="activeTab"
+          :pt="{
+            navcontent: { class: ['mb-2 pb-1', activeTab === 0 ? 'pr-16' : ''] }
+          }"
+        >
+          <TabPanel header="Quick">
+            <QuickSelect
+              panelOnly
+              v-model="model"
+              :maxDays="maxDays"
+              @select="emit('select', $event)"
+              @close="closeOverlay"
             />
-          </div>
-        </TabPanel>
-      </TabView>
+          </TabPanel>
+          <TabPanel header="Absolute">
+            <InputDateRange
+              panelOnly
+              mode="absolute"
+              :editingField="editingField"
+              v-model="model"
+              :maxDays="maxDays"
+              @select="emit('select', $event)"
+              @close="closeOverlay"
+            />
+          </TabPanel>
+          <TabPanel header="Relative">
+            <InputDateRange
+              v-if="activeTab === 2"
+              panelOnly
+              mode="relative"
+              :editingField="editingField"
+              v-model="model"
+              :maxDays="maxDays"
+              @select="emit('select', $event)"
+              @close="closeOverlay"
+            />
+          </TabPanel>
+          <TabPanel header="Now">
+            <div class="flex flex-col gap-4 max-w-[300px] px-4 mb-2">
+              <div class="text-sm text-color-secondary">
+                Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
+              </div>
+              <PrimeButton
+                label="Set Now"
+                severity="secondary"
+                size="small"
+                @click="setNow"
+              />
+            </div>
+          </TabPanel>
+        </TabView>
+      </div>
     </OverlayPanel>
   </div>
 </template>
