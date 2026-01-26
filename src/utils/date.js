@@ -327,15 +327,14 @@ export const RELATIVE_DIRECTIONS = [
 
 export const COMMON_DATE_RANGES = {
   today: { label: 'Today', value: 'today', maxDays: 1 },
-  this_week: { label: 'This week', value: 'this_week', maxDays: 7 },
-  last_1_minute: { label: 'Last 1 minute', value: 'last_1_minute', maxDays: 0 },
-  last_5_minutes: { label: 'Last 5 minutes', value: 'last_5_minutes', maxDays: 0 },
-  last_15_minutes: { label: 'Last 15 minutes', value: 'last_15_minutes', maxDays: 0 },
-  last_30_minutes: { label: 'Last 30 minutes', value: 'last_30_minutes', maxDays: 0 },
-  last_1_hour: { label: 'Last 1 hour', value: 'last_1_hour', maxDays: 0 },
   last_24_hours: { label: 'Last 24 hours', value: 'last_24_hours', maxDays: 1 },
+  this_week: { label: 'This week', value: 'this_week', maxDays: 7 },
   last_7_days: { label: 'Last 7 days', value: 'last_7_days', maxDays: 7 },
+  last_1_minute: { label: 'Last 1 minute', value: 'last_1_minute', maxDays: 0 },
   last_30_days: { label: 'Last 30 days', value: 'last_30_days', maxDays: 30 },
+  last_5_minutes: { label: 'Last 15 minutes', value: 'last_15_minutes', maxDays: 0 },
   last_90_days: { label: 'Last 90 days', value: 'last_90_days', maxDays: 90 },
-  last_1_year: { label: 'Last 1 year', value: 'last_1_year', maxDays: 365 }
+  last_30_minutes: { label: 'Last 30 minutes', value: 'last_30_minutes', maxDays: 0 },
+  last_1_year: { label: 'Last 1 year', value: 'last_1_year', maxDays: 365 },
+  last_1_hour: { label: 'Last 1 hour', value: 'last_1_hour', maxDays: 0 }
 }
