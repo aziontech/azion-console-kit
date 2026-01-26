@@ -106,17 +106,33 @@
 
   const normalizeUnit = (unit) => {
     if (!unit) return null
-    const normalizedUnitCandidate = String(unit).toLowerCase().trim()
-    if (normalizedUnitCandidate === 'minute' || normalizedUnitCandidate === 'minutes')
-      return 'minutes'
-    if (normalizedUnitCandidate === 'hour' || normalizedUnitCandidate === 'hours') return 'hours'
-    if (normalizedUnitCandidate === 'day' || normalizedUnitCandidate === 'days') return 'days'
-    if (normalizedUnitCandidate === 'month' || normalizedUnitCandidate === 'months') return 'months'
-    return null
+
+    const normalized = String(unit).toLowerCase().trim()
+
+    switch (normalized) {
+      case 'minute':
+      case 'minutes':
+        return 'minutes'
+
+      case 'hour':
+      case 'hours':
+        return 'hours'
+
+      case 'day':
+      case 'days':
+        return 'days'
+
+      case 'month':
+      case 'months':
+        return 'months'
+
+      default:
+        return null
+    }
   }
 
   const parseRelativeFromLabel = (label) => {
-    if (!label || typeof label !== 'string') return null
+    if (!label) return null
     const match = label.trim().match(/^(last|next)\s+(\d+)\s+([a-zA-Z]+)$/i)
     if (!match) return null
 
