@@ -62,6 +62,13 @@
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
+  const sizeInput = (value) => {
+    if (value.length > 5) {
+      return value.length
+    }
+    return 7
+  }
+
   const inputValue = computed({
     get: () => {
       return hasChanges.value
@@ -291,7 +298,6 @@
           preset: model.value?.relative?.preset
         }
 
-
         if (shouldSetDefaultRelativeRange) {
           model.value.startDate = now
           model.value.labelEnd = 'now'
@@ -375,15 +381,18 @@
 
     <div
       v-else
-      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="w-min cursor-pointer"
+        class="cursor-pointer"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none'
         "
+        :style="{
+          width: `${sizeInput(model.labelStart || startDateInput)}ch`
+        }"
         :value="model.labelStart ? model.labelStart : startDateInput"
         readonly
         @click="openStart"
@@ -396,12 +405,15 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="w-min cursor-pointer"
+        class="cursor-pointer"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none'
         "
+        :style="{
+          width: `${sizeInput(model.labelEnd || endDateInput)}ch`
+        }"
         :value="model.labelEnd ? model.labelEnd : endDateInput"
         readonly
         @click="openEnd"
