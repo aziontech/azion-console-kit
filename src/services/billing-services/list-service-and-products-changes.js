@@ -1,6 +1,8 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics, filterOutConnectorProducts } from './filter-connector-items'
 const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesService = async (billID) => {
@@ -242,22 +244,43 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  const filteredProducts = products.filter((item) => ![BOT_MANAGER_SLUG].includes(item.productSlug))
+  const shouldShowConnectors = !hasFlagBlockApiV4()
+
+  const productsFilteredByFlag = shouldShowConnectors
+    ? products
+    : filterOutConnectorProducts(products)
+
+  const metricsValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsValue
+    : filterOutConnectorMetrics(productMetricsValue)
+  const metricsAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsAccounted
+    : filterOutConnectorMetrics(productMetricsAccounted)
+  const metricsRegionValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionValue
+    : filterOutConnectorMetrics(productMetricsRegionValue)
+  const metricsRegionAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionAccounted
+    : filterOutConnectorMetrics(productMetricsRegionAccounted)
+
+  const filteredProducts = productsFilteredByFlag.filter(
+    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
+  )
 
   if (!filteredProducts.length) {
     return { body: filteredProducts, statusCode }
   }
 
-  const groupedMetrics = groupBy(productMetricsValue, productMetricsAccounted, [
+  const groupedMetrics = groupBy(metricsValueFilteredByFlag, metricsAccountedFilteredByFlag, [
     'productSlug',
     'metricSlug'
   ])
 
-  const groupedRegionMetrics = groupBy(productMetricsRegionValue, productMetricsRegionAccounted, [
-    'productSlug',
-    'metricSlug',
-    'regionName'
-  ])
+  const groupedRegionMetrics = groupBy(
+    metricsRegionValueFilteredByFlag,
+    metricsRegionAccountedFilteredByFlag,
+    ['productSlug', 'metricSlug', 'regionName']
+  )
 
   const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
 
