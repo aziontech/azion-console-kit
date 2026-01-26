@@ -6,7 +6,12 @@
     @mouseleave="handleCellMouseLeave"
   >
     <div class="flex items-center gap-2 flex-1 min-w-0">
-      <p class="overflow-hidden whitespace-nowrap text-ellipsis">
+      <p
+        ref="textElement"
+        class="overflow-hidden whitespace-nowrap text-ellipsis flex-1 min-w-0"
+        @mouseenter="handleTextMouseEnter"
+        @mouseleave="handleTextMouseLeave"
+      >
         {{ items[0] }}
       </p>
       <span
@@ -27,6 +32,15 @@
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
     <Teleport to="body">
+      <div
+        v-if="showTextPopup"
+        class="absolute z-[9999] max-w-80 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)]"
+        :style="textPopupStyle"
+        @mouseenter="handleTextPopupMouseEnter"
+        @mouseleave="handleTextPopupMouseLeave"
+      >
+        <p class="text-xs break-words">{{ items[0] }}</p>
+      </div>
       <div
         v-if="showPopup"
         ref="popupElement"
@@ -64,12 +78,17 @@
     }
   })
 
+  const textElement = ref(null)
   const tagElement = ref(null)
   const popupElement = ref(null)
   const showPopup = ref(false)
+  const showTextPopup = ref(false)
   const popupPosition = ref({ posX: 0, posY: 0 })
+  const textPopupPosition = ref({ posX: 0, posY: 0 })
   const hoverTimeout = ref(null)
+  const textHoverTimeout = ref(null)
   const popupHovered = ref(false)
+  const textPopupHovered = ref(false)
   const isCellHovered = ref(false)
   const isPopupFixed = ref(false)
 
@@ -79,6 +98,61 @@
     maxWidth: '320px',
     maxHeight: '216px'
   }))
+
+  const textPopupStyle = computed(() => ({
+    left: `${textPopupPosition.value.posX}px`,
+    top: `${textPopupPosition.value.posY}px`,
+    maxWidth: '320px'
+  }))
+
+  const isTextTruncated = () => {
+    if (!textElement.value) return false
+    return textElement.value.scrollWidth > textElement.value.clientWidth
+  }
+
+  const handleTextMouseEnter = () => {
+    if (!isTextTruncated()) return
+
+    textHoverTimeout.value = setTimeout(() => {
+      const rect = textElement.value?.getBoundingClientRect()
+      if (!rect) return
+      const popupWidth = 320
+      const viewportWidth = window.innerWidth
+
+      let posX = rect.right + 6
+
+      if (posX + popupWidth > viewportWidth) {
+        posX = rect.left - popupWidth - 6
+      }
+
+      textPopupPosition.value = {
+        posX: posX,
+        posY: rect.top - 7
+      }
+      showTextPopup.value = true
+    }, 1000)
+  }
+
+  const handleTextMouseLeave = () => {
+    if (textHoverTimeout.value) {
+      clearTimeout(textHoverTimeout.value)
+      textHoverTimeout.value = null
+    }
+    setTimeout(() => {
+      if (!textPopupHovered.value) {
+        showTextPopup.value = false
+      }
+    }, 100)
+  }
+
+  const handleTextPopupMouseEnter = () => {
+    textPopupHovered.value = true
+  }
+
+  const handleTextPopupMouseLeave = () => {
+    textPopupHovered.value = false
+    showTextPopup.value = false
+  }
 
   const remainingItems = computed(() => {
     return props.items.slice(1)
@@ -183,6 +257,9 @@
     document.removeEventListener('click', handleClickOutside)
     if (hoverTimeout.value) {
       clearTimeout(hoverTimeout.value)
+    }
+    if (textHoverTimeout.value) {
+      clearTimeout(textHoverTimeout.value)
     }
   })
 </script>

@@ -1,13 +1,14 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import TableBlock from '@/templates/list-table-block/v2/index.vue'
+  import { computed, ref, inject } from 'vue'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
-  import { computed, ref, inject } from 'vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
+  import TableBlock from '@/templates/list-table-block/v2/index.vue'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -74,6 +75,7 @@
   const toast = useToast()
   const currentPhase = ref('request')
   const hasContentToList = ref(true)
+  const isLoadingButtonOrder = ref(false)
 
   const getColumns = computed(() => {
     return [
@@ -87,12 +89,21 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'name',
         header: 'Name',
-        disableSort: true
+        disableSort: true,
+        style: columnStyles.priority(1, 150),
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         field: 'status',
@@ -100,6 +111,7 @@
         type: 'component',
         filterPath: 'active',
         sortField: 'active',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -111,20 +123,41 @@
       {
         field: 'description',
         header: 'Description',
-        disableSort: true
+        disableSort: true,
+        type: 'component',
+        style: columnStyles.priority(5, 350, 400),
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-format-with-popup'
+          })
+        }
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
-        disableSort: true
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
-        disableSort: true
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
+        dynamicClass: (columnData) => (columnData === 'Not Available' ? 'text-color-secondary' : '')
       }
     ]
   })
+
+  const actions = computed(() => [
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'rule',
+      icon: 'pi pi-trash',
+      service: deleteRulesEngineWithDecorator
+    }
+  ])
 
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
@@ -164,18 +197,6 @@
     currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
-
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'rule',
-      icon: 'pi pi-trash',
-      service: deleteRulesEngineWithDecorator
-    }
-  ]
-
-  const isLoadingButtonOrder = ref(false)
 
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true

@@ -520,6 +520,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        :style="col.style"
         :class="[col.disableSort ? '' : 'hover:cursor-pointer', col.class]"
         data-testid="data-table-column"
         class="lg:break-words lg:whitespace-normal"
@@ -531,7 +532,10 @@
             </template>
             <template v-else>
               <template v-if="col.type !== 'component'">
-                <div :data-testid="`list-table-block__column__${col.field}__row`">
+                <div
+                  :data-testid="`list-table-block__column__${col.field}__row`"
+                  :class="col.dynamicClass ? col.dynamicClass(rowData[col.field]) : ''"
+                >
                   {{ rowData[col.field] }}
                 </div>
               </template>

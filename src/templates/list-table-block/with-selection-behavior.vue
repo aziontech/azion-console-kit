@@ -72,7 +72,7 @@
         :header="col.header"
         :sortField="col?.sortField"
         headerClass="p-highlight"
-        :class="{ 'hover:cursor-pointer ': !disabledList }"
+        :class="['hover:cursor-pointer', !disabledList ? 'hover:cursor-pointer' : '', col.class]"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -80,6 +80,7 @@
             <div
               @click="!disableEditOnClick && editItemSelected($event, rowData)"
               :data-testid="`list-table-block__column__${col.field}__row`"
+              :class="col.dynamicClass ? col.dynamicClass(rowData[col.field]) : ''"
             >
               {{ rowData[col.field] }}
             </div>

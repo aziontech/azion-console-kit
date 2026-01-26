@@ -144,11 +144,11 @@ export function useDataTable(props, emit) {
           originalEvent: {
             page: 0,
             first: 0,
-            rows: 10,
+            rows: itemsByPage.value,
             pageCount: 39
           },
           first: 0,
-          rows: 10,
+          rows: itemsByPage.value,
           sortField: null,
           sortOrder: null,
           multiSortMeta: [],
@@ -159,7 +159,6 @@ export function useDataTable(props, emit) {
         }
         const numberOfLinesPerPage = event.rows
         tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-        itemsByPage.value = numberOfLinesPerPage
         minimumOfItemsPerPage.value = numberOfLinesPerPage
         firstItemIndex.value = event.first
       }
