@@ -128,7 +128,8 @@
     "slice-ansi": "4.0.0",
     "strip-ansi": "6.0.1",
     "supports-color": "7.2.0",
-    "supports-hyperlinks": "2.3.0"
+    "supports-hyperlinks": "2.3.0",
+    "axios": "^1.13.3"
   },
   "engines": {
     "node": ">=22.18.0",
