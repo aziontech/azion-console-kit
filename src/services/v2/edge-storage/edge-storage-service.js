@@ -97,6 +97,7 @@ export class EdgeStorageService extends BaseService {
         onProgress(progress)
       }
     }
+
     await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(prefix)}${
@@ -164,7 +165,7 @@ export class EdgeStorageService extends BaseService {
   downloadEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects/${fileName}`,
+      url: `${this.baseURL}/buckets/${bucketName}/objects/${fileName}`,
       config: {
         responseType: 'blob'
       }
