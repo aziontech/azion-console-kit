@@ -5,6 +5,9 @@
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
+  import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
+  import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
+  import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -96,7 +99,6 @@
       version: '3.0.1'
     }
   ])
-  const currentMarketplaceIndex = ref(0)
   const changelogItems = ref([
     {
       time: '12 hours ago',
@@ -143,21 +145,6 @@
     createModalStore.toggle()
   }
 
-  const nextMarketplaceItem = () => {
-    currentMarketplaceIndex.value =
-      (currentMarketplaceIndex.value + 1) % marketplaceItems.value.length
-  }
-
-  const previousMarketplaceItem = () => {
-    currentMarketplaceIndex.value =
-      currentMarketplaceIndex.value === 0
-        ? marketplaceItems.value.length - 1
-        : currentMarketplaceIndex.value - 1
-  }
-
-  const goToMarketplaceItem = (index) => {
-    currentMarketplaceIndex.value = index
-  }
   onMounted(async () => {
     teams.value = await props.listTeamsService()
     if (props.inviteSession.sessionIsExpired()) {
@@ -277,193 +264,12 @@
         </div>
 
         <div class="flex flex-col w-full md:w-[30%] gap-8">
-          <!-- Monthly Usage Mock-->
-          <div
-            class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
-          >
-            <div
-              class="bg-[var(--surface-50)] border-b border-[var(--surface-border)] px-4 py-1.5 h-11 flex items-center"
-            >
-              <h2 class="text-base font-semibold text-white">Monthly Usage</h2>
-            </div>
-
-            <div class="p-4 flex flex-col gap-2.5">
-              <div
-                v-for="(item, index) in monthlyUsageData"
-                :key="index"
-                class="flex items-start justify-between text-xs"
-              >
-                <span class="text-[var(--text-color-secondary)]">{{ item.label }}</span>
-                <span class="text-[var(--text-color)]">{{ item.value }}</span>
-              </div>
-            </div>
-
-            <div
-              class="border-t border-[var(--surface-border)] h-11 flex items-center justify-center px-4 cursor-pointer hover:bg-[var(--surface-hover)]"
-              @click="navigateToUsage"
-            >
-              <span class="text-xs text-[var(--text-color-link)] text-center">
-                View all Usage...
-              </span>
-            </div>
-          </div>
-          <!-- Start Marketplace Trends Block -->
-          <div
-            class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
-          >
-            <div
-              class="bg-[var(--surface-50)] border-b border-[var(--surface-border)] px-4 py-1.5 h-11 flex items-center"
-            >
-              <h2 class="text-base font-semibold text-white">Marketplace Trends</h2>
-            </div>
-
-            <div class="bg-[var(--surface-100)] flex gap-2.5 h-[138px] items-center px-4 py-3">
-              <div class="flex-1 flex flex-col gap-3">
-                <div class="flex flex-col gap-2 w-full">
-                  <div class="flex gap-2.5 items-center w-full">
-                    <div class="rounded-md size-6 overflow-hidden flex-shrink-0">
-                      <i class="pi pi-box text-[var(--text-color-base)]"></i>
-                    </div>
-                    <div class="flex-1 flex flex-col gap-0 justify-center">
-                      <h3
-                        class="text-sm font-semibold text-[var(--text-color-base)] overflow-hidden text-ellipsis whitespace-nowrap"
-                      >
-                        {{ marketplaceItems[currentMarketplaceIndex].name }}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p
-                    class="text-xs text-[var(--text-color-muted)] leading-[1.5] overflow-hidden max-h-[53px] min-h-[24px]"
-                    style="
-                      display: -webkit-box;
-                      -webkit-line-clamp: 3;
-                      -webkit-box-orient: vertical;
-                      line-clamp: 3;
-                    "
-                  >
-                    {{ marketplaceItems[currentMarketplaceIndex].description }}
-                  </p>
-                </div>
-
-                <div class="flex gap-2.5 items-center text-[10px] leading-[1.3]">
-                  <div class="flex gap-1 items-center">
-                    <span class="text-[var(--text-color-base)]">By</span>
-                    <span class="font-semibold text-[var(--text-color-muted)]">
-                      {{ marketplaceItems[currentMarketplaceIndex].author }}
-                    </span>
-                  </div>
-                  <div class="flex gap-1 items-center">
-                    <span class="text-[var(--text-color-base)]">Version</span>
-                    <span class="text-[var(--text-color-muted)]">
-                      {{ marketplaceItems[currentMarketplaceIndex].version }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="border-t border-[var(--surface-border)] h-11 flex gap-4 items-center justify-center px-4 py-2"
-            >
-              <PrimeButton
-                icon="pi pi-chevron-left"
-                text
-                rounded
-                size="small"
-                :disabled="currentMarketplaceIndex === 0"
-                @click="previousMarketplaceItem"
-                class="w-8 h-8"
-                :class="{ 'opacity-60': currentMarketplaceIndex === 0 }"
-              />
-
-              <div class="flex gap-1.5 h-full items-center justify-center">
-                <button
-                  v-for="(item, index) in marketplaceItems"
-                  :key="index"
-                  @click="goToMarketplaceItem(index)"
-                  class="w-2 h-2 rounded-full transition-opacity"
-                  :class="
-                    currentMarketplaceIndex === index
-                      ? 'bg-white opacity-100'
-                      : 'bg-white opacity-16'
-                  "
-                />
-              </div>
-
-              <PrimeButton
-                icon="pi pi-chevron-right"
-                text
-                rounded
-                size="small"
-                @click="nextMarketplaceItem"
-                class="w-8 h-8"
-              />
-            </div>
-          </div>
-          <!-- Start Azion Changelog Block -->
-          <div
-            class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
-          >
-            <div
-              class="bg-[var(--surface-50)] border-b border-[var(--surface-border)] px-4 py-1.5 h-11 flex items-center"
-            >
-              <h2 class="text-base font-semibold text-white">Azion Changelog</h2>
-            </div>
-
-            <div class="p-4">
-              <div class="flex items-center w-[273px]">
-                <div class="flex flex-col items-start w-full">
-                  <div
-                    v-for="(item, index) in changelogItems"
-                    :key="index"
-                    class="flex items-start min-h-[70px] w-full"
-                  >
-                    <div class="flex flex-col items-center self-stretch">
-                      <div
-                        class="bg-[#18181b] border-2 border-[#3f3f46] flex items-center justify-center p-0.5 rounded-[7.875px] size-[15.75px]"
-                      >
-                        <div
-                          class="bg-[#18181b] flex-1 h-full rounded-[7.875px] flex items-center justify-center"
-                          style="
-                            box-shadow:
-                              0px 0.5px 0px 0px rgba(0, 0, 0, 0.06),
-                              0px 1px 1px 0px rgba(0, 0, 0, 0.12);
-                          "
-                        >
-                          <div class="bg-[#fe601f] rounded-[2.625px] size-[5.25px]"></div>
-                        </div>
-                      </div>
-
-                      <div
-                        v-if="index < changelogItems.length - 1"
-                        class="bg-[#3f3f46] flex-1 w-0.5"
-                      ></div>
-                    </div>
-
-                    <div class="flex-1 flex flex-col px-3.5">
-                      <div class="flex flex-col gap-1 rounded-md w-full">
-                        <p class="text-[10px] text-[#a1a1aa] leading-normal">
-                          {{ item.time }}
-                        </p>
-                        <p class="text-xs text-white leading-[1.5]">
-                          {{ item.description }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="border-t border-[var(--surface-border)] h-11 flex items-center justify-center px-4 cursor-pointer hover:bg-[var(--surface-hover)]"
-            >
-              <span class="text-xs text-[var(--text-color-link)] text-center">
-                View all Changelog...
-              </span>
-            </div>
-          </div>
+          <MonthlyUsageCard
+            :usageData="monthlyUsageData"
+            @viewAll="navigateToUsage"
+          />
+          <MarketplaceTrendsCard :items="marketplaceItems" />
+          <AzionChangelogCard :changelogItems="changelogItems" />
         </div>
       </section>
     </template>
