@@ -32,11 +32,13 @@
             icon="pi pi-chevron-left"
             size="small"
             outlined
+            @click="shiftQuick(-1)"
           />
           <PrimeButton
             icon="pi pi-chevron-right"
             size="small"
             outlined
+            @click="shiftQuick(1)"
           />
         </div>
         <TabView
@@ -105,6 +107,7 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
+  import { shiftQuickRange } from './utils/quick-range-navigation'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
@@ -172,6 +175,16 @@
 
   const onOverlayHide = () => {
     isOverlayOpen.value = false
+  }
+
+  const shiftQuick = (stepDirection) => {
+    const result = shiftQuickRange(model.value, stepDirection > 0 ? 'next' : 'prev')
+    if (!result) return
+
+    model.value.startDate = result.startDate
+    model.value.endDate = result.endDate
+
+    emit('select', model.value)
   }
 
   const setNow = () => {
