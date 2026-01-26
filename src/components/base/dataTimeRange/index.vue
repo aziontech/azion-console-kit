@@ -61,6 +61,19 @@
             @close="closeOverlay"
           />
         </TabPanel>
+        <TabPanel header="Now">
+          <div class="flex flex-col gap-4 max-w-[300px] px-4 mb-2">
+            <div class="text-sm text-color-secondary">
+              Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
+            </div>
+            <PrimeButton
+              label="Set Now"
+              severity="secondary"
+              size="small"
+              @click="setNow"
+            />
+          </div>
+        </TabPanel>
       </TabView>
     </OverlayPanel>
   </div>
@@ -70,6 +83,7 @@
   import { defineModel, nextTick, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
+  import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -115,7 +129,6 @@
 
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
-
     const event = tabIndex === 0 ? payload : payload?.event
     const field = tabIndex === 0 ? undefined : payload?.field
     if (field === 'start' || field === 'end') editingField.value = field
@@ -142,5 +155,21 @@
 
   const onOverlayHide = () => {
     isOverlayOpen.value = false
+  }
+
+  const setNow = () => {
+    const now = new Date()
+    model.value.label = ''
+
+    if (editingField.value === 'start') {
+      model.value.startDate = now
+      model.value.labelStart = 'now'
+    } else {
+      model.value.endDate = now
+      model.value.labelEnd = 'now'
+    }
+
+    emit('select', model.value)
+    closeOverlay()
   }
 </script>

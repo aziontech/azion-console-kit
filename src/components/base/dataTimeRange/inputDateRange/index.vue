@@ -62,6 +62,13 @@
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
+  const sizeInput = (value) => {
+    if (value.length > 5) {
+      return value.length
+    }
+    return 7
+  }
+
   const inputValue = computed({
     get: () => {
       return hasChanges.value
@@ -93,6 +100,12 @@
   const isInvalidRange = computed(() => {
     const start = model.value?.startDate
     const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
     if (!start || !end) return false
     return new Date(start).getTime() > new Date(end).getTime()
   })
@@ -220,6 +233,19 @@
         model.value.startDate = newDate
         model.value.labelStart = ''
         hasInitializedAbsoluteRange.value = true
+        const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
+
+        const isSameHourAndMinuteAsEnd =
+          Boolean(currentEndDate) &&
+          newDate.getFullYear() === currentEndDate.getFullYear() &&
+          newDate.getMonth() === currentEndDate.getMonth() &&
+          newDate.getDate() === currentEndDate.getDate() &&
+          newDate.getHours() === currentEndDate.getHours() &&
+          newDate.getMinutes() === currentEndDate.getMinutes()
+
+        if (isSameHourAndMinuteAsEnd) {
+          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+        }
       } else {
         const hasStart = Boolean(model.value.startDate)
         const startEqualsCurrentEnd =
@@ -261,6 +287,7 @@
         preset: model.value?.relative?.preset
       }
 
+      const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
         model.value.startDate = calculatedDate
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -269,6 +296,12 @@
           value: relativeValue.value,
           unit: relativeUnit.value,
           preset: model.value?.relative?.preset
+        }
+
+        if (shouldSetDefaultRelativeRange) {
+          model.value.startDate = now
+          model.value.labelEnd = 'now'
+          model.value.label = ''
         }
       } else {
         model.value.endDate = calculatedDate
@@ -348,15 +381,18 @@
 
     <div
       v-else
-      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none max-md:w-full"
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="w-min cursor-pointer"
+        class="cursor-pointer"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none'
         "
+        :style="{
+          width: `${sizeInput(model.labelStart || startDateInput)}ch`
+        }"
         :value="model.labelStart ? model.labelStart : startDateInput"
         readonly
         @click="openStart"
@@ -369,12 +405,15 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="w-min cursor-pointer"
+        class="cursor-pointer"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none'
         "
+        :style="{
+          width: `${sizeInput(model.labelEnd || endDateInput)}ch`
+        }"
         :value="model.labelEnd ? model.labelEnd : endDateInput"
         readonly
         @click="openEnd"
