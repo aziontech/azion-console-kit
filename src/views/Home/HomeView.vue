@@ -169,8 +169,8 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full h-full flex gap-8 pt-10 px-8 pb-8">
-        <div class="flex flex-col w-[70%] gap-8">
+      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 px-8 pb-8">
+        <div class="flex flex-col w-full md:w-[70%] gap-8">
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
             <PrimeButton
@@ -181,6 +181,7 @@
               @click="openModalCreate"
             />
           </div>
+          <!-- Start Metrics Block -->
           <div class="flex flex-col gap-3 w-full">
             <div class="flex gap-3 items-center h-7">
               <span class="text-base font-semibold">Metrics</span>
@@ -191,7 +192,6 @@
                 text
               />
             </div>
-            <!-- Metrics Grid Mock-->
             <div class="flex flex-col gap-2 w-full relative">
               <div
                 class="border border-[var(--surface-border)] rounded-md overflow-hidden flex w-full"
@@ -254,6 +254,7 @@
               </div>
             </div>
           </div>
+          <!-- Start Resources Block -->
           <div class="flex flex-col gap-3 w-full">
             <div class="flex gap-3">
               <span class="text-[16px]">Resources</span>
@@ -263,7 +264,7 @@
               class="h-[308px] w-full border rounded border-[var(--surface-border)] bg-[var(--surface-section)]"
             ></div>
           </div>
-          <!-- Last Activities -->
+          <!-- Start Last Activities Block -->
           <div class="flex flex-col gap-3 w-full">
             <div class="flex gap-3">
               <span class="text-[16px]">Last Activities</span>
@@ -275,7 +276,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col w-[30%] gap-8">
+        <div class="flex flex-col w-full md:w-[30%] gap-8">
           <!-- Monthly Usage Mock-->
           <div
             class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
@@ -306,7 +307,7 @@
               </span>
             </div>
           </div>
-          <!-- Marketplace Trends Mock -->
+          <!-- Start Marketplace Trends Block -->
           <div
             class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
           >
@@ -400,7 +401,7 @@
               />
             </div>
           </div>
-          <!-- Azion Changelog Mock -->
+          <!-- Start Azion Changelog Block -->
           <div
             class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col overflow-hidden"
           >
