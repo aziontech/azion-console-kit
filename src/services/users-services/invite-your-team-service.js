@@ -1,6 +1,7 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const inviteYourTeamService = async (payload) => {
   const bodyRequest = adapt(payload)
@@ -24,48 +25,6 @@ const adapt = (payload) => {
     email: payload.email,
     teams_ids: [payload.team]
   }
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const body = httpResponse.body
-
-  if (body?.errors && Array.isArray(body.errors) && body.errors.length > 0) {
-    const error = body.errors[0]
-    if (error?.detail && error?.source?.pointer) {
-      const field = error.source.pointer.split('/').pop()
-      return `${field}: ${error.detail}`
-    }
-    if (error?.detail) {
-      return error.detail
-    }
-  }
-
-  if (body?.detail && body?.source?.pointer) {
-    const field = body.source.pointer.split('/').pop()
-    return `${field}: ${body.detail}`
-  }
-
-  const definedKeys = ['first_name', 'last_name', 'email', 'teams_ids']
-  let key = definedKeys.find((key) => body[key])
-
-  if (!key) {
-    key = Object.keys(body)[0]
-  }
-
-  const value = body[key]
-  const isString = typeof value === 'string'
-  const isArray = Array.isArray(value)
-
-  let message = ''
-  if (isString) message = value
-  if (isArray) message = value[0]
-
-  return `${key}: ${message}`
 }
 
 /**

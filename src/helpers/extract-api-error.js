@@ -10,6 +10,22 @@
 export const extractApiError = (httpResponse) => {
   const errorBody = httpResponse.body
 
+  if (errorBody?.errors && Array.isArray(errorBody.errors) && errorBody.errors.length > 0) {
+    const error = errorBody.errors[0]
+    if (error?.detail && error?.source?.pointer) {
+      const field = error.source.pointer.split('/').pop()
+      return `${field}: ${error.detail}`
+    }
+    if (error?.detail) {
+      return error.detail
+    }
+  }
+
+  if (errorBody?.detail && errorBody?.source?.pointer) {
+    const field = errorBody.source.pointer.split('/').pop()
+    return `${field}: ${errorBody.detail}`
+  }
+
   if (typeof errorBody?.detail === 'string' && errorBody.detail) {
     return errorBody.detail
   }
