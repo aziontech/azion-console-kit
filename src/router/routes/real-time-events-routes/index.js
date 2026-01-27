@@ -38,6 +38,9 @@ export const realTimeEventsRoutes = {
       listService: RealTimeEventsService.listActivityHistory,
       loadService: RealTimeEventsService.loadActivityHistory
     },
+    edgePulse: {
+      listService: RealTimeEventsService.listEdgePulse
+    },
     loadFieldsData: RealTimeEventsService.loadFieldsEventsData,
     getTotalRecords: RealTimeEventsService.getTotalRecords
   },
