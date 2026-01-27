@@ -1,18 +1,3 @@
-/* eslint-disable no-undef */
-/** @type {import('@commitlint/types').UserConfig} */
-module.exports = {
-  extends: ['@commitlint/config-conventional'],
-  rules: {
-    'body-max-line-length': [0]
-  },
-  parserPreset: {
-    parserOpts: {
-      headerPattern: /^(\[ENG-.*])?\s?(\w+):\s(.*)$/,
-      headerCorrespondence: ['scope', 'type', 'subject']
-    }
-  }
-}
-
 /**
  * Pattern:
  * [ENG-*] -> Scope is optional
@@ -27,3 +12,20 @@ module.exports = {
  *
  *
  */
+
+/* eslint-disable no-undef */
+/** @type {import('@commitlint/types').UserConfig} */
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'body-max-line-length': [0]
+  },
+  parserPreset: {
+    parserOpts: {
+      headerPattern: /^(\[ENG-.*])?\s?(\w+):\s(.*)$/, // eslint-disable-line
+      headerCorrespondence: ['scope', 'type', 'subject']
+    }
+  }
+}
+
+
