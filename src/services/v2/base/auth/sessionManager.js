@@ -46,10 +46,8 @@ const ensure = {
       ]
       await Promise.allSettled(promises)
     }
-
   }
 }
-
 
 export const sessionManager = {
   async afterLogin() {
@@ -59,7 +57,7 @@ export const sessionManager = {
   async switchAccount() {
     await clearAll()
   },
-  async logout() {    
+  async logout() {
     await clearAll()
   }
 }

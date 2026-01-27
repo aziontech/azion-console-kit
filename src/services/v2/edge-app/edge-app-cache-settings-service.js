@@ -37,10 +37,14 @@ export class CacheSettingsService extends BaseService {
     const firstPage = params.page === 1
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this.useEnsureQueryData(queryKey, () => this.#fetchList(edgeApplicationId, params), {
-      persist: firstPage && !skipCache,
-      skipCache
-    })
+    return await this.useEnsureQueryData(
+      queryKey,
+      () => this.#fetchList(edgeApplicationId, params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   /**
@@ -67,8 +71,6 @@ export class CacheSettingsService extends BaseService {
   }
 
   loadCacheSettingsService = async (edgeApplicationId, cacheSettingId) => {
-    
-
     await waitForPersistenceRestore()
 
     return await this.useEnsureQueryData(
@@ -88,7 +90,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return {
       feedback: 'Cache Settings successfully created',
@@ -106,7 +110,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return 'Cache Settings successfully edited'
   }
@@ -118,7 +124,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return 'Cache Setting successfully deleted'
   }

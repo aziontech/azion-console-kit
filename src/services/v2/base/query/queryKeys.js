@@ -21,7 +21,7 @@ export const queryKeys = {
   },
   edgeApp: {
     all: ['edge-apps'],
-    detail: (id) => {      
+    detail: (id) => {
       return [...queryKeys.edgeApp.all, id]
     },
     list: (id, params) => {
@@ -29,32 +29,82 @@ export const queryKeys = {
     },
     origins: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'origins'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'origins', 'list', params],
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'origins',
+        'list',
+        params
+      ],
       detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'origins', 'detail', id]
     },
     cacheSettings: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'cache-settings'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'cache-settings', 'list', params],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'cache-settings', 'detail', id]
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'cache-settings',
+        'list',
+        params
+      ],
+      detail: (parentId, id) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'cache-settings',
+        'detail',
+        id
+      ]
     },
     deviceGroups: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'device-groups'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'device-groups', 'list', params],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'device-groups', 'detail', id]
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'device-groups',
+        'list',
+        params
+      ],
+      detail: (parentId, id) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'device-groups',
+        'detail',
+        id
+      ]
     },
     errorResponse: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'error-responses'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'error-responses', 'list', params],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'error-responses', 'detail', id]
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'error-responses',
+        'list',
+        params
+      ],
+      detail: (parentId, id) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'error-responses',
+        'detail',
+        id
+      ]
     },
     rulesEngine: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'rules-engine'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'rules-engine', 'list', params],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'rules-engine', 'detail', id]
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'rules-engine',
+        'list',
+        params
+      ],
+      detail: (parentId, id) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'rules-engine',
+        'detail',
+        id
+      ]
     },
     functionInstance: {
       all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'functions'],
-      list: (parentId, params) => [...queryKeys.edgeApp.detail(parentId), 'functions', 'list', params],
+      list: (parentId, params) => [
+        ...queryKeys.edgeApp.detail(parentId),
+        'functions',
+        'list',
+        params
+      ],
       detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'functions', 'detail', id]
     }
   },
@@ -75,7 +125,12 @@ export const queryKeys = {
     rulesEngine: {
       all: (parentId) => [...queryKeys.firewall.detail(parentId), 'rules-engine'],
       list: (id, params) => [...queryKeys.firewall.detail(id), 'rules-engine', 'list', params],
-      detail: (parentId, id) => [...queryKeys.firewall.detail(parentId), 'rules-engine', 'detail', id]
+      detail: (parentId, id) => [
+        ...queryKeys.firewall.detail(parentId),
+        'rules-engine',
+        'detail',
+        id
+      ]
     }
   },
   teams: {

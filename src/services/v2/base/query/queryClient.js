@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/vue-query'
 import { broadcastQueryClient } from '@tanstack/query-broadcast-client-experimental'
-import { getCacheOptions, CACHE_TYPE } from './queryOptions'
+import { getCacheOptions } from './queryOptions'
 import { isProduction } from '@/helpers/get-environment'
 
 const isProductionEnvironment = isProduction()

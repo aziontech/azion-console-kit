@@ -57,7 +57,9 @@ export class EdgeAppErrorResponseService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.errorResponse.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.errorResponse.all(edgeApplicationId)
+    })
 
     return 'Your Error Responses has been edited'
   }

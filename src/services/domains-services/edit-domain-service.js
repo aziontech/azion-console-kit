@@ -139,8 +139,9 @@ const resolveCertificateId = async (payload, cnames) => {
 
   if (edgeCertificate === 'lets_encrypt' || edgeCertificate === 'lets_encrypt_http') {
     const letEncryptBase = buildLetsEncryptBase(payload.name, cnames, edgeCertificate)
-    const { id } =
-      await digitalCertificatesService.createDigitalCertificateLetEncrypt(letEncryptBase)
+    const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
+      letEncryptBase
+    )
     return id
   }
 

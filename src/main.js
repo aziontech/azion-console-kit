@@ -57,4 +57,3 @@ app.use(VueMonacoEditorPlugin, {
 })
 
 app.mount('#app')
-

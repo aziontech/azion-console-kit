@@ -52,20 +52,16 @@ export class EdgeFirewallService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(
-      queryKeys.firewall.list(params),
-      () => this.#fetchList(params),
-      {
-        persist: !params.search,
-        skipCache: params.search
-      }
-    )
+    await this.usePrefetchQuery(queryKeys.firewall.list(params), () => this.#fetchList(params), {
+      persist: !params.search,
+      skipCache: params.search
+    })
   }
 
   listEdgeFirewallService = async (params) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.search || params?.hasFilter
-    
+
     return await this.useEnsureQueryData(
       queryKeys.firewall.list(params),
       () => this.#fetchList(params),
@@ -153,7 +149,6 @@ export class EdgeFirewallService extends BaseService {
   }
 
   loadEdgeFirewallService = async ({ id }) => {
-
     return await this.useEnsureQueryData(
       queryKeys.firewall.detail(id),
       () => this.#fetchOne({ id }),

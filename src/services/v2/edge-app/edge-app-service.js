@@ -15,7 +15,7 @@ export class EdgeAppService extends BaseService {
   adapter = EdgeAppAdapter
   baseURL = 'v4/workspace/applications'
   fieldsDefault = DEFAULT_FIELDS
-  
+
   #fetchList = async (
     params = {
       pageSize: 10,
@@ -102,24 +102,22 @@ export class EdgeAppService extends BaseService {
 
   listEdgeApplicationsService = async (params) => {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
-    const firstPage = params?.page === 1 
+    const firstPage = params?.page === 1
     const queryKey = queryKeys.edgeApp.list(params)
 
-    return await this.useEnsureQueryData(
-      queryKey,
-      () => this.#fetchList(params),
-      {
-        persist: firstPage && !skipCache,
-        skipCache
-      }
-    )
+    return await this.useEnsureQueryData(queryKey, () => this.#fetchList(params), {
+      persist: firstPage && !skipCache,
+      skipCache
+    })
   }
 
   listEdgeApplicationsServiceDropdown = this.#fetchDropdown
 
   loadEdgeApplicationService = async (payload) => {
     const queryKey = queryKeys.edgeApp.detail(payload.id)
-    return await this.useEnsureQueryData(queryKey, () => this.#fetchOne(payload), { persist: false })
+    return await this.useEnsureQueryData(queryKey, () => this.#fetchOne(payload), {
+      persist: false
+    })
   }
 
   createEdgeApplicationService = this.create

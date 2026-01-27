@@ -94,18 +94,12 @@ const INVALIDATION_MAP = [
   {
     prefix: 'Rule Engine',
     group: null,
-    keys: [
-      queryKeys.edgeApp.all,
-      queryKeys.firewall.all
-    ]
+    keys: [queryKeys.edgeApp.all, queryKeys.firewall.all]
   },
   {
     prefix: 'Edge Function',
     group: null,
-    keys: [
-      queryKeys.edgeApp.all,
-      queryKeys.firewall.all
-    ]
+    keys: [queryKeys.edgeApp.all, queryKeys.firewall.all]
   },
   {
     prefix: 'Team',

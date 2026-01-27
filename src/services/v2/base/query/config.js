@@ -21,11 +21,11 @@ export const PERSISTENCE_CONFIG = {
       return true
     }
   },
-  HYDRATE_OPTIONS: { 
+  HYDRATE_OPTIONS: {
     defaultOptions: {
       queries: {
-        gcTime: toMilliseconds({ hours: 1 }) 
-      } 
-    } 
+        gcTime: toMilliseconds({ hours: 1 })
+      }
+    }
   }
 }

@@ -25,7 +25,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+    })
 
     return {
       feedback: 'Rule successfully created',
@@ -55,7 +57,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rule successfully updated'
   }
@@ -68,7 +72,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rule successfully deleted'
   }
@@ -93,7 +99,9 @@ export class RulesEngineService extends BaseService {
     }
 
     // Remove list queries from cache (including IndexedDB) after reordering
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rules Engine successfully ordered'
   }
@@ -174,9 +182,9 @@ export class RulesEngineService extends BaseService {
           body: responseBody
         }
       },
-      { 
-        persist: firstPage && !skipCache, 
-        skipCache 
+      {
+        persist: firstPage && !skipCache,
+        skipCache
       }
     )
   }

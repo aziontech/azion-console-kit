@@ -152,7 +152,7 @@ export class WorkloadService extends BaseService {
   listWorkloads = async (params) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.hasFilter
-    
+
     return await this.useEnsureQueryData(
       queryKeys.workload.list({ ...params, fields: this.fieldsDefault }),
       () => this.#fetchList(params),
@@ -164,8 +164,6 @@ export class WorkloadService extends BaseService {
   }
 
   loadWorkload = async ({ id }) => {
-
-
     const workload = await this.useEnsureQueryData(
       queryKeys.workload.detail(id),
       () => this.#fetchOne({ id }),

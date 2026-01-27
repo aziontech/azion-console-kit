@@ -108,7 +108,6 @@ export class EdgeFirewallRulesEngineService extends BaseService {
   }
 
   loadEdgeFirewallRulesEngineService = async ({ id, edgeFirewallId }) => {
-
     return await this.useEnsureQueryData(
       queryKeys.firewall.rulesEngine.detail(edgeFirewallId, id),
       () => this.#fetchEdgeFirewallRulesEngine({ id, edgeFirewallId }),

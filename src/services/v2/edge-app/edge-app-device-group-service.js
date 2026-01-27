@@ -40,9 +40,9 @@ export class DeviceGroupService extends BaseService {
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchList(edgeApplicationId, params),
-      { 
-        persist: firstPage && !skipCache, 
-        skipCache 
+      {
+        persist: firstPage && !skipCache,
+        skipCache
       }
     )
   }
@@ -93,7 +93,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+    })
 
     return {
       id: result.data.data.id,
@@ -111,7 +113,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+    })
 
     return 'Device Group successfully updated'
   }
@@ -123,7 +127,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+    })
 
     return 'Device Group successfully deleted'
   }

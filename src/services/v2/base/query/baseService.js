@@ -17,7 +17,7 @@ export class BaseService {
     if (options && typeof options !== 'object') {
       throw new Error('Invalid options type. Expected object, received: ' + typeof options)
     }
-    
+
     const cacheOptions = getCacheOptions(options.cacheType)
 
     const {
@@ -27,11 +27,11 @@ export class BaseService {
       ...restOptions
     } = options || {}
 
-    return { 
-      meta: { 
-        persist, 
+    return {
+      meta: {
+        persist,
         cacheType,
-        skipCache 
+        skipCache
       },
       ...cacheOptions,
       ...(restOptions || {})
@@ -39,24 +39,24 @@ export class BaseService {
   }
 
   useQuery(queryKey, queryFn, options = {}) {
-      if(!queryFn || typeof queryFn !== 'function') {
-        throw new Error('Invalid query key or query function')
-      }
+    if (!queryFn || typeof queryFn !== 'function') {
+      throw new Error('Invalid query key or query function')
+    }
 
-      if(!queryKey || !Array.isArray(queryKey) || queryKey.length === 0) {
-        throw new Error('Invalid query key. Expected array, received: ' + typeof queryKey)
-      }
-      
-      const queryOptions = this.#getQueryOptions(options)
+    if (!queryKey || !Array.isArray(queryKey) || queryKey.length === 0) {
+      throw new Error('Invalid query key. Expected array, received: ' + typeof queryKey)
+    }
 
-      return useQuery({ 
-        queryKey,
-        queryFn,
-        ...queryOptions,
-        onError: () => {
-          return Promise.resolve(null)
-        } 
-      })
+    const queryOptions = this.#getQueryOptions(options)
+
+    return useQuery({
+      queryKey,
+      queryFn,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
+      }
+    })
   }
 
   useMutation(mutationFn, options = {}) {
@@ -103,36 +103,36 @@ export class BaseService {
   }
 
   async usePrefetchQuery(queryKey, queryFn, options = {}) {
-      const queryOptions = this.#getQueryOptions(options)
-      await waitForPersistenceRestore()
+    const queryOptions = this.#getQueryOptions(options)
+    await waitForPersistenceRestore()
 
-      return await this.queryClient.prefetchQuery({
-        queryKey: queryKey,
-        queryFn,
-        ...queryOptions,
-        onError: () => {
-          return Promise.resolve(null)
-        }
-      })
+    return await this.queryClient.prefetchQuery({
+      queryKey: queryKey,
+      queryFn,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
+      }
+    })
   }
 
   async useEnsureQueryData(queryKey, queryFn, options = {}) {
-      const queryOptions = this.#getQueryOptions(options)
+    const queryOptions = this.#getQueryOptions(options)
 
-      await waitForPersistenceRestore()
+    await waitForPersistenceRestore()
 
-      if (queryOptions.meta?.skipCache) {
-        return await queryFn()
+    if (queryOptions.meta?.skipCache) {
+      return await queryFn()
+    }
+
+    return await this.queryClient.ensureQueryData({
+      queryKey,
+      queryFn,
+      revalidateIfStale: true,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
       }
-
-      return await this.queryClient.ensureQueryData({
-        queryKey,
-        queryFn,
-        revalidateIfStale: true,
-        ...queryOptions,
-        onError: () => {
-          return Promise.resolve(null)
-        }
-      })
+    })
   }
 }
