@@ -8,6 +8,7 @@
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
+  import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -241,21 +242,11 @@
               </div>
             </div>
           </div>
-          <!-- Start Resources Block -->
+          <ResourcesBlock />
           <div class="flex flex-col gap-3 w-full">
-            <div class="flex gap-3">
-              <span class="text-[16px]">Resources</span>
-              <i class="pi pi-filter"></i>
-            </div>
-            <div
-              class="h-[308px] w-full border rounded border-[var(--surface-border)] bg-[var(--surface-section)]"
-            ></div>
-          </div>
-          <!-- Start Last Activities Block -->
-          <div class="flex flex-col gap-3 w-full">
-            <div class="flex gap-3">
+            <div class="flex items-center gap-3">
               <span class="text-[16px]">Last Activities</span>
-              <i class="pi pi-filter"></i>
+              <i class="ai ai-filter-alt"></i>
             </div>
             <div
               class="h-[308px] w-full border rounded border-[var(--surface-border)] bg-[var(--surface-section)]"
