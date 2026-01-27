@@ -157,7 +157,7 @@
   <ContentBlock>
     <template #content>
       <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 px-8 pb-8">
-        <div class="flex flex-col w-full md:w-[70%] gap-8">
+        <div class="flex flex-col w-full md:w-[75%] gap-8">
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
             <PrimeButton
@@ -263,7 +263,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col w-full md:w-[30%] gap-8">
+        <div class="flex flex-col w-full md:w-[25%] gap-8">
           <MonthlyUsageCard
             :usageData="monthlyUsageData"
             @viewAll="navigateToUsage"
