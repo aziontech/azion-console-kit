@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from './queryClient'
-import { createFinalKey, queryKeys } from './queryKeys'
+import { queryKeys } from './queryKeys'
 import { CACHE_TYPE, getCacheOptions } from './queryOptions'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { toMilliseconds } from './config'
@@ -48,10 +48,9 @@ export class BaseService {
       }
       
       const queryOptions = this.#getQueryOptions(options)
-      const finalKey = createFinalKey(queryKey)
 
       return useQuery({ 
-        queryKey: finalKey,
+        queryKey,
         queryFn,
         ...queryOptions,
         onError: () => {
@@ -108,7 +107,7 @@ export class BaseService {
       await waitForPersistenceRestore()
 
       return await this.queryClient.prefetchQuery({
-        queryKey: createFinalKey(queryKey),
+        queryKey: queryKey,
         queryFn,
         ...queryOptions,
         onError: () => {
@@ -119,7 +118,6 @@ export class BaseService {
 
   async useEnsureQueryData(queryKey, queryFn, options = {}) {
       const queryOptions = this.#getQueryOptions(options)
-      const finalKey = createFinalKey(queryKey)
 
       await waitForPersistenceRestore()
 
@@ -128,7 +126,7 @@ export class BaseService {
       }
 
       return await this.queryClient.ensureQueryData({
-        queryKey: finalKey,
+        queryKey,
         queryFn,
         revalidateIfStale: true,
         ...queryOptions,

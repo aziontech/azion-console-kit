@@ -26,18 +26,6 @@ export const clearAllCache = () => {
   return queryClient.clear()
 }
 
-export const clearCacheByType = async (cacheType) => {
-  await queryClient.removeQueries({
-    predicate: (query) => {
-      return query.meta?.cacheType === cacheType
-    }
-  })
-}
-
-export const clearCacheGlobal = async () => {
-  await clearCacheByType(CACHE_TYPE.GLOBAL)
-}
-
 export const cancelAllQueries = async () => {
   await queryClient.cancelQueries()
 }

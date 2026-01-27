@@ -1,17 +1,3 @@
-import { toValue, computed, isRef } from 'vue'
-
-export function createFinalKey(queryKey) {
-  if (!queryKey || !Array.isArray(queryKey) || queryKey.length === 0) {
-    throw new Error('Query key cannot be null or undefined')
-  }
-  if (!Array.isArray(queryKey)) queryKey = [queryKey]
-
-  const hasReactive = queryKey.some((value) => isRef(value) || typeof value === 'function')
-
-  if (!hasReactive) return queryKey
-  return computed(() => queryKey.map((item) => toValue(item)))
-}
-
 export const queryKeys = {
   account: {
     all: ['account'],

@@ -1,4 +1,3 @@
-import { toValue } from 'vue'
 import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
@@ -7,6 +6,19 @@ import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+
+export const DEFAULT_FIELDS = [
+  'name',
+  'domains',
+  'workload_domain',
+  'infrastructure',
+  'active',
+  'last_modified',
+  'id',
+  'last_editor',
+  'product_version',
+  'workload_domain'
+]
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -22,6 +34,7 @@ export class WorkloadService extends BaseService {
     this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
+    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (params = { pageSize: 10 }) => {
@@ -52,18 +65,7 @@ export class WorkloadService extends BaseService {
     const params = {
       page: 1,
       pageSize,
-      fields: [
-        'name',
-        'domains',
-        'workload_domain',
-        'infrastructure',
-        'active',
-        'last_modified',
-        'id',
-        'last_editor',
-        'product_version',
-        'workload_domain'
-      ],
+      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
 
@@ -152,7 +154,7 @@ export class WorkloadService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter
     
     return await this.useEnsureQueryData(
-      queryKeys.workload.list({ ...params, fields: true }),
+      queryKeys.workload.list({ ...params, fields: this.fieldsDefault }),
       () => this.#fetchList(params),
       {
         persist: firstPage && !skipCache,
