@@ -248,7 +248,7 @@
   const fetchData = async (currentPage = 1) => {
     try {
       loading.value = true
-      
+
       if (currentPage === INITIAL_PAGE) {
         data.value = []
       }
