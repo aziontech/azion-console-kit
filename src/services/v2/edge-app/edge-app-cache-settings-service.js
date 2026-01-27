@@ -36,7 +36,7 @@ export class CacheSettingsService extends BaseService {
     const queryKey = [...queryKeys.cacheSettings.lists(edgeApplicationId), params]
     const hasFilter = params?.hasFilter || false
 
-    return await this._ensureQueryData(queryKey, () => this.#fetchList(edgeApplicationId, params), {
+    return await this.useEnsureQueryData(queryKey, () => this.#fetchList(edgeApplicationId, params), {
       persist: params.page === 1 && !params.search && !hasFilter,
       skipCache: hasFilter
     })
@@ -83,7 +83,7 @@ export class CacheSettingsService extends BaseService {
 
     await waitForPersistenceRestore()
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       [...queryKeys.cacheSettings.details(edgeApplicationId), cacheSettingId],
       () => this.#fetchCacheSetting(edgeApplicationId, cacheSettingId),
       { persist: true }

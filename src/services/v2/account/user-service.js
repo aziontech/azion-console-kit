@@ -15,7 +15,7 @@ export class UserService extends BaseService {
 
   async getUserInfo() {
     const queryKey = queryKeys.user.info()
-    return await this._ensureQueryData(queryKey, async () => this.fetchUserInfo())
+    return await this.useEnsureQueryData(queryKey, async () => this.fetchUserInfo())
   }
 }
 

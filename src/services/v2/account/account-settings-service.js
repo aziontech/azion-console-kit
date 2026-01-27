@@ -15,7 +15,7 @@ export class AccountSettingsService extends BaseService {
 
   async getAccountJobRole() {
     const queryKey = queryKeys.accountSettings.jobRole()
-    return await this._ensureQueryData(queryKey, async () => this.fetchAccountJobRole())
+    return await this.useEnsureQueryData(queryKey, async () => this.fetchAccountJobRole())
   }
 
   _adaptJobRole(response) {

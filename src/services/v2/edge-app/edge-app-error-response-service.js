@@ -36,7 +36,7 @@ export class EdgeAppErrorResponseService extends BaseService {
     const queryKey = [...queryKeys.errorResponse.lists(edgeApplicationId), params]
     const hasFilter = params?.hasFilter || false
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       () => queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
       { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }

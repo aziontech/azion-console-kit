@@ -18,7 +18,7 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(
+    return this.useQuery(
       queryKeys.solutions.list(group, type),
       () => this.getListSolutions(params),
       {
@@ -51,7 +51,7 @@ export class SolutionService extends BaseService {
 
     await Promise.all(
       prefetchConfigs.map(({ group, type }) =>
-        this._ensureQueryData(
+        this.useEnsureQueryData(
           queryKeys.solutions.list(group, type),
           () => this.getListSolutions({ group, type }),
           { cacheType: this.cacheType.STATIC }

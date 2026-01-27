@@ -92,7 +92,7 @@ export class BillingGqlService extends BaseService {
   }
 
   async getCreditAndExpirationDate() {
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       () => queryKeys.billing.lastBill(),
       () => this.fetchCreditAndExpirationDate()
     )

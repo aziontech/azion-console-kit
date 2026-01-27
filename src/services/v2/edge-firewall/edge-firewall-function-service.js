@@ -92,7 +92,7 @@ export class EdgeFirewallFunctionService extends BaseService {
     ].filter((item) => item !== undefined && item !== '' && item !== null)
 
     const hasFilter = params?.hasFilter || false
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeFirewallFunctions(edgeFirewallId, params),
       { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
@@ -180,7 +180,7 @@ export class EdgeFirewallFunctionService extends BaseService {
       })
     }
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeFirewallFunctions.detail(edgeFirewallId, functionId),
       () => this.#fetchEdgeFirewallFunction({ edgeFirewallId, functionId }),
       { persist: true }

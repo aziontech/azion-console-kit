@@ -50,7 +50,7 @@ export class EdgeFirewallService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(
+    await this.useEnsureQueryData(
       queryKeys.edgeFirewall.list(params),
       () => this.#fetchList(params),
       {
@@ -62,7 +62,7 @@ export class EdgeFirewallService extends BaseService {
   listEdgeFirewallService = async (params) => {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeFirewall.list(paramsValue),
       () => this.#fetchList(paramsValue),
       {
@@ -163,7 +163,7 @@ export class EdgeFirewallService extends BaseService {
       await this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.details() })
     }
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeFirewall.detail(id),
       () => this.#fetchOne({ id }),
       { persist: true }

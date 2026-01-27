@@ -56,7 +56,7 @@ export class EdgeFirewallRulesEngineService extends BaseService {
     ].filter((item) => item !== undefined && item !== '' && item !== null)
 
     const hasFilter = !!params.search
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeFirewallRulesEngineList(params),
       { persist: !hasFilter, skipCache: hasFilter }
@@ -136,7 +136,7 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       })
     }
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeFirewallRulesEngine.detail(edgeFirewallId, id),
       () => this.#fetchEdgeFirewallRulesEngine({ id, edgeFirewallId }),
       { persist: true }

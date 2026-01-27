@@ -25,7 +25,7 @@ export const listEdgeApplicationsService = async ({
   const params = { orderBy, sort, page, pageSize }
   const queryKey = baseService.queryKeys.edgeAppV3.list(orderBy, sort, page, pageSize)
 
-  return await baseService._ensureQueryData(queryKey, () => fetchList(params), {
+  return await baseService.useEnsureQueryData(queryKey, () => fetchList(params), {
     persist: page === 1
   })
 }

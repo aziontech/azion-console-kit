@@ -51,7 +51,7 @@ export class EdgeAppService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(queryKeys.edgeApp.list(params), () => this.#fetchList(params), {
+    await this.useEnsureQueryData(queryKeys.edgeApp.list(params), () => this.#fetchList(params), {
       persist: !params.search
     })
   }
@@ -95,7 +95,7 @@ export class EdgeAppService extends BaseService {
   listEdgeApplicationsService = async (params) => {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeApp.list(paramsValue),
       () => this.#fetchList(paramsValue),
       {
@@ -119,7 +119,7 @@ export class EdgeAppService extends BaseService {
       await this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.details() })
     }
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeApp.detail(params.id),
       () => this.#fetchOne(params),
       { persist: true }

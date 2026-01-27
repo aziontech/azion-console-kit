@@ -24,8 +24,8 @@ const CACHE_PRESETS = {
 }
 
 export const getCacheOptions = (cacheType = CACHE_TYPE.GLOBAL) => {
-  const cachePreset = { DEFAULT_OPTIONS, ...CACHE_PRESETS[CACHE_TYPE.GLOBAL] }
-  
+  const cachePreset = { ...DEFAULT_OPTIONS, ...CACHE_PRESETS[CACHE_TYPE.GLOBAL] }
+    
   if (cacheType && CACHE_PRESETS[cacheType]) {
     return { ...cachePreset, ...CACHE_PRESETS[cacheType] }
   }

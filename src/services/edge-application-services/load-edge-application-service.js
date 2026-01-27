@@ -29,7 +29,7 @@ export const loadEdgeApplicationService = async ({ id }) => {
     })
   }
 
-  return await baseService._ensureQueryData(
+  return await baseService.useEnsureQueryData(
     baseService.queryKeys.edgeAppV3.detail(id),
     () => fetchEdgeApplication({ id }),
     {

@@ -82,7 +82,7 @@ export class EdgeApplicationFunctionService extends BaseService {
       params.search
     ]
     const hasFilter = params?.hasFilter || false
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
       { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
@@ -138,7 +138,7 @@ export class EdgeApplicationFunctionService extends BaseService {
       })
     }
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.edgeAppFunctions.detail(edgeApplicationID, functionID),
       () => this.#fetchEdgeApplicationFunction({ edgeApplicationID, functionID }),
       { persist: true }

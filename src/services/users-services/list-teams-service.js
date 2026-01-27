@@ -36,7 +36,7 @@ class TeamsService extends BaseService {
   useListTeams = async () => {
     const queryKey = queryKeys.teams.all
 
-    return this._ensureQueryData(queryKey, () => this.listTeams())
+    return this.useEnsureQueryData(queryKey, () => this.listTeams())
   }
 
   invalidateTeamsCache = async () => {

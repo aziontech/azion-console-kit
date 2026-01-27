@@ -26,7 +26,7 @@ export const listOriginsService = async ({
   const params = { id, orderBy, sort, page, pageSize }
   const queryKey = [...baseService.queryKeys.origins.lists(id), orderBy, sort, page, pageSize]
 
-  return await baseService._ensureQueryData(queryKey, () => fetchList(params), {
+  return await baseService.useEnsureQueryData(queryKey, () => fetchList(params), {
     persist: page === 1
   })
 }

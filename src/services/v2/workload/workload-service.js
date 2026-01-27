@@ -67,7 +67,7 @@ export class WorkloadService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(queryKeys.workload.list(params), () => this.#fetchList(params), {
+    await this.useEnsureQueryData(queryKeys.workload.list(params), () => this.#fetchList(params), {
       persist: !params.search
     })
   }
@@ -151,7 +151,7 @@ export class WorkloadService extends BaseService {
   listWorkloads = async (params) => {
     const paramsValue = toValue(params)
     const hasFilter = paramsValue?.hasFilter || false
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       queryKeys.workload.list(paramsValue),
       () => this.#fetchList(paramsValue),
       {
@@ -175,7 +175,7 @@ export class WorkloadService extends BaseService {
       await this.queryClient.removeQueries({ queryKey: queryKeys.workload.details() })
     }
 
-    const workload = await this._ensureQueryData(
+    const workload = await this.useEnsureQueryData(
       queryKeys.workload.detail(id),
       () => this.#fetchOne({ id }),
       { persist: true }

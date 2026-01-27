@@ -159,7 +159,7 @@ export class RulesEngineService extends BaseService {
     const hasFilter = params?.hasFilter || false
     const skipCache = params?.skipCache || false
 
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       () => queryKeys.rulesEngine.all(edgeApplicationId),
       async () => {
         const [requestRules, responseRules] = await Promise.all([
