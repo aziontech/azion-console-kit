@@ -189,7 +189,7 @@ const fixtures = {
             ]
           }
         ]
-      },
+      }
     ]
   },
   mockError: [{ message: 'Error' }]
