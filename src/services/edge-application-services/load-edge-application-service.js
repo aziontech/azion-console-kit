@@ -14,26 +14,11 @@ const fetchEdgeApplication = async ({ id }) => {
 }
 
 export const loadEdgeApplicationService = async ({ id }) => {
-  const cachedQueries = baseService.queryClient.getQueriesData({
-    queryKey: baseService.queryKeys.edgeAppV3.details()
-  })
-
-  const hasDifferentId = cachedQueries.some(([key]) => {
-    const cachedId = key[key.length - 1]
-    return cachedId && cachedId !== id
-  })
-
-  if (hasDifferentId) {
-    await baseService.queryClient.removeQueries({
-      queryKey: baseService.queryKeys.edgeAppV3.details()
-    })
-  }
-
   return await baseService.useEnsureQueryData(
     baseService.queryKeys.edgeAppV3.detail(id),
     () => fetchEdgeApplication({ id }),
     {
-      persist: true
+      persist: false
     }
   )
 }

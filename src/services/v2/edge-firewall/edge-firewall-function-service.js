@@ -77,25 +77,13 @@ export class EdgeFirewallFunctionService extends BaseService {
     edgeFirewallId,
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
-    // Normalize fields to match what will actually be used in the fetch
-    // This ensures cache hit regardless of what fields are passed
-    const normalizedFields = ['id', 'name', 'last_editor', 'last_modified', 'function']
-    const fieldsKey = normalizedFields.sort().join(',')
-
-    const queryKey = [
-      ...queryKeys.edgeFirewallFunctions.lists(edgeFirewallId),
-      params.page,
-      params.pageSize,
-      fieldsKey,
-      params.ordering,
-      params.search
-    ].filter((item) => item !== undefined && item !== '' && item !== null)
-
-    const hasFilter = params?.hasFilter || false
+    const queryKey = queryKeys.firewall.functions.list(edgeFirewallId, params)
+    const firstPage = params?.page === 1
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeFirewallFunctions(edgeFirewallId, params),
-      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
+      { persist: firstPage && !skipCache, skipCache }
     )
   }
 
@@ -131,7 +119,7 @@ export class EdgeFirewallFunctionService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewallFunctions.all(payload.id) })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
 
     return { feedback: 'Your Function has been created', id: data.data.id }
   }
@@ -145,12 +133,7 @@ export class EdgeFirewallFunctionService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeFirewallFunctions.all(payload.edgeFirewallID)
-    })
-    this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeFirewallFunctions.details(payload.edgeFirewallID)
-    })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
 
     return 'Function successfully updated'
   }
@@ -165,25 +148,10 @@ export class EdgeFirewallFunctionService extends BaseService {
   }
 
   loadFunctionsService = async (edgeFirewallId, functionId) => {
-    const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: queryKeys.edgeFirewallFunctions.details(edgeFirewallId)
-    })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== functionId
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({
-        queryKey: queryKeys.edgeFirewallFunctions.details(edgeFirewallId)
-      })
-    }
-
     return await this.useEnsureQueryData(
-      queryKeys.edgeFirewallFunctions.detail(edgeFirewallId, functionId),
+      queryKeys.firewall.functions.detail(edgeFirewallId, functionId),
       () => this.#fetchEdgeFirewallFunction({ edgeFirewallId, functionId }),
-      { persist: true }
+      { persist: false }
     )
   }
 
@@ -193,9 +161,7 @@ export class EdgeFirewallFunctionService extends BaseService {
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeFirewallFunctions.all(edgeFirewallId)
-    })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
 
     return 'Function successfully deleted'
   }

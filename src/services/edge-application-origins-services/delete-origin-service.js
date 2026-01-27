@@ -18,7 +18,7 @@ export const deleteOriginsService = async (originKey, id) => {
   const result = parseHttpResponse(httpResponse)
 
   // Remove list queries from cache (including IndexedDB) after deleting
-  queryClient.removeQueries({ queryKey: queryKeys.origins.all(id) })
+  queryClient.removeQueries({ queryKey: queryKeys.edgeApp.origins.all(id) })
 
   return result
 }

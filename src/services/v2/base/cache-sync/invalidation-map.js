@@ -19,96 +19,92 @@ const INVALIDATION_MAP = [
   {
     prefix: 'Workloads',
     group: GROUPS.WORKLOADS,
-    keys: [queryKeys.workload.lists(), queryKeys.workload.details()]
+    keys: [queryKeys.workload.all]
   },
   {
     prefix: 'Domain',
     group: GROUPS.WORKLOADS,
-    keys: [queryKeys.workload.lists(), queryKeys.workload.details()]
+    keys: [queryKeys.workload.all]
   },
   {
     prefix: 'Edge Application',
     group: GROUPS.EDGE_APP,
-    keys: [queryKeys.edgeApp.lists(), queryKeys.edgeApp.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'Application',
     group: GROUPS.EDGE_APP,
-    keys: [queryKeys.edgeApp.lists(), queryKeys.edgeApp.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'Edge Function',
     group: GROUPS.EDGE_APP_FUNCTIONS,
-    keys: [queryKeys.edgeAppFunctions.lists(), queryKeys.edgeAppFunctions.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'ApplicationFunctionInstance',
     group: GROUPS.EDGE_APP_FUNCTIONS,
-    keys: [queryKeys.edgeAppFunctions.lists(), queryKeys.edgeAppFunctions.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'ApplicationRuleEngineRequestPhase',
     group: GROUPS.EDGE_APP_RULES_ENGINE,
-    keys: [queryKeys.rulesEngine.lists(), queryKeys.rulesEngine.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'ApplicationRuleEngineResponsePhase',
     group: GROUPS.EDGE_APP_RULES_ENGINE,
-    keys: [queryKeys.rulesEngine.lists(), queryKeys.rulesEngine.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'Origin',
     group: GROUPS.EDGE_APP_ORIGINS,
-    keys: [queryKeys.origins.lists(), queryKeys.origins.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'CacheSetting',
     group: GROUPS.EDGE_APP_CACHE_SETTINGS,
-    keys: [queryKeys.cacheSettings.lists(), queryKeys.cacheSettings.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'DeviceGroup',
     group: GROUPS.EDGE_APP_DEVICE_GROUPS,
-    keys: [queryKeys.deviceGroups.lists(), queryKeys.deviceGroups.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'ErrorResponses',
     group: GROUPS.EDGE_APP_ERROR_RESPONSES,
-    keys: [queryKeys.errorResponse.lists(), queryKeys.errorResponse.details()]
+    keys: [queryKeys.edgeApp.all]
   },
   {
     prefix: 'Firewall',
     group: GROUPS.EDGE_FIREWALL,
-    keys: [queryKeys.edgeFirewall.lists(), queryKeys.edgeFirewall.details()]
+    keys: [queryKeys.firewall.all]
   },
   {
     prefix: 'FirewallFunctionInstance',
     group: GROUPS.EDGE_FIREWALL_FUNCTIONS,
-    keys: [queryKeys.edgeFirewallFunctions.lists(), queryKeys.edgeFirewallFunctions.details()]
+    keys: [queryKeys.firewall.all]
   },
   {
     prefix: 'FirewallRuleEngine',
     group: GROUPS.EDGE_FIREWALL_RULES_ENGINE,
-    keys: [queryKeys.edgeFirewallRulesEngine.lists(), queryKeys.edgeFirewallRulesEngine.details()]
+    keys: [queryKeys.firewall.all]
   },
   {
     prefix: 'Rule Engine',
     group: null,
     keys: [
-      queryKeys.rulesEngine.lists(),
-      queryKeys.rulesEngine.details(),
-      queryKeys.edgeFirewallRulesEngine.lists(),
-      queryKeys.edgeFirewallRulesEngine.details()
+      queryKeys.edgeApp.all,
+      queryKeys.firewall.all
     ]
   },
   {
     prefix: 'Edge Function',
     group: null,
     keys: [
-      queryKeys.edgeAppFunctions.lists(),
-      queryKeys.edgeAppFunctions.details(),
-      queryKeys.edgeFirewallFunctions.lists(),
-      queryKeys.edgeFirewallFunctions.details()
+      queryKeys.edgeApp.all,
+      queryKeys.firewall.all
     ]
   },
   {

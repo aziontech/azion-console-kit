@@ -1,19 +1,29 @@
-import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallAdapter } from './edge-firewall-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+
+export const DEFAULT_FIELDS = [
+  'id',
+  'name',
+  'debug_rules',
+  'last_editor',
+  'last_modified',
+  'last_modify',
+  'active'
+]
 
 export class EdgeFirewallService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeFirewallAdapter
     this.baseURL = 'v4/workspace/firewalls'
+    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (
     params = {
       pageSize: 10,
-      fields: ['id', 'name', 'debug_rules', 'last_editor', 'last_modified', 'active']
+      fields: this.fieldsDefault
     }
   ) => {
     const { data } = await this.http.request({
@@ -34,40 +44,34 @@ export class EdgeFirewallService extends BaseService {
     }
   }
 
-  ensureList = async (pageSize = 10) => {
+  prefetchList = async (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: [
-        'id',
-        'name',
-        'debug_rules',
-        'last_editor',
-        'last_modified',
-        'last_modify',
-        'active'
-      ],
+      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
 
-    await this.useEnsureQueryData(
-      queryKeys.edgeFirewall.list(params),
+    await this.usePrefetchQuery(
+      queryKeys.firewall.list(params),
       () => this.#fetchList(params),
       {
-        persist: !params.search
+        persist: !params.search,
+        skipCache: params.search
       }
     )
   }
 
   listEdgeFirewallService = async (params) => {
-    const paramsValue = toValue(params)
-    const hasFilter = paramsValue?.hasFilter || false
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.search || params?.hasFilter
+    
     return await this.useEnsureQueryData(
-      queryKeys.edgeFirewall.list(paramsValue),
-      () => this.#fetchList(paramsValue),
+      queryKeys.firewall.list(params),
+      () => this.#fetchList(params),
       {
-        persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
-        skipCache: paramsValue?.skipCache || hasFilter
+        persist: firstPage && !skipCache,
+        skipCache
       }
     )
   }
@@ -114,7 +118,7 @@ export class EdgeFirewallService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
     return data
   }
 
@@ -127,7 +131,7 @@ export class EdgeFirewallService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
     return {
       feedback: 'Your Firewall has been cloned',
       urlToEditView: `/firewalls/edit/${data.data.id}`,
@@ -144,29 +148,16 @@ export class EdgeFirewallService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.lists() })
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.details() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
     return 'Your Firewall has been updated'
   }
 
   loadEdgeFirewallService = async ({ id }) => {
-    const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: queryKeys.edgeFirewall.details()
-    })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== id
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.details() })
-    }
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeFirewall.detail(id),
+      queryKeys.firewall.detail(id),
       () => this.#fetchOne({ id }),
-      { persist: true }
+      { persist: false }
     )
   }
 
@@ -176,7 +167,7 @@ export class EdgeFirewallService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFirewall.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
     return 'Your Firewall has been deleted'
   }
 }

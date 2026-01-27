@@ -24,10 +24,11 @@ export const listOriginsService = async ({
   pageSize = 200
 }) => {
   const params = { id, orderBy, sort, page, pageSize }
-  const queryKey = [...baseService.queryKeys.origins.lists(id), orderBy, sort, page, pageSize]
 
+  const queryKey = baseService.queryKeys.edgeApp.origins.all(id)
+  const firstPage = page === 1
   return await baseService.useEnsureQueryData(queryKey, () => fetchList(params), {
-    persist: page === 1
+    persist: firstPage
   })
 }
 

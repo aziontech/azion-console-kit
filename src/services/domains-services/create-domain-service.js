@@ -14,8 +14,7 @@ export const createDomainService = async (payload) => {
     body
   })
 
-  queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
-
+  queryClient.removeQueries({ queryKey: queryKeys.workload.all })
   return handleHttpResponse(httpResponse)
 }
 

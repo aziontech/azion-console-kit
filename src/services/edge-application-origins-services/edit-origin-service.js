@@ -15,8 +15,7 @@ export const editOriginService = async (payload) => {
   const result = parseHttpResponse(httpResponse)
 
   // Remove list and detail queries from cache (including IndexedDB) after editing
-  queryClient.removeQueries({ queryKey: queryKeys.origins.all(payload.edgeApplicationId) })
-  queryClient.removeQueries({ queryKey: queryKeys.origins.details(payload.edgeApplicationId) })
+  queryClient.removeQueries({ queryKey: queryKeys.edgeApp.origins.all(payload.edgeApplicationId) })
 
   return result
 }

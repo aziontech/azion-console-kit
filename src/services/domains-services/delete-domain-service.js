@@ -9,7 +9,7 @@ export const deleteDomainService = async (id) => {
     method: 'DELETE'
   })
 
-  queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
+  queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
   return parseHttpResponse(httpResponse)
 }

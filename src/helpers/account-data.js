@@ -53,7 +53,7 @@ export const loadProfileAndAccountInfo = async () => {
 
     account.client_id
       ? contractService
-          .getContractServicePlan(account.client_id, { prefetch: true })
+          .getContractServicePlan(account.client_id)
           .then(({ isDeveloperSupportPlan, yourServicePlan }) => {
             accountStore.setAccountData({
               isDeveloperSupportPlan,
