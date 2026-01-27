@@ -1,7 +1,7 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallFunctionAdapter } from './edge-firewall-function-adapter'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeFirewallFunctionService extends BaseService {
   constructor() {

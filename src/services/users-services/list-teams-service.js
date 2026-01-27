@@ -1,6 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { makeTeamsBaseUrl } from './make-teams-base-url'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const adapt = (results) => {
   return results.map((item) => ({ label: item.name, value: item.id }))

@@ -1,4 +1,4 @@
-import { queryKeys } from '../query/querySystem'
+import { queryKeys } from '../query/queryKeys'
 
 const GROUPS = {
   EDGE_APP: 'edge-app',

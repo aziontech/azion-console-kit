@@ -1,7 +1,7 @@
 import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallAdapter } from './edge-firewall-adapter'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeFirewallService extends BaseService {
   constructor() {

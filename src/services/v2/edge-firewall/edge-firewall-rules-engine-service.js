@@ -1,6 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallRulesEngineAdapter } from './edge-firewall-rules-engine-adapter'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeFirewallRulesEngineService extends BaseService {
   constructor() {

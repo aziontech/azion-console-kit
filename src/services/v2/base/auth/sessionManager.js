@@ -42,13 +42,19 @@ const ensure = {
   },
 
   async lists() {
-    const pageSize = getPageSizeFromStorage()
-    const promises = [
-      edgeAppService.ensureList(pageSize),
-      workloadService.ensureList(pageSize),
-      edgeFirewallService.ensureList(pageSize)
-    ]
-    await Promise.allSettled(promises)
+    const accountStore = useAccountStore()
+    const isClientAccount = accountStore.account?.kind === 'client'
+
+    if (isClientAccount) {
+      const pageSize = getPageSizeFromStorage()
+      const promises = [
+        edgeAppService.ensureList(pageSize),
+        workloadService.ensureList(pageSize),
+        edgeFirewallService.ensureList(pageSize)
+      ]
+      await Promise.allSettled(promises)
+    }
+
   }
 }
 

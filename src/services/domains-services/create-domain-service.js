@@ -3,7 +3,7 @@ import { makeDomainsBaseUrl } from './make-domains-base-url'
 import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 import { buildCertificateNames } from '@/services/utils/domain-names'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import * as Errors from '@/services/axios/errors'
 
 export const createDomainService = async (payload) => {

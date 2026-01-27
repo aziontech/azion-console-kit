@@ -33,7 +33,7 @@ export const loadUserAndAccountInfo = async () => {
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
 
-  sessionManager.afterLogin()
+  await sessionManager.afterLogin()
 }
 
 export const loadProfileAndAccountInfo = async () => {

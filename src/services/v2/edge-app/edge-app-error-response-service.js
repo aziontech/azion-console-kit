@@ -1,7 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeAppErrorResponseService extends BaseService {
   constructor() {

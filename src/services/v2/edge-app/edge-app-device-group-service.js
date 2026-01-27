@@ -1,7 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DeviceGroupService extends BaseService {
   constructor() {

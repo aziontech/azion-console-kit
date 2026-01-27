@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from './queryClient'
-import { createFinalKey, queryKeys } from './querySystem'
+import { createFinalKey, queryKeys } from './queryKeys'
 import { CACHE_TYPE, getCacheOptions } from './queryOptions'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { toMilliseconds } from './config'
