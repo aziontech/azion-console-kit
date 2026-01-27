@@ -74,8 +74,9 @@ const adapt = ({ body, statusCode }) => {
   )
 
   const filteredProducts = productsGrouped.filter((item) => {
-    if ([BOT_MANAGER_SLUG].includes(item.productSlug)) return false
-    return productsWithUsage.has(item.productSlug)
+    return [BOT_MANAGER_SLUG].includes(item.productSlug)
+      ? false
+      : productsWithUsage.has(item.productSlug)
   })
 
   const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
