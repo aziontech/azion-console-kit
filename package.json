@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.49.21",
+  "version": "1.49.23",
   "private": false,
   "type": "module",
   "repository": {
@@ -42,7 +42,7 @@
     "@mdi/font": "^7.4.47",
     "@sentry/vite-plugin": "^4.3.0",
     "@sentry/vue": "^10.27.0",
-    "@stripe/stripe-js": "^4.1.0",
+    "@stripe/stripe-js": "^4.10.0",
     "@tanstack/query-broadcast-client-experimental": "^5.90.10",
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.3",
@@ -129,6 +129,7 @@
     "strip-ansi": "6.0.1",
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
+    "d3-color": "^3.1.0",
     "axios": "^1.13.3"
   },
   "engines": {

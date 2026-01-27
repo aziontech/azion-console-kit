@@ -67,9 +67,17 @@ const adapt = ({ body, statusCode }) => {
 
   const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
 
-  const filteredProducts = productsGrouped.filter(
-    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
+  const productsWithUsage = new Set(
+    productsGrouped
+      .filter((item) => Number(item.accounted || 0) > 0)
+      .map((item) => item.productSlug)
   )
+
+  const filteredProducts = productsGrouped.filter((item) => {
+    return [BOT_MANAGER_SLUG].includes(item.productSlug)
+      ? false
+      : productsWithUsage.has(item.productSlug)
+  })
 
   const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
     'productSlug',
