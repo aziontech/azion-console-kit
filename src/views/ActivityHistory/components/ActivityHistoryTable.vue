@@ -31,7 +31,20 @@
   const data = ref([])
   const totalRecords = ref(0)
   const searchValue = ref('')
-  const dateRange = ref(null)
+  const now = new Date()
+  const { startDate, endDate } = createRelativeRange(30, 'days', 'last', now)
+  const dateRange = ref({
+    startDate,
+    endDate,
+    label: 'Last 30 days',
+    labelStart: 'Last 30 days',
+    labelEnd: 'Last 30 days',
+    relative: {
+      direction: 'last',
+      value: 30,
+      unit: 'days'
+    }
+  })
   const appliedFilters = ref([])
   const first = ref(0)
   const rows = ref(10)
@@ -146,20 +159,6 @@
   }
 
   onMounted(() => {
-    const now = new Date()
-    const { startDate, endDate } = createRelativeRange(30, 'days', 'last', now)
-    dateRange.value = {
-      startDate,
-      endDate,
-      label: 'Last 30 days',
-      labelStart: 'Last 30 days',
-      labelEnd: 'Last 30 days',
-      relative: {
-        direction: 'last',
-        value: 30,
-        unit: 'days'
-      }
-    }
     loadData()
   })
 </script>
@@ -176,6 +175,8 @@
     :lazy="true"
     :appliedFilters="appliedFilters"
     :searchValue="searchValue"
+    :notShowEmptyBlock="true"
+    emptyListMessage="Has no data"
     dataKey="id"
     @page="handlePage"
     :empty-block="{
