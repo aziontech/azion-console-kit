@@ -15,19 +15,11 @@ function getReloadState() {
 }
 
 function setReloadState(state) {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch {
-    // Ignore storage errors
-  }
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
 function clearReloadState() {
-  try {
-    sessionStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // Ignore storage errors
-  }
+  sessionStorage.removeItem(STORAGE_KEY)
 }
 
 function canAttemptReload(targetPath) {
@@ -136,6 +128,7 @@ export function useChunkPreloadErrorHandler() {
 
   window.addEventListener('vite:preloadError', (event) => {
     chunkErrors.add(event.payload)
+    event.preventDefault()
   })
 
   router.onError((error, to) => {
