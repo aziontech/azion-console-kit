@@ -36,8 +36,18 @@ export class ActivityHistoryService extends BaseService {
     return { offSetEnd, offSetStart }
   }
 
-  listActivityHistoryEvents = async ({ offset = 0, limit = 1000, search = '', dateRange = 30 }) => {
-    const { offSetEnd, offSetStart } = this.#getOffsetDate({ intervalDays: dateRange })
+  listActivityHistoryEvents = async ({
+    offset = 0,
+    limit = 1000,
+    search = '',
+    dateRange = 30,
+    begin,
+    end
+  }) => {
+    const hasExplicitRange = Boolean(begin && end)
+    const { offSetEnd, offSetStart } = hasExplicitRange
+      ? { offSetStart: new Date(begin), offSetEnd: new Date(end) }
+      : this.#getOffsetDate({ intervalDays: dateRange })
     const baseQuery = `
       query ActivityHistory(
         $offset: Int, 
@@ -130,8 +140,11 @@ export class ActivityHistoryService extends BaseService {
     }
   }
 
-  getTotalRecords = async ({ search = '', dateRange = 30 }) => {
-    const { offSetEnd, offSetStart } = this.#getOffsetDate({ intervalDays: dateRange })
+  getTotalRecords = async ({ search = '', dateRange = 30, begin, end }) => {
+    const hasExplicitRange = Boolean(begin && end)
+    const { offSetEnd, offSetStart } = hasExplicitRange
+      ? { offSetStart: new Date(begin), offSetEnd: new Date(end) }
+      : this.#getOffsetDate({ intervalDays: dateRange })
 
     const query = `
       query ActivityHistory(

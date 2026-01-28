@@ -4,8 +4,9 @@
   import PrimeButton from 'primevue/button'
 
   import DataTable from '@/components/DataTable'
-  import DateRangeSelector from './DateRangeSelector.vue'
+  import DataTimeRange from '@/components/base/dataTimeRange'
   import OperationTag from './OperationTag.vue'
+  import { createRelativeRange } from '@utils/date.js'
 
   const props = defineProps({
     listService: {
@@ -30,7 +31,7 @@
   const data = ref([])
   const totalRecords = ref(0)
   const searchValue = ref('')
-  const dateRange = ref(30)
+  const dateRange = ref(null)
   const appliedFilters = ref([])
   const first = ref(0)
   const rows = ref(10)
@@ -61,18 +62,23 @@
     try {
       isLoading.value = true
 
+      const begin = dateRange.value?.startDate
+      const end = dateRange.value?.endDate
+
       const response = await props.listService({
         limit: rows.value,
         offset: first.value,
         search: searchValue.value,
-        dateRange: dateRange.value
+        begin,
+        end
       })
 
       data.value = response.body || []
 
       totalRecords.value = await props.getTotalRecordsService({
         search: searchValue.value,
-        dateRange: dateRange.value
+        begin,
+        end
       })
 
       emit('on-load-data', data.value.length > 0 || searchValue.value.length > 0)
@@ -140,6 +146,20 @@
   }
 
   onMounted(() => {
+    const now = new Date()
+    const { startDate, endDate } = createRelativeRange(30, 'days', 'last', now)
+    dateRange.value = {
+      startDate,
+      endDate,
+      label: 'Last 30 days',
+      labelStart: 'Last 30 days',
+      labelEnd: 'Last 30 days',
+      relative: {
+        direction: 'last',
+        value: 30,
+        unit: 'days'
+      }
+    }
     loadData()
   })
 </script>
@@ -190,9 +210,9 @@
               />
             </div>
             <DataTable.Actions>
-              <DateRangeSelector
+              <DataTimeRange
                 v-model="dateRange"
-                @change="handleDateRangeChange"
+                @select="handleDateRangeChange"
               />
               <DataTable.ColumnSelector
                 :columns="allColumns"
