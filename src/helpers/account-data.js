@@ -33,7 +33,7 @@ export const loadUserAndAccountInfo = async () => {
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
 
-  sessionManager.afterLogin()
+  await sessionManager.afterLogin()
 }
 
 export const loadProfileAndAccountInfo = async () => {
@@ -53,7 +53,7 @@ export const loadProfileAndAccountInfo = async () => {
 
     account.client_id
       ? contractService
-          .getContractServicePlan(account.client_id, { prefetch: true })
+          .getContractServicePlan(account.client_id)
           .then(({ isDeveloperSupportPlan, yourServicePlan }) => {
             accountStore.setAccountData({
               isDeveloperSupportPlan,

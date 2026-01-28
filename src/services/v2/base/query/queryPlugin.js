@@ -57,13 +57,9 @@ export const queryPlugin = {
 
 export const waitForPersistenceRestore = () => restorePromise || Promise.resolve()
 
-export const pauseQueryPersistence = () => {
+export const pauseQueryPersistence = async () => {
   if (unsubscribePersistence && typeof unsubscribePersistence === 'function') {
-    try {
-      unsubscribePersistence()
-    } catch {
-      // Ignore errors
-    }
+    await unsubscribePersistence()
     unsubscribePersistence = null
   }
 }

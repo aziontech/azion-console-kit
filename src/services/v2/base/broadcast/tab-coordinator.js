@@ -1,5 +1,3 @@
-import { logger } from '../logger'
-
 const HEARTBEAT_INTERVAL = 10000
 const INACTIVE_TIMEOUT = HEARTBEAT_INTERVAL * 2
 
@@ -58,7 +56,6 @@ export class TabCoordinator {
     this.stopCheck()
     this.startHeartbeat()
 
-    logger.log('TabCoordinator', 'This tab is now primary')
     this.onBecomePrimary()
   }
 
@@ -69,7 +66,6 @@ export class TabCoordinator {
     this.stopHeartbeat()
     this.startCheck()
 
-    logger.log('TabCoordinator', 'This tab lost primary status')
     this.onLosePrimary()
   }
 
