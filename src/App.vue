@@ -10,7 +10,6 @@
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
 
-  // Handle version skew errors after deployments
   useChunkPreloadErrorHandler()
 
   const DEFAULT_TITLE = 'Azion Console'
