@@ -35,12 +35,11 @@ export class EdgeAppErrorResponseService extends BaseService {
 
     const queryKey = queryKeys.edgeApp.errorResponse.list(edgeApplicationId, params)
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
-    const firstPage = params?.page === 1
 
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
-      { persist: firstPage && !skipCache, skipCache }
+      { persist: false, skipCache }
     )
   }
 

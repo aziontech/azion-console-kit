@@ -164,7 +164,6 @@ export class RulesEngineService extends BaseService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
-    const firstPage = params?.page === 1
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
@@ -183,7 +182,7 @@ export class RulesEngineService extends BaseService {
         }
       },
       {
-        persist: firstPage && !skipCache,
+        persist: false,
         skipCache
       }
     )

@@ -35,13 +35,12 @@ export class DeviceGroupService extends BaseService {
 
     const queryKey = queryKeys.edgeApp.deviceGroups.list(edgeApplicationId, params)
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
-    const firstPage = params?.page === 1
 
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchList(edgeApplicationId, params),
       {
-        persist: firstPage && !skipCache,
+        persist: false,
         skipCache
       }
     )

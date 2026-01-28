@@ -34,14 +34,13 @@ export class CacheSettingsService extends BaseService {
     await waitForPersistenceRestore()
 
     const queryKey = queryKeys.edgeApp.cacheSettings.list(edgeApplicationId, params)
-    const firstPage = params.page === 1
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchList(edgeApplicationId, params),
       {
-        persist: firstPage && !skipCache,
+        persist: false,
         skipCache
       }
     )

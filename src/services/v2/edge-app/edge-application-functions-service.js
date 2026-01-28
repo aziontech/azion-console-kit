@@ -74,12 +74,11 @@ export class EdgeApplicationFunctionService extends BaseService {
     params = { pageSize: 10, fields: [], page: 1 }
   ) => {
     const queryKey = queryKeys.edgeApp.functionInstance.list(edgeApplicationId, params)
-    const firstPage = params?.page === 1
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeApplicationFunctions(edgeApplicationId, params),
-      { persist: firstPage && !skipCache, skipCache }
+      { persist: false, skipCache }
     )
   }
 

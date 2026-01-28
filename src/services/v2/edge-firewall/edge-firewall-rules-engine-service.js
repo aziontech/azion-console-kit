@@ -47,13 +47,12 @@ export class EdgeFirewallRulesEngineService extends BaseService {
 
   listEdgeFirewallRulesEngineService = async (params = { id: '', fields: '', search: '' }) => {
     const queryKey = queryKeys.firewall.rulesEngine.list(params.id, params)
-    const firstPage = params?.page === 1
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
       queryKey,
       () => this.#fetchEdgeFirewallRulesEngineList(params),
-      { persist: firstPage && !skipCache, skipCache }
+      { persist: false, skipCache }
     )
   }
 
