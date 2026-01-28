@@ -51,10 +51,10 @@ export class AccountHandler {
    * Switches the account based on the account ID and redirects to the corresponding page.
    * @param {string} accountId - Account ID
    */
-  async switchAccountAndRedirect(accountId) {    
+  async switchAccountAndRedirect(accountId) {
     await sessionManager.switchAccount()
     const { firstLogin } = await this.switchAccountService(accountId)
-    
+
     if (firstLogin) {
       window.location = '/signup/additional-data'
       return

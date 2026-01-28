@@ -11,7 +11,7 @@ const baseQueryClient = new QueryClient({
       ...getCacheOptions()
     },
     mutations: {
-      retry: 1
+      retry: false
     }
   }
 })
