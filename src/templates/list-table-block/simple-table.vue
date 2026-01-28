@@ -1,12 +1,8 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import DataTable from '@/components/DataTable/DataTable.vue'
-  import Column from 'primevue/column'
-  import PrimeButton from 'primevue/button'
-  import Tag from 'primevue/tag'
+  import DataTable from '@/components/DataTable'
   import Skeleton from 'primevue/skeleton'
-  import { columnBuilder } from './columns/column-builder.js'
 
   const props = defineProps({
     data: {
@@ -44,12 +40,17 @@
     dataKey: {
       type: String,
       default: 'id'
+    },
+    emptyBlock: {
+      type: Object,
+      default: () => ({})
     }
   })
 
   const emit = defineEmits(['row-click'])
 
   const router = useRouter()
+  const menuRefs = ref({})
 
   const displayData = computed(() => {
     if (props.loading) {
@@ -87,14 +88,12 @@
     return value
   }
 
-  const getTagSeverity = (status) => {
-    const severityMap = {
-      active: 'success',
-      inactive: 'danger',
-      pending: 'warning',
-      default: 'info'
-    }
-    return severityMap[status?.toLowerCase()] || severityMap.default
+  const setMenuRef = (rowId) => (el) => {
+    menuRefs.value[rowId] = el
+  }
+
+  const handleMenuToggle = (event, rowId) => {
+    menuRefs.value[rowId]?.toggle(event)
   }
 </script>
 
@@ -106,13 +105,16 @@
     :dataKey="dataKey"
     :paginator="false"
     :rowHover="true"
-    :notShowEmptyBlock="true"
     tableClass="overflow-clip rounded-md"
     scrollHeight="auto"
     @rowClick="handleRowClick"
     class="w-full border border-[var(--surface-border)] rounded-md overflow-hidden"
+    :emptyBlock="emptyBlock"
+    :pt="{
+      emptyState: 'py-4 h-[306px]'
+    }"
   >
-    <Column
+    <DataTable.Column
       v-for="col in columns"
       :key="col.field"
       :field="col.field"
@@ -127,48 +129,16 @@
             :width="col.skeletonWidth || '80%'"
           />
         </template>
-
-        <template v-else-if="col.type === 'link'">
-          <PrimeButton
-            link
-            @click.stop="$emit('row-click', { data: rowData })"
-          >
-            <p class="p-link underline text-xs">
-              {{ getFieldValue(rowData, col.field) }}
-            </p>
-          </PrimeButton>
-        </template>
-
-        <template v-else-if="col.type === 'tag'">
-          <Tag
-            :value="getFieldValue(rowData, col.field)"
-            :severity="getTagSeverity(getFieldValue(rowData, col.field))"
-          />
-        </template>
-
-        <template v-else-if="col.type === 'text-array'">
-          <component
-            :is="
-              columnBuilder({
-                data: getFieldValue(rowData, col.field) || [],
-                columnAppearance: 'text-array-with-popup',
-                dependencies: { showCopy: false }
-              })
-            "
-          />
-        </template>
-
-        <template v-else-if="col.type === 'component' && col.component">
+        <template v-if="col.type === 'component' && col.component">
           <component :is="col.component(getFieldValue(rowData, col.field))" />
         </template>
-
         <template v-else>
-          <span class="text-xs">{{ getFieldValue(rowData, col.field) }}</span>
+          <span>{{ getFieldValue(rowData, col.field) }}</span>
         </template>
       </template>
-    </Column>
+    </DataTable.Column>
 
-    <Column
+    <DataTable.Column
       v-if="actions.length > 0"
       :frozen="true"
       :alignFrozen="'right'"
@@ -176,24 +146,14 @@
       bodyStyle="text-align: center"
     >
       <template #body="{ data: rowData }">
-        <template v-if="rowData.isSkeletonRow">
-          <Skeleton
-            shape="circle"
-            size="24px"
-          />
-        </template>
-        <template v-else>
-          <PrimeButton
-            icon="pi pi-ellipsis-v"
-            text
-            size="small"
-            severity="secondary"
-            @click.stop="toggleMenu($event, rowData)"
-            data-testid="resources-table-row-actions"
-          />
-        </template>
+        <DataTable.RowActions
+          :rowData="rowData"
+          :actions="actions"
+          :onMenuToggle="handleMenuToggle"
+          :menuRefSetter="setMenuRef"
+        />
       </template>
-    </Column>
+    </DataTable.Column>
 
     <template #footer>
       <div

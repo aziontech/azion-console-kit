@@ -1,26 +1,139 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeMenu from 'primevue/menu'
   import PrimeButton from 'primevue/button'
+  import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
+  import { workloadService } from '@/services/v2/workload/workload-service'
+  import { clipboardWrite } from '@/helpers/clipboard'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
   import SimpleTable from '@/templates/list-table-block/simple-table.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import WorkloadsEmptyState from './workloads-empty-state.vue'
 
   const router = useRouter()
+  const isLoading = ref(false)
+
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+
+  const edgeDnsColumns = [
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
+    {
+      field: 'domain',
+      header: 'Domain',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData?.content || columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
+    {
+      field: 'active',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    },
+    { field: 'lastModified', header: 'Last Modified' }
+  ]
+
+  const objectStorageColumns = [
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
+    { field: 'size', header: 'Size' },
+    { field: 'lastModified', header: 'Last Modified' }
+  ]
+
+  const functionsColumns = [
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
+    {
+      field: 'runtime',
+      header: 'Language',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'language-icon-with-text'
+        })
+      }
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    },
+    { field: 'lastModified', header: 'Last Modified' }
+  ]
 
   const selectedResource = ref('workloads')
   const filterMenu = ref()
+  const workloadsData = ref([])
+  const edgeDnsData = ref([])
+  const objectStorageData = ref([])
+  const functionsData = ref([])
 
-  const resourceTypes = [
-    { label: 'Workloads', value: 'workloads' },
+  const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
+  const resourceTypes = computed(() => [
+    { label: handleTextDomainWorkload.pluralTitle, value: 'workloads' },
     { label: 'Edge DNS', value: 'edge-dns' },
     { label: 'Object Storage', value: 'object-storage' },
     { label: 'Functions', value: 'functions' }
-  ]
+  ])
 
   const filterMenuItems = computed(() => [
     {
       label: 'Filter by resource',
-      items: resourceTypes.map((resource) => ({
+      items: resourceTypes.value.map((resource) => ({
         label: resource.label,
         icon: selectedResource.value === resource.value ? 'pi pi-check' : undefined,
         command: () => {
@@ -29,165 +142,71 @@
       }))
     }
   ])
+  const domainNameColumn = computed(() => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      return 'Workload Domain'
+    }
+    return 'Domain name'
+  })
 
-  const toggleFilterMenu = (event) => {
-    filterMenu.value.toggle(event)
-  }
-
-  const workloadsColumns = [
-    { field: 'name', header: 'Workload Name', type: 'link', sortable: true },
-    { field: 'domains', header: 'Domain', type: 'text-array', sortable: false },
-    { field: 'status', header: 'Status', type: 'tag', sortable: false },
-    { field: 'lastModified', header: 'Last Modified', type: 'text', sortable: true }
-  ]
-
-  const edgeDnsColumns = [
-    { field: 'name', header: 'Zone Name', type: 'link', sortable: true },
-    { field: 'domain', header: 'Domain', type: 'text', sortable: false },
-    { field: 'status', header: 'Status', type: 'tag', sortable: false },
-    { field: 'lastModified', header: 'Last Modified', type: 'text', sortable: true }
-  ]
-
-  const objectStorageColumns = [
-    { field: 'name', header: 'Bucket Name', type: 'link', sortable: true },
-    { field: 'objects', header: 'Objects', type: 'text', sortable: false },
-    { field: 'size', header: 'Size', type: 'text', sortable: false },
-    { field: 'lastModified', header: 'Last Modified', type: 'text', sortable: true }
-  ]
-
-  const functionsColumns = [
-    { field: 'name', header: 'Function Name', type: 'link', sortable: true },
-    { field: 'language', header: 'Language', type: 'text', sortable: false },
-    { field: 'status', header: 'Status', type: 'tag', sortable: false },
-    { field: 'lastModified', header: 'Last Modified', type: 'text', sortable: true }
-  ]
+  const workloadsColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
+    {
+      field: 'workloadHostname',
+      header: domainNameColumn.value,
+      filterPath: 'workloadHostname',
+      disableSort: true,
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData || !columnData?.content) return null
+        return columnBuilder({
+          data: columnData.content,
+          columnAppearance: 'text-format-with-popup',
+          dependencies: {
+            copyContentService: clipboardWrite,
+            showCopy: !!clipboardWrite
+          }
+        })
+      }
+    },
+    {
+      field: 'active',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        if (!columnData) return null
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
+    }
+  ])
 
   const currentColumns = computed(() => {
     const columnsMap = {
-      workloads: workloadsColumns,
+      workloads: workloadsColumns.value,
       'edge-dns': edgeDnsColumns,
       'object-storage': objectStorageColumns,
       functions: functionsColumns
     }
-    return columnsMap[selectedResource.value] || workloadsColumns
+    return columnsMap[selectedResource.value] || workloadsColumns.value
   })
-
-  const workloadsData = ref([
-    {
-      id: 1,
-      name: 'Azion Store Frontend',
-      domains: ['store.azionstore.com', 'www.azionstore.com', 'cdn.azionstore.com'],
-      status: 'Active',
-      lastModified: 'Dec 15, 2025, 09:15:15 PM'
-    },
-    {
-      id: 2,
-      name: 'Azion Store Checkout',
-      domains: ['checkout.azionstore.com'],
-      status: 'Active',
-      lastModified: 'Dec 12, 2025, 10:19:15 AM'
-    },
-    {
-      id: 3,
-      name: 'Azion Store Assets',
-      domains: ['9oljy1u03ji.map.azionedge.net'],
-      status: 'Active',
-      lastModified: 'Dec 12, 2025, 10:03:15 PM'
-    },
-    {
-      id: 4,
-      name: 'Azion Store API',
-      domains: ['api.azionstore.com'],
-      status: 'Active',
-      lastModified: 'Dec 10, 2025, 7:24:15 PM'
-    },
-    {
-      id: 5,
-      name: 'Azion Store Admin',
-      domains: ['admin.azionstore.com'],
-      status: 'Active',
-      lastModified: 'Dec 10, 2025, 7:24:15 PM'
-    }
-  ])
-
-  const edgeDnsData = ref([
-    {
-      id: 1,
-      name: 'azionstore.com',
-      domain: 'azionstore.com',
-      status: 'Active',
-      lastModified: 'Dec 14, 2025, 10:30:00 AM'
-    },
-    {
-      id: 2,
-      name: 'api.azionstore.com',
-      domain: 'api.azionstore.com',
-      status: 'Active',
-      lastModified: 'Dec 13, 2025, 02:15:00 PM'
-    },
-    {
-      id: 3,
-      name: 'cdn.azionstore.com',
-      domain: 'cdn.azionstore.com',
-      status: 'Active',
-      lastModified: 'Dec 12, 2025, 08:45:00 AM'
-    }
-  ])
-
-  const objectStorageData = ref([
-    {
-      id: 1,
-      name: 'azion-store-assets',
-      objects: '1,234',
-      size: '2.5 GB',
-      lastModified: 'Dec 15, 2025, 11:00:00 AM'
-    },
-    {
-      id: 2,
-      name: 'azion-store-backups',
-      objects: '56',
-      size: '15.2 GB',
-      lastModified: 'Dec 14, 2025, 03:30:00 PM'
-    },
-    {
-      id: 3,
-      name: 'azion-store-logs',
-      objects: '10,567',
-      size: '890 MB',
-      lastModified: 'Dec 15, 2025, 09:00:00 AM'
-    }
-  ])
-
-  const functionsData = ref([
-    {
-      id: 1,
-      name: 'auth-handler',
-      language: 'JavaScript',
-      status: 'Active',
-      lastModified: 'Dec 14, 2025, 04:20:00 PM'
-    },
-    {
-      id: 2,
-      name: 'image-optimizer',
-      language: 'JavaScript',
-      status: 'Active',
-      lastModified: 'Dec 13, 2025, 10:15:00 AM'
-    },
-    {
-      id: 3,
-      name: 'rate-limiter',
-      language: 'JavaScript',
-      status: 'Active',
-      lastModified: 'Dec 12, 2025, 02:45:00 PM'
-    },
-    {
-      id: 4,
-      name: 'geo-redirect',
-      language: 'JavaScript',
-      status: 'Inactive',
-      lastModified: 'Dec 10, 2025, 09:30:00 AM'
-    }
-  ])
 
   const currentData = computed(() => {
     const dataMap = {
@@ -201,7 +220,7 @@
 
   const currentViewAllLink = computed(() => {
     const linksMap = {
-      workloads: '/workload',
+      workloads: `/${handleTextDomainWorkload.pluralLabel}`,
       'edge-dns': '/edge-dns',
       'object-storage': '/object-storage/buckets',
       functions: '/edge-functions'
@@ -211,12 +230,47 @@
 
   const currentViewAllLabel = computed(() => {
     const labelsMap = {
-      workloads: 'View all Workloads...',
+      workloads: `View all ${handleTextDomainWorkload.pluralTitle}...`,
       'edge-dns': 'View all Edge DNS...',
       'object-storage': 'View all Buckets...',
       functions: 'View all Functions...'
     }
     return labelsMap[selectedResource.value] || 'View all...'
+  })
+
+  const editWorkloadRouteName = computed(() => (isWorkload.value ? 'edit-workload' : 'edit-domain'))
+
+  const emptyBlock = computed(() => {
+    const emptyBlockMap = {
+      workloads: {
+        title: `No ${handleTextDomainWorkload.pluralTitle} yet`,
+        description: isWorkload.value
+          ? 'Create your first Workload to configure domains, protocols, security, and application execution for incoming traffic.'
+          : 'Create your first Domain to configure firewalls and applications execution for incoming traffic.',
+        createButtonLabel: handleTextDomainWorkload.singularTitle,
+        createPagePath: `${handleTextDomainWorkload.pluralLabel}/create`
+      },
+      'edge-dns': {
+        title: 'No DNS Zones yet',
+        description:
+          'Create your first DNS zone to host authoritative records and control domain name resolution.',
+        createButtonLabel: 'Zone',
+        createPagePath: 'edge-dns/create'
+      },
+      'object-storage': {
+        title: 'No Buckets yet',
+        description: 'Create your first bucket to store, organize, and access data.',
+        createButtonLabel: 'Bucket',
+        createPagePath: '/object-storage/create'
+      },
+      functions: {
+        title: 'No Functions yet',
+        description: "Create your first function to execute code at Azion's global infrastructure.",
+        createButtonLabel: 'Function',
+        createPagePath: 'functions/create?origin=list'
+      }
+    }
+    return emptyBlockMap[selectedResource.value] || emptyBlockMap.workloads
   })
 
   const currentActions = computed(() => {
@@ -225,7 +279,8 @@
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
-          command: (rowData) => router.push({ name: 'edit-workload', params: { id: rowData.id } })
+          command: (rowData) =>
+            router.push({ name: editWorkloadRouteName.value, params: { id: rowData.id } })
         },
         {
           label: 'Delete',
@@ -271,9 +326,93 @@
     return actionsMap[selectedResource.value] || []
   })
 
+  const toggleFilterMenu = (event) => {
+    filterMenu.value.toggle(event)
+  }
+
+  const loadWorkloads = async () => {
+    try {
+      const response = await workloadService.listWorkloads({
+        pageSize: 5,
+        ordering: '-last_modified',
+        fields: [
+          'name',
+          'domains',
+          'workload_domain',
+          'infrastructure',
+          'active',
+          'last_modified',
+          'id',
+          'last_editor',
+          'product_version',
+          'workload_domain'
+        ]
+      })
+      workloadsData.value = response.body
+    } catch (error) {
+      workloadsData.value = []
+    }
+  }
+
+  const loadEdgeDns = async () => {
+    try {
+      const response = await edgeDNSService.listEdgeDNSService({
+        pageSize: 5,
+        ordering: '-last_modified',
+        fields: ['id', 'name', 'domain', 'active', 'last_modified']
+      })
+      edgeDnsData.value = response.body
+    } catch (error) {
+      edgeDnsData.value = []
+    }
+  }
+
+  const loadObjectStorage = async () => {
+    try {
+      const response = await edgeStorageService.listEdgeStorageBuckets({
+        pageSize: 5,
+        ordering: '-last_modified'
+      })
+      objectStorageData.value = response.body.map((item) => ({
+        ...item,
+        id: item.name,
+        size: item.size || '-'
+      }))
+    } catch (error) {
+      objectStorageData.value = []
+    }
+  }
+
+  const loadFunctions = async () => {
+    try {
+      const response = await edgeFunctionService.listEdgeFunctionsService({
+        pageSize: 5,
+        ordering: '-last_modified'
+      })
+      functionsData.value = response.body
+    } catch (error) {
+      functionsData.value = []
+    }
+  }
+
+  const loadDataForResource = async (resource) => {
+    isLoading.value = true
+    try {
+      const loaderMap = {
+        workloads: loadWorkloads,
+        'edge-dns': loadEdgeDns,
+        'object-storage': loadObjectStorage,
+        functions: loadFunctions
+      }
+      await loaderMap[resource]?.()
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const handleRowClick = (event) => {
     const routeMap = {
-      workloads: { name: 'edit-workload', params: { id: event.data.id } },
+      workloads: { name: editWorkloadRouteName.value, params: { id: event.data.id } },
       'edge-dns': { name: 'edit-edge-dns', params: { id: event.data.id } },
       'object-storage': { name: 'edge-storage-bucket', params: { bucketName: event.data.name } },
       functions: { name: 'edit-edge-functions', params: { id: event.data.id } }
@@ -281,6 +420,14 @@
     const route = routeMap[selectedResource.value]
     if (route) router.push(route)
   }
+
+  watch(
+    selectedResource,
+    (newResource) => {
+      loadDataForResource(newResource)
+    },
+    { immediate: true }
+  )
 </script>
 
 <template>
@@ -323,14 +470,20 @@
         </PrimeMenu>
       </div>
     </div>
+    <WorkloadsEmptyState
+      v-if="selectedResource === 'workloads' && currentData.length === 0 && !isLoading"
+    />
     <SimpleTable
+      v-else
       :data="currentData"
       :columns="currentColumns"
       :rows-limit="5"
+      :loading="isLoading"
       :actions="currentActions"
       :view-all-link="currentViewAllLink"
       :view-all-label="currentViewAllLabel"
       @row-click="handleRowClick"
+      :empty-block="emptyBlock"
     />
   </div>
 </template>
