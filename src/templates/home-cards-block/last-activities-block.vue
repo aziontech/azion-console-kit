@@ -7,8 +7,7 @@
   const columns = [
     {
       field: 'ts',
-      header: 'Date',
-      skeletonWidth: '150px'
+      header: 'Date'
     },
     {
       field: 'type',
@@ -21,18 +20,15 @@
           severity: getOperationSeverity(value),
           class: 'text-[11px] font-semibold'
         })
-      },
-      skeletonWidth: '70px'
+      }
     },
     {
       field: 'title',
-      header: 'Name',
-      skeletonWidth: '150px'
+      header: 'Activity'
     },
     {
       field: 'authorEmail',
-      header: 'User',
-      skeletonWidth: '180px'
+      header: 'User'
     }
   ]
 
