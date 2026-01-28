@@ -40,28 +40,25 @@ export const loadProfileAndAccountInfo = async () => {
   const accountStore = useAccountStore()
   const { account, accountIsNotRegular } = accountStore
 
-  const promises = [
-    accountIsNotRegular
-      ? billingGqlService.getCreditAndExpirationDate().then(({ credit, formatCredit, days }) => {
-          accountStore.setAccountData({
-            credit,
-            formatCredit,
-            days
-          })
-        })
-      : Promise.resolve(),
+  const loadBillingData = async () => {
+    if (!accountIsNotRegular) return
 
-    account.client_id
-      ? contractService
-          .getContractServicePlan(account.client_id)
-          .then(({ isDeveloperSupportPlan, yourServicePlan }) => {
-            accountStore.setAccountData({
-              isDeveloperSupportPlan,
-              yourServicePlan
-            })
-          })
-      : Promise.resolve()
-  ]
+    const billingData = await billingGqlService.getCreditAndExpirationDate()
+    if (!billingData) return
 
-  await Promise.all(promises)
+    const { credit, formatCredit, days } = billingData
+    accountStore.setAccountData({ credit, formatCredit, days })
+  }
+
+  const loadContractData = async () => {
+    if (!account?.client_id) return
+
+    const contractData = await contractService.getContractServicePlan(account.client_id)
+    if (!contractData) return
+
+    const { isDeveloperSupportPlan, yourServicePlan } = contractData
+    accountStore.setAccountData({ isDeveloperSupportPlan, yourServicePlan })
+  }
+
+  await Promise.all([loadBillingData(), loadContractData()])
 }

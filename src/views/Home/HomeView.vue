@@ -114,8 +114,13 @@
     }
   }
 
+  const loadTeams = async () => {
+    const result = await props.listTeamsService()
+    teams.value = result || []
+  }
+
   onMounted(async () => {
-    teams.value = await props.listTeamsService()
+    await loadTeams()
     showOnboardingSchedulingDialog()
     if (props.inviteSession.sessionIsExpired()) {
       props.inviteSession.turnInviteBlockVisable()

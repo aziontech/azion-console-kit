@@ -108,11 +108,10 @@
   }
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
-    optionsTeams.value = result
+    optionsTeams.value = result || []
 
-    if (!props.isEditForm) {
-      const firstTeamId = result[0].value
-      return firstTeamId
+    if (!props.isEditForm && optionsTeams.value.length > 0) {
+      return optionsTeams.value[0].value
     }
   }
 
