@@ -462,7 +462,7 @@
     startLoading()
     tracker.reset()
     closeDesktopMenu()
-    window.location.href = '/logout'
+    window.location.assign('/logout')
   }
 
   const openSwitchAccountDialog = () => {
