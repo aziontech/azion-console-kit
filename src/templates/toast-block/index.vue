@@ -12,7 +12,7 @@
             :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
           />
           <h5
-            class="text-color text-base font-semibold truncate"
+            class="text-color text-base font-medium truncate"
             :data-testid="handleDataTestIdInItem(message, 'title')"
           >
             {{ toUpperCaseTitleCase(parseText(message.summary, CHAR_LIMITS.SUMMARY)) }}

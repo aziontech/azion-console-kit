@@ -9,7 +9,7 @@
         <i :class="`${icon || messageStyle.icon} text-2xl ${messageStyle.iconColor}`"></i>
       </div>
       <div class="flex flex-col">
-        <h4 class="text-lg font-bold">
+        <h4 class="text-lg font-medium">
           <slot name="title">{{ title }}</slot>
         </h4>
         <p class="w-full max-w-screen-lg text-color-secondary sm:max-w-6xl text-sm">
