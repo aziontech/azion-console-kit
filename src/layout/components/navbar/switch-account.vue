@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-  import { computed, inject, toRef } from 'vue'
+  import { computed, inject } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import SwitchAccountBlock from '@/templates/switch-account-block'
 
@@ -27,7 +27,7 @@
   })
 
   const accountStore = useAccountStore()
-  const user = toRef(accountStore, 'accountData')
+  const user = computed(() => accountStore.accountData)
   const openSwitchAccount = inject('openSwitchAccount')
   const profileMenuDefault = [
     {

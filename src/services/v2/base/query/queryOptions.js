@@ -9,7 +9,8 @@ const DEFAULT_OPTIONS = {
   refetchOnMount: false,
   retry: false,
   persist: true,
-  skipCache: false
+  skipCache: false,
+  enabled: false
 }
 
 const CACHE_PRESETS = {
