@@ -1,11 +1,11 @@
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 export const ActivityHistoryAdapter = {
   transformListActivityHistoryEvents({ data }) {
     try {
       const parsedEvents =
         data?.activityHistoryEvents?.map((element) => ({
-          ts: formatExhibitionDate(element.ts, 'full', 'short'),
+          ts: formatDateToDayMonthYearHour(element.ts),
           title: element.title,
           type: element.type,
           authorName: element.authorName,
