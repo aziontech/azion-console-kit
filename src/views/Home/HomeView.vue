@@ -3,8 +3,8 @@
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
   import { useAccountStore } from '@/stores/account'
-  import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
+  import InviteUserDialog from './Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
@@ -12,7 +12,6 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const createModalStore = useCreateModalStore()
   const router = useRouter()
   const { accountData } = useAccountStore()
 
@@ -39,6 +38,7 @@
 
   const user = accountData
   const teams = ref([])
+  const showInviteDialog = ref(false)
   const metricsData = ref([
     {
       label: 'Total Data Transfered',
@@ -141,9 +141,13 @@
     router.push({ name: 'billing-tabs' })
   }
 
-  const openModalCreate = () => {
+  const openInviteDialog = () => {
     tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
-    createModalStore.toggle()
+    showInviteDialog.value = true
+  }
+
+  const handleInviteSuccess = () => {
+    showInviteDialog.value = false
   }
 
   onMounted(async () => {
@@ -166,7 +170,7 @@
               severity="secondary"
               label="Invite User"
               outlined
-              @click="openModalCreate"
+              @click="openInviteDialog"
             />
           </div>
           <!-- Start Metrics Block -->
@@ -265,4 +269,11 @@
       </section>
     </template>
   </ContentBlock>
+
+  <InviteUserDialog
+    v-model:visible="showInviteDialog"
+    :listTeamsService="props.listTeamsService"
+    :inviteYourTeamService="props.inviteYourTeamService"
+    @invite-success="handleInviteSuccess"
+  />
 </template>

@@ -1,6 +1,7 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const inviteYourTeamService = async (payload) => {
   const bodyRequest = adapt(payload)
@@ -24,31 +25,6 @@ const adapt = (payload) => {
     email: payload.email,
     teams_ids: [payload.team]
   }
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const definedKeys = ['first_name', 'last_name', 'email', 'teams_ids']
-  let key = definedKeys.find((key) => httpResponse.body[key])
-
-  // Case not found any defined key
-  if (!key) {
-    key = Object.keys(httpResponse.body)[0]
-  }
-
-  const value = httpResponse.body[key]
-  const isString = typeof value === 'string'
-  const isArray = Array.isArray(value)
-
-  let message = ''
-  if (isString) message = value
-  if (isArray) message = value[0]
-
-  return `${key}: ${message}`
 }
 
 /**
