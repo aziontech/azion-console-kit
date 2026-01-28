@@ -3,15 +3,16 @@
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
   import { useAccountStore } from '@/stores/account'
-  import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
+  import InviteUserDialog from './Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
+  import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
+  import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const createModalStore = useCreateModalStore()
   const router = useRouter()
   const { accountData } = useAccountStore()
 
@@ -38,6 +39,7 @@
 
   const user = accountData
   const teams = ref([])
+  const showInviteDialog = ref(false)
   const metricsData = ref([
     {
       label: 'Total Data Transfered',
@@ -122,9 +124,13 @@
     router.push({ name: 'billing-tabs' })
   }
 
-  const openModalCreate = () => {
+  const openInviteDialog = () => {
     tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
-    createModalStore.toggle()
+    showInviteDialog.value = true
+  }
+
+  const handleInviteSuccess = () => {
+    showInviteDialog.value = false
   }
 
   onMounted(async () => {
@@ -139,7 +145,7 @@
   <ContentBlock>
     <template #content>
       <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 px-8 pb-8">
-        <div class="flex flex-col w-full md:w-[70%] gap-8">
+        <div class="flex flex-col w-full md:w-[75%] gap-8">
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
             <PrimeButton
@@ -147,7 +153,7 @@
               severity="secondary"
               label="Invite User"
               outlined
-              @click="openModalCreate"
+              @click="openInviteDialog"
             />
           </div>
           <!-- Start Metrics Block -->
@@ -223,26 +229,8 @@
               </div>
             </div>
           </div>
-          <!-- Start Resources Block -->
-          <div class="flex flex-col gap-3 w-full">
-            <div class="flex gap-3">
-              <span class="text-[16px]">Resources</span>
-              <i class="pi pi-filter"></i>
-            </div>
-            <div
-              class="h-[308px] w-full border rounded border-[var(--surface-border)] bg-[var(--surface-section)]"
-            ></div>
-          </div>
-          <!-- Start Last Activities Block -->
-          <div class="flex flex-col gap-3 w-full">
-            <div class="flex gap-3">
-              <span class="text-[16px]">Last Activities</span>
-              <i class="pi pi-filter"></i>
-            </div>
-            <div
-              class="h-[308px] w-full border rounded border-[var(--surface-border)] bg-[var(--surface-section)]"
-            ></div>
-          </div>
+          <ResourcesBlock />
+          <LastActivitiesBlock />
         </div>
 
         <div class="flex flex-col w-full md:w-[30%] gap-8">
@@ -253,4 +241,11 @@
       </section>
     </template>
   </ContentBlock>
+
+  <InviteUserDialog
+    v-model:visible="showInviteDialog"
+    :listTeamsService="props.listTeamsService"
+    :inviteYourTeamService="props.inviteYourTeamService"
+    @invite-success="handleInviteSuccess"
+  />
 </template>
