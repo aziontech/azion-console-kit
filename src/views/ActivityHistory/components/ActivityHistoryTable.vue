@@ -213,6 +213,7 @@
             <DataTable.Actions>
               <DataTimeRange
                 v-model="dateRange"
+                :maxDays="183"
                 @select="handleDateRangeChange"
               />
               <DataTable.ColumnSelector

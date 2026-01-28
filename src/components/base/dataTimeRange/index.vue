@@ -3,13 +3,13 @@
     <QuickSelect
       v-model="model"
       :maxDays="maxDays"
-      @select="emit('select', $event)"
+      @select="handleSelect"
       @open="openOverlay($event, 0)"
     />
     <InputDateRange
       v-model="model"
       :maxDays="maxDays"
-      @select="emit('select', $event)"
+      @select="handleSelect"
       @open="openOverlay($event, 1)"
     />
 
@@ -52,7 +52,7 @@
               panelOnly
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -63,7 +63,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -75,7 +75,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-  import { defineModel, nextTick, ref } from 'vue'
+  import { defineModel, nextTick, ref, computed } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from 'primevue/button'
@@ -111,7 +111,7 @@
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
-  defineProps({
+  const props = defineProps({
     maxDays: {
       type: Number
     }
@@ -146,6 +146,38 @@
       }
     }
   })
+
+  const maxDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    return new Date()
+  })
+  const minDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    const now = new Date()
+    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
+
+  const clampToBounds = (date) => {
+    if (!date) return date
+    const parsed = new Date(date)
+    if (!props.maxDays || props.maxDays <= 0) return parsed
+    const min = minDate.value
+    const max = maxDate.value
+    if (min && parsed < min) return new Date(min)
+    if (max && parsed > max) return new Date(max)
+    return parsed
+  }
+
+  const clampModelRangeInPlace = () => {
+    if (!model.value) return
+    if (model.value.startDate) model.value.startDate = clampToBounds(model.value.startDate)
+    if (model.value.endDate) model.value.endDate = clampToBounds(model.value.endDate)
+  }
+
+  const handleSelect = () => {
+    clampModelRangeInPlace()
+    emit('select', model.value)
+  }
 
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
@@ -184,7 +216,7 @@
     model.value.startDate = result.startDate
     model.value.endDate = result.endDate
 
-    emit('select', model.value)
+    handleSelect()
   }
 
   const setNow = () => {
@@ -192,14 +224,14 @@
     model.value.label = ''
 
     if (editingField.value === 'start') {
-      model.value.startDate = now
+      model.value.startDate = clampToBounds(now)
       model.value.labelStart = 'now'
     } else {
-      model.value.endDate = now
+      model.value.endDate = clampToBounds(now)
       model.value.labelEnd = 'now'
     }
 
-    emit('select', model.value)
+    handleSelect()
     closeOverlay()
   }
 </script>
