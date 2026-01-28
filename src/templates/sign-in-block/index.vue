@@ -240,7 +240,7 @@
   })
 
   const showSocialIdps = ref(true)
-  const emailValidateRegex = /^\S+@\S+\.\S+$/
+  const emailValidateRegex = /^\S[^\s@]*@\S[^\s.]*\.\S+$/
 
   const validationSchema = yup.object({
     email: yup.string().matches(emailValidateRegex, 'Use a valid email to sign in.'),

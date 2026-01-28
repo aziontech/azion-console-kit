@@ -108,7 +108,7 @@
 
   const emailSended = ref(false)
   const isSendingEmailLoading = ref(false)
-  const emailValidateRegex = /^\S+@\S+\.\S+$/
+  const emailValidateRegex = /^\S[^\s@]*@\S[^\s.]*\.\S+$/
 
   const validationSchema = yup.object({
     email: yup
