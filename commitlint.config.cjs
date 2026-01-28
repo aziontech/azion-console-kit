@@ -7,7 +7,7 @@ module.exports = {
   },
   parserPreset: {
     parserOpts: {
-      headerPattern: /^(\[ENG-.*])?\s?(\w+):\s(.*)$/,
+      headerPattern: /^(\[ENG-.*])?\s?(\w+):\s(.*)$/, // eslint-disable-line
       headerCorrespondence: ['scope', 'type', 'subject']
     }
   }
