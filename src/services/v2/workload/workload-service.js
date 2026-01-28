@@ -1,4 +1,3 @@
-import { toValue } from 'vue'
 import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
@@ -6,7 +5,20 @@ import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
+
+export const DEFAULT_FIELDS = [
+  'name',
+  'domains',
+  'workload_domain',
+  'infrastructure',
+  'active',
+  'last_modified',
+  'id',
+  'last_editor',
+  'product_version',
+  'workload_domain'
+]
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -22,6 +34,7 @@ export class WorkloadService extends BaseService {
     this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
+    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (params = { pageSize: 10 }) => {
@@ -48,28 +61,15 @@ export class WorkloadService extends BaseService {
     return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
   }
 
-  ensureList = async (pageSize = 10) => {
+  prefetchList = async (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: [
-        'name',
-        'domains',
-        'workload_domain',
-        'infrastructure',
-        'active',
-        'last_modified',
-        'id',
-        'last_editor',
-        'product_version',
-        'workload_domain'
-      ],
+      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(queryKeys.workload.list(params), () => this.#fetchList(params), {
-      persist: !params.search
-    })
+    await this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
   #ensureCertificate = async (payload) => {
@@ -137,7 +137,8 @@ export class WorkloadService extends BaseService {
     const workload = await this.#ensureWorkload(payload)
     await this.#ensureDeployment(payload, workload.id)
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.workload.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return {
       feedback:
@@ -149,36 +150,24 @@ export class WorkloadService extends BaseService {
   }
 
   listWorkloads = async (params) => {
-    const paramsValue = toValue(params)
-    const hasFilter = paramsValue?.hasFilter || false
-    return await this._ensureQueryData(
-      queryKeys.workload.list(paramsValue),
-      () => this.#fetchList(paramsValue),
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter
+
+    return await this.useEnsureQueryData(
+      queryKeys.workload.list({ ...params, fields: this.fieldsDefault }),
+      () => this.#fetchList(params),
       {
-        persist: paramsValue?.page === 1 && !paramsValue?.search && !hasFilter,
-        skipCache: paramsValue?.skipCache || hasFilter
+        persist: firstPage && !skipCache,
+        skipCache
       }
     )
   }
 
   loadWorkload = async ({ id }) => {
-    const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: queryKeys.workload.details()
-    })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== id
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({ queryKey: queryKeys.workload.details() })
-    }
-
-    const workload = await this._ensureQueryData(
+    const workload = await this.useEnsureQueryData(
       queryKeys.workload.detail(id),
       () => this.#fetchOne({ id }),
-      { persist: true }
+      { persist: false }
     )
 
     this.initialDomains = workload.initialDomains || []
@@ -195,8 +184,7 @@ export class WorkloadService extends BaseService {
       await this.#ensureDeployment(payload, payload.id)
     }
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
-    this.queryClient.removeQueries({ queryKey: queryKeys.workload.details() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return 'Your workload has been updated'
   }
@@ -345,7 +333,7 @@ export class WorkloadService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.workload.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return `Workload successfully deleted.`
   }

@@ -7,7 +7,10 @@ const DEFAULT_OPTIONS = {
   refetchOnReconnect: false,
   refetchInterval: false,
   refetchOnMount: false,
-  retry: 1
+  retry: false,
+  persist: true,
+  skipCache: false,
+  enabled: false
 }
 
 const CACHE_PRESETS = {
@@ -22,14 +25,11 @@ const CACHE_PRESETS = {
 }
 
 export const getCacheOptions = (cacheType = CACHE_TYPE.GLOBAL) => {
-  if (!CACHE_PRESETS[cacheType]) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[TanStack Query] Invalid cacheType: "${cacheType}". Falling back to GLOBAL cache settings.`,
-      `Valid types: ${Object.keys(CACHE_TYPE).join(', ')}`
-    )
-    return { ...DEFAULT_OPTIONS, ...CACHE_PRESETS[CACHE_TYPE.GLOBAL] }
+  const cachePreset = { ...DEFAULT_OPTIONS, ...CACHE_PRESETS[CACHE_TYPE.GLOBAL] }
+
+  if (cacheType && CACHE_PRESETS[cacheType]) {
+    return { ...cachePreset, ...CACHE_PRESETS[cacheType] }
   }
 
-  return { ...DEFAULT_OPTIONS, ...CACHE_PRESETS[cacheType] }
+  return cachePreset
 }

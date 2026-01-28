@@ -1,3 +1,6 @@
+import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
+import { useAccountStore } from '@/stores/account'
+
 window.addEventListener('storage', handleStorageChange)
 
 function handleStorageChange(event) {
@@ -10,3 +13,10 @@ function handleStorageChange(event) {
     window.location.reload()
   }
 }
+
+onSwitchAccount(async () => {
+  const accountStore = useAccountStore()
+  accountStore.resetAccount()
+
+  window.location.reload()
+})
