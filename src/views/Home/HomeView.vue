@@ -119,24 +119,6 @@
       description: 'Many products and services are been renamed for market pattern.'
     }
   ])
-  const monthlyUsageData = ref([
-    {
-      label: 'Edge DNS Hosted Zones',
-      value: '13'
-    },
-    {
-      label: 'Object Storage Data Stored',
-      value: '26.642 GB'
-    },
-    {
-      label: 'Workloads Total Data Transfered',
-      value: '22.416 GB'
-    },
-    {
-      label: 'Workloads Total Requests',
-      value: '5123'
-    }
-  ])
 
   const navigateToUsage = () => {
     router.push({ name: 'billing-tabs' })
@@ -251,11 +233,8 @@
           <LastActivitiesBlock />
         </div>
 
-        <div class="flex flex-col w-full md:w-[25%] gap-8">
-          <MonthlyUsageCard
-            :usageData="monthlyUsageData"
-            @viewAll="navigateToUsage"
-          />
+        <div class="flex flex-col w-full md:w-[30%] gap-8">
+          <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard :items="marketplaceItems" />
           <AzionChangelogCard :changelogItems="changelogItems" />
         </div>
