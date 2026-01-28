@@ -32,20 +32,17 @@ O Vite dispara um evento `vite:preloadError` quando falha ao carregar chunks. Es
 
 ### Anti-Loop
 
-
 - Máximo de 2 tentativas por path
 - Cooldown de 10 segundos entre tentativas
 - Estado persistido em `sessionStorage` (sobrevive ao reload)
 
 ### Segurança
 
-
 - Validação contra Open Redirect antes do reload
 - Bloqueia URLs absolutas, protocol-relative (`//`) e `javascript:`
 - Valida encoding para evitar bypass
 
 ### Observabilidade
-
 
 - Todos os erros são reportados ao Sentry
 - Contexto inclui: tentativas, timestamps, user agent, URL
@@ -63,8 +60,6 @@ useChunkPreloadErrorHandler()
 ## Configuração
 
 ```js
-const MAX_RELOAD_ATTEMPTS = 2 // Tentativas máximas por path
-const RELOAD_COOLDOWN_MS = 10_000 // Intervalo mínimo entre tentativas
 const MAX_RELOAD_ATTEMPTS = 2 // Tentativas máximas por path
 const RELOAD_COOLDOWN_MS = 10_000 // Intervalo mínimo entre tentativas
 ```
