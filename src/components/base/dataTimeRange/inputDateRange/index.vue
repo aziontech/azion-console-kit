@@ -299,7 +299,7 @@
         }
 
         if (shouldSetDefaultRelativeRange) {
-          model.value.startDate = now
+          model.value.endDate = now
           model.value.labelEnd = 'now'
           model.value.label = ''
         }

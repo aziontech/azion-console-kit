@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-  import { ref, defineModel } from 'vue'
+  import { ref, defineModel, onMounted, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
@@ -104,6 +104,95 @@
   const quickSelectValue = ref(15)
   const quickSelectUnit = ref('minutes')
 
+  const normalizeUnit = (unit) => {
+    if (!unit) return null
+
+    const normalized = String(unit).toLowerCase().trim()
+
+    switch (normalized) {
+      case 'minute':
+      case 'minutes':
+        return 'minutes'
+
+      case 'hour':
+      case 'hours':
+        return 'hours'
+
+      case 'day':
+      case 'days':
+        return 'days'
+
+      case 'month':
+      case 'months':
+        return 'months'
+
+      default:
+        return null
+    }
+  }
+
+  const parseRelativeFromLabel = (label) => {
+    if (!label) return null
+    const match = label.trim().match(/^(last|next)\s+(\d+)\s+([a-zA-Z]+)$/i)
+    if (!match) return null
+
+    const direction = match[1].toLowerCase()
+    const value = Number(match[2])
+    const unit = normalizeUnit(match[3])
+    if (!Number.isFinite(value) || value <= 0 || !unit) return null
+
+    return { direction, value, unit }
+  }
+
+  const getQuickStepFromModel = () => {
+    const step =
+      model.value?.quick || model.value?.relative || parseRelativeFromLabel(model.value?.label)
+    const unit = normalizeUnit(step?.unit)
+    if (!unit || !Number.isFinite(step?.value) || step.value <= 0) return null
+
+    const direction = step?.direction === 'next' ? 'next' : 'last'
+    return { direction, value: step.value, unit }
+  }
+
+  const syncFieldsFromModel = () => {
+    const step = getQuickStepFromModel()
+    if (!step) return
+    quickSelectDirection.value = step.direction
+    quickSelectValue.value = step.value
+    quickSelectUnit.value = step.unit
+  }
+
+  const syncModelQuickFromFields = () => {
+    model.value = {
+      ...model.value,
+      quick: {
+        value: quickSelectValue.value,
+        unit: quickSelectUnit.value,
+        direction: quickSelectDirection.value
+      }
+    }
+  }
+
+  onMounted(() => {
+    if (!props.panelOnly) return
+    syncFieldsFromModel()
+    syncModelQuickFromFields()
+  })
+
+  watch(
+    () => model.value?.quick,
+    () => {
+      if (!props.panelOnly) return
+      syncFieldsFromModel()
+    },
+    { deep: true }
+  )
+
+  watch([quickSelectDirection, quickSelectValue, quickSelectUnit], () => {
+    if (!props.panelOnly) return
+    syncModelQuickFromFields()
+  })
+
   const applyQuickSelect = () => {
     const now = new Date()
     const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
@@ -118,7 +207,12 @@
       endDate: newEndDate,
       label: '',
       labelStart: '',
-      labelEnd: ''
+      labelEnd: '',
+      quick: {
+        value: quickSelectValue.value,
+        unit: quickSelectUnit.value,
+        direction: quickSelectDirection.value
+      }
     }
     emit('select', model.value)
     emit('close')
