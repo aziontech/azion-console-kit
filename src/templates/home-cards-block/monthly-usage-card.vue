@@ -67,7 +67,7 @@
           </template>
           <template v-else>
             <div
-              v-for="(item, index) in usageData"
+              v-for="item in usageData"
               :key="item.key"
               class="flex items-start justify-between text-xs"
             >
