@@ -54,6 +54,7 @@
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
+    "exceljs": "^4.4.0",
     "front-matter": "^4.0.2",
     "idb-keyval": "^6.2.2",
     "jszip": "^3.10.1",
@@ -72,11 +73,9 @@
     "vee-validate": "^4.15.1",
     "vue": "3.5.22",
     "vue-router": "^4.5.1",
-    "xlsx": "^0.18.5",
     "yup": "^1.7.1"
   },
   "devDependencies": {
-    "azion": "^1.20.10",
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@cypress/code-coverage": "^3.12.39",
@@ -91,6 +90,7 @@
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/test-utils": "^2.4.1",
     "autoprefixer": "^10.4.14",
+    "azion": "^1.20.10",
     "cypress": "13.14.0",
     "cypress-plugin-tab": "^1.0.5",
     "cypress-real-events": "^1.13.0",
