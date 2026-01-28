@@ -14,7 +14,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
-  plugins: ['no-unsanitized'],
+  plugins: ['no-unsanitized', 'regexp'],
   rules: {
     'no-unsanitized/method': 'error',
     'no-unsanitized/property': 'error',
@@ -31,6 +31,12 @@ module.exports = {
     'security/detect-object-injection': 0,
     'security/detect-possible-timing-attacks': 'error',
     'security/detect-pseudoRandomBytes': 'error',
-    'security/detect-unsafe-regex': 'error'
+    'security/detect-unsafe-regex': 'error',
+    
+    'regexp/no-super-linear-backtracking': 'error',
+    'regexp/no-misleading-unicode-character': 'error',
+    'regexp/no-obscure-range': 'error',
+    'regexp/no-control-character': 'error',
+    'regexp/strict': 'error'
   }
 }
