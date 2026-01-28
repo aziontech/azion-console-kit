@@ -6,7 +6,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
-  import LoadingState from './create-modal-block-loading-state.vue'
+  import LoadingState from '@/templates/create-modal-block/create-modal-block-loading-state.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   const { pluralTitle, pluralLabel } = TEXT_DOMAIN_WORKLOAD()
