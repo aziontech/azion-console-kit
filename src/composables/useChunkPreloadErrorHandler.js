@@ -92,17 +92,36 @@ function reportToSentry(error, targetPath, willReload, blockReason) {
 }
 
 function isValidRedirectPath(path) {
+  const isInvalidUrlLikeValue = (value) => {
+    const trimmed = value.trimStart()
+    const lower = trimmed.toLowerCase()
+
+    // Scheme-relative URLs (//evil.com) and backslash variants (\\evil.com)
+    if (lower.startsWith('//') || lower.startsWith('\\\\')) {
+      return true
+    }
+
+    // Any explicit URL scheme (covers http(s), data:, vbscript:, etc.)
+    const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(trimmed)
+    if (schemeMatch) {
+      return true
+    }
+
+    return false
+  }
+
+  // Must be a same-origin absolute-path reference
   if (!path.startsWith('/') || path.startsWith('//')) {
     return false
   }
 
-  if (path.includes('://') || path.toLowerCase().startsWith('javascript:')) {
+  if (isInvalidUrlLikeValue(path)) {
     return false
   }
 
   try {
     const decoded = decodeURIComponent(path)
-    if (decoded.startsWith('//') || decoded.includes('://')) {
+    if (isInvalidUrlLikeValue(decoded)) {
       return false
     }
   } catch {
