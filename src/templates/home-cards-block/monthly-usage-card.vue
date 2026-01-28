@@ -48,34 +48,34 @@
       </div>
     </template>
     <template #content>
-        <div class="p-4 flex flex-col gap-2.5">
-          <template v-if="isLoading">
-            <div
-              v-for="index in 4"
-              :key="index"
-              class="flex items-start justify-between text-xs"
-            >
-              <SkeletonBlock
-                width="17rem"
-                :isLoaded="false"
-              />
-              <SkeletonBlock
-                width="4rem"
-                :isLoaded="false"
-              />
-            </div>
-          </template>
-          <template v-else>
-            <div
-              v-for="item in usageData"
-              :key="item.key"
-              class="flex items-start justify-between text-xs"
-            >
-              <span class="text-[var(--text-color-secondary)]">{{ item.label }}</span>
-              <span class="text-[var(--text-color)]">{{ item.value }}</span>
-            </div>
-          </template>
-        </div>
+      <div class="p-4 flex flex-col gap-2.5">
+        <template v-if="isLoading">
+          <div
+            v-for="index in 4"
+            :key="index"
+            class="flex items-start justify-between text-xs"
+          >
+            <SkeletonBlock
+              width="17rem"
+              :isLoaded="false"
+            />
+            <SkeletonBlock
+              width="4rem"
+              :isLoaded="false"
+            />
+          </div>
+        </template>
+        <template v-else>
+          <div
+            v-for="item in usageData"
+            :key="item.key"
+            class="flex items-start justify-between text-xs"
+          >
+            <span class="text-[var(--text-color-secondary)]">{{ item.label }}</span>
+            <span class="text-[var(--text-color)]">{{ item.value }}</span>
+          </div>
+        </template>
+      </div>
     </template>
 
     <template #footer>
@@ -109,9 +109,7 @@
 
   defineEmits(['viewAll'])
 
-  const DEFAULT_USAGE_LIST = [
-    { label: 'No usage data available', value: '---', key: 'no_data' }
-  ]
+  const DEFAULT_USAGE_LIST = [{ label: 'No usage data available', value: '---', key: 'no_data' }]
 
   const DEFAULT_SELECTED_KEYS = [
     'edge_dns_hosted_zones',
@@ -134,9 +132,7 @@
 
   const usageData = computed(() => {
     if (!selectedOptions.value.length) return DEFAULT_USAGE_LIST
-    return allUsageOptions.value.filter((option) =>
-      selectedOptions.value.includes(option.key)
-    )
+    return allUsageOptions.value.filter((option) => selectedOptions.value.includes(option.key))
   })
 
   const listServiceAndProductsChanges = async () => {
@@ -179,7 +175,8 @@
         if (!desc.service) return
 
         const key = `${product.slug}_${desc.slug}`
-        const label = product.service === desc.service ? product.service : `${product.service} ${desc.service}`
+        const label =
+          product.service === desc.service ? product.service : `${product.service} ${desc.service}`
 
         options.push({
           key,

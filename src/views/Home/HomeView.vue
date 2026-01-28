@@ -4,7 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { useAccountStore } from '@/stores/account'
   import ContentBlock from '@/templates/content-block'
-  import InviteUserDialog from './Dialog/InviteUserDialog.vue'
+  import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'

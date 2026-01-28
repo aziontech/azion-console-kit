@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-  import HomeCardBlock from './index.vue'
+  import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
 
   defineOptions({ name: 'AzionChangelogCard' })
 
