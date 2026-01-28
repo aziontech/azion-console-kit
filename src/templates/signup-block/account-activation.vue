@@ -60,7 +60,7 @@
   }
 
   const validateEmail = (email) => {
-    const re = /^\S+@\S+\.\S+$/
+    const re = /^\S[^\s@]*@\S[^\s.]*\.\S+$/
     return re.test(email)
   }
 
