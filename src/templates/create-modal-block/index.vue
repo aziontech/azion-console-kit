@@ -1,13 +1,19 @@
 <script setup>
+  import { computed, ref, inject, watch } from 'vue'
+  import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
   import PrimeInputText from 'primevue/inputtext'
-  import LoadingState from './create-modal-block-loading-state.vue'
-  import { computed, ref, inject } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
+  import LoadingState from '@/templates/create-modal-block/create-modal-block-loading-state.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
   const { pluralTitle, pluralLabel } = TEXT_DOMAIN_WORKLOAD()
+  const accountStore = useAccountStore()
+  const createModalStore = useCreateModalStore()
+  const emit = defineEmits('closeModal')
+  const router = useRouter()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -32,10 +38,6 @@
       })
     }
   })
-
-  const accountStore = useAccountStore()
-
-  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
 
   const RESOURCES = [
     {
@@ -131,21 +133,16 @@
     }
   ]
 
+  const selectedTab = ref('recommended')
+  const search = ref('')
+
+  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
+
   const filteredTabs = computed(() => {
     return TABS.filter((menuitem) => menuitem.show)
   })
 
-  const emit = defineEmits('closeModal')
-
-  const router = useRouter()
-
-  const selectedTab = ref('recommended')
-  const search = ref('')
   const isSearching = computed(() => !!search.value.trim().length)
-
-  if (hideCreateOptions.value) {
-    selectedTab.value = 'newResource'
-  }
 
   const filteredResources = computed(() => {
     const showRosourceOnlyV4 = ['Edge Connector', 'Custom Page']
@@ -181,6 +178,30 @@
         title: 'Import from GitHub'
       }
     }
+  })
+
+  const resultsText = computed(() => {
+    const options = {
+      zero: 'No results found.',
+      one: '1 search result for',
+      multiple: `${filteredTemplates.value.length} search results for`
+    }
+
+    if (!filteredTemplates.value.length) return options.zero
+    if (filteredTemplates.value.length === 1) return options.one
+    return options.multiple
+  })
+
+  const filteredTemplates = computed(() => {
+    return filterBySearchField(search.value)
+  })
+
+  const hasInitialData = computed(() => {
+    return templatesData.value[selectedTab.value].length > 0
+  })
+
+  const isEmptyDueToNoData = computed(() => {
+    return !hasInitialData.value && filteredTemplates.value.length === 0 && !isLoading.value
   })
 
   const redirect = (toLink, selection) => {
@@ -251,33 +272,23 @@
     return template[key].toLowerCase().includes(filter.toLowerCase())
   }
 
-  const filteredTemplates = computed(() => {
-    return filterBySearchField(search.value)
-  })
-
-  const hasInitialData = computed(() => {
-    return templatesData.value[selectedTab.value].length > 0
-  })
-
-  const isEmptyDueToNoData = computed(() => {
-    return !hasInitialData.value && filteredTemplates.value.length === 0 && !isLoading.value
-  })
-
   const resetFilters = () => {
     search.value = ''
   }
 
-  const resultsText = computed(() => {
-    const options = {
-      zero: 'No results found.',
-      one: '1 search result for',
-      multiple: `${filteredTemplates.value.length} search results for`
-    }
+  watch(
+    () => createModalStore.initialTab,
+    (newTab) => {
+      if (newTab) {
+        selectedTab.value = newTab
+      }
+    },
+    { immediate: true }
+  )
 
-    if (!filteredTemplates.value.length) return options.zero
-    if (filteredTemplates.value.length === 1) return options.one
-    return options.multiple
-  })
+  if (hideCreateOptions.value) {
+    selectedTab.value = 'newResource'
+  }
 </script>
 
 <template>

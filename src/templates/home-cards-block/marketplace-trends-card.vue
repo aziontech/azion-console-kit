@@ -87,7 +87,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import HomeCardBlock from './index.vue'
+  import HomeCardBlock from '@/templates/home-cards-block/index.vue'
 
   defineOptions({ name: 'MarketplaceTrendsCard' })
 
@@ -107,8 +107,7 @@
   }
 
   const previousItem = () => {
-    currentIndex.value =
-      currentIndex.value === 0 ? props.items.length - 1 : currentIndex.value - 1
+    currentIndex.value = !currentIndex.value ? props.items.length - 1 : currentIndex.value - 1
   }
 
   const goToItem = (index) => {
