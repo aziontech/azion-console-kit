@@ -6,8 +6,11 @@
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
   import Layout from '@/layout'
+  import { useChunkPreloadErrorHandler } from '@/composables/useChunkPreloadErrorHandler'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+
+  useChunkPreloadErrorHandler()
 
   const DEFAULT_TITLE = 'Azion Console'
 
