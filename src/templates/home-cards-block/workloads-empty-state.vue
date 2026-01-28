@@ -1,4 +1,5 @@
 <script setup>
+  import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
@@ -7,7 +8,7 @@
   const router = useRouter()
   const createModalStore = useCreateModalStore()
 
-  const actionItems = [
+  const actionItems = computed(() => [
     {
       title: 'Import from GitHub',
       description: 'Import a repository from GitHub.',
@@ -26,7 +27,7 @@
       buttonLabel: 'Create',
       action: handleCreateFromScratch
     }
-  ]
+  ])
 
   const handleCreateFromScratch = () => {
     router.push({ name: 'create-workload' })
