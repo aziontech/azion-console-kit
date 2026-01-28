@@ -32,7 +32,6 @@ module.exports = {
     'security/detect-possible-timing-attacks': 'error',
     'security/detect-pseudoRandomBytes': 'error',
     'security/detect-unsafe-regex': 'error',
-    
     'regexp/no-super-linear-backtracking': 'error',
     'regexp/no-misleading-unicode-character': 'error',
     'regexp/no-obscure-range': 'error',
