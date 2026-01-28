@@ -11,7 +11,7 @@
     :outlined="props.outlined"
     :class="props.class"
     @click="visible = true"
-    v-tooltip.bottom="{ value: 'Feedback', showDelay: 200, disabled: currentLabel !== '' }"
+    v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
     data-testid="header-block__open-feedback-button"
   />
 
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, inject } from 'vue'
+  import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import { createFeedbackServices } from '@/services/feedback-services'
@@ -109,15 +109,6 @@
 
   const { accountData: account } = storeToRefs(useAccountStore())
   const toast = useToast()
-  const currentWidth = inject('currentWidth')
-  const SCREEN_BREAKPOINT_MD = 768
-
-  const currentLabel = computed(() => {
-    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Feedback'
-    }
-    return ''
-  })
 
   const visible = ref(false)
   const loading = ref(false)

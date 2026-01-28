@@ -13,7 +13,7 @@
       'bg-header hover:bg-header-button-hover': !createModalIsOpen,
       'bg-header-button-enabled': createModalIsOpen
     }"
-    v-tooltip.bottom="{ value: 'Create', showDelay: 200, disabled: currentLabel !== '' }"
+    v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
   />
 
   <PrimeDialog
