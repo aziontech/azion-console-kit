@@ -4,7 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { useAccountStore } from '@/stores/account'
   import ContentBlock from '@/templates/content-block'
-  import InviteUserDialog from './Dialog/InviteUserDialog.vue'
+  import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
@@ -118,24 +118,6 @@
     {
       time: '4 days ago',
       description: 'Many products and services are been renamed for market pattern.'
-    }
-  ])
-  const monthlyUsageData = ref([
-    {
-      label: 'Edge DNS Hosted Zones',
-      value: '13'
-    },
-    {
-      label: 'Object Storage Data Stored',
-      value: '26.642 GB'
-    },
-    {
-      label: 'Workloads Total Data Transfered',
-      value: '22.416 GB'
-    },
-    {
-      label: 'Workloads Total Requests',
-      value: '5123'
     }
   ])
 
@@ -253,15 +235,11 @@
             <ResourcesBlock />
             <LastActivitiesBlock />
           </div>
-
-          <div class="flex flex-col w-full md:w-[25%] gap-8">
-            <MonthlyUsageCard
-              :usageData="monthlyUsageData"
-              @viewAll="navigateToUsage"
-            />
-            <MarketplaceTrendsCard :items="marketplaceItems" />
-            <AzionChangelogCard :changelogItems="changelogItems" />
-          </div>
+        </div>
+        <div class="flex flex-col w-full md:w-[30%] gap-8">
+          <MonthlyUsageCard @viewAll="navigateToUsage" />
+          <MarketplaceTrendsCard :items="marketplaceItems" />
+          <AzionChangelogCard :changelogItems="changelogItems" />
         </div>
       </section>
     </template>

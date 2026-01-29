@@ -87,7 +87,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import HomeCardBlock from '@/templates/home-cards-block/index.vue'
+  import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
 
   defineOptions({ name: 'MarketplaceTrendsCard' })
 
