@@ -131,14 +131,6 @@
 
     if (!start || !end) return false
 
-    if (props.maxDays && props.maxDays > 0) {
-      const min = minDate.value
-      const max = maxDate.value
-      const startDate = new Date(start)
-      const endDate = new Date(end)
-      if (min && startDate < min) return true
-      if (max && endDate > max) return true
-    }
     return new Date(start).getTime() > new Date(end).getTime()
   })
 
@@ -335,7 +327,7 @@
         }
 
         if (shouldSetDefaultRelativeRange) {
-          model.value.endDate = boundedEnd
+          model.value.endDate = now
           model.value.labelEnd = 'now'
           model.value.label = ''
         }
