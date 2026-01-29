@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 env:
   HUSKY: 0

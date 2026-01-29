@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export const createOriginService = async (payload) => {
   const { id } = payload
@@ -15,7 +15,7 @@ export const createOriginService = async (payload) => {
   const result = parseHttpResponse(httpResponse, id)
 
   // Remove list queries from cache (including IndexedDB) after creating
-  queryClient.removeQueries({ queryKey: queryKeys.origins.all(id) })
+  queryClient.removeQueries({ queryKey: queryKeys.edgeApp.origins.all(id) })
 
   return result
 }

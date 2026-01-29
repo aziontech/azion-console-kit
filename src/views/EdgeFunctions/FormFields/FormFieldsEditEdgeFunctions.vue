@@ -248,6 +248,7 @@
             <FieldTextIcon
               label="Runtime"
               name="runtimeFormat.content"
+              :value="runtimeFormat?.content"
               icon="pi pi-lock"
               disabled
               description="Runtime isn't an editable field."

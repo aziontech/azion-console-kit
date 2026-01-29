@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.49.17",
+  "version": "1.49.24",
   "private": false,
   "type": "module",
   "repository": {
@@ -42,15 +42,14 @@
     "@mdi/font": "^7.4.47",
     "@sentry/vite-plugin": "^4.3.0",
     "@sentry/vue": "^10.27.0",
-    "@stripe/stripe-js": "^4.1.0",
+    "@stripe/stripe-js": "^4.10.0",
     "@tanstack/query-broadcast-client-experimental": "^5.90.10",
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.3",
     "@vee-validate/yup": "^4.15.1",
     "@vueuse/core": "^10.11.1",
     "analytics": "^0.8.19",
-    "axios": "^1.12.0",
-    "azion": "^1.20.10",
+    "axios": "^1.13.3",
     "azion-theme": "^1.16.2",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
@@ -77,6 +76,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "azion": "^1.20.10",
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@cypress/code-coverage": "^3.12.39",
@@ -128,7 +128,9 @@
     "slice-ansi": "4.0.0",
     "strip-ansi": "6.0.1",
     "supports-color": "7.2.0",
-    "supports-hyperlinks": "2.3.0"
+    "supports-hyperlinks": "2.3.0",
+    "d3-color": "^3.1.0",
+    "axios": "^1.13.3"
   },
   "engines": {
     "node": ">=22.18.0",

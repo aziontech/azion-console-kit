@@ -162,7 +162,7 @@
 
   const logout = () => {
     startLoading()
-    window.location.href = '/logout'
+    window.location.assign('/logout')
   }
 
   const decorateDeleteService = async () => {

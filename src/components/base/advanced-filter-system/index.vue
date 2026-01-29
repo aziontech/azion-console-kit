@@ -1,4 +1,5 @@
 <script setup>
+  import { ref, onMounted, defineModel, computed } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
@@ -6,11 +7,12 @@
   import PrimeButton from 'primevue/button'
 
   import { useAccountStore } from '@/stores/account'
-  import { ref, onMounted, defineModel } from 'vue'
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
+  const accountStore = useAccountStore()
 
+  const userUTC = accountStore.accountUtcOffset
   const emit = defineEmits(['updatedFilter'])
 
   const props = defineProps({
@@ -30,9 +32,26 @@
   const filterData = defineModel('filterData')
 
   const filterDataRange = ref({})
+  const hasPendingDateUpdate = ref(false)
 
-  const accountStore = useAccountStore()
-  const userUTC = accountStore.accountUtcOffset
+  const isInvalidRange = computed(() => {
+    const start = filterDataRange.value?.startDate
+    const end = filterDataRange.value?.endDate
+
+    const labelStart =
+      typeof filterDataRange.value?.labelStart === 'string'
+        ? filterDataRange.value.labelStart.trim()
+        : ''
+    const labelEnd =
+      typeof filterDataRange.value?.labelEnd === 'string'
+        ? filterDataRange.value.labelEnd.trim()
+        : ''
+
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
+    if (!start || !end) return false
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
 
   const parseRelativeFromLabel = (label) => {
     if (!label || typeof label !== 'string') return null
@@ -50,15 +69,60 @@
   }
 
   const updatedTime = () => {
-    const parsed = parseRelativeFromLabel(filterDataRange.value.label)
-    if (parsed) {
-      const { startDate, endDate } = createRelativeRange(
-        parsed.value,
-        parsed.unit,
-        parsed.direction,
-        new Date()
-      )
+    const now = new Date()
 
+    if (
+      typeof filterDataRange.value.labelEnd === 'string' &&
+      filterDataRange.value.labelEnd.trim() === 'now'
+    ) {
+      filterDataRange.value.endDate = now
+    }
+
+    if (
+      typeof filterDataRange.value.labelStart === 'string' &&
+      filterDataRange.value.labelStart.trim() === 'now'
+    ) {
+      filterDataRange.value.startDate = now
+    }
+
+    if (
+      typeof filterDataRange.value.label === 'string' &&
+      filterDataRange.value.label.trim() === 'now'
+    ) {
+      filterDataRange.value.endDate = now
+    }
+
+    const labelEndParsed = parseRelativeFromLabel(filterDataRange.value.labelEnd)
+    const labelStartParsed = parseRelativeFromLabel(filterDataRange.value.labelStart)
+    const labelParsed = parseRelativeFromLabel(filterDataRange.value.label)
+
+    if (labelEndParsed) {
+      const { startDate } = createRelativeRange(
+        labelEndParsed.value,
+        labelEndParsed.unit,
+        labelEndParsed.direction,
+        now
+      )
+      filterDataRange.value.endDate = startDate
+    }
+
+    if (labelStartParsed) {
+      const { startDate } = createRelativeRange(
+        labelStartParsed.value,
+        labelStartParsed.unit,
+        labelStartParsed.direction,
+        now
+      )
+      filterDataRange.value.startDate = startDate
+    }
+
+    if (labelParsed) {
+      const { startDate, endDate } = createRelativeRange(
+        labelParsed.value,
+        labelParsed.unit,
+        labelParsed.direction,
+        now
+      )
       filterDataRange.value.startDate = startDate
       filterDataRange.value.endDate = endDate
     }
@@ -68,16 +132,20 @@
       filterDataRange.value.endDate,
       userUTC
     )
-
     filterData.value.tsRange = {
       tsRangeBegin,
       tsRangeEnd
     }
   }
 
-  const filterSearch = () => {
+  const applyFilters = () => {
     updatedTime()
     emitUpdatedFilter()
+    hasPendingDateUpdate.value = false
+  }
+
+  const onDateRangeSelect = () => {
+    hasPendingDateUpdate.value = true
   }
 
   const emitUpdatedFilter = () => {
@@ -92,7 +160,7 @@
 
   const removeFilter = (index) => {
     filterData.value.fields.splice(index, 1)
-    filterSearch()
+    applyFilters()
   }
 
   const updatedTimeRange = (begin, end, userUTC) => {
@@ -111,6 +179,8 @@
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
       label: filterData.value.tsRange.label || ''
     }
+
+    hasPendingDateUpdate.value = false
   })
 </script>
 
@@ -138,7 +208,7 @@
           <DialogFilter
             v-model:filterAdvanced="filterData.fields"
             :fieldsInFilter="props.fieldsInFilter"
-            @applyFilter="filterSearch"
+            @applyFilter="applyFilters"
           />
           <AzionQueryLanguage
             :fieldsInFilter="props.fieldsInFilter"
@@ -150,14 +220,27 @@
           class="max-md:w-full"
           v-model="filterDataRange"
           :maxDays="props.filterDateRangeMaxDays"
-          @select="filterSearch"
+          @select="onDateRangeSelect"
         />
         <PrimeButton
+          v-if="!hasPendingDateUpdate"
           icon="pi pi-refresh"
           outlined
           size="small"
           label="Refresh"
-          @click="filterSearch"
+          class="w-[5.875rem]"
+          :disabled="isInvalidRange"
+          @click="applyFilters"
+        />
+        <PrimeButton
+          v-else
+          icon="pi pi-arrow-circle-right"
+          severity="secondary"
+          size="small"
+          label="Update"
+          :disabled="isInvalidRange"
+          class="w-[5.875rem]"
+          @click="applyFilters"
         />
       </div>
       <div class="flex flex-1 w-full">
