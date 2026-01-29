@@ -1,5 +1,6 @@
 <script setup>
   import { computed } from 'vue'
+  import { motion, AnimatePresence } from 'motion-v'
   import PrimeButton from 'primevue/button'
   import { useInfoBannerStore } from '@/stores/info-banner'
 
@@ -39,101 +40,64 @@
 
 <template>
   <div
-    class="flex flex-col gap-2 w-full"
+    class="flex flex-col gap-2 w-full px-8"
     :class="{
-      'pb-8': visibleBanners.length
+      'mt-8': visibleBanners.length
     }"
   >
-    <TransitionGroup
-      name="banner"
-      tag="div"
-      class="flex flex-col gap-2"
-    >
-      <div
-        v-for="banner in visibleBanners"
-        :key="banner.id"
-        :class="[
-          'flex gap-[10px] items-center px-4 py-3 rounded-md w-full border overflow-hidden',
-          getStyle(banner.severity).container
-        ]"
-      >
-        <div :class="['flex items-center p-2 rounded-[6px]', getStyle(banner.severity).iconBg]">
-          <i
+    <div class="flex flex-col">
+      <AnimatePresence>
+        <motion.div
+          v-for="banner in visibleBanners"
+          :key="banner.id"
+          :initial="{ height: 0, marginBottom: 0 }"
+          :animate="{ height: 'auto', marginBottom: 8 }"
+          :exit="{ height: 0, marginBottom: 0 }"
+          :transition="{
+            type: 'spring',
+            visualDuration: 0.3,
+            bounce: 0
+          }"
+          class="overflow-hidden"
+        >
+          <motion.div
+            :initial="{ opacity: 0, y: -20 }"
+            :animate="{ opacity: 1, y: 0 }"
+            :exit="{ opacity: 0, y: -20 }"
+            :transition="{
+              type: 'spring',
+              visualDuration: 0.25,
+              bounce: 0.1
+            }"
             :class="[
-              getStyle(banner.severity).icon,
-              'text-[16px]',
-              getStyle(banner.severity).iconColor
+              'flex gap-[10px] items-center px-4 py-3 rounded-md w-full border',
+              getStyle(banner.severity).container
             ]"
-          />
-        </div>
-        <div
-          class="flex-1 text-xs leading-5 text-[#ededed]"
-          v-html="banner.content"
-        />
-        <PrimeButton
-          text
-          rounded
-          severity="secondary"
-          icon="pi pi-times"
-          class="!w-7 !h-7"
-          @click="handleClose(banner.id)"
-        />
-      </div>
-    </TransitionGroup>
+          >
+            <div :class="['flex items-center p-2 rounded-[6px]', getStyle(banner.severity).iconBg]">
+              <i
+                :class="[
+                  getStyle(banner.severity).icon,
+                  'text-[16px]',
+                  getStyle(banner.severity).iconColor
+                ]"
+              />
+            </div>
+            <div
+              class="flex-1 text-xs leading-5 text-[#ededed]"
+              v-html="banner.content"
+            />
+            <PrimeButton
+              text
+              rounded
+              severity="secondary"
+              icon="pi pi-times"
+              class="!w-7 !h-7"
+              @click="handleClose(banner.id)"
+            />
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   </div>
 </template>
-
-<style scoped>
-  .banner-enter-active {
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease,
-      max-height 0.3s ease,
-      margin 0.3s ease,
-      padding 0.3s ease;
-  }
-
-  .banner-leave-active {
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease,
-      max-height 0.2s ease,
-      margin 0.2s ease,
-      padding 0.2s ease;
-  }
-
-  .banner-enter-from {
-    opacity: 0;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    transform: translateY(-10px);
-    overflow: hidden;
-  }
-
-  .banner-enter-to {
-    opacity: 1;
-    max-height: 100px;
-    transform: translateY(0);
-  }
-
-  .banner-leave-from {
-    opacity: 1;
-    max-height: 100px;
-  }
-
-  .banner-leave-to {
-    opacity: 0;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    transform: translateY(-10px);
-    overflow: hidden;
-  }
-
-  .banner-move {
-    transition: transform 0.3s ease;
-  }
-</style>

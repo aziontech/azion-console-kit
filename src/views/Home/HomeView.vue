@@ -2,7 +2,10 @@
   import { inject, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
+  import { inviteYourTeamService } from '@/services/users-services'
+  import { teamsService } from '@/services/users-services/list-teams-service'
   import { useAccountStore } from '@/stores/account'
+  import InviteSession from '@/helpers/invite-session'
   import ContentBlock from '@/templates/content-block'
   import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
@@ -10,7 +13,6 @@
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
   import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
-  import InfoBanner from '@/templates/info-banner'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -18,25 +20,6 @@
   const { accountData } = useAccountStore()
 
   defineOptions({ name: 'home-view' })
-
-  const props = defineProps({
-    listTeamsService: {
-      type: Function,
-      required: true
-    },
-    inviteYourTeamService: {
-      type: Function,
-      required: true
-    },
-    inviteSession: {
-      type: Function,
-      required: true
-    },
-    windowManager: {
-      type: Object,
-      required: true
-    }
-  })
 
   const user = accountData
   const teams = ref([])
@@ -135,9 +118,9 @@
   }
 
   onMounted(async () => {
-    teams.value = await props.listTeamsService()
-    if (props.inviteSession.sessionIsExpired()) {
-      props.inviteSession.turnInviteBlockVisable()
+    teams.value = await teamsService.listTeams()
+    if (InviteSession.sessionIsExpired()) {
+      InviteSession.turnInviteBlockVisable()
     }
   })
 </script>
@@ -145,96 +128,93 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full h-full flex flex-col pt-10 px-8 pb-8">
-        <InfoBanner />
-        <div class="flex flex-col md:flex-row gap-8">
-          <div class="flex flex-col w-full md:w-[75%] gap-8">
-            <div class="flex w-full justify-between items-center">
-              <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
+      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 pb-8">
+        <div class="flex flex-col w-full md:w-[75%] gap-8">
+          <div class="flex w-full justify-between items-center">
+            <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
+            <PrimeButton
+              icon="pi pi-user-plus"
+              severity="secondary"
+              label="Invite User"
+              outlined
+              @click="openInviteDialog"
+            />
+          </div>
+          <!-- Start Metrics Block -->
+          <div class="flex flex-col gap-3 w-full">
+            <div class="flex gap-3 items-center h-7">
+              <span class="text-base font-semibold">Metrics</span>
               <PrimeButton
-                icon="pi pi-user-plus"
+                icon="ai ai-filter"
+                size="small"
                 severity="secondary"
-                label="Invite User"
-                outlined
-                @click="openInviteDialog"
+                text
               />
             </div>
-            <!-- Start Metrics Block -->
-            <div class="flex flex-col gap-3 w-full">
-              <div class="flex gap-3 items-center h-7">
-                <span class="text-base font-semibold">Metrics</span>
-                <PrimeButton
-                  icon="ai ai-filter"
-                  size="small"
-                  severity="secondary"
-                  text
-                />
-              </div>
-              <div class="flex flex-col gap-2 w-full relative">
+            <div class="flex flex-col gap-2 w-full relative">
+              <div
+                class="border border-[var(--surface-border)] rounded-md overflow-hidden flex w-full"
+              >
                 <div
-                  class="border border-[var(--surface-border)] rounded-md overflow-hidden flex w-full"
+                  v-for="(metric, index) in metricsData"
+                  :key="index"
+                  class="bg-[var(--surface-section)] flex-1 h-[101px] p-5 flex flex-col gap-2.5"
+                  :class="{ 'border-l border-[var(--surface-border)]': index > 0 }"
                 >
-                  <div
-                    v-for="(metric, index) in metricsData"
-                    :key="index"
-                    class="bg-[var(--surface-section)] flex-1 h-[101px] p-5 flex flex-col gap-2.5"
-                    :class="{ 'border-l border-[var(--surface-border)]': index > 0 }"
-                  >
-                    <div class="flex items-center justify-between w-full">
-                      <div class="flex flex-1 gap-2 items-center">
-                        <span
-                          class="text-[10px] uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
-                          style="font-family: 'Proto Mono', monospace"
-                        >
-                          {{ metric.label }}
-                        </span>
-                        <div class="bg-[var(--surface-input)] p-1 rounded-full flex items-center">
-                          <i class="pi pi-info-circle text-[7px]"></i>
-                        </div>
+                  <div class="flex items-center justify-between w-full">
+                    <div class="flex flex-1 gap-2 items-center">
+                      <span
+                        class="text-[10px] uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
+                        style="font-family: 'Proto Mono', monospace"
+                      >
+                        {{ metric.label }}
+                      </span>
+                      <div class="bg-[var(--surface-input)] p-1 rounded-full flex items-center">
+                        <i class="pi pi-info-circle text-[7px]"></i>
                       </div>
                     </div>
+                  </div>
 
-                    <div class="flex gap-2 items-center w-full">
-                      <div class="flex gap-1 items-center">
-                        <span class="text-[28px] font-semibold tracking-tight text-[#ededed]">
-                          {{ metric.value }}
-                        </span>
-                        <span class="text-xs text-[#ededed]">{{ metric.unit }}</span>
-                      </div>
+                  <div class="flex gap-2 items-center w-full">
+                    <div class="flex gap-1 items-center">
+                      <span class="text-[28px] font-semibold tracking-tight text-[#ededed]">
+                        {{ metric.value }}
+                      </span>
+                      <span class="text-xs text-[#ededed]">{{ metric.unit }}</span>
+                    </div>
 
-                      <div
-                        class="flex gap-2 items-center px-2 py-1 rounded-md"
+                    <div
+                      class="flex gap-2 items-center px-2 py-1 rounded-md"
+                      :class="
+                        metric.trend.direction === 'up'
+                          ? 'bg-[rgba(22,163,74,0.2)]'
+                          : 'bg-[rgba(245,61,61,0.2)]'
+                      "
+                    >
+                      <i
+                        class="text-[10.5px]"
                         :class="
                           metric.trend.direction === 'up'
-                            ? 'bg-[rgba(22,163,74,0.2)]'
-                            : 'bg-[rgba(245,61,61,0.2)]'
+                            ? 'pi pi-arrow-circle-up text-[#39e478]'
+                            : 'pi pi-arrow-circle-down text-[#f53d3d]'
+                        "
+                      ></i>
+                      <span
+                        class="text-[11px] font-semibold leading-4"
+                        :class="
+                          metric.trend.direction === 'up' ? 'text-[#39e478]' : 'text-[#f53d3d]'
                         "
                       >
-                        <i
-                          class="text-[10.5px]"
-                          :class="
-                            metric.trend.direction === 'up'
-                              ? 'pi pi-arrow-circle-up text-[#39e478]'
-                              : 'pi pi-arrow-circle-down text-[#f53d3d]'
-                          "
-                        ></i>
-                        <span
-                          class="text-[11px] font-semibold leading-4"
-                          :class="
-                            metric.trend.direction === 'up' ? 'text-[#39e478]' : 'text-[#f53d3d]'
-                          "
-                        >
-                          {{ metric.trend.percentage }}
-                        </span>
-                      </div>
+                        {{ metric.trend.percentage }}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <ResourcesBlock />
-            <LastActivitiesBlock />
           </div>
+          <ResourcesBlock />
+          <LastActivitiesBlock />
         </div>
         <div class="flex flex-col w-full md:w-[30%] gap-8">
           <MonthlyUsageCard @viewAll="navigateToUsage" />
@@ -247,8 +227,8 @@
 
   <InviteUserDialog
     v-model:visible="showInviteDialog"
-    :listTeamsService="props.listTeamsService"
-    :inviteYourTeamService="props.inviteYourTeamService"
+    :listTeamsService="teamsService.listTeams"
+    :inviteYourTeamService="inviteYourTeamService"
     @invite-success="handleInviteSuccess"
   />
 </template>
