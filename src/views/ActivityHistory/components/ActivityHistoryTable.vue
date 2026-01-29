@@ -32,17 +32,17 @@
   const totalRecords = ref(0)
   const searchValue = ref('')
   const now = new Date()
-  const { startDate, endDate } = createRelativeRange(30, 'days', 'last', now)
+  const { startDate, endDate } = createRelativeRange(5, 'minutes', 'last', now)
   const dateRange = ref({
     startDate,
     endDate,
-    label: 'Last 30 days',
-    labelStart: 'Last 30 days',
-    labelEnd: 'Last 30 days',
+    label: 'Last 5 minutes',
+    labelStart: 'Last 5 minutes',
+    labelEnd: 'Last 5 minutes',
     relative: {
       direction: 'last',
-      value: 30,
-      unit: 'days'
+      value: 5,
+      unit: 'minutes'
     }
   })
   const appliedFilters = ref([])
