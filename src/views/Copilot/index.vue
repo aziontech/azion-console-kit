@@ -39,7 +39,7 @@
     }
 
     loadPromptSuggestionWithRoleDecorator(account.jobRole)
-    hasSupport.value = !account.isDeveloperSupportPlan
+    hasSupport.value = !account?.isDeveloperSupportPlan
   })
 </script>
 
