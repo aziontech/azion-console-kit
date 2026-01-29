@@ -45,29 +45,6 @@
     default: () => ({})
   })
 
-  const maxDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    return new Date()
-  })
-  const minDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    const now = new Date()
-    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
-  })
-
-  const clampToBounds = (date) => {
-    if (!date) return date
-    const parsed = new Date(date)
-    if (!props.maxDays || props.maxDays <= 0) return parsed
-
-    const min = minDate.value
-    const max = maxDate.value
-
-    if (min && parsed < min) return new Date(min)
-    if (max && parsed > max) return new Date(max)
-    return parsed
-  }
-
   // Refs
   const selectedDate = ref(new Date())
   const selectedTime = ref('')
@@ -85,12 +62,15 @@
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
-  const sizeInput = (value) => {
-    if (value.length > 5) {
-      return value.length
-    }
-    return 7
-  }
+  const maxDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    return new Date()
+  })
+  const minDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    const now = new Date()
+    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
 
   const inputValue = computed({
     get: () => {
@@ -139,11 +119,25 @@
     emit('select', model.value)
   }
 
-  onMounted(() => {
-    if (props.mode === 'relative') {
-      updateRelativeRange()
+  const sizeInput = (value) => {
+    if (value.length > 5) {
+      return value.length
     }
-  })
+    return 7
+  }
+
+  const clampToBounds = (date) => {
+    if (!date) return date
+    const parsed = new Date(date)
+    if (!props.maxDays || props.maxDays <= 0) return parsed
+
+    const min = minDate.value
+    const max = maxDate.value
+
+    if (min && parsed < min) return new Date(min)
+    if (max && parsed > max) return new Date(max)
+    return parsed
+  }
 
   const openStart = (event) => {
     selectedTime.value = ''
@@ -394,6 +388,12 @@
   if (model.value.endDate) {
     model.value.endDate = new Date(model.value.endDate)
   }
+
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      updateRelativeRange()
+    }
+  })
 
   defineExpose({})
 </script>
