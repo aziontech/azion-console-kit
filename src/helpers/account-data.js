@@ -36,29 +36,30 @@ export const loadUserAndAccountInfo = async () => {
   sessionManager.afterLogin()
 }
 
-export const loadProfileAndAccountInfo = async () => {
+export const loadBillingData = async () => {
   const accountStore = useAccountStore()
   const { account, accountIsNotRegular } = accountStore
 
-  const loadBillingData = async () => {
-    if (!accountIsNotRegular) return
+  if (!accountIsNotRegular) return
+  if (account.formatCredit) return
 
-    const billingData = await billingGqlService.getCreditAndExpirationDate()
-    if (!billingData) return
+  const billingData = await billingGqlService.getCreditAndExpirationDate()
+  if (!billingData) return
 
-    const { credit, formatCredit, days } = billingData
-    accountStore.setAccountData({ credit, formatCredit, days })
-  }
+  const { credit, formatCredit, days } = billingData
+  accountStore.setAccountData({ credit, formatCredit, days })
+}
 
-  const loadContractData = async () => {
-    if (!account?.client_id) return
+export const loadContractData = async () => {
+  const accountStore = useAccountStore()
+  const { account } = accountStore
 
-    const contractData = await contractService.getContractServicePlan(account.client_id)
-    if (!contractData) return
+  if (!account?.client_id) return
+  if (account.yourServicePlan) return
 
-    const { isDeveloperSupportPlan, yourServicePlan } = contractData
-    accountStore.setAccountData({ isDeveloperSupportPlan, yourServicePlan })
-  }
+  const contractData = await contractService.getContractServicePlan(account.client_id)
+  if (!contractData) return
 
-  await Promise.all([loadBillingData(), loadContractData()])
+  const { isDeveloperSupportPlan, yourServicePlan } = contractData
+  accountStore.setAccountData({ isDeveloperSupportPlan, yourServicePlan })
 }
