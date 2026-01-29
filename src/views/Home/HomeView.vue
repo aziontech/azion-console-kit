@@ -10,6 +10,7 @@
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
   import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
+  import MetricsBlock from '@/templates/home-cards-block/metrics-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -40,44 +41,6 @@
   const user = accountData
   const teams = ref([])
   const showInviteDialog = ref(false)
-  const metricsData = ref([
-    {
-      label: 'Total Data Transfered',
-      value: '218.8',
-      unit: 'MB',
-      trend: {
-        direction: 'up',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Requests',
-      value: '6.6',
-      unit: '/ s',
-      trend: {
-        direction: 'down',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Bandwidth Saving',
-      value: '20.8',
-      unit: 'MB',
-      trend: {
-        direction: 'up',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Data Transf. Offload',
-      value: '49',
-      unit: '%',
-      trend: {
-        direction: 'up',
-        percentage: '86.62%'
-      }
-    }
-  ])
   const marketplaceItems = ref([
     {
       name: 'CardStream',
@@ -156,79 +119,7 @@
               @click="openInviteDialog"
             />
           </div>
-          <!-- Start Metrics Block -->
-          <div class="flex flex-col gap-3 w-full">
-            <div class="flex gap-3 items-center h-7">
-              <span class="text-base font-semibold">Metrics</span>
-              <PrimeButton
-                icon="ai ai-filter"
-                size="small"
-                severity="secondary"
-                text
-              />
-            </div>
-            <div class="flex flex-col gap-2 w-full relative">
-              <div
-                class="border border-[var(--surface-border)] rounded-md overflow-hidden flex w-full"
-              >
-                <div
-                  v-for="(metric, index) in metricsData"
-                  :key="index"
-                  class="bg-[var(--surface-section)] flex-1 h-[101px] p-5 flex flex-col gap-2.5"
-                  :class="{ 'border-l border-[var(--surface-border)]': index > 0 }"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <div class="flex flex-1 gap-2 items-center">
-                      <span
-                        class="text-[10px] uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
-                        style="font-family: 'Proto Mono', monospace"
-                      >
-                        {{ metric.label }}
-                      </span>
-                      <div class="bg-[var(--surface-input)] p-1 rounded-full flex items-center">
-                        <i class="pi pi-info-circle text-[7px]"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-2 items-center w-full">
-                    <div class="flex gap-1 items-center">
-                      <span class="text-[28px] font-semibold tracking-tight text-[#ededed]">
-                        {{ metric.value }}
-                      </span>
-                      <span class="text-xs text-[#ededed]">{{ metric.unit }}</span>
-                    </div>
-
-                    <div
-                      class="flex gap-2 items-center px-2 py-1 rounded-md"
-                      :class="
-                        metric.trend.direction === 'up'
-                          ? 'bg-[rgba(22,163,74,0.2)]'
-                          : 'bg-[rgba(245,61,61,0.2)]'
-                      "
-                    >
-                      <i
-                        class="text-[10.5px]"
-                        :class="
-                          metric.trend.direction === 'up'
-                            ? 'pi pi-arrow-circle-up text-[#39e478]'
-                            : 'pi pi-arrow-circle-down text-[#f53d3d]'
-                        "
-                      ></i>
-                      <span
-                        class="text-[11px] font-semibold leading-4"
-                        :class="
-                          metric.trend.direction === 'up' ? 'text-[#39e478]' : 'text-[#f53d3d]'
-                        "
-                      >
-                        {{ metric.trend.percentage }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MetricsBlock />
           <ResourcesBlock />
           <LastActivitiesBlock />
         </div>
