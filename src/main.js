@@ -21,7 +21,6 @@ import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prom
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
 import { queryPlugin } from '@/services/v2/base/query/queryPlugin'
-import { startCacheSync } from '@/services/v2/base/cache-sync'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'
@@ -58,5 +57,3 @@ app.use(VueMonacoEditorPlugin, {
 })
 
 app.mount('#app')
-
-startCacheSync()

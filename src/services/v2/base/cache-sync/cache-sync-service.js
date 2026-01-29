@@ -6,7 +6,6 @@ import {
 import { getKeysForEvents } from './invalidation-map'
 import { toMilliseconds } from '../query/config'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
-import { logger } from '../logger'
 
 const POLL_INTERVAL = toMilliseconds({ minutes: SYNC_INTERVAL_MINUTES })
 // Cache sync polling disabled (prevents periodic activity-history requests).
@@ -55,7 +54,7 @@ class CacheSyncService {
           await queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
           await queryClient.refetchQueries({ queryKey: query.queryKey, exact: true })
         } catch (error) {
-          logger.error('CacheSync', 'Failed to remove query:', query.queryKey, error)
+          // Silently fail
         }
       }
     }
@@ -101,7 +100,7 @@ class CacheSyncService {
         await this.invalidateQueries(eventTitles)
       }
     } catch (error) {
-      logger.error('CacheSync', 'Poll failed:', error)
+      // Silently fail
     }
   }
 
