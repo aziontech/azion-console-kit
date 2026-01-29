@@ -48,8 +48,8 @@ const prefetchForClientAccount = async () => {
 }
 
 export const sessionManager = {
-  async afterLogin() {
-    await prefetchForClientAccount()
+  afterLogin() {
+    prefetchForClientAccount()
   },
   async switchAccount() {
     await clearAllData()
