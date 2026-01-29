@@ -550,16 +550,16 @@ export function useDataTable(props, emit) {
 
     const name = generateExportFilename(filenameBase, 'xlsx')
     try {
-      const mod = await import('xlsx')
-      const XLSX = mod.default ?? mod
-      const headerRow = fields
-      const dataRows = nonEmptyRows.map((row) => fields.map((fieldName) => row?.[fieldName]))
-      const worksheetData = [headerRow, ...dataRows]
-      const wb = XLSX.utils.book_new()
-      const ws = XLSX.utils.aoa_to_sheet(worksheetData)
+      const { Workbook } = await import('exceljs')
+      const workbook = new Workbook()
+      const worksheet = workbook.addWorksheet('Sheet1')
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
-      const arrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      worksheet.addRow(fields)
+      nonEmptyRows.forEach((row) => {
+        worksheet.addRow(fields.map((fieldName) => row?.[fieldName]))
+      })
+
+      const arrayBuffer = await workbook.xlsx.writeBuffer()
       const blob = new Blob([arrayBuffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
