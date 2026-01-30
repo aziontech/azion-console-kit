@@ -1,6 +1,7 @@
 import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { getPlaceholderFromCache } from '@/services/v2/base/query/placeholderHelper'
 
 export const DEFAULT_FIELDS = [
   'id',
@@ -127,6 +128,24 @@ export class EdgeAppService extends BaseService {
   editEdgeApplicationService = this.edit
 
   deleteEdgeApplicationService = this.delete
+
+  /**
+   * Returns useQuery configuration for loading Edge Application with instant edit pattern.
+   * Use with useQuery from @tanstack/vue-query in component.
+   *
+   * @param {string|number} edgeApplicationId - The Edge Application ID
+   * @param {Object} options - Additional options (onError, staleTime, etc.)
+   * @returns {Object} - Configuration object for useQuery
+   */
+  useLoadEdgeApplicationConfig(edgeApplicationId, options = {}) {
+    return {
+      queryKey: queryKeys.edgeApp.detail(edgeApplicationId),
+      queryFn: async () => await this.loadEdgeApplicationService({ id: edgeApplicationId }),
+      placeholderData: () => getPlaceholderFromCache(queryKeys.edgeApp.all, edgeApplicationId),
+      staleTime: 3 * 60 * 1000,
+      ...options
+    }
+  }
 }
 
 export const edgeAppService = new EdgeAppService()
