@@ -23,6 +23,12 @@ const CERTIFICATE_TYPE_OPTIONS = [
   { label: 'Trusted CA Certificate', value: 'trusted_ca_certificate' }
 ]
 
+const OPERATION_OPTIONS = [
+  { label: 'Created', value: 'created' },
+  { label: 'Edited', value: 'edited' },
+  { label: 'Deleted', value: 'deleted' }
+]
+
 const DATA_TYPES_OPTIONS = [
   {
     label: 'INTEGER',
@@ -84,6 +90,14 @@ export const filterBuilder = ({ filterKey, filterHeader, filterValue, onUpdate, 
         'onUpdate:modelValue': onUpdate,
         options: isCertificate ? CERTIFICATE_TYPE_OPTIONS : DATA_TYPES_OPTIONS,
         placeholder: 'Select type'
+      })
+
+    case 'operation':
+      return h(DropdownFilterField, {
+        modelValue: filterValue,
+        'onUpdate:modelValue': onUpdate,
+        options: OPERATION_OPTIONS,
+        placeholder: 'Select operation'
       })
 
     default:

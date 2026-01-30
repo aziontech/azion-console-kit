@@ -50,15 +50,14 @@
   const rows = ref(10)
 
   const allColumns = ref([
-    { field: 'date', header: 'Date', visible: true },
     { field: 'operation', header: 'Operation', visible: true },
     { field: 'title', header: 'Title', visible: true },
-    // { field: 'resourceName', header: 'Resource Name', visible: true },
-    // { field: 'resourceItem', header: 'Resource Item', visible: true },
-    // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
+    { field: 'resourceName', header: 'Resource Name', visible: true },
+    { field: 'resourceItem', header: 'Resource Item', visible: true },
+    { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
     { field: 'authorName', header: 'Author Name', visible: true },
-    { field: 'authorEmail', header: 'Author Email', visible: true }
-    // { field: 'authorIp', header: 'Author IP', visible: false }
+    { field: 'authorEmail', header: 'Author Email', visible: true },
+    { field: 'authorIp', header: 'Author IP', visible: false }
   ])
 
   const selectedColumns = ref(allColumns.value.filter((col) => col.visible))
@@ -83,7 +82,8 @@
         offset: first.value,
         search: searchValue.value,
         begin,
-        end
+        end,
+        filter: appliedFilters.value
       })
 
       data.value = response.body || []
@@ -91,7 +91,8 @@
       totalRecords.value = await props.getTotalRecordsService({
         search: searchValue.value,
         begin,
-        end
+        end,
+        filter: appliedFilters.value
       })
 
       emit('on-load-data', data.value.length > 0 || searchValue.value.length > 0)
