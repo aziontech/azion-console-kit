@@ -128,6 +128,10 @@
     filterRef.value?.toggle(event)
   }
 
+  const handleEditFilter = ({ filter, event }) => {
+    filterRef.value?.openForFilter?.(filter, event)
+  }
+
   const handleApplyFilter = (filter) => {
     const existingIndex = appliedFilters.value.findIndex((item) => item.field === filter.field)
     if (existingIndex >= 0) {
@@ -192,6 +196,7 @@
           <DataTable.AppliedFilters
             :appliedFilters="appliedFilters"
             @remove="handleRemoveFilter"
+            @edit="handleEditFilter"
           />
         </template>
         <template #second-line>
