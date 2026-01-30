@@ -2,7 +2,10 @@
   import { inject, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
+  import { inviteYourTeamService } from '@/services/users-services'
+  import { teamsService } from '@/services/users-services/list-teams-service'
   import { useAccountStore } from '@/stores/account'
+  import InviteSession from '@/helpers/invite-session'
   import ContentBlock from '@/templates/content-block'
   import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
@@ -17,25 +20,6 @@
   const { accountData } = useAccountStore()
 
   defineOptions({ name: 'home-view' })
-
-  const props = defineProps({
-    listTeamsService: {
-      type: Function,
-      required: true
-    },
-    inviteYourTeamService: {
-      type: Function,
-      required: true
-    },
-    inviteSession: {
-      type: Function,
-      required: true
-    },
-    windowManager: {
-      type: Object,
-      required: true
-    }
-  })
 
   const user = accountData
   const teams = ref([])
@@ -134,9 +118,9 @@
   }
 
   onMounted(async () => {
-    teams.value = await props.listTeamsService()
-    if (props.inviteSession.sessionIsExpired()) {
-      props.inviteSession.turnInviteBlockVisable()
+    teams.value = await teamsService.listTeams()
+    if (InviteSession.sessionIsExpired()) {
+      InviteSession.turnInviteBlockVisable()
     }
   })
 </script>
@@ -144,7 +128,7 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 px-8 pb-8">
+      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 pb-8">
         <div class="flex flex-col w-full md:w-[75%] gap-8">
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
@@ -232,7 +216,6 @@
           <ResourcesBlock />
           <LastActivitiesBlock />
         </div>
-
         <div class="flex flex-col w-full md:w-[30%] gap-8">
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard :items="marketplaceItems" />
@@ -244,8 +227,8 @@
 
   <InviteUserDialog
     v-model:visible="showInviteDialog"
-    :listTeamsService="props.listTeamsService"
-    :inviteYourTeamService="props.inviteYourTeamService"
+    :listTeamsService="teamsService.listTeams"
+    :inviteYourTeamService="inviteYourTeamService"
     @invite-success="handleInviteSuccess"
   />
 </template>
