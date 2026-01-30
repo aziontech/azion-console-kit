@@ -23,7 +23,7 @@ const buildDynamicFilters = (filter = {}) => {
     return []
   }
 
-  const allowed = { 
+  const allowed = {
     title: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     comment: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     type: { operator: 'Eq', type: 'String' },
