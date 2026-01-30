@@ -3,10 +3,11 @@
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
   import { useRouter } from 'vue-router'
-  import { ref, watch, watchEffect } from 'vue'
+  import { ref, watch, watchEffect, onMounted } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'
   import { openContactSupport } from '@/helpers'
+  import { loadContractData } from '@/helpers/account-data'
 
   defineOptions({
     name: 'copilot-sidebar'
@@ -26,6 +27,10 @@
   const loadPromptSuggestionWithRoleDecorator = (role) => {
     suggestionsOptions.value = loadPromptSuggestion(role)
   }
+
+  onMounted(() => {
+    loadContractData()
+  })
 
   watchEffect(async () => {
     const { account } = useAccountStore()
