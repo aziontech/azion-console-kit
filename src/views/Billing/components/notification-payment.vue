@@ -21,6 +21,7 @@
     :title="notificationPayment.title"
     :typeMessage="notificationPayment.type"
     :buttons="actionsButtons"
+    class="mb-4"
   >
     <template #description>
       {{ notificationPayment.description }}

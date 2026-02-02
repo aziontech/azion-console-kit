@@ -1,7 +1,7 @@
 import { getCurrentMonthStartEnd } from '@/helpers/get-current-month-start-end'
 import { BillingGqlAdapter } from './billing-gql-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class BillingGqlService extends BaseService {
   constructor() {
@@ -92,7 +92,7 @@ export class BillingGqlService extends BaseService {
   }
 
   async getCreditAndExpirationDate() {
-    return await this._ensureQueryData(
+    return await this.useEnsureQueryData(
       () => queryKeys.billing.lastBill(),
       () => this.fetchCreditAndExpirationDate()
     )

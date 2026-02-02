@@ -129,7 +129,6 @@
     'name',
     'last_editor',
     'last_modified',
-    'last_modify',
     'product_version',
     'active'
   ]

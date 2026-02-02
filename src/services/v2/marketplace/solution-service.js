@@ -1,6 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { useAccountStore } from '@/stores/account'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class SolutionService extends BaseService {
   baseUrl = 'marketplace/solution/'
@@ -18,7 +18,7 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(
+    return this.useQuery(
       queryKeys.solutions.list(group, type),
       () => this.getListSolutions(params),
       {
@@ -33,7 +33,7 @@ export class SolutionService extends BaseService {
    *
    * @param {boolean} isFlagBlockApiV4 - flag to determine template type
    */
-  async ensureList(isFlagBlockApiV4 = false) {
+  async prefetchList(isFlagBlockApiV4 = false) {
     const accountStore = useAccountStore()
     const { jobRole } = accountStore.account
 
@@ -51,7 +51,7 @@ export class SolutionService extends BaseService {
 
     await Promise.all(
       prefetchConfigs.map(({ group, type }) =>
-        this._ensureQueryData(
+        this.usePrefetchQuery(
           queryKeys.solutions.list(group, type),
           () => this.getListSolutions({ group, type }),
           { cacheType: this.cacheType.STATIC }
@@ -59,11 +59,6 @@ export class SolutionService extends BaseService {
       )
     )
   }
-
-  async invalidateSolutionsCache() {
-    await this.queryClient.invalidateQueries({ queryKey: queryKeys.solutions.lists() })
-  }
-
   #adaptResponse(response) {
     const isArray = Array.isArray(response.data)
     const parsedSolutions =

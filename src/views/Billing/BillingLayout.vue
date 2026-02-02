@@ -25,6 +25,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import NotificationPayment from '@/views/Billing/components/notification-payment'
+  import { loadBillingData, loadContractData } from '@/helpers/account-data'
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -90,6 +91,8 @@
   }
 
   onMounted(() => {
+    loadBillingData()
+    loadContractData()
     loadCardDefault()
   })
 </script>
