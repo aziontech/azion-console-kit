@@ -1,7 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { CacheSettingsAdapter } from './edge-app-cache-settings-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class CacheSettingsService extends BaseService {
   constructor() {
@@ -33,13 +33,17 @@ export class CacheSettingsService extends BaseService {
   listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = [...queryKeys.cacheSettings.lists(edgeApplicationId), params]
-    const hasFilter = params?.hasFilter || false
+    const queryKey = queryKeys.edgeApp.cacheSettings.list(edgeApplicationId, params)
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this._ensureQueryData(queryKey, () => this.#fetchList(edgeApplicationId, params), {
-      persist: params.page === 1 && !params.search && !hasFilter,
-      skipCache: hasFilter
-    })
+    return await this.useEnsureQueryData(
+      queryKey,
+      () => this.#fetchList(edgeApplicationId, params),
+      {
+        persist: false,
+        skipCache
+      }
+    )
   }
 
   /**
@@ -66,27 +70,12 @@ export class CacheSettingsService extends BaseService {
   }
 
   loadCacheSettingsService = async (edgeApplicationId, cacheSettingId) => {
-    const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: queryKeys.cacheSettings.details(edgeApplicationId)
-    })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== cacheSettingId
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({
-        queryKey: queryKeys.cacheSettings.details(edgeApplicationId)
-      })
-    }
-
     await waitForPersistenceRestore()
 
-    return await this._ensureQueryData(
-      [...queryKeys.cacheSettings.details(edgeApplicationId), cacheSettingId],
+    return await this.useEnsureQueryData(
+      queryKeys.edgeApp.cacheSettings.detail(edgeApplicationId, cacheSettingId),
       () => this.#fetchCacheSetting(edgeApplicationId, cacheSettingId),
-      { persist: true }
+      { persist: false }
     )
   }
 
@@ -100,7 +89,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: queryKeys.cacheSettings.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return {
       feedback: 'Cache Settings successfully created',
@@ -118,8 +109,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.cacheSettings.all(edgeApplicationId) })
-    this.queryClient.removeQueries({ queryKey: queryKeys.cacheSettings.details(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return 'Cache Settings successfully edited'
   }
@@ -131,7 +123,9 @@ export class CacheSettingsService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: queryKeys.cacheSettings.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+    })
 
     return 'Cache Setting successfully deleted'
   }

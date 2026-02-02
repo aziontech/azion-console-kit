@@ -18,7 +18,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
       } catch {
         setRedirectRoute(to)
         await tracker.reset()
-        await sessionManager.clearCacheGlobal()
+        await sessionManager.logout()
         return '/login'
       }
     }

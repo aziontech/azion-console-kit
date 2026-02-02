@@ -1,7 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { queryKeys } from '@/services/v2/base/query/querySystem'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeAppErrorResponseService extends BaseService {
   constructor() {
@@ -33,13 +33,13 @@ export class EdgeAppErrorResponseService extends BaseService {
   }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = [...queryKeys.errorResponse.lists(edgeApplicationId), params]
-    const hasFilter = params?.hasFilter || false
+    const queryKey = queryKeys.edgeApp.errorResponse.list(edgeApplicationId, params)
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this._ensureQueryData(
-      () => queryKey,
+    return await this.useEnsureQueryData(
+      queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
-      { persist: params.page === 1 && !params.search && !hasFilter, skipCache: hasFilter }
+      { persist: false, skipCache }
     )
   }
 
@@ -56,7 +56,9 @@ export class EdgeAppErrorResponseService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: queryKeys.errorResponse.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeApp.errorResponse.all(edgeApplicationId)
+    })
 
     return 'Your Error Responses has been edited'
   }

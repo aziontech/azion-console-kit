@@ -43,7 +43,6 @@ export class AccountHandler {
   async switchAndReturnAccountPage(clientId) {
     await sessionManager.switchAccount()
     const accountId = await this.searchAccount(clientId)
-
     const { firstLogin } = await this.switchAccountService(accountId)
     return { name: firstLogin ? 'additional-data' : 'home' }
   }
