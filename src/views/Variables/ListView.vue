@@ -23,7 +23,7 @@
       type: 'delete',
       title: 'variable',
       icon: 'pi pi-trash',
-      service: variablesService.deleteVariablesService
+      service: variablesService.delete
     }
   ]
 
@@ -115,7 +115,7 @@
       <ListTableBlock
         @on-before-go-to-edit="checkIfIsEditable"
         @on-before-go-to-add-page="handleTrackEvent"
-        :listService="variablesService.listVariablesService"
+        :listService="variablesService.list"
         :columns="getColumns"
         editPagePath="/variables/edit"
         ref="refListTable"

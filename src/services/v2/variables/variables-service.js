@@ -23,7 +23,7 @@ export class VariablesService extends BaseService {
     })
   }
 
-  listVariablesService = async (params = {}) => {
+  list = async (params = {}) => {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(queryKeys.variables.list(), () => this.#fetchList(), {
@@ -32,14 +32,14 @@ export class VariablesService extends BaseService {
     })
   }
 
-  loadVariableService = async ({ id }) => {
+  load = async ({ id }) => {
     const listData = await this.useEnsureQueryData(
       queryKeys.variables.list(),
       () => this.#fetchList(),
       { persist: true }
     )
 
-    const variable = listData.body.find((item) => item.id === id)
+    const variable = listData.body.find((item) => String(item.id) === String(id))
 
     if (!variable) {
       throw new Error('Variable not found')
@@ -53,7 +53,7 @@ export class VariablesService extends BaseService {
     }
   }
 
-  createVariablesService = async (payload) => {
+  create = async (payload) => {
     const { data } = await this.http.request({
       method: 'POST',
       url: this.#baseURL,
@@ -64,7 +64,7 @@ export class VariablesService extends BaseService {
     return { ...data, secret: payload.secret }
   }
 
-  editVariableService = async (payload) => {
+  edit = async (payload) => {
     const body = VariablesAdapter.transformPayload(payload)
     await this.http.request({
       method: 'PUT',
@@ -76,7 +76,7 @@ export class VariablesService extends BaseService {
     return 'Your variable has been updated'
   }
 
-  deleteVariablesService = async (id) => {
+  delete = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.#baseURL}/${id}`,

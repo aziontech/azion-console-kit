@@ -74,7 +74,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="variablesService.createVariablesService"
+        :createService="variablesService.create"
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"

@@ -61,8 +61,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="variablesService.editVariableService"
-        :loadService="variablesService.loadVariableService"
+        :editService="variablesService.edit"
+        :loadService="variablesService.load"
         updatedRedirect="list-variables"
         :schema="validationSchema"
         @loaded-service-object="setVariableName"

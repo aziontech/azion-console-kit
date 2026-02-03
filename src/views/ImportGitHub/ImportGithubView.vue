@@ -76,7 +76,7 @@
   const createServiceWithVariablesDecorator = async (formValues) => {
     if (formValues.newVariables) {
       await Promise.all(
-        formValues.newVariables.map((variable) => variablesService.createVariablesService(variable))
+        formValues.newVariables.map((variable) => variablesService.create(variable))
       )
     }
 
