@@ -50,14 +50,18 @@
   const rows = ref(10)
 
   const allColumns = ref([
+    { field: 'date', header: 'Date', visible: true },
     { field: 'operation', header: 'Operation', visible: true },
     { field: 'title', header: 'Title', visible: true },
     { field: 'resourceName', header: 'Resource Name', visible: true },
     { field: 'resourceItem', header: 'Resource Item', visible: true },
     { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
-    { field: 'authorName', header: 'Author Name', visible: true },
     { field: 'authorEmail', header: 'Author Email', visible: true },
-    { field: 'authorIp', header: 'Author IP', visible: false }
+    { field: 'authorIp', header: 'Author IP', visible: false },
+    { field: 'authorName', header: 'Author Name', visible: false },
+    { field: 'accountId', header: 'Account ID', visible: false },
+    { field: 'userAgent', header: 'User Agent', visible: false },
+    { field: 'requestData', header: 'Request Data', visible: false }
   ])
 
   const selectedColumns = ref(allColumns.value.filter((col) => col.visible))

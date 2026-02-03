@@ -1,5 +1,42 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
+const formatRequestData = (value) => {
+  if (value === null || value === undefined) return '-'
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value, null, 2)
+    } catch {
+      return String(value)
+    }
+  }
+
+  const asString = String(value)
+  const trimmed = asString.trim()
+  if (!trimmed) return '-'
+
+  const tryParse = (input) => {
+    try {
+      return JSON.parse(input)
+    } catch {
+      return null
+    }
+  }
+
+  const parsed =
+    tryParse(trimmed) ||
+    tryParse(trimmed.replaceAll('\\"', '"').replaceAll('\\n', '\n').replaceAll('\\t', '\t'))
+
+  if (parsed && typeof parsed === 'object') {
+    try {
+      return JSON.stringify(parsed, null, 2)
+    } catch {
+      return asString
+    }
+  }
+
+  return asString
+}
+
 export const ActivityHistoryAdapter = {
   transformListActivityHistoryEvents({ data }) {
     try {
@@ -14,9 +51,12 @@ export const ActivityHistoryAdapter = {
           resource: element.resourceType || '-',
           resourceName: element.resourceId || '-',
           resourceItemName: element.resourceItemId || '-',
-          authorName: element.authorName,
           authorEmail: element.authorEmail,
-          authorIp: element.remoteAddress || '-'
+          authorIp: element.remoteAddress || '-',
+          accountId: element.accountId || '-',
+          authorName: element.authorName,
+          userAgent: element.userAgent || '-',
+          requestData: formatRequestData(element.requestData)
         })) || []
 
       return parsedEvents
