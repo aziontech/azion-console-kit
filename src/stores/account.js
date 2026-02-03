@@ -123,6 +123,9 @@ export const useAccountStore = defineStore({
 
     hasHideCreateOptionsFlag(state) {
       return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
+    },
+    isClientAccount(state) {
+      return state.account?.kind === 'client'
     }
   },
   actions: {

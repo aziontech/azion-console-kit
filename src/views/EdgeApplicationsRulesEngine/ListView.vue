@@ -1,17 +1,19 @@
 <script setup>
   import { computed, ref, inject } from 'vue'
-  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import TableBlock from '@/templates/list-table-block/v2/index.vue'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import TableBlock from '@/templates/list-table-block/v2/index.vue'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const dialog = useDialog()
+  const toast = useToast()
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -71,8 +73,6 @@
   const drawerRulesEngineRef = ref('')
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
-  const dialog = useDialog()
-  const toast = useToast()
   const currentPhase = ref('request')
   const hasContentToList = ref(true)
   const isLoadingButtonOrder = ref(false)
@@ -291,6 +291,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
+    :isLoadingReorder="isLoadingButtonOrder"
     @on-review-changes="
       ({ data, alteredRows, reload }) => updateRulesOrder(data, alteredRows, reload)
     "

@@ -128,6 +128,7 @@
         :onClickCreate="emptyBlock.onClickCreate"
         :documentationService="emptyBlock.documentationService"
         data-testid="edge-applications-empty-results-block"
+        @click-to-create="emit('click-to-create')"
       >
         <template #illustration>
           <Illustration />

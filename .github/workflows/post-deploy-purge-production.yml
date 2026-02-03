@@ -48,12 +48,12 @@ jobs:
           fi
 
           COUNT=0
-          MAX_COUNT=88
+          MAX_COUNT=44
 
           while true; do
             COUNT=$((COUNT + 1))
-            echo "[Check $COUNT/$MAX_COUNT] Waiting 15 seconds before next version check..."
-            sleep 15
+            echo "[Check $COUNT/$MAX_COUNT] Waiting 30 seconds before next version check..."
+            sleep 30
 
             echo "Purging package URL: $PACKAGE_URL"
             azion purge --urls "$PACKAGE_URL" --layer edge_caching
@@ -64,6 +64,8 @@ jobs:
             if [ -z "$CURRENT_VERSION" ]; then
               echo "Current version is empty; keeping previous value and continuing to poll."
             elif [ "$CURRENT_VERSION" != "$INITIAL_VERSION" ]; then
+              echo "Triggering final purge..."
+              sleep 15
               azion purge --wildcard "${CONSOLE_URL}/*" --layer edge_caching
               echo "Purge of ${CONSOLE_URL}/* completed."
               break

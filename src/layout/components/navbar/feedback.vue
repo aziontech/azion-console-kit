@@ -96,7 +96,7 @@
   const props = defineProps({
     styleTextColor: {
       type: String,
-      default: () => 'text-white'
+      default: () => 'text-color'
     },
     class: {
       type: String

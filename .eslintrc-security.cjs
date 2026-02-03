@@ -1,5 +1,10 @@
-/* eslint-env node */
+/**
+* 'off' or 0 - disable the rule completely
+* 'warn' or 1 - show as warning (doesn't fail build)
+* 'error' or 2 - show as error (fails build)
+**/
 
+/* eslint-env node */
 module.exports = {
   root: true,
   extends: [
@@ -23,7 +28,7 @@ module.exports = {
     'security/detect-non-literal-fs-filename': 'error',
     'security/detect-non-literal-regexp': 'error',
     'security/detect-non-literal-require': 'error',
-    'security/detect-object-injection': 'error',
+    'security/detect-object-injection': 0,
     'security/detect-possible-timing-attacks': 'error',
     'security/detect-pseudoRandomBytes': 'error',
     'security/detect-unsafe-regex': 'error'

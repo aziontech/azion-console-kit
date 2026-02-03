@@ -1,14 +1,15 @@
 <script setup>
   import { computed, ref, inject } from 'vue'
+  import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
-  import PrimeButton from 'primevue/button'
-  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-  import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
-  import Drawer from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from '@/views/EdgeApplicationsRulesEngine/Drawer'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+  import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
   import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -202,6 +203,7 @@
       reload()
     }
   }
+
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {
@@ -261,6 +263,7 @@
       createButtonLabel: 'Rule',
       documentationService: documentationService
     }"
+    :isLoadingReorder="isLoadingButtonOrder"
     @on-before-go-to-edit="handleTrackEditEvent"
     @on-load-data="handleLoadData"
     @on-review-changes="
