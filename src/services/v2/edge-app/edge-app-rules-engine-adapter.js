@@ -11,7 +11,7 @@ export const RulesEngineAdapter = {
     }
 
     const response =
-      data?.map((rule, index) => ({
+      data?.map((rule) => ({
         id: rule.id,
         stringId: rule.id?.toString(),
         name: rule.name,
@@ -24,8 +24,8 @@ export const RulesEngineAdapter = {
         criteria: rule.criteria,
         status: statusMap[rule.active],
         position: {
-          value: index,
-          immutableValue: index,
+          value: rule.order,
+          immutableValue: rule.order,
           altered: false,
           min: 0,
           max: data.length - 1,

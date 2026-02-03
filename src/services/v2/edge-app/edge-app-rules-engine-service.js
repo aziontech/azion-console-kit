@@ -160,6 +160,8 @@ export class RulesEngineService extends BaseService {
 
     const transformedData = this.adapter?.transformListRulesEngine?.(allRules, phase) ?? allRules
 
+    transformedData.sort((dataA, dataB) => dataA.position.value - dataB.position.value)
+
     return transformedData
   }
 
