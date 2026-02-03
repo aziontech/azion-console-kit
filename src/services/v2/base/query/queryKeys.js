@@ -144,5 +144,10 @@ export const queryKeys = {
   billing: {
     all: ['billing'],
     lastBill: () => [...queryKeys.billing.all, 'last-bill']
+  },
+  variables: {
+    all: ['variables'],
+    list: (params) => [...queryKeys.variables.all, 'list', params],
+    detail: (id) => [...queryKeys.variables.all, 'detail', id]
   }
 }

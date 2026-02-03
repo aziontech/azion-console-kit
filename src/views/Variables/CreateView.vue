@@ -7,16 +7,10 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { variablesService } from '@/services/v2/variables'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createVariablesService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const keyRegex = /^[A-Z0-9_]*$/
 
@@ -80,7 +74,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createVariablesService"
+        :createService="variablesService.createVariablesService"
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"

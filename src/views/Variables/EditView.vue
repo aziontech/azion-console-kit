@@ -9,6 +9,7 @@
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { variablesService } from '@/services/v2/variables'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -20,12 +21,6 @@
     variableName.value = variable.key
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, variable.key)
   }
-
-  const props = defineProps({
-    loadVariableService: { type: Function, required: true },
-    editVariableService: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
-  })
 
   const keyRegex = /^[A-Z0-9_]*$/
 
@@ -66,9 +61,9 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editVariableService"
-        :loadService="props.loadVariableService"
-        :updatedRedirect="updatedRedirect"
+        :editService="variablesService.editVariableService"
+        :loadService="variablesService.loadVariableService"
+        updatedRedirect="list-variables"
         :schema="validationSchema"
         @loaded-service-object="setVariableName"
         @on-edit-success="handleTrackEditEvent"

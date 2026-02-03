@@ -1,6 +1,5 @@
 import * as VulcanService from '@/services/vulcan-services'
 import * as GitHubServices from '@/services/github-services'
-import * as VariablesService from '@/services/variables-services'
 import * as TemplateEngineService from '@/services/template-engine-services'
 import * as MarketplaceService from '@/services/marketplace-services'
 
@@ -16,7 +15,6 @@ export const importGithubRoutes = {
       props: {
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
-        createVariablesService: VariablesService.createVariablesService,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
         loadSolutionService: MarketplaceService.loadSolutionService
       },
