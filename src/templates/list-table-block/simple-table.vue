@@ -54,8 +54,8 @@
 
   const displayData = computed(() => {
     if (props.loading) {
-      //eslint-disable-next-line no-unused-vars
-      return Array.from({ length: props.rowsLimit }, (item, index) => ({
+      // eslint-disable-next-line id-length
+      return Array.from({ length: props.rowsLimit }, (_, index) => ({
         id: `skeleton-${index}`,
         isSkeletonRow: true
       }))
@@ -104,10 +104,8 @@
     :loading="false"
     :dataKey="dataKey"
     :paginator="false"
-    :rowHover="true"
     tableClass="overflow-clip rounded-md"
     scrollHeight="auto"
-    @rowClick="handleRowClick"
     class="w-full border border-[var(--surface-border)] rounded-md overflow-hidden"
     :emptyBlock="emptyBlock"
     :pt="{
@@ -120,21 +118,27 @@
       :field="col.field"
       :header="col.header"
       :sortable="col.sortable || false"
-      :class="{ 'hover:cursor-pointer': !col.disableClick }"
     >
       <template #body="{ data: rowData }">
-        <template v-if="rowData.isSkeletonRow">
-          <Skeleton
-            class="h-[14px]"
-            :width="col.skeletonWidth || '80%'"
-          />
-        </template>
-        <template v-if="col.type === 'component' && col.component">
-          <component :is="col.component(getFieldValue(rowData, col.field))" />
-        </template>
-        <template v-else>
-          <span>{{ getFieldValue(rowData, col.field) }}</span>
-        </template>
+        <div
+          :class="{ 'cursor-pointer hover:underline': col.enableClick && !rowData.isSkeletonRow }"
+          @click.stop="
+            col.enableClick && !rowData.isSkeletonRow && handleRowClick({ data: rowData })
+          "
+        >
+          <template v-if="rowData.isSkeletonRow">
+            <Skeleton
+              class="h-[14px]"
+              :width="col.skeletonWidth || '80%'"
+            />
+          </template>
+          <template v-else-if="col.type === 'component' && col.component">
+            <component :is="col.component(getFieldValue(rowData, col.field))" />
+          </template>
+          <template v-else>
+            <span>{{ getFieldValue(rowData, col.field) }}</span>
+          </template>
+        </div>
       </template>
     </DataTable.Column>
 

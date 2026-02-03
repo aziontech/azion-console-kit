@@ -4,6 +4,7 @@ import {
   fetchHomeMetricsWithVariation,
   fetchWafMetricsWithVariation
 } from '@/services/home-metrics-service'
+import { set, get } from '@/helpers/local-storage-manager'
 
 const STORAGE_KEY = 'azion-home-metrics-filters'
 
@@ -12,20 +13,8 @@ const DEFAULT_FILTERS = {
   timeRange: 'last-hour'
 }
 
-const getStoredFilters = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    return JSON.parse(stored)
-  }
-  return DEFAULT_FILTERS
-}
-
-const saveFiltersToStorage = (filters) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filters))
-}
-
 export const useHomeMetrics = () => {
-  const storedFilters = getStoredFilters()
+  const storedFilters = get(STORAGE_KEY) || DEFAULT_FILTERS
   const selectedResource = ref(storedFilters.resource)
   const selectedTimeRange = ref(storedFilters.timeRange)
   const isLoading = ref(false)
@@ -201,9 +190,12 @@ export const useHomeMetrics = () => {
   }
 
   const updateFilters = async () => {
-    saveFiltersToStorage({
-      resource: selectedResource.value,
-      timeRange: selectedTimeRange.value
+    set({
+      key: STORAGE_KEY,
+      value: {
+        resource: selectedResource.value,
+        timeRange: selectedTimeRange.value
+      }
     })
     metricsData.value = getDefaultMetricsConfig(selectedResource.value)
     await loadMetrics()

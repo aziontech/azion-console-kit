@@ -6,6 +6,7 @@
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { clipboardWrite } from '@/helpers/clipboard'
+  import { set, get } from '@/helpers/local-storage-manager'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
@@ -16,12 +17,16 @@
   const router = useRouter()
   const isLoading = ref(false)
 
+  const STORAGE_KEY = 'azion-home-resources-filter'
+  const DEFAULT_RESOURCE = 'workloads'
+
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   const edgeDnsColumns = [
     {
       field: 'name',
       header: 'Name',
+      enableClick: true,
       type: 'component',
       component: (columnData) => {
         if (!columnData) return null
@@ -62,6 +67,7 @@
     {
       field: 'name',
       header: 'Name',
+      enableClick: true,
       type: 'component',
       component: (columnData) => {
         if (!columnData) return null
@@ -79,6 +85,7 @@
     {
       field: 'name',
       header: 'Name',
+      enableClick: true,
       type: 'component',
       component: (columnData) => {
         if (!columnData) return null
@@ -115,7 +122,7 @@
     { field: 'lastModified', header: 'Last Modified' }
   ]
 
-  const selectedResource = ref('workloads')
+  const selectedResource = ref(get(STORAGE_KEY) || DEFAULT_RESOURCE)
   const filterMenu = ref()
   const workloadsData = ref([])
   const edgeDnsData = ref([])
@@ -138,21 +145,17 @@
         icon: selectedResource.value === resource.value ? 'pi pi-check' : undefined,
         command: () => {
           selectedResource.value = resource.value
+          set({ key: STORAGE_KEY, value: resource.value })
         }
       }))
     }
   ])
-  const domainNameColumn = computed(() => {
-    if (handleTextDomainWorkload.singularLabel === 'workload') {
-      return 'Workload Domain'
-    }
-    return 'Domain name'
-  })
 
   const workloadsColumns = computed(() => [
     {
       field: 'name',
-      header: 'Name',
+      header: `${handleTextDomainWorkload.singularTitle} Name`,
+      enableClick: true,
       type: 'component',
       component: (columnData) => {
         if (!columnData) return null
@@ -163,16 +166,16 @@
       }
     },
     {
-      field: 'workloadHostname',
-      header: domainNameColumn.value,
-      filterPath: 'workloadHostname',
+      field: 'domains',
+      header: 'Domains',
+      filterPath: 'domains',
       disableSort: true,
       type: 'component',
       component: (columnData) => {
-        if (!columnData || !columnData?.content) return null
+        if (!columnData) return null
         return columnBuilder({
-          data: columnData.content,
-          columnAppearance: 'text-format-with-popup',
+          data: columnData,
+          columnAppearance: 'text-array-with-popup',
           dependencies: {
             copyContentService: clipboardWrite,
             showCopy: !!clipboardWrite
@@ -303,7 +306,7 @@
           label: 'View',
           icon: 'pi pi-eye',
           command: (rowData) =>
-            router.push({ name: 'edge-storage-bucket', params: { bucketName: rowData.name } })
+            router.push({ name: 'object-storage-view', params: { id: rowData.name } })
         },
         {
           label: 'Delete',
@@ -314,8 +317,7 @@
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
-          command: (rowData) =>
-            router.push({ name: 'edit-edge-functions', params: { id: rowData.id } })
+          command: (rowData) => router.push({ name: 'edit-functions', params: { id: rowData.id } })
         },
         {
           label: 'Delete',
@@ -344,8 +346,7 @@
           'last_modified',
           'id',
           'last_editor',
-          'product_version',
-          'workload_domain'
+          'product_version'
         ]
       })
       workloadsData.value = response.body
@@ -414,8 +415,8 @@
     const routeMap = {
       workloads: { name: editWorkloadRouteName.value, params: { id: event.data.id } },
       'edge-dns': { name: 'edit-edge-dns', params: { id: event.data.id } },
-      'object-storage': { name: 'edge-storage-bucket', params: { bucketName: event.data.name } },
-      functions: { name: 'edit-edge-functions', params: { id: event.data.id } }
+      'object-storage': { name: 'object-storage-view', params: { id: event.data.name } },
+      functions: { name: 'edit-functions', params: { id: event.data.id } }
     }
     const route = routeMap[selectedResource.value]
     if (route) router.push(route)
