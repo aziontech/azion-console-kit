@@ -37,7 +37,8 @@ const buildDynamicFilters = (filter = {}) => {
     userId: { operator: 'Eq', type: 'String' },
     userIp: { operator: 'Eq', type: 'String' },
     userAgent: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
-    uuid: { operator: 'Eq', type: 'String' }
+    uuid: { operator: 'Eq', type: 'String' },
+    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
   }
 
   const normalized = normalizeFilterArray(filter)
@@ -131,7 +132,14 @@ export class ActivityHistoryService extends BaseService {
 
     const dynamic = buildDynamicFilters(filter)
     const combinedOrEntries = [
-      ...(search ? ['{ titleIlike: $search }', '{ commentIlike: $search }'] : []),
+      ...(search
+        ? [
+            '{ titleIlike: $search }',
+            '{ authorNameIlike: $search }',
+            '{ authorEmailIlike: $search }',
+            '{ resourceTypeIlike: $search }'
+          ]
+        : []),
       ...dynamic.orEntries
     ]
     const orClause = combinedOrEntries.length ? `or: [${combinedOrEntries.join(', ')}],` : ''
@@ -246,7 +254,14 @@ export class ActivityHistoryService extends BaseService {
 
     const dynamic = buildDynamicFilters(filter)
     const combinedOrEntries = [
-      ...(search ? ['{ titleIlike: $search }', '{ commentIlike: $search }'] : []),
+      ...(search
+        ? [
+            '{ titleIlike: $search }',
+            '{ authorNameIlike: $search }',
+            '{ authorEmailIlike: $search }',
+            '{ resourceTypeIlike: $search }'
+          ]
+        : []),
       ...dynamic.orEntries
     ]
     const orClause = combinedOrEntries.length ? `or: [${combinedOrEntries.join(', ')}],` : ''

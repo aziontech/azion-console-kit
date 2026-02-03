@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
 
@@ -7,6 +8,7 @@
   import DataTimeRange from '@/components/base/dataTimeRange'
   import OperationTag from './OperationTag.vue'
   import { createRelativeRange } from '@utils/date.js'
+  import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
 
   const props = defineProps({
     listService: {
@@ -25,6 +27,7 @@
 
   const emit = defineEmits(['on-load-data'])
 
+  const router = useRouter()
   const toast = useToast()
   const filterRef = ref(null)
   const isLoading = ref(false)
@@ -61,7 +64,10 @@
     { field: 'authorName', header: 'Author Name', visible: false },
     { field: 'accountId', header: 'Account ID', visible: false },
     { field: 'userAgent', header: 'User Agent', visible: false },
-    { field: 'requestData', header: 'Request Data', visible: false }
+    { field: 'requestData', header: 'Request Data', visible: false },
+    { field: 'remotePort', header: 'Remote Port', visible: false },
+    { field: 'comment', header: 'Comment', visible: false },
+    { field: 'uuid', header: 'UUID', visible: false }
   ])
 
   const selectedColumns = ref(allColumns.value.filter((col) => col.visible))
@@ -153,6 +159,29 @@
     loadData()
   }
 
+  const handleRowClick = async (payload) => {
+    const rowData = payload?.data || payload
+    const location = resolveActivityHistoryRoute(rowData)
+    if (!location) {
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'No route available for this activity'
+      })
+      return
+    }
+
+    try {
+      await router.push(location)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error?.message || 'Navigation error'
+      })
+    }
+  }
+
   const getColumnStyle = (field) => {
     const styles = {
       date: { width: '189px' },
@@ -197,13 +226,6 @@
     <template #header>
       <DataTable.Header :showDivider="hasAppliedFilters">
         <template #first-line>
-          <DataTable.AppliedFilters
-            :appliedFilters="appliedFilters"
-            @remove="handleRemoveFilter"
-            @edit="handleEditFilter"
-          />
-        </template>
-        <template #second-line>
           <div class="flex items-center justify-between w-full gap-3">
             <div class="flex w-full items-center gap-2 flex-1">
               <PrimeButton
@@ -215,7 +237,7 @@
               />
               <DataTable.Search
                 v-model="searchValue"
-                placeholder="Search by date, operation or resource..."
+                placeholder="Search by author or resource..."
                 class="flex-1 w-full"
                 @search="handleSearch"
               />
@@ -232,6 +254,13 @@
               />
             </DataTable.Actions>
           </div>
+        </template>
+        <template #second-line>
+          <DataTable.AppliedFilters
+            :appliedFilters="appliedFilters"
+            @remove="handleRemoveFilter"
+            @edit="handleEditFilter"
+          />
         </template>
       </DataTable.Header>
     </template>
@@ -251,6 +280,7 @@
         <template v-else-if="col.field === 'resourceName' || col.field === 'resourceItemName'">
           <span
             v-if="rowData[col.field]"
+            @click="handleRowClick({ data: rowData })"
             class="text-[var(--text-color-link)] cursor-pointer hover:underline"
           >
             {{ rowData[col.field] }}

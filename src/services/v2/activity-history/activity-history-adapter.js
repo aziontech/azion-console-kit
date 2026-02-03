@@ -48,6 +48,9 @@ export const ActivityHistoryAdapter = {
           title: element.title,
           operation: element.type,
           type: element.type,
+          resourceType: element.resourceType,
+          resourceId: element.resourceId,
+          resourceItemId: element.resourceItemId,
           resource: element.resourceType || '-',
           resourceName: element.resourceId || '-',
           resourceItemName: element.resourceItemId || '-',
@@ -56,7 +59,9 @@ export const ActivityHistoryAdapter = {
           accountId: element.accountId || '-',
           authorName: element.authorName,
           userAgent: element.userAgent || '-',
-          requestData: formatRequestData(element.requestData)
+          requestData: formatRequestData(element.requestData),
+          remotePort: element.remotePort || '-',
+          comment: element.comment || '-'
         })) || []
 
       return parsedEvents
