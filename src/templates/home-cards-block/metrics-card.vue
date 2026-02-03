@@ -1,5 +1,6 @@
 <script setup>
   import { computed } from 'vue'
+  import Skeleton from 'primevue/skeleton'
 
   const props = defineProps({
     metric: {
@@ -12,14 +13,19 @@
     }
   })
 
-  const trendClasses = computed(() => {
-    const isUp = props.metric.trend?.direction === 'up'
+  const variationData = computed(() => {
+    if (!props.metric.variation || props.metric.variation.value === 0) return null
+
+    const { value, type } = props.metric.variation
+    const isPositive = value > 0
+    const isSuccess = type === 'regular' ? isPositive : !isPositive
+
     return {
-      background: isUp ? 'bg-[rgba(22,163,74,0.2)]' : 'bg-[rgba(245,61,61,0.2)]',
-      icon: isUp
-        ? 'pi pi-arrow-circle-up text-[#39e478]'
-        : 'pi pi-arrow-circle-down text-[#f53d3d]',
-      text: isUp ? 'text-[#39e478]' : 'text-[#f53d3d]'
+      background: isSuccess ? 'bg-[rgba(22,163,74,0.2)]' : 'bg-[rgba(245,61,61,0.2)]',
+      icon: isPositive ? 'pi pi-arrow-circle-up' : 'pi pi-arrow-circle-down',
+      iconColor: isSuccess ? 'text-[#39e478]' : 'text-[#f53d3d]',
+      textColor: isSuccess ? 'text-[#39e478]' : 'text-[#f53d3d]',
+      percentage: `${Math.abs(value).toFixed(2)}%`
     }
   })
 </script>
@@ -43,15 +49,27 @@
         </span>
         <div
           v-tooltip.top="metric.tooltip"
-          class="bg-[var(--surface-input)] p-[5px] rounded-full flex items-center cursor-help"
+          class="bg-[#262626] p-[5px] rounded-full flex items-center"
         >
-          <i class="pi pi-info-circle text-[7px]"></i>
+          <i class="pi pi-info-circle text-[10px]"></i>
         </div>
       </div>
     </div>
 
     <div class="flex gap-2 items-center w-full">
-      <div class="flex gap-1 items-center">
+      <div
+        v-if="metric.isLoading"
+        class="flex gap-1 items-center"
+      >
+        <Skeleton
+          width="80px"
+          height="28px"
+        />
+      </div>
+      <div
+        v-else
+        class="flex gap-1 items-center"
+      >
         <span class="text-[28px] font-semibold tracking-[-1.4px] text-[#ededed]">
           {{ metric.value }}
         </span>
@@ -59,19 +77,19 @@
       </div>
 
       <div
-        v-if="metric.trend"
+        v-if="variationData && !metric.isLoading"
         class="flex gap-2 items-center px-2 py-1 rounded-md"
-        :class="trendClasses.background"
+        :class="variationData.background"
       >
         <i
           class="text-[10.5px]"
-          :class="trendClasses.icon"
+          :class="[variationData.icon, variationData.iconColor]"
         ></i>
         <span
           class="text-[11px] font-semibold leading-4"
-          :class="trendClasses.text"
+          :class="variationData.textColor"
         >
-          {{ metric.trend.percentage }}
+          {{ variationData.percentage }}
         </span>
       </div>
     </div>

@@ -3,69 +3,24 @@
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+  import { useHomeMetrics } from '@/composables/useHomeMetrics'
   import MetricsCard from './metrics-card.vue'
-
-  const STORAGE_KEY = 'azion-home-metrics-filters'
 
   const resourceOptions = [
     { label: 'WAF Rules', value: 'waf' },
     { label: 'Workloads', value: 'workloads' }
   ]
 
-  const timeRangeOptions = [
-    { label: 'Last Hour', value: 'last-hour' },
-    { label: 'Last Day', value: 'last-day' },
-    { label: 'Last Week', value: 'last-week' }
-  ]
   const filterMenu = ref()
-  // const isLoading = ref(false)
-  const lastUpdated = ref(null)
-  const storedFilters = getStoredFilters()
-  const selectedResource = ref(storedFilters.resource)
-  const selectedTimeRange = ref(storedFilters.timeRange)
 
-  const metricsData = ref([
-    {
-      label: 'Total Data Transfered',
-      value: '218.8',
-      unit: 'MB',
-      tooltip: 'Total amount of data transferred through the edge',
-      trend: {
-        direction: 'up',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Requests',
-      value: '5',
-      unit: '/s',
-      tooltip: 'Number of requests per second',
-      trend: {
-        direction: 'down',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Bandwidth Saving',
-      value: '20.8',
-      unit: 'MB',
-      tooltip: 'Bandwidth saved through caching and optimization',
-      trend: {
-        direction: 'up',
-        percentage: '6.62%'
-      }
-    },
-    {
-      label: 'Data Transf. Offload',
-      value: '49',
-      unit: '%',
-      tooltip: 'Percentage of data transfer offloaded to the edge',
-      trend: {
-        direction: 'up',
-        percentage: '86.62%'
-      }
-    }
-  ])
+  const {
+    selectedResource,
+    selectedTimeRange,
+    metricsData,
+    timeRangeOptions,
+    loadMetrics,
+    updateFilters
+  } = useHomeMetrics()
 
   const filterMenuItems = computed(() => [
     {
@@ -92,63 +47,20 @@
   ])
 
   const formattedTimestamp = computed(() => {
-    if (!lastUpdated.value) {
-      const now = new Date()
-      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-      return `${formatDateToDayMonthYearHour(oneHourAgo)} - ${formatDateToDayMonthYearHour(now)}`
-    }
-    return lastUpdated.value
+    const selectedOption = timeRangeOptions.find((opt) => opt.value === selectedTimeRange.value)
+    const hours = selectedOption?.hours || 1
+
+    const now = new Date()
+    const startTime = new Date(now.getTime() - hours * 60 * 60 * 1000)
+
+    return `${formatDateToDayMonthYearHour(startTime)} - ${formatDateToDayMonthYearHour(now)}`
   })
 
   const toggleFilterMenu = (event) => {
     filterMenu.value.toggle(event)
   }
 
-  const loadMetrics = async () => {
-    return
-
-    // isLoading.value = true
-    // try {
-    //   const response = await props.metricsService({
-    //     resource: selectedResource.value,
-    //     timeRange: selectedTimeRange.value
-    //   })
-    //   metricsData.value = response
-    //   lastUpdated.value = formattedTimestamp.value
-    // } catch (error) {
-    //   console.error('Failed to load metrics:', error)
-    // } finally {
-    //   isLoading.value = false
-    // }
-  }
-
-  const saveFiltersToStorage = () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        resource: selectedResource.value,
-        timeRange: selectedTimeRange.value
-      })
-    )
-  }
-
-  function getStoredFilters() {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      return JSON.parse(stored)
-    }
-
-    return { resource: 'workloads', timeRange: 'last-hour' }
-  }
-
-  watch(
-    [selectedResource, selectedTimeRange],
-    () => {
-      saveFiltersToStorage()
-      loadMetrics()
-    },
-    { immediate: false }
-  )
+  watch([selectedResource, selectedTimeRange], updateFilters, { immediate: false })
 
   onMounted(() => {
     loadMetrics()
