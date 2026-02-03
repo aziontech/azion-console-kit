@@ -14,18 +14,9 @@ const transformMap = {
 }
 
 export const VariablesAdapter = {
-  transformList(data, fields) {
+  transformList(data) {
     if (!Array.isArray(data)) return []
-    return adaptServiceDataResponse(data, fields, transformMap)
-  },
-
-  transformOne(data) {
-    return {
-      id: data?.uuid,
-      key: data?.key,
-      value: data?.value,
-      secret: data?.secret
-    }
+    return adaptServiceDataResponse(data, null, transformMap)
   },
 
   transformPayload(payload) {

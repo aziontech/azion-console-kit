@@ -147,7 +147,6 @@ export const queryKeys = {
   },
   variables: {
     all: ['variables'],
-    list: (params) => [...queryKeys.variables.all, 'list', params],
-    detail: (id) => [...queryKeys.variables.all, 'detail', id]
+    list: () => [...queryKeys.variables.all, 'list']
   }
 }
