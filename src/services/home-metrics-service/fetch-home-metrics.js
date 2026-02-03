@@ -45,125 +45,177 @@ const sumMetricValues = (data, fieldName) => {
 }
 
 export const fetchDataTransferred = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery(
-    'httpMetrics',
-    ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
-    tsRangeBegin,
-    tsRangeEnd
-  )
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  return sumMetricValues(data, 'dataTransferredTotal')
+    return sumMetricValues(data, 'dataTransferredTotal')
+  } catch (error) {
+    throw new Error('Unable to load Data Transferred data')
+  }
 }
 
 export const fetchRequests = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery(
-    'httpMetrics',
-    ['edgeRequestsTotalPerSecond'],
-    tsRangeBegin,
-    tsRangeEnd
-  )
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['edgeRequestsTotalPerSecond'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  if (data.length === 0) return 0
+    if (data.length === 0) return 0
 
-  const totalRequestsPerSecond = data.reduce(
-    (sum, item) => sum + (item.edgeRequestsTotalPerSecond || 0),
-    0
-  )
-  const average = totalRequestsPerSecond / data.length
-  return Math.round(average * 100) / 100
+    const totalRequestsPerSecond = data.reduce(
+      (sum, item) => sum + (item.edgeRequestsTotalPerSecond || 0),
+      0
+    )
+    const average = totalRequestsPerSecond / data.length
+    return Math.round(average * 100) / 100
+  } catch (error) {
+    throw new Error('Unable to load Requests data')
+  }
 }
 
 export const fetchBandwidthSaved = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery('httpMetrics', ['bandwidthSavedData'], tsRangeBegin, tsRangeEnd)
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['bandwidthSavedData'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  return sumMetricValues(data, 'bandwidthSavedData')
+    return sumMetricValues(data, 'bandwidthSavedData')
+  } catch (error) {
+    throw new Error('Unable to load Bandwidth Saved data')
+  }
 }
 
 export const fetchOffload = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery('httpMetrics', ['offload'], tsRangeBegin, tsRangeEnd)
+  try {
+    const payload = buildGraphQLQuery('httpMetrics', ['offload'], tsRangeBegin, tsRangeEnd)
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  if (data.length === 0) return 0
+    if (data.length === 0) return 0
 
-  const totalOffload = data.reduce((sum, item) => sum + (item.offload || 0), 0)
-  return totalOffload / data.length
+    const totalOffload = data.reduce((sum, item) => sum + (item.offload || 0), 0)
+    return totalOffload / data.length
+  } catch (error) {
+    throw new Error('Unable to load Offload data')
+  }
 }
 
 export const fetchWafRequestsBlocked = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery('httpMetrics', ['wafRequestsBlocked'], tsRangeBegin, tsRangeEnd)
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['wafRequestsBlocked'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  return sumMetricValues(data, 'wafRequestsBlocked')
+    return sumMetricValues(data, 'wafRequestsBlocked')
+  } catch (error) {
+    throw new Error('Unable to load WAF Requests Blocked data')
+  }
 }
 
 export const fetchWafRequestsAllowed = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery('httpMetrics', ['wafRequestsAllowed'], tsRangeBegin, tsRangeEnd)
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['wafRequestsAllowed'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  return sumMetricValues(data, 'wafRequestsAllowed')
+    return sumMetricValues(data, 'wafRequestsAllowed')
+  } catch (error) {
+    throw new Error('Unable to load WAF Requests Allowed data')
+  }
 }
 
 export const fetchWafRequestsThreat = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = buildGraphQLQuery('httpMetrics', ['wafRequestsThreat'], tsRangeBegin, tsRangeEnd)
+  try {
+    const payload = buildGraphQLQuery(
+      'httpMetrics',
+      ['wafRequestsThreat'],
+      tsRangeBegin,
+      tsRangeEnd
+    )
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  return sumMetricValues(data, 'wafRequestsThreat')
+    return sumMetricValues(data, 'wafRequestsThreat')
+  } catch (error) {
+    throw new Error('Unable to load WAF Requests Threat data')
+  }
 }
 
 export const fetchTopCountryThreat = async (tsRangeBegin, tsRangeEnd) => {
-  const payload = {
-    query: `
-      query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-        httpMetrics (
-          limit: 20
-          aggregate: {sum: requests}
-          groupBy: [geolocCountryName]
-          orderBy: [sum_DESC]
-          filter: {
-            tsRange: {
-              begin: $tsRange_begin
-              end: $tsRange_end
+  try {
+    const payload = {
+      query: `
+        query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+          httpMetrics (
+            limit: 20
+            aggregate: {sum: requests}
+            groupBy: [geolocCountryName]
+            orderBy: [sum_DESC]
+            filter: {
+              tsRange: {
+                begin: $tsRange_begin
+                end: $tsRange_end
+              }
+              wafBlock: "1"
+              wafLearning: "0"
             }
-            wafBlock: "1"
-            wafLearning: "0"
+          ) {
+            sum
+            geolocCountryName
           }
-        ) {
-          sum
-          geolocCountryName
         }
+      `,
+      variables: {
+        tsRange_begin: tsRangeBegin,
+        tsRange_end: tsRangeEnd
       }
-    `,
-    variables: {
-      tsRange_begin: tsRangeBegin,
-      tsRange_end: tsRangeEnd
     }
-  }
 
-  const response = await metricsApi.post('', payload)
-  const data = response.data?.data?.httpMetrics || []
+    const response = await metricsApi.post('', payload)
+    const data = response.data?.data?.httpMetrics || []
 
-  if (data.length === 0) return { country: 'N/A', requests: 0 }
+    if (data.length === 0) return { country: 'N/A', requests: 0 }
 
-  const topCountry = data[0]
-  return {
-    country: topCountry.geolocCountryName || 'Unknown',
-    requests: topCountry.sum || 0
+    const topCountry = data[0]
+    return {
+      country: topCountry.geolocCountryName || 'Unknown',
+      requests: topCountry.sum || 0
+    }
+  } catch (error) {
+    throw new Error('Unable to load Top Country Threat data')
   }
 }

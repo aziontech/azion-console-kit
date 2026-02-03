@@ -6,12 +6,12 @@ const COUNT_THOUSAND = 1000
 const DECIMAL_PLACES = 1
 
 export const formatMetricValue = (value, type = 'bytes') => {
-  if (value === 0 || value === null || value === undefined) {
+  if (value <= 0 || value === null || value === undefined) {
     return { value: '0', unit: type === 'bytes' ? 'Bytes' : '' }
   }
 
   if (type === 'bytes') {
-    const sizeIndex = Math.floor(Math.log(value) / Math.log(BYTES_PER_KILOBYTE))
+    const sizeIndex = Math.max(0, Math.floor(Math.log(value) / Math.log(BYTES_PER_KILOBYTE)))
     const convertedValue = value / Math.pow(BYTES_PER_KILOBYTE, sizeIndex)
     const formattedValue = convertedValue.toFixed(DECIMAL_PLACES)
 
