@@ -50,15 +50,16 @@
   })
   const appliedFilters = ref([])
   const first = ref(0)
-  const rows = ref(10)
+  const rows = ref(100)
 
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true },
     { field: 'operation', header: 'Operation', visible: true },
     { field: 'resourceType', header: 'Resource', visible: true },
     { field: 'resourceName', header: 'Resource Name', visible: true },
-    { field: 'resourceItem', header: 'Resource Item', visible: true },
-    { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
+    // I am leaving the code commented out because the API does not yet provide this data.
+    // { field: 'resourceItem', header: 'Resource Item', visible: true },
+    // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
     { field: 'authorEmail', header: 'Author Email', visible: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },
@@ -67,7 +68,8 @@
     { field: 'requestData', header: 'Request Data', visible: false },
     { field: 'remotePort', header: 'Remote Port', visible: false },
     { field: 'comment', header: 'Comment', visible: false },
-    { field: 'uuid', header: 'UUID', visible: false }
+    { field: 'uuid', header: 'UUID', visible: false },
+    { field: 'resourceId', header: 'Resource ID', visible: false }
   ])
 
   const selectedColumns = ref(allColumns.value.filter((col) => col.visible))
@@ -76,6 +78,10 @@
     return allColumns.value.filter((col) =>
       selectedColumns.value.some((selected) => selected.field === col.field)
     )
+  })
+
+  const filterableColumns = computed(() => {
+    return visibleColumns.value.filter((col) => col.field !== 'date')
   })
 
   const hasAppliedFilters = computed(() => appliedFilters.value.length > 0)
@@ -299,7 +305,7 @@
 
     <DataTable.Filter
       ref="filterRef"
-      :filters="visibleColumns"
+      :filters="filterableColumns"
       @apply="handleApplyFilter"
     />
     <template #emptyBlockButton>

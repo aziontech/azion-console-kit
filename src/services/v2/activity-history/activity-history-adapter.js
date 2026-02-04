@@ -48,7 +48,7 @@ export const ActivityHistoryAdapter = {
           title: element.title,
           operation: element.type,
           type: element.type,
-          resourceType: element.resourceType,
+          resourceType: element.resourceType || '-',
           resourceId: element.resourceId,
           resourceItemId: element.resourceItemId,
           resource: element.resourceType || '-',

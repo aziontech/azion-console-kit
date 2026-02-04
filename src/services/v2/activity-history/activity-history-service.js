@@ -31,7 +31,7 @@ const buildDynamicFilters = (filter = {}) => {
     authorEmail: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     accountId: { operator: 'Eq', type: 'String' },
     resourceId: { operator: 'Eq', type: 'String' },
-    resourceType: { operator: 'Eq', type: 'String' },
+    resourceType: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     remoteType: { operator: 'Eq', type: 'String' },
     remotePort: { operator: 'Eq', type: 'Int' },
     userId: { operator: 'Eq', type: 'String' },
