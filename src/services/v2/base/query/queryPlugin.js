@@ -1,6 +1,6 @@
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { persistQueryClient } from '@tanstack/query-persist-client-core'
-import { queryClient } from './queryClient'
+import { queryClient, clearAllCache } from './queryClient'
 import { createIDBPersister } from './indexedDbPersister'
 import { PERSISTENCE_CONFIG } from './config'
 
@@ -71,6 +71,22 @@ export const resumeQueryPersistence = () => {
 
   const [unsubscribe] = persistQueryClient(loadConfig())
   unsubscribePersistence = unsubscribe
+}
+
+export const clearAllCacheAndDeleteAzionIndexedDB = async () => {
+  await pauseQueryPersistence()
+  await clearAllCache()
+  await persister.removeClient()
+  await new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      resolve()
+      return
+    }
+    const request = indexedDB.deleteDatabase(PERSISTENCE_CONFIG.IDB_NAME)
+    request.onsuccess = () => resolve()
+    request.onerror = () => reject(request.error)
+    request.onblocked = () => resolve()
+  })
 }
 
 export default queryPlugin

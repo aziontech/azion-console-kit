@@ -17,10 +17,8 @@ export class VariablesService extends BaseService {
     return { body, count }
   }
 
-  prefetchList = async () => {
-    return await this.useEnsureQueryData(queryKeys.variables.list(), () => this.#fetchList(), {
-      persist: true
-    })
+  prefetchList = () => {
+    return this.usePrefetchQuery(queryKeys.variables.list(), () => this.#fetchList())
   }
 
   list = async (params = {}) => {

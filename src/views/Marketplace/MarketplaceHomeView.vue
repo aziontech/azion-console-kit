@@ -71,14 +71,14 @@
             <LoadingList />
           </template>
           <!-- Default View -->
-          <template v-else-if="allSelected">
+          <template v-else-if="selectedCategory?.code === 'all'">
             <div class="md:text-base lg:text-2xl font-medium">Featured</div>
             <ListSolutions :solutions="featured" />
             <div class="text-base font-medium">New releases</div>
             <ListSolutions :solutions="released" />
           </template>
           <!-- Searched -->
-          <template v-else-if="searching">
+          <template v-else-if="searchForQuery">
             <template v-if="solutions.length > 0">
               <div class="text-sm">
                 {{ solutions.length }} search results for
@@ -114,7 +114,7 @@
 </template>
 
 <script setup>
-  import { computed, onBeforeMount, ref } from 'vue'
+  import { computed, ref, watch, onMounted } from 'vue'
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
@@ -123,147 +123,143 @@
   import LoadingList from './components/LoadingList'
   import LoadingEmptySearch from './components/LoadingEmptySearch'
   import { useToast } from 'primevue/usetoast'
-
-  const selectedCategory = ref({ name: 'All', code: 'all' })
-  const categories = ref([])
-  const $toast = useToast()
-  const loading = ref(false)
-  const solutions = ref([])
-  const searching = ref(false)
-  const search = ref('')
-  const PAGE_TYPE = 'marketplace'
-  const ERROR_PROPS = {
-    closable: true,
-    severity: 'error'
-  }
-  const CATEGORY_ALL = { name: 'All', code: 'all' }
+  import { marketplaceService } from '@/services/v2/marketplace'
+  import { useDebounceFn } from '@vueuse/core'
 
   defineOptions({ name: 'marketplace-home' })
 
-  const props = defineProps({
-    listCategoriesService: {
-      type: Function,
-      required: true
-    },
-    listSolutionsService: {
-      type: Function,
-      required: true
+  const selectedCategory = ref({ name: 'All', code: 'all' })
+  const search = ref('')
+  const searchForQuery = ref('')
+  const listData = ref([])
+  const listLoading = ref(false)
+  const listError = ref(null)
+  const categoriesData = ref([])
+  const categoriesLoading = ref(false)
+
+  const $toast = useToast()
+
+  const PAGE_TYPE = 'marketplace'
+  const ERROR_PROPS = { closable: true, severity: 'error' }
+  const CATEGORY_ALL = { name: 'All', code: 'all' }
+  const SEARCH_DEBOUNCE_MS = 500
+  const PREFETCH_TAB_NAMES = ['Security', 'Performance', 'Edge AI']
+
+  const loading = computed(() => listLoading.value || categoriesLoading.value)
+
+  const solutions = computed(() => {
+    const list = listData.value || []
+    if (searchForQuery.value) {
+      return list.filter((solution) => !solution.instanceType?.isTemplate)
     }
+    return list
   })
 
-  onBeforeMount(() => {
-    loadData()
+  const featured = computed(() => solutions.value.filter((solution) => solution.featured))
+
+  const released = computed(() => solutions.value.filter((solution) => solution.released))
+
+  const categoriesList = computed(() => {
+    const data = categoriesData.value || []
+    const mapped = data
+      .map((category) => ({
+        name: category.name,
+        code: category.slug,
+        total: category.solutionsCount
+      }))
+      .filter((category) => category.total > 0 && category.code !== 'build')
+    return mapped.length ? [CATEGORY_ALL, ...mapped] : []
   })
 
-  const loadData = async () => {
-    try {
-      loading.value = true
-      const payload = { type: PAGE_TYPE }
-      const promises = [props.listCategoriesService(payload), loadSolutions(payload)]
-
-      const [categoriesData, templatesData] = await Promise.all(promises)
-      categories.value = categoriesData
-      solutions.value = templatesData
-    } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
-    } finally {
-      loading.value = false
+  const getListParams = () => {
+    if (searchForQuery.value) {
+      return { type: PAGE_TYPE, search: searchForQuery.value }
     }
+    const code = selectedCategory.value?.code ?? 'all'
+    return { type: PAGE_TYPE, category: code }
   }
 
-  const loadSolutions = (payload) => {
-    return props.listSolutionsService(payload)
-  }
+  const isCanceledError = (err) => err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED'
 
   const disabledOption = ({ code }) => code === selectedCategory.value?.code
 
-  const changeCategory = async () => {
+  const changeCategory = () => {
     const { code } = selectedCategory.value
-    const category = code === 'all' ? undefined : code
-
-    try {
-      loading.value = true
+    if (code === 'all') {
+      searchForQuery.value = ''
       search.value = ''
-      searching.value = false
-      solutions.value = await loadSolutions({
-        type: PAGE_TYPE,
-        category
-      })
-    } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
-    } finally {
-      loading.value = false
     }
   }
 
-  const debounce = (func, timeout = 400) => {
-    let timer
-    return (...args) => {
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        func.apply(this, args)
-      }, timeout)
-    }
-  }
-
-  const searchSolutions = debounce(async () => {
-    if (search.value === '') {
+  const runSearch = () => {
+    const term = search.value.trim()
+    if (term === '') {
       resetFilters()
       return
     }
-
-    try {
-      selectedCategory.value = { code: '', name: '' }
-      searching.value = !!search.value
-      loading.value = true
-      const payload = { type: PAGE_TYPE, search: search.value }
-      const loadedSolutions = await loadSolutions(payload)
-      solutions.value = loadedSolutions.filter((solution) => !solution.instanceType.isTemplate)
-    } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
-    } finally {
-      loading.value = false
-    }
-  })
-
-  const resetFilters = async () => {
-    try {
-      loading.value = true
-      selectedCategory.value = CATEGORY_ALL
-      searching.value = false
-      search.value = ''
-
-      const payload = { type: PAGE_TYPE }
-      solutions.value = await loadSolutions(payload)
-    } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
-    } finally {
-      loading.value = false
-    }
+    selectedCategory.value = { code: '', name: '' }
+    searchForQuery.value = term
   }
 
-  const featured = computed(() => {
-    return solutions.value.filter((solution) => solution.featured)
-  })
+  const searchSolutions = useDebounceFn(runSearch, SEARCH_DEBOUNCE_MS)
 
-  const released = computed(() => {
-    return solutions.value.filter((solution) => solution.released)
-  })
+  const resetFilters = () => {
+    selectedCategory.value = CATEGORY_ALL
+    search.value = ''
+    searchForQuery.value = ''
+  }
 
-  const allSelected = computed(() => {
-    return selectedCategory.value.code === 'all'
-  })
+  let listRequestId = 0
+  let listAbortController = null
 
-  const categoriesList = computed(() => {
-    let mappedCategories = categories.value.map((category) => ({
-      name: category.name,
-      code: category.slug,
-      total: category.solutionsCount
-    }))
-    mappedCategories = mappedCategories.filter(
-      (category) => category.total > 0 && category.code !== 'build'
-    )
+  watch(
+    () => getListParams(),
+    async () => {
+      listAbortController?.abort()
+      listAbortController = new AbortController()
+      const signal = listAbortController.signal
 
-    return mappedCategories.length ? [CATEGORY_ALL, ...mappedCategories] : []
+      const id = ++listRequestId
+      const params = getListParams()
+      listLoading.value = true
+      listError.value = null
+      try {
+        const data = await marketplaceService.fetchListWithCache(params, { signal })
+        if (id === listRequestId) listData.value = data ?? []
+      } catch (err) {
+        if (id === listRequestId && !isCanceledError(err)) {
+          listError.value = err
+          $toast.add({
+            ...ERROR_PROPS,
+            summary: err?.message ?? err
+          })
+        }
+      } finally {
+        if (id === listRequestId) listLoading.value = false
+      }
+    },
+    { immediate: true }
+  )
+
+  onMounted(async () => {
+    categoriesLoading.value = true
+    try {
+      const data = await marketplaceService.fetchCategoriesWithCache()
+      const list = Array.isArray(data) ? data : []
+      categoriesData.value = list
+      const slugsToPrefetch = list
+        .filter((cat) => PREFETCH_TAB_NAMES.includes(cat.name))
+        .map((cat) => cat.slug)
+        .filter(Boolean)
+      if (slugsToPrefetch.length > 0) {
+        marketplaceService.prefetchListByCategories(slugsToPrefetch)
+      }
+    } catch (err) {
+      if (!isCanceledError(err)) {
+        $toast.add({ ...ERROR_PROPS, summary: err?.message ?? err })
+      }
+    } finally {
+      categoriesLoading.value = false
+    }
   })
 </script>

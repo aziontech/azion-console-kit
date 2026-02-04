@@ -44,25 +44,14 @@ export class EdgeAppService extends BaseService {
     return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
       fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
-
-    const firstPage = params?.page === 1
-    const skipCache = params?.hasFilter || params?.skipCache || params?.search
-
-    return await this.useEnsureQueryData(
-      queryKeys.edgeApp.list(params),
-      () => this.#fetchList(params),
-      {
-        persist: firstPage && !skipCache,
-        skipCache
-      }
-    )
+    return this.usePrefetchQuery(queryKeys.edgeApp.list(params), () => this.#fetchList(params))
   }
 
   create = async (payload) => {
