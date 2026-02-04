@@ -4,6 +4,7 @@ import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+import { variablesService } from '@/services/v2/variables'
 import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from './session-broadcast'
 
@@ -45,6 +46,14 @@ const prefetchForClientAccount = async () => {
   ]
 
   await Promise.allSettled(promises)
+
+  prefetchSecondaryServices(pageSize)
+}
+
+const prefetchSecondaryServices = (pageSize) => {
+  const secondaryPromises = [variablesService.prefetchList(pageSize)]
+
+  Promise.allSettled(secondaryPromises).catch(() => {})
 }
 
 export const sessionManager = {
