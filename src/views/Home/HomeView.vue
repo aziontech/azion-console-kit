@@ -11,6 +11,8 @@
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
+  import CommunicationsCard from '@/templates/home-cards-block/communications-card.vue'
+  import { listBannersService } from '@/services/communications-services'
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
   import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
 
@@ -217,8 +219,9 @@
           <LastActivitiesBlock />
         </div>
         <div class="flex flex-col w-full md:w-[30%] gap-8">
+          <CommunicationsCard :listBannersService="listBannersService" />
           <MonthlyUsageCard @viewAll="navigateToUsage" />
-          <MarketplaceTrendsCard :items="marketplaceItems" />
+          <MarketplaceTrendsCard />
           <AzionChangelogCard :changelogItems="changelogItems" />
         </div>
       </section>
