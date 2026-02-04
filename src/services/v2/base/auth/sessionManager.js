@@ -1,7 +1,7 @@
 import { clearAllCache } from '../query/queryClient'
-import { persister, pauseQueryPersistence } from '../query/queryPlugin'
+import { persister, pauseQueryPersistence } from '@/services/v2/base/query/queryPlugin'
 import { useAccountStore } from '@/stores/account'
-import { sendSwitchAccountBroadcast } from './session-broadcast'
+import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
