@@ -39,6 +39,11 @@ export const marketplaceRoutes = {
           {
             label: 'Marketplace',
             to: '/marketplace'
+          },
+          {
+            label: '',
+            dynamic: true,
+            routeParam: 'solution'
           }
         ]
       }

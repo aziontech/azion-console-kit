@@ -14,7 +14,8 @@ export const MarketplaceAdapter = {
         isTemplate: item.instance_type?.is_template
       },
       category: item.category?.[0]?.name,
-      updatedAt: item.updated_at
+      updatedAt: item.updated_at,
+      latestVersion: item.latest_version
     }
   },
 

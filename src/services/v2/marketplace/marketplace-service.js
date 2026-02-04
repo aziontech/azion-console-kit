@@ -126,6 +126,44 @@ export class MarketplaceService extends BaseService {
       slugs.map((slug) => this.listMarketplaceService({ type: 'marketplace', category: slug }))
     )
   }
+
+  getFromCache = ({ vendor, solution }) => {
+    if (!vendor || !solution) return undefined
+
+    const allQueries = this.queryClient.getQueryCache().getAll()
+
+    for (const query of allQueries) {
+      const key = query.queryKey
+      if (!Array.isArray(key) || key[0] !== 'marketplace') continue
+
+      const listData = query.state?.data
+      if (!Array.isArray(listData)) continue
+
+      const item = listData.find(
+        (el) => el.vendor?.slug === vendor && el.slug === solution
+      )
+
+      if (item) {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          referenceId: item.referenceId,
+          headline: item.headline,
+          vendor: item.vendor,
+          lastUpdate: item.updatedAt,
+          latestVersion: item.latestVersion,
+          version: item.latestVersion,
+          instanceType: item.instanceType,
+          category: item.category,
+          featured: item.featured,
+          released: item.released
+        }
+      }
+    }
+
+    return undefined
+  }
 }
 
 export const marketplaceService = new MarketplaceService()
