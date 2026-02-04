@@ -54,3 +54,31 @@ export const getWithExpiration = (key, { encrypt = true } = {}) => {
     return null
   }
 }
+
+export const set = ({ key, value, encrypt = false }) => {
+  if (!key) {
+    return
+  }
+
+  try {
+    const payload = encrypt ? btoa(JSON.stringify(value)) : JSON.stringify(value)
+    localStorage.setItem(key, payload)
+  } catch (err) {
+    // ignore quota or serialization errors
+  }
+}
+
+export const get = (key, { encrypt = false } = {}) => {
+  if (!key) {
+    return null
+  }
+
+  const stored = localStorage.getItem(key)
+  if (!stored) return null
+
+  try {
+    return encrypt ? JSON.parse(atob(stored)) : JSON.parse(stored)
+  } catch (error) {
+    return null
+  }
+}

@@ -110,7 +110,12 @@
     }
   ]
 
-  const TABS = [
+  const selectedTab = ref('recommended')
+  const search = ref('')
+
+  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
+
+  const TABS = computed(() => [
     {
       label: 'Recommended',
       value: 'recommended',
@@ -131,15 +136,10 @@
       value: 'githubImport',
       show: !hideCreateOptions.value
     }
-  ]
-
-  const selectedTab = ref('recommended')
-  const search = ref('')
-
-  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
+  ])
 
   const filteredTabs = computed(() => {
-    return TABS.filter((menuitem) => menuitem.show)
+    return TABS.value.filter((menuitem) => menuitem.show)
   })
 
   const isSearching = computed(() => !!search.value.trim().length)
