@@ -2,9 +2,9 @@
   import { ref, defineOptions, watch, onMounted, computed } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@templates/action-bar-block'
-  import FormLoading from './form-loading'
-  import EngineJsonForm from './engine-jsonform'
-  import EngineAzion from './engine-azion'
+  import FormLoading from '@templates/template-engine-block/form-loading'
+  import EngineJsonForm from '@templates/template-engine-block/engine-jsonform'
+  import EngineAzion from '@templates/template-engine-block/engine-azion'
 
   defineOptions({ name: 'templateEngineBlock' })
 
