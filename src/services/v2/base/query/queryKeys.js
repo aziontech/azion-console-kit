@@ -144,5 +144,10 @@ export const queryKeys = {
   billing: {
     all: ['billing'],
     lastBill: () => [...queryKeys.billing.all, 'last-bill']
+  },
+  appcues: {
+    all: ['appcues'],
+    tags: () => [...queryKeys.appcues.all, 'tags'],
+    launchpads: () => [...queryKeys.appcues.all, 'launchpads']
   }
 }
