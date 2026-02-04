@@ -54,6 +54,9 @@
     updatedRedirect: { type: String, required: true }
   })
 
+  const cachedWorkload = workloadService.getFromCache(route.params.id)
+  const workloadName = ref(cachedWorkload?.name)
+
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
       productName: 'Workload'
@@ -71,8 +74,6 @@
       })
       .track()
   }
-
-  const workloadName = ref()
 
   const setWorkloadName = async (workload) => {
     workloadName.value = workload.name
