@@ -60,7 +60,15 @@ const ROUTE_MAP = {
   Application: { edit: 'edit-application', list: 'list-applications' },
   Bucket: { edit: 'object-storage-edit', list: 'object-storage-list' },
   Connector: { edit: 'edit-connectors', list: 'list-connectors' },
-  Schema: { edit: 'database-sql-database', list: 'list-sql-databases' }
+  Schema: { edit: 'database-sql-database', list: 'list-sql-databases' },
+  CustomPages: { edit: 'edit-custom-pages', list: 'list-custom-pages' },
+  'Purge:cachekey': { edit: 'list-real-time-purge', list: 'list-real-time-purge' },
+  Credential: {
+    edit: 'credentials-tabs',
+    list: 'credentials-tabs',
+    params: { tab: 'object-storage' }
+  },
+  User: { edit: 'edit-users', list: 'list-users' }
 }
 
 // Resolve a ação (edited/created → edit, deleted → list)

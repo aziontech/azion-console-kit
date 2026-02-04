@@ -55,7 +55,7 @@
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true },
     { field: 'operation', header: 'Operation', visible: true },
-    { field: 'title', header: 'Title', visible: true },
+    { field: 'resourceType', header: 'Resource', visible: true },
     { field: 'resourceName', header: 'Resource Name', visible: true },
     { field: 'resourceItem', header: 'Resource Item', visible: true },
     { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
