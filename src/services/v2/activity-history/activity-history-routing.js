@@ -1,4 +1,3 @@
-// Helpers
 const editRoute =
   (name, params = {}) =>
   ({ id }) => ({
@@ -7,7 +6,7 @@ const editRoute =
   })
 
 const tryParseJson = (value) => {
-  if (value === null || value === undefined) return null
+  if (!value) return null
   if (typeof value === 'object') return value
   const text = String(value).trim()
   if (!text) return null
@@ -32,10 +31,6 @@ const extractBucketName = (event) => {
 
 const listRoute = (name) => () => ({ name })
 
-// não tem mais titulo
-//
-
-// Mapa de rotas por resourceType
 const ROUTE_MAP = {
   NetworkList: { edit: 'edit-network-list', list: 'list-network-list' },
   Function: { edit: 'edit-functions', list: 'list-functions' },
@@ -71,7 +66,6 @@ const ROUTE_MAP = {
   User: { edit: 'edit-users', list: 'list-users' }
 }
 
-// Resolve a ação (edited/created → edit, deleted → list)
 const resolveAction = (action) => {
   const normalized = String(action || '')
     .trim()
@@ -120,7 +114,6 @@ const normalizeResourceType = (resourceType) => {
   return aliases[normalized] || raw
 }
 
-// Extrai o ID do evento, tentando múltiplos campos
 const extractId = (event) => {
   const id =
     event?.resourceId ??
@@ -132,7 +125,6 @@ const extractId = (event) => {
   return id !== null && String(id).trim() !== '' ? id : null
 }
 
-// Função principal
 export const resolveActivityHistoryRoute = (event = {}) => {
   const resourceType = normalizeResourceType(event?.resourceType)
   const action = event?.type

@@ -1,7 +1,7 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const formatRequestData = (value) => {
-  if (value === null || value === undefined) return '-'
+  if (!value) return '-'
   if (typeof value === 'object') {
     try {
       return JSON.stringify(value, null, 2)
