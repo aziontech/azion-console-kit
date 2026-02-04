@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
 
@@ -7,6 +8,7 @@
   import DataTimeRange from '@/components/base/dataTimeRange'
   import OperationTag from './OperationTag.vue'
   import { createRelativeRange } from '@utils/date.js'
+  import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
 
   const props = defineProps({
     listService: {
@@ -25,6 +27,7 @@
 
   const emit = defineEmits(['on-load-data'])
 
+  const router = useRouter()
   const toast = useToast()
   const filterRef = ref(null)
   const isLoading = ref(false)
@@ -47,18 +50,26 @@
   })
   const appliedFilters = ref([])
   const first = ref(0)
-  const rows = ref(10)
+  const rows = ref(100)
 
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true },
     { field: 'operation', header: 'Operation', visible: true },
-    { field: 'title', header: 'Title', visible: true },
-    // { field: 'resourceName', header: 'Resource Name', visible: true },
+    { field: 'resourceType', header: 'Resource', visible: true },
+    { field: 'resourceName', header: 'Resource Name', visible: true },
+    // I am leaving the code commented out because the API does not yet provide this data.
     // { field: 'resourceItem', header: 'Resource Item', visible: true },
     // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
-    { field: 'authorName', header: 'Author Name', visible: true },
-    { field: 'authorEmail', header: 'Author Email', visible: true }
-    // { field: 'authorIp', header: 'Author IP', visible: false }
+    { field: 'authorEmail', header: 'Author Email', visible: true },
+    { field: 'authorIp', header: 'Author IP', visible: false },
+    { field: 'authorName', header: 'Author Name', visible: false },
+    { field: 'accountId', header: 'Account ID', visible: false },
+    { field: 'userAgent', header: 'User Agent', visible: false },
+    { field: 'requestData', header: 'Request Data', visible: false },
+    { field: 'remotePort', header: 'Remote Port', visible: false },
+    { field: 'comment', header: 'Comment', visible: false },
+    { field: 'uuid', header: 'UUID', visible: false },
+    { field: 'resourceId', header: 'Resource ID', visible: false }
   ])
 
   const selectedColumns = ref(allColumns.value.filter((col) => col.visible))
@@ -67,6 +78,10 @@
     return allColumns.value.filter((col) =>
       selectedColumns.value.some((selected) => selected.field === col.field)
     )
+  })
+
+  const filterableColumns = computed(() => {
+    return visibleColumns.value.filter((col) => col.field !== 'date')
   })
 
   const hasAppliedFilters = computed(() => appliedFilters.value.length > 0)
@@ -83,7 +98,8 @@
         offset: first.value,
         search: searchValue.value,
         begin,
-        end
+        end,
+        filter: appliedFilters.value
       })
 
       data.value = response.body || []
@@ -91,7 +107,8 @@
       totalRecords.value = await props.getTotalRecordsService({
         search: searchValue.value,
         begin,
-        end
+        end,
+        filter: appliedFilters.value
       })
 
       emit('on-load-data', data.value.length > 0 || searchValue.value.length > 0)
@@ -127,6 +144,10 @@
     filterRef.value?.toggle(event)
   }
 
+  const handleEditFilter = ({ filter, event }) => {
+    filterRef.value?.openForFilter?.(filter, event)
+  }
+
   const handleApplyFilter = (filter) => {
     const existingIndex = appliedFilters.value.findIndex((item) => item.field === filter.field)
     if (existingIndex >= 0) {
@@ -142,6 +163,29 @@
     appliedFilters.value = appliedFilters.value.filter((item) => item.field !== field)
     first.value = 0
     loadData()
+  }
+
+  const handleRowClick = async (payload) => {
+    const rowData = payload?.data || payload
+    const location = resolveActivityHistoryRoute(rowData)
+    if (!location) {
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'No route available for this activity'
+      })
+      return
+    }
+
+    try {
+      await router.push(location)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error?.message || 'Navigation error'
+      })
+    }
   }
 
   const getColumnStyle = (field) => {
@@ -188,12 +232,6 @@
     <template #header>
       <DataTable.Header :showDivider="hasAppliedFilters">
         <template #first-line>
-          <DataTable.AppliedFilters
-            :appliedFilters="appliedFilters"
-            @remove="handleRemoveFilter"
-          />
-        </template>
-        <template #second-line>
           <div class="flex items-center justify-between w-full gap-3">
             <div class="flex w-full items-center gap-2 flex-1">
               <PrimeButton
@@ -205,7 +243,7 @@
               />
               <DataTable.Search
                 v-model="searchValue"
-                placeholder="Search by date, operation or resource..."
+                placeholder="Search by author or resource..."
                 class="flex-1 w-full"
                 @search="handleSearch"
               />
@@ -222,6 +260,13 @@
               />
             </DataTable.Actions>
           </div>
+        </template>
+        <template #second-line>
+          <DataTable.AppliedFilters
+            :appliedFilters="appliedFilters"
+            @remove="handleRemoveFilter"
+            @edit="handleEditFilter"
+          />
         </template>
       </DataTable.Header>
     </template>
@@ -241,6 +286,7 @@
         <template v-else-if="col.field === 'resourceName' || col.field === 'resourceItemName'">
           <span
             v-if="rowData[col.field]"
+            @click="handleRowClick({ data: rowData })"
             class="text-[var(--text-color-link)] cursor-pointer hover:underline"
           >
             {{ rowData[col.field] }}
@@ -259,7 +305,7 @@
 
     <DataTable.Filter
       ref="filterRef"
-      :filters="visibleColumns"
+      :filters="filterableColumns"
       @apply="handleApplyFilter"
     />
     <template #emptyBlockButton>

@@ -94,6 +94,7 @@
             v-if="appliedFilters.length"
             :applied-filters="appliedFilters"
             @remove="handleRemoveFilter"
+            @edit="handleEditFilter"
           />
         </slot>
       </template>
@@ -489,6 +490,10 @@
     if (filterPanel.value) {
       filterPanel.value.toggle(event)
     }
+  }
+
+  const handleEditFilter = ({ filter, event }) => {
+    filterPanel.value?.openForFilter?.(filter, event)
   }
 
   const handleApplyFilter = (filterData = {}) => {

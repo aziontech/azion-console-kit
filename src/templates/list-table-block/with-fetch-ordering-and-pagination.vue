@@ -212,6 +212,10 @@
     return props.allowedFilters.filter((filter) => filter.field !== 'last_modified')
   })
 
+  const handleEditFilter = ({ filter, event }) => {
+    filterPanel.value?.openForFilter?.(filter, event)
+  }
+
   const rowClick = (event, col, rowData) => {
     if (!props.frozenColumns.length) {
       return editItemSelected(event, rowData)
@@ -312,6 +316,7 @@
                 <DataTable.AppliedFilters
                   :applied-filters="appliedFilters"
                   @remove="handleRemoveFilter"
+                  @edit="handleEditFilter"
                 />
               </template>
             </DataTable.Header>
