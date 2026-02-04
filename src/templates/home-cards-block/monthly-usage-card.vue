@@ -40,7 +40,7 @@
                   :binary="true"
                   :tabindex="-1"
                 />
-                <span class="font-normal">{{ option.label }}</span>
+                <span class="font-normal text-xs py-2">{{ option.label }}</span>
               </div>
             </template>
           </Listbox>
@@ -198,6 +198,15 @@
   :deep(.p-listbox) {
     box-shadow: none !important;
     outline: none !important;
+    border: none !important;
+    border-color: transparent !important;
+  }
+
+  :deep(.p-listbox.p-component.p-focus) {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+    border-color: transparent !important;
   }
 
   :deep(.p-listbox:focus) {
@@ -210,7 +219,19 @@
     outline: none !important;
   }
 
-  :deep(.p-listbox-option.p-focus) {
+  :deep(.p-listbox-item.p-focus) {
+    box-shadow: none !important;
+    outline: none !important;
+    background: transparent !important;
+  }
+
+  :deep(.p-listbox-item.p-highlight) {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  :deep(.p-listbox-item:focus) {
     box-shadow: none !important;
     outline: none !important;
     background: transparent !important;
