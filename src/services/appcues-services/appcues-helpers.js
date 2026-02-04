@@ -56,7 +56,7 @@ export const fetchLaunchpads = async (api) => {
 }
 
 export const findTagIdByName = (tags, tagName) => {
-  const tag = tags.find((t) => t.name === tagName)
+  const tag = tags.find((item) => item.name === tagName)
   return tag?.id || null
 }
 
