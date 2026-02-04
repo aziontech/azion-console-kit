@@ -49,7 +49,7 @@ export class SolutionService extends BaseService {
       })
     }
 
-return Promise.all(
+    return Promise.all(
       prefetchConfigs.map(({ group, type }) =>
         this.usePrefetchQuery(
           queryKeys.solutions.list(group, type),
