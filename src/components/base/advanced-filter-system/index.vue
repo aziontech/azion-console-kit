@@ -7,6 +7,7 @@
   import PrimeButton from 'primevue/button'
 
   import { useAccountStore } from '@/stores/account'
+  import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
@@ -164,8 +165,38 @@
   }
 
   const updatedTimeRange = (begin, end, userUTC) => {
-    const dateBegin = begin.resetUTC(userUTC).toBeholderFormat()
-    const dateEnd = end.resetUTC(userUTC).toBeholderFormat()
+    const beginDate = new Date(begin)
+    const endDate = new Date(end)
+
+    const dateBegin = createUtcDateFromUserTimezoneParts(
+      {
+        year: beginDate.getFullYear(),
+        monthIndex: beginDate.getMonth(),
+        day: beginDate.getDate(),
+        hour: beginDate.getHours(),
+        minute: beginDate.getMinutes(),
+        second: beginDate.getSeconds(),
+        millisecond: beginDate.getMilliseconds()
+      },
+      userUTC
+    )
+      .toISOString()
+      .replace(/(\..+)/, '')
+
+    const dateEnd = createUtcDateFromUserTimezoneParts(
+      {
+        year: endDate.getFullYear(),
+        monthIndex: endDate.getMonth(),
+        day: endDate.getDate(),
+        hour: endDate.getHours(),
+        minute: endDate.getMinutes(),
+        second: endDate.getSeconds(),
+        millisecond: endDate.getMilliseconds()
+      },
+      userUTC
+    )
+      .toISOString()
+      .replace(/(\..+)/, '')
 
     return {
       tsRangeBegin: dateBegin,
