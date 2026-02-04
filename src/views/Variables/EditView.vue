@@ -17,6 +17,8 @@
   const breadcrumbs = useBreadcrumbs()
   const variableName = ref('Edit Variable')
 
+  const cachedVariable = variablesService.getFromCache(route.params?.id) ?? {}
+
   const setVariableName = (variable) => {
     variableName.value = variable.key
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, variable.key)
@@ -64,6 +66,7 @@
         :editService="variablesService.edit"
         :loadService="variablesService.load"
         updatedRedirect="list-variables"
+        :initialValues="cachedVariable"
         :schema="validationSchema"
         @loaded-service-object="setVariableName"
         @on-edit-success="handleTrackEditEvent"

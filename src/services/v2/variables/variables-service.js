@@ -32,18 +32,37 @@ export class VariablesService extends BaseService {
     })
   }
 
-  load = async ({ id }) => {
-    const listData = await this.useEnsureQueryData(
-      queryKeys.variables.list(),
-      () => this.#fetchList(),
-      { persist: true }
-    )
+  getFromCache = (id) => {
+    if (!id) return undefined
+
+    const listData = this.queryClient.getQueryData(queryKeys.variables.list())
+
+    if (!listData?.body) {
+      return undefined
+    }
 
     const variable = listData.body.find((item) => String(item.id) === String(id))
 
     if (!variable) {
-      throw new Error('Variable not found')
+      return undefined
     }
+
+    return {
+      id: variable.id,
+      key: variable.key,
+      value: variable.value?.content ?? variable.value,
+      secret: variable.value?.isSecret ?? false
+    }
+  }
+
+  load = async ({ id }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `${this.#baseURL}/${id}`,
+      config: { baseURL: '/api' }
+    })
+
+    const variable = VariablesAdapter.transformItem(data)
 
     return {
       id: variable.id,
@@ -60,8 +79,17 @@ export class VariablesService extends BaseService {
       body: payload,
       config: { baseURL: '/api' }
     })
+
     this.queryClient.removeQueries({ queryKey: queryKeys.variables.all })
-    return { ...data, secret: payload.secret }
+
+    const variable = VariablesAdapter.transformItem(data)
+
+    return {
+      id: variable.id,
+      key: variable.key,
+      value: variable.value?.content ?? variable.value,
+      secret: variable.value?.isSecret ?? false
+    }
   }
 
   edit = async (payload) => {

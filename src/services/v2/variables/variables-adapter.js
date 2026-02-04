@@ -19,6 +19,11 @@ export const VariablesAdapter = {
     return adaptServiceDataResponse(data, null, transformMap)
   },
 
+  transformItem(data) {
+    if (!data) return null
+    return adaptServiceDataResponse([data], null, transformMap)[0]
+  },
+
   transformPayload(payload) {
     return {
       key: payload.key,
