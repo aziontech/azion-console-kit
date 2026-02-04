@@ -1,12 +1,48 @@
 <template>
-  <HomeCardBlock title="Marketplace Trends">
+  <HomeCardBlock
+    v-if="isLoading"
+    title="Marketplace Trends"
+  >
     <template #content>
-      <div class="bg-[var(--surface-100)] flex gap-2.5 h-[138px] items-center px-4 py-3">
+      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3">
+        <div class="flex-1 flex flex-col gap-3 animate-pulse">
+          <div class="flex gap-2.5 items-center">
+            <div class="rounded-md size-6 bg-[var(--surface-200)]"></div>
+            <div class="h-4 bg-[var(--surface-200)] rounded w-32"></div>
+          </div>
+          <div class="space-y-2">
+            <div class="h-3 bg-[var(--surface-200)] rounded w-full"></div>
+            <div class="h-3 bg-[var(--surface-200)] rounded w-3/4"></div>
+          </div>
+          <div class="flex gap-4">
+            <div class="h-3 bg-[var(--surface-200)] rounded w-16"></div>
+            <div class="h-3 bg-[var(--surface-200)] rounded w-20"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </HomeCardBlock>
+
+  <HomeCardBlock
+    v-else-if="hasItems"
+    title="Marketplace Trends"
+  >
+    <template #content>
+      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3">
         <div class="flex-1 flex flex-col gap-3">
           <div class="flex flex-col gap-2 w-full">
             <div class="flex gap-2.5 items-center w-full">
               <div class="rounded-md size-6 overflow-hidden flex-shrink-0">
-                <i class="pi pi-box text-[var(--text-color-base)]"></i>
+                <img
+                  v-if="currentItem.vendorIcon"
+                  :src="currentItem.vendorIcon"
+                  :alt="currentItem.author"
+                  class="size-6 object-contain"
+                />
+                <i
+                  v-else
+                  class="pi pi-box text-[var(--text-color-base)]"
+                ></i>
               </div>
               <div class="flex-1 flex flex-col gap-0 justify-center">
                 <h3
@@ -67,7 +103,11 @@
             :key="index"
             @click="goToItem(index)"
             class="w-2 h-2 rounded-full transition-opacity"
-            :class="currentIndex === index ? 'bg-white opacity-100' : 'bg-white opacity-16'"
+            :class="
+              currentIndex === index
+                ? 'bg-neutral-200'
+                : 'bg-[var(--text-color-secondary)] opacity-40'
+            "
           />
         </div>
 
@@ -85,32 +125,47 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import PrimeButton from 'primevue/button'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
+  import { solutionService } from '@/services/v2/marketplace/solution-service'
 
   defineOptions({ name: 'MarketplaceTrendsCard' })
 
-  const props = defineProps({
-    items: {
-      type: Array,
-      required: true
-    }
-  })
-
+  const items = ref([])
   const currentIndex = ref(0)
+  const isLoading = ref(false)
 
-  const currentItem = computed(() => props.items[currentIndex.value])
+  const currentItem = computed(() => items.value[currentIndex.value] || {})
+
+  const hasItems = computed(() => items.value.length > 0)
 
   const nextItem = () => {
-    currentIndex.value = (currentIndex.value + 1) % props.items.length
+    if (!hasItems.value) return
+    currentIndex.value = (currentIndex.value + 1) % items.value.length
   }
 
   const previousItem = () => {
-    currentIndex.value = !currentIndex.value ? props.items.length - 1 : currentIndex.value - 1
+    if (!hasItems.value) return
+    currentIndex.value = !currentIndex.value ? items.value.length - 1 : currentIndex.value - 1
   }
 
   const goToItem = (index) => {
     currentIndex.value = index
   }
+
+  const loadTrendingSolutions = async () => {
+    isLoading.value = true
+    try {
+      items.value = await solutionService.listTrendingSolutions(3)
+    } catch (error) {
+      items.value = []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  onMounted(() => {
+    loadTrendingSolutions()
+  })
 </script>
