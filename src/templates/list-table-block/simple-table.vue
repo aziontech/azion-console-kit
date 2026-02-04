@@ -106,7 +106,7 @@
     :paginator="false"
     tableClass="overflow-clip rounded-md"
     scrollHeight="auto"
-    class="w-full border border-[var(--surface-border)] rounded-md overflow-hidden"
+    class="w-full overflow-hidden"
     :emptyBlock="emptyBlock"
     :pt="{
       emptyState: 'py-4 h-[306px]'

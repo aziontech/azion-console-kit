@@ -49,14 +49,15 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-10 pb-8">
+      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-6 pb-8">
         <div class="flex flex-col w-full md:w-[75%] gap-8">
           <div class="flex w-full justify-between items-center">
-            <h1 class="text-[22px]">Welcome {{ user.name }}</h1>
+            <h1 class="text-[22px] font-semibold">Welcome {{ user.name }}</h1>
             <PrimeButton
               icon="pi pi-user-plus"
               severity="secondary"
               label="Invite User"
+              size="small"
               outlined
               @click="openInviteDialog"
             />
