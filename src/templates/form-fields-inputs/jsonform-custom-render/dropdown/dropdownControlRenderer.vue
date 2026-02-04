@@ -62,14 +62,9 @@
       :disabled="disabled"
       :filter="filter"
       :loading="loading"
+      :aditionalError="errorMessage"
       @onChange="onChange"
       @onBlur="onBlur"
     />
-    <small
-      v-if="errorMessage"
-      class="p-error text-xs font-normal leading-tight"
-    >
-      {{ errorMessage }}
-    </small>
   </div>
 </template>
