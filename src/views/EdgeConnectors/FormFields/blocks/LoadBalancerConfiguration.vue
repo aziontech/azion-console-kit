@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
+  import { watch, computed } from 'vue'
   import { useField } from 'vee-validate'
-  import { watch } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
@@ -87,10 +87,14 @@
     { label: 'IP Hash', value: 'ip_hash' }
   ]
 
+  const hasInitialConfig = computed(() => {
+    return maxRetries.value && connectionTimeout.value && readWriteTimeout.value
+  })
+
   watch(
     () => loadBalancerEnabled.value,
     (newValue) => {
-      if (newValue) {
+      if (newValue && !hasInitialConfig.value) {
         method.value = 'round_robin'
         maxRetries.value = 3
         connectionTimeout.value = 30

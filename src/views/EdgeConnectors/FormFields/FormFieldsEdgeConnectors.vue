@@ -15,12 +15,16 @@
   />
 
   <EdgeConnectorsFormFieldsLoadBalancerConfiguration
-    v-if="enableLoadBalancerConfiguration"
+    :class="{
+      hidden: !enableLoadBalancerConfiguration
+    }"
     :isDrawer="isDrawer"
   />
 
   <EdgeConnectorsFormFieldsAddress
-    v-if="isHttpEnabled"
+    :class="{
+      hidden: !isHttpEnabled
+    }"
     :isDrawer="isDrawer"
   />
 
