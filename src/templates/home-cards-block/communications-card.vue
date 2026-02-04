@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isVisible"
-    class="border border-[var(--surface-border)] rounded-md bg-[var(--surface-section)] flex flex-col relative"
+    class="border surface-border rounded-md surface-section flex flex-col relative"
   >
     <PrimeButton
       v-if="communication.dismissible"
@@ -9,45 +9,45 @@
       severity="secondary"
       text
       rounded
-      class="absolute top-3 right-3 z-10"
+      class="absolute top-3 right-3 z-1"
       @click="handleDismiss"
     />
 
-    <div class="p-6 flex flex-col gap-6">
+    <div class="flex flex-col">
       <div
-        v-if="communication.images?.length"
-        class="flex justify-center gap-4"
+        v-if="communication.image"
+        class="flex justify-center p-6"
       >
         <img
-          v-for="(image, index) in communication.images"
-          :key="index"
-          :src="image.src"
-          :alt="image.alt || 'Communication image'"
+          :src="communication.image"
+          alt="Communication image"
           class="max-h-40 object-contain"
         />
       </div>
 
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col w-full">
         <span
           v-if="communication.tag"
-          class="text-[10px] font-mono uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
+          class="text-[10px] font-mono uppercase tracking-wider text-color-secondary border-y surface-border py-3 font-medium px-6"
         >
           {{ communication.tag }}
         </span>
 
-        <h3 class="text-xl font-semibold text-white leading-tight">
+        <h3 class="text-xl font-semibold text-white leading-tight px-6 py-4 surface-border border-b">
           {{ communication.message }}
         </h3>
       </div>
 
-      <PrimeButton
-        v-if="communication.ctaText && communication.ctaHref"
-        :label="communication.ctaText"
-        severity="secondary"
-        outlined
-        class="w-full uppercase tracking-widest text-xs font-medium"
-        @click="handleCtaClick"
-      />
+      <div class="p-6">
+        <PrimeButton
+          v-if="communication.ctaText && communication.ctaHref"
+          :label="communication.ctaText"
+          severity="secondary"
+          outlined
+          class="w-full uppercase tracking-widest text-xs font-medium"
+          @click="handleCtaClick"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -55,21 +55,14 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import PrimeButton from 'primevue/button'
+  import { listCommunicationsService } from '@/services/appcues-services'
 
   defineOptions({ name: 'CommunicationsCard' })
-
-  const props = defineProps({
-    listBannersService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const STORAGE_KEY_PREFIX = 'comm_dismissed:'
   const ALLOWED_URL_PROTOCOLS = ['https:', 'http:']
   const MAX_ID_LENGTH = 128
   const MAX_MESSAGE_LENGTH = 500
-  const MAX_IMAGES = 10
 
   const communication = ref(null)
   const isDismissed = ref(false)
@@ -96,16 +89,6 @@
     return text.slice(0, maxLength)
   }
 
-  const sanitizeImages = (images) => {
-    if (!Array.isArray(images)) return []
-    return images
-      .slice(0, MAX_IMAGES)
-      .filter((img) => img && typeof img === 'object' && isValidUrl(img.src))
-      .map((img) => ({
-        src: img.src,
-        alt: sanitizeText(img.alt || '', 200)
-      }))
-  }
 
   const isVisible = computed(() => {
     if (!communication.value) return false
@@ -176,7 +159,7 @@
       ctaHref: banner.ctaHref && isValidUrl(banner.ctaHref) ? banner.ctaHref : null,
       startAt: banner.startAt || null,
       endAt: banner.endAt || null,
-      images: sanitizeImages(banner.images || []),
+      image: banner.image && isValidUrl(banner.image) ? banner.image : null,
       priority: typeof banner.priority === 'number' ? banner.priority : 0
     }
   }
@@ -184,7 +167,7 @@
   const loadBanners = async () => {
     isLoading.value = true
     try {
-      const banners = await props.listBannersService()
+      const banners = await listCommunicationsService()
 
       if (!Array.isArray(banners) || banners.length === 0) {
         return
