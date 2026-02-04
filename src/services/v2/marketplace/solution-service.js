@@ -98,7 +98,6 @@ export class SolutionService extends BaseService {
   }
 
   adaptTrendingResponse(response, limit) {
-    console.log('[SolutionService] Raw response:', response)
     const isArray = Array.isArray(response.data)
     if (!isArray || !response.data.length) return []
 

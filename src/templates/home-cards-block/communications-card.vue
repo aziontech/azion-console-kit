@@ -199,8 +199,8 @@
       if (validBanner) {
         communication.value = adaptBanner(validBanner)
       }
-    } catch (error) {
-      console.error('[CommunicationsCard] Error loading banners:', error)
+    } catch {
+      // Error loading banners - fail silently
     } finally {
       isLoading.value = false
     }
