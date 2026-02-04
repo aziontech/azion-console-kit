@@ -6,16 +6,17 @@
   import { teamsService } from '@/services/users-services/list-teams-service'
 
   const teams = ref([])
-  const loading = ref(false)
+  const loading = ref(true)
 
-  onMounted(async () => {
-    loading.value = true
+  const fetchTeams = async () => {
     try {
       teams.value = await teamsService.useListTeams()
     } finally {
       loading.value = false
     }
-  })
+  }
+
+  onMounted(() => fetchTeams())
 
   const { value: name } = useField('name')
   const { value: email } = useField('email')
