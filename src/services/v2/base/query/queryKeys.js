@@ -19,6 +19,12 @@ export const queryKeys = {
     all: ['solutions'],
     list: (group, type) => [...queryKeys.solutions.all, 'list', group, type]
   },
+  marketplace: {
+    all: ['marketplace'],
+    list: (params) => [...queryKeys.marketplace.all, 'list', params],
+    categories: () => [...queryKeys.marketplace.all, 'categories'],
+    detail: (vendor, slug) => [...queryKeys.marketplace.all, 'detail', vendor, slug]
+  },
   edgeApp: {
     all: ['edge-apps'],
     detail: (id) => {

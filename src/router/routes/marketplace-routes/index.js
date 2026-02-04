@@ -12,10 +12,6 @@ export const marketplaceRoutes = {
       path: '',
       name: 'marketplace-home',
       component: () => import('@views/Marketplace/MarketplaceHomeView.vue'),
-      props: {
-        listCategoriesService: MarketplaceService.listCategoriesService,
-        listSolutionsService: MarketplaceService.listSolutionsService
-      },
       meta: {
         title: 'Marketplace'
       }

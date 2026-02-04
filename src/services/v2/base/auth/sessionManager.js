@@ -1,6 +1,7 @@
 import { clearAllCache } from '../query/queryClient'
 import { persister, pauseQueryPersistence } from '../query/queryPlugin'
 import { solutionService } from '@/services/v2/marketplace/solution-service'
+import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
@@ -37,14 +38,14 @@ const prefetchForClientAccount = async () => {
   const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
   const pageSize = getPageSizeFromStorage()
 
-  const promises = [
+  await Promise.allSettled([
     solutionService.prefetchList(hasFlagBlockApiV4()),
     edgeAppService.prefetchList(pageSize),
     workloadService.prefetchList(pageSize),
     edgeFirewallService.prefetchList(pageSize)
-  ]
+  ])
 
-  await Promise.allSettled(promises)
+  marketplaceService.prefetchMarketplace({ type: 'marketplace', category: 'all' })
 }
 
 export const sessionManager = {
