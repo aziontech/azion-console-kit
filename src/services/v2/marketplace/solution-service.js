@@ -33,6 +33,16 @@ export class SolutionService extends BaseService {
    *
    * @param {boolean} isFlagBlockApiV4 - flag to determine template type
    */
+  async listTrendingSolutions(limit = 3) {
+    const response = await this.http.request({
+      method: 'GET',
+      url: this.baseUrl,
+      config: { baseURL: '/api' }
+    })
+
+    return this.adaptTrendingResponse(response, limit)
+  }
+
   async prefetchList(isFlagBlockApiV4 = false) {
     const accountStore = useAccountStore()
     const { jobRole } = accountStore.account
@@ -85,6 +95,25 @@ export class SolutionService extends BaseService {
     parsedSolutions.sort((solutionA, solutionB) => solutionA.name.localeCompare(solutionB.name))
 
     return parsedSolutions
+  }
+
+  adaptTrendingResponse(response, limit) {
+    const isArray = Array.isArray(response.data)
+    if (!isArray || !response.data.length) return []
+
+    const trendingSolutions = response.data
+      .filter((element) => element.featured)
+      .slice(0, limit)
+      .map((element) => ({
+        id: `${element.id}`,
+        name: element.name,
+        description: element.headline,
+        author: element.vendor?.name || 'Unknown',
+        vendorIcon: element.vendor?.icon || null,
+        version: element.version || element.latest_version
+      }))
+
+    return trendingSolutions
   }
 }
 
