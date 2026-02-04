@@ -78,7 +78,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return { feedback: 'Rule Engine successfully created' }
   }
@@ -92,7 +94,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rule Engine successfully updated'
   }
@@ -123,7 +127,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rules Engine successfully ordered'
   }
@@ -134,7 +140,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       url: this.#getUrl(edgeFirewallId, `/${ruleEngineId}`)
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rules Engine successfully deleted'
   }

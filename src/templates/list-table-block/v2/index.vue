@@ -120,6 +120,10 @@
     emptyBlock: {
       type: Object,
       default: () => ({})
+    },
+    isLoadingReorder: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -191,6 +195,7 @@
     table.forEach((row, index) => {
       if (row.position) {
         row.position.value = index
+        row.position.max = table.length - 1
         row.position.altered = row.position.immutableValue !== row.position.value
       }
     })
@@ -609,7 +614,7 @@
 
     <teleport
       to="#action-bar"
-      v-if="columnOrderAltered"
+      v-if="columnOrderAltered && !isLoading"
     >
       <slot
         name="reorderFooter"
@@ -634,10 +639,11 @@
             data-testid="rules-engine-save-order-button"
             size="small"
             type="button"
+            :loading="isLoadingReorder"
             @click="
               emit('on-review-changes', { data: data, alteredRows: alteredRows, reload: reload })
             "
-            :badge="alteredRows.length"
+            :badge="!isLoadingReorder ? alteredRows.length : undefined"
           />
         </div>
       </slot>

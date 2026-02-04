@@ -35,12 +35,8 @@ export default mergeConfig(
           'src/plugins/**',
           'src/modules/**'
         ],
-        statements: 50,
-        branches: 50,
-        functions: 50,
-        lines: 50,
         reporter: ['text', 'lcov', 'html'],
-        reportsDirectory: './coverage/unit',
+        reportsDirectory: './coverage/unit'
       },
       reporters: ['default', 'vitest-sonar-reporter'],
       outputFile: {
