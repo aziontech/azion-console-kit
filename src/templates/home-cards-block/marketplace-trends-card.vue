@@ -54,13 +54,7 @@
             </div>
 
             <p
-              class="text-xs text-[var(--text-color-muted)] leading-[1.5] overflow-hidden max-h-[53px] min-h-[24px]"
-              style="
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                line-clamp: 3;
-              "
+              class="text-xs leading-[1.5] overflow-hidden text-color-secondary"
             >
               {{ currentItem.description }}
             </p>
@@ -91,10 +85,10 @@
           text
           rounded
           size="small"
-          :disabled="currentIndex === 0"
+          :disabled="isFirstItem"
           @click="previousItem"
           class="w-8 h-8"
-          :class="{ 'opacity-60': currentIndex === 0 }"
+          :class="{ 'opacity-60': isFirstItem }"
         />
 
         <div class="flex gap-1.5 h-full items-center justify-center">
@@ -116,8 +110,10 @@
           text
           rounded
           size="small"
+          :disabled="isLastItem"
           @click="nextItem"
           class="w-8 h-8"
+          :class="{ 'opacity-60': isLastItem }"
         />
       </div>
     </template>
@@ -140,14 +136,17 @@
 
   const hasItems = computed(() => items.value.length > 0)
 
+  const isFirstItem = computed(() => currentIndex.value === 0)
+  const isLastItem = computed(() => currentIndex.value === items.value.length - 1)
+
   const nextItem = () => {
-    if (!hasItems.value) return
-    currentIndex.value = (currentIndex.value + 1) % items.value.length
+    if (!hasItems.value || isLastItem.value) return
+    currentIndex.value++
   }
 
   const previousItem = () => {
-    if (!hasItems.value) return
-    currentIndex.value = !currentIndex.value ? items.value.length - 1 : currentIndex.value - 1
+    if (!hasItems.value || isFirstItem.value) return
+    currentIndex.value--
   }
 
   const goToItem = (index) => {
