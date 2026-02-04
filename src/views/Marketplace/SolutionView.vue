@@ -2,7 +2,10 @@
   <ContentBlock>
     <template #heading>
       <template v-if="solution">
-        <PageHeadingBlock :pageTitle="solution.name" :entityName="solution.name" />
+        <PageHeadingBlock
+          :pageTitle="solution.name"
+          :entityName="solution.name"
+        />
         <!-- Solutions props -->
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div
@@ -16,7 +19,10 @@
             />
           </div>
           <div class="flex gap-3 items-center">
-            <div v-if="solution.vendor?.name" class="gap-1 items-center hidden sm:flex">
+            <div
+              v-if="solution.vendor?.name"
+              class="gap-1 items-center hidden sm:flex"
+            >
               <span class="text-xs font-medium text-color-primary">By</span>
               <PrimeButton
                 link
@@ -30,22 +36,48 @@
             </div>
             <div class="flex gap-1 items-center">
               <span class="text-xs font-medium text-color-primary">Version</span>
-              <Skeleton v-if="!solutionVersion" width="3rem" height="1rem" />
-              <span v-else class="text-xs font-medium text-color-secondary">{{ solutionVersion }}</span>
+              <Skeleton
+                v-if="!solutionVersion"
+                width="3rem"
+                height="1rem"
+              />
+              <span
+                v-else
+                class="text-xs font-medium text-color-secondary"
+                >{{ solutionVersion }}</span
+              >
             </div>
-            <div v-if="solution.lastUpdate" class="flex gap-1 items-center">
+            <div
+              v-if="solution.lastUpdate"
+              class="flex gap-1 items-center"
+            >
               <span class="text-xs font-medium text-color-primary">Last Updated</span>
-              <span class="text-xs font-medium text-color-secondary">{{ solution.lastUpdate }}</span>
+              <span class="text-xs font-medium text-color-secondary">{{
+                solution.lastUpdate
+              }}</span>
             </div>
           </div>
         </div>
       </template>
       <template v-else>
-        <Skeleton width="12rem" height="1.5rem" class="mb-4" />
+        <Skeleton
+          width="12rem"
+          height="1.5rem"
+          class="mb-4"
+        />
         <div class="flex gap-3 items-center">
-          <Skeleton width="6rem" height="1rem" />
-          <Skeleton width="4rem" height="1rem" />
-          <Skeleton width="8rem" height="1rem" />
+          <Skeleton
+            width="6rem"
+            height="1rem"
+          />
+          <Skeleton
+            width="4rem"
+            height="1rem"
+          />
+          <Skeleton
+            width="8rem"
+            height="1rem"
+          />
         </div>
       </template>
     </template>
@@ -60,25 +92,56 @@
           <div>
             <div class="text-xl font-medium mb-2">Overview</div>
             <template v-if="!isFullyLoaded">
-              <Skeleton width="100%" height="1rem" class="mb-2" />
-              <Skeleton width="90%" height="1rem" class="mb-2" />
-              <Skeleton width="95%" height="1rem" />
+              <Skeleton
+                width="100%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="90%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="95%"
+                height="1rem"
+              />
             </template>
-            <div v-else v-html="solution.overview"></div>
+            <div
+              v-else
+              v-html="solution.overview"
+            ></div>
           </div>
           <div>
             <div class="text-xl font-medium mb-2">Usage</div>
             <template v-if="!isFullyLoaded">
-              <Skeleton width="100%" height="1rem" class="mb-2" />
-              <Skeleton width="85%" height="1rem" class="mb-2" />
-              <Skeleton width="92%" height="1rem" />
+              <Skeleton
+                width="100%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="85%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="92%"
+                height="1rem"
+              />
             </template>
-            <div v-else v-html="solution.usage"></div>
+            <div
+              v-else
+              v-html="solution.usage"
+            ></div>
           </div>
           <div>
             <div class="text-xl font-medium mb-2">Changelog</div>
             <template v-if="!isFullyLoaded">
-              <Skeleton width="80%" height="1rem" />
+              <Skeleton
+                width="80%"
+                height="1rem"
+              />
             </template>
             <div v-else>
               [{{ solution.latestVersion }}] - {{ solution.lastUpdate }} -
@@ -88,10 +151,20 @@
           <div>
             <div class="text-xl font-medium mb-2">Support</div>
             <template v-if="!isFullyLoaded">
-              <Skeleton width="100%" height="1rem" class="mb-2" />
-              <Skeleton width="75%" height="1rem" />
+              <Skeleton
+                width="100%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="75%"
+                height="1rem"
+              />
             </template>
-            <div v-else v-html="solution.support"></div>
+            <div
+              v-else
+              v-html="solution.support"
+            ></div>
           </div>
         </div>
         <!-- Right Sidebar -->
@@ -99,10 +172,26 @@
           <!-- Card -->
           <div class="p-6 sm:p-8 border surface-section rounded surface-border">
             <template v-if="!isFullyLoaded">
-              <Skeleton width="60%" height="1.5rem" class="mb-3" />
-              <Skeleton width="100%" height="1rem" class="mb-2" />
-              <Skeleton width="90%" height="1rem" class="mb-8" />
-              <Skeleton width="100%" height="2.5rem" borderRadius="6px" />
+              <Skeleton
+                width="60%"
+                height="1.5rem"
+                class="mb-3"
+              />
+              <Skeleton
+                width="100%"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="90%"
+                height="1rem"
+                class="mb-8"
+              />
+              <Skeleton
+                width="100%"
+                height="2.5rem"
+                borderRadius="6px"
+              />
             </template>
             <template v-else>
               <div class="text-xl font-medium mb-3">{{ sidebarTitle }}</div>
@@ -139,7 +228,11 @@
             <div class="text-lg font-medium mb-3">Details</div>
             <div class="h-8 w-full flex flex-row justify-between align-items-center">
               <span class="text-sm text-color-secondary">Website</span>
-              <Skeleton v-if="!solution?.vendor?.url" width="8rem" height="1rem" />
+              <Skeleton
+                v-if="!solution?.vendor?.url"
+                width="8rem"
+                height="1rem"
+              />
               <PrimeButton
                 v-else
                 class="p-0 text-right"

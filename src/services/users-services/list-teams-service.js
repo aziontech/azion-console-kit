@@ -39,10 +39,6 @@ class TeamsService extends BaseService {
     return this.useEnsureQueryData(queryKey, () => this.listTeams())
   }
 
-  /**
-   * Composable-friendly: returns Vue Query result (data, isLoading, etc.) for use in components.
-   * enabled: true sobrescreve o padrão do getCacheOptions (enabled: false) para a request rodar.
-   */
   useListTeamsQuery() {
     return this.useQuery(queryKeys.teams.all, () => this.listTeams(), {
       cacheType: this.cacheType.STATIC,

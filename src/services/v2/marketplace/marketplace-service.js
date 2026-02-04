@@ -139,9 +139,7 @@ export class MarketplaceService extends BaseService {
       const listData = query.state?.data
       if (!Array.isArray(listData)) continue
 
-      const item = listData.find(
-        (el) => el.vendor?.slug === vendor && el.slug === solution
-      )
+      const item = listData.find((el) => el.vendor?.slug === vendor && el.slug === solution)
 
       if (item) {
         return {
