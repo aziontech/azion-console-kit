@@ -1,58 +1,19 @@
-import appcuesApi from '../axios/makeAppcuesApi'
+import { appcuesService } from './appcues-service'
 
-const ACCOUNT_ID = import.meta.env.VITE_APPCUES_ACCOUNT_ID
-
-let cachedApi = null
-let cachedTags = null
-let cachedLaunchpads = null
-let tagsPromise = null
-let launchpadsPromise = null
-
-export const getApi = () => {
-  if (!cachedApi) {
-    cachedApi = appcuesApi()
+export const fetchTags = async () => {
+  try {
+    return await appcuesService.getTags()
+  } catch {
+    return []
   }
-  return cachedApi
 }
 
-export const getAccountId = () => {
-  return ACCOUNT_ID
-}
-
-export const fetchTags = async (api) => {
-  if (cachedTags) return cachedTags
-  
-  if (tagsPromise) return tagsPromise
-
-  tagsPromise = api.get(`/accounts/${ACCOUNT_ID}/tags`)
-    .then((response) => {
-      cachedTags = response.data || []
-      return cachedTags
-    })
-    .catch(() => {
-      tagsPromise = null
-      return []
-    })
-
-  return tagsPromise
-}
-
-export const fetchLaunchpads = async (api) => {
-  if (cachedLaunchpads) return cachedLaunchpads
-  
-  if (launchpadsPromise) return launchpadsPromise
-
-  launchpadsPromise = api.get(`/accounts/${ACCOUNT_ID}/launchpads`)
-    .then((response) => {
-      cachedLaunchpads = response.data || []
-      return cachedLaunchpads
-    })
-    .catch(() => {
-      launchpadsPromise = null
-      return []
-    })
-
-  return launchpadsPromise
+export const fetchLaunchpads = async () => {
+  try {
+    return await appcuesService.getLaunchpads()
+  } catch {
+    return []
+  }
 }
 
 export const findTagIdByName = (tags, tagName) => {
