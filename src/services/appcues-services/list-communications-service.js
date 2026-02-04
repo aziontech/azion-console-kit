@@ -1,6 +1,4 @@
 import {
-  getApi,
-  getAccountId,
   fetchTags,
   fetchLaunchpads,
   findTagIdByName,
@@ -78,22 +76,15 @@ const extractCommunicationData = (launchpad) => {
 }
 
 export const listCommunicationsService = async () => {
-  const api = getApi()
-  const accountId = getAccountId()
-
-  if (!api || !accountId) {
-    return []
-  }
-
   try {
-    const tags = await fetchTags(api)
+    const tags = await fetchTags()
     const communicationsTagId = findTagIdByName(tags, COMMUNICATIONS_TAG_NAME)
 
     if (!communicationsTagId) {
       return []
     }
 
-    const launchpads = await fetchLaunchpads(api)
+    const launchpads = await fetchLaunchpads()
     const communicationsLaunchpads = filterLaunchpadsByTagId(launchpads, communicationsTagId)
 
     if (communicationsLaunchpads.length === 0) {
