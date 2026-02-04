@@ -219,10 +219,14 @@
           <LastActivitiesBlock />
         </div>
         <div class="flex flex-col w-full md:w-[30%] gap-8">
-          <CommunicationsCard :listBannersService="listBannersService" />
+          <!-- 
+          Oculta o CommunicationsCard enquanto não tem conexão com a API do APP CUES
+          <CommunicationsCard :listBannersService="listBannersService" /> -->
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />
-          <AzionChangelogCard :changelogItems="changelogItems" />
+          <!-- 
+          Oculta o ChangeLog enquanto não tem conexão com a API do APP CUES
+          <AzionChangelogCard :changelogItems="changelogItems" /> -->
         </div>
       </section>
     </template>
