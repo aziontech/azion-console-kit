@@ -33,7 +33,7 @@ export class SolutionService extends BaseService {
    *
    * @param {boolean} isFlagBlockApiV4 - flag to determine template type
    */
-  async prefetchList(isFlagBlockApiV4 = false) {
+  prefetchList(isFlagBlockApiV4 = false) {
     const accountStore = useAccountStore()
     const { jobRole } = accountStore.account
 
@@ -49,7 +49,7 @@ export class SolutionService extends BaseService {
       })
     }
 
-    await Promise.all(
+return Promise.all(
       prefetchConfigs.map(({ group, type }) =>
         this.usePrefetchQuery(
           queryKeys.solutions.list(group, type),

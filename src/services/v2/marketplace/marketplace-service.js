@@ -104,19 +104,17 @@ export class MarketplaceService extends BaseService {
     )
   }
 
-  prefetchMarketplace = async () => {
+  prefetchMarketplace = () => {
     const listParams = { type: 'marketplace', category: 'all' }
     const listKey = queryKeys.marketplace.list(listParams)
     const categoriesKey = queryKeys.marketplace.categories()
 
-    await Promise.allSettled([
-      this.useEnsureQueryData(listKey, ({ signal }) => this.fetchList(listParams, { signal }), {
-        cacheType: this.cacheType.STATIC,
-        persist: true
+    return Promise.allSettled([
+      this.usePrefetchQuery(listKey, () => this.fetchList(listParams), {
+        cacheType: this.cacheType.STATIC
       }),
-      this.useEnsureQueryData(categoriesKey, ({ signal }) => this.fetchCategories({ signal }), {
-        cacheType: this.cacheType.STATIC,
-        persist: true
+      this.usePrefetchQuery(categoriesKey, () => this.fetchCategories(), {
+        cacheType: this.cacheType.STATIC
       })
     ])
   }

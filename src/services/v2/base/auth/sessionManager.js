@@ -1,15 +1,18 @@
 import { clearAllCache } from '../query/queryClient'
 import { persister, pauseQueryPersistence } from '../query/queryPlugin'
+import { useAccountStore } from '@/stores/account'
+import { sendSwitchAccountBroadcast } from './session-broadcast'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
-import { useAccountStore } from '@/stores/account'
-import { sendSwitchAccountBroadcast } from './session-broadcast'
+import { variablesService } from '@/services/v2/variables'
 
-const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
+const DEFAULT_PAGE_SIZE = 10
 
 const clearAllData = async () => {
   await pauseQueryPersistence()
@@ -19,7 +22,7 @@ const clearAllData = async () => {
   await persister.removeClient()
 }
 
-const getPageSizeFromStorage = () => {
+const getPageSize = () => {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
     return stored?.numberOfLinesPerPage ?? DEFAULT_PAGE_SIZE
@@ -28,15 +31,14 @@ const getPageSizeFromStorage = () => {
   }
 }
 
-const prefetchForClientAccount = async () => {
+const prefetchInBackground = async () => {
   const accountStore = useAccountStore()
 
   if (!accountStore.isClientAccount) {
     return
   }
 
-  const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
-  const pageSize = getPageSizeFromStorage()
+  const pageSize = getPageSize()
 
   await Promise.allSettled([
     solutionService.prefetchList(hasFlagBlockApiV4()),
@@ -45,12 +47,12 @@ const prefetchForClientAccount = async () => {
     edgeFirewallService.prefetchList(pageSize)
   ])
 
-  marketplaceService.prefetchMarketplace({ type: 'marketplace', category: 'all' })
+  Promise.allSettled([variablesService.prefetchList(), marketplaceService.prefetchMarketplace()])
 }
 
 export const sessionManager = {
   afterLogin() {
-    prefetchForClientAccount()
+    queueMicrotask(prefetchInBackground)
   },
   async switchAccount() {
     await clearAllData()
