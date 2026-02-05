@@ -348,7 +348,7 @@ export class WorkloadService extends BaseService {
         id: item.id,
         name: item.name?.text ?? item.name,
         workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
-        infrastructure: item.infrastructure === 'Production' ? '1' : '2',
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
       }),
       listPath: 'body'
     })
