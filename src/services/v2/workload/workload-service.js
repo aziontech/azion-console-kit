@@ -338,34 +338,38 @@ export class WorkloadService extends BaseService {
     return `Workload successfully deleted.`
   }
 
-  getFromCache = (id) => {
-    if (!id) return {}
+  getWorkloadFromCache = (id) => {
+    if (!id) return undefined
 
-    const allQueries = this.queryClient.getQueryCache().getAll()
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2',
+      }),
+      listPath: 'body'
+    })
+  }
 
-    for (const query of allQueries) {
-      const key = query.queryKey
-      if (!Array.isArray(key) || key[0] !== 'workloads') continue
+  getDomainFromCache = (id) => {
+    if (!id) return undefined
 
-      const listData = query.state?.data?.body
-      if (!Array.isArray(listData)) continue
-
-      const item = listData.find((el) => String(el.id) === String(id))
-
-      if (item) {
-        return {
-          id: item.id,
-          name: item.name?.text ?? item.name,
-          active: item.active?.content === 'Active',
-          workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
-          infrastructure: item.infrastructure === 'Production' ? '1' : '2',
-          domains: item.domains,
-          isLocked: item.isLocked
-        }
-      }
-    }
-
-    return {}
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        active: item.active?.content === 'Active',
+        domainName: item.workloadHostname?.content,
+        environment: item.infrastructure === 'Production' ? 'production' : 'staging',
+        cnames: item.domains.join('\n') || ''
+      }),
+      listPath: 'body'
+    })
   }
 }
 

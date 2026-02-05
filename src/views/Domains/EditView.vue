@@ -12,7 +12,7 @@
         :loadService="loadDomainService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
-        :initialValues="cachedDomain"	
+        :initialValues="cachedDomain"
         @loaded-service-object="setDomainName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
@@ -119,8 +119,12 @@
   const breadcrumbs = useBreadcrumbs()
   const digitalCertificates = ref([])
 
-  const cachedDomain = workloadService.getFromCache(route.params.id)
+  const cachedDomain = workloadService.getDomainFromCache(route.params.id) ?? {}
   const domainName = ref(cachedDomain?.name)
+
+  if (cachedDomain?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedDomain.name)
+  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
