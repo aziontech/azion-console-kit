@@ -48,7 +48,7 @@
       </div>
     </template>
     <template #content>
-      <div class="p-4 flex flex-col gap-2.5">
+      <div class="p-4 flex flex-col gap-2.5 surface-100">
         <template v-if="isLoading">
           <div
             v-for="index in 4"
@@ -71,8 +71,8 @@
             :key="item.key"
             class="flex items-start justify-between text-xs"
           >
-            <span class="text-[var(--text-color-secondary)]">{{ item.label }}</span>
-            <span class="text-[var(--text-color)]">{{ item.value }}</span>
+            <span class="text-color-secondary">{{ item.label }}</span>
+            <span class="text-color">{{ item.value }}</span>
           </div>
         </template>
       </div>

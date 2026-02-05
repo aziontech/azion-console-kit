@@ -1,7 +1,10 @@
 <template>
-  <HomeCardBlock title="Azion Changelog">
+  <HomeCardBlock
+    v-if="changelogItems.length > 0"
+    title="Azion Changelog"
+  >
     <template #content>
-      <div class="p-4">
+      <div class="p-4 surface-100">
         <div class="flex items-center w-[273px]">
           <div class="flex flex-col items-start w-full">
             <div
@@ -11,29 +14,24 @@
             >
               <div class="flex flex-col items-center self-stretch">
                 <div
-                  class="bg-[#18181b] border-2 border-[#3f3f46] flex items-center justify-center p-0.5 rounded-[7.875px] size-[15.75px]"
+                  class="border-2 surface-border flex items-center justify-center p-0.5 rounded-full h-4 w-4"
                 >
                   <div
-                    class="bg-[#18181b] flex-1 h-full rounded-[7.875px] flex items-center justify-center"
-                    style="
-                      box-shadow:
-                        0px 0.5px 0px 0px rgba(0, 0, 0, 0.06),
-                        0px 1px 1px 0px rgba(0, 0, 0, 0.12);
-                    "
+                    class="flex-1 h-full rounded-full flex items-center justify-center"
                   >
-                    <div class="bg-[#fe601f] rounded-[2.625px] size-[5.25px]"></div>
+                    <div class="bg-orange-500 rounded-full h-1 w-1"></div>
                   </div>
                 </div>
 
                 <div
                   v-if="index < changelogItems.length - 1"
-                  class="bg-[#3f3f46] flex-1 w-0.5"
+                  class="bg-[var(--surface-border)] flex-1 w-0.5"
                 ></div>
               </div>
 
               <div class="flex-1 flex flex-col px-3.5">
                 <div class="flex flex-col gap-1 rounded-md w-full">
-                  <p class="text-[10px] text-[#a1a1aa] leading-normal">
+                  <p class="text-[10px] text-[var(--text-color-secondary)] leading-normal">
                     {{ item.time }}
                   </p>
                   <p class="text-xs text-white leading-[1.5]">
@@ -48,27 +46,43 @@
     </template>
 
     <template #footer>
-      <span
+      <a
+        href="https://www.azion.com/en/documentation/products/release-notes/"
+        target="_blank"
+        rel="noopener noreferrer"
         class="text-xs text-[var(--text-color-link)] text-center cursor-pointer hover:underline w-full"
-        @click="$emit('viewAll')"
       >
         View all Changelog...
-      </span>
+      </a>
     </template>
   </HomeCardBlock>
 </template>
 
 <script setup>
+  import { ref, onMounted } from 'vue'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
+  import { listChangelogService } from '@/services/appcues-services'
 
   defineOptions({ name: 'AzionChangelogCard' })
 
-  defineProps({
-    changelogItems: {
-      type: Array,
-      required: true
-    }
-  })
-
   defineEmits(['viewAll'])
+
+  const changelogItems = ref([])
+  const isLoading = ref(false)
+
+  const loadChangelog = async () => {
+    isLoading.value = true
+    try {
+      const items = await listChangelogService()
+      changelogItems.value = items
+    } catch {
+      changelogItems.value = []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  onMounted(() => {
+    loadChangelog()
+  })
 </script>
