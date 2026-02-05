@@ -10,6 +10,8 @@
   import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
   import MonthlyUsageCard from '@/templates/home-cards-block/monthly-usage-card.vue'
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
+  import CommunicationsCard from '@/templates/home-cards-block/communications-card.vue'
+  import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
   import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
   import MetricsBlock from '@/templates/home-cards-block/metrics-block.vue'
@@ -105,8 +107,10 @@
           class="flex flex-col w-full gap-8"
           :class="homeStyle.secondColumn"
         >
+          <CommunicationsCard />
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />
+          <AzionChangelogCard />  
         </div>
       </section>
     </template>
