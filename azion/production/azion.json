@@ -3,7 +3,8 @@
   "bucket": "consolekit31-07-2024",
   "preset": "vue",
   "env": "production",
-  "prefix": "20251121155156",
+  "prefix": "20260205183423",
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": {
     "id": 50904,
