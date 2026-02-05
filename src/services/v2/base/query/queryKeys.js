@@ -154,5 +154,31 @@ export const queryKeys = {
   variables: {
     all: ['variables'],
     list: () => [...queryKeys.variables.all, 'list']
+  },
+  edgeFunction: {
+    all: ['edge-functions'],
+    list: (params) => [...queryKeys.edgeFunction.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id]
+  },
+  edgeStorage: {
+    all: ['edge-storage'],
+    buckets: {
+      all: () => [...queryKeys.edgeStorage.all, 'buckets'],
+      list: (params) => [...queryKeys.edgeStorage.buckets.all(), 'list', params],
+      detail: (name) => [...queryKeys.edgeStorage.buckets.all(), 'detail', name]
+    },
+    files: {
+      all: (bucketName) => [...queryKeys.edgeStorage.all, 'files', bucketName],
+      list: (bucketName, params) => [...queryKeys.edgeStorage.files.all(bucketName), 'list', params]
+    },
+    credentials: {
+      all: () => [...queryKeys.edgeStorage.all, 'credentials'],
+      list: (bucketName, params) => [
+        ...queryKeys.edgeStorage.credentials.all(),
+        'list',
+        bucketName,
+        params
+      ]
+    }
   }
 }
