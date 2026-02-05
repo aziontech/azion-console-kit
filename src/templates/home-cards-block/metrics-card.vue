@@ -32,18 +32,17 @@
 
 <template>
   <div
-    class="bg-[var(--surface-section)] h-[101px] p-5 flex flex-col gap-2.5 w-1/2 lg:w-1/4 lg:flex-1"
+    class="bg-[var(--surface-section)] h-[101px] p-5 flex flex-col gap-2.5"
     :class="[
       index % 2 !== 0 ? 'border-l border-[var(--surface-border)]' : '',
-      index >= 2 ? 'border-t border-[var(--surface-border)] lg:border-t-0' : '',
-      index >= 1 ? 'lg:border-l lg:border-[var(--surface-border)]' : ''
+      index >= 2 ? 'border-t border-[var(--surface-border)] xl:border-t-0' : '',
+      index >= 1 ? 'xl:border-l xl:border-[var(--surface-border)]' : ''
     ]"
   >
     <div class="flex items-center justify-between w-full">
       <div class="flex flex-1 gap-2 items-center">
         <span
-          class="text-[10px] uppercase tracking-[1px] text-[var(--text-color-secondary)] font-medium"
-          style="font-family: 'Proto Mono', monospace"
+          class="text-[10px] font-mono uppercase tracking-[1px] text-[var(--text-color-secondary)] font-medium"
         >
           {{ metric.label }}
         </span>
@@ -76,8 +75,12 @@
         <span class="text-xs text-[#ededed]">{{ metric.unit }}</span>
       </div>
 
+      <i
+        v-if="metric.isVariationLoading && !metric.isLoading"
+        class="pi pi-spin pi-spinner text-[var(--text-color-secondary)] text-sm"
+      />
       <div
-        v-if="variationData && !metric.isLoading"
+        v-else-if="variationData && !metric.isLoading"
         class="flex gap-2 items-center px-2 py-1 rounded-md"
         :class="variationData.background"
       >

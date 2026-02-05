@@ -13,7 +13,9 @@
   import SimpleTable from '@/templates/list-table-block/simple-table.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import WorkloadsEmptyState from './workloads-empty-state.vue'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
+  const tableDefinitionsStore = useTableDefinitionsStore()
   const router = useRouter()
   const isLoading = ref(false)
 
@@ -335,7 +337,8 @@
   const loadWorkloads = async () => {
     try {
       const response = await workloadService.listWorkloads({
-        pageSize: 5,
+        page: 1,
+        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
         ordering: '-last_modified',
         fields: [
           'name',
@@ -358,7 +361,8 @@
   const loadEdgeDns = async () => {
     try {
       const response = await edgeDNSService.listEdgeDNSService({
-        pageSize: 5,
+        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        page: 1,
         ordering: '-last_modified',
         fields: ['id', 'name', 'domain', 'active', 'last_modified']
       })
@@ -371,7 +375,8 @@
   const loadObjectStorage = async () => {
     try {
       const response = await edgeStorageService.listEdgeStorageBuckets({
-        pageSize: 5,
+        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        page: 1,
         ordering: '-last_modified'
       })
       objectStorageData.value = response.body.map((item) => ({
@@ -387,7 +392,8 @@
   const loadFunctions = async () => {
     try {
       const response = await edgeFunctionService.listEdgeFunctionsService({
-        pageSize: 5,
+        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        page: 1,
         ordering: '-last_modified'
       })
       functionsData.value = response.body
@@ -447,7 +453,10 @@
           :model="filterMenuItems"
           :popup="true"
           :pt="{
-            submenuHeader: { class: 'text-[10px]' }
+            submenuHeader: {
+              class:
+                'text-[10px] font-mono uppercase tracking-wider text-[var(--text-color-secondary)] font-medium'
+            }
           }"
         >
           <template #submenulabel="{ item }">
@@ -485,6 +494,7 @@
       :view-all-label="currentViewAllLabel"
       @row-click="handleRowClick"
       :empty-block="emptyBlock"
+      hideIllustration
     />
   </div>
 </template>

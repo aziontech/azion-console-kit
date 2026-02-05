@@ -1,8 +1,10 @@
 import { ref } from 'vue'
 import { formatMetricValue } from '@/helpers/format-metric-value'
 import {
-  fetchHomeMetricsWithVariation,
-  fetchWafMetricsWithVariation
+  fetchHomeMetrics,
+  fetchWafMetrics,
+  fetchHomeMetricsVariationOnly,
+  fetchWafMetricsVariationOnly
 } from '@/services/home-metrics-service'
 import { set, get } from '@/helpers/local-storage-manager'
 
@@ -45,28 +47,32 @@ export const useHomeMetrics = () => {
           value: '0',
           unit: '',
           tooltip: 'Total number of requests blocked by WAF',
-          isLoading: true
+          isLoading: true,
+          isVariationLoading: true
         },
         {
           label: 'Total Requests Allowed',
           value: '0',
           unit: '',
           tooltip: 'Total number of requests allowed by WAF',
-          isLoading: true
+          isLoading: true,
+          isVariationLoading: true
         },
         {
           label: 'Total Requests Threat',
           value: '0',
           unit: '',
           tooltip: 'Total number of threat requests detected by WAF',
-          isLoading: true
+          isLoading: true,
+          isVariationLoading: true
         },
         {
           label: 'Top Country Threat',
           value: 'N/A',
           unit: '',
           tooltip: 'Country with the highest number of threat requests',
-          isLoading: true
+          isLoading: true,
+          isVariationLoading: false
         }
       ]
     }
@@ -77,93 +83,98 @@ export const useHomeMetrics = () => {
         value: '0',
         unit: 'Bytes',
         tooltip: 'Total amount of data transferred through the edge',
-        isLoading: true
+        isLoading: true,
+        isVariationLoading: true
       },
       {
         label: 'Requests per Second',
         value: '0',
         unit: '/s',
         tooltip: 'Average number of requests per second',
-        isLoading: true
+        isLoading: true,
+        isVariationLoading: true
       },
       {
         label: 'Bandwidth Saving',
         value: '0',
-        unit: 'Bytes',
+        unit: 'Bytes/s',
         tooltip: 'Bandwidth saved through caching and optimization',
-        isLoading: true
+        isLoading: true,
+        isVariationLoading: true
       },
       {
         label: 'Data Transf. Offload',
         value: '0',
         unit: '%',
         tooltip: 'Percentage of data transfer offloaded to the edge',
-        isLoading: true
+        isLoading: true,
+        isVariationLoading: true
       }
     ]
   }
 
-  const updateMetricData = (index, value, unit, variation = null) => {
+  const updateMetricData = (index, value, unit, isVariationLoading = true) => {
     metricsData.value[index] = {
       ...metricsData.value[index],
       value,
       unit,
+      isLoading: false,
+      isVariationLoading
+    }
+  }
+
+  const updateMetricVariation = (index, variation) => {
+    metricsData.value[index] = {
+      ...metricsData.value[index],
       variation,
-      isLoading: false
+      isVariationLoading: false
     }
   }
 
   const processWafMetrics = (metrics) => {
     const requestsBlockedFormatted = formatMetricValue(metrics.requestsBlocked, 'count')
-    updateMetricData(0, requestsBlockedFormatted.value, requestsBlockedFormatted.unit, {
-      value: metrics.requestsBlockedVariation,
-      type: 'inverse'
-    })
+    updateMetricData(0, requestsBlockedFormatted.value, requestsBlockedFormatted.unit, true)
 
     const requestsAllowedFormatted = formatMetricValue(metrics.requestsAllowed, 'count')
-    updateMetricData(1, requestsAllowedFormatted.value, requestsAllowedFormatted.unit, {
-      value: metrics.requestsAllowedVariation,
-      type: 'regular'
-    })
+    updateMetricData(1, requestsAllowedFormatted.value, requestsAllowedFormatted.unit, true)
 
     const requestsThreatFormatted = formatMetricValue(metrics.requestsThreat, 'count')
-    updateMetricData(2, requestsThreatFormatted.value, requestsThreatFormatted.unit, {
-      value: metrics.requestsThreatVariation,
-      type: 'inverse'
-    })
+    updateMetricData(2, requestsThreatFormatted.value, requestsThreatFormatted.unit, true)
 
     const topCountryFormatted = formatMetricValue(metrics.topCountryThreat.requests, 'count')
     updateMetricData(
       3,
       `${metrics.topCountryThreat.country} (${topCountryFormatted.value}${topCountryFormatted.unit})`,
-      ''
+      '',
+      false
     )
+  }
+
+  const processWafVariations = (variations) => {
+    updateMetricVariation(0, { value: variations.requestsBlockedVariation, type: 'inverse' })
+    updateMetricVariation(1, { value: variations.requestsAllowedVariation, type: 'regular' })
+    updateMetricVariation(2, { value: variations.requestsThreatVariation, type: 'inverse' })
   }
 
   const processWorkloadMetrics = (metrics) => {
     const dataTransferredFormatted = formatMetricValue(metrics.dataTransferred, 'bytes')
-    updateMetricData(0, dataTransferredFormatted.value, dataTransferredFormatted.unit, {
-      value: metrics.dataTransferredVariation,
-      type: 'regular'
-    })
+    updateMetricData(0, dataTransferredFormatted.value, dataTransferredFormatted.unit, true)
 
     const requestsFormatted = formatMetricValue(metrics.requests, 'count')
-    updateMetricData(1, requestsFormatted.value, `${requestsFormatted.unit}/s`, {
-      value: metrics.requestsVariation,
-      type: 'regular'
-    })
+    updateMetricData(1, requestsFormatted.value, `${requestsFormatted.unit}/s`, true)
 
     const bandwidthSavedFormatted = formatMetricValue(metrics.bandwidthSaved, 'bytes')
-    updateMetricData(2, bandwidthSavedFormatted.value, bandwidthSavedFormatted.unit, {
-      value: metrics.bandwidthSavedVariation,
-      type: 'regular'
-    })
+    updateMetricData(2, bandwidthSavedFormatted.value, `${bandwidthSavedFormatted.unit}/s`, true)
 
     const offloadFormatted = formatMetricValue(metrics.offload, 'percentage')
-    updateMetricData(3, offloadFormatted.value, offloadFormatted.unit, {
-      value: metrics.offloadVariation,
-      type: 'regular'
-    })
+    updateMetricData(3, offloadFormatted.value, offloadFormatted.unit, true)
+  }
+
+  const processWorkloadVariations = (variations) => {
+    updateMetricVariation(0, { value: variations.dataTransferredVariation, type: 'regular' })
+    updateMetricVariation(1, { value: variations.requestsVariation, type: 'regular' })
+    updateMetricVariation(2, { value: variations.bandwidthSavedVariation, type: 'regular' })
+    updateMetricVariation(3, { value: variations.offloadVariation, type: 'regular' })
   }
 
   const loadMetrics = async () => {
@@ -174,17 +185,35 @@ export const useHomeMetrics = () => {
       const { begin, end } = getTimeRange()
 
       if (selectedResource.value === 'waf') {
-        const metrics = await fetchWafMetricsWithVariation(begin, end)
+        const metrics = await fetchWafMetrics(begin, end)
         processWafMetrics(metrics)
+        isLoading.value = false
+
+        fetchWafMetricsVariationOnly(metrics, begin, end)
+          .then(processWafVariations)
+          .catch(() => {
+            metricsData.value.forEach((metric, index) => {
+              if (index < 3) metric.isVariationLoading = false
+            })
+          })
       } else {
-        const metrics = await fetchHomeMetricsWithVariation(begin, end)
+        const metrics = await fetchHomeMetrics(begin, end)
         processWorkloadMetrics(metrics)
+        isLoading.value = false
+
+        fetchHomeMetricsVariationOnly(metrics, begin, end)
+          .then(processWorkloadVariations)
+          .catch(() => {
+            metricsData.value.forEach((metric) => {
+              metric.isVariationLoading = false
+            })
+          })
       }
     } catch (error) {
       metricsData.value.forEach((metric) => {
         metric.isLoading = false
+        metric.isVariationLoading = false
       })
-    } finally {
       isLoading.value = false
     }
   }
