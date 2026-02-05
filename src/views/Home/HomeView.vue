@@ -1,5 +1,5 @@
 <script setup>
-  import { inject, onMounted, ref } from 'vue'
+  import { inject, onMounted, onUnmounted, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
   import { inviteYourTeamService } from '@/services/users-services'
@@ -15,17 +15,33 @@
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
   import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
   import MetricsBlock from '@/templates/home-cards-block/metrics-block.vue'
+  import { useResize } from '@/composables/useResize'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
   const { accountData } = useAccountStore()
-
+  const { BREAKPOINTS } = useResize()
   defineOptions({ name: 'home-view' })
 
   const user = accountData
   const teams = ref([])
   const showInviteDialog = ref(false)
+
+  const homeSection = ref(null)
+  const homeWidth = ref(0)
+  let resizeObserver = null
+
+  const homeStyle = computed(() => {
+    if (!homeWidth.value || homeWidth.value > BREAKPOINTS.LG) {
+      return { section: 'lg:flex-row', firstColumn: 'lg:w-[75%]', secondColumn: 'lg:w-[25%]' }
+    }
+    return {
+      section: 'flex-col',
+      firstColumn: 'w-full',
+      secondColumn: 'w-full'
+    }
+  })
 
   const navigateToUsage = () => {
     router.push({ name: 'billing-tabs' })
@@ -45,14 +61,32 @@
     if (InviteSession.sessionIsExpired()) {
       InviteSession.turnInviteBlockVisable()
     }
+
+    if (homeSection.value) {
+      resizeObserver = new ResizeObserver((entries) => {
+        homeWidth.value = entries[0].contentRect.width
+      })
+      resizeObserver.observe(homeSection.value)
+    }
+  })
+
+  onUnmounted(() => {
+    resizeObserver?.disconnect()
   })
 </script>
 
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full h-full flex flex-col md:flex-row gap-8 pt-6 pb-8">
-        <div class="flex flex-col w-full md:w-[75%] gap-8">
+      <section
+        ref="homeSection"
+        class="w-full h-full flex flex-col gap-8 pt-6 pb-8"
+        :class="homeStyle.section"
+      >
+        <div
+          class="flex flex-col w-full gap-8"
+          :class="homeStyle.firstColumn"
+        >
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px] font-semibold">Welcome {{ user.name }}</h1>
             <PrimeButton
@@ -62,13 +96,17 @@
               size="small"
               outlined
               @click="openInviteDialog"
+              class="whitespace-nowrap"
             />
           </div>
           <MetricsBlock />
           <ResourcesBlock />
           <LastActivitiesBlock />
         </div>
-        <div class="flex flex-col w-full md:w-[30%] gap-8">
+        <div
+          class="flex flex-col w-full gap-8"
+          :class="homeStyle.secondColumn"
+        >
           <CommunicationsCard />
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />

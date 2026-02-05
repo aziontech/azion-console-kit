@@ -110,7 +110,7 @@
 
     <div class="flex flex-col gap-2 w-full relative">
       <div
-        class="border border-[var(--surface-border)] rounded-md overflow-hidden flex flex-wrap w-full"
+        class="border border-[var(--surface-border)] rounded-md overflow-hidden grid grid-cols-2 xl:grid-cols-4 w-full"
       >
         <MetricsCard
           v-for="(metric, index) in metricsData"

@@ -166,7 +166,7 @@
         @click="handleViewAllClick"
         data-testid="resources-table-view-all"
       >
-        <span class="text-xs text-[#93c5fd]">
+        <span class="text-xs font-normal text-[var(--text-color-link)]">
           {{ viewAllLabel }}
         </span>
       </div>
