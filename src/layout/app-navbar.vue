@@ -34,6 +34,7 @@
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
+          style-text-color="text-white"
         />
 
         <ButtonHelper />
