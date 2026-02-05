@@ -92,6 +92,8 @@
 
   const editable = ref(null)
 
+  const emit = defineEmits(['dirty'])
+
   defineOptions({ name: 'azion-query-language' })
 
   const props = defineProps({
@@ -254,6 +256,15 @@
   const executeQuery = () => {
     const filter = AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
+    emit('dirty', false)
+  }
+
+  const getParsedFilters = () => {
+    return AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
+  }
+
+  const markAsApplied = () => {
+    emit('dirty', false)
   }
 
   const handleSearch = () => {
@@ -281,13 +292,33 @@
     query.value = AzionQueryLanguage.handleInicialQuery(props.filterAdvanced, props.fieldsInFilter)
   }
 
+  const suppressDirtyEmit = ref(false)
+
   watch(
     () => [props.fieldsInFilter, props.filterAdvanced],
     () => {
+      suppressDirtyEmit.value = true
       handleInitialQuery()
+      nextTick(() => {
+        suppressDirtyEmit.value = false
+      })
     },
     { deep: true }
   )
+
+  watch(
+    query,
+    () => {
+      if (suppressDirtyEmit.value) return
+      emit('dirty', true)
+    },
+    { flush: 'post' }
+  )
+
+  defineExpose({
+    getParsedFilters,
+    markAsApplied
+  })
 
   onClickOutside(ignoreClickOutside, () => (showSuggestionsFocusInput.value = false))
 </script>

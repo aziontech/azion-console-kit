@@ -33,6 +33,8 @@
 
   const filterDataRange = ref({})
   const hasPendingDateUpdate = ref(false)
+  const hasPendingQueryUpdate = ref(false)
+  const aqlRef = ref(null)
 
   const isInvalidRange = computed(() => {
     const start = filterDataRange.value?.startDate
@@ -139,6 +141,14 @@
   }
 
   const applyFilters = () => {
+    if (hasPendingQueryUpdate.value) {
+      const parsed = aqlRef.value?.getParsedFilters?.()
+      if (Array.isArray(parsed)) {
+        filterData.value.fields = parsed
+      }
+      aqlRef.value?.markAsApplied?.()
+      hasPendingQueryUpdate.value = false
+    }
     updatedTime()
     emitUpdatedFilter()
     hasPendingDateUpdate.value = false
@@ -146,6 +156,10 @@
 
   const onDateRangeSelect = () => {
     hasPendingDateUpdate.value = true
+  }
+
+  const onAqlDirtyChange = (isDirty) => {
+    hasPendingQueryUpdate.value = Boolean(isDirty)
   }
 
   const emitUpdatedFilter = () => {
@@ -214,6 +228,8 @@
             :fieldsInFilter="props.fieldsInFilter"
             :searchAdvancedFilter="searchAdvancedFilter"
             :filterAdvanced="filterData.fields"
+            ref="aqlRef"
+            @dirty="onAqlDirtyChange"
           />
         </div>
         <DataTimeRange
@@ -223,7 +239,7 @@
           @select="onDateRangeSelect"
         />
         <PrimeButton
-          v-if="!hasPendingDateUpdate"
+          v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
           icon="pi pi-refresh"
           outlined
           size="small"
