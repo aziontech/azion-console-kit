@@ -33,7 +33,9 @@
           {{ communication.tag }}
         </span>
 
-        <h3 class="text-xl font-semibold text-white leading-tight px-6 py-4 surface-border border-b">
+        <h3
+          class="text-xl font-semibold text-white leading-tight px-6 py-4 surface-border border-b"
+        >
           {{ communication.message }}
         </h3>
       </div>
@@ -88,7 +90,6 @@
     if (!text || typeof text !== 'string') return ''
     return text.slice(0, maxLength)
   }
-
 
   const isVisible = computed(() => {
     if (!communication.value) return false

@@ -53,9 +53,7 @@
               </div>
             </div>
 
-            <p
-              class="text-xs leading-[1.5] overflow-hidden text-color-secondary"
-            >
+            <p class="text-xs leading-[1.5] overflow-hidden text-color-secondary">
               {{ currentItem.description }}
             </p>
           </div>

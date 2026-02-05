@@ -21,10 +21,11 @@ export const getAccountId = () => {
 
 export const fetchTags = async (api) => {
   if (cachedTags) return cachedTags
-  
+
   if (tagsPromise) return tagsPromise
 
-  tagsPromise = api.get(`/accounts/${ACCOUNT_ID}/tags`)
+  tagsPromise = api
+    .get(`/accounts/${ACCOUNT_ID}/tags`)
     .then((response) => {
       cachedTags = response.data || []
       return cachedTags
@@ -39,10 +40,11 @@ export const fetchTags = async (api) => {
 
 export const fetchLaunchpads = async (api) => {
   if (cachedLaunchpads) return cachedLaunchpads
-  
+
   if (launchpadsPromise) return launchpadsPromise
 
-  launchpadsPromise = api.get(`/accounts/${ACCOUNT_ID}/launchpads`)
+  launchpadsPromise = api
+    .get(`/accounts/${ACCOUNT_ID}/launchpads`)
     .then((response) => {
       cachedLaunchpads = response.data || []
       return cachedLaunchpads

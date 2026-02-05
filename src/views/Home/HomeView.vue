@@ -110,7 +110,7 @@
           <CommunicationsCard />
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />
-          <AzionChangelogCard />  
+          <AzionChangelogCard />
         </div>
       </section>
     </template>

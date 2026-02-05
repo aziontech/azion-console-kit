@@ -51,7 +51,7 @@ const extractCommunicationData = (launchpad) => {
       }
 
       const interactionData = config.interactionData || {}
-      
+
       if (interactionData.text) {
         const text = interactionData.text
         if (text.includes('|')) {

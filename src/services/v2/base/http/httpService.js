@@ -32,7 +32,7 @@ export class HttpService {
     abortGroup,
     processError = true
   }) {
-    const signal = this.#getSignal(abortIdentifier, abortGroup)
+    const signal = config.signal ?? this.#getSignal(abortIdentifier, abortGroup)
     const requestUrl = this.#buildRequestUrl(url, params)
 
     try {

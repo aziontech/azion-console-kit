@@ -61,7 +61,7 @@ export class WorkloadService extends BaseService {
     return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
@@ -69,7 +69,7 @@ export class WorkloadService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
+    return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
   #ensureCertificate = async (payload) => {

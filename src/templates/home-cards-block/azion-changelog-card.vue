@@ -16,9 +16,7 @@
                 <div
                   class="border-2 surface-border flex items-center justify-center p-0.5 rounded-full h-4 w-4"
                 >
-                  <div
-                    class="flex-1 h-full rounded-full flex items-center justify-center"
-                  >
+                  <div class="flex-1 h-full rounded-full flex items-center justify-center">
                     <div class="bg-orange-500 rounded-full h-1 w-1"></div>
                   </div>
                 </div>
