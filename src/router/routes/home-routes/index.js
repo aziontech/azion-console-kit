@@ -13,7 +13,6 @@ export const homeRoutes = {
   name: 'home',
   component: () => import('@views/Home/HomeView.vue'),
   props: {
-    listTeamsService: UsersService.listTeamsService,
     inviteYourTeamService: UsersService.inviteYourTeamService,
     inviteSession: InviteSession,
     windowManager: {

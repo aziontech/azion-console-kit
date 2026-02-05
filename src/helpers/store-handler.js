@@ -1,22 +1,35 @@
 import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
 import { useAccountStore } from '@/stores/account'
 
-window.addEventListener('storage', handleStorageChange)
+const isLoginPage = () => window.location.pathname === '/login'
 
-function handleStorageChange(event) {
-  if (event.key !== '__user_traits') return
-
-  const { newValue, oldValue } = event
-  const isNewValueDifferent = JSON.parse(newValue).client_id !== JSON.parse(oldValue).client_id
-
-  if (isNewValueDifferent) {
-    window.location.reload()
+function getClientIdFromJson(jsonString) {
+  if (!jsonString) return null
+  try {
+    return JSON.parse(jsonString)?.client_id ?? null
+  } catch {
+    return null
   }
 }
 
-onSwitchAccount(async () => {
-  const accountStore = useAccountStore()
-  accountStore.resetAccount()
+window.addEventListener('storage', (event) => {
+  if (event.key !== '__user_traits') return
 
-  window.location.reload()
+  const newClientId = getClientIdFromJson(event.newValue)
+  const oldClientId = getClientIdFromJson(event.oldValue)
+
+  if (!newClientId || !oldClientId) return
+  if (newClientId === oldClientId) return
+
+  window.location.assign(isLoginPage() ? '/' : window.location.href)
+})
+
+onSwitchAccount(() => {
+  if (isLoginPage()) {
+    window.location.assign('/')
+    return
+  }
+
+  useAccountStore().resetAccount()
+  window.location.assign(window.location.href)
 })
