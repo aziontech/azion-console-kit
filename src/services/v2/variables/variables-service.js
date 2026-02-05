@@ -34,7 +34,7 @@ export class VariablesService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'variables',
+      cacheKey: queryKeys.variables.all,
       findFn: (item) => String(item.id) === String(id),
       mapFn: (item) => ({
         id: item.id,

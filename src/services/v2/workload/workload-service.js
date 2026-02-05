@@ -342,7 +342,7 @@ export class WorkloadService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'workloads',
+      cacheKey: queryKeys.workload.all,
       findFn: (item) => String(item.id) === String(id),
       mapFn: (item) => ({
         id: item.id,
@@ -358,7 +358,7 @@ export class WorkloadService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'workloads',
+      cacheKey: queryKeys.workload.all,
       findFn: (item) => String(item.id) === String(id),
       mapFn: (item) => ({
         id: item.id,

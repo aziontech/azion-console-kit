@@ -13,8 +13,8 @@ export const createEdgeApplicationService = async (payload) => {
 
   const result = parseHttpResponse(httpResponse)
 
-  await queryClient.removeQueries({ queryKey: queryKeys.edgeAppV3.all })
-  await queryClient.removeQueries({ queryKey: queryKeys.edgeApp.all })
+  await queryClient.removeQueries({ queryKey: queryKeys.applicationV3.all })
+  await queryClient.removeQueries({ queryKey: queryKeys.application.all })
 
   return result
 }

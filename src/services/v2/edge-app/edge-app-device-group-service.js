@@ -33,7 +33,7 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = queryKeys.edgeApp.deviceGroups.list(edgeApplicationId, params)
+    const queryKey = queryKeys.application.deviceGroups.list(edgeApplicationId, params)
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
@@ -74,7 +74,7 @@ export class DeviceGroupService extends BaseService {
     await waitForPersistenceRestore()
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeApp.deviceGroups.detail(edgeApplicationId, deviceGroupId),
+      queryKeys.application.deviceGroups.detail(edgeApplicationId, deviceGroupId),
       () => this.#fetchDeviceGroup(edgeApplicationId, deviceGroupId),
       { persist: false }
     )
@@ -93,7 +93,7 @@ export class DeviceGroupService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after creating
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
     })
 
     return {
@@ -113,7 +113,7 @@ export class DeviceGroupService extends BaseService {
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
     })
 
     return 'Device Group successfully updated'
@@ -127,7 +127,7 @@ export class DeviceGroupService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after deleting
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.deviceGroups.all(edgeApplicationId)
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
     })
 
     return 'Device Group successfully deleted'

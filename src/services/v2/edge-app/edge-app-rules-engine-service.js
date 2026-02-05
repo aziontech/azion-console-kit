@@ -26,7 +26,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after creating
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return {
@@ -58,7 +58,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after editing
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rule successfully updated'
@@ -73,7 +73,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after deleting
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rule successfully deleted'
@@ -100,7 +100,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after reordering
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rules Engine successfully ordered'
@@ -169,7 +169,7 @@ export class RulesEngineService extends BaseService {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeApp.rulesEngine.list(edgeApplicationId, params),
+      queryKeys.application.rulesEngine.list(edgeApplicationId, params),
       async () => {
         const [requestRules, responseRules] = await Promise.all([
           this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),

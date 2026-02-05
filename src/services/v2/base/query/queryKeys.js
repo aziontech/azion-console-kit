@@ -25,93 +25,93 @@ export const queryKeys = {
     categories: () => [...queryKeys.marketplace.all, 'categories'],
     detail: (vendor, slug) => [...queryKeys.marketplace.all, 'detail', vendor, slug]
   },
-  edgeApp: {
-    all: ['edge-apps'],
+  application: {
+    all: ['application'],
     detail: (id) => {
-      return [...queryKeys.edgeApp.all, id]
+      return [...queryKeys.application.all, id]
     },
     list: (id, params) => {
-      return [...queryKeys.edgeApp.all, id, 'list', params]
+      return [...queryKeys.application.all, id, 'list', params]
     },
     origins: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'origins'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'origins'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'origins',
         'list',
         params
       ],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'origins', 'detail', id]
+      detail: (parentId, id) => [...queryKeys.application.detail(parentId), 'origins', 'detail', id]
     },
     cacheSettings: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'cache-settings'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'cache-settings'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'cache-settings',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'cache-settings',
         'detail',
         id
       ]
     },
     deviceGroups: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'device-groups'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'device-groups'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'device-groups',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'device-groups',
         'detail',
         id
       ]
     },
     errorResponse: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'error-responses'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'error-responses'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'error-responses',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'error-responses',
         'detail',
         id
       ]
     },
     rulesEngine: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'rules-engine'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'rules-engine'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'rules-engine',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'rules-engine',
         'detail',
         id
       ]
     },
     functionInstance: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'functions'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'functions'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'functions',
         'list',
         params
       ],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'functions', 'detail', id]
+      detail: (parentId, id) => [...queryKeys.application.detail(parentId), 'functions', 'detail', id]
     }
   },
   workload: {
@@ -142,10 +142,10 @@ export const queryKeys = {
   teams: {
     all: ['teams', 'list']
   },
-  edgeAppV3: {
-    all: ['edge-apps-v3'],
-    list: (params) => [...queryKeys.edgeAppV3.all, 'list', params],
-    detail: (id) => [...queryKeys.edgeAppV3.all, 'detail', id]
+  applicationV3: {
+    all: ['application-v3'],
+    list: (params) => [...queryKeys.applicationV3.all, 'list', params],
+    detail: (id) => [...queryKeys.applicationV3.all, 'detail', id]
   },
   billing: {
     all: ['billing'],

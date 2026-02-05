@@ -260,6 +260,7 @@
       props: () => ({
         editEdgeApplicationService: props.edgeApplicationServices.editEdgeApplication,
         edgeApplication: edgeApplication.value,
+        initialValues: edgeAppService.getApplicationFromCache(route.params.id) ?? {},
         updatedRedirect: props.edgeApplicationServices.updatedRedirect,
         isTab: true,
         contactSalesEdgeApplicationService:
