@@ -29,6 +29,28 @@ const extractBucketName = (event) => {
   return name !== null && name !== undefined && String(name).trim() !== '' ? name : null
 }
 
+const extractBucketObjectInfo = (event) => {
+  const raw = event?.requestDataRaw ?? event?.requestData
+  const parsed = tryParseJson(raw)
+
+  const bucketName = parsed?.bucket_name
+  const objectKey = parsed?.object_key
+
+  const normalizedBucketName =
+    bucketName !== null && bucketName !== undefined && String(bucketName).trim() !== ''
+      ? String(bucketName)
+      : null
+
+  const key = objectKey !== null && objectKey !== undefined ? String(objectKey) : ''
+  const lastSlashIndex = key.lastIndexOf('/')
+  const folderPath = lastSlashIndex >= 0 ? key.slice(0, lastSlashIndex + 1) : ''
+
+  return {
+    bucketName: normalizedBucketName,
+    folderPath
+  }
+}
+
 const listRoute = (name) => () => ({ name })
 
 const ROUTE_MAP = {
@@ -54,6 +76,7 @@ const ROUTE_MAP = {
   Workload: { edit: 'edit-workload', list: 'list-workloads' },
   Application: { edit: 'edit-application', list: 'list-applications' },
   Bucket: { edit: 'object-storage-edit', list: 'object-storage-list' },
+  BucketObject: { edit: 'object-storage-view', list: 'object-storage-view' },
   Connector: { edit: 'edit-connectors', list: 'list-connectors' },
   Schema: { edit: 'database-sql-database', list: 'list-sql-databases' },
   CustomPages: { edit: 'edit-custom-pages', list: 'list-custom-pages' },
@@ -104,6 +127,8 @@ const normalizeResourceType = (resourceType) => {
     application: 'Application',
     bucket: 'Bucket',
     buckets: 'Bucket',
+    'bucket object': 'BucketObject',
+    bucketobject: 'BucketObject',
     'dns record': 'DNS Record',
     'dns zone': 'DNS Zone',
     'dns dnssec': 'DNS DNSSec',
@@ -133,6 +158,19 @@ export const resolveActivityHistoryRoute = (event = {}) => {
   const resolvedAction = resolveAction(action)
 
   if (!routeConfig || !resolvedAction) return null
+
+  if (resourceType === 'BucketObject') {
+    if (resolvedAction !== 'edit') return listRoute(routeConfig.list)()
+
+    const { bucketName, folderPath } = extractBucketObjectInfo(event)
+    if (!bucketName) return null
+
+    return {
+      name: routeConfig.edit,
+      params: { id: String(bucketName), ...(routeConfig.params || {}) },
+      query: folderPath ? { folderPath } : undefined
+    }
+  }
 
   const id =
     resourceType === 'Bucket' ? extractBucketName(event) || extractId(event) : extractId(event)

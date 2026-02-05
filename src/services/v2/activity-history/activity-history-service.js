@@ -177,6 +177,7 @@ export class ActivityHistoryService extends BaseService {
           requestData
           userAgent
           uuid
+          resourceName
         }
       }`
 

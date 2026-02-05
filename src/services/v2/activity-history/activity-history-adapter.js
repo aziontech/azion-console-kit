@@ -52,7 +52,7 @@ export const ActivityHistoryAdapter = {
           resourceId: element.resourceId,
           resourceItemId: element.resourceItemId,
           resource: element.resourceType || '-',
-          resourceName: element.resourceId || '-',
+          resourceName: element.resourceName || '-',
           resourceItemName: element.resourceItemId || '-',
           authorEmail: element.authorEmail,
           authorIp: element.remoteAddress || '-',
