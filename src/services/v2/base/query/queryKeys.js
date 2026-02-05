@@ -160,6 +160,11 @@ export const queryKeys = {
     list: (params) => [...queryKeys.edgeFunction.all, 'list', params],
     detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id]
   },
+  edgeDNS: {
+    all: ['edge-dns'],
+    list: (params) => [...queryKeys.edgeDNS.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id]
+  },
   edgeStorage: {
     all: ['edge-storage'],
     buckets: {

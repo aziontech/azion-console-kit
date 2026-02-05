@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeDNSAdapter } from './edge-dns-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class EdgeDNSService extends BaseService {
   constructor() {
     super()
@@ -11,7 +12,7 @@ export class EdgeDNSService extends BaseService {
     return `${this.baseURL}${suffix}`
   }
 
-  listEdgeDNSService = async (params = { pageSize: 10, fields: [] }) => {
+  #fetchDNSList = async (params = { pageSize: 10, fields: [] }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(),
@@ -26,6 +27,20 @@ export class EdgeDNSService extends BaseService {
       count,
       body: transformed
     }
+  }
+
+  listEdgeDNSService = async (params = { pageSize: 10, fields: [] }) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeDNS.list(params),
+      () => this.#fetchDNSList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   loadEdgeDNSService = async ({ id, params = { fields: [] } }) => {
@@ -66,6 +81,8 @@ export class EdgeDNSService extends BaseService {
 
     if (payload.dnssec) this.createEdgeDNSZoneDNSSEC(data.data.id)
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeDNS.all })
+
     return data
   }
 
@@ -78,6 +95,8 @@ export class EdgeDNSService extends BaseService {
 
     this.createEdgeDNSZoneDNSSEC(payload.id, payload.dnssec)
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeDNS.all })
+
     return 'Edge DNS has been updated'
   }
 
@@ -86,6 +105,8 @@ export class EdgeDNSService extends BaseService {
       method: 'DELETE',
       url: this.getUrl(`/${id}`)
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeDNS.all })
 
     return 'Your Edge DNS has been deleted'
   }
