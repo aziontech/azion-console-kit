@@ -20,7 +20,6 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
   import PrimeButton from 'primevue/button'
-  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
@@ -62,6 +61,15 @@
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
   const isLocked = ref(false)
+  
+  const cachedEdgeApplication = 
+    edgeAppService.getApplicationFromCache(edgeApplicationId.value)
+
+
+  if (cachedEdgeApplication?.name) {
+    edgeApplication.value = cachedEdgeApplication
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedEdgeApplication.name)
+  }
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -162,7 +170,7 @@
     let selectedTab = tab
     if (!tab) selectedTab = 'main-settings'
 
-    edgeApplication.value = await handleLoadEdgeApplication()
+    edgeApplication.value = { ...edgeApplication.value, ...(await handleLoadEdgeApplication()) }
     verifyTab(edgeApplication.value)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
@@ -260,7 +268,6 @@
       props: () => ({
         editEdgeApplicationService: props.edgeApplicationServices.editEdgeApplication,
         edgeApplication: edgeApplication.value,
-        initialValues: edgeAppService.getApplicationFromCache(route.params.id) ?? {},
         updatedRedirect: props.edgeApplicationServices.updatedRedirect,
         isTab: true,
         contactSalesEdgeApplicationService:
@@ -379,10 +386,7 @@
 </script>
 
 <template>
-  <EditViewSkeleton v-if="!edgeApplication" />
-
   <ContentBlock
-    v-else
     data-testid="edge-application-details-content-block"
   >
     <template #heading>

@@ -2,29 +2,19 @@ import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-export const DEFAULT_FIELDS = [
-  'id',
-  'name',
-  'last_editor',
-  'last_modified',
-  'product_version',
-  'active'
-]
 
 export class EdgeAppService extends BaseService {
   adapter = EdgeAppAdapter
   baseURL = 'v4/workspace/applications'
-  fieldsDefault = DEFAULT_FIELDS
 
   #fetchList = async (
     params = {
       pageSize: 10,
-      fields: this.fieldsDefault
     }
   ) => {
     const { data } = await this.http.request({ method: 'GET', url: this.baseURL, params })
     const { count, results } = data
-    const body = this.adapter?.transformListEdgeApp?.(results, params.fields) ?? results
+    const body = this.adapter?.transformListEdgeApp?.(results) ?? results
     return { body, count }
   }
 
@@ -48,7 +38,6 @@ export class EdgeAppService extends BaseService {
     const params = {
       page: 1,
       pageSize,
-      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.application.list(params), () => this.#fetchList(params))
@@ -119,17 +108,16 @@ export class EdgeAppService extends BaseService {
 
   getApplicationFromCache = (id) => {
     if (!id) return undefined
-
+  
     return super.getFromCache({
-      cacheKey: queryKeys.application.all,
-      findFn: (item) => String(item.id) === String(id),
-      mapFn: (item) => ({
-        id: item.id,
-        name: item.name?.text ?? item.name,
-        isActive: item.active?.content === 'Active',
-        productVersion: item.productVersion
+      queryKey: queryKeys.application.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({  
+        ...item,
+        name: item.name.text,
+        isActive: item.active?.content === 'Active'
       }),
-      listPath: 'body'
     })
   }
 }
