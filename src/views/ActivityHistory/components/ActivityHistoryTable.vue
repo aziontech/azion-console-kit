@@ -7,7 +7,7 @@
   import DataTable from '@/components/DataTable'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import OperationTag from './OperationTag.vue'
-  import { createRelativeRange } from '@utils/date.js'
+  import { createStartOfDay } from '@utils/date.js'
   import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
 
   const props = defineProps({
@@ -35,17 +35,18 @@
   const totalRecords = ref(0)
   const searchValue = ref('')
   const now = new Date()
-  const { startDate, endDate } = createRelativeRange(5, 'minutes', 'last', now)
+  const startDate = createStartOfDay(now)
+  const endDate = now
   const dateRange = ref({
     startDate,
     endDate,
-    label: 'Last 5 minutes',
-    labelStart: 'Last 5 minutes',
-    labelEnd: 'Last 5 minutes',
+    label: 'Today',
+    labelStart: 'Today',
+    labelEnd: 'Today',
     relative: {
       direction: 'last',
-      value: 5,
-      unit: 'minutes'
+      value: 0,
+      unit: 'days'
     }
   })
   const appliedFilters = ref([])
