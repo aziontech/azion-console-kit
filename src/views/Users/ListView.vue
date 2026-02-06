@@ -71,65 +71,73 @@
     }
   }
 
-  const getColumns = computed(() => [
-    {
-      field: 'firstName',
-      header: 'First Name',
-      sortField: 'first_name'
-    },
-    {
-      field: 'lastName',
-      header: 'Last Name',
-      sortField: 'last_name'
-    },
-    {
-      field: 'email',
-      header: 'Email Address'
-    },
-    {
-      field: 'teams',
-      header: 'Teams',
-      disableSort: true
-    },
-    {
-      field: 'mfa',
-      header: 'MFA',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'firstName',
+        header: 'First Name',
+        sortField: 'first_name'
+      },
+      {
+        field: 'lastName',
+        header: 'Last Name',
+        sortField: 'last_name'
+      },
+      {
+        field: 'email',
+        header: 'Email Address'
+      },
+      {
+        field: 'teams',
+        header: 'Teams',
+        disableSort: true,
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-array-with-popup'
+          })
+      },
+      {
+        field: 'mfa',
+        header: 'MFA',
+        type: 'component',
+        disableSort: true,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'owner',
+        header: 'Account Owner',
+        filterPath: 'owner.content',
+        type: 'component',
+        disableSort: true,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        disableSort: true,
+        filterPath: 'status.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
-    },
-    {
-      field: 'owner',
-      header: 'Account Owner',
-      filterPath: 'owner.content',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      disableSort: true,
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    }
-  ])
+    ]
+  })
 </script>
 
 <template>

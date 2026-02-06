@@ -119,7 +119,7 @@ describe('UsersServices', () => {
         firstName: fixtures.disabledUserMock.first_name,
         lastName: fixtures.disabledUserMock.last_name,
         email: fixtures.disabledUserMock.email,
-        teams: 'Default Team, Azion Team',
+        teams: ['Default Team', 'Azion Team'],
         mfa: {
           content: 'Inactive',
           severity: 'danger'
