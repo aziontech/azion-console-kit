@@ -3,9 +3,17 @@
   "bucket": "console-kit-2024-08-21-stage",
   "preset": "vue",
   "env": "production",
-  "prefix": "20260129171729",
-  "rotate-prefix": false,
+  "prefix": "20240821142547",
   "not-first-run": true,
+  "function": {
+    "id": 28363,
+    "name": "__DEFAULT__",
+    "file": ".edge/worker.js",
+    "args": "azion/stage/args.json",
+    "instance-id": 46105,
+    "instance-name": "__DEFAULT__",
+    "cache-id": 0
+  },
   "application": {
     "id": 1724264169,
     "name": "__DEFAULT__"
@@ -17,7 +25,7 @@
     "url": "https://o3s8583vvw.map.azionedge.net"
   },
   "rt-purge": {
-    "purge_on_publish": true
+    "purge_on_publish": false
   },
   "origin": [
     {
