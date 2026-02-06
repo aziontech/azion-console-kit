@@ -6,15 +6,6 @@
   "prefix": "20260129171729",
   "rotate-prefix": false,
   "not-first-run": true,
-  "function": {
-    "id": 28363,
-    "name": "__DEFAULT__",
-    "file": ".edge/worker.js",
-    "args": "azion/stage/args.json",
-    "instance-id": 27187,
-    "instance-name": "__DEFAULT__",
-    "cache-id": 0
-  },
   "application": {
     "id": 1724264169,
     "name": "__DEFAULT__"
