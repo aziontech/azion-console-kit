@@ -8,9 +8,18 @@ export default class Aql {
     this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
+  normalizeQuery(query) {
+    if (!query) return query
+
+    return query
+      .replace(/\b(in|between)\b\s*\(/gi, (match, op) => `${op} (`)
+      .replace(/\(\s+/g, '(')
+  }
+
   parse(query, suggestions, domains) {
     if (!query) return []
-    const expressions = query.split(/and/i).map((expr) => expr.trim())
+    const normalizedQuery = this.normalizeQuery(query)
+    const expressions = normalizedQuery.split(/and/i).map((expr) => expr.trim())
     const expressionRegex =
       /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
 
@@ -66,7 +75,7 @@ export default class Aql {
           operator.toUpperCase() === 'IN' &&
           field.toLowerCase() === this.handleTextDomainWorkload.singularLabel
         ) {
-          parsedValue = this.formatDomainValues(query, domains)
+          parsedValue = this.formatDomainValues(normalizedQuery, domains)
         } else {
           parsedValue = value.replace(/^["']|["']$/g, '')
         }
@@ -105,12 +114,16 @@ export default class Aql {
 
   formatDomainValues(query, domains) {
     const extractDomainClauseContent = (query) => {
-      const indicator = `${this.handleTextDomainWorkload.singularLabel} in (`
       const lowerQuery = query.toLowerCase()
-      const pos = lowerQuery.indexOf(indicator)
-      if (pos === -1) return null
+      const escapedField = this.handleTextDomainWorkload.singularLabel.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&'
+      )
+      const clauseRegex = new RegExp(`\\b${escapedField}\\b\\s+in\\s*\\(`, 'i')
+      const match = clauseRegex.exec(lowerQuery)
+      if (!match) return null
 
-      const startIndex = query.indexOf('(', pos)
+      const startIndex = query.indexOf('(', match.index)
       if (startIndex === -1) return null
 
       let counter = 0
@@ -141,7 +154,8 @@ export default class Aql {
       for (let i = 0; i < str.length; i++) {
         const char = str[i]
         if (char === ',' && nesting === 0) {
-          tokens.push(token.trim())
+          const cleaned = token.trim()
+          if (cleaned.length > 0) tokens.push(cleaned)
           token = ''
         } else {
           token += char
@@ -178,6 +192,10 @@ export default class Aql {
   }
 
   mapOperatorValue(op) {
+    if (typeof op === 'string' && /^[a-zA-Z]+$/.test(op)) {
+      op = op.toLowerCase()
+    }
+
     switch (op) {
       case 'in':
         return 'In'
@@ -239,6 +257,8 @@ export default class Aql {
 
           if (query.endsWith(' ') || query.endsWith('in')) {
             newQuery = `${query}(${suggestion})`
+          } else if (query.endsWith('(')) {
+            newQuery = `${query}${suggestion})`
           } else if (query.endsWith(',') || !query.endsWith(')')) {
             newQuery = `${query}, ${suggestion})`
           } else {
@@ -336,11 +356,12 @@ export default class Aql {
   }
 
   queryValidator(query, suggestions) {
+    const normalizedQuery = this.normalizeQuery(query)
     const hasErrorInCompoundFields = this.queryValidationForCompoundFields(query)
-    const hasErrorInFields = this.queryValidationIfFieldsExistInList(query, suggestions)
-    const hasErrorInOperatorIn = this.queryValidationForInOperator(query, suggestions)
-    const hasErrorNotSpace = this.queryValidatorNoSpaces(query)
-    const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(query)
+    const hasErrorInFields = this.queryValidationIfFieldsExistInList(normalizedQuery, suggestions)
+    const hasErrorInOperatorIn = this.queryValidationForInOperator(normalizedQuery, suggestions)
+    const hasErrorNotSpace = this.queryValidatorNoSpaces(normalizedQuery)
+    const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(normalizedQuery)
 
     const erros = [
       ...hasErrorInCompoundFields,
