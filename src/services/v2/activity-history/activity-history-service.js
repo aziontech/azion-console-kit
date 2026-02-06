@@ -83,6 +83,23 @@ const buildDynamicFilters = (filter = {}) => {
   }
 }
 
+const normalizeOrdering = (ordering) => {
+  if (!ordering) return 'ts'
+  const value = String(ordering).trim()
+  if (!value) return 'ts'
+  return value
+}
+
+const orderingToOrderBy = (ordering) => {
+  const value = normalizeOrdering(ordering)
+  const isDesc = value.startsWith('-')
+  const field = isDesc ? value.slice(1) : value
+  if (!field) return ['ts_DESC']
+
+  const suffix = isDesc ? 'DESC' : 'ASC'
+  return [`${field}_${suffix}`]
+}
+
 export class ActivityHistoryService extends BaseService {
   constructor() {
     super()
@@ -123,7 +140,8 @@ export class ActivityHistoryService extends BaseService {
     dateRange = 30,
     begin,
     end,
-    filter = []
+    filter = [],
+    ordering
   }) => {
     const hasExplicitRange = Boolean(begin && end)
     const { offSetEnd, offSetStart } = hasExplicitRange
@@ -160,7 +178,7 @@ export class ActivityHistoryService extends BaseService {
             ${orClause}
             ${dynamic.andFields}
           }, 
-          orderBy: [ts_DESC]
+          orderBy: [${orderingToOrderBy(ordering).join(', ')}]
         ) { 
           ts
           title

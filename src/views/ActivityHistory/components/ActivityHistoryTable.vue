@@ -52,6 +52,14 @@
   const appliedFilters = ref([])
   const first = ref(0)
   const rows = ref(100)
+  const sortField = ref('date')
+  const sortOrder = ref(-1)
+
+  const ordering = computed(() => {
+    if (!sortField.value) return null
+    const apiField = sortField.value === 'date' ? 'ts' : sortField.value
+    return sortOrder.value === -1 ? `-${apiField}` : apiField
+  })
 
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true },
@@ -100,7 +108,8 @@
         search: searchValue.value,
         begin,
         end,
-        filter: appliedFilters.value
+        filter: appliedFilters.value,
+        ordering: ordering.value
       })
 
       data.value = response.body || []
@@ -138,6 +147,13 @@
   const handlePage = (event) => {
     first.value = event.first
     rows.value = event.rows
+    loadData()
+  }
+
+  const handleSort = (event) => {
+    sortField.value = event.sortField
+    sortOrder.value = event.sortOrder
+    first.value = 0
     loadData()
   }
 
@@ -218,12 +234,15 @@
     :columns="visibleColumns"
     :paginator="true"
     :lazy="true"
+    :sortField="sortField"
+    :sortOrder="sortOrder"
     :appliedFilters="appliedFilters"
     :searchValue="searchValue"
     :notShowEmptyBlock="true"
     emptyListMessage="Has no data"
     dataKey="id"
     @page="handlePage"
+    @sort="handleSort"
     :empty-block="{
       title: 'No activity has been recorded',
       description: 'No activities found.',
