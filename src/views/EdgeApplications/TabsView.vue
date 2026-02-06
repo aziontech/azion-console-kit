@@ -61,10 +61,8 @@
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
   const isLocked = ref(false)
-  
-  const cachedEdgeApplication = 
-    edgeAppService.getApplicationFromCache(edgeApplicationId.value)
 
+  const cachedEdgeApplication = edgeAppService.getApplicationFromCache(edgeApplicationId.value)
 
   if (cachedEdgeApplication?.name) {
     edgeApplication.value = cachedEdgeApplication
@@ -386,9 +384,7 @@
 </script>
 
 <template>
-  <ContentBlock
-    data-testid="edge-application-details-content-block"
-  >
+  <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
       <MigrationMessage />
 

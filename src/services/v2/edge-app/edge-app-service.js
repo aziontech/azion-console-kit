@@ -2,14 +2,13 @@ import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-
 export class EdgeAppService extends BaseService {
   adapter = EdgeAppAdapter
   baseURL = 'v4/workspace/applications'
 
   #fetchList = async (
     params = {
-      pageSize: 10,
+      pageSize: 10
     }
   ) => {
     const { data } = await this.http.request({ method: 'GET', url: this.baseURL, params })
@@ -108,16 +107,22 @@ export class EdgeAppService extends BaseService {
 
   getApplicationFromCache = (id) => {
     if (!id) return undefined
-  
+
     return super.getFromCache({
       queryKey: queryKeys.application.all,
       id,
       listPath: 'body',
-      select: (item) => ({  
+      select: (item) => ({
         ...item,
         name: item.name.text,
-        isActive: item.active?.content === 'Active'
-      }),
+        debugRules: item.debug,
+        isActive: item.active?.content === 'Active',
+        active: item.active?.content === 'Active',
+        applicationAccelerator: item.applicationAcceleratorEnabled,
+        caching: item.edgeCacheEnabled,
+        edgeFunctions: item.edgeFunctionsEnabled,
+        imageOptimization: item.imageProcessorEnabled
+      })
     })
   }
 }

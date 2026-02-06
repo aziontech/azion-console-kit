@@ -111,7 +111,12 @@ export const queryKeys = {
         'list',
         params
       ],
-      detail: (parentId, id) => [...queryKeys.application.detail(parentId), 'functions', 'detail', id]
+      detail: (parentId, id) => [
+        ...queryKeys.application.detail(parentId),
+        'functions',
+        'detail',
+        id
+      ]
     }
   },
   workload: {

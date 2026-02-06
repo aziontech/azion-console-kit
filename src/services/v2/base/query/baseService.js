@@ -138,36 +138,32 @@ export class BaseService {
 
   getFromCache({ queryKey, id, listPath = 'body', select, fieldName = 'id' }) {
     if (!queryKey || id === undefined || id === null) return undefined
-  
-    const queries = this.queryClient
-      .getQueryCache()
-      .findAll({
-        predicate: (query) => {
-          const key = query.queryKey
-          if (!Array.isArray(key)) return false
-  
-          if (Array.isArray(queryKey)) {
-            return queryKey.every((query, index) => key[index] === query)
-          }
-  
-          return key[0] === queryKey
-        },
-      })
-  
+
+    const queries = this.queryClient.getQueryCache().findAll({
+      predicate: (query) => {
+        const key = query.queryKey
+        if (!Array.isArray(key)) return false
+
+        if (Array.isArray(queryKey)) {
+          return queryKey.every((query, index) => key[index] === query)
+        }
+
+        return key[0] === queryKey
+      }
+    })
+
     for (const query of queries) {
       const data = query?.state?.data
       const list = listPath ? data?.[listPath] : data
       if (!Array.isArray(list)) continue
-  
-      const item = list.find(
-        (item) => String(item?.[fieldName]) === String(id)
-      )
-  
+
+      const item = list.find((item) => String(item?.[fieldName]) === String(id))
+
       if (!item) continue
-  
+
       return select ? select(item) : item
     }
-  
+
     return undefined
   }
 }

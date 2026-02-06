@@ -14,7 +14,9 @@ export const editOriginService = async (payload) => {
 
   const result = parseHttpResponse(httpResponse)
 
-  queryClient.removeQueries({ queryKey: queryKeys.application.origins.all(payload.edgeApplicationId) })
+  queryClient.removeQueries({
+    queryKey: queryKeys.application.origins.all(payload.edgeApplicationId)
+  })
 
   return result
 }
