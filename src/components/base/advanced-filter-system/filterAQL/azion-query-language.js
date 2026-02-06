@@ -11,9 +11,7 @@ export default class Aql {
   normalizeQuery(query) {
     if (!query) return query
 
-    return query
-      .replace(/\b(in|between)\b\s*\(/gi, (match, op) => `${op} (`)
-      .replace(/\(\s+/g, '(')
+    return query.replace(/\b(in|between)\b\s*\(/gi, (match, op) => `${op} (`).replace(/\(\s+/g, '(')
   }
 
   parse(query, suggestions, domains) {
@@ -187,6 +185,36 @@ export default class Aql {
     return result
   }
 
+  upsertInListValue(query, valueToAdd) {
+    if (!query) return query
+    const value = String(valueToAdd ?? '').trim()
+    if (!value) return query
+
+    const startIndex = query.lastIndexOf('(')
+    if (startIndex === -1) return query
+
+    const endIndex = query.indexOf(')', startIndex)
+    const innerRaw = query.slice(startIndex + 1, endIndex === -1 ? query.length : endIndex)
+
+    const tokens = innerRaw
+      .split(',')
+      .map((token) => token.trim())
+      .filter((token) => token.length > 0)
+
+    const alreadyExists = tokens.some((token) => token.toLowerCase() === value.toLowerCase())
+    if (!alreadyExists) tokens.push(value)
+
+    const rebuiltInner = tokens.join(', ')
+    const prefix = query.slice(0, startIndex + 1)
+
+    if (endIndex === -1) {
+      return `${prefix}${rebuiltInner})`
+    }
+
+    const suffix = query.slice(endIndex)
+    return `${prefix}${rebuiltInner}${suffix}`
+  }
+
   operatorInfo(operators, operator) {
     return operators.find((op) => op.label === operator)?.value
   }
@@ -248,22 +276,8 @@ export default class Aql {
       }
       case 'value': {
         if (fieldName === this.handleTextDomainWorkload.singularLabel) {
-          const suggestion = suggestionLabel.trim()
-
-          let newQuery = ''
-          if (query.includes(suggestionLabel.trim())) {
-            return { query, nextStep: 'value', label: fieldName }
-          }
-
-          if (query.endsWith(' ') || query.endsWith('in')) {
-            newQuery = `${query}(${suggestion})`
-          } else if (query.endsWith('(')) {
-            newQuery = `${query}${suggestion})`
-          } else if (query.endsWith(',') || !query.endsWith(')')) {
-            newQuery = `${query}, ${suggestion})`
-          } else {
-            newQuery = `${query.slice(0, -1)}, ${suggestion})`
-          }
+          const value = suggestionLabel.trim()
+          const newQuery = this.upsertInListValue(query, value)
           return { query: newQuery, nextStep: 'value', label: fieldName }
         } else {
           return { query: `${suggestionLabel} `, nextStep: 'value', label: fieldName }

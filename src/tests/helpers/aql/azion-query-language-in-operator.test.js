@@ -67,6 +67,44 @@ describe('AQL - IN operator normalization and list parsing', () => {
     expect(res.query).toBe(`${base}string1)`)
   })
 
+  it.each([
+    {
+      initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (,,)`,
+      expected: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item)`
+    },
+    {
+      initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (, item)`,
+      expected: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item)`
+    },
+    {
+      initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in ( , item )`,
+      expected: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item)`
+    },
+    {
+      initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (, , item)`,
+      expected: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item)`
+    },
+    {
+      initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item, , second)`,
+      expected: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (item, second)`
+    }
+  ])(
+    'should sanitize empty values and duplicated commas when inserting: $initial',
+    ({ initial, expected }) => {
+      const aql = new Aql()
+      const suggestion = { label: 'item' }
+
+      const res = aql.selectSuggestion(
+        suggestion,
+        initial,
+        'value',
+        TEXT_DOMAIN_WORKLOAD().singularLabel
+      )
+
+      expect(res.query).toBe(expected)
+    }
+  )
+
   it('should not treat an empty token before comma as a value in queryValidationForInOperator', () => {
     const aql = new Aql()
     const query = `${TEXT_DOMAIN_WORKLOAD().singularLabel} in(, string1)`
