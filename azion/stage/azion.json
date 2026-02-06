@@ -3,7 +3,8 @@
   "bucket": "console-kit-2024-08-21-stage",
   "preset": "vue",
   "env": "production",
-  "prefix": "20240821142547",
+  "prefix": "20260129171729",
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": {
     "id": 28363,
@@ -25,7 +26,7 @@
     "url": "https://o3s8583vvw.map.azionedge.net"
   },
   "rt-purge": {
-    "purge_on_publish": false
+    "purge_on_publish": true
   },
   "origin": [
     {
