@@ -35,7 +35,7 @@
     },
     {
       field: 'authorEmail',
-      header: 'User'
+      header: 'Author Email'
     }
   ]
 
