@@ -1,30 +1,37 @@
 <script setup>
   import { ref, onMounted, h } from 'vue'
-  import Tag from 'primevue/tag'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
   import SimpleTable from '@/templates/list-table-block/simple-table.vue'
+  import OperationTag from '@/views/ActivityHistory/components/OperationTag.vue'
   import { activityHistoryService } from '@/services/v2/activity-history/activity-history-service'
+  import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
+
+  const router = useRouter()
+  const toast = useToast()
 
   const columns = [
     {
-      field: 'ts',
+      field: 'date',
       header: 'Date'
     },
     {
-      field: 'type',
+      field: 'operation',
       header: 'Operation',
       type: 'component',
       component: (value) => {
         if (!value) return null
-        return h(Tag, {
-          value: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
-          severity: getOperationSeverity(value),
-          class: 'text-[11px] font-semibold'
-        })
+        return h(OperationTag, { operation: value })
       }
     },
     {
-      field: 'title',
-      header: 'Activity'
+      field: 'resourceType',
+      header: 'Resource'
+    },
+    {
+      field: 'resourceName',
+      header: 'Resource Name',
+      enableClick: true
     },
     {
       field: 'authorEmail',
@@ -34,15 +41,6 @@
 
   const activities = ref([])
   const isLoading = ref(false)
-
-  const getOperationSeverity = (type) => {
-    const severities = {
-      created: 'success',
-      updated: 'warn',
-      deleted: 'danger'
-    }
-    return severities[type?.toLowerCase()] || 'info'
-  }
 
   const loadActivities = async () => {
     isLoading.value = true
@@ -57,6 +55,31 @@
       activities.value = []
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const handleRowClick = async (event) => {
+    const rowData = event?.data || event
+    const location = resolveActivityHistoryRoute(rowData)
+    if (!location) {
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'No route available for this activity',
+        life: 5000
+      })
+      return
+    }
+
+    try {
+      await router.push(location)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error?.message || 'Navigation error',
+        life: 5000
+      })
     }
   }
 
@@ -81,6 +104,7 @@
         title: 'No activities yet',
         description: 'Your recent activities will appear here.'
       }"
+      @row-click="handleRowClick"
     />
   </div>
 </template>
