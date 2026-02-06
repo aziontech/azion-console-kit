@@ -17,28 +17,41 @@
             content: { class: 'p-0 max-w-72 !shadow-none !outline-none rounded-md bg-neutral-900' }
           }"
         >
-          <div class="px-3 py-2 bg-neutral-900 rounded-md">
+          <div class="px-3 py-2 bg-neutral-900 rounded-md flex items-center justify-between">
             <span
               class="text-[10px] font-mono uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
             >
               Show by usage
             </span>
+            <i
+              v-if="hasReachedMaxSelections"
+              v-tooltip.left="{ value: 'You\'ve reached the maximum selection (6 items).', showDelay: 200 }"
+              class="pi pi-exclamation-triangle flex justify-center items-center text-yellow-500 cursor-help w-4 h-4 text-base"
+            />
           </div>
           <Listbox
-            v-model="selectedOptions"
+            :modelValue="selectedOptions"
             :options="allUsageOptions"
             optionLabel="label"
             optionValue="key"
             multiple
             class="w-full border-none"
             listStyle="max-height: 250px"
+            @update:modelValue="handleSelectionChange"
           >
             <template #option="{ option }">
-              <div class="flex items-center gap-2 pointer-events-none">
+              <div
+                class="flex items-center gap-2"
+                :class="{
+                  'pointer-events-none': true,
+                  'opacity-50 cursor-not-allowed': isOptionDisabled(option.key)
+                }"
+              >
                 <Checkbox
                   :modelValue="selectedOptions.includes(option.key)"
                   :binary="true"
                   :tabindex="-1"
+                  :disabled="isOptionDisabled(option.key)"
                 />
                 <span class="font-normal text-xs py-2">{{ option.label }}</span>
               </div>
@@ -71,8 +84,8 @@
             :key="item.key"
             class="flex items-start justify-between text-xs"
           >
-            <span class="text-color-secondary">{{ item.label }}</span>
-            <span class="text-color">{{ item.value }}</span>
+            <span class="text-color-secondary text-left">{{ item.label }}</span>
+            <span class="text-color text-right">{{ item.value }}</span>
           </div>
         </template>
       </div>
@@ -126,8 +139,24 @@
   const isLoading = ref(true)
   const columnSelectorPanel = ref(null)
 
+  const MAX_SELECTIONS = 6
+
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
+  }
+
+  const hasReachedMaxSelections = computed(() => {
+    return selectedOptions.value.length >= MAX_SELECTIONS
+  })
+
+  const isOptionDisabled = (optionKey) => {
+    return hasReachedMaxSelections.value && !selectedOptions.value.includes(optionKey)
+  }
+
+  const handleSelectionChange = (newSelection) => {
+    if (newSelection.length <= MAX_SELECTIONS) {
+      selectedOptions.value = newSelection
+    }
   }
 
   const usageData = computed(() => {
