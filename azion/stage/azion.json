@@ -4,6 +4,7 @@
   "preset": "vue",
   "env": "production",
   "prefix": "20240821142547",
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": {
     "id": 28363,
