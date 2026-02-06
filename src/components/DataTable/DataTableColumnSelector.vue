@@ -17,31 +17,33 @@
       }"
       data-testid="data-table-actions-column-header-toggle-columns-panel"
     >
-      <Listbox
-        v-model="selectedColumns"
-        multiple
-        :options="[{ label: 'Available Columns', items: columns }]"
-        class="hidden-columns-panel"
-        optionLabel="header"
-        optionGroupLabel="label"
-        optionGroupChildren="items"
-        data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-      >
-        <template #optiongroup="slotProps">
-          <p class="text-sm font-medium">
-            {{ slotProps.option.label }}
-          </p>
-        </template>
-        <template #option="slotProps">
-          <div
-            :class="{
-              'opacity-50 pointer-events-none': slotProps.option.field === 'name'
-            }"
-          >
-            {{ slotProps.option.header }}
-          </div>
-        </template>
-      </Listbox>
+      <div :class="{ 'max-h-[280px] overflow-y-auto': shouldEnableScroll }">
+        <Listbox
+          v-model="selectedColumns"
+          multiple
+          :options="[{ label: 'Available Columns', items: columns }]"
+          class="hidden-columns-panel"
+          optionLabel="header"
+          optionGroupLabel="label"
+          optionGroupChildren="items"
+          data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+        >
+          <template #optiongroup="slotProps">
+            <p class="text-sm font-medium">
+              {{ slotProps.option.label }}
+            </p>
+          </template>
+          <template #option="slotProps">
+            <div
+              :class="{
+                'opacity-50 pointer-events-none': slotProps.option.field === 'name'
+              }"
+            >
+              {{ slotProps.option.header }}
+            </div>
+          </template>
+        </Listbox>
+      </div>
     </OverlayPanel>
   </div>
 </template>
@@ -66,6 +68,8 @@
   const emit = defineEmits(['update:selectedColumns'])
 
   const columnSelectorPanel = ref(null)
+
+  const shouldEnableScroll = computed(() => (props.columns?.length || 0) > 7)
 
   const selectedColumns = computed({
     get: () => props.selectedColumns,

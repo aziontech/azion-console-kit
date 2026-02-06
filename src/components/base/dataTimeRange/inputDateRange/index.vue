@@ -62,12 +62,15 @@
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
-  const sizeInput = (value) => {
-    if (value.length > 5) {
-      return value.length
-    }
-    return 7
-  }
+  const maxDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    return new Date()
+  })
+  const minDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    const now = new Date()
+    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
 
   const inputValue = computed({
     get: () => {
@@ -107,6 +110,7 @@
     if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
 
     if (!start || !end) return false
+
     return new Date(start).getTime() > new Date(end).getTime()
   })
 
@@ -115,11 +119,25 @@
     emit('select', model.value)
   }
 
-  onMounted(() => {
-    if (props.mode === 'relative') {
-      updateRelativeRange()
+  const sizeInput = (value) => {
+    if (value.length > 5) {
+      return value.length
     }
-  })
+    return 7
+  }
+
+  const clampToBounds = (date) => {
+    if (!date) return date
+    const parsed = new Date(date)
+    if (!props.maxDays || props.maxDays <= 0) return parsed
+
+    const min = minDate.value
+    const max = maxDate.value
+
+    if (min && parsed < min) return new Date(min)
+    if (max && parsed > max) return new Date(max)
+    return parsed
+  }
 
   const openStart = (event) => {
     selectedTime.value = ''
@@ -140,7 +158,7 @@
     } else {
       model.value.labelEnd = ''
     }
-    selectedDate.value = date
+    selectedDate.value = clampToBounds(date)
     updateSelectedDateTime()
     hasChanges.value = false
     emitSelectIfValid()
@@ -153,8 +171,10 @@
     } else {
       model.value.labelEnd = ''
     }
-    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
+    const newDate = clampToBounds(new Date(selectedYear.value, selectedMonth.value, 1))
     selectedDate.value = newDate
+    selectedMonth.value = newDate.getMonth()
+    selectedYear.value = newDate.getFullYear()
     updateSelectedDateTime()
     hasChanges.value = false
     emitSelectIfValid()
@@ -228,9 +248,10 @@
       const [hours, minutes] = time.split(':')
       const newDate = new Date(selectedDate.value)
       newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+      const boundedDate = clampToBounds(newDate)
 
       if (props.editingField === 'start') {
-        model.value.startDate = newDate
+        model.value.startDate = boundedDate
         model.value.labelStart = ''
         hasInitializedAbsoluteRange.value = true
         const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
@@ -244,7 +265,7 @@
           newDate.getMinutes() === currentEndDate.getMinutes()
 
         if (isSameHourAndMinuteAsEnd) {
-          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
         }
       } else {
         const hasStart = Boolean(model.value.startDate)
@@ -256,11 +277,11 @@
         const shouldInitializeStartDate =
           !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
 
-        model.value.endDate = newDate
+        model.value.endDate = boundedDate
         model.value.labelEnd = ''
 
         if (shouldInitializeStartDate) {
-          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
+          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
           model.value.labelStart = ''
           hasInitializedAbsoluteRange.value = true
         }
@@ -278,7 +299,8 @@
         now
       )
 
-      const calculatedDate = relativeDirection.value === 'last' ? newStartDate : newEndDate
+      const boundedStart = clampToBounds(newStartDate)
+      const boundedEnd = clampToBounds(newEndDate)
 
       model.value.relative = {
         direction: relativeDirection.value,
@@ -289,7 +311,7 @@
 
       const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
-        model.value.startDate = calculatedDate
+        model.value.startDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
         model.value.relativeStart = {
           direction: relativeDirection.value,
@@ -304,7 +326,7 @@
           model.value.label = ''
         }
       } else {
-        model.value.endDate = calculatedDate
+        model.value.endDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
         model.value.relativeEnd = {
           direction: relativeDirection.value,
@@ -324,26 +346,27 @@
     const parsedDate = parseDateSimple(tempInputValue.value)
 
     if (parsedDate) {
+      const boundedParsedDate = clampToBounds(parsedDate)
       if (props.editingField === 'start') {
-        model.value.startDate = parsedDate
+        model.value.startDate = boundedParsedDate
         model.value.labelStart = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure end date is not before start date
-        if (model.value.endDate && parsedDate > model.value.endDate) {
-          model.value.endDate = parsedDate
+        if (model.value.endDate && boundedParsedDate > model.value.endDate) {
+          model.value.endDate = boundedParsedDate
           model.value.labelEnd = ''
         }
       } else {
-        model.value.endDate = parsedDate
+        model.value.endDate = boundedParsedDate
         model.value.labelEnd = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure start date is not after end date
-        if (model.value.startDate && parsedDate < model.value.startDate) {
-          model.value.startDate = parsedDate
+        if (model.value.startDate && boundedParsedDate < model.value.startDate) {
+          model.value.startDate = boundedParsedDate
           model.value.labelStart = ''
         }
       }
@@ -365,6 +388,12 @@
   if (model.value.endDate) {
     model.value.endDate = new Date(model.value.endDate)
   }
+
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      updateRelativeRange()
+    }
+  })
 
   defineExpose({})
 </script>
@@ -464,6 +493,8 @@
           :showButtonBar="false"
           :showWeek="false"
           :dateFormat="'dd/mm/yy'"
+          :minDate="minDate"
+          :maxDate="maxDate"
           class="w-full"
           @date-select="onDateSelect"
           :pt="{

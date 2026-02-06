@@ -8,10 +8,14 @@
     }
   })
 
-  const emit = defineEmits(['remove'])
+  const emit = defineEmits(['remove', 'edit'])
 
   const removeFilter = (field) => {
     emit('remove', field)
+  }
+
+  const editFilter = (filter, event) => {
+    emit('edit', { filter, event })
   }
 
   const getFormattedValue = (filter) => {
@@ -27,13 +31,14 @@
     <div
       v-for="filter in appliedFilters"
       :key="filter.field"
-      class="flex items-center gap-2 px-3 py-1.5 bg-[var(--input-bg)] rounded-md text-sm"
+      class="flex items-center gap-2 px-3 py-1.5 bg-[var(--input-bg)] rounded-md text-sm cursor-pointer"
+      @click="(event) => editFilter(filter, event)"
     >
       <span class="font-normal">{{ filter.label }} {{ filter.matchMode }}:</span>
       <span>{{ getFormattedValue(filter) }}</span>
       <button
         class="flex items-center"
-        @click="removeFilter(filter.field)"
+        @click.stop="removeFilter(filter.field)"
         :aria-label="`Remove ${filter.label} filter`"
       >
         <i class="pi pi-times-circle" />
