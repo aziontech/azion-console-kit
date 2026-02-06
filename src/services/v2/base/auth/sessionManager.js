@@ -10,6 +10,11 @@ import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 import { variablesService } from '@/services/v2/variables'
+import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -47,7 +52,15 @@ const prefetchInBackground = async () => {
     edgeFirewallService.prefetchList(pageSize)
   ])
 
-  Promise.allSettled([variablesService.prefetchList(), marketplaceService.prefetchMarketplace()])
+  Promise.allSettled([
+    variablesService.prefetchList(),
+    marketplaceService.prefetchMarketplace(),
+    edgeStorageService.prefetchList(),
+    edgeDNSService.prefetchList(),
+    edgeFunctionService.prefetchList(),
+    edgeConnectorsService.prefetchList(),
+    dataStreamService.prefetchList()
+  ])
 }
 
 export const sessionManager = {

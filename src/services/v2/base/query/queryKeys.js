@@ -185,5 +185,15 @@ export const queryKeys = {
         params
       ]
     }
+  },
+  dataStream: {
+    all: ['data-streams'],
+    list: (params) => [...queryKeys.dataStream.all, 'list', params],
+    detail: (id) => [...queryKeys.dataStream.all, 'detail', id]
+  },
+  edgeConnectors: {
+    all: ['edge-connectors'],
+    list: (params) => [...queryKeys.edgeConnectors.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeConnectors.all, 'detail', id]
   }
 }

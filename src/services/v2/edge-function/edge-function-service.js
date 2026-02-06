@@ -109,13 +109,17 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
+  prefetchList = () => {
+    return this.usePrefetchQuery(queryKeys.edgeFunction.list({}), () => this.#fetchFunctionsList())
+  }
+
   listEdgeFunctionsService = async (params = { pageSize: 100, fields: [] }) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeFunction.list(params),
-      () => this.#fetchFunctionsList(params),
+      queryKeys.edgeFunction.list(),
+      () => this.#fetchFunctionsList(),
       {
         persist: firstPage && !skipCache,
         skipCache

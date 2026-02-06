@@ -26,13 +26,19 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
 
+  prefetchList = () => {
+    return this.usePrefetchQuery(queryKeys.edgeStorage.buckets.list({}), () =>
+      this.#fetchBucketsList()
+    )
+  }
+
   listEdgeStorageBuckets = async (params = {}) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeStorage.buckets.list(params),
-      () => this.#fetchBucketsList(params),
+      queryKeys.edgeStorage.buckets.list(),
+      () => this.#fetchBucketsList(),
       {
         persist: firstPage && !skipCache,
         skipCache
