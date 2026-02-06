@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.49.28",
+  "version": "1.50.2",
   "private": false,
   "type": "module",
   "repository": {
@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "cp package.json dist/",
     "preview": "vite preview",
     "ci": "yarn install --frozen-lockfile",
     "test:unit": "TZ=UTC vitest --ui",

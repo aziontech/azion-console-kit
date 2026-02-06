@@ -18,6 +18,10 @@
 
 ---
 
+![Workflow Deploy Production](https://github.com/aziontech/azion-console-kit/actions/workflows/deploy-production.yml/badge.svg)
+![Workflow Deploy Stage](https://github.com/aziontech/azion-console-kit/actions/workflows/deploy-stage.yml/badge.svg)
+
+
 ## Introduction 📖
 
 **Azion Console Kit** is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) interface.

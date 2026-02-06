@@ -39,6 +39,13 @@ class TeamsService extends BaseService {
     return this.useEnsureQueryData(queryKey, () => this.listTeams())
   }
 
+  useListTeamsQuery() {
+    return this.useQuery(queryKeys.teams.all, () => this.listTeams(), {
+      cacheType: this.cacheType.STATIC,
+      enabled: true
+    })
+  }
+
   invalidateTeamsCache = async () => {
     await this.queryClient.removeQueries({ queryKey: queryKeys.teams.all })
   }

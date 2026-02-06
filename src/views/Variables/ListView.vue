@@ -6,30 +6,13 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { h, computed, ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { variablesService } from '@/services/v2/variables'
+  import { clipboardWrite, documentationCatalog } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'variables-view' })
-
-  const props = defineProps({
-    listVariablesService: {
-      required: true,
-      type: Function
-    },
-    deleteVariablesService: {
-      required: true,
-      type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const enableRedirect = ref(true)
   const refListTable = ref()
@@ -40,7 +23,7 @@
       type: 'delete',
       title: 'variable',
       icon: 'pi pi-trash',
-      service: props.deleteVariablesService
+      service: variablesService.delete
     }
   ]
 
@@ -68,7 +51,7 @@
               data: columnData.content,
               columnAppearance: 'text-format-with-popup',
               dependencies: {
-                showCopy: props.clipboardWrite
+                showCopy: clipboardWrite
               }
             })
           }
@@ -132,7 +115,7 @@
       <ListTableBlock
         @on-before-go-to-edit="checkIfIsEditable"
         @on-before-go-to-add-page="handleTrackEvent"
-        :listService="listVariablesService"
+        :listService="variablesService.list"
         :columns="getColumns"
         editPagePath="/variables/edit"
         ref="refListTable"
@@ -153,7 +136,7 @@
             'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
           createPagePath: 'variables/create',
-          documentationService: props.documentationService
+          documentationService: documentationCatalog.variables
         }"
       />
     </template>
