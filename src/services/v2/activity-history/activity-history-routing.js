@@ -99,6 +99,7 @@ const resolveAction = (action) => {
     case 'updated':
     case 'update':
     case 'created':
+    case 'changed':
       return 'edit'
     case 'deleted':
     case 'removed':

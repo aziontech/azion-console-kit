@@ -287,7 +287,7 @@
           <span
             v-if="rowData[col.field]"
             @click="handleRowClick({ data: rowData })"
-            class="text-[var(--text-color-link)] cursor-pointer hover:underline"
+            class="text-color cursor-pointer hover:underline"
           >
             {{ rowData[col.field] }}
           </span>
