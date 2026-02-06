@@ -92,7 +92,7 @@
 
   const editable = ref(null)
 
-  const emit = defineEmits(['dirty'])
+  const emit = defineEmits(['dirty', 'validation'])
 
   defineOptions({ name: 'azion-query-language' })
 
@@ -287,6 +287,10 @@
   const handleErrorsQuery = computed(() =>
     AzionQueryLanguage.queryValidator(query.value, suggestionsData.value)
   )
+
+  watch(handleErrorsQuery, (errors) => {
+    emit('validation', Boolean(errors?.length))
+  })
 
   const handleInitialQuery = () => {
     query.value = AzionQueryLanguage.handleInicialQuery(props.filterAdvanced, props.fieldsInFilter)
