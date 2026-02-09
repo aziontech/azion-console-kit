@@ -167,7 +167,7 @@ export class RulesEngineService extends BaseService {
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
-
+    delete params.pageSize
     return await this.useEnsureQueryData(
       queryKeys.application.rulesEngine.list(edgeApplicationId, params),
       async () => {
@@ -197,6 +197,7 @@ export class RulesEngineService extends BaseService {
    */
   prefetchRulesEngineList = async (edgeApplicationId) => {
     const defaultParams = {
+      page: 1,
       fields: [
         'id',
         'name',
@@ -207,7 +208,7 @@ export class RulesEngineService extends BaseService {
         'last_modified',
         'last_editor'
       ],
-      ordering: ''
+      ordering: 'id'
     }
 
     return await this.listRulesEngineRequestAndResponsePhase({

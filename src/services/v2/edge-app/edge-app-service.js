@@ -37,6 +37,7 @@ export class EdgeAppService extends BaseService {
     const params = {
       page: 1,
       pageSize,
+      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.application.list(params), () => this.#fetchList(params))

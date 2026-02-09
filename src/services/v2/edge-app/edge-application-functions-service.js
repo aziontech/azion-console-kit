@@ -87,10 +87,10 @@ export class EdgeApplicationFunctionService extends BaseService {
    * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
    * @param {string} edgeApplicationId - The edge application ID
    */
-  prefetchFunctionsList = async (edgeApplicationId) => {
+  prefetchFunctionsList = async (edgeApplicationId, pageSize = 10) => {
     return await this.listEdgeApplicationFunctions(edgeApplicationId, {
-      pageSize: 10,
       page: 1,
+      pageSize,
       ordering: 'name',
       fields: ['id', 'name', 'edge_function', 'args', 'last_modified', 'last_editor']
     })

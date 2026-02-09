@@ -27,6 +27,7 @@
   import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -134,6 +135,9 @@
   const preloadTabData = async () => {
     if (!edgeApplication.value) return
 
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+
     const preloadPromises = []
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
@@ -147,13 +151,17 @@
       )
     }
 
-    preloadPromises.push(deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value))
+    preloadPromises.push(
+      deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
+    )
 
-    preloadPromises.push(cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value))
+    preloadPromises.push(
+      cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
+    )
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
       preloadPromises.push(
-        edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value)
+        edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value, pageSize)
       )
     }
 

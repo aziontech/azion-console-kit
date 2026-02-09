@@ -51,10 +51,10 @@ export class DeviceGroupService extends BaseService {
    * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
    * @param {string} edgeApplicationId - The edge application ID
    */
-  prefetchDeviceGroupsList = async (edgeApplicationId) => {
+  prefetchDeviceGroupsList = async (edgeApplicationId, pageSize = 10) => {
     const defaultParams = {
       page: 1,
-      pageSize: 10,
+      pageSize,
       fields: ['id', 'name', 'user_agent'],
       ordering: 'name'
     }
