@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeConnectorsAdapter } from './edge-connectors-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class EdgeConnectorsService extends BaseService {
   constructor() {
     super()
@@ -7,7 +8,7 @@ export class EdgeConnectorsService extends BaseService {
     this.baseURL = 'v4/workspace/connectors'
   }
 
-  listEdgeConnectorsService = async (params = { pageSize: 10 }) => {
+  #fetchConnectorsList = async (params = { pageSize: 10 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -22,6 +23,32 @@ export class EdgeConnectorsService extends BaseService {
       body,
       count
     }
+  }
+
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeConnectors.list(defaultParams), () =>
+      this.#fetchConnectorsList(defaultParams)
+    )
+  }
+
+  listEdgeConnectorsService = async (params = { pageSize: 10 }) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeConnectors.list(params),
+      () => this.#fetchConnectorsList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   listEdgeConnectorsDropDownService = async (params, callBackFilter) => {
@@ -42,6 +69,8 @@ export class EdgeConnectorsService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeConnectors.all })
+
     const { id } = data.data
 
     return {
@@ -58,6 +87,8 @@ export class EdgeConnectorsService extends BaseService {
       url: `${this.baseURL}/${payload.id}`,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeConnectors.all })
 
     return 'Connector has been updated'
   }
@@ -76,6 +107,8 @@ export class EdgeConnectorsService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeConnectors.all })
 
     return 'Resource successfully deleted'
   }
