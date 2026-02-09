@@ -16,7 +16,7 @@
 
 <script setup>
   import { watch, computed, ref } from 'vue'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
 
   const emit = defineEmits(['update:modelValue'])
   const props = defineProps({
@@ -39,7 +39,7 @@
     errors: Boolean
   })
 
-  const store = useAccountStore()
+  const store = useThemeStore()
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })

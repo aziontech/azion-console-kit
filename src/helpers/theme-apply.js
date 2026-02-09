@@ -1,6 +1,11 @@
-export const themeSelect = ({ HTMLElement, theme }) => {
+export const themeApply = ({ HTMLElement, theme }) => {
   let selectedTheme = theme
-  if (!theme || theme === 'system') {
+
+  if (!HTMLElement) {
+    HTMLElement = document.querySelector(':root')
+  }
+
+  if (!selectedTheme || selectedTheme === 'system') {
     selectedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 

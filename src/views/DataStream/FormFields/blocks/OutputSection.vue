@@ -813,7 +813,7 @@
   import { MIN_PAYLOAD_SIZE_IN_BYTES, MAX_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
   import { computed, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
@@ -825,7 +825,7 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
 
-  const store = useAccountStore()
+  const store = useThemeStore()
 
   const { value: endpoint } = useField('endpoint')
   const { value: endpointUrl } = useField('endpointUrl')

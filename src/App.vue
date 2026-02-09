@@ -3,8 +3,9 @@
   import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
-  import { themeSelect } from '@/helpers'
+  import { themeApply } from '@/helpers'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
@@ -15,7 +16,9 @@
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()
-  const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
+  const themeStore = useThemeStore()
+  const { hasActiveUserId, account } = storeToRefs(accountStore)
+  const { currentTheme } = storeToRefs(themeStore)
 
   const route = useRoute()
 
@@ -58,8 +61,13 @@
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
-  const root = document.querySelector(':root')
-  watch(currentTheme, (theme) => themeSelect({ HTMLElement: root, theme }))
+  watch(currentTheme, (theme) => {
+    themeApply({
+      HTMLElement: document.querySelector(':root'),
+      theme: theme
+    })
+  })
+
   watch(account, () => {
     updateTrackingTraits()
   })
