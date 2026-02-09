@@ -1,13 +1,13 @@
 <template>
   <div
-    class="w-full"
+    class="w-full relative"
     ref="ignoreClickOutside"
   >
     <div class="relative">
       <div class="flex gap-2 items-center justify-center">
         <ContentEditable
           v-model="query"
-          @focus="showSuggestionsFocusInput = true"
+          @focus="openSuggestions"
           @keydown.tab="onSelectSuggestionWithTab"
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
@@ -40,8 +40,9 @@
       :options="filteredSuggestions"
       ref="listboxRef"
       optionLabel="label"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs py-2"
-      @update:modelValue="selectSuggestion"
+      :modelValue="listboxModel"
+      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-50 max-w-xs py-2 top-full left-0"
+      @update:modelValue="onListboxModelUpdate"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
       data-testid="azion-query-language-suggestions"
       :pt="{
@@ -54,6 +55,7 @@
         <div
           class="w-full rounded-md font-mono"
           :data-testid="`azion-query-language-list-item${slotProps.index}`"
+          @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
           :class="[
             'p-2 cursor-pointer ',
             {
@@ -85,7 +87,9 @@
   const selectedFieldName = ref('')
   const highlightedIndex = ref(0)
   const listboxRef = ref(null)
-  const domains = ref({})
+  const domains = ref([])
+
+  const listboxModel = ref(null)
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
@@ -212,6 +216,17 @@
     selectedFieldName.value = data?.label
     changeCurrentStep(data?.nextStep)
     highlightedIndex.value = 0
+  }
+
+  const onListboxModelUpdate = (modelValue) => {
+    listboxModel.value = modelValue
+    selectSuggestion(modelValue)
+  }
+
+  const onOptionMouseDown = (option) => {
+    const restoreCursorInLastOffset = true
+    onListboxModelUpdate(option)
+    editable.value?.restoreCursorPosition?.(restoreCursorInLastOffset)
   }
 
   const scrollToHighlighted = () => {

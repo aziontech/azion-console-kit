@@ -8,6 +8,11 @@ export default class Aql {
     this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
+  #isDomainWorkloadField(fieldName) {
+    if (!fieldName) return false
+    return String(fieldName).toLowerCase() === this.handleTextDomainWorkload.singularLabel
+  }
+
   normalizeQuery(query) {
     if (!query) return query
 
@@ -191,7 +196,10 @@ export default class Aql {
     if (!value) return query
 
     const startIndex = query.lastIndexOf('(')
-    if (startIndex === -1) return query
+    if (startIndex === -1) {
+      const trimmed = query.trimEnd()
+      return `${trimmed} (${value})`
+    }
 
     const endIndex = query.indexOf(')', startIndex)
     const innerRaw = query.slice(startIndex + 1, endIndex === -1 ? query.length : endIndex)
@@ -275,7 +283,7 @@ export default class Aql {
         return { query: newQuery, nextStep: 'value', label: fieldName }
       }
       case 'value': {
-        if (fieldName === this.handleTextDomainWorkload.singularLabel) {
+        if (this.#isDomainWorkloadField(fieldName)) {
           const value = suggestionLabel.trim()
           const newQuery = this.upsertInListValue(query, value)
           return { query: newQuery, nextStep: 'value', label: fieldName }
@@ -301,7 +309,12 @@ export default class Aql {
     const matchingFields = suggestions.filter((item) =>
       item.label.toLowerCase().startsWith(tokenForMatch)
     )
-    let operatorFound = this.operators.find((op) => tokenForMatch.toLowerCase().includes(op))
+    const sortedOperators = [...this.operators].sort((left, right) => right.length - left.length)
+    let operatorFound = sortedOperators.find((op) => {
+      const escaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const pattern = /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
+      return new RegExp(pattern, 'i').test(tokenForMatch)
+    })
 
     const hasValueAfterOperator = operatorFound ? tokenRaw.split(operatorFound)[1] : null
 
@@ -768,7 +781,7 @@ export default class Aql {
   }
 
   getValueSuggestions(domains, selectedFieldName) {
-    if (selectedFieldName === this.handleTextDomainWorkload.singularLabel) {
+    if (this.#isDomainWorkloadField(selectedFieldName)) {
       return domains
     }
     return []

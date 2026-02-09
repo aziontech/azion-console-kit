@@ -67,6 +67,22 @@ describe('AQL - IN operator normalization and list parsing', () => {
     expect(res.query).toBe(`${base}string1)`)
   })
 
+  it('should insert into IN list when fieldName is lowercase', () => {
+    const aql = new Aql()
+
+    const suggestion = { label: 'string1' }
+    const base = `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (`
+
+    const res = aql.selectSuggestion(
+      suggestion,
+      base,
+      'value',
+      TEXT_DOMAIN_WORKLOAD().singularLabel.toLowerCase()
+    )
+
+    expect(res.query).toBe(`${base}string1)`)
+  })
+
   it.each([
     {
       initial: `${TEXT_DOMAIN_WORKLOAD().singularLabel} in (,,)`,
