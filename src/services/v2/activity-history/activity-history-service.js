@@ -90,11 +90,27 @@ const normalizeOrdering = (ordering) => {
   return value
 }
 
+const ALLOWED_ORDERING_FIELDS = new Set([
+  'ts',
+  'type',
+  'resourceType',
+  'resourceName',
+  'resourceId',
+  'authorEmail',
+  'authorName',
+  'accountId',
+  'userIp',
+  'userAgent',
+  'remotePort',
+  'comment',
+  'uuid'
+])
+
 const orderingToOrderBy = (ordering) => {
   const value = normalizeOrdering(ordering)
   const isDesc = value.startsWith('-')
   const field = isDesc ? value.slice(1) : value
-  if (!field) return ['ts_DESC']
+  if (!field || !ALLOWED_ORDERING_FIELDS.has(field)) return ['ts_DESC']
 
   const suffix = isDesc ? 'DESC' : 'ASC'
   return [`${field}_${suffix}`]

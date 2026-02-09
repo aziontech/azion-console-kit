@@ -55,21 +55,38 @@
   const sortField = ref('date')
   const sortOrder = ref(-1)
 
+  const SORT_FIELD_MAP = {
+    date: 'ts',
+    operation: 'type',
+    resourceType: 'resourceType',
+    resourceName: 'resourceName',
+    resourceId: 'resourceId',
+    authorEmail: 'authorEmail',
+    authorIp: 'userIp',
+    authorName: 'authorName',
+    accountId: 'accountId',
+    userAgent: 'userAgent',
+    remotePort: 'remotePort',
+    comment: 'comment',
+    uuid: 'uuid'
+  }
+
   const ordering = computed(() => {
     if (!sortField.value) return null
-    const apiField = sortField.value === 'date' ? 'ts' : sortField.value
+    const apiField = SORT_FIELD_MAP[sortField.value] || null
+    if (!apiField) return null
     return sortOrder.value === -1 ? `-${apiField}` : apiField
   })
 
   const allColumns = ref([
-    { field: 'date', header: 'Date', visible: true },
-    { field: 'operation', header: 'Operation', visible: true },
-    { field: 'resourceType', header: 'Resource', visible: true },
-    { field: 'resourceName', header: 'Resource Name', visible: true },
+    { field: 'date', header: 'Date', visible: true, sortable: true },
+    { field: 'operation', header: 'Operation', visible: true, sortable: true },
+    { field: 'resourceType', header: 'Resource', visible: true, sortable: true },
+    { field: 'resourceName', header: 'Resource Name', visible: true, sortable: true },
     // I am leaving the code commented out because the API does not yet provide this data.
     // { field: 'resourceItem', header: 'Resource Item', visible: true },
     // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
-    { field: 'authorEmail', header: 'Author Email', visible: true },
+    { field: 'authorEmail', header: 'Author Email', visible: true, sortable: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },
     { field: 'accountId', header: 'Account ID', visible: false },
@@ -296,7 +313,7 @@
       :key="col.field"
       :field="col.field"
       :header="col.header"
-      :sortable="col.field === 'date'"
+      :sortable="!!col.sortable"
       :style="getColumnStyle(col.field)"
     >
       <template #body="{ data: rowData }">
