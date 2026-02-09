@@ -62,14 +62,18 @@
   })
 
   watch(currentTheme, (theme) => {
-    themeApply({
-      HTMLElement: document.querySelector(':root'),
-      theme: theme
-    })
+    themeApply(theme)
   })
 
   watch(account, () => {
     updateTrackingTraits()
+  })
+
+  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)')
+  prefersDarkScheme.addEventListener('change', (event) => {
+    if (currentTheme.value === 'system') {
+      themeApply(event.matches ? 'dark' : 'light')
+    }
   })
 </script>
 

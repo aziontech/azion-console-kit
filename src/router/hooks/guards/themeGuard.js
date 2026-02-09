@@ -9,8 +9,5 @@ export async function themeGuard() {
 
   themeStore.setTheme(currentTheme)
 
-  themeApply({
-    HTMLElement: document.querySelector(':root'),
-    theme: currentTheme
-  })
+  themeApply(currentTheme)
 }
