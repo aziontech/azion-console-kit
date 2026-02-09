@@ -79,6 +79,7 @@ describe('ActivityHistoryServices', () => {
         { key: 'authorName', value: fixtures.activityHistory.authorName },
         { key: 'comment', value: fixtures.activityHistory.comment },
         { key: 'title', value: fixtures.activityHistory.title },
+        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
         { key: 'type', value: fixtures.activityHistory.type },
         { key: 'userId', value: fixtures.activityHistory.userId }
       ],

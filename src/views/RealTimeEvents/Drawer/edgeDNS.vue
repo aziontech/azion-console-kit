@@ -45,17 +45,9 @@
     }
   )
 
-  const tags = computed(() => {
-    if (details.value.level) {
-      return [
-        {
-          text: details.value.level.content,
-          severity: details.value.level.severity,
-          icon: details.value.level.icon
-        }
-      ]
-    }
-    return []
+  const title = computed(() => {
+    if (!details.value.qtype) return 'More Details'
+    return `More Details: Q Type - ${details.value.qtype}`
   })
 
   defineExpose({
@@ -66,17 +58,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="`Q Type - ${details.qtype}`"
-          :date="details.ts"
-          :tags="tags"
-          :loading="loading"
-          hideDivider
-        />
         <TabView
           class="w-full h-full"
           v-if="!loading"

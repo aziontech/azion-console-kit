@@ -4,6 +4,8 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
 
@@ -72,6 +74,6 @@ const adaptResponse = (response) => {
     scheme: imagesProcessedEvents.scheme?.toUpperCase(),
     host: imagesProcessedEvents.host,
     ts: getCurrentTimezone(imagesProcessedEvents.ts),
-    data: buildSummary(imagesProcessedEvents)
+    data: buildSummary(imagesProcessedEvents, false, shouldShowTsColumn)
   }
 }
