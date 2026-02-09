@@ -14,6 +14,7 @@
           @keydown.enter.prevent="confirmSelection"
           @keydown.esc.prevent="showSuggestionsFocusInput = false"
           @keydown.ctrl.space.prevent="openSuggestions"
+          @keydown.meta.space.prevent="openSuggestions"
           @external-link="handleExternalLink"
           @search="handleSearch"
           :handleQuery="handleQuery"
@@ -190,15 +191,18 @@
   }
 
   const openSuggestions = () => {
-    handleQuery()
+    handleQuery({ useCursorOffset: true })
     if (filteredSuggestions.value.length) {
       showSuggestionsFocusInput.value = true
     }
   }
 
-  const handleQuery = () => {
+  const handleQuery = ({ useCursorOffset = false } = {}) => {
+    const cursorOffset = useCursorOffset ? editable.value?.getCursorOffset?.() : null
+    const queryForMatch =
+      typeof cursorOffset === 'number' ? query.value?.slice(0, cursorOffset) : query.value
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
-      query.value,
+      queryForMatch,
       suggestionsData.value
     )
     changeCurrentStep(handleInputMaching.operator)
