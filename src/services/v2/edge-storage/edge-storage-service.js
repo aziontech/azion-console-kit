@@ -16,7 +16,7 @@ export class EdgeStorageService extends BaseService {
       params: {
         search: '',
         fields: '',
-        ordering: 'name',
+        ordering: '-last_modified',
         page: 1,
         pageSize: 10,
         ...params
@@ -26,9 +26,15 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
 
-  prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.edgeStorage.buckets.list({}), () =>
-      this.#fetchBucketsList()
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      ordering: '-last_modified',
+      fields: ['name', 'size', 'last_editor', 'last_modified', 'workloads_access']
+    }
+    return this.usePrefetchQuery(queryKeys.edgeStorage.buckets.list(defaultParams), () =>
+      this.#fetchBucketsList(defaultParams)
     )
   }
 
@@ -37,8 +43,8 @@ export class EdgeStorageService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeStorage.buckets.list(),
-      () => this.#fetchBucketsList(),
+      queryKeys.edgeStorage.buckets.list(params),
+      () => this.#fetchBucketsList(params),
       {
         persist: firstPage && !skipCache,
         skipCache

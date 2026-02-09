@@ -44,8 +44,25 @@ export class DataStreamService extends BaseService {
     }
   }
 
-  prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.dataStream.list({}), () => this.#fetchDataStreamList())
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      ordering: '-last_modified',
+      fields: [
+        'id',
+        'name',
+        'active',
+        'outputs',
+        'transform',
+        'inputs',
+        'last_editor',
+        'last_modified'
+      ]
+    }
+    return this.usePrefetchQuery(queryKeys.dataStream.list(defaultParams), () =>
+      this.#fetchDataStreamList(defaultParams)
+    )
   }
 
   listDataStreamService = async (params = { pageSize: 10 }) => {
@@ -53,8 +70,8 @@ export class DataStreamService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.dataStream.list(),
-      () => this.#fetchDataStreamList(),
+      queryKeys.dataStream.list(params),
+      () => this.#fetchDataStreamList(params),
       {
         persist: firstPage && !skipCache,
         skipCache

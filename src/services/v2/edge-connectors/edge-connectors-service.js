@@ -25,9 +25,15 @@ export class EdgeConnectorsService extends BaseService {
     }
   }
 
-  prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.edgeConnectors.list({}), () =>
-      this.#fetchConnectorsList()
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeConnectors.list(defaultParams), () =>
+      this.#fetchConnectorsList(defaultParams)
     )
   }
 
@@ -36,8 +42,8 @@ export class EdgeConnectorsService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeConnectors.list(),
-      () => this.#fetchConnectorsList(),
+      queryKeys.edgeConnectors.list(params),
+      () => this.#fetchConnectorsList(params),
       {
         persist: firstPage && !skipCache,
         skipCache

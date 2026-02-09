@@ -15,6 +15,8 @@ import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
 import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
+import { wafService } from '@/services/v2/waf/waf-service'
+import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -55,11 +57,13 @@ const prefetchInBackground = async () => {
   Promise.allSettled([
     variablesService.prefetchList(),
     marketplaceService.prefetchMarketplace(),
-    edgeStorageService.prefetchList(),
-    edgeDNSService.prefetchList(),
-    edgeFunctionService.prefetchList(),
-    edgeConnectorsService.prefetchList(),
-    dataStreamService.prefetchList()
+    edgeStorageService.prefetchList(pageSize),
+    edgeDNSService.prefetchList(pageSize),
+    edgeFunctionService.prefetchList(pageSize),
+    edgeConnectorsService.prefetchList(pageSize),
+    dataStreamService.prefetchList(pageSize),
+    wafService.prefetchList(pageSize),
+    edgeSQLService.prefetchList(pageSize)
   ])
 }
 

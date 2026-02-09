@@ -29,18 +29,30 @@ export class EdgeDNSService extends BaseService {
     }
   }
 
-  prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.edgeDNS.list({}), () => this.#fetchDNSList())
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'domain', 'active', 'last_modified'],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeDNS.list(defaultParams), () =>
+      this.#fetchDNSList(defaultParams)
+    )
   }
 
   listEdgeDNSService = async (params = { pageSize: 10, fields: [] }) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
-    return await this.useEnsureQueryData(queryKeys.edgeDNS.list(), () => this.#fetchDNSList(), {
-      persist: firstPage && !skipCache,
-      skipCache
-    })
+    return await this.useEnsureQueryData(
+      queryKeys.edgeDNS.list(params),
+      () => this.#fetchDNSList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   loadEdgeDNSService = async ({ id, params = { fields: [] } }) => {

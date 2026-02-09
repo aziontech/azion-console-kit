@@ -92,7 +92,9 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
-  #fetchFunctionsList = async (params = { pageSize: 100, fields: [] }) => {
+  #fetchFunctionsList = async (
+    params = { pageSize: 100, fields: [], ordering: '-last_modified' }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(),
@@ -110,7 +112,14 @@ export class EdgeFunctionService extends BaseService {
   }
 
   prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.edgeFunction.list({}), () => this.#fetchFunctionsList())
+    const defaultParams = {
+      pageSize: 100,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeFunction.list(defaultParams), () =>
+      this.#fetchFunctionsList(defaultParams)
+    )
   }
 
   listEdgeFunctionsService = async (params = { pageSize: 100, fields: [] }) => {
@@ -119,7 +128,7 @@ export class EdgeFunctionService extends BaseService {
 
     return await this.useEnsureQueryData(
       queryKeys.edgeFunction.list(),
-      () => this.#fetchFunctionsList(),
+      () => this.#fetchFunctionsList(params),
       {
         persist: firstPage && !skipCache,
         skipCache

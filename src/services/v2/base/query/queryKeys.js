@@ -195,5 +195,20 @@ export const queryKeys = {
     all: ['edge-connectors'],
     list: (params) => [...queryKeys.edgeConnectors.all, 'list', params],
     detail: (id) => [...queryKeys.edgeConnectors.all, 'detail', id]
+  },
+  teamPermission: {
+    all: ['team-permissions'],
+    list: (params) => [...queryKeys.teamPermission.all, 'list', params],
+    detail: (id) => [...queryKeys.teamPermission.all, 'detail', id]
+  },
+  waf: {
+    all: ['waf-rules'],
+    list: (params) => [...queryKeys.waf.all, 'list', params],
+    detail: (id) => [...queryKeys.waf.all, 'detail', id]
+  },
+  edgeSql: {
+    all: ['edge-sql'],
+    list: (params) => [...queryKeys.edgeSql.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
   }
 }
