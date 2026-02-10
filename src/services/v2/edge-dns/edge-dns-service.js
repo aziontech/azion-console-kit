@@ -33,12 +33,29 @@ export class EdgeDNSService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: ['id', 'name', 'domain', 'active', 'last_modified'],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeDNS.list(defaultParams), () =>
       this.#fetchDNSList(defaultParams)
     )
+  }
+
+  getZoneFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.edgeDNS.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        ...item,
+        name: item.name?.text ?? item.name,
+        domain: item.domain?.content ?? item.domain,
+        isActive: item.active?.content === 'Active',
+        nameservers: item.nameservers,
+        productVersion: item.productVersion
+      })
+    })
   }
 
   listEdgeDNSService = async (params = { pageSize: 10, fields: [] }) => {
@@ -65,13 +82,21 @@ export class EdgeDNSService extends BaseService {
     return this.adapter?.transformLoadEdgeDNS?.(response.data, params.fields)
   }
 
-  loadEdgeDNSZoneDNSSEC = async (DNSZoneID, params = { fields: [] }) => {
+  #fetchDNSSEC = async (DNSZoneID, params = { fields: [] }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(`/${DNSZoneID}/dnssec`)
     })
 
     return this.adapter?.transformLoadEdgeDNSSEC?.(data.data, params.fields)
+  }
+
+  loadEdgeDNSZoneDNSSEC = async (DNSZoneID, params = { fields: [] }) => {
+    return await this.useEnsureQueryData(
+      queryKeys.edgeDNS.dnssec(DNSZoneID),
+      () => this.#fetchDNSSEC(DNSZoneID, params),
+      { persist: false }
+    )
   }
 
   createEdgeDNSZoneDNSSEC = async (DNSZoneID, enableDNSSEC = true) => {

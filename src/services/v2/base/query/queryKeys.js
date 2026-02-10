@@ -168,7 +168,13 @@ export const queryKeys = {
   edgeDNS: {
     all: ['edge-dns'],
     list: (params) => [...queryKeys.edgeDNS.all, 'list', params],
-    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id]
+    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id],
+    dnssec: (id) => [...queryKeys.edgeDNS.detail(id), 'dnssec'],
+    records: {
+      all: (parentId) => [...queryKeys.edgeDNS.detail(parentId), 'records'],
+      list: (parentId, params) => [...queryKeys.edgeDNS.detail(parentId), 'records', 'list', params],
+      detail: (parentId, id) => [...queryKeys.edgeDNS.detail(parentId), 'records', 'detail', id]
+    }
   },
   edgeStorage: {
     all: ['edge-storage'],
