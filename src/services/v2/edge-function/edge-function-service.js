@@ -126,10 +126,10 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
-  prefetchList = () => {
+  prefetchList = (pageSize = 10) => {
     const defaultParams = {
       page: 1,
-      pageSize: 10,
+      pageSize,
       fields: [
         'id',
         'name',
