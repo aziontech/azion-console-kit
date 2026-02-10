@@ -15,7 +15,7 @@
     },
     runtime: {
       type: String,
-      default: 'jaFvascript',
+      default: 'javascript',
       validator: (value) => {
         return ['javascript', 'json', 'lua'].includes(value)
       }
