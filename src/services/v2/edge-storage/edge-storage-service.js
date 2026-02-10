@@ -219,7 +219,9 @@ export class EdgeStorageService extends BaseService {
           filter: {
             tsGte: "${tsGte}"
             tsLt: "${tsLt}"
-          }
+          },
+          limit: 1000,
+          offset: 0
         ) {
           bucketName
           storedGb
