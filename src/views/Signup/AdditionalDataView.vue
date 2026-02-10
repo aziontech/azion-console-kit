@@ -63,7 +63,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import { LottieAnimation } from 'lottie-web-vue'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import AdditionalDataAnimationDark from '@/assets/animations/additional-data-dark.json'
   import AdditionalDataAnimationLight from '@/assets/animations/additional-data-light.json'
@@ -82,7 +82,7 @@
     return additionalDataRef.value?.hasFormValues ? 'w-auto' : 'w-full'
   })
 
-  const { currentTheme } = storeToRefs(useAccountStore())
+  const { currentTheme } = storeToRefs(useThemeStore())
 
   const isAnimationDark = computed(() => {
     const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
