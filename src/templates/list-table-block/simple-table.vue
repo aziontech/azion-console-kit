@@ -51,6 +51,7 @@
 
   const router = useRouter()
   const menuRefs = ref({})
+  const isHoverFooter = ref(false)
 
   const displayData = computed(() => {
     if (props.loading) {
@@ -165,8 +166,13 @@
         class="flex justify-center items-center py-3 cursor-pointer bg-[var(--surface-section)] border-t border-[var(--surface-border)]"
         @click="handleViewAllClick"
         data-testid="resources-table-view-all"
+        @mouseover="isHoverFooter = true"
+        @mouseout="isHoverFooter = false"
       >
-        <span class="text-xs font-normal text-[var(--text-color-link)]">
+        <span
+          class="text-xs font-normal text-[var(--text-color-link)]"
+          :class="{ underline: isHoverFooter }"
+        >
           {{ viewAllLabel }}
         </span>
       </div>
