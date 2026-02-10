@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeDNSRecordsAdapter } from './edge-dns-records-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class EdgeDNSRecordsService extends BaseService {
   constructor() {
     super()
@@ -11,7 +12,7 @@ export class EdgeDNSRecordsService extends BaseService {
     return `${this.baseURL}${suffix}`
   }
 
-  listRecords = async (zoneId, params = { pageSize: 10, fields: [] }) => {
+  #fetchRecordsList = async (zoneId, params = { pageSize: 10, fields: [] }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(`/${zoneId}/records`),
@@ -26,6 +27,30 @@ export class EdgeDNSRecordsService extends BaseService {
       count,
       body: transformed
     }
+  }
+
+  prefetchRecordsList = async (zoneId, pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: 'id'
+    }
+    return await this.useEnsureQueryData(
+      queryKeys.edgeDNS.records.list(zoneId, defaultParams),
+      () => this.#fetchRecordsList(zoneId, defaultParams),
+      { persist: false }
+    )
+  }
+
+  listRecords = async (zoneId, params = { pageSize: 10, fields: [] }) => {
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeDNS.records.list(zoneId, params),
+      () => this.#fetchRecordsList(zoneId, params),
+      { persist: false, skipCache }
+    )
   }
 
   loadRecord = async ({ id, edgeDNSId }, params = { fields: [] }) => {
