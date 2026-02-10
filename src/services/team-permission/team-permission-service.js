@@ -54,8 +54,8 @@ class TeamPermissionService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.teamPermission.list(),
-      () => this.#fetchTeamPermissionList(),
+      queryKeys.teamPermission.list(params),
+      () => this.#fetchTeamPermissionList(params),
       {
         persist: firstPage && !skipCache,
         skipCache

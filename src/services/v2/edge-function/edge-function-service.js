@@ -69,7 +69,7 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
-  listEdgeFunctions = async (params = { pageSize: 100, fields: [] }) => {
+  listEdgeFunctions = async (params = { page: 1, pageSize: 10, fields: [] }) => {
     if (!params.executionEnvironment) return []
 
     const { data } = await this.http.request({
@@ -93,7 +93,22 @@ export class EdgeFunctionService extends BaseService {
   }
 
   #fetchFunctionsList = async (
-    params = { pageSize: 100, fields: [], ordering: '-last_modified' }
+    params = {
+      page: 1,
+      pageSize: 10,
+      fields: [
+        'id',
+        'name',
+        'active',
+        'runtime',
+        'vendor',
+        'execution_environment',
+        'reference_count',
+        'last_editor',
+        'last_modified'
+      ],
+      ordering: '-last_modified'
+    }
   ) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -113,8 +128,19 @@ export class EdgeFunctionService extends BaseService {
 
   prefetchList = () => {
     const defaultParams = {
-      pageSize: 100,
-      fields: [],
+      page: 1,
+      pageSize: 10,
+      fields: [
+        'id',
+        'name',
+        'active',
+        'runtime',
+        'vendor',
+        'execution_environment',
+        'reference_count',
+        'last_editor',
+        'last_modified'
+      ],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeFunction.list(defaultParams), () =>
@@ -122,12 +148,29 @@ export class EdgeFunctionService extends BaseService {
     )
   }
 
-  listEdgeFunctionsService = async (params = { pageSize: 100, fields: [] }) => {
+  listEdgeFunctionsService = async (
+    params = {
+      page: 1,
+      pageSize: 10,
+      fields: [
+        'id',
+        'name',
+        'active',
+        'runtime',
+        'vendor',
+        'execution_environment',
+        'reference_count',
+        'last_editor',
+        'last_modified'
+      ],
+      ordering: '-last_modified'
+    }
+  ) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeFunction.list(),
+      queryKeys.edgeFunction.list(params),
       () => this.#fetchFunctionsList(params),
       {
         persist: firstPage && !skipCache,
