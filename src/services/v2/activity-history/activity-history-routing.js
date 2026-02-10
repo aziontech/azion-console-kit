@@ -59,16 +59,6 @@ const ROUTE_MAP = {
   Certificate: { edit: 'edit-digital-certificates', list: 'list-digital-certificates' },
   DataStream: { edit: 'edit-data-stream', list: 'list-data-stream' },
   Firewall: { edit: 'edit-firewall', list: 'list-firewalls' },
-  FirewallRuleEngine: {
-    edit: 'edit-firewall',
-    list: 'list-firewall-rule-engine',
-    params: { tab: 'rulesEngine' }
-  },
-  FirewallFunctionInstance: {
-    edit: 'edit-firewall',
-    list: 'list-firewall-function-instance',
-    params: { tab: 'functions' }
-  },
   'DNS Record': { edit: 'edge-dns-records', list: 'list-dns-records' },
   'DNS DNSSec': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
   'DNS Zone': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
