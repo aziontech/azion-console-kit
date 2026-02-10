@@ -14,15 +14,21 @@ const getInitialTheme = () => {
 export const useThemeStore = defineStore({
   id: 'theme',
   state: () => ({
-    theme: getInitialTheme()
+    theme: getInitialTheme(),
+    resolved: getInitialTheme()
   }),
   getters: {
-    currentTheme: (state) => state.theme
+    currentTheme: (state) => state.theme,
+    resolvedTheme: (state) => state.resolved
   },
   actions: {
     setTheme(theme) {
       this.theme = theme
+      this.resolved = theme === 'system' ? getSystemTheme() : theme
       localStorage.setItem('theme', theme)
+    },
+    setResolvedTheme(theme) {
+      this.resolved = theme === 'system' ? getSystemTheme() : theme
     }
   }
 })

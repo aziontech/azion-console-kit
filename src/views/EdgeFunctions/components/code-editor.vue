@@ -1,19 +1,3 @@
-<template>
-  <vue-monaco-editor
-    v-model:value="code"
-    :language="runtime"
-    :theme="theme"
-    class="w-full min-h-[390px] h-full border surface-border border-r rounded-md"
-    :class="{
-      'border-transparent': !errors,
-      '!border-red-500 border h-[calc(100%-1.5rem)]': errors,
-      'cursor-not-allowed': EDITOR_OPTIONS.readOnly
-    }"
-    :options="EDITOR_OPTIONS"
-    @change="emit('update:modelValue', $event)"
-  />
-</template>
-
 <script setup>
   import { watch, computed, ref } from 'vue'
   import { useThemeStore } from '@/stores/theme'
@@ -31,17 +15,12 @@
     },
     runtime: {
       type: String,
-      default: 'javascript',
+      default: 'jaFvascript',
       validator: (value) => {
         return ['javascript', 'json', 'lua'].includes(value)
       }
     },
     errors: Boolean
-  })
-
-  const store = useThemeStore()
-  const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
   const code = ref(props.initialValue)
@@ -52,13 +31,33 @@
     readOnly: props.readOnly
   })
 
+  const store = useThemeStore()
+  const theme = computed(() => {
+    return store.resolvedTheme === 'light' ? 'vs' : 'vs-dark'
+  })
+
   watch(
     () => props.modelValue,
     (modelValue) => (code.value = modelValue)
   )
-
   watch(
     () => props.readOnly,
     (value) => (EDITOR_OPTIONS.value.readOnly = value)
   )
 </script>
+
+<template>
+  <vue-monaco-editor
+    v-model:value="code"
+    :language="runtime"
+    :theme="theme"
+    class="w-full min-h-[390px] h-full border surface-border border-r rounded-md"
+    :class="{
+      'border-transparent': !errors,
+      '!border-red-500 border h-[calc(100%-1.5rem)]': errors,
+      'cursor-not-allowed': EDITOR_OPTIONS.readOnly
+    }"
+    :options="EDITOR_OPTIONS"
+    @change="emit('update:modelValue', $event)"
+  />
+</template>

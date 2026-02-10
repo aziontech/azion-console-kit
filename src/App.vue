@@ -22,16 +22,6 @@
 
   const route = useRoute()
 
-  watch(
-    () => route,
-    (to) => {
-      const hasId = to.params.id
-      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
-      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
-    },
-    { immediate: true, deep: true }
-  )
-
   const updateTrackingTraits = () => {
     const {
       user_id: userID,
@@ -69,10 +59,22 @@
     updateTrackingTraits()
   })
 
+  watch(
+    () => route,
+    (to) => {
+      const hasId = to.params.id
+      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
+      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
+    },
+    { immediate: true, deep: true }
+  )
+
   window.matchMedia(DARK_SCHEME_QUERY).addEventListener('change', (event) => {
     if (currentTheme.value === 'system') {
       themeApply(event.matches ? 'dark' : 'light')
     }
+
+    themeStore.setResolvedTheme(currentTheme.value)
   })
 </script>
 
