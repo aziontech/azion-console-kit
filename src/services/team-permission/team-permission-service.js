@@ -43,9 +43,15 @@ class TeamPermissionService extends BaseService {
     }
   }
 
-  prefetchList = () => {
-    return this.usePrefetchQuery(queryKeys.teamPermission.list({}), () =>
-      this.#fetchTeamPermissionList()
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      ordering: 'name',
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'permissions', 'is_active']
+    }
+    return this.usePrefetchQuery(queryKeys.teamPermission.list(defaultParams), () =>
+      this.#fetchTeamPermissionList(defaultParams)
     )
   }
 

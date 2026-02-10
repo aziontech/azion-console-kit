@@ -17,6 +17,7 @@ import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connec
 import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 import { wafService } from '@/services/v2/waf/waf-service'
 import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
+import { teamPermissionService } from '@/services/team-permission/team-permission-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -63,7 +64,8 @@ const prefetchInBackground = async () => {
     edgeConnectorsService.prefetchList(pageSize),
     dataStreamService.prefetchList(pageSize),
     wafService.prefetchList(pageSize),
-    edgeSQLService.prefetchList(pageSize)
+    edgeSQLService.prefetchList(pageSize),
+    teamPermissionService.prefetchList(pageSize)
   ])
 }
 
