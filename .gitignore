@@ -21,9 +21,6 @@ package-lock.json
 /cypress/screenshots/
 
 # Editor directories and files
-.vscode/*
-.windsurf/*
-!.vscode/extensions.json
 .idea
 *.suo
 *.ntvs*
