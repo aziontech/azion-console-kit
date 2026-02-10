@@ -343,7 +343,7 @@
   const toast = useToast()
   const loadingStore = useLoadingStore()
 
-  const initialData = marketplaceService.getFromCache({
+  const initialData = marketplaceService.getSolutionFromCache({
     vendor: route.params.vendor,
     solution: route.params.solution
   })

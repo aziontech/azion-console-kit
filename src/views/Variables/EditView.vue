@@ -17,7 +17,7 @@
   const breadcrumbs = useBreadcrumbs()
   const variableName = ref('Edit Variable')
 
-  const cachedVariable = variablesService.getFromCache(route.params?.id) ?? {}
+  const cachedVariable = variablesService.getVariableFromCache(route.params?.id) ?? {}
 
   const setVariableName = (variable) => {
     variableName.value = variable.key

@@ -337,6 +337,40 @@ export class WorkloadService extends BaseService {
 
     return `Workload successfully deleted.`
   }
+
+  getWorkloadFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
+      }),
+      listPath: 'body'
+    })
+  }
+
+  getDomainFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        active: item.active?.content === 'Active',
+        domainName: item.workloadHostname?.content,
+        environment: item.infrastructure === 'Production' ? 'production' : 'staging',
+        cnames: item.domains.join('\n') || ''
+      }),
+      listPath: 'body'
+    })
+  }
 }
 
 export const workloadService = new WorkloadService()

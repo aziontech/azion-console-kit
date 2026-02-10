@@ -12,6 +12,7 @@
         :loadService="workloadService.loadWorkload"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        :initialValues="cachedWorkload"
         @loaded-service-object="setWorkloadName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
@@ -54,6 +55,13 @@
     updatedRedirect: { type: String, required: true }
   })
 
+  const cachedWorkload = workloadService.getWorkloadFromCache(route.params.id) ?? {}
+  const workloadName = ref(cachedWorkload?.name)
+
+  if (cachedWorkload?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedWorkload.name)
+  }
+
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
       productName: 'Workload'
@@ -71,8 +79,6 @@
       })
       .track()
   }
-
-  const workloadName = ref()
 
   const setWorkloadName = async (workload) => {
     workloadName.value = workload.name
