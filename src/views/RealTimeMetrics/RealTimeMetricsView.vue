@@ -124,11 +124,73 @@
     tsRange: {
       tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
       tsRangeEnd: new Date(),
-      label: 'Last 5 minutes'
+      label: 'Last 5 minutes',
+      autoRefresh: {
+        enabled: false,
+        every: 10,
+        unit: 'seconds'
+      }
     },
     fields: [],
     dataset: ''
   })
+
+  const autoRefreshTimeoutId = ref(null)
+  const autoRefreshInFlight = ref(false)
+
+  const clearAutoRefreshTimer = () => {
+    if (!autoRefreshTimeoutId.value) return
+    clearTimeout(autoRefreshTimeoutId.value)
+    autoRefreshTimeoutId.value = null
+  }
+
+  const getAutoRefreshIntervalMs = () => {
+    const cfg = advancedFilterModel.value?.tsRange?.autoRefresh
+    if (!cfg?.enabled) return null
+
+    const every = Number(cfg.every)
+    if (!Number.isFinite(every) || every < 1) return null
+
+    const unit = String(cfg.unit || '')
+      .toLowerCase()
+      .trim()
+    switch (unit) {
+      case 'seconds':
+        return every * 1000
+      case 'minutes':
+        return every * 60 * 1000
+      case 'hours':
+        return every * 60 * 60 * 1000
+      default:
+        return null
+    }
+  }
+
+  const scheduleAutoRefresh = () => {
+    clearAutoRefreshTimer()
+
+    const intervalMs = getAutoRefreshIntervalMs()
+    if (!intervalMs) return
+
+    autoRefreshTimeoutId.value = setTimeout(async () => {
+      try {
+        if (autoRefreshInFlight.value) {
+          scheduleAutoRefresh()
+          return
+        }
+
+        autoRefreshInFlight.value = true
+        await applyAdvancedFilter()
+      } finally {
+        autoRefreshInFlight.value = false
+        scheduleAutoRefresh()
+      }
+    }, intervalMs)
+  }
+
+  const restartAutoRefresh = () => {
+    scheduleAutoRefresh()
+  }
 
   const updateGroupData = (data) => {
     groupData.value = { ...data }
@@ -367,7 +429,25 @@
     })
 
     await loadCurrentReports(userUTC)
+
+    restartAutoRefresh()
   }
+
+  const autoRefreshConfigKey = computed(() => {
+    const cfg = advancedFilterModel.value?.tsRange?.autoRefresh
+    return JSON.stringify({
+      enabled: Boolean(cfg?.enabled),
+      every: cfg?.every,
+      unit: cfg?.unit,
+      tsRangeBegin: advancedFilterModel.value?.tsRange?.tsRangeBegin,
+      tsRangeEnd: advancedFilterModel.value?.tsRange?.tsRangeEnd,
+      fields: advancedFilterModel.value?.fields
+    })
+  })
+
+  watch(autoRefreshConfigKey, () => {
+    restartAutoRefresh()
+  })
 
   watch(currentInfo, () => {
     const eventName = 'Clicked to View Real-Time Metrics'
@@ -382,6 +462,7 @@
   })
 
   onUnmounted(() => {
+    clearAutoRefreshTimer()
     groupObservable.unsubscribe(updateGroupData)
     filterObservable.unsubscribe(updateFilterData)
     reportObservable.unsubscribe(updateReportData)

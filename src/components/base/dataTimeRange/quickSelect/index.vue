@@ -58,6 +58,31 @@
         </PrimeButton>
       </div>
     </div>
+
+    <div class="mt-4 pt-4 border-t border-[var(--surface-border)]">
+      <div class="flex gap-3 justify-between">
+        <div class="flex align-center items-center gap-3">
+          <InputSwitch v-model="autoRefreshEnabled" id="autoRefreshEnabled" />
+          <label for="autoRefreshEnabled" class="text-sm font-medium leading-5 text-color">Refresh Every</label>
+        </div>
+        <div class="flex gap-2 items-center">
+          <InputNumber
+            v-model="autoRefreshEvery"
+            :min="1"
+            :disabled="!autoRefreshEnabled"
+            :pt="{ input: { class: 'w-16' } }"
+            showButtons
+          />
+          <Dropdown
+            v-model="autoRefreshUnit"
+            :options="AUTO_REFRESH_UNITS"
+            optionLabel="label"
+            optionValue="value"
+            :disabled="!autoRefreshEnabled"
+          />
+        </div>
+      </div>
+    </div>
   </template>
 </template>
 
@@ -66,6 +91,7 @@
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
+  import InputSwitch from 'primevue/inputswitch'
   import {
     createRelativeRange,
     createStartOfDay,
@@ -103,6 +129,16 @@
   const quickSelectDirection = ref('last')
   const quickSelectValue = ref(15)
   const quickSelectUnit = ref('minutes')
+
+  const AUTO_REFRESH_UNITS = [
+    { label: 'Seconds', value: 'seconds' },
+    { label: 'Minutes', value: 'minutes' },
+    { label: 'Hours', value: 'hours' }
+  ]
+
+  const autoRefreshEnabled = ref(false)
+  const autoRefreshEvery = ref(10)
+  const autoRefreshUnit = ref('seconds')
 
   const normalizeUnit = (unit) => {
     if (!unit) return null
@@ -160,6 +196,15 @@
     quickSelectDirection.value = step.direction
     quickSelectValue.value = step.value
     quickSelectUnit.value = step.unit
+
+    const autoRefresh = model.value?.autoRefresh
+    autoRefreshEnabled.value = Boolean(autoRefresh?.enabled)
+    if (Number.isFinite(autoRefresh?.every) && Number(autoRefresh.every) >= 1) {
+      autoRefreshEvery.value = Number(autoRefresh.every)
+    }
+    if (typeof autoRefresh?.unit === 'string') {
+      autoRefreshUnit.value = autoRefresh.unit
+    }
   }
 
   const syncModelQuickFromFields = () => {
@@ -169,6 +214,11 @@
         value: quickSelectValue.value,
         unit: quickSelectUnit.value,
         direction: quickSelectDirection.value
+      },
+      autoRefresh: {
+        enabled: autoRefreshEnabled.value,
+        every: autoRefreshEvery.value,
+        unit: autoRefreshUnit.value
       }
     }
   }
@@ -193,6 +243,11 @@
     syncModelQuickFromFields()
   })
 
+  watch([autoRefreshEnabled, autoRefreshEvery, autoRefreshUnit], () => {
+    if (!props.panelOnly) return
+    syncModelQuickFromFields()
+  })
+
   const applyQuickSelect = () => {
     const now = new Date()
     const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
@@ -201,6 +256,8 @@
       quickSelectDirection.value,
       now
     )
+
+    const preservedAutoRefresh = model.value?.autoRefresh
 
     model.value = {
       startDate: newStartDate,
@@ -212,7 +269,8 @@
         value: quickSelectValue.value,
         unit: quickSelectUnit.value,
         direction: quickSelectDirection.value
-      }
+      },
+      autoRefresh: preservedAutoRefresh
     }
     emit('select', model.value)
     emit('close')
@@ -316,12 +374,15 @@
         return
     }
 
+    const preservedAutoRefresh = model.value?.autoRefresh
+
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
       label: range.label,
       labelStart: '',
-      labelEnd: ''
+      labelEnd: '',
+      autoRefresh: preservedAutoRefresh
     }
 
     emit('select', model.value)

@@ -140,6 +140,10 @@
       tsRangeBegin,
       tsRangeEnd
     }
+
+    if (filterDataRange.value?.autoRefresh) {
+      filterData.value.tsRange.autoRefresh = { ...filterDataRange.value.autoRefresh }
+    }
   }
 
   const applyFilters = () => {
@@ -212,7 +216,8 @@
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
       label: filterData.value.tsRange.label || '',
-      utcOffset: userUTC
+      utcOffset: userUTC,
+      autoRefresh: filterData.value.tsRange.autoRefresh
     }
 
     hasPendingDateUpdate.value = false
