@@ -3,7 +3,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import { computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-edge-service' })
 
@@ -23,7 +23,7 @@
     formatOnPaste: true
   }
 
-  const store = useAccountStore()
+  const store = useThemeStore()
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })

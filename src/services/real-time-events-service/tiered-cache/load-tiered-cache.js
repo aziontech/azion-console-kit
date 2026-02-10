@@ -4,6 +4,8 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 export const loadTieredCache = async (filter) => {
   const payload = adapt(filter)
 
@@ -79,6 +81,6 @@ const adaptResponse = (response) => {
     proxyHost: l2CacheEvents.proxyHost,
     ts: getCurrentTimezone(l2CacheEvents.ts),
     serverProtocol: l2CacheEvents.serverProtocol?.toUpperCase(),
-    data: buildSummary(l2CacheEvents)
+    data: buildSummary(l2CacheEvents, false, shouldShowTsColumn)
   }
 }

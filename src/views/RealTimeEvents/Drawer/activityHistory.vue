@@ -46,16 +46,9 @@
     }
   )
 
-  const tags = computed(() => {
-    if (details.value.type) {
-      return [
-        {
-          icon: 'pi pi-replay',
-          text: details.value.type
-        }
-      ]
-    }
-    return []
+  const title = computed(() => {
+    if (!details.value.title) return 'More Details'
+    return `More Details: ${details.value.title}`
   })
 
   defineExpose({
@@ -66,17 +59,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="details.title"
-          :date="details.ts"
-          :tags="tags"
-          :loading="loading"
-          hideDivider
-        />
         <TabView
           class="w-full h-full"
           v-if="!loading"

@@ -339,6 +339,7 @@
 
 <script setup>
   import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
@@ -354,8 +355,9 @@
 
   const { startLoading } = useLoadingStore()
   const accountStore = useAccountStore()
-  const { accountData: user, currentTheme, hasAccessToSSOManagement } = storeToRefs(accountStore)
-  const setTheme = accountStore.setTheme
+  const themeStore = useThemeStore()
+  const { accountData: user, hasAccessToSSOManagement } = storeToRefs(accountStore)
+  const { currentTheme } = storeToRefs(themeStore)
 
   const hasAccessToActivityHistory = computed(() => {
     return user.value.kind === 'client'
@@ -455,7 +457,7 @@
   }
 
   const setSelectedTheme = (theme) => {
-    setTheme(theme)
+    themeStore.setTheme(theme)
   }
 
   const logout = () => {

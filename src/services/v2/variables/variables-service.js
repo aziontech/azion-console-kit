@@ -30,27 +30,20 @@ export class VariablesService extends BaseService {
     })
   }
 
-  getFromCache = (id) => {
+  getVariableFromCache = (id) => {
     if (!id) return undefined
 
-    const listData = this.queryClient.getQueryData(queryKeys.variables.list())
-
-    if (!listData?.body) {
-      return undefined
-    }
-
-    const variable = listData.body.find((item) => String(item.id) === String(id))
-
-    if (!variable) {
-      return undefined
-    }
-
-    return {
-      id: variable.id,
-      key: variable.key,
-      value: variable.value?.content ?? variable.value,
-      secret: variable.value?.isSecret ?? false
-    }
+    return super.getFromCache({
+      cacheKey: 'variables',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        key: item.key,
+        value: item.value?.content ?? item.value,
+        secret: item.value?.isSecret ?? false
+      }),
+      listPath: 'body'
+    })
   }
 
   load = async ({ id }) => {

@@ -4,6 +4,8 @@ import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClient
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 export const loadEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
 
@@ -54,7 +56,7 @@ const adaptResponse = (response) => {
 
   return {
     id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,
-    data: buildSummary(edgeFunctionsEvents),
+    data: buildSummary(edgeFunctionsEvents, false, shouldShowTsColumn),
     functionLanguage: edgeFunctionsEvents.functionLanguage,
     ts: getCurrentTimezone(edgeFunctionsEvents.ts)
   }

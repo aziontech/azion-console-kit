@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
 
@@ -50,7 +53,7 @@ const adaptResponse = (response) => {
     configurationId: imagesProcessedEvents.configurationId,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
     httpReferer: imagesProcessedEvents.httpReferer,
-    summary: buildSummary(imagesProcessedEvents),
+    summary: buildSummary(imagesProcessedEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: imagesProcessedEvents.ts,
     tsFormat: getCurrentTimezone(imagesProcessedEvents.ts)
   }))

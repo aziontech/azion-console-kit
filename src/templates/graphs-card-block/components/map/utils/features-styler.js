@@ -1,13 +1,13 @@
 import { Style, Fill, Stroke } from 'ol/style.js'
 
-import { useAccountStore } from '@/stores/account'
+import { useThemeStore } from '@/stores/theme'
 import { storeToRefs } from 'pinia'
 
 import { VARIATIONS, COMMON_LAYERS_COLORS } from '../constants/color-scheme'
 
 const getCurrentTheme = () => {
-  const accountStore = useAccountStore()
-  const { currentTheme } = storeToRefs(accountStore)
+  const themeStore = useThemeStore()
+  const { currentTheme } = storeToRefs(themeStore)
 
   if (currentTheme.value === 'system') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'

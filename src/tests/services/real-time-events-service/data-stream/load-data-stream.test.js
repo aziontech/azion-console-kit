@@ -81,6 +81,7 @@ describe('DataStreamingServices', () => {
         { key: 'jobName', value: 'jobName' },
         { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
         { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
+        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
         { key: 'url', value: fixtures.dataStreaming.url }
       ]
     })

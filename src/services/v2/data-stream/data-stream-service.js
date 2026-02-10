@@ -1,6 +1,7 @@
 import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DataStreamAdapter } from './data-stream-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DataStreamService extends BaseService {
   constructor() {
@@ -15,7 +16,7 @@ export class DataStreamService extends BaseService {
     return this.adapter?.[method]?.(data) ?? data
   }
 
-  listDataStreamService = async (params = { pageSize: 10 }) => {
+  #fetchDataStreamList = async (params = { pageSize: 10 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -43,6 +44,41 @@ export class DataStreamService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      ordering: '-last_modified',
+      fields: [
+        'id',
+        'name',
+        'active',
+        'outputs',
+        'transform',
+        'inputs',
+        'last_editor',
+        'last_modified'
+      ]
+    }
+    return this.usePrefetchQuery(queryKeys.dataStream.list(defaultParams), () =>
+      this.#fetchDataStreamList(defaultParams)
+    )
+  }
+
+  listDataStreamService = async (params = { pageSize: 10 }) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.dataStream.list(params),
+      () => this.#fetchDataStreamList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   listTemplates = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -63,6 +99,8 @@ export class DataStreamService extends BaseService {
       url: this.baseURL,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.dataStream.all })
 
     return response.data
   }
@@ -122,6 +160,8 @@ export class DataStreamService extends BaseService {
       url: `${this.baseURL}/${payload.id}`,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.dataStream.all })
 
     return 'Your data stream has been updated'
   }
@@ -194,6 +234,8 @@ export class DataStreamService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.dataStream.all })
 
     return 'Data Stream successfully deleted'
   }
