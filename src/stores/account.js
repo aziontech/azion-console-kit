@@ -82,6 +82,15 @@ export const useAccountStore = defineStore({
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     },
+    accountTimezone(state) {
+      return state.account?.timezone
+    },
+    timezoneInfo() {
+      return {
+        timezone: this.accountTimezone,
+        utcOffset: this.accountUtcOffset
+      }
+    },
     ssoSignUpMethod(state) {
       return state.identifySignUpProvider
     },

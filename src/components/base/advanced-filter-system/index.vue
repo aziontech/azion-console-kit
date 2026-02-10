@@ -14,6 +14,7 @@
   const accountStore = useAccountStore()
 
   const userUTC = accountStore.accountUtcOffset
+  const userTimezone = accountStore.accountTimezone
   const emit = defineEmits(['updatedFilter'])
 
   const props = defineProps({
@@ -71,6 +72,8 @@
 
   const updatedTime = () => {
     const now = new Date()
+
+    const selectedUtcOffset = filterDataRange.value?.utcOffset || userUTC
 
     if (
       typeof filterDataRange.value.labelEnd === 'string' &&
@@ -131,7 +134,7 @@
     const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(
       filterDataRange.value.startDate,
       filterDataRange.value.endDate,
-      userUTC
+      selectedUtcOffset
     )
     filterData.value.tsRange = {
       tsRangeBegin,
@@ -208,7 +211,8 @@
     filterDataRange.value = {
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
-      label: filterData.value.tsRange.label || ''
+      label: filterData.value.tsRange.label || '',
+      utcOffset: userUTC
     }
 
     hasPendingDateUpdate.value = false
@@ -251,6 +255,8 @@
           class="max-md:w-full"
           v-model="filterDataRange"
           :maxDays="props.filterDateRangeMaxDays"
+          :defaultUtcOffset="userUTC"
+          :userTimezone="userTimezone"
           @select="onDateRangeSelect"
         />
         <PrimeButton
