@@ -25,7 +25,10 @@
             </span>
             <i
               v-if="hasReachedMaxSelections"
-              v-tooltip.left="{ value: 'You\'ve reached the maximum selection (6 items).', showDelay: 200 }"
+              v-tooltip.left="{
+                value: 'You\'ve reached the maximum selection (6 items).',
+                showDelay: 200
+              }"
               class="pi pi-exclamation-triangle flex justify-center items-center text-yellow-500 cursor-help w-4 h-4 text-base"
             />
           </div>

@@ -4,7 +4,7 @@
     title="Marketplace Trends"
   >
     <template #content>
-      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3">
+      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
         <div class="flex-1 flex flex-col gap-3 animate-pulse">
           <div class="flex gap-2.5 items-center">
             <div class="rounded-md size-6 bg-[var(--surface-200)]"></div>
@@ -21,6 +21,40 @@
         </div>
       </div>
     </template>
+    <template #footer>
+      <div class="flex gap-4 items-center justify-center w-full">
+        <PrimeButton
+          icon="pi pi-chevron-left"
+          text
+          rounded
+          size="small"
+          disabled
+          class="w-8 h-8"
+        />
+
+        <div class="flex gap-1.5 h-full items-center justify-center">
+          <button
+            v-for="index in 3"
+            :key="index"
+            class="w-2 h-2 rounded-full transition-opacity"
+            :class="
+              currentIndex === index
+                ? 'bg-neutral-200'
+                : 'bg-[var(--text-color-secondary)] opacity-40'
+            "
+          />
+        </div>
+
+        <PrimeButton
+          icon="pi pi-chevron-right"
+          text
+          rounded
+          size="small"
+          disabled
+          class="w-8 h-8"
+        />
+      </div>
+    </template>
   </HomeCardBlock>
 
   <HomeCardBlock
@@ -28,7 +62,7 @@
     title="Marketplace Trends"
   >
     <template #content>
-      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3">
+      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
         <div class="flex-1 flex flex-col gap-3">
           <div class="flex flex-col gap-2 w-full">
             <div class="flex gap-2.5 items-center w-full">

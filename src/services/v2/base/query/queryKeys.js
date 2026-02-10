@@ -17,7 +17,8 @@ export const queryKeys = {
   },
   solutions: {
     all: ['solutions'],
-    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type]
+    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type],
+    trending: () => [...queryKeys.solutions.all, 'trending']
   },
   marketplace: {
     all: ['marketplace'],

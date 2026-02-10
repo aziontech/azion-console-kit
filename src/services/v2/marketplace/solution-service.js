@@ -87,22 +87,29 @@ export class SolutionService extends BaseService {
     return parsedSolutions
   }
   async listTrendingSolutions(limit = 3) {
+    const allTrending = await this.useEnsureQueryData(
+      queryKeys.solutions.trending(),
+      () => this.#fetchTrendingSolutions(),
+      { cacheType: this.cacheType.STATIC }
+    )
+    return allTrending.slice(0, limit)
+  }
+
+  async #fetchTrendingSolutions() {
     const response = await this.http.request({
       method: 'GET',
       url: this.baseUrl,
       config: { baseURL: '/api' }
     })
-
-    return this.adaptTrendingResponse(response, limit)
+    return this.adaptTrendingResponse(response)
   }
 
-  adaptTrendingResponse(response, limit) {
+  adaptTrendingResponse(response) {
     const isArray = Array.isArray(response.data)
     if (!isArray || !response.data.length) return []
 
     const trendingSolutions = response.data
       .filter((element) => element.featured)
-      .slice(0, limit)
       .map((element) => ({
         id: `${element.id}`,
         name: element.name,
