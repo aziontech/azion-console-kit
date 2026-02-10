@@ -4,6 +4,7 @@
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
+    :initialValues="props.initialValues"
     @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect

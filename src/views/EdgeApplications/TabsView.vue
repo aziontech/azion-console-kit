@@ -279,6 +279,7 @@
         edgeApplication: edgeApplication.value,
         updatedRedirect: props.edgeApplicationServices.updatedRedirect,
         isTab: true,
+        initialValues: edgeApplication.value,
         contactSalesEdgeApplicationService:
           props.edgeApplicationServices.contactSalesEdgeApplicationService
       })
