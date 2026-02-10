@@ -62,8 +62,15 @@
     <div class="mt-4 pt-4 border-t border-[var(--surface-border)]">
       <div class="flex gap-3 justify-between">
         <div class="flex align-center items-center gap-3">
-          <InputSwitch v-model="autoRefreshEnabled" id="autoRefreshEnabled" />
-          <label for="autoRefreshEnabled" class="text-sm font-medium leading-5 text-color">Refresh Every</label>
+          <InputSwitch
+            v-model="autoRefreshEnabled"
+            id="autoRefreshEnabled"
+          />
+          <label
+            for="autoRefreshEnabled"
+            class="text-sm font-medium leading-5 text-color"
+            >Refresh Every</label
+          >
         </div>
         <div class="flex gap-2 items-center">
           <InputNumber
@@ -87,7 +94,7 @@
 </template>
 
 <script setup>
-  import { ref, defineModel, onMounted, watch } from 'vue'
+  import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
@@ -102,7 +109,7 @@
     getCurrentMonthLabel
   } from '@utils/date.js'
 
-  const emit = defineEmits(['select', 'open', 'close'])
+  const emit = defineEmits(['select', 'open', 'close', 'autoRefresh'])
 
   defineOptions({ name: 'QuickSelect' })
 
@@ -223,10 +230,96 @@
     }
   }
 
+  const autoRefreshTimeoutId = ref(null)
+  const autoRefreshInFlight = ref(false)
+
+  const isAutoRefreshDebugEnabled = () => {
+    try {
+      return window?.localStorage?.getItem?.('debug:autoRefresh') === '1'
+    } catch {
+      return false
+    }
+  }
+
+  const autoRefreshDebug = (...args) => {
+    if (!isAutoRefreshDebugEnabled()) return
+    // eslint-disable-next-line no-console
+    console.log('[auto-refresh][QuickSelect]', ...args)
+  }
+
+  const clearAutoRefreshTimer = () => {
+    if (!autoRefreshTimeoutId.value) return
+    clearTimeout(autoRefreshTimeoutId.value)
+    autoRefreshTimeoutId.value = null
+    autoRefreshDebug('timer cleared')
+  }
+
+  const getAutoRefreshIntervalMs = (cfg) => {
+    if (!cfg?.enabled) return null
+
+    const every = Number(cfg.every)
+    if (!Number.isFinite(every) || every < 1) return null
+
+    const unit = String(cfg.unit || '')
+      .toLowerCase()
+      .trim()
+
+    switch (unit) {
+      case 'seconds':
+        return every * 1000
+      case 'minutes':
+        return every * 60 * 1000
+      case 'hours':
+        return every * 60 * 60 * 1000
+      default:
+        return null
+    }
+  }
+
+  const scheduleAutoRefresh = () => {
+    if (props.panelOnly) return
+
+    clearAutoRefreshTimer()
+
+    const cfg = model.value?.autoRefresh
+    const intervalMs = getAutoRefreshIntervalMs(cfg)
+    autoRefreshDebug('schedule requested', { cfg, intervalMs })
+    if (!intervalMs) return
+
+    autoRefreshTimeoutId.value = setTimeout(async () => {
+      try {
+        if (autoRefreshInFlight.value) {
+          autoRefreshDebug('skipping tick (in flight)')
+          scheduleAutoRefresh()
+          return
+        }
+
+        autoRefreshInFlight.value = true
+        autoRefreshDebug('tick -> emit(autoRefresh)')
+        emit('autoRefresh', model.value)
+      } finally {
+        autoRefreshInFlight.value = false
+        autoRefreshDebug('tick finished; rescheduling')
+        scheduleAutoRefresh()
+      }
+    }, intervalMs)
+
+    autoRefreshDebug('timer scheduled', { intervalMs })
+  }
+
   onMounted(() => {
     if (!props.panelOnly) return
     syncFieldsFromModel()
     syncModelQuickFromFields()
+  })
+
+  onMounted(() => {
+    if (props.panelOnly) return
+    scheduleAutoRefresh()
+  })
+
+  onUnmounted(() => {
+    clearAutoRefreshTimer()
   })
 
   watch(
@@ -247,6 +340,15 @@
     if (!props.panelOnly) return
     syncModelQuickFromFields()
   })
+
+  watch(
+    () => model.value?.autoRefresh,
+    () => {
+      autoRefreshDebug('model.autoRefresh changed', model.value?.autoRefresh)
+      scheduleAutoRefresh()
+    },
+    { deep: true }
+  )
 
   const applyQuickSelect = () => {
     const now = new Date()

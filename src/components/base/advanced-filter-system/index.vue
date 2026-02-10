@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, defineModel, computed } from 'vue'
+  import { ref, onMounted, defineModel, computed, watch } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
@@ -68,6 +68,20 @@
     if (!Number.isFinite(value) || value <= 0) return null
 
     return { direction, value, unit }
+  }
+
+  const isAutoRefreshDebugEnabled = () => {
+    try {
+      return window?.localStorage?.getItem?.('debug:autoRefresh') === '1'
+    } catch {
+      return false
+    }
+  }
+
+  const autoRefreshDebug = (...args) => {
+    if (!isAutoRefreshDebugEnabled()) return
+    // eslint-disable-next-line no-console
+    console.log('[auto-refresh][AdvancedFilterSystem]', ...args)
   }
 
   const updatedTime = () => {
@@ -156,6 +170,20 @@
     hasPendingDateUpdate.value = true
   }
 
+  const onAutoRefreshTick = () => {
+    autoRefreshDebug('tick received', {
+      hasPendingDateUpdate: hasPendingDateUpdate.value,
+      autoRefresh: filterDataRange.value?.autoRefresh,
+      label: filterDataRange.value?.label,
+      labelStart: filterDataRange.value?.labelStart,
+      labelEnd: filterDataRange.value?.labelEnd
+    })
+    if (hasPendingDateUpdate.value) return
+    updatedTime()
+    autoRefreshDebug('emitting updatedFilter')
+    emitUpdatedFilter()
+  }
+
   const emitUpdatedFilter = () => {
     emit('updatedFilter')
   }
@@ -222,6 +250,21 @@
 
     hasPendingDateUpdate.value = false
   })
+
+  watch(
+    () => filterDataRange.value?.autoRefresh,
+    (autoRefresh) => {
+      if (!filterData.value?.tsRange) return
+
+      if (!autoRefresh) {
+        delete filterData.value.tsRange.autoRefresh
+        return
+      }
+
+      filterData.value.tsRange.autoRefresh = { ...autoRefresh }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
@@ -263,6 +306,7 @@
           :defaultUtcOffset="userUTC"
           :userTimezone="userTimezone"
           @select="onDateRangeSelect"
+          @autoRefresh="onAutoRefreshTick"
         />
         <PrimeButton
           v-if="!hasPendingDateUpdate"

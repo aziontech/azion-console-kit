@@ -456,7 +456,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2">
+      <div class="flex gap-3 mt-2 h-[200px]">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -481,7 +481,7 @@
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"

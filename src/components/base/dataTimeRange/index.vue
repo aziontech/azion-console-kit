@@ -4,6 +4,7 @@
       v-model="model"
       :maxDays="maxDays"
       @select="emit('select', $event)"
+      @autoRefresh="emit('autoRefresh', $event)"
       @open="openOverlay($event, 0)"
     />
     <InputDateRange
@@ -53,6 +54,7 @@
               v-model="model"
               :maxDays="maxDays"
               @select="emit('select', $event)"
+              @autoRefresh="emit('autoRefresh', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -93,8 +95,9 @@
             </div>
           </TabPanel>
         </TabView>
+
         <div
-          class="flex items-center gap-2 mb-2 mt-2 justify-between"
+          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
           :class="{
             'px-4 mt-1': activeTab === 3
           }"
@@ -145,7 +148,7 @@
     }
   })
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'autoRefresh'])
 
   const overlayPanel = ref(null)
   const activeTab = ref(0)
