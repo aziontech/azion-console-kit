@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadEdgeFunctionsConsole } from '@/services/real-time-events-service/edge-functions-console'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -66,6 +67,7 @@ describe('EdgeFunctionsConsoleServices', () => {
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
+    const expectedTs = getCurrentTimezone(fixtures.edgeFunctionConsole.ts)
 
     expect(response).toEqual({
       lineSource: fixtures.edgeFunctionConsole.lineSource,
@@ -82,7 +84,8 @@ describe('EdgeFunctionsConsoleServices', () => {
         { key: 'line', value: fixtures.edgeFunctionConsole.line },
         { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource },
         { key: 'solutionId', value: fixtures.edgeFunctionConsole.solutionId },
-        { key: 'source', value: fixtures.edgeFunctionConsole.source }
+        { key: 'source', value: fixtures.edgeFunctionConsole.source },
+        { key: 'ts', value: expectedTs }
       ],
       ts: 'February 23, 2024 at 06:07:25 PM'
     })

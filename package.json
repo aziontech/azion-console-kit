@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.50.1",
+  "version": "1.50.3",
   "private": false,
   "type": "module",
   "repository": {
@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "cp package.json dist/",
     "preview": "vite preview",
     "ci": "yarn install --frozen-lockfile",
     "test:unit": "TZ=UTC vitest --ui",
@@ -49,7 +48,7 @@
     "@vee-validate/yup": "^4.15.1",
     "@vueuse/core": "^10.11.1",
     "analytics": "^0.8.19",
-    "axios": "^1.13.3",
+    "axios": "^1.13.5",
     "azion-theme": "^1.16.2",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
@@ -130,7 +129,7 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "d3-color": "^3.1.0",
-    "axios": "^1.13.3"
+    "axios": "^1.13.5"
   },
   "engines": {
     "node": ">=22.18.0",
