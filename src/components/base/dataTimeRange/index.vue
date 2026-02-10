@@ -93,20 +93,25 @@
             </div>
           </TabPanel>
         </TabView>
-      </div>
-      <div class="flex items-center gap-2 mb-2 px-1 mt-2 justify-between">
-        <div class="text-xs text-color-secondary">
-          UTC:
-          <span class="text-color font-medium">{{ userTimezone }}</span>
+        <div
+          class="flex items-center gap-2 mb-2 mt-2 justify-between"
+          :class="{
+            'px-4 mt-1': activeTab === 3
+          }"
+        >
+          <div class="text-xs text-color-secondary">
+            UTC:
+            <span class="text-color font-medium">{{ userTimezone }}</span>
+          </div>
+          <Dropdown
+            v-model="model.utcOffset"
+            :options="utcOffsetOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-auto"
+            :pt="{ input: { class: 'text-xs' } }"
+          />
         </div>
-        <Dropdown
-          v-model="model.utcOffset"
-          :options="utcOffsetOptions"
-          optionLabel="label"
-          optionValue="value"
-          class="w-auto"
-          :pt="{ input: { class: 'text-xs' } }"
-        />
       </div>
     </OverlayPanel>
   </div>
