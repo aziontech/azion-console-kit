@@ -50,7 +50,7 @@ export class WafService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.waf.list(),
+      queryKeys.waf.list(params),
       () => this.#fetchWafRulesList(params),
       {
         persist: firstPage && !skipCache,
