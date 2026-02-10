@@ -62,6 +62,7 @@
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
   const isLocked = ref(false)
+  const isApplicationLoaded = ref(false)
 
   const cachedEdgeApplication = edgeAppService.getApplicationFromCache(edgeApplicationId.value)
 
@@ -177,6 +178,7 @@
     if (!tab) selectedTab = 'main-settings'
 
     edgeApplication.value = { ...edgeApplication.value, ...(await handleLoadEdgeApplication()) }
+    isApplicationLoaded.value = true
     verifyTab(edgeApplication.value)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
@@ -229,6 +231,7 @@
   provide('unsaved', { changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved })
 
   provide('edgeApplication', edgeApplication)
+  provide('isApplicationLoaded', isApplicationLoaded)
 
   const tagProps = {
     value: 'Locked',

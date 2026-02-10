@@ -33,16 +33,17 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
-  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { inject, ref, watch } from 'vue'
 
   defineOptions({ name: 'edit-application' })
 
   const emit = defineEmits(['updatedApplication'])
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const unsavedStatus = inject('unsaved')
+  const isApplicationLoaded = inject('isApplicationLoaded', ref(true))
 
   const props = defineProps({
     editEdgeApplicationService: {
@@ -75,8 +76,19 @@
     })
   })
 
-  const loadEdgeApplication = async () => {
-    return props.edgeApplication
+  const loadEdgeApplication = () => {
+    if (isApplicationLoaded.value) {
+      return props.edgeApplication
+    }
+
+    return new Promise((resolve) => {
+      const unwatch = watch(isApplicationLoaded, (loaded) => {
+        if (loaded) {
+          unwatch()
+          resolve(props.edgeApplication)
+        }
+      })
+    })
   }
 
   const updatedStatusUnSaved = () => {
