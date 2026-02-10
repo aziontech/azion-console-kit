@@ -168,16 +168,28 @@
       }
     },
     {
-      field: 'domains',
+      field: 'displayDomains',
       header: 'Domains',
-      filterPath: 'domains',
+      filterPath: 'displayDomains',
       disableSort: true,
       type: 'component',
       component: (columnData) => {
         if (!columnData) return null
+
+        if (Array.isArray(columnData) && columnData.length > 0) {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-array-with-popup',
+            dependencies: {
+              copyContentService: clipboardWrite,
+              showCopy: !!clipboardWrite
+            }
+          })
+        }
+
         return columnBuilder({
           data: columnData,
-          columnAppearance: 'text-array-with-popup',
+          columnAppearance: 'text-format-with-popup',
           dependencies: {
             copyContentService: clipboardWrite,
             showCopy: !!clipboardWrite
@@ -352,7 +364,13 @@
           'product_version'
         ]
       })
-      workloadsData.value = response.body
+      workloadsData.value = response.body.map((item) => ({
+        ...item,
+        displayDomains:
+          item.domains && item.domains.length > 0
+            ? item.domains
+            : item.workloadHostname?.content || item.workloadHostname
+      }))
     } catch (error) {
       workloadsData.value = []
     }
