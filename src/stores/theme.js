@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia'
 
+export const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)'
+
+export const getSystemTheme = () => {
+  return window.matchMedia(DARK_SCHEME_QUERY).matches ? 'dark' : 'light'
+}
+
 const getInitialTheme = () => {
   const storedTheme = localStorage.getItem('theme')
-  if (storedTheme) return storedTheme
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return storedTheme || getSystemTheme()
 }
 
 export const useThemeStore = defineStore({
@@ -13,9 +17,7 @@ export const useThemeStore = defineStore({
     theme: getInitialTheme()
   }),
   getters: {
-    currentTheme(state) {
-      return state.theme
-    }
+    currentTheme: (state) => state.theme
   },
   actions: {
     setTheme(theme) {

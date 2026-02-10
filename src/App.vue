@@ -3,7 +3,7 @@
   import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
-  import { useThemeStore } from '@/stores/theme'
+  import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import { themeApply } from '@/helpers'
   import Layout from '@/layout'
@@ -69,8 +69,7 @@
     updateTrackingTraits()
   })
 
-  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)')
-  prefersDarkScheme.addEventListener('change', (event) => {
+  window.matchMedia(DARK_SCHEME_QUERY).addEventListener('change', (event) => {
     if (currentTheme.value === 'system') {
       themeApply(event.matches ? 'dark' : 'light')
     }
