@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
 
@@ -48,7 +51,7 @@ const adaptResponse = (response) => {
   const data = response.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     configurationId: dataStreamedEvents.configurationId,
     id: generateCurrentTimestamp(),
-    summary: buildSummary(dataStreamedEvents),
+    summary: buildSummary(dataStreamedEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: dataStreamedEvents.ts,
     tsFormat: getCurrentTimezone(dataStreamedEvents.ts)
   }))

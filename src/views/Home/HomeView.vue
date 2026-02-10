@@ -19,10 +19,6 @@
   defineOptions({ name: 'home-view' })
 
   const props = defineProps({
-    listTeamsService: {
-      type: Function,
-      required: true
-    },
     inviteYourTeamService: {
       type: Function,
       required: true
@@ -43,7 +39,6 @@
   const { accountData } = useAccountStore()
   const user = accountData
 
-  const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
   const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
 
@@ -114,8 +109,7 @@
     }
   }
 
-  onMounted(async () => {
-    teams.value = await props.listTeamsService()
+  onMounted(() => {
     showOnboardingSchedulingDialog()
     if (props.inviteSession.sessionIsExpired()) {
       props.inviteSession.turnInviteBlockVisable()
@@ -310,7 +304,7 @@
             :unSaved="false"
           >
             <template #form>
-              <FormFieldsHome :teams="teams"></FormFieldsHome>
+              <FormFieldsHome />
             </template>
             <template #action-bar="{ onSubmit, loading }">
               <PrimeButton

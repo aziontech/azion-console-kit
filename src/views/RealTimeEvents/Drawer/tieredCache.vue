@@ -66,15 +66,9 @@
     }
   )
 
-  const proxyTag = computed(() => {
-    let tags = []
-    if (details.value.scheme) {
-      tags.push({ text: `Scheme: ${details.value.scheme}` })
-    }
-    if (details.value.serverProtocol) {
-      tags.push({ text: `Server Protocol: ${details.value.serverProtocol}` })
-    }
-    return tags
+  const title = computed(() => {
+    if (!details.value.proxyHost) return 'More Details'
+    return `More Details: ${details.value.proxyHost}`
   })
 
   defineExpose({
@@ -85,17 +79,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="details.proxyHost"
-          :date="details.ts"
-          :tags="proxyTag"
-          :loading="loading"
-          hideDivider
-        />
         <TabView
           class="w-full h-full"
           v-if="!loading"

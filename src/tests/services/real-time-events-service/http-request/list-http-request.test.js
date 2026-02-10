@@ -62,6 +62,7 @@ describe('HttpRequestServices', () => {
       `\t\tupstreamBytesSent`,
       `\t\tsslProtocol`,
       `\t\twafLearning`,
+      `\t\trequestUri`,
       `\t\trequestTime`,
       '\t\tserverProtocol',
       '\t\tupstreamCacheStatus',

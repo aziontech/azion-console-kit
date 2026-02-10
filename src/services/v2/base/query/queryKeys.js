@@ -19,6 +19,12 @@ export const queryKeys = {
     all: ['solutions'],
     list: (group, type) => [...queryKeys.solutions.all, 'list', group, type]
   },
+  marketplace: {
+    all: ['marketplace'],
+    list: (params) => [...queryKeys.marketplace.all, 'list', params],
+    categories: () => [...queryKeys.marketplace.all, 'categories'],
+    detail: (vendor, slug) => [...queryKeys.marketplace.all, 'detail', vendor, slug]
+  },
   edgeApp: {
     all: ['edge-apps'],
     detail: (id) => {
@@ -144,5 +150,65 @@ export const queryKeys = {
   billing: {
     all: ['billing'],
     lastBill: () => [...queryKeys.billing.all, 'last-bill']
+  },
+  variables: {
+    all: ['variables'],
+    list: () => [...queryKeys.variables.all, 'list']
+  },
+  edgeFunction: {
+    all: ['edge-functions'],
+    list: (params) => [...queryKeys.edgeFunction.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id]
+  },
+  edgeDNS: {
+    all: ['edge-dns'],
+    list: (params) => [...queryKeys.edgeDNS.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id]
+  },
+  edgeStorage: {
+    all: ['edge-storage'],
+    buckets: {
+      all: () => [...queryKeys.edgeStorage.all, 'buckets'],
+      list: (params) => [...queryKeys.edgeStorage.buckets.all(), 'list', params],
+      detail: (name) => [...queryKeys.edgeStorage.buckets.all(), 'detail', name]
+    },
+    files: {
+      all: (bucketName) => [...queryKeys.edgeStorage.all, 'files', bucketName],
+      list: (bucketName, params) => [...queryKeys.edgeStorage.files.all(bucketName), 'list', params]
+    },
+    credentials: {
+      all: () => [...queryKeys.edgeStorage.all, 'credentials'],
+      list: (bucketName, params) => [
+        ...queryKeys.edgeStorage.credentials.all(),
+        'list',
+        bucketName,
+        params
+      ]
+    }
+  },
+  dataStream: {
+    all: ['data-streams'],
+    list: (params) => [...queryKeys.dataStream.all, 'list', params],
+    detail: (id) => [...queryKeys.dataStream.all, 'detail', id]
+  },
+  edgeConnectors: {
+    all: ['edge-connectors'],
+    list: (params) => [...queryKeys.edgeConnectors.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeConnectors.all, 'detail', id]
+  },
+  teamPermission: {
+    all: ['team-permissions'],
+    list: (params) => [...queryKeys.teamPermission.all, 'list', params],
+    detail: (id) => [...queryKeys.teamPermission.all, 'detail', id]
+  },
+  waf: {
+    all: ['waf-rules'],
+    list: (params) => [...queryKeys.waf.all, 'list', params],
+    detail: (id) => [...queryKeys.waf.all, 'detail', id]
+  },
+  edgeSql: {
+    all: ['edge-sql'],
+    list: (params) => [...queryKeys.edgeSql.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
   }
 }

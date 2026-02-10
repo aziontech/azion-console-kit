@@ -3,9 +3,9 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
+  import Drawer from '@/views/EdgeFirewallRulesEngine/Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import Drawer from '@/views/EdgeApplicationsRulesEngine/Drawer'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'

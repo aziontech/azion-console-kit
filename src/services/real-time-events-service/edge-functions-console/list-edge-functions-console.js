@@ -7,6 +7,9 @@ import * as Errors from '@/services/axios/errors'
 import { buildSummary } from '@/helpers'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
 
@@ -39,7 +42,7 @@ const adaptResponse = (body) => {
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
-        summary: buildSummary(cellsConsoleEvents),
+        summary: buildSummary(cellsConsoleEvents, shouldLimitRequestUri, shouldShowTsColumn),
         configurationId: cellsConsoleEvents.configurationId,
         line: cellsConsoleEvents.line,
         id: generateCurrentTimestamp(),

@@ -12,6 +12,7 @@
         :loadService="loadDomainService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        :initialValues="cachedDomain"
         @loaded-service-object="setDomainName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
@@ -51,6 +52,7 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -116,7 +118,13 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const digitalCertificates = ref([])
-  const domainName = ref()
+
+  const cachedDomain = workloadService.getDomainFromCache(route.params.id) ?? {}
+  const domainName = ref(cachedDomain?.name)
+
+  if (cachedDomain?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedDomain.name)
+  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)

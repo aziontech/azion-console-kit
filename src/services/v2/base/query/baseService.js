@@ -135,4 +135,37 @@ export class BaseService {
       }
     })
   }
+
+  /**
+   * Get an item from the query cache
+   * @param {Object} config - Configuration object
+   * @param {string} config.cacheKey - The first element of the query key to match (e.g., 'workloads', 'marketplace')
+   * @param {Function} config.findFn - Function to find the item in the cached list
+   * @param {Function} [config.mapFn] - Optional function to transform the found item
+   * @param {string} [config.listPath='body'] - Path to the list in the cached data (e.g., 'body' or '' for root)
+   * @returns {Object|undefined} The found item or undefined
+   */
+  getFromCache({ cacheKey, findFn, mapFn, listPath = 'body' }) {
+    if (!cacheKey || !findFn) return undefined
+
+    const allQueries = this.queryClient.getQueryCache().getAll()
+
+    for (const query of allQueries) {
+      const key = query.queryKey
+      if (!Array.isArray(key) || key[0] !== cacheKey) continue
+
+      const cachedData = query.state?.data
+      const listData = listPath ? cachedData?.[listPath] : cachedData
+
+      if (!Array.isArray(listData)) continue
+
+      const item = listData.find(findFn)
+
+      if (item) {
+        return mapFn ? mapFn(item) : item
+      }
+    }
+
+    return undefined
+  }
 }

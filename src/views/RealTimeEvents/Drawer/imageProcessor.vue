@@ -58,11 +58,9 @@
     }
   )
 
-  const schemeTag = computed(() => {
-    if (details.value.scheme) {
-      return [{ text: `Scheme: ${details.value.scheme}` }]
-    }
-    return []
+  const title = computed(() => {
+    if (!details.value.host) return 'More Details'
+    return `More Details: ${details.value.host}`
   })
 
   defineExpose({
@@ -73,17 +71,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="details.host"
-          :date="details.ts"
-          :tags="schemeTag"
-          :loading="loading"
-          hideDivider
-        />
         <TabView
           class="w-full h-full"
           v-if="!loading"
