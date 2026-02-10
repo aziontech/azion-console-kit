@@ -372,6 +372,25 @@
     }
   }
 
+  const loadObjectStorageMetrics = async () => {
+    try {
+      const metrics = await edgeStorageService.getEdgeStorageMetrics()
+      if (!metrics || !objectStorageData.value.length) return
+
+      const metricsMap = metrics.reduce((acc, metric) => {
+        acc[metric.bucketName] = metric.storedGb
+        return acc
+      }, {})
+
+      objectStorageData.value = objectStorageData.value.map((item) => ({
+        ...item,
+        size: metricsMap[item.name] !== undefined ? `${metricsMap[item.name]} GB` : '-'
+      }))
+    } catch (error) {
+      // Silent fail - metrics are non-blocking
+    }
+  }
+
   const loadObjectStorage = async () => {
     try {
       const response = await edgeStorageService.listEdgeStorageBuckets({
@@ -382,8 +401,9 @@
       objectStorageData.value = response.body.map((item) => ({
         ...item,
         id: item.name,
-        size: item.size || '-'
+        size: '-'
       }))
+      loadObjectStorageMetrics()
     } catch (error) {
       objectStorageData.value = []
     }
