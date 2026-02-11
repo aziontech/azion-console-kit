@@ -69,13 +69,13 @@
   import { computed, ref } from 'vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useField } from 'vee-validate'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
 
   const { value: name } = useField('name')
   const { value: dataSet, errorMessage: dataSetErrorMessage } = useField('dataSet')
 
-  const store = useAccountStore()
+  const store = useThemeStore()
   const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
   const theme = computed(() => {

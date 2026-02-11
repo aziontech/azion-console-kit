@@ -5,15 +5,12 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { teamPermissionService } from '@/services/team-permission'
+  import { deleteTeamPermissionService } from '@/services/team-permission'
+  import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    listTeamPermissionService: { required: true, type: Function },
-    deleteTeamPermissionService: { required: true, type: Function },
-    documentationService: { required: true, type: Function }
-  })
 
   const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
 
@@ -23,7 +20,7 @@
       type: 'delete',
       title: 'team',
       icon: 'pi pi-trash',
-      service: props.deleteTeamPermissionService
+      service: deleteTeamPermissionService
     }
   ]
 
@@ -104,7 +101,7 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        :listService="listTeamPermissionService"
+        :listService="teamPermissionService.listTeamPermissionService"
         :columns="getColumns"
         editPagePath="/teams-permission/edit"
         emptyListMessage="No teams found."
@@ -122,7 +119,7 @@
           description: 'Create your first team to define and assign permissions to users.',
           createButtonLabel: 'Team',
           createPagePath: 'teams-permission/create',
-          documentationService: documentationService
+          documentationService: documentationAccountsProducts.teamPermissions
         }"
       >
       </FetchListTableBlock>

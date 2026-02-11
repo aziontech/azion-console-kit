@@ -3,7 +3,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import { ref, computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import LabelBlock from '@/templates/label-block'
   import { useField } from 'vee-validate'
@@ -16,7 +16,7 @@
     }
   })
 
-  const store = useAccountStore()
+  const store = useThemeStore()
   const contentTypeShellScript = 'Shell Script'
 
   const editorOptions = computed(() => {

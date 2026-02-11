@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WafAdapter } from './waf-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class WafService extends BaseService {
   constructor() {
     super()
@@ -7,9 +8,7 @@ export class WafService extends BaseService {
     this.baseURL = 'v4/workspace/wafs'
   }
 
-  listWafRules = async (
-    params = { search: '', fields: '', ordering: 'name', page: 1, pageSize: 10 }
-  ) => {
+  #fetchWafRulesList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -32,6 +31,34 @@ export class WafService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.waf.list(defaultParams), () =>
+      this.#fetchWafRulesList(defaultParams)
+    )
+  }
+
+  listWafRules = async (
+    params = { search: '', fields: '', ordering: 'name', page: 1, pageSize: 10 }
+  ) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.waf.list(params),
+      () => this.#fetchWafRulesList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createWafRule = async (payload) => {
     const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
     const { data: response } = await this.http.request({
@@ -39,6 +66,8 @@ export class WafService extends BaseService {
       url: this.baseURL,
       body: adaptedPayload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return response.data
   }
@@ -51,6 +80,8 @@ export class WafService extends BaseService {
       body: adaptedPayload
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
     return 'Your WAF rule has been updated.'
   }
 
@@ -59,6 +90,8 @@ export class WafService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${wafId}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'WAF Rule successfully deleted.'
   }
@@ -80,6 +113,8 @@ export class WafService extends BaseService {
       url: `${this.baseURL}/${payload.id}/clone`,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return {
       feedback: 'Your WAF rule has been cloned',

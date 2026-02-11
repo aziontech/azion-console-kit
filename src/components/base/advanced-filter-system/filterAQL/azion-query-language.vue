@@ -1,19 +1,20 @@
 <template>
   <div
-    class="w-full"
+    class="w-full relative"
     ref="ignoreClickOutside"
   >
     <div class="relative">
       <div class="flex gap-2 items-center justify-center">
         <ContentEditable
           v-model="query"
-          @focus="showSuggestionsFocusInput = true"
+          @focus="openSuggestions"
           @keydown.tab="onSelectSuggestionWithTab"
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
           @keydown.esc.prevent="showSuggestionsFocusInput = false"
           @keydown.ctrl.space.prevent="openSuggestions"
+          @keydown.meta.space.prevent="openSuggestions"
           @external-link="handleExternalLink"
           @search="handleSearch"
           :handleQuery="handleQuery"
@@ -40,8 +41,9 @@
       :options="filteredSuggestions"
       ref="listboxRef"
       optionLabel="label"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs py-2"
-      @update:modelValue="selectSuggestion"
+      :modelValue="listboxModel"
+      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-50 max-w-xs py-2 top-full left-0"
+      @update:modelValue="onListboxModelUpdate"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
       data-testid="azion-query-language-suggestions"
       :pt="{
@@ -54,6 +56,7 @@
         <div
           class="w-full rounded-md font-mono"
           :data-testid="`azion-query-language-list-item${slotProps.index}`"
+          @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
           :class="[
             'p-2 cursor-pointer ',
             {
@@ -85,12 +88,16 @@
   const selectedFieldName = ref('')
   const highlightedIndex = ref(0)
   const listboxRef = ref(null)
-  const domains = ref({})
+  const domains = ref([])
+
+  const listboxModel = ref(null)
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
 
   const editable = ref(null)
+
+  const emit = defineEmits(['dirty', 'validation'])
 
   defineOptions({ name: 'azion-query-language' })
 
@@ -184,15 +191,18 @@
   }
 
   const openSuggestions = () => {
-    handleQuery()
+    handleQuery({ useCursorOffset: true })
     if (filteredSuggestions.value.length) {
       showSuggestionsFocusInput.value = true
     }
   }
 
-  const handleQuery = () => {
+  const handleQuery = ({ useCursorOffset = false } = {}) => {
+    const cursorOffset = useCursorOffset ? editable.value?.getCursorOffset?.() : null
+    const queryForMatch =
+      typeof cursorOffset === 'number' ? query.value?.slice(0, cursorOffset) : query.value
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
-      query.value,
+      queryForMatch,
       suggestionsData.value
     )
     changeCurrentStep(handleInputMaching.operator)
@@ -210,6 +220,17 @@
     selectedFieldName.value = data?.label
     changeCurrentStep(data?.nextStep)
     highlightedIndex.value = 0
+  }
+
+  const onListboxModelUpdate = (modelValue) => {
+    listboxModel.value = modelValue
+    selectSuggestion(modelValue)
+  }
+
+  const onOptionMouseDown = (option) => {
+    const restoreCursorInLastOffset = true
+    onListboxModelUpdate(option)
+    editable.value?.restoreCursorPosition?.(restoreCursorInLastOffset)
   }
 
   const scrollToHighlighted = () => {
@@ -254,6 +275,15 @@
   const executeQuery = () => {
     const filter = AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
+    emit('dirty', false)
+  }
+
+  const getParsedFilters = () => {
+    return AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
+  }
+
+  const markAsApplied = () => {
+    emit('dirty', false)
   }
 
   const handleSearch = () => {
@@ -277,17 +307,41 @@
     AzionQueryLanguage.queryValidator(query.value, suggestionsData.value)
   )
 
+  watch(handleErrorsQuery, (errors) => {
+    emit('validation', Boolean(errors?.length))
+  })
+
   const handleInitialQuery = () => {
     query.value = AzionQueryLanguage.handleInicialQuery(props.filterAdvanced, props.fieldsInFilter)
   }
 
+  const suppressDirtyEmit = ref(false)
+
   watch(
     () => [props.fieldsInFilter, props.filterAdvanced],
     () => {
+      suppressDirtyEmit.value = true
       handleInitialQuery()
+      nextTick(() => {
+        suppressDirtyEmit.value = false
+      })
     },
     { deep: true }
   )
+
+  watch(
+    query,
+    () => {
+      if (suppressDirtyEmit.value) return
+      emit('dirty', true)
+    },
+    { flush: 'post' }
+  )
+
+  defineExpose({
+    getParsedFilters,
+    markAsApplied
+  })
 
   onClickOutside(ignoreClickOutside, () => (showSuggestionsFocusInput.value = false))
 </script>

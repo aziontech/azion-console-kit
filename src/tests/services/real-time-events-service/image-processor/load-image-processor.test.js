@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadImageProcessor } from '@/services/real-time-events-service/image-processor'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -82,6 +83,7 @@ describe('ImageProcessorServices', () => {
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
+    const expectedTs = getCurrentTimezone(fixtures.imageProcessor.ts)
 
     expect(response).toEqual({
       host: fixtures.imageProcessor.host,
@@ -106,6 +108,7 @@ describe('ImageProcessorServices', () => {
         { key: 'sslSessionReused', value: fixtures.imageProcessor.sslSessionReused },
         { key: 'status', value: fixtures.imageProcessor.status },
         { key: 'tcpinfoRtt', value: fixtures.imageProcessor.tcpinfoRtt },
+        { key: 'ts', value: expectedTs },
         { key: 'upstreamCacheStatus', value: fixtures.imageProcessor.upstreamCacheStatus },
         { key: 'upstreamResponseTime', value: fixtures.imageProcessor.upstreamResponseTime },
         { key: 'upstreamResponseTimeStr', value: fixtures.imageProcessor.upstreamResponseTimeStr },

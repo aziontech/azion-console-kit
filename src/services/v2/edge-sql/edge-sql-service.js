@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeSQLAdapter } from './edge-sql-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { extractAffectedTableNames } from '../utils/statement-utils'
 import {
   getSchemaCache,
@@ -27,15 +28,7 @@ export class EdgeSQLService extends BaseService {
     }
   }
 
-  listDatabases = async (
-    params = {
-      orderBy: 'name',
-      sort: 'asc',
-      page: 1,
-      pageSize: 10,
-      search: ''
-    }
-  ) => {
+  #fetchDatabasesList = async (params = {}) => {
     const { data } = await this.http.request({
       url: this.baseURL,
       method: 'GET',
@@ -52,6 +45,40 @@ export class EdgeSQLService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'status', 'active', 'last_modified', 'last_editor'],
+      ordering: 'name'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeSql.list(defaultParams), () =>
+      this.#fetchDatabasesList(defaultParams)
+    )
+  }
+
+  listDatabases = async (
+    params = {
+      orderBy: 'name',
+      sort: 'asc',
+      page: 1,
+      pageSize: 10,
+      search: ''
+    }
+  ) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeSql.list(params),
+      () => this.#fetchDatabasesList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createDatabase = async ({ name }) => {
     const body = this.adapter?.adaptDatabaseCreatePayload?.({ name })
 
@@ -65,6 +92,8 @@ export class EdgeSQLService extends BaseService {
 
     const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeSql.all })
+
     return this._formatSuccessResponse(adaptedData, null, {
       shouldMonitor,
       databaseId: adaptedData.id,
@@ -77,6 +106,8 @@ export class EdgeSQLService extends BaseService {
       url: `${this.baseURL}/${id}`,
       method: 'DELETE'
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeSql.all })
 
     const feedback = this.adapter?.adaptDatabaseDelete?.(data)
     return feedback

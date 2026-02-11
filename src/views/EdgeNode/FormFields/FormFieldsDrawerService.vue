@@ -1,5 +1,5 @@
 <script setup>
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
@@ -77,7 +77,7 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const store = useAccountStore()
+  const store = useThemeStore()
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
