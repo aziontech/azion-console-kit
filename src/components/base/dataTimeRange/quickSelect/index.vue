@@ -99,6 +99,7 @@
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
+  import { convertUnitToMilliseconds } from '@/helpers'
   import {
     createRelativeRange,
     createStartOfDay,
@@ -249,16 +250,7 @@
       .toLowerCase()
       .trim()
 
-    switch (unit) {
-      case 'seconds':
-        return every * 1000
-      case 'minutes':
-        return every * 60 * 1000
-      case 'hours':
-        return every * 60 * 60 * 1000
-      default:
-        return null
-    }
+    return convertUnitToMilliseconds(unit, every)
   }
 
   const scheduleAutoRefresh = () => {

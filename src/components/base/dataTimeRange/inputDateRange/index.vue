@@ -384,7 +384,7 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="cursor-pointer"
+        class="cursor-pointer ml-[2.5px]"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
@@ -405,7 +405,7 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="cursor-pointer"
+        class="cursor-pointer ml-[2.5px]"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'

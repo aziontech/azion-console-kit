@@ -209,6 +209,19 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
   })
 }
 
+const convertUnitToMilliseconds = (unit, value) => {
+  switch (unit) {
+    case 'seconds':
+      return value * 1000
+    case 'minutes':
+      return value * 60 * 1000
+    case 'hours':
+      return value * 60 * 60 * 1000
+    default:
+      return null
+  }
+}
+
 const getCurrentDateTimeIntl = () => {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -394,5 +407,6 @@ export {
   getOffset,
   parseUtcOffsetToMinutes,
   createUtcDateFromUserTimezoneParts,
-  getUtcIsoRangeForUserDay
+  getUtcIsoRangeForUserDay,
+  convertUnitToMilliseconds
 }
