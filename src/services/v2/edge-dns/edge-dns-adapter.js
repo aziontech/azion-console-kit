@@ -12,7 +12,9 @@ const transformMap = {
     return {
       content: value.domain
     }
-  }
+  },
+  nameservers: (value) => value.nameservers,
+  productVersion: (value) => value.product_version
 }
 
 const transformLoadingMap = {

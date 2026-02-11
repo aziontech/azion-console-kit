@@ -181,11 +181,11 @@
     isApplicationLoaded.value = true
     verifyTab(edgeApplication.value)
 
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
-    preloadTabData()
-
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
+
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
+    preloadTabData()
   }
 
   const tabTitle = computed(() => edgeApplication.value?.name || '')
