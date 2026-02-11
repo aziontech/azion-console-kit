@@ -73,9 +73,6 @@ export const useAccountStore = defineStore({
       const { client_flags = [] } = state.account
       return !client_flags.includes(state.flags.FORCE_REDIRECT_TO_CONSOLE)
     },
-    currentTheme(state) {
-      return state.account?.colorTheme
-    },
     isFirstLogin(state) {
       return state.account?.first_login
     },
@@ -135,10 +132,6 @@ export const useAccountStore = defineStore({
     resetAccount() {
       this.account = {}
       this.identifySignUpProvider = ''
-    },
-    setTheme(theme) {
-      this.account.colorTheme = theme
-      localStorage.setItem('theme', theme)
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method

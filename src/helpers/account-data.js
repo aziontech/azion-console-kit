@@ -27,7 +27,6 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.permissions = userResults.permissions
   accountInfo.email = userResults.email
   accountInfo.user_id = userResults.id
-  accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
 
   accountStore.setAccountData(accountInfo)
