@@ -119,6 +119,6 @@
   const formSubmit = async (onSubmit, values, formValid) => {
     await onSubmit()
     if (!formValid) return
-    emit('updatedApplication', values)
+    emit('updatedApplication', { ...props.edgeApplication, ...values })
   }
 </script>
