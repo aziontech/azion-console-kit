@@ -212,7 +212,7 @@
     let selectedTab = tab
     if (!selectedTab) selectedTab = 'mainSettings'
 
-    edgeDNS.value = await loaderEdgeDNS()
+    edgeDNS.value = { ...edgeDNS.value, ...(await loaderEdgeDNS()) }
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeDNS.value?.name)
     preloadTabData()
