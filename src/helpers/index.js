@@ -27,7 +27,7 @@ import { getStaticUrlsByEnvironment } from './get-static-urls-by-environment'
 import InviteSession from './invite-session'
 import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
-import { themeSelect } from './theme-select'
+import { themeApply } from './theme-apply'
 import {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -103,7 +103,7 @@ export {
   parseCamelToSnake,
   parseSnakeToCamel,
   removeHtmlTagFromText,
-  themeSelect,
+  themeApply,
   convertValueToDate,
   convertDateToLocalTimezone,
   windowOpen,

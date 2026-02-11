@@ -70,7 +70,7 @@ export class EdgeSQLService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeSql.list(),
+      queryKeys.edgeSql.list(params),
       () => this.#fetchDatabasesList(params),
       {
         persist: firstPage && !skipCache,

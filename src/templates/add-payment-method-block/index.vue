@@ -3,7 +3,7 @@
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -18,7 +18,7 @@
 
   defineOptions({ name: 'add-payment-method-block' })
 
-  const accountStore = useAccountStore()
+  const themeStore = useThemeStore()
 
   const stripe = ref(null)
   const isSubmitting = ref(false)
@@ -79,7 +79,7 @@
     try {
       stripe.value = await props.stripeClientService()
       stripeComponents.value = stripe.value.elements()
-      const theme = accountStore.currentTheme
+      const theme = themeStore.currentTheme
       const inputStyles = {
         style: {
           base: {

@@ -14,7 +14,7 @@
 <script setup>
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { onClickOutside } from '@vueuse/core'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import * as countries from './json/countries.json'
   import {
@@ -163,7 +163,7 @@
     }
   })
 
-  const { currentTheme } = storeToRefs(useAccountStore())
+  const { currentTheme } = storeToRefs(useThemeStore())
   watch(currentTheme, () => {
     rerenderMap()
   })
