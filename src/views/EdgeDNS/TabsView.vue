@@ -397,6 +397,7 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
+        :entityName="edgeDNS?.name"
         description="Configure DNS records and zone settings used for authoritative domain resolution."
       />
     </template>
