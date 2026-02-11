@@ -70,6 +70,10 @@ export class EdgeDNSRecordsService extends BaseService {
       body: this.adapter?.transformPayload?.(payload)
     })
 
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeDNS.records.all(payload.edgeDNSID)
+    })
+
     return {
       feedback: 'Edge DNS Record has been created',
       urlToEditView: `/edge-dns/edit/${payload.edgeDNSID}/records/edit/${data.data.id}`
@@ -82,6 +86,10 @@ export class EdgeDNSRecordsService extends BaseService {
       url: this.getUrl(`/${edgeDNSID}/records/${recordID}`)
     })
 
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeDNS.records.all(edgeDNSID)
+    })
+
     return 'Edge DNS Record successfully deleted'
   }
 
@@ -90,6 +98,10 @@ export class EdgeDNSRecordsService extends BaseService {
       method: 'PUT',
       url: this.getUrl(`/${payload.edgeDNSId}/records/${payload.id}`),
       body: this.adapter?.transformPayload?.(payload)
+    })
+
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeDNS.records.all(payload.edgeDNSId)
     })
 
     return 'Edge DNS Record has been updated'

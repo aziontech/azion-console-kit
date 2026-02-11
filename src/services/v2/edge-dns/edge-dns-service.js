@@ -108,6 +108,10 @@ export class EdgeDNSService extends BaseService {
         enabled: enableDNSSEC
       }
     })
+
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.edgeDNS.dnssec(DNSZoneID)
+    })
   }
 
   createEdgeDNSZonesService = async (payload) => {
