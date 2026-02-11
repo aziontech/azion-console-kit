@@ -230,5 +230,10 @@ export const queryKeys = {
     all: ['digital-certificates-crl'],
     list: (params) => [...queryKeys.digitalCertificatesCRL.all, 'list', params],
     detail: (id) => [...queryKeys.digitalCertificatesCRL.all, 'detail', id]
+  },
+  users: {
+    all: ['users'],
+    list: (params) => [...queryKeys.users.all, 'list', params],
+    detail: (id) => [...queryKeys.users.all, 'detail', id]
   }
 }

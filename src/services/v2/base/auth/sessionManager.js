@@ -22,6 +22,7 @@ import { networkListsService } from '@/services/v2/network-lists/network-lists-s
 import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
+import { usersService } from '@/services/v2/users/users-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -73,7 +74,8 @@ const prefetchInBackground = async () => {
     networkListsService.prefetchList(pageSize),
     digitalCertificatesService.prefetchList(pageSize),
     digitalCertificatesCRLService.prefetchList(pageSize),
-    customPageService.prefetchList(pageSize)
+    customPageService.prefetchList(pageSize),
+    usersService.prefetchList(pageSize)
   ])
 }
 
