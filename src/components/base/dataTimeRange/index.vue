@@ -154,6 +154,7 @@
   const activeTab = ref(0)
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
+  const hasInitializedUtcOffset = ref(false)
 
   const model = defineModel({
     type: Object,
@@ -177,22 +178,6 @@
       }
     }
   })
-
-  const hasInitializedUtcOffset = ref(false)
-
-  onMounted(() => {
-    if (!model.value?.utcOffset) {
-      model.value.utcOffset = props.defaultUtcOffset
-    }
-    hasInitializedUtcOffset.value = true
-  })
-
-  const formatUtcOffsetLabel = (offset) => {
-    const normalized = typeof offset === 'string' ? offset.trim() : ''
-    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
-    if (!match) return 'UTC'
-    return `UTC${match[1]}${match[2]}:${match[3]}`
-  }
 
   const utcOffsetOptions = computed(() => {
     const offsets = []
@@ -223,6 +208,13 @@
       emit('select', model.value)
     }
   )
+
+  const formatUtcOffsetLabel = (offset) => {
+    const normalized = typeof offset === 'string' ? offset.trim() : ''
+    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
+    if (!match) return 'UTC'
+    return `UTC${match[1]}${match[2]}:${match[3]}`
+  }
 
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
@@ -279,4 +271,11 @@
     emit('select', model.value)
     closeOverlay()
   }
+
+  onMounted(() => {
+    if (!model.value?.utcOffset) {
+      model.value.utcOffset = props.defaultUtcOffset
+    }
+    hasInitializedUtcOffset.value = true
+  })
 </script>
