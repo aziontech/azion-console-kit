@@ -1,5 +1,6 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listUsersService } from '@/services/users-services'
+import { usersService } from '@/services/v2/users/users-service'
+import { httpService } from '@/services/v2/base/http/httpService'
+import * as queryPlugin from '@/services/v2/base/query/queryPlugin'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { createPinia } from 'pinia'
 import { useAccountStore } from '@/stores/account'
@@ -49,16 +50,17 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listUsersService
-
   return {
-    sut
+    sut: usersService.listUsers
   }
 }
 
 vi.mock('@/stores/account')
+vi.spyOn(queryPlugin, 'waitForPersistenceRestore').mockResolvedValue()
+
 describe('UsersServices', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
     createPinia()
     useAccountStore.mockReturnValue({
       accountData: { user_id: 10 }
@@ -66,33 +68,32 @@ describe('UsersServices', () => {
   })
 
   it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
         results: null
       }
     })
 
     const { sut } = makeSut()
-    const version = 'v4'
-    await sut({})
+    await sut({ skipCache: true })
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users?ordering=&page=1&page_size=10&fields=&search=`,
-      method: 'GET'
-    })
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'v4/iam/users',
+        method: 'GET'
+      })
+    )
   })
 
   it('should parsed correctly each user', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
         results: [fixtures.userMock, fixtures.disabledUserMock]
       }
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const { body: result } = await sut({ skipCache: true })
 
     expect(result).toEqual([
       {
@@ -137,41 +138,38 @@ describe('UsersServices', () => {
   })
 
   it('should return empty array if no users found', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
         results: []
       }
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const { body: result } = await sut({ skipCache: true })
 
     expect(result).toEqual([])
   })
 
   it('should return empty array if api response is not a array', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {}
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {}
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const { body: result } = await sut({ skipCache: true })
 
     expect(result).toEqual([])
   })
 
   it('should not return logged user in list', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
         results: [fixtures.userMock, fixtures.disabledUserMock, fixtures.loggedUserMock]
       }
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const { body: result } = await sut({ skipCache: true })
 
     const expectedLoggedUser = {
       id: 11,

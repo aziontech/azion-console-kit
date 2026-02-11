@@ -226,5 +226,30 @@ export const queryKeys = {
     all: ['edge-sql'],
     list: (params) => [...queryKeys.edgeSql.all, 'list', params],
     detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
+  },
+  networkLists: {
+    all: ['network-lists'],
+    list: (params) => [...queryKeys.networkLists.all, 'list', params],
+    detail: (id) => [...queryKeys.networkLists.all, 'detail', id]
+  },
+  digitalCertificates: {
+    all: ['digital-certificates'],
+    list: (params) => [...queryKeys.digitalCertificates.all, 'list', params],
+    detail: (id) => [...queryKeys.digitalCertificates.all, 'detail', id]
+  },
+  customPages: {
+    all: ['custom-pages'],
+    list: (params) => [...queryKeys.customPages.all, 'list', params],
+    detail: (id) => [...queryKeys.customPages.all, 'detail', id]
+  },
+  digitalCertificatesCRL: {
+    all: ['digital-certificates-crl'],
+    list: (params) => [...queryKeys.digitalCertificatesCRL.all, 'list', params],
+    detail: (id) => [...queryKeys.digitalCertificatesCRL.all, 'detail', id]
+  },
+  users: {
+    all: ['users'],
+    list: (params) => [...queryKeys.users.all, 'list', params],
+    detail: (id) => [...queryKeys.users.all, 'detail', id]
   }
 }

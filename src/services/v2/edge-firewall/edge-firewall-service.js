@@ -8,7 +8,6 @@ export const DEFAULT_FIELDS = [
   'debug_rules',
   'last_editor',
   'last_modified',
-  'last_modify',
   'active'
 ]
 
