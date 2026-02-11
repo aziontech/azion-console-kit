@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { CustomPageAdapter } from './custom-page-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class CustomPageService extends BaseService {
   constructor() {
@@ -8,7 +9,7 @@ export class CustomPageService extends BaseService {
     this.baseURL = 'v4/workspace/custom_pages'
   }
 
-  listCustomPagesService = async (params = { pageSize: 10 }) => {
+  #fetchCustomPages = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -23,6 +24,32 @@ export class CustomPageService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'last_editor', 'last_modified', 'active'],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.customPages.list(defaultParams), () =>
+      this.#fetchCustomPages(defaultParams)
+    )
+  }
+
+  listCustomPagesService = async (params = { pageSize: 10 }) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.customPages.list(params),
+      () => this.#fetchCustomPages(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createCustomPagesService = async (payload) => {
     const body = this.adapter?.transformPayloadCreateCustomPage?.(payload) ?? payload
 
@@ -31,6 +58,8 @@ export class CustomPageService extends BaseService {
       url: this.baseURL,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.customPages.all })
 
     return data
   }
@@ -43,6 +72,8 @@ export class CustomPageService extends BaseService {
       url: `${this.baseURL}/${payload.id}`,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.customPages.all })
 
     return 'Your Custom Page has been updated!'
   }
@@ -61,6 +92,8 @@ export class CustomPageService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.customPages.all })
 
     return 'Custom Page successfully deleted!'
   }

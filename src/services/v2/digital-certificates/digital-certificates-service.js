@@ -1,6 +1,7 @@
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DigitalCertificatesAdapter } from './digital-certificates-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DigitalCertificatesService extends BaseService {
   constructor() {
@@ -17,6 +18,8 @@ export class DigitalCertificatesService extends BaseService {
       url: this.baseURL,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
 
     return data
   }
@@ -54,10 +57,12 @@ export class DigitalCertificatesService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
+
     return 'Your digital certificate has been updated!'
   }
 
-  listDigitalCertificates = async (params) => {
+  #fetchDigitalCertificates = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -72,6 +77,47 @@ export class DigitalCertificatesService extends BaseService {
     })
 
     return this.adapter?.transformListDigitalCertificates?.(data, params)
+  }
+
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [
+        'id',
+        'name',
+        'subject_name',
+        'issuer',
+        'status',
+        'status_detail',
+        'validity',
+        'type',
+        'challenge',
+        'authority',
+        'key_algorithm',
+        'last_editor',
+        'last_modified',
+        'managed'
+      ],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.digitalCertificates.list(defaultParams), () =>
+      this.#fetchDigitalCertificates(defaultParams)
+    )
+  }
+
+  listDigitalCertificates = async (params) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.digitalCertificates.list(params),
+      () => this.#fetchDigitalCertificates(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   listDigitalCertificatesDropdown = async (params) => {
@@ -113,6 +159,8 @@ export class DigitalCertificatesService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
 
     return 'Digital certificate successfully deleted!'
   }
