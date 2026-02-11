@@ -22,16 +22,12 @@
   const loading = computed(() => control.value.schema.loading || false)
 
   const options = computed(() => {
-    if (control.value.schema.options?.items) {
-      return control.value.schema.options.items
+    if (control.value.schema.oneOf) {
+      return control.value.schema.oneOf.map((item) => ({
+        label: item.title || item.const,
+        value: item.const
+      }))
     }
-
-    const enumValues = control.value.schema.enum || []
-    const enumLabels = control.value.schema.enumLabels || enumValues
-    return enumValues.map((value, index) => ({
-      label: enumLabels[index] || value,
-      value: value
-    }))
   })
 
   const optionLabel = computed(() => control.value.schema.optionLabel || 'label')
