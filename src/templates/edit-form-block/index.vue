@@ -59,8 +59,7 @@
   const { scrollToError } = useScrollToError()
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
-    validationSchema: props.schema,
-    initialValues: props.initialValues
+    validationSchema: props.schema
   })
 
   let formHasUpdated, visibleOnSaved
@@ -111,20 +110,33 @@
 
   const loadInitialData = async () => {
     try {
-      if (props.initialValues && Object.keys(props.initialValues).length > 0) {
-        const initialValues = props.initialValues
+      const hasCachedValues = props.initialValues && Object.keys(props.initialValues).length > 0
 
-        emit('loaded-service-object', initialValues)
-        resetForm({ values: initialValues })
+      // If we have cached values, use resetForm to set them immediately without marking as dirty
+      if (hasCachedValues) {
+        resetForm({ values: props.initialValues })
+        emit('loaded-service-object', props.initialValues)
+      }
 
+      // Always load full data from service
+      const { id } = route.params
+      const loadedValues = await props.loadService({ id })
+
+      // If loadService returns empty/undefined, keep cached values
+      if (!loadedValues || Object.keys(loadedValues).length === 0) {
         return
       }
 
-      const { id } = route.params
-      const initialValues = await props.loadService({ id })
+      // Merge: loaded values are base, cache values override (preserving cache data)
+      const mergedValues = hasCachedValues
+        ? { ...loadedValues, ...props.initialValues }
+        : loadedValues
 
-      emit('loaded-service-object', initialValues)
-      resetForm({ values: initialValues })
+      // Emit with full merged data
+      emit('loaded-service-object', mergedValues)
+
+      // Reset form with merged values - this sets the initial state so no dirty detection
+      resetForm({ values: mergedValues })
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)

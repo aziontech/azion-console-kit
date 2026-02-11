@@ -84,6 +84,7 @@ describe('DataStreamingServices', () => {
         { key: 'edgeFunctionsSolutionId', value: fixtures.edgeFunction.edgeFunctionsSolutionId },
         { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
         { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage },
+        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
         { key: 'virtualhostid', value: fixtures.edgeFunction.virtualhostid }
       ],
       ts: 'February 23, 2024 at 06:07:25 PM'

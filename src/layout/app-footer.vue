@@ -130,13 +130,14 @@
 
   import { ref, computed } from 'vue'
   import Toolbar from 'primevue/toolbar'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
+  import { storeToRefs } from 'pinia'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import { useRoute } from 'vue-router'
-  const accountStore = useAccountStore()
-  const { setTheme } = accountStore
+  const themeStore = useThemeStore()
+  const { currentTheme } = storeToRefs(themeStore)
   const route = useRoute()
 
   defineOptions({
@@ -149,8 +150,6 @@
     { name: 'System', value: 'system', icon: 'pi pi-desktop' }
   ])
 
-  const currentTheme = computed(() => accountStore.currentTheme)
-
   const selectedTheme = computed(() =>
     themeOptions.value.find((option) => option.value === currentTheme.value)
   )
@@ -158,7 +157,7 @@
   const isThemeNotSelected = computed(() => !selectedTheme.value?.value)
 
   const selectTheme = (theme) => {
-    setTheme(theme)
+    themeStore.setTheme(theme)
   }
 
   const toolbarClass = computed(() => ({

@@ -61,7 +61,7 @@ export class WorkloadService extends BaseService {
     return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
@@ -69,7 +69,7 @@ export class WorkloadService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
+    return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
   #ensureCertificate = async (payload) => {
@@ -336,6 +336,40 @@ export class WorkloadService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return `Workload successfully deleted.`
+  }
+
+  getWorkloadFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
+      }),
+      listPath: 'body'
+    })
+  }
+
+  getDomainFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      cacheKey: 'workloads',
+      findFn: (item) => String(item.id) === String(id),
+      mapFn: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        active: item.active?.content === 'Active',
+        domainName: item.workloadHostname?.content,
+        environment: item.infrastructure === 'Production' ? 'production' : 'staging',
+        cnames: item.domains.join('\n') || ''
+      }),
+      listPath: 'body'
+    })
   }
 }
 

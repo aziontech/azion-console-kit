@@ -80,6 +80,10 @@
     emptyFilterMessage: {
       type: String,
       default: 'No results found'
+    },
+    aditionalError: {
+      type: String,
+      default: ''
     }
   })
 
@@ -196,7 +200,7 @@
     :emptyFilterMessage="props.emptyFilterMessage"
     @change="emitChange"
     @blur="emitBlur"
-    :class="{ 'p-invalid': errorMessage }"
+    :class="{ 'p-invalid': aditionalError || errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
     class="w-full"
@@ -218,11 +222,11 @@
   </Dropdown>
 
   <small
-    v-if="errorMessage"
+    v-if="aditionalError || errorMessage"
     :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
   >
-    {{ errorMessage }}
+    {{ aditionalError || errorMessage }}
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"

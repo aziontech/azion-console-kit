@@ -44,7 +44,7 @@ export class EdgeFirewallService extends BaseService {
     }
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
@@ -52,10 +52,7 @@ export class EdgeFirewallService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(queryKeys.firewall.list(params), () => this.#fetchList(params), {
-      persist: !params.search,
-      skipCache: params.search
-    })
+    return this.usePrefetchQuery(queryKeys.firewall.list(params), () => this.#fetchList(params))
   }
 
   listEdgeFirewallService = async (params) => {

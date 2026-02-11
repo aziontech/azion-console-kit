@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadTieredCache } from '@/services/real-time-events-service/tiered-cache'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -85,6 +86,8 @@ describe('tieredCacheServices', () => {
       body: { data: { l2CacheEvents: [fixtures.tieredCache] } }
     })
 
+    const expectedTs = getCurrentTimezone(fixtures.tieredCache.ts)
+
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
@@ -92,7 +95,7 @@ describe('tieredCacheServices', () => {
       scheme: fixtures.tieredCache.scheme,
       proxyHost: fixtures.tieredCache.proxyHost,
       serverProtocol: fixtures.tieredCache.serverProtocol,
-      ts: 'February 23, 2024 at 06:07:25 PM',
+      ts: expectedTs,
       data: [
         { key: 'bytesSent', value: fixtures.tieredCache.bytesSent },
         { key: 'cacheKey', value: fixtures.tieredCache.cacheKey },
@@ -116,6 +119,7 @@ describe('tieredCacheServices', () => {
         { key: 'solution', value: fixtures.tieredCache.solution },
         { key: 'status', value: fixtures.tieredCache.status },
         { key: 'tcpinfoRtt', value: fixtures.tieredCache.tcpinfoRtt },
+        { key: 'ts', value: expectedTs },
         { key: 'upstreamBytesReceived', value: fixtures.tieredCache.upstreamBytesReceived },
         { key: 'upstreamBytesReceivedStr', value: fixtures.tieredCache.upstreamBytesReceivedStr },
         { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus },

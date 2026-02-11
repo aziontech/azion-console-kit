@@ -4,6 +4,8 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 export const loadEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
 
@@ -87,6 +89,6 @@ const adaptResponse = (response) => {
     lineSource: cellsConsoleEvents.lineSource,
     level: levelMap[cellsConsoleEvents.level],
     ts: getCurrentTimezone(cellsConsoleEvents.ts),
-    data: buildSummary(cellsConsoleEvents)
+    data: buildSummary(cellsConsoleEvents, false, shouldShowTsColumn)
   }
 }

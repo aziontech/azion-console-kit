@@ -35,6 +35,9 @@
 
   const filterDataRange = ref({})
   const hasPendingDateUpdate = ref(false)
+  const hasPendingQueryUpdate = ref(false)
+  const hasAqlValidationError = ref(false)
+  const aqlRef = ref(null)
 
   const isInvalidRange = computed(() => {
     const start = filterDataRange.value?.startDate
@@ -147,6 +150,16 @@
   }
 
   const applyFilters = () => {
+    if (hasAqlValidationError.value) return
+
+    if (hasPendingQueryUpdate.value) {
+      const parsed = aqlRef.value?.getParsedFilters?.()
+      if (Array.isArray(parsed)) {
+        filterData.value.fields = parsed
+      }
+      aqlRef.value?.markAsApplied?.()
+      hasPendingQueryUpdate.value = false
+    }
     updatedTime()
     emitUpdatedFilter()
     hasPendingDateUpdate.value = false
@@ -160,6 +173,14 @@
     if (hasPendingDateUpdate.value) return
     updatedTime()
     emitUpdatedFilter()
+  }
+
+  const onAqlDirtyChange = (isDirty) => {
+    hasPendingQueryUpdate.value = Boolean(isDirty)
+  }
+
+  const onAqlValidationChange = (hasError) => {
+    hasAqlValidationError.value = Boolean(hasError)
   }
 
   const emitUpdatedFilter = () => {
@@ -275,6 +296,9 @@
             :fieldsInFilter="props.fieldsInFilter"
             :searchAdvancedFilter="searchAdvancedFilter"
             :filterAdvanced="filterData.fields"
+            ref="aqlRef"
+            @dirty="onAqlDirtyChange"
+            @validation="onAqlValidationChange"
           />
         </div>
         <DataTimeRange
@@ -287,13 +311,13 @@
           @autoRefresh="onAutoRefreshTick"
         />
         <PrimeButton
-          v-if="!hasPendingDateUpdate"
+          v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
           icon="pi pi-refresh"
           outlined
           size="small"
           label="Refresh"
           class="w-[5.875rem]"
-          :disabled="isInvalidRange"
+          :disabled="isInvalidRange || hasAqlValidationError"
           @click="applyFilters"
         />
         <PrimeButton
@@ -302,7 +326,7 @@
           severity="secondary"
           size="small"
           label="Update"
-          :disabled="isInvalidRange"
+          :disabled="isInvalidRange || hasAqlValidationError"
           class="w-[5.875rem]"
           @click="applyFilters"
         />

@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeStorageService extends BaseService {
   constructor() {
@@ -8,14 +9,14 @@ export class EdgeStorageService extends BaseService {
     this.baseURL = 'v4/workspace/storage'
   }
 
-  listEdgeStorageBuckets = async (params = {}) => {
+  #fetchBucketsList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/buckets`,
       params: {
         search: '',
         fields: '',
-        ordering: 'name',
+        ordering: '-last_modified',
         page: 1,
         pageSize: 10,
         ...params
@@ -25,6 +26,32 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      ordering: '-last_modified',
+      fields: ['name', 'size', 'last_editor', 'last_modified', 'workloads_access']
+    }
+    return this.usePrefetchQuery(queryKeys.edgeStorage.buckets.list(defaultParams), () =>
+      this.#fetchBucketsList(defaultParams)
+    )
+  }
+
+  listEdgeStorageBuckets = async (params = {}) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeStorage.buckets.list(params),
+      () => this.#fetchBucketsList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createEdgeStorageBucket = async (bucket = {}) => {
     const body = this.adapter?.transformCreateStorageBucket?.(bucket)
     const { data } = await this.http.request({
@@ -32,6 +59,8 @@ export class EdgeStorageService extends BaseService {
       url: `${this.baseURL}/buckets`,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return data
   }
@@ -63,6 +92,8 @@ export class EdgeStorageService extends BaseService {
       body: { workloads_access: bucket.workloads_access }
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
+
     return data
   }
 
@@ -71,6 +102,8 @@ export class EdgeStorageService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/buckets/${bucketName}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return `Bucket "${bucketName}" has been deleted successfully`
   }
@@ -186,7 +219,9 @@ export class EdgeStorageService extends BaseService {
           filter: {
             tsGte: "${tsGte}"
             tsLt: "${tsLt}"
-          }
+          },
+          limit: 1000,
+          offset: 0
         ) {
           bucketName
           storedGb

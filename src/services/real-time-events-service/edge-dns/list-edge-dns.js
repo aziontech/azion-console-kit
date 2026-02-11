@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listEdgeDNS = async (filter) => {
   const payload = adapt(filter)
 
@@ -48,7 +51,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const data = response.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
-    summary: buildSummary(edgeDnsQueriesEvents),
+    summary: buildSummary(edgeDnsQueriesEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: edgeDnsQueriesEvents.ts,
     tsFormat: getCurrentTimezone(edgeDnsQueriesEvents.ts),
     uuid: edgeDnsQueriesEvents.uuid

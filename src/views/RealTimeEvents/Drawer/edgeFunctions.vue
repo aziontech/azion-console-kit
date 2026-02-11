@@ -44,10 +44,9 @@
     if (!isVisible) details.value = {}
   })
 
-  const tags = computed(() => {
-    return details.value.functionLanguage
-      ? [{ icon: 'pi pi-code', text: details.value.functionLanguage }]
-      : []
+  const title = computed(() => {
+    if (!details.value.functionLanguage) return 'More Details'
+    return `More Details: Function Language - ${details.value.functionLanguage}`
   })
 
   defineExpose({ openDetailDrawer })
@@ -56,18 +55,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          title="Function Language"
-          :date="details.ts"
-          :tags="tags"
-          :loading="loading"
-          hideDivider
-        />
-
         <TabView
           class="w-full h-full"
           v-if="!loading"
