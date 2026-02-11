@@ -106,18 +106,21 @@
       header: 'Type'
     },
     {
-      field: 'value',
-      header: 'Value',
-      sortField: 'answers_list',
-      filterPath: 'value.content',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-format-with-popup',
-          dependencies: { showCopy: !!props.clipboardWrite }
-        })
-    },
+        field: 'value',
+        header: 'Value',
+        sortField: 'answers_list',
+        filterPath: 'value.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: Array.isArray(columnData) ? columnData : columnData?.content,
+            columnAppearance: 'text-array-with-popup',
+            dependencies: {
+              showCopy: !!props.clipboardWrite
+            }
+          })
+        }
+      },
     {
       field: 'ttl',
       header: 'TTL (seconds)',
@@ -209,13 +212,13 @@
     let selectedTab = tab
     if (!selectedTab) selectedTab = 'mainSettings'
 
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
+
     edgeDNS.value = { ...edgeDNS.value, ...(await loaderEdgeDNS()) }
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeDNS.value?.name)
     preloadTabData()
-
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
-    changeTab(activeTabIndexByRoute)
   }
 
   // --- Cache from listing ---
