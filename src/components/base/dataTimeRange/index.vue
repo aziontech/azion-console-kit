@@ -216,11 +216,6 @@
     ]
   })
 
-  // const formattedUtcApplied = computed(() => {
-  //   const offset = model.value?.utcOffset || props.defaultUtcOffset
-  //   return formatUtcOffsetLabel(offset)
-  // })
-
   watch(
     () => model.value?.utcOffset,
     () => {
