@@ -4,6 +4,7 @@
       v-model="model"
       :maxDays="maxDays"
       @select="emit('select', $event)"
+      @autoRefresh="emit('autoRefresh', $event)"
       @open="openOverlay($event, 0)"
     />
     <InputDateRange
@@ -53,6 +54,7 @@
               v-model="model"
               :maxDays="maxDays"
               @select="emit('select', $event)"
+              @autoRefresh="emit('autoRefresh', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -93,16 +95,37 @@
             </div>
           </TabPanel>
         </TabView>
+
+        <div
+          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
+          :class="{
+            'px-4 mt-1': activeTab === 3
+          }"
+        >
+          <div class="text-xs text-color-secondary">
+            UTC:
+            <span class="text-color font-medium">{{ userTimezone }}</span>
+          </div>
+          <Dropdown
+            v-model="model.utcOffset"
+            :options="utcOffsetOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-auto"
+            :pt="{ input: { class: 'text-xs' } }"
+          />
+        </div>
       </div>
     </OverlayPanel>
   </div>
 </template>
 
 <script setup>
-  import { defineModel, nextTick, ref } from 'vue'
+  import { computed, defineModel, nextTick, onMounted, ref, watch } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -111,18 +134,27 @@
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
-  defineProps({
+  const props = defineProps({
     maxDays: {
       type: Number
+    },
+    defaultUtcOffset: {
+      type: String,
+      default: '+0000'
+    },
+    userTimezone: {
+      type: String,
+      default: '+0000'
     }
   })
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'autoRefresh'])
 
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
+  const hasInitializedUtcOffset = ref(false)
 
   const model = defineModel({
     type: Object,
@@ -146,6 +178,43 @@
       }
     }
   })
+
+  const utcOffsetOptions = computed(() => {
+    const offsets = []
+    for (let hour = -12; hour <= 14; hour++) {
+      const sign = hour >= 0 ? '+' : '-'
+      const absHour = Math.abs(hour)
+      const hh = String(absHour).padStart(2, '0')
+      offsets.push({
+        label: `UTC${sign}${hh}:00`,
+        value: `${sign}${hh}00`
+      })
+    }
+
+    return [
+      {
+        label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
+        value: props.defaultUtcOffset
+      },
+      { label: 'UTC+00:00', value: '+0000' },
+      ...offsets
+    ]
+  })
+
+  watch(
+    () => model.value?.utcOffset,
+    () => {
+      if (!hasInitializedUtcOffset.value) return
+      emit('select', model.value)
+    }
+  )
+
+  const formatUtcOffsetLabel = (offset) => {
+    const normalized = typeof offset === 'string' ? offset.trim() : ''
+    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
+    if (!match) return 'UTC'
+    return `UTC${match[1]}${match[2]}:${match[3]}`
+  }
 
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
@@ -202,4 +271,11 @@
     emit('select', model.value)
     closeOverlay()
   }
+
+  onMounted(() => {
+    if (!model.value?.utcOffset) {
+      model.value.utcOffset = props.defaultUtcOffset
+    }
+    hasInitializedUtcOffset.value = true
+  })
 </script>

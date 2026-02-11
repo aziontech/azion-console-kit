@@ -130,4 +130,31 @@ describe('AQL - IN operator normalization and list parsing', () => {
 
     expect(errors).toContain('in-operator-empty-value-error')
   })
+
+  it('should not raise quote-error when composite field contains "in" substring (instance) and is quoted', () => {
+    const aql = new Aql()
+    const suggestions = [
+      {
+        label: 'Edge Functions Instance ID List',
+        value: {
+          operator: [
+            {
+              label: 'Equals',
+              value: {
+                value: 'Equals',
+                type: 'String'
+              }
+            }
+          ]
+        }
+      }
+    ]
+
+    const query = '"edge functions instance id list" = 1'
+    const errors = aql.queryValidator(query, suggestions)
+
+    expect(errors).not.toContain(
+      'composite fields must be included in quotes. e.g: "Upstream Status".'
+    )
+  })
 })

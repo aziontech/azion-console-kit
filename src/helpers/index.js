@@ -35,7 +35,8 @@ import {
   convertValueToDateByUserTimezone,
   formatDateMonthAndYear,
   getRemainingDays,
-  getCurrentDateTimeIntl
+  getCurrentDateTimeIntl,
+  convertUnitToMilliseconds
 } from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
@@ -132,5 +133,6 @@ export {
   getRemainingDays,
   getCurrentDateTimeIntl,
   contactSalesEdgeApplicationService,
-  formatString
+  formatString,
+  convertUnitToMilliseconds
 }
