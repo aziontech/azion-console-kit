@@ -33,6 +33,7 @@ export class EdgeDNSService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
+      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeDNS.list(defaultParams), () =>
