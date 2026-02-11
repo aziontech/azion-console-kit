@@ -13,7 +13,7 @@
   import LabelBlock from '@/templates/label-block'
 
   import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, inject, ref } from 'vue'
 
   const props = defineProps({
     handleBlock: {
@@ -147,6 +147,9 @@
     ]
   }
 
+  const isApplicationLoaded = inject('isApplicationLoaded', ref(true))
+  const isLoadingDeliverySettings = computed(() => !isApplicationLoaded.value)
+
   const checkIsProtocol = computed(() => ({
     http: deliveryProtocol.value === 'http',
     https: deliveryProtocol.value === 'http,https',
@@ -241,6 +244,7 @@
         label="Protocol Usage"
         nameField="deliveryProtocol"
         :isCard="false"
+        :disabled="isLoadingDeliverySettings"
         @onRadioChange="(option) => setDeliveryProtocol(option, false)"
         :options="usageProtocolRadioOptions"
         data-testid="form-horizontal-delivery-settings-protocol-usage"
@@ -267,11 +271,12 @@
               filter
               autoFilterFocus
               optionLabel="name"
+              :loading="isLoadingDeliverySettings"
               :class="{ 'p-invalid': httpPortError }"
               placeholder="Select an HTTP port"
               class="w-full"
               display="chip"
-              :disabled="checkIsProtocol.http3"
+              :disabled="isLoadingDeliverySettings || checkIsProtocol.http3"
               :pt="{
                 trigger: {
                   class: `${checkIsProtocol.http3 ? 'hidden' : ''}`
@@ -311,10 +316,11 @@
               autoFilterFocus
               optionLabel="name"
               display="chip"
+              :loading="isLoadingDeliverySettings"
               :class="{ 'p-invalid': httpsPortError }"
               placeholder="Select an HTTPS port"
               class="w-full"
-              :disabled="checkIsProtocol.http || checkIsProtocol.http3"
+              :disabled="isLoadingDeliverySettings || checkIsProtocol.http || checkIsProtocol.http3"
               :pt="{
                 trigger: {
                   class: `${checkIsProtocol.http || checkIsProtocol.http3 ? 'hidden' : ''}`
@@ -347,9 +353,10 @@
             optionLabel="label"
             optionValue="value"
             :value="minimumTlsVersion"
+            :loading="isLoadingDeliverySettings"
             inputId="minimumTlsVersion"
             placeholder="Select a minimum TLS Version"
-            :disabled="checkIsProtocol.http"
+            :disabled="isLoadingDeliverySettings || checkIsProtocol.http"
             description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
           />
         </div>
@@ -363,9 +370,10 @@
             optionLabel="label"
             optionValue="value"
             :value="supportedCiphers"
+            :loading="isLoadingDeliverySettings"
             inputId="supportedCiphers"
             placeholder="Select the supported cipher suite"
-            :disabled="checkIsProtocol.http"
+            :disabled="isLoadingDeliverySettings || checkIsProtocol.http"
             description="Select which cipher suite the application supports. See the list of supported ciphers in the documentation."
           />
         </div>
