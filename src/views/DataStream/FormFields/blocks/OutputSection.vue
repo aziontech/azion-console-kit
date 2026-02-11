@@ -814,6 +814,7 @@
   import { computed, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useThemeStore } from '@/stores/theme'
+  import { useAccountStore } from '@/stores/account'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
@@ -825,7 +826,8 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
 
-  const store = useThemeStore()
+  const themeStore = useThemeStore()
+  const accountStore = useAccountStore()
 
   const { value: endpoint } = useField('endpoint')
   const { value: endpointUrl } = useField('endpointUrl')
@@ -892,7 +894,9 @@
   const { value: containerName } = useField('containerName')
   const { value: blobToken } = useField('blobToken')
 
-  const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
+  const hasNoPermissionToEditDataStream = computed(
+    () => !accountStore.hasPermissionToEditDataStream
+  )
 
   const listEndpoint = ref([
     { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
@@ -927,7 +931,7 @@
   ])
 
   const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+    return themeStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
   const DEFAULT_MONACO_OPTIONS = {
