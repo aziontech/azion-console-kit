@@ -163,11 +163,11 @@
     edgeFirewall.value = await loaderEdgeFirewall()
     verifyTab(edgeFirewall.value)
 
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
-    preloadTabData()
-
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
+
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
+    preloadTabData()
   }
 
   const title = computed(() => {

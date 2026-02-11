@@ -106,21 +106,21 @@
       header: 'Type'
     },
     {
-        field: 'value',
-        header: 'Value',
-        sortField: 'answers_list',
-        filterPath: 'value.content',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: Array.isArray(columnData) ? columnData : columnData?.content,
-            columnAppearance: 'text-array-with-popup',
-            dependencies: {
-              showCopy: !!props.clipboardWrite
-            }
-          })
-        }
-      },
+      field: 'value',
+      header: 'Value',
+      sortField: 'answers_list',
+      filterPath: 'value.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: Array.isArray(columnData) ? columnData : columnData?.content,
+          columnAppearance: 'text-array-with-popup',
+          dependencies: {
+            showCopy: !!props.clipboardWrite
+          }
+        })
+      }
+    },
     {
       field: 'ttl',
       header: 'TTL (seconds)',

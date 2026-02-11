@@ -172,7 +172,12 @@ export const queryKeys = {
     dnssec: (id) => [...queryKeys.edgeDNS.detail(id), 'dnssec'],
     records: {
       all: (parentId) => [...queryKeys.edgeDNS.detail(parentId), 'records'],
-      list: (parentId, params) => [...queryKeys.edgeDNS.detail(parentId), 'records', 'list', params],
+      list: (parentId, params) => [
+        ...queryKeys.edgeDNS.detail(parentId),
+        'records',
+        'list',
+        params
+      ],
       detail: (parentId, id) => [...queryKeys.edgeDNS.detail(parentId), 'records', 'detail', id]
     }
   },
