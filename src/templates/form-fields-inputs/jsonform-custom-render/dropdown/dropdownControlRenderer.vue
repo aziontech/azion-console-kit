@@ -28,6 +28,7 @@
         value: item.const
       }))
     }
+    return []
   })
 
   const optionLabel = computed(() => control.value.schema.optionLabel || 'label')
