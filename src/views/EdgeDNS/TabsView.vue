@@ -200,10 +200,7 @@
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    await Promise.allSettled([
-      edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize),
-      edgeDNSService.loadEdgeDNSZoneDNSSEC(edgeDNSId.value)
-    ])
+    await edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
   }
 
   const renderTabCurrentRouter = async () => {
