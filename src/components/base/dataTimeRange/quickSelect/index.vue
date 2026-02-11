@@ -233,25 +233,10 @@
   const autoRefreshTimeoutId = ref(null)
   const autoRefreshInFlight = ref(false)
 
-  const isAutoRefreshDebugEnabled = () => {
-    try {
-      return window?.localStorage?.getItem?.('debug:autoRefresh') === '1'
-    } catch {
-      return false
-    }
-  }
-
-  const autoRefreshDebug = (...args) => {
-    if (!isAutoRefreshDebugEnabled()) return
-    // eslint-disable-next-line no-console
-    console.log('[auto-refresh][QuickSelect]', ...args)
-  }
-
   const clearAutoRefreshTimer = () => {
     if (!autoRefreshTimeoutId.value) return
     clearTimeout(autoRefreshTimeoutId.value)
     autoRefreshTimeoutId.value = null
-    autoRefreshDebug('timer cleared')
   }
 
   const getAutoRefreshIntervalMs = (cfg) => {
@@ -283,28 +268,22 @@
 
     const cfg = model.value?.autoRefresh
     const intervalMs = getAutoRefreshIntervalMs(cfg)
-    autoRefreshDebug('schedule requested', { cfg, intervalMs })
     if (!intervalMs) return
 
     autoRefreshTimeoutId.value = setTimeout(async () => {
       try {
         if (autoRefreshInFlight.value) {
-          autoRefreshDebug('skipping tick (in flight)')
           scheduleAutoRefresh()
           return
         }
 
         autoRefreshInFlight.value = true
-        autoRefreshDebug('tick -> emit(autoRefresh)')
         emit('autoRefresh', model.value)
       } finally {
         autoRefreshInFlight.value = false
-        autoRefreshDebug('tick finished; rescheduling')
         scheduleAutoRefresh()
       }
     }, intervalMs)
-
-    autoRefreshDebug('timer scheduled', { intervalMs })
   }
 
   onMounted(() => {
@@ -344,7 +323,6 @@
   watch(
     () => model.value?.autoRefresh,
     () => {
-      autoRefreshDebug('model.autoRefresh changed', model.value?.autoRefresh)
       scheduleAutoRefresh()
     },
     { deep: true }

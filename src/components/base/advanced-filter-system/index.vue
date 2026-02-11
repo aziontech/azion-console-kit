@@ -70,20 +70,6 @@
     return { direction, value, unit }
   }
 
-  const isAutoRefreshDebugEnabled = () => {
-    try {
-      return window?.localStorage?.getItem?.('debug:autoRefresh') === '1'
-    } catch {
-      return false
-    }
-  }
-
-  const autoRefreshDebug = (...args) => {
-    if (!isAutoRefreshDebugEnabled()) return
-    // eslint-disable-next-line no-console
-    console.log('[auto-refresh][AdvancedFilterSystem]', ...args)
-  }
-
   const updatedTime = () => {
     const now = new Date()
 
@@ -171,16 +157,8 @@
   }
 
   const onAutoRefreshTick = () => {
-    autoRefreshDebug('tick received', {
-      hasPendingDateUpdate: hasPendingDateUpdate.value,
-      autoRefresh: filterDataRange.value?.autoRefresh,
-      label: filterDataRange.value?.label,
-      labelStart: filterDataRange.value?.labelStart,
-      labelEnd: filterDataRange.value?.labelEnd
-    })
     if (hasPendingDateUpdate.value) return
     updatedTime()
-    autoRefreshDebug('emitting updatedFilter')
     emitUpdatedFilter()
   }
 
