@@ -211,5 +211,10 @@ export const queryKeys = {
     all: ['edge-sql'],
     list: (params) => [...queryKeys.edgeSql.all, 'list', params],
     detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
+  },
+  appcues: {
+    all: ['appcues'],
+    tags: () => [...queryKeys.appcues.all, 'tags'],
+    launchpads: () => [...queryKeys.appcues.all, 'launchpads']
   }
 }
