@@ -216,10 +216,10 @@
     return `UTC${match[1]}${match[2]}:${match[3]}`
   }
 
-  const openOverlay = async (payload, tabIndex) => {
-    activeTab.value = tabIndex
-    const event = tabIndex === 0 ? payload : payload?.event
-    const field = tabIndex === 0 ? undefined : payload?.field
+  const openOverlay = async (payload) => {
+    activeTab.value = 0
+    const event = payload?.event ?? payload
+    const field = payload?.field
     if (field === 'start' || field === 'end') editingField.value = field
 
     if (!event) return
