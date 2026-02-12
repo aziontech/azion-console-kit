@@ -145,8 +145,9 @@
       :isTabs="true"
       :editInDrawer="false"
       emptyListMessage="No credentials found"
-      :paginator="false"
+      :paginator="true"
       :enableEditClick="false"
+      default-ordering-field-name="-last_modified"
       exportFileName="Credentials"
       :emptyBlock="{
         title: 'No credentials found',
