@@ -2,27 +2,17 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallAdapter } from './edge-firewall-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-export const DEFAULT_FIELDS = [
-  'id',
-  'name',
-  'debug_rules',
-  'last_editor',
-  'last_modified',
-  'active'
-]
-
 export class EdgeFirewallService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeFirewallAdapter
     this.baseURL = 'v4/workspace/firewalls'
-    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (
     params = {
       pageSize: 10,
-      fields: this.fieldsDefault
+      fields: []
     }
   ) => {
     const { data } = await this.http.request({
@@ -47,7 +37,7 @@ export class EdgeFirewallService extends BaseService {
     const params = {
       page: 1,
       pageSize,
-      fields: this.fieldsDefault,
+      fields: [],
       ordering: '-last_modified'
     }
 

@@ -45,15 +45,6 @@
   const route = useRoute()
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
-  const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
-    'id',
-    'name',
-    'last_editor',
-    'last_modified',
-    'version',
-    'function'
-  ]
-
   const documentationService = () => {
     openDocumentationProducts('/secure/firewall/functions-instances/')
   }
@@ -175,7 +166,6 @@
     :editInDrawer="openEditFunctionDrawer"
     :actions="actions"
     isTabs
-    :apiFields="EDGE_FIREWALL_FUNCTIONS_API_FIELDS"
     :frozen-columns="['name']"
     exportFileName="Firewall Functions"
     :emptyBlock="{

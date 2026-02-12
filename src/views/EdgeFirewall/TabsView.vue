@@ -15,8 +15,11 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   const breadcrumbs = useBreadcrumbs()
+  const tableDefinitionsStore = useTableDefinitionsStore()
+  const pageSize = tableDefinitionsStore.getNumberOfLinesPerPage || 10
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -127,7 +130,7 @@
     changeTab(index)
   }
 
-  const verifyTab = ({ edgeFunctionsEnabled }) => {
+  const verifyTab = ({ edgeFunctionsEnabled } = {}) => {
     if (!edgeFunctionsEnabled) {
       delete mapTabs.value.functions
       mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
@@ -145,7 +148,7 @@
     const preloadPromises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value))
+      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value, pageSize))
     }
 
     preloadPromises.push(
