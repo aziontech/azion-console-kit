@@ -1,6 +1,4 @@
 import {
-  getApi,
-  getAccountId,
   fetchTags,
   fetchLaunchpads,
   findTagIdByName,
@@ -69,22 +67,15 @@ const extractChangelogItems = (launchpad) => {
 }
 
 export const listChangelogService = async () => {
-  const api = getApi()
-  const accountId = getAccountId()
-
-  if (!api || !accountId) {
-    return []
-  }
-
   try {
-    const tags = await fetchTags(api)
+    const tags = await fetchTags()
     const changelogTagId = findTagIdByName(tags, CHANGELOG_TAG_NAME)
 
     if (!changelogTagId) {
       return []
     }
 
-    const launchpads = await fetchLaunchpads(api)
+    const launchpads = await fetchLaunchpads()
     const changelogLaunchpads = filterLaunchpadsByTagId(launchpads, changelogTagId)
 
     if (changelogLaunchpads.length === 0) {

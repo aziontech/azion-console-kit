@@ -79,11 +79,12 @@
                 ></i>
               </div>
               <div class="flex-1 flex flex-col gap-0 justify-center">
-                <h3
-                  class="text-sm font-semibold text-[var(--text-color-base)] overflow-hidden text-ellipsis whitespace-nowrap"
+                <router-link
+                  :to="`/marketplace/solution/azion/${currentItem.slug}`"
+                  class="text-sm font-semibold text-[var(--text-color-base)] overflow-hidden text-ellipsis whitespace-nowrap hover:underline"
                 >
                   {{ currentItem.name }}
-                </h3>
+                </router-link>
               </div>
             </div>
 
@@ -188,7 +189,7 @@
   const loadTrendingSolutions = async () => {
     isLoading.value = true
     try {
-      items.value = await solutionService.listTrendingSolutions(3)
+      items.value = await solutionService.listTrendingSolutions({ ids: [2, 6, 43] })
     } catch (error) {
       items.value = []
     } finally {

@@ -86,12 +86,20 @@ export class SolutionService extends BaseService {
 
     return parsedSolutions
   }
-  async listTrendingSolutions(limit = 3) {
+  async listTrendingSolutions({ ids = [], limit = 3 } = {}) {
     const allTrending = await this.useEnsureQueryData(
       queryKeys.solutions.trending(),
       () => this.#fetchTrendingSolutions(),
       { cacheType: this.cacheType.STATIC }
     )
+
+    if (ids.length > 0) {
+      const filtered = ids
+        .map((id) => allTrending.find((solution) => solution.id === `${id}`))
+        .filter(Boolean)
+      return filtered
+    }
+
     return allTrending.slice(0, limit)
   }
 
@@ -113,6 +121,7 @@ export class SolutionService extends BaseService {
       .map((element) => ({
         id: `${element.id}`,
         name: element.name,
+        slug: element.slug,
         description: element.headline,
         author: element.vendor?.name || 'Unknown',
         vendorIcon: element.vendor?.icon || null,
