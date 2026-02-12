@@ -54,6 +54,7 @@
       show: () => mapTabs.value.mainSettings === activeTab.value,
       props: () => ({
         edgeFirewall: edgeFirewall.value,
+        initialValues: edgeFirewall.value,
         loadDomains: props.listDomainsService,
         updatedRedirect: props.edgeFirewallServices.updatedRedirect,
         isTab: true
@@ -160,14 +161,23 @@
     let selectedTab = tab
     if (!selectedTab) selectedTab = 'mainSettings'
 
-    edgeFirewall.value = await loaderEdgeFirewall()
-    verifyTab(edgeFirewall.value)
-
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
 
+    edgeFirewall.value = { ...edgeFirewall.value, ...(await loaderEdgeFirewall()) }
+    verifyTab(edgeFirewall.value)
+
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
     preloadTabData()
+  }
+
+  // --- Cache from listing ---
+
+  const cachedFirewall = edgeFirewallService.getFirewallFromCache(edgeFirewallId.value)
+
+  if (cachedFirewall?.name) {
+    edgeFirewall.value = cachedFirewall
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedFirewall.name)
   }
 
   const title = computed(() => {

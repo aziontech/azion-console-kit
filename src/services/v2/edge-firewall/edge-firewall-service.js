@@ -68,6 +68,21 @@ export class EdgeFirewallService extends BaseService {
     )
   }
 
+  getFirewallFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.firewall.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        ...item,
+        name: item.name?.text ?? item.name,
+        isActive: item.active?.content === 'Active'
+      })
+    })
+  }
+
   listEdgeFirewallServiceDropdown = async (
     params = {
       pageSize: 10,
