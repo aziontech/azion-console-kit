@@ -28,7 +28,7 @@ export const edgeSQLRoutes = {
             to: '/sql-database'
           },
           {
-            label: 'Create Database'
+            label: 'Create'
           }
         ]
       }
@@ -42,6 +42,11 @@ export const edgeSQLRoutes = {
           {
             label: 'SQL Database',
             to: '/sql-database'
+          },
+          {
+            label: 'Edit Database',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

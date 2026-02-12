@@ -4,26 +4,25 @@ import { digitalCertificatesService } from '@/services/v2/digital-certificates/d
 import { buildCertificateNames } from '@/services/utils/domain-names'
 import { hasAnyFieldChanged } from '@/services/v2/utils/hasAnyFieldChanged'
 import { DigitalCertificatesAdapter } from '@/services/v2/digital-certificates/digital-certificates-adapter'
-const keysToCheck = ['common_name', 'alternative_names']
-
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import * as Errors from '@/services/axios/errors'
 
-export const editDomainService = async (payload) => {
-  // Build request body from payload (pure + certificate resolution)
-  const body = await buildRequestBody(payload)
+const keysToCheck = ['common_name', 'alternative_names']
 
-  // API call
+export const editDomainService = async (payload) => {
+  const body = await buildRequestBody(payload)
   const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}/${payload.id}`,
     method: 'PATCH',
     body
   })
 
-  // Response handling
+  queryClient.removeQueries({ queryKey: queryKeys.workload.all })
+
   return handleHttpResponse(httpResponse)
 }
 
-// Utilities
 const splitCnames = (cnames) => cnames.split('\n').filter((item) => item !== '')
 
 const buildLetsEncryptBase = (name, cnames, edgeCertificate) => {
@@ -40,7 +39,61 @@ const buildLetsEncryptBase = (name, cnames, edgeCertificate) => {
   }
 }
 
-// Decide and resolve certificate id (including change detection)
+const certificateIsWildcard = (subjectName) => {
+  if (Array.isArray(subjectName)) {
+    return subjectName.some((name) => typeof name === 'string' && name.trim().startsWith('*'))
+  }
+
+  if (typeof subjectName === 'string') {
+    return subjectName.trim().startsWith('*')
+  }
+
+  return false
+}
+
+const getWildcardBaseDomains = (subjectName) =>
+  (Array.isArray(subjectName) ? subjectName : [subjectName]).reduce((acc, name) => {
+    if (typeof name === 'string') {
+      const domain = name.trim().slice(1).replace(/^\.+/, '')
+      if (name.trim().startsWith('*') && domain) acc.push(domain)
+    }
+    return acc
+  }, [])
+
+const hostnameIsSubdomainOf = (hostname, baseDomain) => {
+  if (typeof hostname !== 'string' || typeof baseDomain !== 'string') return false
+  const host = hostname.trim().toLowerCase()
+  const base = baseDomain.trim().toLowerCase()
+
+  if (!host || !base) return false
+  if (!host.endsWith(`.${base}`)) return false
+
+  return host.length > base.length + 1
+}
+
+const hasUncoveredHostnamesForWildcard = (subjectName, hostnames) => {
+  const bases = getWildcardBaseDomains(subjectName)
+  if (!bases.length) return []
+
+  const uncovered = (hostnames || []).filter((hostname) => {
+    return !bases.some((base) => hostnameIsSubdomainOf(hostname, base))
+  })
+
+  return !uncovered.length
+}
+
+const shouldSkipLetsEncryptRecreation = ({ changed, subjectNameCertificate, letEncryptBase }) => {
+  if (!changed) return false
+  if (!certificateIsWildcard(subjectNameCertificate)) return false
+
+  const hostnames = [
+    letEncryptBase.letEncrypt.commonName,
+    ...(letEncryptBase.letEncrypt.alternativeNames || [])
+  ]
+
+  return hasUncoveredHostnamesForWildcard(subjectNameCertificate, hostnames)
+}
+
 const resolveCertificateId = async (payload, cnames) => {
   const edgeCertificate = payload.edgeCertificate
 
@@ -66,6 +119,14 @@ const resolveCertificateId = async (payload, cnames) => {
       keysToCheck
     )
 
+    const skipRecreation = shouldSkipLetsEncryptRecreation({
+      changed,
+      subjectNameCertificate: payload.subjectNameCertificate,
+      letEncryptBase
+    })
+
+    if (skipRecreation) return null
+
     if (changed) {
       const { id } = await digitalCertificatesService.createDigitalCertificateLetEncrypt(
         letEncryptBase,
@@ -77,7 +138,6 @@ const resolveCertificateId = async (payload, cnames) => {
     return null
   }
 
-  // If user selected Let's Encrypt directly, ensure a new certificate is created
   if (edgeCertificate === 'lets_encrypt' || edgeCertificate === 'lets_encrypt_http') {
     const letEncryptBase = buildLetsEncryptBase(payload.name, cnames, edgeCertificate)
     const { id } =
@@ -85,11 +145,9 @@ const resolveCertificateId = async (payload, cnames) => {
     return id
   }
 
-  // Otherwise, use the provided certificate id (or null)
   return null
 }
 
-// Normalize payload and assemble API body
 const buildRequestBody = async (payload) => {
   const cnames = splitCnames(payload.cnames)
 

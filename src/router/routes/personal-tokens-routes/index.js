@@ -1,5 +1,6 @@
 import * as PersonalTokensService from '@/services/personal-tokens-services'
 import * as Helpers from '@/helpers'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const personalTokensRoutes = {
@@ -13,7 +14,7 @@ export const personalTokensRoutes = {
       props: {
         listPersonalTokensService: PersonalTokensService.listPersonalTokens,
         deletePersonalTokenService: PersonalTokensService.deletePersonalToken,
-        documentationService: Helpers.documentationCatalog.personalTokens
+        documentationService: documentationAccountsProducts.personalTokens
       },
       meta: {
         title: 'Personal Tokens',
@@ -42,7 +43,7 @@ export const personalTokensRoutes = {
             to: '/personal-tokens'
           },
           {
-            label: 'Create Personal Token',
+            label: 'Create',
             to: '/personal-tokens/create'
           }
         ]

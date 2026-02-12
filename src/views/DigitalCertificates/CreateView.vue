@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitleByCertificateType"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="pageTitleByCertificateType"
+        description="Configure certificate data, validation methods, and lifecycle settings used to secure traffic."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
@@ -100,8 +103,7 @@
   }
 
   const handleToast = (response) => {
-    const label =
-      certificateTypeList.value === 'Certificates' ? 'View Edge Certificate' : 'View CRL'
+    const label = certificateTypeList.value === 'Certificates' ? 'View Certificate' : 'View CRL'
 
     const toast = {
       feedback: 'Your digital certificate has been created!',

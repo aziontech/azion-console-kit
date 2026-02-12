@@ -2,9 +2,7 @@
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
 
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
@@ -12,6 +10,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import * as Helpers from '@/helpers'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'list-edge-sql-databases' })
 
@@ -105,10 +104,28 @@
     router.push(`/sql-database/database/${database.id}`)
   }
 
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      lastEditor: rowData.lastEditor,
+      lastModified: rowData.lastModified,
+      status: rowData.data?.content
+    }
+  }
+
   const getColumns = computed(() => [
-    { field: 'name', header: 'Name' },
-    { field: 'lastEditor', header: 'Last Editor' },
-    { field: 'lastModified', header: 'Last Modified' },
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      style: 'max-width: 300px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
+    },
     {
       field: 'status',
       header: 'Status',
@@ -118,6 +135,18 @@
           data: columnData,
           columnAppearance: 'tag'
         })
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      sortField: 'lastModified',
+      filterPath: 'lastModified'
     }
   ])
 
@@ -127,7 +156,13 @@
       label: 'Delete',
       title: 'database',
       icon: 'pi pi-trash',
-      service: deleteDatabase
+      service: deleteDatabase,
+      disabled: (data) => {
+        if (data.status.content === 'deleting' || data.status.content === 'creating') {
+          return true
+        }
+        return false
+      }
     }
   ]
 
@@ -157,6 +192,24 @@
     { immediate: true }
   )
 
+  watch(
+    () => fetchListRef.value?.data,
+    (data) => {
+      if (Array.isArray(data) && data.length) {
+        const databaseCreating = data.find((database) => {
+          const statusContent =
+            typeof database.status === 'string' ? database.status : database.status?.content
+          return statusContent === 'creating'
+        })
+
+        if (databaseCreating?.id) {
+          startPolling(databaseCreating.id)
+        }
+      }
+    },
+    { immediate: true }
+  )
+
   onUnmounted(() => {
     stopPolling()
     stopDeletePolling()
@@ -169,7 +222,17 @@
       <PageHeadingBlock
         pageTitle="SQL Database"
         data-testid="edge-sql-heading"
+        description="Deploy and manage SQL Databases to store and query structured relational data."
       >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="SQL Database"
+            @click="handleTrackEvent"
+            createPagePath="/sql-database/create"
+            data-testid="create_Database_button"
+          />
+        </template>
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -183,10 +246,7 @@
         complete.
       </InlineMessage>
       <FetchListTableBlock
-        v-if="hasContentToList"
         ref="fetchListRef"
-        addButtonLabel="Database"
-        createPagePath="/sql-database/create"
         editPagePath="/sql-database/database"
         :enableEditClick="false"
         :listService="edgeSQLService.listDatabases"
@@ -199,20 +259,17 @@
         data-testid="edge-sql-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'name'"
+        :frozen-columns="['name']"
+        exportFileName="SQL Database"
+        :csvMapper="csvMapper"
+        :emptyBlock="{
+          title: 'No SQL Databases yet',
+          description: 'Create your first database to store relational data and run SQL queries.',
+          createButtonLabel: 'SQL Database',
+          createPagePath: '/sql-database/create',
+          documentationService: Helpers.documentationGuideProducts.edgeSQL
+        }"
       />
-      <EmptyResultsBlock
-        v-else
-        title="No Databases have been created"
-        description="Create your first SQL Database to store and query your data at the edge."
-        createButtonLabel="Database"
-        createPagePath="/sql-database/create"
-        :documentationService="Helpers.documentationGuideProducts.edgeSQL"
-        data-testid="edge-sql-empty-results-block"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

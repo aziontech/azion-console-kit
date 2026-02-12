@@ -1,4 +1,4 @@
-import * as Helpers from '@/helpers'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const customPagesRoutes = {
@@ -10,7 +10,7 @@ export const customPagesRoutes = {
       name: 'list-custom-pages',
       component: () => import('@views/CustomPages/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationGuideProducts.customPages
+        documentationService: documentationSecureProducts.customPages
       },
       meta: {
         title: 'Custom Pages',
@@ -35,7 +35,7 @@ export const customPagesRoutes = {
             to: '/custom-pages'
           },
           {
-            label: 'Create Page',
+            label: 'Create',
             to: '/custom-pages/create'
           }
         ],
@@ -59,7 +59,9 @@ export const customPagesRoutes = {
           },
           {
             label: 'Edit Page',
-            to: '/custom-pages/edit'
+            to: '/custom-pages/edit',
+            dynamic: true,
+            routeParam: 'id'
           }
         ],
         flag: 'checkout_access_without_flag'

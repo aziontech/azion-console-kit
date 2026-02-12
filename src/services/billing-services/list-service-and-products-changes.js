@@ -1,6 +1,8 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics, filterOutConnectorProducts } from './filter-connector-items'
 const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesService = async (billID) => {
@@ -140,14 +142,10 @@ const PRODUCT_NAMES = {
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
   ddos_protection_unlimited: 'DDoS Protection Unlimited',
-  plan_business: 'Plan Business',
-  plan_enterprise: 'Plan Enterprise',
-  plan_missioncritical: 'Plan Mission Critical',
-  support_enterprise: 'Support Enterprise',
-  support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
   tiered_cache: 'Tiered Cache',
-  edge_storage: 'Object Storage'
+  edge_storage: 'Object Storage',
+  connector: 'Connector'
 }
 
 const METRIC_SLUGS = {
@@ -168,17 +166,14 @@ const METRIC_SLUGS = {
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
   edge_dns_queries: { title: 'Standard Queries' },
-  data_ingested: { title: 'Data Ingested (GB)', unit: 'GB' },
-  plan_business: { title: 'Plan Business' },
-  plan_enterprise: { title: 'Plan Enterprise' },
-  plan_missioncritical: { title: 'Plan Mission critical' },
-  support_enterprise: { title: 'Total Days', unit: 'Days' },
-  support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  data_ingested: { title: 'Data Ingested', unit: 'GB' },
+  data_stream_data_streamed: { title: 'Data Streamed', unit: 'GB' },
   edge_storage_class_a_operations: { title: 'Class A Operations' },
   edge_storage_class_b_operations: { title: 'Class B Operations' },
   edge_storage_class_c_operations: { title: 'Class C Operations' },
-  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
+  edge_storage_data_stored: { title: 'Data Stored', unit: 'GB' },
+  connector_load_balancer_data_transfer: { title: 'Data Transfered', unit: 'GB' },
+  connector_shielded_connectors: { title: 'Shielded Connectors' }
 }
 
 const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
@@ -239,24 +234,55 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  const filteredProducts = products.filter((item) => ![BOT_MANAGER_SLUG].includes(item.productSlug))
+  const shouldShowConnectors = !hasFlagBlockApiV4()
+
+  const productsFilteredByFlag = shouldShowConnectors
+    ? products
+    : filterOutConnectorProducts(products)
+
+  const metricsValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsValue
+    : filterOutConnectorMetrics(productMetricsValue)
+  const metricsAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsAccounted
+    : filterOutConnectorMetrics(productMetricsAccounted)
+  const metricsRegionValueFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionValue
+    : filterOutConnectorMetrics(productMetricsRegionValue)
+  const metricsRegionAccountedFilteredByFlag = shouldShowConnectors
+    ? productMetricsRegionAccounted
+    : filterOutConnectorMetrics(productMetricsRegionAccounted)
+
+  const filteredProducts = productsFilteredByFlag.filter(
+    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
+  )
 
   if (!filteredProducts.length) {
     return { body: filteredProducts, statusCode }
   }
 
-  const groupedMetrics = groupBy(productMetricsValue, productMetricsAccounted, [
+  const groupedMetrics = groupBy(metricsValueFilteredByFlag, metricsAccountedFilteredByFlag, [
     'productSlug',
     'metricSlug'
   ])
 
-  const groupedRegionMetrics = groupBy(productMetricsRegionValue, productMetricsRegionAccounted, [
-    'productSlug',
-    'metricSlug',
-    'regionName'
-  ])
+  const productsWithUsage = new Set(
+    groupedMetrics
+      .filter((metric) => Number(metric.accounted || 0) > 0 || Number(metric.value || 0) > 0)
+      .map((metric) => metric.productSlug)
+  )
 
-  const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
+  const groupedRegionMetrics = groupBy(
+    metricsRegionValueFilteredByFlag,
+    metricsRegionAccountedFilteredByFlag,
+    ['productSlug', 'metricSlug', 'regionName']
+  )
+
+  const productsToShow = filteredProducts.filter((product) =>
+    productsWithUsage.has(product.productSlug)
+  )
+
+  const data = mapProducts(productsToShow, groupedMetrics, groupedRegionMetrics)
 
   return { body: data, statusCode }
 }

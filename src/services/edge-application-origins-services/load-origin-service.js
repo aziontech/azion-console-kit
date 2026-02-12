@@ -1,11 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { createFinalKey } from '@/services/v2/base/query/keyFactory'
-import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
-import { originsKeys } from './list-origins-service'
+import { BaseService } from '@/services/v2/base/query/baseService'
+
+const baseService = new BaseService()
 
 const fetchOrigin = async ({ edgeApplicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -17,32 +15,14 @@ const fetchOrigin = async ({ edgeApplicationId, id }) => {
   return parseHttpResponse(httpResponse)
 }
 
-export const loadOriginService = async ({ edgeApplicationId, id }) => {
-  const cachedQueries = queryClient.getQueriesData({
-    queryKey: originsKeys.details(edgeApplicationId)
-  })
-
-  const hasDifferentId = cachedQueries.some(([key]) => {
-    const cachedId = key[key.length - 1]
-    return cachedId && cachedId !== id
-  })
-
-  if (hasDifferentId) {
-    await queryClient.removeQueries({ queryKey: originsKeys.details(edgeApplicationId) })
-  }
-
-  await waitForPersistenceRestore()
-
-  const queryOptions = {
-    meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
-  }
-
-  return await queryClient.ensureQueryData({
-    queryKey: createFinalKey([...originsKeys.details(edgeApplicationId), id]),
-    queryFn: () => fetchOrigin({ edgeApplicationId, id }),
-    ...queryOptions
-  })
+export const loadOriginService = async ({ applicationId, id }) => {
+  return await baseService.useEnsureQueryData(
+    baseService.queryKeys.application.origins.detail(applicationId, id),
+    () => fetchOrigin({ applicationId, id }),
+    {
+      persist: false
+    }
+  )
 }
 
 const adapt = (httpResponse) => {

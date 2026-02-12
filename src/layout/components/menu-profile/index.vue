@@ -339,6 +339,7 @@
 
 <script setup>
   import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
@@ -353,17 +354,17 @@
   defineOptions({ name: 'profile-block' })
 
   const { startLoading } = useLoadingStore()
-  const user = useAccountStore().accountData
-  const { currentTheme } = storeToRefs(useAccountStore())
-  const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
-  const setTheme = useAccountStore().setTheme
+  const accountStore = useAccountStore()
+  const themeStore = useThemeStore()
+  const { accountData: user, hasAccessToSSOManagement } = storeToRefs(accountStore)
+  const { currentTheme } = storeToRefs(themeStore)
 
   const hasAccessToActivityHistory = computed(() => {
-    return user.kind === 'client'
+    return user.value.kind === 'client'
   })
 
   onBeforeMount(() => {
-    switch (user.kind) {
+    switch (user.value.kind) {
       case 'brand':
         profileMenuDefault.push({
           label: 'Resellers Management',
@@ -456,14 +457,14 @@
   }
 
   const setSelectedTheme = (theme) => {
-    setTheme(theme)
+    themeStore.setTheme(theme)
   }
 
   const logout = () => {
     startLoading()
     tracker.reset()
     closeDesktopMenu()
-    window.location.href = '/logout'
+    window.location.assign('/logout')
   }
 
   const openSwitchAccountDialog = () => {
@@ -476,7 +477,7 @@
 
   const profileMenuItems = computed(() => {
     const switchAccount =
-      user && !user.is_client_only
+      user.value && !user.value.is_client_only
         ? [
             {
               label: 'Switch Account',

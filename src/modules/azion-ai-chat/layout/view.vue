@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-[calc(100vh-15.5rem)] max-h-[calc(100vh-15.5rem)] pb-8 px-8 h-full">
-    <div class="flex flex-col border h-full rounded-md surface-border p-3">
+  <div class="min-h-[500px] h-[calc(100vh-16rem)] pb-8 px-8">
+    <div class="flex flex-col border h-full rounded-md surface-section surface-border">
       <div
-        class="sticky w-full flex justify-end px-3 top-0 surface-section"
+        class="sticky w-full flex justify-end p-3 top-0 surface-section border-b surface-border"
         v-if="getStartConversation"
       >
         <PrimeButton

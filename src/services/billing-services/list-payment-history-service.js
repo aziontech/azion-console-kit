@@ -3,7 +3,7 @@ import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
-import { formatDateToMonthYear, formatDateToUS } from '@/helpers/convert-date'
+import { formatDateToMonthYear, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { paymentService } from '@/services/v2/payment/payment-service'
 
 const PAGE_SIZE = 200
@@ -26,12 +26,12 @@ const STATUS_AS_TAG = {
   }
 }
 
-export const listPaymentHistoryService = async () => {
+export const listPaymentHistoryService = async (params = {}) => {
   const { accountIsNotRegular } = useAccountStore()
   const ACCOUNT_IS_REGULAR = !accountIsNotRegular
   let httpResponse = accountIsNotRegular
     ? await listPaymentHistoryForNotRegularAccounts()
-    : await listPaymentHistoryForRegularAccounts()
+    : await listPaymentHistoryForRegularAccounts(params)
 
   if (ACCOUNT_IS_REGULAR) {
     httpResponse.body = removeCurrentPayment(httpResponse)
@@ -40,16 +40,52 @@ export const listPaymentHistoryService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
+const escapeGraphQLString = (value = '') => {
+  if (!value || !value.length) return ''
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+}
+
+const buildAccountingDetailFilterBlock = (params = {}) => {
+  const periodToLt = params.periodToLt || getLastDayMonth()
+  const periodToGte = params.periodToGte
+  const invoiceNumber = params.invoiceNumber || params.invoice_number
+
+  const lines = []
+  if (periodToGte) {
+    lines.push(`periodToGte: "${escapeGraphQLString(periodToGte)}"`)
+  }
+  if (periodToLt) {
+    lines.push(`periodToLt: "${escapeGraphQLString(periodToLt)}"`)
+  }
+  if (invoiceNumber) {
+    lines.push(`invoiceNumber: "${escapeGraphQLString(invoiceNumber)}"`)
+  }
+
+  if (!lines.length) {
+    return ''
+  }
+
+  return `filter: {\n ${lines.join(',\n ')}\n },`
+}
+
 const removeCurrentPayment = (payments) => {
   if (!payments.body.length) return payments.body
 
   const currentMonth = new Date().toISOString().slice(0, 7)
 
   return payments.body.filter((payment) => {
-    const [month, , year] = payment.paymentDate.split('/')
-    const formattedDate = `${year}-${month.padStart(2, '0')}`
+    const match = String(payment.paymentDate).match(/^(\d{2})\/(\d{2})\/(\d{4})/)
+    if (match) {
+      const month = match[2]
+      const year = match[3]
+      const formattedDate = `${year}-${month}`
+      return formattedDate !== currentMonth
+    }
 
-    return formattedDate !== currentMonth
+    const parsed = new Date(payment.paymentDate)
+    if (isNaN(parsed.getTime())) return true
+
+    return parsed.toISOString().slice(0, 7) !== currentMonth
   })
 }
 
@@ -61,14 +97,13 @@ const listPaymentHistoryForNotRegularAccounts = async () => {
   return adaptPaymentHistoryForNotRegularAccounts(body)
 }
 
-const listPaymentHistoryForRegularAccounts = async () => {
+const listPaymentHistoryForRegularAccounts = async (params = {}) => {
+  const filterBlock = buildAccountingDetailFilterBlock(params)
   const payload = {
     query: `
         query {
           accountingDetail (
-            filter: {
-              periodToLt: "${getLastDayMonth()}"
-            },
+            ${filterBlock}
             limit: ${ACCOUNTING_LIST_LIMIT},
             groupBy: [billId],
             orderBy: [periodTo_DESC]
@@ -110,7 +145,7 @@ const adaptPaymentHistoryForNotRegularAccounts = (results) => {
       disabled: !card.invoice_number,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
       status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
-      paymentDate: formatDateToUS(card.payment_due)
+      paymentDate: formatDateToDayMonthYearHour(card.payment_due)
     }
   })
 
@@ -128,9 +163,10 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
       invoiceNumber: {
         content: card.billId
       },
+      billId: card.billId,
       disabled: disabledOpenInvoice,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
-      paymentDate: formatDateToUS(card.periodTo)
+      paymentDate: formatDateToDayMonthYearHour(card.periodTo)
     }
   })
 

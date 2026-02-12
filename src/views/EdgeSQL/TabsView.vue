@@ -8,6 +8,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useEdgeSQL } from './composable/useEdgeSQL'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import MainSettings from './MainSettings.vue'
   import TablesView from './TablesView.vue'
   import CodeEditor from './CodeEditor.vue'
@@ -17,6 +18,7 @@
   const mapTabs = ref({ tables: 0, editor: 1, settings: 2 })
   const route = useRoute()
   const router = useRouter()
+  const breadcrumbs = useBreadcrumbs()
   const { setCurrentTables, setCurrentDatabase } = useEdgeSQL()
 
   const activeTab = ref(0)
@@ -47,6 +49,7 @@
     database.value = data
     setCurrentDatabase(data)
     title.value = data?.name || ''
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, data?.name)
   }
 
   const loadTables = async () => {
@@ -93,6 +96,7 @@
   })
 
   const showActionBar = computed(() => activeTab.value === mapTabs.value.settings)
+  const showTablesView = computed(() => activeTab.value === mapTabs.value.tables)
 
   renderTabCurrentRouter()
   loadTables()
@@ -103,6 +107,7 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
+        description="Configure a SQL database instance that can be accessed by Applications, Functions, and APIs."
         :loadedItemLabel="title"
       />
     </template>
@@ -120,6 +125,7 @@
         >
           <TablesView
             @go-editor="goEditor"
+            v-if="showTablesView"
             @load-tables="loadTables"
             :listTables="listTables"
             :isLoadTables="loadedTables"

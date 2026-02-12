@@ -1,40 +1,47 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Client Management" />
+      <PageHeadingBlock
+        pageTitle="Client Management"
+        description="Manage client accounts and their configurations."
+      >
+        <template #default>
+          <div class="flex justify-between gap-2 w-full">
+            <div class="flex gap-2">
+              <DataTableActionsButtons
+                size="small"
+                label="Client"
+                createPagePath="management/create"
+                data-testid="create_Client_button"
+              />
+            </div>
+          </div>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
-        v-if="hasContentToList"
         :listService="listAccountsClientDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        addButtonLabel="Client"
-        createPagePath="management/create"
         emptyListMessage="No clients found."
-        editPagePath="management/edit"
+        editPagePath="/client/management/edit"
         enableEditClick
+        exportFileName="Client Management"
+        :csvMapper="csvMapper"
+        :empty-block="{
+          title: 'No Clients yet',
+          description: 'Create your first client account to manage configurations.',
+          createButtonLabel: 'Client',
+          createPagePath: '/client/management/create'
+        }"
       />
-
-      <EmptyResultsBlock
-        v-if="!hasContentToList"
-        title="No clients have been created"
-        description="Click the button below to create your first client account."
-        createButtonLabel="Client"
-        createPagePath="management/create"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
@@ -42,6 +49,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useRouter } from 'vue-router'
   import { computed, ref, onBeforeMount } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'client-management-view' })
 
@@ -54,6 +62,14 @@
       router.push('/')
     }
   })
+
+  const csvMapper = (rowData) => {
+    return {
+      name: rowData.name,
+      company: rowData.company,
+      status: rowData.status?.content || rowData.status
+    }
+  }
 
   const getColumns = computed(() => {
     return [

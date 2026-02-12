@@ -18,10 +18,10 @@
       :rowsPerPageOptions="[10, 25, 50, 100]"
       :rows="minimumOfItemsPerPage"
       @page="onPage"
-      @sort="(e) => $emit('sort', e)"
+      @sort="(e) => onSort(e)"
       :first="firstItemIndex"
       :globalFilterFields="filterBy"
-      :notShowEmptyBlock="notShowEmptyBlock"
+      :notShowEmptyBlock="notShowEmptyBlockComputed"
       removableSort
       scrollable
       scrollHeight="flex"
@@ -43,110 +43,130 @@
       }"
     >
       <template #header>
-        <DataTable.Header>
-          <div class="flex flex-col gap-2 w-full">
-            <div class="flex items-center gap-2 justify-between">
-              <div class="text-color text-lg font-medium">{{ props.title }}</div>
+        <DataTable.Header :showDivider="!!appliedFilters.length">
+          <template #first-line>
+            <div class="flex flex-col gap-2 w-full">
+              <div class="flex items-center gap-2 justify-between">
+                <div class="text-color text-lg font-medium">{{ props.title }}</div>
 
-              <SplitButton
-                icon="pi pi-plus"
-                size="small"
-                severity="secondary"
-                label="Insert"
-                @click="insertRow"
-                :disabled="disabledActionsJsonView || disabledAction"
-                :model="items"
-              />
-            </div>
-            <div class="flex items-center gap-2 justify-between">
-              <div class="flex gap-2 items-center">
-                <DataTable.Search
-                  v-model="filters.global.value"
-                  :debounce="500"
-                  placeholder="Search..."
-                  @input="handleSearchValue"
-                  @search="fetchOnSearch"
-                  :disabled="disabledActionsJsonView"
+                <SplitButton
+                  icon="pi pi-plus"
+                  size="small"
+                  severity="secondary"
+                  label="Insert"
+                  @click="insertRow"
+                  :disabled="disabledActionsJsonView || disabledAction"
+                  :model="items"
                 />
               </div>
-              <DataTable.Actions>
-                <SelectButton
-                  v-model="selectedView"
-                  :options="options"
-                  optionLabel="value"
-                  dataKey="value"
-                  aria-labelledby="custom"
-                  @change="onViewChange"
-                >
-                  <template #option="slotProps">
-                    <div class="flex items-center gap-2">
-                      <i :class="slotProps.option.icon"></i>
-                      <span>{{ slotProps.option.label }}</span>
-                    </div>
-                  </template>
-                </SelectButton>
-                <PrimeButton
-                  icon="pi pi-refresh"
-                  @click="reloadTable"
-                  outlined
-                  iconOnly
-                  v-tooltip="{
-                    value: 'Reload',
-                    position: 'bottom'
-                  }"
-                  size="small"
-                />
-                <PrimeButton
-                  icon="pi pi-download"
-                  outlined
-                  iconOnly
-                  @click="toggleExportMenu($event)"
-                  v-tooltip.left="{ value: 'Export', showDelay: 200 }"
-                  size="small"
-                />
-                <Menu
-                  ref="exportMenuRef"
-                  :popup="true"
-                  :model="exportMenuItems"
-                />
-
-                <PrimeButton
-                  icon="ai ai-column"
-                  outlined
-                  iconOnly
-                  :disabled="disabledActionsJsonView"
-                  @click="toggleColumnSelector"
-                  v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
-                  data-testid="data-table-actions-column-header-toggle-columns"
-                />
-                <OverlayPanel
-                  ref="columnSelectorPanel"
-                  :pt="{ content: { class: 'p-0' } }"
-                  data-testid="data-table-actions-column-header-toggle-columns-panel"
-                >
-                  <Listbox
-                    v-model="selectedColumns"
-                    multiple
-                    :options="[
-                      {
-                        label: 'Available Columns',
-                        items: props.columns.filter((c) => c?.field !== 'actions')
-                      }
-                    ]"
-                    class="hidden-columns-panel"
-                    optionLabel="header"
-                    optionGroupLabel="label"
-                    optionGroupChildren="items"
-                    data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+                <div class="flex gap-2 items-center">
+                  <PrimeButton
+                    v-if="allowedFilters.length"
+                    outlined
+                    icon="pi pi-filter"
+                    size="small"
+                    @click="toggleFilter"
+                    :disabled="disabledActionsJsonView"
+                    data-testid="data-table-actions-column-header-toggle-filter"
+                  />
+                  <DataTable.Search
+                    v-model="filters.global.value"
+                    :debounce="500"
+                    placeholder="Search..."
+                    @input="handleSearchValue"
+                    @search="fetchOnSearch"
+                    :disabled="disabledActionsJsonView"
+                  />
+                </div>
+                <DataTable.Actions>
+                  <SelectButton
+                    v-model="selectedView"
+                    :options="options"
+                    optionLabel="value"
+                    dataKey="value"
+                    aria-labelledby="custom"
+                    @change="onViewChange"
                   >
-                    <template #optiongroup="slotProps">
-                      <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                    <template #option="slotProps">
+                      <div class="flex items-center gap-2">
+                        <i :class="slotProps.option.icon"></i>
+                        <span>{{ slotProps.option.label }}</span>
+                      </div>
                     </template>
-                  </Listbox>
-                </OverlayPanel>
-              </DataTable.Actions>
+                  </SelectButton>
+                  <PrimeButton
+                    icon="pi pi-refresh"
+                    @click="reloadTable"
+                    outlined
+                    iconOnly
+                    v-tooltip="{
+                      value: 'Reload',
+                      position: 'bottom'
+                    }"
+                    size="small"
+                  />
+                  <PrimeButton
+                    icon="pi pi-download"
+                    outlined
+                    iconOnly
+                    @click="toggleExportMenu($event)"
+                    v-tooltip.left="{ value: 'Export', showDelay: 200 }"
+                    size="small"
+                  />
+                  <Menu
+                    ref="exportMenuRef"
+                    :popup="true"
+                    :model="exportMenuItems"
+                  />
+
+                  <PrimeButton
+                    icon="ai ai-column"
+                    outlined
+                    iconOnly
+                    :disabled="disabledActionsJsonView"
+                    @click="toggleColumnSelector"
+                    v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
+                    data-testid="data-table-actions-column-header-toggle-columns"
+                  />
+                  <OverlayPanel
+                    ref="columnSelectorPanel"
+                    :pt="{ content: { class: 'p-0' } }"
+                    data-testid="data-table-actions-column-header-toggle-columns-panel"
+                  >
+                    <Listbox
+                      v-model="selectedColumns"
+                      multiple
+                      :options="[
+                        {
+                          label: 'Available Columns',
+                          items: props.columns.filter((c) => c?.field !== 'actions')
+                        }
+                      ]"
+                      class="hidden-columns-panel"
+                      optionLabel="header"
+                      optionGroupLabel="label"
+                      optionGroupChildren="items"
+                      data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                    >
+                      <template #optiongroup="slotProps">
+                        <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                      </template>
+                    </Listbox>
+                  </OverlayPanel>
+                </DataTable.Actions>
+              </div>
             </div>
-          </div>
+          </template>
+          <template
+            #second-line
+            v-if="appliedFilters.length"
+          >
+            <DataTable.AppliedFilters
+              :applied-filters="appliedFilters"
+              @remove="handleRemoveFilter"
+            />
+          </template>
         </DataTable.Header>
       </template>
       <template #empty>
@@ -201,7 +221,9 @@
               :field="field"
               :value="data[field]"
             >
-              {{ data[field] }}
+              <span v-tooltip.top="isTruncatedValue(data[field]) ? String(data[field]) : null">
+                {{ formatCellValue(data[field]) }}
+              </span>
             </slot>
           </template>
           <template #editor="{ data, field }">
@@ -227,6 +249,18 @@
             />
 
             <InputText
+              v-else-if="
+                ['integer', 'bigint', 'decimal', 'float'].includes(
+                  String(col.tagType).toLowerCase()
+                )
+              "
+              v-model="data[field]"
+              type="number"
+              class="w-full"
+              inputmode="decimal"
+            />
+
+            <InputText
               v-else
               v-model="data[field]"
               class="w-full"
@@ -234,15 +268,15 @@
           </template>
         </Column>
         <DataTable.Column header="Actions">
-          <template #body="{ data, index }">
+          <template #body="{ data }">
             <div
-              v-if="isRowEditing(index)"
+              v-if="isRowEditing(data)"
               class="flex gap-1 justify-end"
             >
               <PrimeButton
                 :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
                 size="small"
-                @click.stop="saveRowEdit(data, index)"
+                @click.stop="saveRowEdit(data)"
                 outlined
                 iconOnly
                 data-testid="row-save-button"
@@ -255,7 +289,7 @@
                 severity="secondary"
                 outlined
                 iconOnly
-                @click.stop="cancelRowEdit(data, index)"
+                @click.stop="cancelRowEdit(data)"
                 data-testid="row-cancel-button"
                 v-tooltip.top="'Cancel'"
               />
@@ -283,11 +317,18 @@
       :model="computedMenuItems"
       :popup="true"
     />
+    <DataTable.Filter
+      v-if="allowedFilters.length"
+      ref="filterPanel"
+      :filters="allowedFilters"
+      @apply="handleApplyFilter"
+    />
   </div>
 </template>
 
 <script setup>
   import { ref, toRefs, watch, computed, nextTick } from 'vue'
+  import { FilterMatchMode } from 'primevue/api'
   import Column from 'primevue/column'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
@@ -328,6 +369,7 @@
         documentationService: null
       })
     },
+    notShowEmptyBlock: { type: Boolean, default: false },
     options: {
       type: Array,
       default: () => [
@@ -342,6 +384,9 @@
           icon: 'ai ai-layers'
         }
       ]
+    },
+    exportFileName: {
+      type: String
     }
   })
 
@@ -361,11 +406,22 @@
   ]
 
   const dataTypeOptions = dataTypes.map((type) => ({ label: type, value: type }))
+  const allowedFilters = computed(() =>
+    (props.columns || [])
+      .filter((col) => col?.field && col.field !== 'actions')
+      .map((col) => ({
+        ...col,
+        sortField: col?.sortField ?? col?.field
+      }))
+  )
   const isSchemaView = computed(() => selectedView.value?.value === 'schema')
   const displayDataForView = computed(() =>
     selectedView.value?.value === 'json' ? [] : editableData.value
   )
-  const notShowEmptyBlock = computed(() => selectedView.value?.value === 'json')
+  const notShowEmptyBlockComputed = computed(() => {
+    const isJsonView = selectedView.value?.value === 'json'
+    return Boolean(props.notShowEmptyBlock || isJsonView)
+  })
 
   const disabledActionsJsonView = computed(() => selectedView.value?.value === 'json')
 
@@ -423,6 +479,62 @@
     icon: 'pi pi-table'
   })
 
+  const appliedFilters = ref([])
+  const filterPanel = ref(null)
+
+  const resetFilterState = () => {
+    appliedFilters.value = []
+    filters.value = {
+      global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+    }
+    filterPanel.value?.hide?.()
+  }
+
+  const toggleFilter = (event) => {
+    if (filterPanel.value) filterPanel.value.toggle(event)
+  }
+
+  const handleApplyFilter = (filterData) => {
+    const hasValue =
+      filterData?.value !== null && filterData?.value !== undefined && filterData?.value !== ''
+    if (!filterData?.field || !filterData?.label || !hasValue) return
+
+    const existingIndex = appliedFilters.value.findIndex(
+      (filterEntry) => filterEntry.field === filterData.field
+    )
+    const entry = {
+      field: filterData.field,
+      label: filterData.label,
+      value: filterData.value,
+      matchMode: 'contains'
+    }
+    if (existingIndex !== -1) {
+      appliedFilters.value[existingIndex] = entry
+    } else {
+      appliedFilters.value.push(entry)
+    }
+
+    filters.value[filterData.field] = {
+      value: filterData.value,
+      matchMode: FilterMatchMode.CONTAINS
+    }
+  }
+
+  const handleRemoveFilter = (field) => {
+    appliedFilters.value = appliedFilters.value.filter((filterEntry) => filterEntry.field !== field)
+    if (filters.value?.[field]) {
+      delete filters.value[field]
+    }
+  }
+
+  watch(
+    () => selectedView.value?.value,
+    (newValue, oldValue) => {
+      if (!oldValue || newValue === oldValue) return
+      resetFilterState()
+    }
+  )
+
   const {
     filters,
     sortFieldValue,
@@ -442,6 +554,28 @@
     exportTableAsXLSX
   } = useDataTable(tableProps, emit)
 
+  watch(
+    () => selectedColumns.value,
+    (newVal, oldVal) => {
+      const newList = Array.isArray(newVal) ? newVal : []
+      if (newList.length === 0) {
+        const previous = Array.isArray(oldVal) ? oldVal : []
+        if (previous.length) {
+          selectedColumns.value = previous
+          return
+        }
+
+        const availableColumns = (props.columns || []).filter(
+          (column) => column?.field !== 'actions'
+        )
+        if (availableColumns.length) {
+          selectedColumns.value = [availableColumns[0]]
+        }
+      }
+    },
+    { deep: true }
+  )
+
   const editRow = (row) => {
     const key = getRowKey(row)
     if (key == null) return
@@ -449,6 +583,13 @@
     if (!editingRows.value.some((editing) => getRowKey(editing) === key)) {
       editingRows.value = [...editingRows.value, row]
     }
+  }
+
+  const onSort = (event) => {
+    editableData.value = editableData.value.filter((row) => row?._isNew !== true)
+    editingRows.value = []
+    backups.value.clear()
+    emit('sort', event)
   }
 
   const onRowEditSave = (event) => {
@@ -496,12 +637,13 @@
     emit('row-edit-cancel', { id: key, original })
   }
 
-  const isRowEditing = (rowIndex) => {
-    const row = editableData.value[rowIndex]
+  const isRowEditing = (row) => {
     if (!row) return false
     const key = getRowKey(row)
-    if (key != null) return editingRows.value.some((editing) => getRowKey(editing) === key)
-    return editingRows.value.includes(row)
+    if (key == null) {
+      return editingRows.value.includes(row)
+    }
+    return editingRows.value.some((editing) => getRowKey(editing) === key)
   }
 
   const showRowMenu = (event, rowData) => {
@@ -512,15 +654,14 @@
     }
   }
 
-  const saveRowEdit = (rowData, rowIndex) => {
+  const saveRowEdit = (rowData) => {
     isLoadingEditRow.value = true
-    onRowEditSave({ newData: { ...rowData }, data: rowData, index: rowIndex })
-
+    onRowEditSave({ newData: { ...rowData }, data: rowData })
     isLoadingEditRow.value = false
   }
 
-  const cancelRowEdit = (rowData, rowIndex) => {
-    onRowEditCancel({ data: rowData, index: rowIndex })
+  const cancelRowEdit = (rowData) => {
+    onRowEditCancel({ data: rowData })
   }
 
   const computedMenuItems = computed(() => {
@@ -559,7 +700,8 @@
   }
 
   // Use centralized export helpers from useDataTable
-  const exportAsCSV = () => handleExportTableDataToCSV()
+  const exportAsCSV = () =>
+    handleExportTableDataToCSV(props.title, editableData.value, selectedColumns.value)
   const exportAsJSON = () =>
     exportTableAsJSON(props.title, editableData.value, selectedColumns.value)
   const exportAsXLSX = () =>
@@ -598,6 +740,20 @@
     }
     return list
   })
+
+  const MAX_CELL_LENGTH = 100
+
+  const formatCellValue = (value) => {
+    if (value == null) return value
+    const stringValue = String(value)
+    if (stringValue.length <= MAX_CELL_LENGTH) return stringValue
+    return `${stringValue.slice(0, MAX_CELL_LENGTH)}...`
+  }
+
+  const isTruncatedValue = (value) => {
+    if (value == null) return false
+    return String(value).length > MAX_CELL_LENGTH
+  }
 
   const insertColumnSplitEvent = async () => {
     selectedView.value = {

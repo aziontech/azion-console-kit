@@ -1,21 +1,16 @@
 <template>
   <PrimeButton
+    v-if="!panelOnly"
     icon="pi pi-calendar"
     outlined
     size="small"
-    @click="toggleOverlayPanel"
+    @click="emit('open', $event)"
     :pt="{
       icon: { class: 'max-md:m-0' }
     }"
   />
 
-  <OverlayPanel
-    ref="overlayPanelQuickSelect"
-    :showCloseIcon="false"
-    class="max-w-[430px]"
-  >
-    <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
-
+  <template v-else>
     <div class="flex gap-2">
       <div class="flex gap-2 flex-1">
         <Dropdown
@@ -63,15 +58,48 @@
         </PrimeButton>
       </div>
     </div>
-  </OverlayPanel>
+
+    <div class="mt-4 pt-4 border-t border-[var(--surface-border)]">
+      <div class="flex gap-3 justify-between">
+        <div class="flex align-center items-center gap-3">
+          <InputSwitch
+            v-model="autoRefreshEnabled"
+            id="autoRefreshEnabled"
+          />
+          <label
+            for="autoRefreshEnabled"
+            class="text-sm font-medium leading-5 text-color"
+            >Refresh Every</label
+          >
+        </div>
+        <div class="flex gap-2 items-center">
+          <InputNumber
+            v-model="autoRefreshEvery"
+            :min="1"
+            :disabled="!autoRefreshEnabled"
+            :pt="{ input: { class: 'w-16' } }"
+            showButtons
+          />
+          <Dropdown
+            v-model="autoRefreshUnit"
+            :options="AUTO_REFRESH_UNITS"
+            optionLabel="label"
+            optionValue="value"
+            :disabled="!autoRefreshEnabled"
+          />
+        </div>
+      </div>
+    </div>
+  </template>
 </template>
 
 <script setup>
-  import { ref, defineModel } from 'vue'
+  import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
   import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
+  import InputSwitch from 'primevue/inputswitch'
+  import { convertUnitToMilliseconds } from '@/helpers'
   import {
     createRelativeRange,
     createStartOfDay,
@@ -82,7 +110,7 @@
     getCurrentMonthLabel
   } from '@utils/date.js'
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'open', 'close', 'autoRefresh'])
 
   defineOptions({ name: 'QuickSelect' })
 
@@ -94,7 +122,11 @@
   const props = defineProps({
     maxDays: {
       type: Number,
-      default: 0
+      default: 365
+    },
+    panelOnly: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -106,11 +138,187 @@
   const quickSelectValue = ref(15)
   const quickSelectUnit = ref('minutes')
 
-  const overlayPanelQuickSelect = ref(null)
+  const AUTO_REFRESH_UNITS = [
+    { label: 'Seconds', value: 'seconds' },
+    { label: 'Minutes', value: 'minutes' },
+    { label: 'Hours', value: 'hours' }
+  ]
 
-  const toggleOverlayPanel = (event) => {
-    overlayPanelQuickSelect.value.toggle(event)
+  const autoRefreshEnabled = ref(false)
+  const autoRefreshEvery = ref(10)
+  const autoRefreshUnit = ref('seconds')
+
+  const normalizeUnit = (unit) => {
+    if (!unit) return null
+
+    const normalized = String(unit).toLowerCase().trim()
+
+    switch (normalized) {
+      case 'minute':
+      case 'minutes':
+        return 'minutes'
+
+      case 'hour':
+      case 'hours':
+        return 'hours'
+
+      case 'day':
+      case 'days':
+        return 'days'
+
+      case 'month':
+      case 'months':
+        return 'months'
+
+      default:
+        return null
+    }
   }
+
+  const parseRelativeFromLabel = (label) => {
+    if (!label) return null
+    const match = label.trim().match(/^(last|next)\s+(\d+)\s+([a-zA-Z]+)$/i)
+    if (!match) return null
+
+    const direction = match[1].toLowerCase()
+    const value = Number(match[2])
+    const unit = normalizeUnit(match[3])
+    if (!Number.isFinite(value) || value <= 0 || !unit) return null
+
+    return { direction, value, unit }
+  }
+
+  const getQuickStepFromModel = () => {
+    const step =
+      model.value?.quick || model.value?.relative || parseRelativeFromLabel(model.value?.label)
+    const unit = normalizeUnit(step?.unit)
+    if (!unit || !Number.isFinite(step?.value) || step.value <= 0) return null
+
+    const direction = step?.direction === 'next' ? 'next' : 'last'
+    return { direction, value: step.value, unit }
+  }
+
+  const syncFieldsFromModel = () => {
+    const step = getQuickStepFromModel()
+    if (!step) return
+    quickSelectDirection.value = step.direction
+    quickSelectValue.value = step.value
+    quickSelectUnit.value = step.unit
+
+    const autoRefresh = model.value?.autoRefresh
+    autoRefreshEnabled.value = Boolean(autoRefresh?.enabled)
+    if (Number.isFinite(autoRefresh?.every) && Number(autoRefresh.every) >= 1) {
+      autoRefreshEvery.value = Number(autoRefresh.every)
+    }
+    if (typeof autoRefresh?.unit === 'string') {
+      autoRefreshUnit.value = autoRefresh.unit
+    }
+  }
+
+  const syncModelQuickFromFields = () => {
+    model.value = {
+      ...model.value,
+      quick: {
+        value: quickSelectValue.value,
+        unit: quickSelectUnit.value,
+        direction: quickSelectDirection.value
+      },
+      autoRefresh: {
+        enabled: autoRefreshEnabled.value,
+        every: autoRefreshEvery.value,
+        unit: autoRefreshUnit.value
+      }
+    }
+  }
+
+  const autoRefreshTimeoutId = ref(null)
+  const autoRefreshInFlight = ref(false)
+
+  const clearAutoRefreshTimer = () => {
+    if (!autoRefreshTimeoutId.value) return
+    clearTimeout(autoRefreshTimeoutId.value)
+    autoRefreshTimeoutId.value = null
+  }
+
+  const getAutoRefreshIntervalMs = (cfg) => {
+    if (!cfg?.enabled) return null
+
+    const every = Number(cfg.every)
+    if (!Number.isFinite(every) || every < 1) return null
+
+    const unit = String(cfg.unit || '')
+      .toLowerCase()
+      .trim()
+
+    return convertUnitToMilliseconds(unit, every)
+  }
+
+  const scheduleAutoRefresh = () => {
+    if (props.panelOnly) return
+
+    clearAutoRefreshTimer()
+
+    const cfg = model.value?.autoRefresh
+    const intervalMs = getAutoRefreshIntervalMs(cfg)
+    if (!intervalMs) return
+
+    autoRefreshTimeoutId.value = setTimeout(async () => {
+      try {
+        if (autoRefreshInFlight.value) {
+          scheduleAutoRefresh()
+          return
+        }
+
+        autoRefreshInFlight.value = true
+        emit('autoRefresh', model.value)
+      } finally {
+        autoRefreshInFlight.value = false
+        scheduleAutoRefresh()
+      }
+    }, intervalMs)
+  }
+
+  onMounted(() => {
+    if (!props.panelOnly) return
+    syncFieldsFromModel()
+    syncModelQuickFromFields()
+  })
+
+  onMounted(() => {
+    if (props.panelOnly) return
+    scheduleAutoRefresh()
+  })
+
+  onUnmounted(() => {
+    clearAutoRefreshTimer()
+  })
+
+  watch(
+    () => model.value?.quick,
+    () => {
+      if (!props.panelOnly) return
+      syncFieldsFromModel()
+    },
+    { deep: true }
+  )
+
+  watch([quickSelectDirection, quickSelectValue, quickSelectUnit], () => {
+    if (!props.panelOnly) return
+    syncModelQuickFromFields()
+  })
+
+  watch([autoRefreshEnabled, autoRefreshEvery, autoRefreshUnit], () => {
+    if (!props.panelOnly) return
+    syncModelQuickFromFields()
+  })
+
+  watch(
+    () => model.value?.autoRefresh,
+    () => {
+      scheduleAutoRefresh()
+    },
+    { deep: true }
+  )
 
   const applyQuickSelect = () => {
     const now = new Date()
@@ -121,12 +329,23 @@
       now
     )
 
+    const preservedAutoRefresh = model.value?.autoRefresh
+
     model.value = {
       startDate: newStartDate,
-      endDate: newEndDate
+      endDate: newEndDate,
+      label: '',
+      labelStart: '',
+      labelEnd: '',
+      quick: {
+        value: quickSelectValue.value,
+        unit: quickSelectUnit.value,
+        direction: quickSelectDirection.value
+      },
+      autoRefresh: preservedAutoRefresh
     }
     emit('select', model.value)
-    overlayPanelQuickSelect.value.hide()
+    emit('close')
   }
 
   const applyCommonRange = (range) => {
@@ -227,13 +446,18 @@
         return
     }
 
+    const preservedAutoRefresh = model.value?.autoRefresh
+
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: range.label
+      label: range.label,
+      labelStart: '',
+      labelEnd: '',
+      autoRefresh: preservedAutoRefresh
     }
 
     emit('select', model.value)
-    overlayPanelQuickSelect.value.hide()
+    emit('close')
   }
 </script>

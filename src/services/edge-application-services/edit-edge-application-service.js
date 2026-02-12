@@ -1,37 +1,9 @@
-/**
- * @typedef {Object} EditEdgeApplicationPayload
- * @property {string} id - The ID of the application.
- * @property {string} name - The name of the application.
- * @property {string} deliveryProtocol - The delivery protocol.
- * @property {boolean} http3 - Whether HTTP3 is enabled.
- * @property {Object} httpPort - The HTTP port value.
- * @property {Object} httpsPort - The HTTPS port value.
- * @property {string} minimumTlsVersion - The minimum TLS version.
- * @property {boolean} active - Whether the application is active.
- * @property {Object} debugRules - The debug rules.
- * @property {string} supportedCiphers - The supported ciphers.
- * @property {boolean} applicationAccelerator - Whether application acceleration is enabled.
- * @property {boolean} deviceDetection - Whether device detection is enabled.
- * @property {boolean} edgeFunctions - Whether edge functions are enabled.
- * @property {boolean} imageOptimization - Whether image optimization is enabled.
- * @property {boolean} l2Caching - Whether L2 caching is enabled.
- * @property {boolean} loadBalancer - Whether a load balancer is enabled.
- * @property {boolean} websocket - Whether WebSocket is enabled.
- * @property {boolean} rawLogs - Whether raw logs are enabled.
- * @property {boolean} webApplicationFirewall - Whether web application firewall is enabled.
- */
-
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { edgeAppV3Keys } from './load-edge-application-service'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-/**
- * Edits an edge application.
- * @param {EditEdgeApplicationPayload} payload - The payload for editing the application.
- * @returns {Promise<any>} - A promise that resolves with the result of the edit operation.
- */
 export const editEdgeApplicationService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${payload.id}`,
@@ -41,16 +13,12 @@ export const editEdgeApplicationService = async (payload) => {
 
   const result = parseHttpResponse(httpResponse)
 
-  // Remove list and detail queries from cache (including IndexedDB) after editing
-  queryClient.removeQueries({ queryKey: edgeAppV3Keys.all })
-  queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
+  await queryClient.removeQueries({ queryKey: queryKeys.applicationV3.all })
+  await queryClient.removeQueries({ queryKey: queryKeys.application.all })
 
   return result
 }
 
-/**
- *  @param {EditEdgeApplicationPayload} payload
- */
 const adapt = (payload) => {
   const deliveryProtocol =
     payload.deliveryProtocol === 'http3' ? 'http,https' : payload.deliveryProtocol
@@ -78,11 +46,6 @@ const adapt = (payload) => {
   }
 }
 
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
 const extractErrorKey = (errorSchema, key) => {
   if (key === 'user_has_no_product') {
     const isWebSocket = errorSchema?.[key]?.includes('Websocket')
@@ -98,11 +61,6 @@ const extractErrorKey = (errorSchema, key) => {
   return `${key}: ${errorSchema[key][0]}`
 }
 
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
 const extractApiError = (httpResponse) => {
   const [firstKey] = Object.keys(httpResponse.body)
   const errorMessage = extractErrorKey(httpResponse.body, firstKey)
@@ -110,13 +68,6 @@ const extractApiError = (httpResponse) => {
   return errorMessage
 }
 
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {string} The result message based on the status code.
- * @throws {Error} If there is an error with the response.
- */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:

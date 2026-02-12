@@ -26,7 +26,8 @@
     }
   })
 
-  const user = useAccountStore().accountData
+  const accountStore = useAccountStore()
+  const user = computed(() => accountStore.accountData)
   const openSwitchAccount = inject('openSwitchAccount')
   const profileMenuDefault = [
     {
@@ -56,7 +57,7 @@
   }
 
   const hasAccessToSwitchAccount = computed(() => {
-    return user && !user.is_client_only
+    return user.value && !user.value.is_client_only
   })
 
   const profileMenuSwitchAccount = computed(() => {

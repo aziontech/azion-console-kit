@@ -5,8 +5,9 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useAccountStore } from '@/stores/account'
   import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'
-  import { ref, watchEffect } from 'vue'
+  import { ref, watchEffect, onMounted } from 'vue'
   import { openContactSupport } from '@/helpers'
+  import { loadContractData } from '@/helpers/account-data'
 
   defineOptions({
     name: 'Copilot-view'
@@ -26,6 +27,10 @@
     suggestionsOptions.value = loadPromptSuggestion(role)
   }
 
+  onMounted(() => {
+    loadContractData()
+  })
+
   watchEffect(async () => {
     const { account } = useAccountStore()
 
@@ -39,7 +44,7 @@
     }
 
     loadPromptSuggestionWithRoleDecorator(account.jobRole)
-    hasSupport.value = !account.isDeveloperSupportPlan
+    hasSupport.value = !account?.isDeveloperSupportPlan
   })
 </script>
 
@@ -49,9 +54,10 @@
       <PageHeadingBlock
         pageTitle="Azion Copilot"
         data-testid="Copilot-heading"
-        class="px-8 pt-4"
+        class="px-8 pt-8 mb-4"
         :isRightAlignment="true"
         :tag="tagProps"
+        description="Provide AI-assisted insights and guidance across Azion’s products."
       >
       </PageHeadingBlock>
     </template>

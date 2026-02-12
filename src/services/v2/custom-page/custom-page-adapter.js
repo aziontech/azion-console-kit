@@ -1,5 +1,5 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null : value)
@@ -31,8 +31,8 @@ const transformMap = {
   id: (value) => value.id,
   name: (value) => value.name,
   lastEditor: (value) => value.last_editor,
-  lastModify: (value) => formatDateToDayMonthYearHour(value.last_modified),
-  lastModified: (value) => value.last_modified,
+  lastModify: (value) => convertToRelativeTime(value.last_modified),
+  lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   active: (value) => parseStatusData(value.active)
 }
 

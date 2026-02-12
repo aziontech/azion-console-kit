@@ -1,4 +1,4 @@
-import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
@@ -27,7 +27,15 @@ const transformMap = {
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
   disableEditClick: (value) => value.product_version === LOCKED_VALUE,
-  isLocked: (value) => value.product_version === LOCKED_VALUE
+  isLocked: (value) => value.product_version === LOCKED_VALUE,
+  edgeCacheEnabled: (value) => value.modules?.cache.enabled,
+  edgeFunctionsEnabled: (value) => value.modules?.functions.enabled,
+  applicationAcceleratorEnabled: (value) => value.modules?.application_accelerator.enabled,
+  imageProcessorEnabled: (value) => value.modules?.image_processor.enabled,
+  tieredCacheEnabled: (value) => value.modules?.tiered_cache?.enabled,
+  isActive: (value) => value.active,
+  debug: (value) => value.debug,
+  productVersion: (value) => value.product_version
 }
 
 export const EdgeAppAdapter = {

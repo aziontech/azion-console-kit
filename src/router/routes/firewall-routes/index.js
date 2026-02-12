@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
@@ -11,13 +12,13 @@ export const edgeFirewallRoutes = {
       name: 'list-firewalls',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.edgeFirewall
+        documentationService: documentationSecureProducts.firewall
       },
       meta: {
         title: 'Firewall',
         breadCrumbs: [
           {
-            label: 'Firewall',
+            label: 'Firewalls',
             to: '/firewalls'
           }
         ]
@@ -34,11 +35,11 @@ export const edgeFirewallRoutes = {
         title: 'Create Firewall',
         breadCrumbs: [
           {
-            label: 'Firewall',
+            label: 'Firewalls',
             to: '/firewalls'
           },
           {
-            label: 'Create Firewall',
+            label: 'Create',
             to: '/firewalls/create'
           }
         ]
@@ -52,7 +53,7 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService,
         edgeFirewallServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewall,
-          updatedRedirect: 'list-firewall'
+          updatedRedirect: 'list-firewalls'
         },
         rulesEngineServices: {
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine
@@ -62,11 +63,13 @@ export const edgeFirewallRoutes = {
         title: 'Edit Firewall',
         breadCrumbs: [
           {
-            label: 'Firewall',
+            label: 'Firewalls',
             to: '/firewalls'
           },
           {
-            label: 'Edit Firewall'
+            label: 'Edit Firewall',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

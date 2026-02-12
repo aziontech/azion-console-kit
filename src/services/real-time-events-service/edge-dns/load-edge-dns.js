@@ -3,6 +3,8 @@ import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClient
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 export const loadEdgeDNS = async (filter) => {
   const payload = adapt(filter)
 
@@ -76,6 +78,6 @@ const adaptResponse = (response) => {
     ts: edgeDnsQueriesEvents.ts,
     qtype: edgeDnsQueriesEvents.qtype,
     qTypeDescription: qtypeMap(edgeDnsQueriesEvents.qtype),
-    data: buildSummary(edgeDnsQueriesEvents)
+    data: buildSummary(edgeDnsQueriesEvents, false, shouldShowTsColumn)
   }
 }

@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
 
@@ -72,7 +75,7 @@ const adaptResponse = (response) => {
     host: tieredCacheEvents.host,
     proxyHost: tieredCacheEvents.proxyHost,
     id: generateCurrentTimestamp(),
-    summary: buildSummary(tieredCacheEvents),
+    summary: buildSummary(tieredCacheEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: tieredCacheEvents.ts,
     tsFormat: getCurrentTimezone(tieredCacheEvents.ts)
   }))

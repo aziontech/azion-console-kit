@@ -64,7 +64,9 @@ const parseHttpResponse = (httpResponse) => {
       return 'Invite sent successfully'
     case 400:
       const apiError400 = extractApiError(httpResponse)
-      throw new Error(apiError400).message
+      // For validation errors (400) we want to throw an Error instance,
+      // so tests can assert using `.rejects.toThrow(...)`.
+      throw new Error(apiError400)
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

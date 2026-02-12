@@ -73,14 +73,20 @@ export const useAccountStore = defineStore({
       const { client_flags = [] } = state.account
       return !client_flags.includes(state.flags.FORCE_REDIRECT_TO_CONSOLE)
     },
-    currentTheme(state) {
-      return state.account?.colorTheme
-    },
     isFirstLogin(state) {
       return state.account?.first_login
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
+    },
+    accountTimezone(state) {
+      return state.account?.timezone
+    },
+    timezoneInfo() {
+      return {
+        timezone: this.accountTimezone,
+        utcOffset: this.accountUtcOffset
+      }
     },
     ssoSignUpMethod(state) {
       return state.identifySignUpProvider
@@ -123,6 +129,9 @@ export const useAccountStore = defineStore({
 
     hasHideCreateOptionsFlag(state) {
       return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
+    },
+    isClientAccount(state) {
+      return state.account?.kind === 'client'
     }
   },
   actions: {
@@ -131,12 +140,7 @@ export const useAccountStore = defineStore({
     },
     resetAccount() {
       this.account = {}
-    },
-    setTheme(theme) {
-      this.account.colorTheme = theme
-
-      // TODO: remove the usage of localStorage when API returns the theme
-      localStorage.setItem('theme', theme)
+      this.identifySignUpProvider = ''
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method

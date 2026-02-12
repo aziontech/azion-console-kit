@@ -1,4 +1,3 @@
-import { toValue } from 'vue'
 import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
@@ -6,21 +5,20 @@ import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-export const workloadKeys = {
-  all: ['workloads'],
-  lists: () => [...workloadKeys.all, 'list'],
-  list: ({ page, pageSize, fields, search, ordering }) => [
-    ...workloadKeys.lists(),
-    page,
-    pageSize,
-    fields,
-    search,
-    ordering
-  ],
-  details: () => [...workloadKeys.all, 'detail'],
-  detail: (id) => [...workloadKeys.details(), id]
-}
+export const DEFAULT_FIELDS = [
+  'name',
+  'domains',
+  'workload_domain',
+  'infrastructure',
+  'active',
+  'last_modified',
+  'id',
+  'last_editor',
+  'product_version',
+  'workload_domain'
+]
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -36,6 +34,7 @@ export class WorkloadService extends BaseService {
     this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
+    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (params = { pageSize: 10 }) => {
@@ -58,33 +57,19 @@ export class WorkloadService extends BaseService {
     })
 
     const workloadDeployment = await this.workloadDeployment.listWorkloadDeployment(id)
-    this.initialDomains = data.data.domains
 
     return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
   }
 
-  ensureList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: [
-        'name',
-        'domains',
-        'workload_domain',
-        'infrastructure',
-        'active',
-        'last_modified',
-        'id',
-        'last_editor',
-        'product_version',
-        'workload_domain'
-      ],
+      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
 
-    await this._ensureQueryData(workloadKeys.list(params), () => this.#fetchList(params), {
-      persist: true
-    })
+    return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
   #ensureCertificate = async (payload) => {
@@ -152,7 +137,8 @@ export class WorkloadService extends BaseService {
     const workload = await this.#ensureWorkload(payload)
     await this.#ensureDeployment(payload, workload.id)
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.workload.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return {
       feedback:
@@ -164,31 +150,29 @@ export class WorkloadService extends BaseService {
   }
 
   listWorkloads = async (params) => {
-    const paramsValue = toValue(params)
-    return await this._ensureQueryData(
-      () => workloadKeys.list(paramsValue),
-      () => this.#fetchList(paramsValue),
-      { persist: paramsValue?.page === 1 && !paramsValue?.search }
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter
+
+    return await this.useEnsureQueryData(
+      queryKeys.workload.list({ ...params, fields: this.fieldsDefault }),
+      () => this.#fetchList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
     )
   }
 
   loadWorkload = async ({ id }) => {
-    const cachedQueries = this.queryClient.getQueriesData({ queryKey: workloadKeys.details() })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== id
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({ queryKey: workloadKeys.details() })
-    }
-
-    return await this._ensureQueryData(
-      () => workloadKeys.detail(id),
+    const workload = await this.useEnsureQueryData(
+      queryKeys.workload.detail(id),
       () => this.#fetchOne({ id }),
-      { persist: true }
+      { persist: false }
     )
+
+    this.initialDomains = workload.initialDomains || []
+
+    return workload
   }
 
   editWorkload = async (payload) => {
@@ -200,8 +184,7 @@ export class WorkloadService extends BaseService {
       await this.#ensureDeployment(payload, payload.id)
     }
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
-    this.queryClient.removeQueries({ queryKey: workloadKeys.details() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return 'Your workload has been updated'
   }
@@ -219,6 +202,56 @@ export class WorkloadService extends BaseService {
       .filter((name) => name.trim() !== '.')
     payload.letEncrypt.commonName = commonName
     payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
+  }
+
+  #certificateIsWildcard = (subjctName) => {
+    if (Array.isArray(subjctName)) {
+      return subjctName.some((name) => typeof name === 'string' && name.trim().startsWith('*'))
+    }
+
+    if (typeof subjctName === 'string') {
+      return subjctName.trim().startsWith('*')
+    }
+
+    return false
+  }
+
+  #getWildcardBaseDomains = (subjectName) =>
+    (Array.isArray(subjectName) ? subjectName : [subjectName]).reduce((acc, name) => {
+      if (typeof name === 'string') {
+        const domain = name.trim().slice(1).replace(/^\.+/, '')
+        if (name.trim().startsWith('*') && domain) acc.push(domain)
+      }
+      return acc
+    }, [])
+
+  #hostnameIsSubdomainOf = (hostname, baseDomain) => {
+    if (typeof hostname !== 'string' || typeof baseDomain !== 'string') return false
+    const host = hostname.trim().toLowerCase()
+    const base = baseDomain.trim().toLowerCase()
+
+    if (!host || !base) return false
+    if (!host.endsWith(`.${base}`)) return false
+
+    // ensures there is at least one label before baseDomain
+    return host.length > base.length + 1
+  }
+
+  #hasUncoveredHostnamesForWildcard = (subjctName, hostnames) => {
+    const bases = this.#getWildcardBaseDomains(subjctName)
+    if (!bases.length) return []
+
+    const uncovered = (hostnames || []).filter((hostname) => {
+      return !bases.some((base) => this.#hostnameIsSubdomainOf(hostname, base))
+    })
+
+    return !uncovered.length
+  }
+
+  #shouldSkipLetsEncryptRecreation = ({ changed, subjctName, hostnames }) => {
+    if (!changed) return false
+    if (!this.#certificateIsWildcard(subjctName)) return false
+    return this.#hasUncoveredHostnamesForWildcard(subjctName, hostnames)
   }
 
   #ensureCertificateForEdit = async (payload) => {
@@ -245,6 +278,17 @@ export class WorkloadService extends BaseService {
         payload,
         keysToCheck
       )
+
+      const hostnames = [payload.letEncrypt.commonName, ...payload.letEncrypt.alternativeNames]
+      const skipRecreation = this.#shouldSkipLetsEncryptRecreation({
+        changed,
+        subjctName: payload.subjctName,
+        hostnames
+      })
+
+      if (skipRecreation) {
+        return
+      }
       shouldCreate = changed
     }
 
@@ -289,9 +333,43 @@ export class WorkloadService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
-    this.queryClient.removeQueries({ queryKey: workloadKeys.lists() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return `Workload successfully deleted.`
+  }
+
+  getWorkloadFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
+      }),
+      listPath: 'body'
+    })
+  }
+
+  getDomainFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        active: item.active?.content === 'Active',
+        domainName: item.workloadHostname?.content,
+        environment: item.infrastructure === 'Production' ? 'production' : 'staging',
+        cnames: item?.domains?.join('\n') || ''
+      }),
+      listPath: 'body'
+    })
   }
 }
 

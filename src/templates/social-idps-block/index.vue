@@ -86,7 +86,7 @@
 
     if (validateOAuthRedirect(idp.loginUrl)) {
       accountStore.setSsoSignUpMethod(idp.slug)
-      window.location.href = idp.loginUrl
+      window.location.assign(idp.loginUrl)
       tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
     } else {
       loadingStore.finishLoading()

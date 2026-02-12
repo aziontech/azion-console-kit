@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listHttpRequest = async (filter) => {
   const payload = adapt(filter)
   const graphqlStore = useGraphQLStore()
@@ -39,6 +42,7 @@ const adapt = (filter) => {
       'upstreamBytesSent',
       'sslProtocol',
       'wafLearning',
+      'requestUri',
       'requestTime',
       'serverProtocol',
       'upstreamCacheStatus',
@@ -60,7 +64,7 @@ const adaptResponse = (httpResponse) => {
   const data = httpResponse.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
     requestId: httpEventItem.requestId,
-    summary: buildSummary(httpEventItem),
+    summary: buildSummary(httpEventItem, shouldLimitRequestUri, shouldShowTsColumn),
     ts: httpEventItem.ts,
     tsFormat: getCurrentTimezone(httpEventItem.ts)
   }))

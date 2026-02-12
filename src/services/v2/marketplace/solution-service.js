@@ -1,11 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { useAccountStore } from '@/stores/account'
-
-export const solutionsKeys = {
-  all: ['solutions'],
-  lists: () => [...solutionsKeys.all, 'list'],
-  list: (group, type) => [...solutionsKeys.lists(), group, type]
-}
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class SolutionService extends BaseService {
   baseUrl = 'marketplace/solution/'
@@ -23,10 +18,13 @@ export class SolutionService extends BaseService {
 
   useListSolutions(params) {
     const { group, type } = params
-    return this._createQuery(solutionsKeys.list(group, type), () => this.getListSolutions(params), {
-      staleTime: this.toMilliseconds({ days: 30 }),
-      refetchInterval: false
-    })
+    return this.useQuery(
+      queryKeys.solutions.list(group, type),
+      () => this.getListSolutions(params),
+      {
+        cacheType: this.cacheType.STATIC
+      }
+    )
   }
 
   /**
@@ -35,7 +33,7 @@ export class SolutionService extends BaseService {
    *
    * @param {boolean} isFlagBlockApiV4 - flag to determine template type
    */
-  async ensureList(isFlagBlockApiV4 = false) {
+  prefetchList(isFlagBlockApiV4 = false) {
     const accountStore = useAccountStore()
     const { jobRole } = accountStore.account
 
@@ -51,21 +49,16 @@ export class SolutionService extends BaseService {
       })
     }
 
-    await Promise.all(
+    return Promise.all(
       prefetchConfigs.map(({ group, type }) =>
-        this._ensureQueryData(
-          solutionsKeys.list(group, type),
+        this.usePrefetchQuery(
+          queryKeys.solutions.list(group, type),
           () => this.getListSolutions({ group, type }),
-          { staleTime: this.toMilliseconds({ days: 30 }) }
+          { cacheType: this.cacheType.STATIC }
         )
       )
     )
   }
-
-  async invalidateSolutionsCache() {
-    await this.queryClient.invalidateQueries({ queryKey: solutionsKeys.lists() })
-  }
-
   #adaptResponse(response) {
     const isArray = Array.isArray(response.data)
     const parsedSolutions =

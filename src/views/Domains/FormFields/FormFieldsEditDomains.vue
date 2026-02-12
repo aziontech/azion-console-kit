@@ -59,6 +59,7 @@
   const { value: authorityCertificate } = useField('authorityCertificate')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+  const { value: subjectNameCertificate } = useField('subjectNameCertificate')
 
   const { value: edgeFirewall } = useField('edgeFirewall')
   const drawerEdgeFirewallRef = ref('')
@@ -166,7 +167,7 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id,name,authority'],
+      fields: ['id,name,authority, subject_name'],
       ...queryParams
     })
   }
@@ -178,11 +179,12 @@
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
-  const moreOptions = ['authority', 'status']
-  const selectCertificate = ({ authority, value }) => {
+  const moreOptions = ['authority', 'status', 'subjectName']
+  const selectCertificate = ({ authority, value, subjectName }) => {
     authorityCertificate.value = authority
     isLetEncrypt.value =
       value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
+    subjectNameCertificate.value = subjectName
   }
 </script>
 

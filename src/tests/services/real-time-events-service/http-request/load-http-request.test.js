@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadHttpRequest } from '@/services/real-time-events-service/http-request'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -108,6 +109,8 @@ describe('HttpRequestServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
+    const expectedTs = getCurrentTimezone(fixtures.httpRequestFirst.ts)
+
     expect(response).toEqual({
       data: [
         { key: 'bytesSent', value: fixtures.httpRequestFirst.bytesSent },
@@ -136,6 +139,7 @@ describe('HttpRequestServices', () => {
         { key: 'stacktrace', value: '-' },
         { key: 'status', value: fixtures.httpRequestFirst.status },
         { key: 'tcpinfoRtt', value: fixtures.httpRequestFirst.tcpinfoRtt },
+        { key: 'ts', value: expectedTs },
         { key: 'upstreamAddr', value: fixtures.httpRequestFirst.upstreamAddr },
         { key: 'upstreamBytesReceived', value: fixtures.httpRequestFirst.upstreamBytesReceived },
         { key: 'upstreamBytesSent', value: fixtures.httpRequestFirst.upstreamBytesSent },
@@ -155,7 +159,7 @@ describe('HttpRequestServices', () => {
       remotePort: fixtures.httpRequestFirst.remotePort,
       requestId: fixtures.httpRequestFirst.requestId,
       scheme: fixtures.httpRequestFirst.scheme,
-      ts: 'February 23, 2024 at 06:07:25 PM'
+      ts: expectedTs
     })
   })
 })

@@ -1,12 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DeviceGroupAdapter } from './edge-app-device-group-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-
-export const deviceGroupsKeys = {
-  all: (edgeAppId) => ['device-groups', edgeAppId],
-  lists: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...deviceGroupsKeys.all(edgeAppId), 'detail']
-}
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DeviceGroupService extends BaseService {
   constructor() {
@@ -38,13 +33,32 @@ export class DeviceGroupService extends BaseService {
   listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = deviceGroupsKeys.lists(edgeApplicationId)
+    const queryKey = queryKeys.application.deviceGroups.list(edgeApplicationId, params)
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this._ensureQueryData(
-      () => queryKey,
+    return await this.useEnsureQueryData(
+      queryKey,
       () => this.#fetchList(edgeApplicationId, params),
-      { persist: params.page === 1 }
+      {
+        persist: false,
+        skipCache
+      }
     )
+  }
+
+  /**
+   * Prefetches the first page of device groups to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchDeviceGroupsList = async (edgeApplicationId, pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'user_agent'],
+      ordering: 'name'
+    }
+    return await this.listDeviceGroupService(edgeApplicationId, defaultParams)
   }
 
   #fetchDeviceGroup = async (edgeApplicationId, deviceGroupId) => {
@@ -57,27 +71,12 @@ export class DeviceGroupService extends BaseService {
   }
 
   loadDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
-    const cachedQueries = this.queryClient.getQueriesData({
-      queryKey: deviceGroupsKeys.details(edgeApplicationId)
-    })
-
-    const hasDifferentId = cachedQueries.some(([key]) => {
-      const cachedId = key[key.length - 1]
-      return cachedId && cachedId !== deviceGroupId
-    })
-
-    if (hasDifferentId) {
-      await this.queryClient.removeQueries({
-        queryKey: deviceGroupsKeys.details(edgeApplicationId)
-      })
-    }
-
     await waitForPersistenceRestore()
 
-    return await this._ensureQueryData(
-      () => [...deviceGroupsKeys.details(edgeApplicationId), deviceGroupId],
+    return await this.useEnsureQueryData(
+      queryKeys.application.deviceGroups.detail(edgeApplicationId, deviceGroupId),
       () => this.#fetchDeviceGroup(edgeApplicationId, deviceGroupId),
-      { persist: true }
+      { persist: false }
     )
   }
 
@@ -93,7 +92,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
+    })
 
     return {
       id: result.data.data.id,
@@ -111,8 +112,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.details(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
+    })
 
     return 'Device Group successfully updated'
   }
@@ -124,7 +126,9 @@ export class DeviceGroupService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: deviceGroupsKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.deviceGroups.all(edgeApplicationId)
+    })
 
     return 'Device Group successfully deleted'
   }

@@ -1,9 +1,10 @@
 <script setup>
-  import { toRef, useSlots, useAttrs, computed } from 'vue'
+  import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import TextArea from 'primevue/textarea'
   import LabelBlock from '@/templates/label-block'
 
+  const emit = defineEmits(['blur', 'input'])
   const props = defineProps({
     value: {
       type: String,
@@ -50,15 +51,20 @@
     sensitive: {
       type: Boolean,
       default: false
+    },
+    aditionalError: {
+      type: String,
+      default: ''
     }
   })
 
+  const inputRef = ref(null)
   const name = toRef(props, 'name')
   const slots = useSlots()
   const hasDescriptionSlot = !!slots.description
   const {
     value: inputValue,
-    errorMessage,
+    errorMessage: veeValidateErrorMessage,
     handleBlur,
     handleChange
   } = useField(name, undefined, {
@@ -81,6 +87,18 @@
   const iconPositionClass = computed(() => {
     return props.icon ? `p-input-icon-${props.iconPosition}` : ''
   })
+
+  const onBlur = (event) => {
+    handleBlur(event)
+    emit('blur', event)
+  }
+
+  const onChange = (event) => {
+    handleChange(event)
+    emit('input', event.target.value)
+  }
+
+  defineExpose({ inputRef })
 </script>
 
 <template>
@@ -100,30 +118,30 @@
       class="text-color-secondary top-5 right-5"
     />
     <TextArea
-      :data-testid="customTestId.textarea"
-      :id="name"
+      v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
       v-model="inputValue"
-      :name="props.name"
-      :disabled="props.disabled"
+      ref="inputRef"
       type="text"
       class="w-full min-h-[2.75rem]"
+      :class="[{ 'p-invalid': aditionalError || veeValidateErrorMessage }, props.class]"
+      :id="name"
+      :data-testid="customTestId.textarea"
+      :name="props.name"
+      :disabled="props.disabled"
       :autoResize="props.autoResize"
       :rows="props.rows"
       :cols="props.cols"
       :placeholder="props.placeholder"
-      @input="handleChange"
-      @blur="handleBlur"
-      :class="{ 'p-invalid': errorMessage }"
-      v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
+      @input="onChange"
+      @blur="onBlur"
     />
   </span>
-
   <small
-    v-if="errorMessage"
-    :data-testid="customTestId.error"
+    v-if="aditionalError || veeValidateErrorMessage"
     class="p-error text-xs font-normal leading-tight"
+    :data-testid="customTestId.error"
   >
-    {{ errorMessage }}
+    {{ aditionalError || veeValidateErrorMessage }}
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"

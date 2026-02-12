@@ -1,9 +1,10 @@
 <script setup>
-  import { toRef, computed, useAttrs } from 'vue'
+  import { computed, toRef, useAttrs } from 'vue'
   import { useField } from 'vee-validate'
   import InputNumber from 'primevue/inputnumber'
   import LabelBlock from '@/templates/label-block'
 
+  const emit = defineEmits(['blur', 'input'])
   const props = defineProps({
     value: {
       type: String,
@@ -54,6 +55,10 @@
     useGrouping: {
       type: Boolean,
       default: true
+    },
+    aditionalError: {
+      type: String,
+      default: ''
     }
   })
 
@@ -80,6 +85,16 @@
       error: `${id}__error-message`
     }
   })
+
+  const onBlur = (event) => {
+    handleBlur(event)
+    emit('blur', event)
+  }
+
+  const onInput = (event) => {
+    handleChange(event.value)
+    emit('input', event.value)
+  }
 </script>
 
 <template>
@@ -101,23 +116,24 @@
     :step="props.step"
     :useGrouping="props.useGrouping"
     type="number"
-    @input="(event) => handleChange(event.value)"
-    @blur="handleBlur"
+    @input="onInput"
+    @blur="onBlur"
     :pt="{
       input: {
         name: props.name
       }
     }"
-    :class="[{ 'p-invalid': !!errorMessage }, props.inputClass]"
+    :class="[{ 'p-invalid': aditionalError || errorMessage }, props.inputClass]"
     :data-testid="customTestId.input"
   />
 
   <small
-    v-if="errorMessage"
+    v-if="aditionalError || errorMessage"
     class="p-error text-xs font-normal leading-tight"
     :data-testid="customTestId.error"
-    >{{ errorMessage }}</small
   >
+    {{ aditionalError || errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     :data-testid="customTestId.description"

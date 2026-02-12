@@ -14,6 +14,7 @@
     description: { type: String, required: true },
     documentationService: { type: Function, required: false },
     createPagePath: { type: String, required: false },
+    onClickCreate: { type: Function, required: false },
     disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
@@ -26,7 +27,9 @@
   }
   function navigateToCreatePage() {
     emit('click-to-create')
-    if (props.createPagePath) {
+    if (props.onClickCreate) {
+      props.onClickCreate()
+    } else if (props.createPagePath) {
       router.push(props.createPagePath)
     }
   }
@@ -78,7 +81,7 @@
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
-          label="Learn more"
+          label="View Documentation"
           link
           size="small"
           @click="openDocumentation"

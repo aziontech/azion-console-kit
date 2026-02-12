@@ -2,21 +2,25 @@
   import { useField } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import { computed } from 'vue'
+  import { onMounted, ref } from 'vue'
+  import { teamsService } from '@/services/users-services/list-teams-service'
 
-  const props = defineProps({
-    teams: {
-      type: Array,
-      required: true,
-      default: () => []
+  const teams = ref([])
+  const loading = ref(true)
+
+  const fetchTeams = async () => {
+    try {
+      teams.value = await teamsService.useListTeams()
+    } finally {
+      loading.value = false
     }
-  })
+  }
+
+  onMounted(() => fetchTeams())
 
   const { value: name } = useField('name')
   const { value: email } = useField('email')
   const { value: team } = useField('team')
-
-  const loadingTeams = computed(() => props.teams.length === 0)
 </script>
 
 <template>
@@ -47,9 +51,9 @@
         label="Team"
         required
         name="team"
-        :options="props.teams"
-        :loading="loadingTeams"
-        :disabled="loadingTeams"
+        :options="teams"
+        :loading="loading"
+        :disabled="loading"
         optionLabel="label"
         optionValue="value"
         :value="team"

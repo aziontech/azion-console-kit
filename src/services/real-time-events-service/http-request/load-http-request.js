@@ -4,6 +4,8 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+
 const fieldsByRequest = [
   [
     'httpReferer',
@@ -89,10 +91,11 @@ export const loadHttpRequest = async (filter) => {
 }
 
 const adaptResponse = (httpEventItem) => {
+  const ts = httpEventItem.ts
   const adapt = {
     httpReferer: httpEventItem.httpReferer,
     scheme: httpEventItem.scheme?.toUpperCase(),
-    ts: getCurrentTimezone(httpEventItem.ts),
+    ts,
     httpUserAgent: httpEventItem.httpUserAgent,
     remoteAddress: httpEventItem.remoteAddress,
     host: httpEventItem.host,
@@ -134,11 +137,11 @@ const adaptResponse = (httpEventItem) => {
 
   return {
     host: adapt.host,
-    ts: adapt.ts,
+    ts: getCurrentTimezone(adapt.ts),
     requestId: adapt.requestId,
     remoteAddress: adapt.remoteAddress,
     remotePort: adapt.remotePort,
     scheme: adapt.scheme,
-    data: buildSummary(adapt)
+    data: buildSummary(adapt, false, shouldShowTsColumn)
   }
 }

@@ -171,6 +171,10 @@ const formatDateToMonthYear = (date) => {
 const formatDateToDayMonthYearHour = (date, timezone) => {
   if (!date) return null
 
+  if (typeof date === 'string' && date.match(/^[A-Z][a-z]+\s+\d+,\s+\d{4}/)) {
+    return date
+  }
+
   let userTimezone = timezone || 'UTC'
 
   if (!timezone) {
@@ -182,17 +186,40 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
     }
   }
 
-  return new Date(date).toLocaleString('en-US', {
+  let normalizedDate = date
+  if (typeof date === 'string' && date.includes('.')) {
+    normalizedDate = date.replace(/(\.\d{3})\d+/, '$1')
+  }
+
+  const dateObject = new Date(normalizedDate)
+
+  if (isNaN(dateObject.getTime())) {
+    return null
+  }
+
+  return dateObject.toLocaleString('en-US', {
     timeZone: userTimezone,
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    weekday: 'long',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: true
   })
+}
+
+const convertUnitToMilliseconds = (unit, value) => {
+  switch (unit) {
+    case 'seconds':
+      return value * 1000
+    case 'minutes':
+      return value * 60 * 1000
+    case 'hours':
+      return value * 60 * 60 * 1000
+    default:
+      return null
+  }
 }
 
 const getCurrentDateTimeIntl = () => {
@@ -258,6 +285,7 @@ const getDateRangeByHourRange = (hourRange) => {
 }
 
 const convertToRelativeTime = (date) => {
+  if (!date) return '-'
   const now = new Date()
   const targetDate = new Date(date)
   const diffMs = now.getTime() - targetDate.getTime()
@@ -331,6 +359,51 @@ const convertToRelativeTime = (date) => {
   return `${currentYear - targetYear} years ago`
 }
 
+const getOffset = (timeZone = 'UTC', date = new Date()) => {
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }))
+  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }))
+  const offset = (tzDate.getTime() - utcDate.getTime()) / (60 * 60 * 1000)
+  const sinal = offset > 0 ? '+' : ''
+  return `UTC${sinal}${offset}`
+}
+
+const parseUtcOffsetToMinutes = (utcOffset = '+0000') => {
+  if (typeof utcOffset !== 'string') return 0
+  const match = utcOffset.trim().match(/^([+-])(\d{2})(\d{2})$/)
+  if (!match) return 0
+
+  const sign = match[1] === '-' ? -1 : 1
+  const hours = Number(match[2])
+  const minutes = Number(match[3])
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return 0
+
+  return sign * (hours * 60 + minutes)
+}
+
+const createUtcDateFromUserTimezoneParts = (parts, utcOffset) => {
+  const { year, monthIndex, day, hour = 0, minute = 0, second = 0, millisecond = 0 } = parts ?? {}
+
+  const offsetMinutes = parseUtcOffsetToMinutes(utcOffset)
+  const utcMillis =
+    Date.UTC(year, monthIndex, day, hour, minute, second, millisecond) -
+    offsetMinutes * MINUTE_IN_MILLISECONDS
+
+  return new Date(utcMillis)
+}
+
+const getUtcIsoRangeForUserDay = ({ year, monthIndex, day }, utcOffset) => {
+  const begin = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 0, minute: 0, second: 0, millisecond: 0 },
+    utcOffset
+  )
+  const end = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 23, minute: 59, second: 59, millisecond: 999 },
+    utcOffset
+  )
+
+  return { begin: begin.toISOString(), end: end.toISOString() }
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -344,6 +417,11 @@ export {
   formatDateToDayMonthYearHour,
   getRemainingDays,
   getCurrentDateTimeIntl,
-  getDateRangeByHourRange,
-  convertToRelativeTime
+  convertToRelativeTime,
+  getOffset,
+  parseUtcOffsetToMinutes,
+  createUtcDateFromUserTimezoneParts,
+  getUtcIsoRangeForUserDay,
+  convertUnitToMilliseconds,
+  getDateRangeByHourRange
 }

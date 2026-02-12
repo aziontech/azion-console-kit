@@ -341,9 +341,9 @@ export const EdgeSQLAdapter = {
 
   buildTableInfoStatements(tableName, needSchema) {
     if (needSchema) {
-      return [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName} LIMIT 100;`]
+      return [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName}`]
     }
-    return [`SELECT * FROM ${tableName} LIMIT 100;`]
+    return [`SELECT * FROM ${tableName}`]
   },
 
   adaptQueryResult({ data }, isCountSelect) {

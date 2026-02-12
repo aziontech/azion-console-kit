@@ -51,21 +51,22 @@
     'onError'
   ])
 
-  const { scrollToError } = useScrollToError()
+  const blockViewRedirection = ref(true)
+
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
-  const blockViewRedirection = ref(true)
+  const { scrollToError } = useScrollToError()
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
-    validationSchema: props.schema,
-    initialValues: props.initialValues
+    validationSchema: props.schema
   })
 
   let formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
     const unsavedStatus = inject('unsaved')
+
     formHasUpdated = unsavedStatus.formHasUpdated
     visibleOnSaved = unsavedStatus.visibleOnSaved
   }
@@ -78,6 +79,7 @@
 
   watch(formHasChanges, () => {
     if (!props.isTabs) return
+
     formHasUpdated.value = formHasChanges.value
     visibleOnSaved.value = false
   })
@@ -87,12 +89,11 @@
       router.push({ name: props.updatedRedirect })
       return
     }
+
     router.go(-1)
   }
 
-  const onCancel = () => {
-    goBackToList()
-  }
+  const onCancel = () => goBackToList()
 
   const showToast = (severity, detail) => {
     if (!detail) return
@@ -109,23 +110,37 @@
 
   const loadInitialData = async () => {
     try {
-      if (props.initialValues && Object.keys(props.initialValues).length > 0) {
-        const initialValues = props.initialValues
-        emit('loaded-service-object', initialValues)
-        resetForm({ values: initialValues })
+      const hasCachedValues = props.initialValues && Object.keys(props.initialValues).length > 0
+
+      if (hasCachedValues) {
+        resetForm({ values: props.initialValues })
+        emit('loaded-service-object', props.initialValues)
+      }
+
+      const { id } = route.params
+      const loadedValues = await props.loadService({ id })
+
+      if (!loadedValues || Object.keys(loadedValues).length === 0) {
         return
       }
-      const { id } = route.params
-      const initialValues = await props.loadService({ id })
-      emit('loaded-service-object', initialValues)
-      resetForm({ values: initialValues })
+
+      const mergedValues = hasCachedValues
+        ? { ...loadedValues, ...props.initialValues }
+        : loadedValues
+
+      emit('loaded-service-object', mergedValues)
+
+      resetForm({ values: mergedValues })
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {
         emit('on-load-fail', error)
         showToast('error', error)
+
+        blockViewRedirection.value = false
       }
+
       goBackToList()
     }
   }
@@ -134,19 +149,25 @@
     async (values) => {
       try {
         const feedback = await props.editService(values)
+
         if (!props.disableAfterCreateToastFeedback) {
           showToast('success', feedback || 'edited successfully')
         }
+
         blockViewRedirection.value = false
+
         emit('on-edit-success', feedback)
+
         if (props.disableRedirect) {
           resetForm({ values })
           blockViewRedirection.value = true
           return
         }
+
         goBackToList()
       } catch (error) {
-        blockViewRedirection.value = true
+        blockViewRedirection.value = false
+
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
@@ -169,6 +190,11 @@
 </script>
 
 <template>
+  <DialogUnsavedBlock
+    :blockRedirectUnsaved="formHasChanges"
+    :isTabs="isTabs"
+  />
+
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
       @submit.prevent="handleSubmit"
@@ -186,11 +212,6 @@
       />
     </form>
   </div>
-
-  <DialogUnsavedBlock
-    :blockRedirectUnsaved="formHasChanges"
-    :isTabs="isTabs"
-  />
   <slot
     name="action-bar"
     :onSubmit="onSubmit"

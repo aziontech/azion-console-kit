@@ -32,7 +32,7 @@
           label="Copy Access Key"
           :value="accessKeyValue"
           :disabled="!accessKeyValue"
-          @copy="() => params.copyAccessKey(accessKeyValue)"
+          isCopyVisible
           data-testid="copy-credential-dialog__access-key-field__copy-button"
         />
       </span>
@@ -67,7 +67,7 @@
           label="Copy Secret Key"
           :value="secretKeyValue"
           :disabled="!secretKeyValue"
-          @copy="() => params.copySecretKey(secretKeyValue)"
+          isCopyVisible
           data-testid="copy-credential-dialog__secret-key-field__copy-button"
         />
       </span>

@@ -1,19 +1,17 @@
 import { get, set, del, createStore } from 'idb-keyval'
-import { CACHE_TYPE } from './queryOptions'
 import { encryptSensitiveData, decryptSensitiveData, isEncryptionAvailable } from './encryption'
 
 /**
- * Encrypts a single query's data if it's marked as sensitive
+ * Encrypts a single query's data
  * @param {any} query - Query object to encrypt
- * @returns {Promise<any>} Encrypted query or null if encryption fails
+ * @returns {Promise<any>} Encrypted query or original if encryption fails
  */
 async function encryptQuery(query) {
   if (!query || typeof query !== 'object') {
     return query
   }
 
-  // Check if this is a query object with sensitive cache type
-  if (query.meta?.cacheType === CACHE_TYPE.SENSITIVE && query.state?.data) {
+  if (query.state?.data) {
     if (isEncryptionAvailable()) {
       try {
         return {
@@ -27,18 +25,11 @@ async function encryptQuery(query) {
             encrypted: true
           }
         }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to encrypt sensitive query data:', error)
-        // If encryption fails, don't persist sensitive data
+      } catch {
         return null
       }
-    } else {
-      // If encryption is not available, don't persist sensitive data
-      // eslint-disable-next-line no-console
-      console.warn('Web Crypto API not available, skipping sensitive data persistence')
-      return null
     }
+    return null
   }
 
   return query
@@ -49,7 +40,7 @@ async function encryptQuery(query) {
  * @param {any} data - Cache data to process
  * @returns {Promise<any>} Processed cache data with sensitive data encrypted
  */
-async function encryptSensitiveQueries(data) {
+async function encryptAllQueries(data) {
   if (!data || typeof data !== 'object') {
     return data
   }
@@ -70,7 +61,7 @@ async function encryptSensitiveQueries(data) {
 
   // Handle array of queries
   if (Array.isArray(data)) {
-    const encrypted = await Promise.all(data.map((item) => encryptSensitiveQueries(item)))
+    const encrypted = await Promise.all(data.map((item) => encryptAllQueries(item)))
     return encrypted.filter((item) => item !== null)
   }
 
@@ -78,7 +69,7 @@ async function encryptSensitiveQueries(data) {
   const processed = { ...data }
   for (const key in processed) {
     if (processed[key] && typeof processed[key] === 'object') {
-      processed[key] = await encryptSensitiveQueries(processed[key])
+      processed[key] = await encryptAllQueries(processed[key])
     }
   }
 
@@ -95,34 +86,59 @@ async function decryptQuery(query) {
     return query
   }
 
-  // Check if this is an encrypted sensitive query
-  if (
-    query.meta?.cacheType === CACHE_TYPE.SENSITIVE &&
-    query.meta?.encrypted === true &&
-    query.state?.data
-  ) {
-    if (isEncryptionAvailable()) {
-      try {
+  if (query.meta?.encrypted === true && query.state?.data) {
+    if (!isEncryptionAvailable()) {
+      return null
+    }
+
+    try {
+      const decryptedData = await decryptSensitiveData(query.state.data)
+      return {
+        ...query,
+        state: {
+          ...query.state,
+          data: decryptedData
+        },
+        meta: {
+          ...query.meta,
+          encrypted: false
+        }
+      }
+    } catch {
+      // Fallback: check if data is already decrypted
+      if (typeof query.state.data === 'string') {
+        try {
+          const parsed = JSON.parse(query.state.data)
+          return {
+            ...query,
+            state: {
+              ...query.state,
+              data: parsed
+            },
+            meta: {
+              ...query.meta,
+              encrypted: false
+            }
+          }
+        } catch {
+          return null
+        }
+      }
+
+      if (typeof query.state.data === 'object') {
         return {
           ...query,
           state: {
             ...query.state,
-            data: await decryptSensitiveData(query.state.data)
+            data: query.state.data
           },
           meta: {
             ...query.meta,
             encrypted: false
           }
         }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to decrypt sensitive query data:', error)
-        // If decryption fails, return null to skip this query
-        return null
       }
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn('Web Crypto API not available, skipping sensitive data decryption')
+
       return null
     }
   }
@@ -131,22 +147,28 @@ async function decryptQuery(query) {
 }
 
 /**
- * Recursively decrypts sensitive query data in the cache
- * @param {any} data - Cache data to process
- * @returns {Promise<any>} Processed cache data with sensitive data decrypted
+ * Recursively decrypts all query data in the cache
+ * @param {any} data - Cache data to decrypt
+ * @param {Object} options - Options for decryption
+ * @param {Function} options.onCorruption - Callback when corruption is detected
+ * @returns {Promise<any>} Decrypted cache data
  */
-async function decryptSensitiveQueries(data) {
+async function decryptAllQueries(data, options = {}) {
   if (!data || typeof data !== 'object') {
     return data
   }
 
-  // Handle TanStack Query dehydrated cache structure
-  // The cache has a structure like: { queries: [...], mutations: [...] }
   if (data.queries && Array.isArray(data.queries)) {
     const decryptedQueries = await Promise.all(data.queries.map((query) => decryptQuery(query)))
-
-    // Filter out null values (failed decryptions)
     const validQueries = decryptedQueries.filter((query) => query !== null)
+    const failedCount = decryptedQueries.length - validQueries.length
+
+    if (failedCount > 0) {
+      const failureRate = failedCount / decryptedQueries.length
+      if (failureRate > 0.5 && options.onCorruption) {
+        options.onCorruption()
+      }
+    }
 
     return {
       ...data,
@@ -154,17 +176,15 @@ async function decryptSensitiveQueries(data) {
     }
   }
 
-  // Handle array of queries
   if (Array.isArray(data)) {
-    const decrypted = await Promise.all(data.map((item) => decryptSensitiveQueries(item)))
+    const decrypted = await Promise.all(data.map((item) => decryptAllQueries(item, options)))
     return decrypted.filter((item) => item !== null)
   }
 
-  // Recursively process nested objects
   const processed = { ...data }
   for (const key in processed) {
     if (processed[key] && typeof processed[key] === 'object') {
-      processed[key] = await decryptSensitiveQueries(processed[key])
+      processed[key] = await decryptAllQueries(processed[key], options)
     }
   }
 
@@ -178,17 +198,10 @@ export function createIDBPersister(config, onRestoreComplete = null) {
   return {
     persistClient: async (client) => {
       try {
-        // Encrypt sensitive data before persisting
-        const encryptedClient = await encryptSensitiveQueries(client)
-
-        // Filter out null values (failed encryptions)
+        const encryptedClient = await encryptAllQueries(client)
         const filteredClient = filterNullValues(encryptedClient)
-
         await set(cacheKey, filteredClient, customStore)
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error persisting client with encryption:', error)
-        // Fallback to unencrypted persistence if encryption fails
+      } catch {
         await set(cacheKey, client, customStore)
       }
     },
@@ -203,10 +216,21 @@ export function createIDBPersister(config, onRestoreComplete = null) {
           return undefined
         }
 
-        // Decrypt sensitive data after restoring
-        const decryptedClient = await decryptSensitiveQueries(client)
+        let shouldClearCache = false
+        const decryptedClient = await decryptAllQueries(client, {
+          onCorruption: () => {
+            shouldClearCache = true
+          }
+        })
 
-        // Filter out null values (failed decryptions)
+        if (shouldClearCache) {
+          await del(cacheKey, customStore)
+          if (onRestoreComplete) {
+            queueMicrotask(() => onRestoreComplete(null))
+          }
+          return undefined
+        }
+
         const filteredClient = filterNullValues(decryptedClient)
 
         if (onRestoreComplete) {
@@ -215,6 +239,12 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 
         return filteredClient
       } catch (error) {
+        try {
+          await del(cacheKey, customStore)
+        } catch {
+          // Ignore clear errors
+        }
+
         if (onRestoreComplete) {
           queueMicrotask(() => onRestoreComplete(error))
         }

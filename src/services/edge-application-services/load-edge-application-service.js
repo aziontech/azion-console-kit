@@ -1,15 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from './make-edge-application-base-url'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { createFinalKey } from '@/services/v2/base/query/keyFactory'
-import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
+import { BaseService } from '@/services/v2/base/query/baseService'
 
-export const edgeAppV3Keys = {
-  all: ['edge-apps-v3'],
-  details: () => [...edgeAppV3Keys.all, 'detail'],
-  detail: (id) => [...edgeAppV3Keys.details(), id]
-}
+const baseService = new BaseService()
 
 const fetchEdgeApplication = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -21,29 +14,13 @@ const fetchEdgeApplication = async ({ id }) => {
 }
 
 export const loadEdgeApplicationService = async ({ id }) => {
-  const cachedQueries = queryClient.getQueriesData({ queryKey: edgeAppV3Keys.details() })
-
-  const hasDifferentId = cachedQueries.some(([key]) => {
-    const cachedId = key[key.length - 1]
-    return cachedId && cachedId !== id
-  })
-
-  if (hasDifferentId) {
-    await queryClient.removeQueries({ queryKey: edgeAppV3Keys.details() })
-  }
-
-  await waitForPersistenceRestore()
-
-  const queryOptions = {
-    meta: { persist: true, cacheType: CACHE_TYPE.GLOBAL },
-    ...getCacheOptions(CACHE_TYPE.GLOBAL)
-  }
-
-  return await queryClient.ensureQueryData({
-    queryKey: createFinalKey(edgeAppV3Keys.detail(id)),
-    queryFn: () => fetchEdgeApplication({ id }),
-    ...queryOptions
-  })
+  return await baseService.useEnsureQueryData(
+    baseService.queryKeys.applicationV3.detail(id),
+    () => fetchEdgeApplication({ id }),
+    {
+      persist: false
+    }
+  )
 }
 
 const adapt = (httpResponse) => {

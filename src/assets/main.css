@@ -25,7 +25,7 @@ body.p-overflow-hidden {
 /* https://aziontech.atlassian.net/browse/UXE-1798 */
 /* child scroll behaviour is affecting the parent scroll behaviour */
 * {
-  overscroll-behavior: contain !important;
+  overscroll-behavior: auto !important;
 }
 
 .grecaptcha-badge {

@@ -30,6 +30,7 @@
           :listService="listPagesCodeService"
           :actions="actionsRow"
           emptyListMessage="No status codes found."
+          exportFileName="Page Codes"
         >
           <template #addButton>
             <PrimeButton

@@ -32,7 +32,7 @@
         class="text-left py-2"
       >
         <div class="text-color-secondary text-sm">
-          {{ searchTerm ? 'No queries found.' : 'No queries created yet.' }}
+          {{ searchTerm ? 'No queries found.' : 'No queries created yet' }}
         </div>
       </div>
 
@@ -54,7 +54,7 @@
               outlined
               @click.stop="emit('open-menu', $event, query)"
               data-testid="table-menu-button"
-              class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              class="opacity-100 sm:opacity-0 min-w-8 group-hover:opacity-100 transition-opacity duration-200"
             />
           </div>
         </div>

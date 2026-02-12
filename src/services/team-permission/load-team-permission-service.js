@@ -1,6 +1,6 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeTeamPermissionBaseUrl } from './make-team-permission-base-url'
+import { AxiosHttpClientAdapter } from '@services/axios/AxiosHttpClientAdapter'
+import { makeTeamPermissionBaseUrl } from '@services/team-permission/make-team-permission-base-url'
 
 export const loadTeamPermissionService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -20,25 +20,23 @@ const adapt = (httpResponse) => {
 }
 
 /**
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return `${errorSchema[key]}`
-}
-
-/**
  * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
+ * @param {Object} httpResponse.body - The response body
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const apiKeyError = Object.keys(httpResponse.body)[0]
-  const apiValidationError = extractErrorKey(httpResponse.body, apiKeyError)
+  const body = httpResponse?.body
 
-  return `${apiValidationError}`
+  if (typeof body?.error === 'string' && body.error) {
+    return body.error
+  }
+
+  const firstError = Array.isArray(body?.errors) && body.errors.length > 0 ? body.errors[0] : null
+  if (typeof firstError?.detail === 'string' && firstError.detail) {
+    return firstError.detail
+  }
+
+  return null
 }
 
 const parseHttpResponse = (httpResponse) => {
@@ -49,7 +47,7 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.InvalidApiTokenError().message
     case 403:
       const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
+      throw apiError || new Errors.UnexpectedError().message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:

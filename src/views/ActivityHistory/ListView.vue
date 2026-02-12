@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Activity History"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Activity History"
+        description="View recorded account actions and configuration changes."
+      />
     </template>
     <template #content>
       <div v-if="hasContentToList">
@@ -14,7 +17,7 @@
       <EmptyResultsBlock
         v-else
         title="No activity has been recorded"
-        description="Start using services and products to view your account activity."
+        description="No activities found."
         :documentationService="documentationService"
       >
         <template #illustration>

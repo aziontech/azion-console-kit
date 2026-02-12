@@ -1,83 +1,29 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Variables" />
-    </template>
-    <template #content>
-      <ListTableBlock
-        v-if="hasContentToList"
-        @on-before-go-to-edit="checkIfIsEditable"
-        @on-before-go-to-add-page="handleTrackEvent"
-        :listService="listVariablesService"
-        :columns="getColumns"
-        addButtonLabel="Variable"
-        createPagePath="variables/create"
-        editPagePath="variables/edit"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No variables found."
-        :actions="actions"
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No variables have been created"
-        description="Click the button below to create your first variable."
-        createButtonLabel="Variable"
-        createPagePath="variables/create"
-        @click-to-create="handleTrackEvent"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { h, computed, ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { variablesService } from '@/services/v2/variables'
+  import { clipboardWrite, documentationCatalog } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'variables-view' })
 
-  const props = defineProps({
-    listVariablesService: {
-      required: true,
-      type: Function
-    },
-    deleteVariablesService: {
-      required: true,
-      type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
-
   const enableRedirect = ref(true)
   const refListTable = ref()
   const hasContentToList = ref(true)
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'variable',
       icon: 'pi pi-trash',
-      service: props.deleteVariablesService
+      service: variablesService.delete
     }
   ]
 
@@ -96,15 +42,16 @@
         header: 'Value',
         type: 'component',
         filterPath: 'value.content',
+        style: 'max-width: 300px',
         component: (columnData) => {
           if (columnData.isSecret) {
             return h('span', `${columnData.content}`)
           } else {
             return columnBuilder({
-              data: columnData,
-              columnAppearance: 'text-with-clipboard',
+              data: columnData.content,
+              columnAppearance: 'text-format-with-popup',
               dependencies: {
-                copyContentService: props.clipboardWrite
+                showCopy: clipboardWrite
               }
             })
           }
@@ -112,12 +59,15 @@
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor'
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        filterPath: 'last_editor'
       },
       {
-        field: 'updatedAt',
-        sortField: 'updatedAtDate',
-        header: 'Last Update'
+        field: 'lastModified',
+        header: 'Last Modified',
+        sortField: 'lastModified',
+        filterPath: 'lastModified'
       }
     ]
   })
@@ -143,3 +93,52 @@
     })
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Variables"
+        description="Define and manage variables that store configuration values across Azion’s products."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Variable"
+            @click="handleTrackEvent"
+            createPagePath="variables/create"
+            data-testid="create_Variable_button"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTableBlock
+        @on-before-go-to-edit="checkIfIsEditable"
+        @on-before-go-to-add-page="handleTrackEvent"
+        :listService="variablesService.list"
+        :columns="getColumns"
+        editPagePath="/variables/edit"
+        ref="refListTable"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No variables found."
+        :actions="actions"
+        :lazy="false"
+        :filters="[
+          {
+            field: 'key',
+            header: 'Key'
+          }
+        ]"
+        exportFileName="Variables"
+        :empty-block="{
+          title: 'No Variables yet',
+          description:
+            'Create your first variable to define reusable configuration values for platform resources.',
+          createButtonLabel: 'Variable',
+          createPagePath: 'variables/create',
+          documentationService: documentationCatalog.variables
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

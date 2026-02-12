@@ -78,7 +78,6 @@
   const showDrawerAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
-  const netWorkListOptions = ref({ options: [], done: true })
   const domainsOptions = ref({ options: [], done: false })
   const tuningSelected = ref(null)
   const allowedByAttacks = ref([])
@@ -427,10 +426,8 @@
     }
   }
 
-  const handleListNetworkListDropdown = async ({ id }) => {
-    const response = await networkListsService.listNetworkLists({ id }, true)
-    netWorkListOptions.value.options = response
-    return response
+  const handleListNetworkListDropdown = async (params) => {
+    return await networkListsService.listNetworkLists(params, true)
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
@@ -551,6 +548,7 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     hiddenHeader
+    exportFileName="WAF Rules Tuning"
     :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
   />
 

@@ -199,10 +199,11 @@
   }
 
   const filterSearch = async (filter) => {
+    if (!props.tuningObject) return
     const query = {
       hourRange: selectedFilter.value.hourRange,
-      matchesOn: props.tuningObject.matchesOn,
-      matchZone: props.tuningObject.matchZone,
+      matchesOn: props.tuningObject?.matchesOn,
+      matchZone: props.tuningObject?.matchZone,
       network: selectedFilter.value.network?.id,
       ipsList: filter.filter((item) => item.valueField === 'ip_address')[0]?.value,
       countries: filter
@@ -215,14 +216,18 @@
   }
 
   const listAttacks = async (params) => {
+    if (!props.tuningObject?.ruleId) {
+      totalRecordsFound.value = 0
+      return []
+    }
     let query
 
     if (!params.filters) {
       const hourRange = selectedFilter.value.hourRange
       query = {
         hourRange: hourRange,
-        matchesOn: props.tuningObject.matchesOn,
-        matchZone: props.tuningObject.matchZone,
+        matchesOn: props.tuningObject?.matchesOn,
+        matchZone: props.tuningObject?.matchZone,
         ipsList: selectedFilterAdvanced.value.filter((item) => item.valueField === 'ip_address')[0]
           ?.value,
         countries: selectedFilterAdvanced.value
@@ -241,7 +246,7 @@
 
     const response = await wafRulesTuningGqlService.listWafRulesTuningAttacks({
       wafId: props.wafRuleId,
-      tuningId: props.tuningObject.ruleId,
+      tuningId: props.tuningObject?.ruleId,
       query: query
     })
     totalRecordsFound.value = response.recordsFound
@@ -249,6 +254,7 @@
   }
 
   const filterTuning = async () => {
+    if (!props.tuningObject) return
     filterSearch(selectedFilterAdvanced.value)
   }
 
@@ -279,7 +285,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     },
     {
       field: 'topCountries',
@@ -287,7 +293,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     },
     {
       field: 'topPaths',
@@ -295,7 +301,7 @@
       sortable: true,
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
     }
   ]
 
@@ -356,7 +362,7 @@
           >
             <div class="flex-col justify-center items-start gap-3 flex">
               <div class="text-color text-xl font-medium">
-                {{ tuningObject.ruleIdDescription }}
+                {{ props.tuningObject?.ruleIdDescription }}
               </div>
               <div class="justify-start items-center gap-1 inline-flex">
                 <i class="pi pi-calendar text-color"></i>
@@ -448,8 +454,11 @@
                 v-model:selectedItensData="selectedAttack"
                 :columns="tableColumns"
                 :listService="listAttacks"
+                disabledList
+                disableEditOnClick
                 :hasListService="true"
                 hiddenHeader
+                exportFileName="Possible Attacks"
               />
             </div>
           </div>

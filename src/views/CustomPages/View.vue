@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock
+        :pageTitle="title"
+        description="Configure content and conditions for custom response pages."
+      />
     </template>
     <template #content>
       <component
@@ -26,6 +29,7 @@
 
 <script setup>
   import { ref, computed } from 'vue'
+  import { useRoute } from 'vue-router'
   import CreateFormBlock from '@/templates/create-form-block'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -34,8 +38,11 @@
   import FormFieldsCustomPages from '@/views/CustomPages/FormFields/CustomPages'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
   import { validationSchema, defaultValues } from '@/views/CustomPages/Config/validationSchema'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const initialValues = ref(defaultValues)
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
 
   defineOptions({
     name: 'custom-pages-view'
@@ -72,6 +79,11 @@
   const loadService = async (id) => {
     const payload = await customPageService.loadCustomPagesService(id)
     labelTitleEdit.value = payload.name
+
+    if (props.mode === 'edit') {
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, payload.name)
+    }
+
     return payload
   }
 

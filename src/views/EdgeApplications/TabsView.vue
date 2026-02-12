@@ -13,20 +13,21 @@
   import { useToast } from 'primevue/usetoast'
   import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import EditView from './EditView.vue'
   import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
-  import EditViewSkeleton from './components/EditViewSkeleton.vue'
-
+  import PrimeButton from 'primevue/button'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
-  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { edgeAppErrorResponseService } from '@/services/v2/edge-app/edge-app-error-response-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -56,13 +57,33 @@
   const toast = useToast()
   const route = useRoute()
   const router = useRouter()
+  const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
   const isLocked = ref(false)
+  const isApplicationLoaded = ref(false)
+
+  const cachedEdgeApplication = edgeAppService.getApplicationFromCache(edgeApplicationId.value)
+
+  if (cachedEdgeApplication?.name) {
+    edgeApplication.value = cachedEdgeApplication
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedEdgeApplication.name)
+  }
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
+
+  const componentsRefs = ref(null)
+
+  const addButtonController = computed(() => {
+    const tab = filteredTabs.value[activeTab.value]
+    return {
+      showAddButtonTab: !!tab?.showAddButtonTab,
+      label: tab?.addButtonLabel || tab?.header || 'Create',
+      click: () => componentsRefs.value[0].openCreateDrawer?.()
+    }
+  })
 
   const handleTrackClickToEditErrorResponses = () => {
     tracker.product.clickToEdit({ productName: 'Error Responses' }).track()
@@ -104,7 +125,7 @@
     }, {})
   }
   const verifyTab = (edgeApplication) => {
-    if (!edgeApplication[edgeFunctionsEnabled.value]) {
+    if (edgeFunctionsEnabled.value && !edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()
       return
@@ -115,51 +136,37 @@
   const preloadTabData = async () => {
     if (!edgeApplication.value) return
 
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+
     const preloadPromises = []
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
     if (hasFlagBlockApiV4()) {
-      preloadPromises.push(
-        props.originsServices.listOriginsService({
-          id: edgeApplicationId.value,
-          pageSize: 200
-        })
-      )
+      preloadPromises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
 
       preloadPromises.push(
-        edgeAppErrorResponseService.listEdgeApplicationsErrorResponseService({
-          edgeApplicationId: edgeApplicationId.value,
-          params: {}
-        })
+        edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(
+          edgeApplicationId.value
+        )
       )
     }
 
     preloadPromises.push(
-      deviceGroupService.listDeviceGroupService(edgeApplicationId.value, { pageSize: 10, page: 1 })
+      deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
     )
 
     preloadPromises.push(
-      cacheSettingsService.listCacheSettingsService(edgeApplicationId.value, {
-        pageSize: 100,
-        page: 1
-      })
+      cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
     )
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
       preloadPromises.push(
-        edgeApplicationFunctionService.listEdgeApplicationFunctions(edgeApplicationId.value, {
-          pageSize: 10,
-          page: 1
-        })
+        edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value, pageSize)
       )
     }
 
-    preloadPromises.push(
-      rulesEngineService.listRulesEngineRequestAndResponsePhase({
-        edgeApplicationId: edgeApplicationId.value,
-        params: {}
-      })
-    )
+    preloadPromises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
 
     await Promise.allSettled(preloadPromises)
   }
@@ -170,9 +177,11 @@
     let selectedTab = tab
     if (!tab) selectedTab = 'main-settings'
 
-    edgeApplication.value = await handleLoadEdgeApplication()
+    edgeApplication.value = { ...edgeApplication.value, ...(await handleLoadEdgeApplication()) }
+    isApplicationLoaded.value = true
     verifyTab(edgeApplication.value)
 
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
     preloadTabData()
 
     const activeTabIndexByRoute = mapTabs.value[selectedTab]
@@ -206,7 +215,7 @@
   }
   const changeRouteByTab = (tab) => {
     const params = { id: edgeApplicationId.value, tab }
-    router.push({ name: 'edit-application', params, query: route.query })
+    router.push({ name: 'edit-application', params, query: {} })
   }
   const changeTab = (index) => {
     verifyTab(edgeApplication.value)
@@ -222,6 +231,7 @@
   provide('unsaved', { changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved })
 
   provide('edgeApplication', edgeApplication)
+  provide('isApplicationLoaded', isApplicationLoaded)
 
   const tagProps = {
     value: 'Locked',
@@ -269,6 +279,7 @@
         edgeApplication: edgeApplication.value,
         updatedRedirect: props.edgeApplicationServices.updatedRedirect,
         isTab: true,
+        initialValues: edgeApplication.value,
         contactSalesEdgeApplicationService:
           props.edgeApplicationServices.contactSalesEdgeApplicationService
       })
@@ -278,6 +289,8 @@
       component: EdgeApplicationsOriginsListView,
       condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
+      showAddButtonTab: true,
+      addButtonLabel: 'Origin',
       props: () => ({
         ...props.originsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -289,6 +302,8 @@
       component: EdgeApplicationsDeviceGroupsListView,
       condition: true,
       show: showTabs.deviceGroups,
+      showAddButtonTab: true,
+      addButtonLabel: 'Device',
       props: () => ({
         ...props.deviceGroupsServices,
         edgeApplicationId: edgeApplicationId.value,
@@ -310,6 +325,8 @@
       component: EdgeApplicationsCacheSettingsListView,
       condition: true,
       show: showTabs.cacheSettings,
+      showAddButtonTab: true,
+      addButtonLabel: 'Cache',
       props: () => ({
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isTieredCacheEnabled: true,
@@ -321,6 +338,8 @@
       component: EdgeApplicationsFunctionsListView,
       condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
+      showAddButtonTab: true,
+      addButtonLabel: 'Function',
       props: () => ({
         ...props.functionsServices,
         ...props.edgeFunctionsServices,
@@ -332,6 +351,8 @@
       component: EdgeApplicationsRulesEngineListView,
       condition: true,
       show: showTabs.rulesEngine,
+      showAddButtonTab: true,
+      addButtonLabel: 'Rule',
       props: () => ({
         ...props.rulesEngineServices,
         isImageOptimizationEnabled: isModuleEnabled(imageProcessorEnabled.value).value,
@@ -375,40 +396,60 @@
 </script>
 
 <template>
-  <EditViewSkeleton v-if="!edgeApplication" />
-
-  <ContentBlock
-    v-else
-    data-testid="edge-application-details-content-block"
-  >
+  <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
       <MigrationMessage />
 
       <PageHeadingBlock
         :pageTitle="tabTitle"
         :tag="tagLocked"
+        :entityName="edgeApplication?.name"
         data-testid="edge-application-details-heading"
+        description="Configure application logic, function execution, caching settings, and Connectors used to reach origins."
       />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="({ index = 0 }) => changeTab(index)"
-        class="w-full h-full"
+      <div
+        class="h-full w-full"
         v-if="edgeApplication"
       >
-        <TabPanel
-          v-for="(tab, index) in filteredTabs"
-          :pt="{
-            headerAction: { id: `tab_${index}` },
-            root: {
-              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
-              id: `${tab.header}`
-            }
-          }"
-          :key="index"
-          :header="tab.header"
-        >
+        <div class="flex align-center justify-between relative">
+          <TabView
+            :activeIndex="activeTab"
+            @tab-click="({ index = 0 }) => changeTab(index)"
+            class="flex-1"
+          >
+            <TabPanel
+              v-for="(tab, index) in filteredTabs"
+              :pt="{
+                headerAction: {
+                  id: `tab_${index}`
+                },
+                root: {
+                  'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
+                  id: `${tab.header}`
+                }
+              }"
+              :key="index"
+              :header="tab.header"
+            >
+            </TabPanel>
+          </TabView>
+          <div
+            v-if="addButtonController.showAddButtonTab"
+            class="flex ml-4 items-center"
+          >
+            <PrimeButton
+              :label="addButtonController.label"
+              size="small"
+              icon="pi pi-plus"
+              @click="addButtonController.click"
+              data-testid="data-table-actions-column-body-actions-menu-button"
+            />
+          </div>
+        </div>
+
+        <div>
           <InlineMessage
             class="mt-4 w-full"
             severity="warn"
@@ -417,14 +458,20 @@
             <b>Warning</b>
             {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
           </InlineMessage>
-          <component
-            :is="tab.component"
-            v-if="tab.show"
-            @updatedApplication="updatedApplication"
-            v-bind="tab.props()"
-          />
-        </TabPanel>
-      </TabView>
+          <template
+            v-for="(tab, index) in filteredTabs"
+            :key="index"
+          >
+            <component
+              ref="componentsRefs"
+              :is="tab.component"
+              v-if="tab.show"
+              @updatedApplication="updatedApplication"
+              v-bind="tab.props()"
+            />
+          </template>
+        </div>
+      </div>
     </template>
   </ContentBlock>
 </template>

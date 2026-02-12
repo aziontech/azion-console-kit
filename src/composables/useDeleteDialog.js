@@ -39,11 +39,13 @@ export const useDeleteDialog = () => {
     title,
     id,
     data,
+    description,
     deleteService,
     closeCallback,
     successCallback,
     bypassConfirmation = false,
-    showToast = true
+    showToast = true,
+    warningMessage = ''
   }) => {
     dialog.open(DeleteDialog, {
       data: {
@@ -55,6 +57,8 @@ export const useDeleteDialog = () => {
         deleteService,
         rerender: Math.random(),
         deleteConfirmationText: getDeleteConfirmationText(data),
+        entityDeleteMessage: description,
+        warningMessage: warningMessage,
         showToast
       },
       onClose: closeCallback,

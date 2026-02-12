@@ -11,14 +11,15 @@
   import * as yup from 'yup'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-  const { selectedBucket } = useEdgeStorage()
+  const { getBucketSelected } = useEdgeStorage()
 
   const dialog = useDialog()
   const listTableBlockRef = ref()
   const showCreateCredentialDrawer = ref(false)
+  const bucketSelected = getBucketSelected()
 
   const listCredentialsService = async (params = {}) => {
-    return await edgeStorageService.listCredentials(selectedBucket.value?.name, params)
+    return await edgeStorageService.listCredentials(bucketSelected, params)
   }
 
   const handleCreateCredential = () => {
@@ -29,8 +30,8 @@
     const body = {
       name: credentialData.name,
       capabilities: credentialData.capabilities,
-      expiration_date: credentialData.expirationDate,
-      bucket: selectedBucket.value.name
+      expirationDate: credentialData.expirationDate,
+      bucket: [bucketSelected]
     }
     const result = await edgeStorageService.createCredential(body)
     return result
@@ -56,9 +57,14 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'credential',
       icon: 'pi pi-trash',
+      warningMessage:
+        "This credential affect all buckets. Once confirmed, this action can't be reversed. ",
+      description:
+        'The selected credential will be deleted. Check the Help Center for more details.',
       service: (credentialId) => edgeStorageService.deleteCredential(credentialId)
     }
   ]
@@ -70,17 +76,19 @@
     },
     {
       field: 'accessKey',
-      header: 'Access Key'
+      header: 'Access Key',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
+      }
     },
     {
       field: 'capabilities',
       header: 'Capabilities',
       type: 'component',
+      style: 'max-width: 300px',
       component: (columnData) => {
-        return columnBuilder({
-          data: { value: columnData },
-          columnAppearance: 'expand-text-column'
-        })
+        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     },
     {
@@ -90,6 +98,18 @@
     {
       field: 'expirationDate',
       header: 'Expiration Date'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    },
+    {
+      field: 'lastModify',
+      header: 'Last Modified',
+      sortField: 'lastModify',
+      filterPath: 'lastModify'
     }
   ]
 
@@ -105,8 +125,13 @@
   const initialValues = {
     name: '',
     capabilities: [],
-    expirationDate: null
+    expirationDate: null,
+    bucket: []
   }
+
+  defineExpose({
+    openCreateDrawer: handleCreateCredential
+  })
 </script>
 
 <template>
@@ -121,15 +146,21 @@
       :editInDrawer="false"
       emptyListMessage="No credentials found"
       :paginator="false"
-      addButtonLabel="Credential"
       :enableEditClick="false"
+      exportFileName="Credentials"
+      :emptyBlock="{
+        title: 'No credentials found',
+        description: 'Create a new credential to get started'
+      }"
     >
-      <template #addButton>
+      <template #emptyBlockButton>
         <PrimeButton
           icon="pi pi-plus"
           label="Credential"
+          severity="secondary"
+          size="small"
           @click="handleCreateCredential"
-          data-testid="create_credential_button"
+          data-testid="create_credential_button_empty"
         />
       </template>
     </ListTableBlock>

@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from './queryClient'
-import { createFinalKey } from './keyFactory'
+import { queryKeys } from './queryKeys'
 import { CACHE_TYPE, getCacheOptions } from './queryOptions'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { toMilliseconds } from './config'
@@ -9,29 +9,62 @@ import { toMilliseconds } from './config'
 export class BaseService {
   http = httpService
   queryClient = queryClient
+  queryKeys = queryKeys
   cacheType = CACHE_TYPE
   toMilliseconds = toMilliseconds
 
   #getQueryOptions(options = {}) {
-    const { persist = true, cacheType = this.cacheType.GLOBAL, ...restOptions } = options
+    if (options && typeof options !== 'object') {
+      throw new Error('Invalid options type. Expected object, received: ' + typeof options)
+    }
 
-    const queryOptions = { meta: { persist, cacheType }, ...getCacheOptions(cacheType) }
+    const cacheOptions = getCacheOptions(options.cacheType)
 
-    return { ...queryOptions, ...restOptions }
+    const {
+      cacheType = this.cacheType.GLOBAL,
+      persist = cacheOptions.persist,
+      skipCache = cacheOptions.skipCache,
+      ...restOptions
+    } = options || {}
+
+    return {
+      meta: {
+        persist,
+        cacheType,
+        skipCache
+      },
+      ...cacheOptions,
+      ...(restOptions || {})
+    }
   }
 
-  _createQuery(queryKey, queryFn, options = {}) {
+  useQuery(queryKey, queryFn, options = {}) {
+    if (!queryFn || typeof queryFn !== 'function') {
+      throw new Error('Invalid query key or query function')
+    }
+
+    if (!queryKey || !Array.isArray(queryKey) || queryKey.length === 0) {
+      throw new Error('Invalid query key. Expected array, received: ' + typeof queryKey)
+    }
+
     const queryOptions = this.#getQueryOptions(options)
 
-    return useQuery({ queryKey: createFinalKey(queryKey), queryFn, ...queryOptions })
+    return useQuery({
+      queryKey,
+      queryFn,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
+      }
+    })
   }
 
-  _createMutation(mutationFn, options = {}) {
+  useMutation(mutationFn, options = {}) {
     const {
       invalidateKeysSuccess = [],
       invalidateKeysError = [],
       invalidateKeysSettled = []
-    } = options
+    } = options || {}
 
     const invalidateKeys = (invalidate) => {
       invalidate.forEach((key) => {
@@ -42,7 +75,7 @@ export class BaseService {
     return useMutation({
       mutationFn,
       async onSuccess(data, variables, context) {
-        if (options.onSuccess) {
+        if (options?.onSuccess) {
           await options.onSuccess(data, variables, context)
         }
         if (invalidateKeysSuccess.length > 0) {
@@ -50,7 +83,7 @@ export class BaseService {
         }
       },
       onError(error, variables, context) {
-        if (options.onError) {
+        if (options?.onError) {
           options.onError(error, variables, context)
         }
         if (invalidateKeysError.length > 0) {
@@ -58,38 +91,79 @@ export class BaseService {
         }
       },
       onSettled(data, error, variables, context) {
-        if (options.onSettled) {
+        if (options?.onSettled) {
           options.onSettled(data, error, variables, context)
         }
         if (invalidateKeysSettled.length > 0) {
           invalidateKeys(invalidateKeysSettled)
         }
       },
-      ...options
+      ...(options || {})
     })
   }
 
-  async _prefetchQuery(queryKey, queryFn, options = {}) {
+  async usePrefetchQuery(queryKey, queryFn, options = {}) {
+    const queryOptions = this.#getQueryOptions(options)
+    await waitForPersistenceRestore()
+
+    return await this.queryClient.prefetchQuery({
+      queryKey: queryKey,
+      queryFn,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
+      }
+    })
+  }
+
+  async useEnsureQueryData(queryKey, queryFn, options = {}) {
     const queryOptions = this.#getQueryOptions(options)
 
     await waitForPersistenceRestore()
 
-    return this.queryClient.prefetchQuery({
-      queryKey: createFinalKey(queryKey),
+    if (queryOptions.meta?.skipCache) {
+      return await queryFn()
+    }
+
+    return await this.queryClient.ensureQueryData({
+      queryKey,
       queryFn,
-      ...queryOptions
+      revalidateIfStale: true,
+      ...queryOptions,
+      onError: () => {
+        return Promise.resolve(null)
+      }
     })
   }
 
-  async _ensureQueryData(queryKey, queryFn, options = {}) {
-    const queryOptions = this.#getQueryOptions(options)
+  getFromCache({ queryKey, id, listPath = 'body', select, fieldName = 'id' }) {
+    if (!queryKey || id === undefined || id === null) return undefined
 
-    await waitForPersistenceRestore()
+    const queries = this.queryClient.getQueryCache().findAll({
+      predicate: (query) => {
+        const key = query.queryKey
+        if (!Array.isArray(key)) return false
 
-    return this.queryClient.ensureQueryData({
-      queryKey: createFinalKey(queryKey),
-      queryFn,
-      ...queryOptions
+        if (Array.isArray(queryKey)) {
+          return queryKey.every((query, index) => key[index] === query)
+        }
+
+        return key[0] === queryKey
+      }
     })
+
+    for (const query of queries) {
+      const data = query?.state?.data
+      const list = listPath ? data?.[listPath] : data
+      if (!Array.isArray(list)) continue
+
+      const item = list.find((item) => String(item?.[fieldName]) === String(id))
+
+      if (!item) continue
+
+      return select ? select(item) : item
+    }
+
+    return undefined
   }
 }

@@ -205,7 +205,7 @@
 <template>
   <ButtonPrime
     ref="buttonOverPanel"
-    icon="pi pi-plus"
+    icon="pi pi-filter"
     v-tooltip.bottom="{ value: 'Add filter', showDelay: 200 }"
     outlined
     size="small"

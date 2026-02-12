@@ -1,7 +1,13 @@
-export async function themeGuard({ accountStore }) {
-  // TODO: remove the usage of localStorage when API returns the theme
+import { useThemeStore } from '@/stores/theme'
+import { themeApply } from '@/helpers'
+
+export async function themeGuard() {
+  const themeStore = useThemeStore()
   const theme = localStorage.getItem('theme')
   const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   const currentTheme = theme || fallbackTheme
-  accountStore.setTheme(currentTheme)
+
+  themeStore.setTheme(currentTheme)
+
+  themeApply(currentTheme)
 }

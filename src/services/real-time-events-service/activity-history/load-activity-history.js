@@ -4,6 +4,9 @@ import { buildSummary, capitalizeFirstLetter } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+const shouldLimitRequestUri = false
+
 export const loadActivityHistory = async (filter) => {
   const payload = adapt(filter)
 
@@ -17,6 +20,12 @@ export const loadActivityHistory = async (filter) => {
   })
 
   return adaptResponse(response)
+}
+
+const getSummaryValueByKey = (summary, key, fallback = '') => {
+  if (!Array.isArray(summary) || !key) return fallback
+  const entry = summary.find((item) => item?.key === key)
+  return entry?.value ?? fallback
 }
 
 const adapt = (filter) => {
@@ -46,7 +55,8 @@ const adapt = (filter) => {
     fields: filter.fields,
     and: {
       userIdEq: filter.userId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      titleEq: getSummaryValueByKey(filter.summary, 'title')
     }
   }
   return convertGQL(formatFilter, table)
@@ -60,6 +70,6 @@ const adaptResponse = (response) => {
     title: activityHistoryEvents.title,
     type: capitalizeFirstLetter(activityHistoryEvents.type),
     ts: getCurrentTimezone(activityHistoryEvents.ts),
-    data: buildSummary(activityHistoryEvents)
+    data: buildSummary(activityHistoryEvents, shouldLimitRequestUri, shouldShowTsColumn)
   }
 }

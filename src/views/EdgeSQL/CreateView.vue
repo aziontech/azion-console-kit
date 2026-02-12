@@ -3,6 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Create Database"
+        description="Configure a SQL database instance that can be accessed by Applications, Functions, and APIs."
         data-testid="create-edge-sql-database-heading"
       />
     </template>

@@ -6,7 +6,7 @@ export const useBreadcrumbs = defineStore({
     items: []
   }),
   actions: {
-    update(items, route = null) {
+    update(items, route = null, entityName = null) {
       if (!route) {
         this.items = items
         return
@@ -17,26 +17,42 @@ export const useBreadcrumbs = defineStore({
           const paramValue = route.query[item.queryParam]
 
           if (paramValue && item.typeMapping && item.typeMapping[paramValue]) {
+            const mappedValue = item.typeMapping[paramValue][item.baseLabel]
+
+            if (mappedValue) {
+              return {
+                ...item,
+                label: mappedValue
+              }
+            }
+
             const routeType = item.baseLabel.toLowerCase().includes('create') ? 'create' : 'edit'
             return {
               ...item,
-              label: item.typeMapping[paramValue][routeType]
+              label: item.typeMapping[paramValue][routeType] || item.label || item.baseLabel
             }
           }
 
           return {
             ...item,
-            label: paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel
+            label: item.label || (paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel)
+          }
+        }
+
+        if (item.dynamic && item.routeParam && entityName) {
+          return {
+            ...item,
+            label: entityName
           }
         }
 
         if (item.dynamic && item.routeParam) {
           const paramValue = route.params[item.routeParam]
-          const processedTo = item.to ? item.to.replace(`:${item.routeParam}`, paramValue) : item.to
+          const isNumericId = paramValue && !isNaN(paramValue)
           return {
             ...item,
-            label: paramValue || item.label,
-            to: processedTo
+            label: isNumericId ? null : paramValue || item.label,
+            isLoading: isNumericId
           }
         }
 

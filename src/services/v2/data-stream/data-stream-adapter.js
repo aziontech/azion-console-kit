@@ -1,6 +1,6 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import * as Errors from '@/services/axios/errors'
-import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
+import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const mapDataSourceName = {
   http: 'Edge Applications',

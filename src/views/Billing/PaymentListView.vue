@@ -6,11 +6,13 @@
     isTabs
     :defaultOrderingFieldName="'is_default'"
     :apiFields="API_FIELDS"
+    :allowedFilters="allowedFilters"
     :columns="paymentsColumns"
     :listService="listCreditCards"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
+    exportFileName="Payment Methods"
   >
     <template #addButton>
       <div class="flex gap-4">
@@ -52,7 +54,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2/payment/payment-service'
@@ -112,6 +114,25 @@
     'card_expiration_year',
     'is_default',
     'card_last_4_digits'
+  ]
+
+  const allowedFilters = [
+    {
+      header: 'Card Holder',
+      field: 'card_holder'
+    },
+    {
+      header: 'Brand',
+      field: 'card_brand'
+    },
+    {
+      header: 'Last 4 digits',
+      field: 'card_last_4_digits'
+    },
+    {
+      header: 'Default',
+      field: 'is_default'
+    }
   ]
 
   const paymentsColumns = ref([
@@ -200,7 +221,7 @@
         }
 
         const { account } = useAccountStore()
-        const hasSupport = !account.isDeveloperSupportPlan
+        const hasSupport = !account?.isDeveloperSupportPlan
 
         toast.add({
           closable: true,

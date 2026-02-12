@@ -10,9 +10,7 @@ export const DeviceGroupAdapter = {
       data?.map((deviceGroup) => {
         return {
           id: deviceGroup.id,
-          deviceId: {
-            content: deviceGroup.id
-          },
+          deviceId: deviceGroup.id,
           name: deviceGroup.name,
           userAgent: deviceGroup.user_agent
         }

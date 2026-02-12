@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="domainName"
+        description="Configure domains, certificates, and select the security and application settings executed by this Domain."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +12,7 @@
         :loadService="loadDomainService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        :initialValues="cachedDomain"
         @loaded-service-object="setDomainName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
@@ -38,6 +42,7 @@
 
 <script setup>
   import { ref, inject } from 'vue'
+  import { useRoute } from 'vue-router'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -47,6 +52,8 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { workloadService } from '@/services/v2/workload/workload-service'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -108,8 +115,16 @@
       .track()
   }
 
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
   const digitalCertificates = ref([])
-  const domainName = ref()
+
+  const cachedDomain = workloadService.getDomainFromCache(route.params.id) ?? {}
+  const domainName = ref(cachedDomain?.name)
+
+  if (cachedDomain?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedDomain.name)
+  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
@@ -117,6 +132,7 @@
 
   const setDomainName = async (domain) => {
     domainName.value = domain.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, domain.name)
   }
 
   const validationSchema = yup.object({
@@ -163,6 +179,7 @@
     active: yup.boolean(),
     environment: yup.string(),
     oldDomains: yup.array().of(yup.string()).optional(),
-    authorityCertificate: yup.string().nullable()
+    authorityCertificate: yup.string().nullable(),
+    subjectNameCertificate: yup.array().nullable()
   })
 </script>

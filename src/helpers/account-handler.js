@@ -1,6 +1,6 @@
 import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
-import { sessionManager } from '@/services/v2/base/auth'
+import { sessionManager } from '@/services/v2/base/auth/sessionManager'
 
 export class AccountHandler {
   constructor(switchAccountService, listTypeAccountService) {
@@ -41,8 +41,8 @@ export class AccountHandler {
    * @returns {Promise<Object>} - Returns an object with the corresponding page name
    */
   async switchAndReturnAccountPage(clientId) {
+    await sessionManager.switchAccount()
     const accountId = await this.searchAccount(clientId)
-
     const { firstLogin } = await this.switchAccountService(accountId)
     return { name: firstLogin ? 'additional-data' : 'home' }
   }
@@ -52,7 +52,7 @@ export class AccountHandler {
    * @param {string} accountId - Account ID
    */
   async switchAccountAndRedirect(accountId) {
-    await sessionManager.switchAccount(accountId)
+    await sessionManager.switchAccount()
     const { firstLogin } = await this.switchAccountService(accountId)
 
     if (firstLogin) {
@@ -86,6 +86,7 @@ export class AccountHandler {
    * @return {string | object} The URL string or object to redirect to.
    */
   async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
+    await sessionManager.switchAccount()
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 

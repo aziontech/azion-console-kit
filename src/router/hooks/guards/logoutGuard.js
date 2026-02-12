@@ -15,7 +15,7 @@ export async function logoutGuard({ to, accountStore, tracker }) {
     tracker.reset()
     await sessionManager.logout()
     await logoutService()
-    accountStore.setAccountData({})
+    accountStore.resetAccount()
     return { name: 'login' }
   }
 }

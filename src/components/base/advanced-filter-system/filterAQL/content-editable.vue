@@ -6,6 +6,9 @@
     placeholder="Filter using Azion Query Language syntax..."
     class="contenteditable p-inputtext font-normal text-sm w-full h-auto font-mono"
     @input="handleInput"
+    @keyup="updateCursorOffset"
+    @mouseup="updateCursorOffset"
+    @focus="updateCursorOffset"
     v-on="$attrs"
   />
 </template>
@@ -32,8 +35,12 @@
   const editable = ref(null)
   const cursorOffset = ref(null)
 
-  const handleInput = (event) => {
+  const updateCursorOffset = () => {
     cursorOffset.value = AzionQueryLanguage.saveCursorPosition(editable.value)
+  }
+
+  const handleInput = (event) => {
+    updateCursorOffset()
 
     const newValue = event.target.innerText
     editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
@@ -64,7 +71,8 @@
   )
 
   defineExpose({
-    restoreCursorPosition
+    restoreCursorPosition,
+    getCursorOffset: () => cursorOffset.value
   })
 </script>
 

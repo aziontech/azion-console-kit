@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Your Settings" />
+      <PageHeadingBlock
+        pageTitle="Your Settings"
+        description="Define and manage personal account preferences and profile configuration."
+      />
     </template>
     <template #content>
       <EditFormBlock

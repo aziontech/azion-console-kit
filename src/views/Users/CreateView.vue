@@ -2,6 +2,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
+        description="Configure user identity, access scope, and authentication settings."
         pageTitle="Create User"
         data-testid="users__create-view__page-heading"
       />

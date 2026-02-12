@@ -8,6 +8,13 @@
 
   defineOptions({ name: 'object-storage-credentials-list-view' })
 
+  defineProps({
+    documentationService: {
+      type: Function,
+      required: true
+    }
+  })
+
   const toast = useToast()
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
@@ -21,22 +28,36 @@
     },
     {
       field: 'accessKey',
-      header: 'Access Key'
+      header: 'Access Key',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
+      }
     },
     {
       field: 'capabilities',
       header: 'Capabilities',
       type: 'component',
+      style: 'max-width: 300px',
       component: (columnData) => {
-        return columnBuilder({
-          data: { value: columnData },
-          columnAppearance: 'expand-text-column'
-        })
+        return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     },
     {
       field: 'bucket',
-      header: 'Bucket'
+      header: 'Bucket',
+      type: 'component',
+      component: (columnData) => {
+        if (Array.isArray(columnData)) {
+          return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+        }
+
+        if (columnData && typeof columnData === 'object' && 'content' in columnData) {
+          return columnBuilder({ data: columnData, columnAppearance: 'tag' })
+        }
+
+        return columnBuilder({ data: [], columnAppearance: 'text-array-with-popup' })
+      }
     },
     {
       field: 'createDate',
@@ -45,6 +66,18 @@
     {
       field: 'expirationDate',
       header: 'Expiration Date'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    },
+    {
+      field: 'lastModify',
+      header: 'Last Modified',
+      sortField: 'lastModify',
+      filterPath: 'lastModify'
     }
   ])
 
@@ -87,13 +120,22 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'credential',
+      warningMessage:
+        "This credential affect all buckets. Once confirmed, this action can't be reversed. ",
+      description:
+        'The selected credential will be deleted. Check the Help Center for more details.',
       icon: 'pi pi-trash',
       service: deleteCredentialService,
       showOnlyOnHover: true
     }
   ]
+
+  defineExpose({
+    handleCreateCredential
+  })
 </script>
 
 <template>
@@ -110,6 +152,15 @@
       @on-failed-to-delete="handleFailedToDelete"
       emptyListMessage="No credentials found."
       isTabs
+      :emptyBlock="{
+        title: 'No Object Storage credentials yet',
+        description:
+          'Create your first Object Storage credential to authenticate and control access to buckets.',
+        createButtonLabel: 'Credential',
+        onClickCreate: () => handleCreateCredential(),
+        documentationService: documentationService
+      }"
+      exportFileName="Object Storage Credentials"
     />
     <CredentialDrawer
       ref="credentialDrawerRef"

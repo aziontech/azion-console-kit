@@ -8,9 +8,30 @@ export default class Aql {
     this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
+  buildOperatorsRegex() {
+    const patterns = this.operators.map((op) => {
+      const escaped = op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')
+      return /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
+    })
+
+    return new RegExp(patterns.join('|'), 'i')
+  }
+
+  #isDomainWorkloadField(fieldName) {
+    if (!fieldName) return false
+    return String(fieldName).toLowerCase() === this.handleTextDomainWorkload.singularLabel
+  }
+
+  normalizeQuery(query) {
+    if (!query) return query
+
+    return query.replace(/\b(in|between)\b\s*\(/gi, (match, op) => `${op} (`).replace(/\(\s+/g, '(')
+  }
+
   parse(query, suggestions, domains) {
     if (!query) return []
-    const expressions = query.split(/and/i).map((expr) => expr.trim())
+    const normalizedQuery = this.normalizeQuery(query)
+    const expressions = normalizedQuery.split(/and/i).map((expr) => expr.trim())
     const expressionRegex =
       /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
 
@@ -66,7 +87,7 @@ export default class Aql {
           operator.toUpperCase() === 'IN' &&
           field.toLowerCase() === this.handleTextDomainWorkload.singularLabel
         ) {
-          parsedValue = this.formatDomainValues(query, domains)
+          parsedValue = this.formatDomainValues(normalizedQuery, domains)
         } else {
           parsedValue = value.replace(/^["']|["']$/g, '')
         }
@@ -105,12 +126,16 @@ export default class Aql {
 
   formatDomainValues(query, domains) {
     const extractDomainClauseContent = (query) => {
-      const indicator = `${this.handleTextDomainWorkload.singularLabel} in (`
       const lowerQuery = query.toLowerCase()
-      const pos = lowerQuery.indexOf(indicator)
-      if (pos === -1) return null
+      const escapedField = this.handleTextDomainWorkload.singularLabel.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&'
+      )
+      const clauseRegex = new RegExp(`\\b${escapedField}\\b\\s+in\\s*\\(`, 'i')
+      const match = clauseRegex.exec(lowerQuery)
+      if (!match) return null
 
-      const startIndex = query.indexOf('(', pos)
+      const startIndex = query.indexOf('(', match.index)
       if (startIndex === -1) return null
 
       let counter = 0
@@ -141,7 +166,8 @@ export default class Aql {
       for (let i = 0; i < str.length; i++) {
         const char = str[i]
         if (char === ',' && nesting === 0) {
-          tokens.push(token.trim())
+          const cleaned = token.trim()
+          if (cleaned.length > 0) tokens.push(cleaned)
           token = ''
         } else {
           token += char
@@ -173,11 +199,48 @@ export default class Aql {
     return result
   }
 
+  upsertInListValue(query, valueToAdd) {
+    if (!query) return query
+    const value = String(valueToAdd ?? '').trim()
+    if (!value) return query
+
+    const startIndex = query.lastIndexOf('(')
+    if (startIndex === -1) {
+      const trimmed = query.trimEnd()
+      return `${trimmed} (${value})`
+    }
+
+    const endIndex = query.indexOf(')', startIndex)
+    const innerRaw = query.slice(startIndex + 1, endIndex === -1 ? query.length : endIndex)
+
+    const tokens = innerRaw
+      .split(',')
+      .map((token) => token.trim())
+      .filter((token) => token.length > 0)
+
+    const alreadyExists = tokens.some((token) => token.toLowerCase() === value.toLowerCase())
+    if (!alreadyExists) tokens.push(value)
+
+    const rebuiltInner = tokens.join(', ')
+    const prefix = query.slice(0, startIndex + 1)
+
+    if (endIndex === -1) {
+      return `${prefix}${rebuiltInner})`
+    }
+
+    const suffix = query.slice(endIndex)
+    return `${prefix}${rebuiltInner}${suffix}`
+  }
+
   operatorInfo(operators, operator) {
     return operators.find((op) => op.label === operator)?.value
   }
 
   mapOperatorValue(op) {
+    if (typeof op === 'string' && /^[a-zA-Z]+$/.test(op)) {
+      op = op.toLowerCase()
+    }
+
     switch (op) {
       case 'in':
         return 'In'
@@ -229,21 +292,9 @@ export default class Aql {
         return { query: newQuery, nextStep: 'value', label: fieldName }
       }
       case 'value': {
-        if (fieldName === this.handleTextDomainWorkload.singularLabel) {
-          const suggestion = suggestionLabel.trim()
-
-          let newQuery = ''
-          if (query.includes(suggestionLabel.trim())) {
-            return { query, nextStep: 'value', label: fieldName }
-          }
-
-          if (query.endsWith(' ') || query.endsWith('in')) {
-            newQuery = `${query}(${suggestion})`
-          } else if (query.endsWith(',') || !query.endsWith(')')) {
-            newQuery = `${query}, ${suggestion})`
-          } else {
-            newQuery = `${query.slice(0, -1)}, ${suggestion})`
-          }
+        if (this.#isDomainWorkloadField(fieldName)) {
+          const value = suggestionLabel.trim()
+          const newQuery = this.upsertInListValue(query, value)
           return { query: newQuery, nextStep: 'value', label: fieldName }
         } else {
           return { query: `${suggestionLabel} `, nextStep: 'value', label: fieldName }
@@ -267,7 +318,12 @@ export default class Aql {
     const matchingFields = suggestions.filter((item) =>
       item.label.toLowerCase().startsWith(tokenForMatch)
     )
-    let operatorFound = this.operators.find((op) => tokenForMatch.toLowerCase().includes(op))
+    const sortedOperators = [...this.operators].sort((left, right) => right.length - left.length)
+    let operatorFound = sortedOperators.find((op) => {
+      const escaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const pattern = /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
+      return new RegExp(pattern, 'i').test(tokenForMatch)
+    })
 
     const hasValueAfterOperator = operatorFound ? tokenRaw.split(operatorFound)[1] : null
 
@@ -336,11 +392,12 @@ export default class Aql {
   }
 
   queryValidator(query, suggestions) {
+    const normalizedQuery = this.normalizeQuery(query)
     const hasErrorInCompoundFields = this.queryValidationForCompoundFields(query)
-    const hasErrorInFields = this.queryValidationIfFieldsExistInList(query, suggestions)
-    const hasErrorInOperatorIn = this.queryValidationForInOperator(query, suggestions)
-    const hasErrorNotSpace = this.queryValidatorNoSpaces(query)
-    const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(query)
+    const hasErrorInFields = this.queryValidationIfFieldsExistInList(normalizedQuery, suggestions)
+    const hasErrorInOperatorIn = this.queryValidationForInOperator(normalizedQuery, suggestions)
+    const hasErrorNotSpace = this.queryValidatorNoSpaces(normalizedQuery)
+    const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(normalizedQuery)
 
     const erros = [
       ...hasErrorInCompoundFields,
@@ -377,12 +434,11 @@ export default class Aql {
     let erros = []
     if (!queryText) return []
 
+    const escapedOperatorsRegex = this.buildOperatorsRegex()
+
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        const escapedOperatorsRegex = new RegExp(
-          this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
-        )
         let match = expression.toLowerCase().match(escapedOperatorsRegex)
         let operatorFound = match ? match[0] : null
         if (operatorFound) {
@@ -415,9 +471,6 @@ export default class Aql {
         }
       })
     } else {
-      const escapedOperatorsRegex = new RegExp(
-        this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
-      )
       let match = queryText.toLowerCase().match(escapedOperatorsRegex)
       let operatorFound = match ? match[0] : null
       if (operatorFound) {
@@ -733,7 +786,7 @@ export default class Aql {
   }
 
   getValueSuggestions(domains, selectedFieldName) {
-    if (selectedFieldName === this.handleTextDomainWorkload.singularLabel) {
+    if (this.#isDomainWorkloadField(selectedFieldName)) {
       return domains
     }
     return []

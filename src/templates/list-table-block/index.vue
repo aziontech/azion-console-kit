@@ -8,15 +8,15 @@
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       :class="{ 'disabled-list': disabledList }"
-      v-if="!isLoading"
       :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
       :scrollHeight="props.scrollHeight"
       removableSort
-      :value="data"
+      :data="data"
+      :columns="selectedColumns"
       dataKey="id"
-      @row-click="editItemSelected"
+      @rowClick="editItemSelected"
       :rowHover="!disabledList"
       v-model:filters="filters"
       :paginator="true"
@@ -28,6 +28,7 @@
       :exportFilename="exportFileName"
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
+      :notShowEmptyBlock="true"
       data-testid="data-table"
       :first="firstItemIndex"
       :rowClass="stateClass"
@@ -57,6 +58,21 @@
               />
             </span>
 
+            <PrimeButton
+              v-if="props.allowedFilters.length"
+              outlined
+              icon="pi pi-filter"
+              size="small"
+              @click="toggleFilter"
+              data-testid="data-table-actions-column-header-toggle-filter"
+            />
+
+            <DataTable.Filter
+              ref="filterPanel"
+              :filters="filterWithoutLastModified"
+              @apply="handleApplyFilter"
+            />
+
             <slot
               name="addButton"
               data-testid="data-table-add-button"
@@ -73,6 +89,12 @@
               />
             </slot>
           </div>
+
+          <DataTable.AppliedFilters
+            v-if="appliedFilters.length"
+            :applied-filters="appliedFilters"
+            @remove="handleRemoveFilter"
+          />
         </slot>
       </template>
 
@@ -101,10 +123,9 @@
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
-            <div
-              v-html="rowData[col.field]"
-              :data-testid="`list-table-block__column__${col.field}__row`"
-            />
+            <div :data-testid="`list-table-block__column__${col.field}__row`">
+              {{ rowData[col.field] }}
+            </div>
           </template>
 
           <template v-else>
@@ -132,7 +153,7 @@
               :exportTableCSV="handleExportTableDataToCSV"
             />
             <PrimeButton
-              v-if="hasExportToCsvMapper"
+              v-if="hasExportToCsvMapper && !hasActionsHeaderSlot"
               @click="handleExportTableDataToCSV"
               outlined
               class="max-sm:w-full"
@@ -140,37 +161,39 @@
               :data-testid="`export_button`"
               v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
-            <PrimeButton
-              outlined
-              icon="ai ai-column"
-              class="table-button"
-              @click="toggleColumnSelector"
-              v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
-              data-testid="data-table-actions-column-header-toggle-columns"
-            >
-            </PrimeButton>
-            <OverlayPanel
-              ref="columnSelectorPanel"
-              :pt="{
-                content: { class: 'p-0' }
-              }"
-              data-testid="data-table-actions-column-header-toggle-columns-panel"
-            >
-              <Listbox
-                v-model="selectedColumns"
-                multiple
-                :options="[{ label: 'Available Columns', items: columns }]"
-                class="hidden-columns-panel"
-                optionLabel="header"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+            <template v-if="showColumnSelector">
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
+                data-testid="data-table-actions-column-header-toggle-columns"
               >
-                <template #optiongroup="slotProps">
-                  <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                </template>
-              </Listbox>
-            </OverlayPanel>
+              </PrimeButton>
+              <OverlayPanel
+                ref="columnSelectorPanel"
+                :pt="{
+                  content: { class: 'p-0' }
+                }"
+                data-testid="data-table-actions-column-header-toggle-columns-panel"
+              >
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Available Columns', items: columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </template>
           </div>
         </template>
         <template
@@ -238,67 +261,6 @@
         </slot>
       </template>
     </DataTable>
-
-    <DataTable
-      v-else
-      :disabled="disabledList"
-      :value="Array(10)"
-      :pt="{
-        header: { class: '!border-t-0' }
-      }"
-      data-testid="data-table-skeleton"
-    >
-      <template
-        #header
-        v-if="!props.hiddenHeader"
-      >
-        <slot name="header">
-          <div
-            class="flex flex-wrap justify-between gap-2 w-full"
-            data-testid="data-table-skeleton-header"
-          >
-            <span
-              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
-              data-testid="data-table-skeleton-search"
-            >
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full h-8 md:min-w-[20rem]"
-                v-model="filters.global.value"
-                placeholder="Search"
-                data-testid="data-table-skeleton-search-input"
-              />
-            </span>
-            <slot
-              name="addButton"
-              data-testid="data-table-add-button"
-            >
-              <PrimeButton
-                class="max-sm:w-full"
-                :disabled="disabledAddButton"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                :label="addButtonLabel"
-                size="small"
-                v-if="addButtonLabel"
-                data-testid="data-table-skeleton-add-button"
-              />
-            </slot>
-          </div>
-        </slot>
-      </template>
-      <Column
-        v-for="col of columns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
-        data-testid="data-table-skeleton-column"
-      >
-        <template #body>
-          <Skeleton />
-        </template>
-      </Column>
-    </DataTable>
   </div>
 </template>
 
@@ -306,20 +268,19 @@
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
   import Column from 'primevue/column'
-  import DataTable from 'primevue/datatable'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
-  import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import DataTable from '@/components/DataTable'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -327,6 +288,7 @@
     'on-load-data',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
+    'on-row-click-edit-redirect',
     'update:selectedItensData'
   ])
 
@@ -427,6 +389,14 @@
     isLoading: {
       type: Boolean,
       default: () => false
+    },
+    allowedFilters: {
+      type: Array,
+      default: () => []
+    },
+    showColumnSelector: {
+      type: Boolean,
+      default: true
     }
   })
   const firstItemIndex = ref(0)
@@ -440,15 +410,19 @@
     : 'background-color: transparent !important; cursor: pointer !important;'
   const selectedId = ref(null)
   const dataTableRef = ref(null)
+  const slots = useSlots()
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
+  const appliedFilters = ref([])
+  const filterPanel = ref(null)
   const isLoading = ref(props.isLoading)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
+  const hasActionsHeaderSlot = computed(() => !!slots['actions-header'])
 
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
@@ -501,10 +475,58 @@
   }
 
   const handleExportTableDataToCSV = () => {
-    dataTableRef.value.exportCSV()
+    dataTableRef.value?.exportCSV?.()
   }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
+  }
+
+  const filterWithoutLastModified = computed(() => {
+    return props.allowedFilters.filter((filter) => filter.field !== 'last_modified')
+  })
+
+  const toggleFilter = (event) => {
+    if (filterPanel.value) {
+      filterPanel.value.toggle(event)
+    }
+  }
+
+  const handleApplyFilter = (filterData = {}) => {
+    const hasValue =
+      filterData.value !== null && filterData.value !== undefined && filterData.value !== ''
+
+    if (!filterData.label || !hasValue) {
+      return
+    }
+
+    const existingFilterIndex = appliedFilters.value.findIndex(
+      (filter) => filter.field === filterData.field
+    )
+
+    const filterPayload = {
+      field: filterData.field,
+      label: filterData.label,
+      value: filterData.value,
+      matchMode: 'is'
+    }
+
+    if (existingFilterIndex !== -1) {
+      appliedFilters.value[existingFilterIndex] = filterPayload
+    } else {
+      appliedFilters.value.push(filterPayload)
+    }
+
+    filters.value[filterData.field] = {
+      value: filterData.value,
+      matchMode: FilterMatchMode.CONTAINS
+    }
+  }
+
+  const handleRemoveFilter = (field) => {
+    appliedFilters.value = appliedFilters.value.filter((filter) => filter.field !== field)
+    if (filters.value[field]) {
+      delete filters.value[field]
+    }
   }
 
   const onRowReorder = async (event) => {
@@ -550,6 +572,14 @@
                 title: action.title,
                 id: rowData.id,
                 data: rowData,
+                description:
+                  typeof action.description === 'function'
+                    ? action.description(rowData)
+                    : action.description,
+                warningMessage:
+                  typeof action.warningMessage === 'function'
+                    ? action.warningMessage(rowData)
+                    : action.warningMessage,
                 deleteService: action.service,
                 deleteConfirmationText: undefined,
                 closeCallback: (opt) => {
@@ -698,9 +728,7 @@
 
 <style scoped>
   /* Style for row hover when disabledList is true */
-  :deep(.disabled-list .p-datatable-tbody > tr:hover) {
-    .p-frozen-column {
-      background: var(--surface-section) !important;
-    }
+  :deep(.disabled-list .p-datatable-tbody > tr:hover .p-frozen-column) {
+    background: var(--table-body-row-even-bg) !important;
   }
 </style>

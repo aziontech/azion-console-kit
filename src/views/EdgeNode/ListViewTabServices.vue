@@ -128,6 +128,7 @@
         emptyListMessage="No services found."
         :actions="actions"
         isTabs
+        exportFileName="Edge Node Services"
       >
         <template #addButton>
           <PrimeButton

@@ -1,9 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
-
-export const rulesEngineKeys = {
-  all: (edgeAppId) => ['rules-engine', edgeAppId]
-}
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class RulesEngineService extends BaseService {
   constructor() {
@@ -28,7 +25,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after creating
-    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
+    })
 
     return {
       feedback: 'Rule successfully created',
@@ -58,7 +57,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rule successfully updated'
   }
@@ -71,7 +72,9 @@ export class RulesEngineService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after deleting
-    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rule successfully deleted'
   }
@@ -96,7 +99,9 @@ export class RulesEngineService extends BaseService {
     }
 
     // Remove list queries from cache (including IndexedDB) after reordering
-    this.queryClient.removeQueries({ queryKey: rulesEngineKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
+    })
 
     return 'Rules Engine successfully ordered'
   }
@@ -107,11 +112,11 @@ export class RulesEngineService extends BaseService {
     fields = '',
     search = '',
     ordering = '',
-    page = 1,
-    pageSize = 100
+    page = 1
   }) {
+    const PAGE_SIZE = 100
     const currentPhase = this.getCurrentPhase(phase)
-    const params = { fields, search, ordering, page, pageSize }
+    const params = { fields, search, ordering, page, pageSize: PAGE_SIZE }
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(edgeApplicationId, currentPhase),
@@ -155,12 +160,16 @@ export class RulesEngineService extends BaseService {
 
     const transformedData = this.adapter?.transformListRulesEngine?.(allRules, phase) ?? allRules
 
+    transformedData.sort((dataA, dataB) => dataA.position.value - dataB.position.value)
+
     return transformedData
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
-    return await this._ensureQueryData(
-      () => rulesEngineKeys.all(edgeApplicationId),
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
+    delete params.pageSize
+    return await this.useEnsureQueryData(
+      queryKeys.application.rulesEngine.list(edgeApplicationId, params),
       async () => {
         const [requestRules, responseRules] = await Promise.all([
           this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
@@ -174,8 +183,38 @@ export class RulesEngineService extends BaseService {
           body: responseBody
         }
       },
-      { persist: true }
+      {
+        persist: false,
+        skipCache
+      }
     )
+  }
+
+  /**
+   * Prefetches all rules engine entries to warm up the cache.
+   * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
+   * @param {string} edgeApplicationId - The edge application ID
+   */
+  prefetchRulesEngineList = async (edgeApplicationId) => {
+    const defaultParams = {
+      page: 1,
+      fields: [
+        'id',
+        'name',
+        'description',
+        'phase',
+        'active',
+        'order',
+        'last_modified',
+        'last_editor'
+      ],
+      ordering: 'id'
+    }
+
+    return await this.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId,
+      params: defaultParams
+    })
   }
 
   getCurrentPhase(phase) {

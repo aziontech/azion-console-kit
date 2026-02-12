@@ -1,8 +1,6 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
@@ -23,6 +21,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -42,7 +41,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const hasContentToList = ref(true)
+  const breadcrumbs = useBreadcrumbs()
   const showCreateRecordDrawer = ref(false)
   const showEditRecordDrawer = ref(false)
   const listEDNSResourcesRef = ref('')
@@ -51,12 +50,20 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
-      field: 'id',
-      header: 'ID'
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      style: 'max-width: 300px',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
-      field: 'name',
-      header: 'Name'
+      field: 'id',
+      header: 'ID'
     },
     {
       field: 'type',
@@ -69,7 +76,11 @@
       filterPath: 'value.content',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup',
+          dependencies: { showCopy: !!props.clipboardWrite }
+        })
     },
     {
       field: 'ttl',
@@ -115,7 +126,8 @@
         const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
         return domainRegex.test(value)
       }),
-    isActive: yup.boolean().required()
+    isActive: yup.boolean().required(),
+    dnssec: yup.boolean()
   })
 
   const validationSchemaEDNSRecords = yup.object({
@@ -177,11 +189,7 @@
   }
 
   const reloadResourcesList = () => {
-    if (hasContentToList.value) {
-      listEDNSResourcesRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listEDNSResourcesRef.value.reload()
   }
 
   const handleTrackEditEvent = () => {
@@ -244,16 +252,27 @@
     })
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const showEditFormWithActionTab = computed(() => {
     return activeTab.value === 0
   })
 
   const showRecords = computed(() => {
     return activeTab.value === mapTabs.value?.records
+  })
+
+  const addButtonController = computed(() => {
+    if (activeTab.value === mapTabs.value.records) {
+      return {
+        showAddButtonTab: true,
+        label: 'Record',
+        click: openCreateDrawerEDNSResource
+      }
+    }
+    return {
+      showAddButtonTab: false,
+      label: '',
+      click: () => {}
+    }
   })
 
   const loadRecordServiceWithEDNSIdDecorator = async (payload) => {
@@ -310,6 +329,7 @@
 
   const actions = [
     {
+      label: 'Delete',
       type: 'delete',
       title: 'record',
       icon: 'pi pi-trash',
@@ -375,6 +395,15 @@
   const loadEdgeDNS = async (id) => {
     const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
     edgeDNSName.value = edgeDNS.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeDNS.name)
+
+    try {
+      const dnssecData = await edgeDNSService.loadEdgeDNSZoneDNSSEC(edgeDNS.id)
+      edgeDNS.dnssec = dnssecData?.enabled ?? false
+    } catch {
+      edgeDNS.dnssec = false
+    }
+
     return edgeDNS
   }
 </script>
@@ -382,135 +411,151 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="edgeDNSName" />
+      <PageHeadingBlock
+        :pageTitle="edgeDNSName"
+        description="Configure DNS records and zone settings used for authoritative domain resolution."
+      />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
-        class="w-full"
-      >
-        <TabPanel
-          header="Main Settings"
-          :pt="{
-            root: {
-              'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
-            }
-          }"
+      <div class="flex align-center justify-between relative">
+        <TabView
+          :activeIndex="activeTab"
+          @tab-click="changeRouteByClickingOnTab"
+          class="flex-1"
         >
-          <EditFormBlock
-            :editService="edgeDNSService.editEdgeDNSService"
-            :loadService="loadEdgeDNS"
-            :schema="validationSchemaEditEDNS"
-            :updatedRedirect="updatedRedirect"
-            :isTabs="true"
-            @on-edit-success="handleTrackEditEvent"
-            @on-edit-fail="handleTrackFailEditEvent"
+          <TabPanel
+            header="Main Settings"
+            :pt="{
+              root: {
+                'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
+              }
+            }"
           >
-            <template #form>
-              <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
-            </template>
-            <template #action-bar="{ onSubmit, onCancel, loading }">
-              <ActionBarTemplate
-                v-if="showEditFormWithActionTab"
-                @onSubmit="onSubmit"
-                @onCancel="onCancel"
-                :loading="loading"
+          </TabPanel>
+          <TabPanel
+            header="Records"
+            :pt="{
+              root: {
+                'data-testid': 'edge-dns-edit-view__records__tab-panel'
+              }
+            }"
+          >
+          </TabPanel>
+        </TabView>
+        <div
+          v-if="addButtonController.showAddButtonTab"
+          class="flex ml-4 items-center"
+        >
+          <PrimeButton
+            :label="addButtonController.label"
+            size="small"
+            icon="pi pi-plus"
+            @click="addButtonController.click"
+            data-testid="data-table-actions-column-body-actions-menu-button"
+          />
+        </div>
+      </div>
+
+      <div>
+        <EditFormBlock
+          v-if="showEditFormWithActionTab"
+          :editService="edgeDNSService.editEdgeDNSService"
+          :loadService="loadEdgeDNS"
+          :schema="validationSchemaEditEDNS"
+          :updatedRedirect="updatedRedirect"
+          :isTabs="true"
+          @on-edit-success="handleTrackEditEvent"
+          @on-edit-fail="handleTrackFailEditEvent"
+        >
+          <template #form>
+            <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
+          </template>
+          <template #action-bar="{ onSubmit, onCancel, loading }">
+            <ActionBarTemplate
+              v-if="showEditFormWithActionTab"
+              @onSubmit="onSubmit"
+              @onCancel="onCancel"
+              :loading="loading"
+            />
+          </template>
+        </EditFormBlock>
+
+        <div v-if="showRecords">
+          <FetchListTableBlock
+            ref="listEDNSResourcesRef"
+            addButtonLabel="Record"
+            defaultOrderingFieldName="id"
+            :editInDrawer="openEditDrawerEDNSResource"
+            :columns="recordListColumns"
+            :listService="listRecordsServiceEdgeDNSDecorator"
+            emptyListMessage="No records found."
+            :actions="actions"
+            isTabs
+            :apiFields="EDGE_DNS_RECORDS_FIELDS"
+            exportFileName="Edge DNS Records"
+            @on-before-go-to-edit="handleTrackEventGoToEdit"
+            hideLastModifiedColumn
+            :emptyBlock="{
+              title: 'No record has been created',
+              description: 'Click the button below to create your first record.',
+              createButtonLabel: 'Record',
+              createPagePath: 'records/create',
+              documentationService: documentationService,
+              inTabs: true
+            }"
+          >
+            <template #addButton>
+              <PrimeButton
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerEDNSResource"
+                data-testid="create_Record_button"
               />
             </template>
-          </EditFormBlock>
-        </TabPanel>
-        <TabPanel
-          header="Records"
-          :pt="{
-            root: {
-              'data-testid': 'edge-dns-edit-view__records__tab-panel'
-            }
-          }"
-        >
-          <div v-if="showRecords">
-            <FetchListTableBlock
-              ref="listEDNSResourcesRef"
-              v-if="hasContentToList"
-              addButtonLabel="Record"
-              defaultOrderingFieldName="entry"
-              :editInDrawer="openEditDrawerEDNSResource"
-              :columns="recordListColumns"
-              :listService="listRecordsServiceEdgeDNSDecorator"
-              @on-load-data="handleLoadData"
-              emptyListMessage="No records found."
-              :actions="actions"
-              isTabs
-              :apiFields="EDGE_DNS_RECORDS_FIELDS"
-              @on-before-go-to-edit="handleTrackEventGoToEdit"
-            >
-              <template #addButton>
-                <PrimeButton
-                  icon="pi pi-plus"
-                  label="Record"
-                  @click="openCreateDrawerEDNSResource"
-                  data-testid="create_Record_button"
-                />
-              </template>
-            </FetchListTableBlock>
+            <template #emptyBlockButton>
+              <PrimeButton
+                class="max-md:w-full w-fit"
+                severity="secondary"
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerEDNSResource"
+                data-testid="create_Record_button"
+              />
+            </template>
+          </FetchListTableBlock>
 
-            <EmptyResultsBlock
-              v-else
-              title="No record has been created"
-              description=" Click the button below to create your first record."
-              createButtonLabel="Record"
-              createPagePath="records/create"
-              :documentationService="documentationService"
-              :inTabs="true"
-            >
-              <template #default>
-                <PrimeButton
-                  class="max-md:w-full w-fit"
-                  severity="secondary"
-                  icon="pi pi-plus"
-                  label="Record"
-                  @click="openCreateDrawerEDNSResource"
-                  data-testid="create_Record_button"
-                />
-              </template>
-              <template #illustration>
-                <Illustration />
-              </template>
-            </EmptyResultsBlock>
+          <CreateDrawerBlock
+            v-if="showCreateRecordDrawer"
+            v-model:visible="showCreateRecordDrawer"
+            :createService="edgeDNSRecordsService.createRecord"
+            :schema="validationSchemaEDNSRecords"
+            :initialValues="initialValuesCreateRecords"
+            @onSuccess="handleCreatedSuccessfully"
+            @onError="handleTrackFailCreated"
+            title="Create Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </CreateDrawerBlock>
 
-            <CreateDrawerBlock
-              v-if="showCreateRecordDrawer"
-              v-model:visible="showCreateRecordDrawer"
-              :createService="edgeDNSRecordsService.createRecord"
-              :schema="validationSchemaEDNSRecords"
-              :initialValues="initialValuesCreateRecords"
-              @onSuccess="handleCreatedSuccessfully"
-              @onError="handleTrackFailCreated"
-              title="Create Record"
-            >
-              <template #formFields>
-                <FormFieldsRecords />
-              </template>
-            </CreateDrawerBlock>
-
-            <EditDrawerBlock
-              v-if="showEditRecordDrawer"
-              :id="selectedEdgeDnsRecordToEdit"
-              v-model:visible="showEditRecordDrawer"
-              :loadService="loadRecordServiceWithEDNSIdDecorator"
-              :editService="editRecordServiceWithEDNSIdDecorator"
-              :schema="validationSchemaEDNSRecords"
-              @onSuccess="handleEditedSuccessfully"
-              @onError="handleTrackFailEdit"
-              title="Edit Record"
-            >
-              <template #formFields>
-                <FormFieldsRecords />
-              </template>
-            </EditDrawerBlock>
-          </div>
-        </TabPanel>
-      </TabView>
+          <EditDrawerBlock
+            v-if="showEditRecordDrawer"
+            :id="selectedEdgeDnsRecordToEdit"
+            v-model:visible="showEditRecordDrawer"
+            :loadService="loadRecordServiceWithEDNSIdDecorator"
+            :editService="editRecordServiceWithEDNSIdDecorator"
+            :schema="validationSchemaEDNSRecords"
+            @onSuccess="handleEditedSuccessfully"
+            @onError="handleTrackFailEdit"
+            title="Edit Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </EditDrawerBlock>
+        </div>
+      </div>
       <router-view></router-view>
     </template>
   </ContentBlock>

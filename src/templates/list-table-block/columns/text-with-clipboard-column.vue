@@ -1,11 +1,13 @@
 <template>
-  <div class="gap-2 flex items-center">
-    <expand-text-column
-      :value="content"
-      :sliceValue="30"
-    ></expand-text-column>
+  <div
+    class="gap-2 flex items-center w-full justify-between pr-1"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+  >
+    <expand-text-column :value="content"></expand-text-column>
     <CopyBlock
       :value="content"
+      :isCopyVisible="isHovered"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
   </div>
@@ -19,6 +21,11 @@
     components: {
       ExpandTextColumn,
       CopyBlock
+    },
+    data() {
+      return {
+        isHovered: false
+      }
     },
     props: {
       content: {

@@ -45,7 +45,7 @@ describe('TeamPermissionService', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/teams?ordering=name&page=1&page_size=10&fields=&search=`,
+      url: `${version}/iam/teams?ordering=name&page=1&page_size=100&fields=&search=`,
       method: 'GET'
     })
   })

@@ -1,7 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { makeTeamsBaseUrl } from './make-teams-base-url'
-
-export const teamsKeys = { all: ['teams', 'list'] }
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const adapt = (results) => {
   return results.map((item) => ({ label: item.name, value: item.id }))
@@ -34,11 +33,21 @@ class TeamsService extends BaseService {
     return adapt(data.results)
   }
 
-  useListTeams = () => {
-    return this._ensureQueryData(teamsKeys.all, () => this.listTeams(), {
-      cacheType: this.cacheType.SENSITIVE,
-      refetchOnMount: true
+  useListTeams = async () => {
+    const queryKey = queryKeys.teams.all
+
+    return this.useEnsureQueryData(queryKey, () => this.listTeams())
+  }
+
+  useListTeamsQuery() {
+    return this.useQuery(queryKeys.teams.all, () => this.listTeams(), {
+      cacheType: this.cacheType.STATIC,
+      enabled: true
     })
+  }
+
+  invalidateTeamsCache = async () => {
+    await this.queryClient.removeQueries({ queryKey: queryKeys.teams.all })
   }
 }
 

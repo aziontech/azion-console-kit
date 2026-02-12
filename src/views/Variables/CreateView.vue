@@ -7,16 +7,10 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { variablesService } from '@/services/v2/variables'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createVariablesService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const keyRegex = /^[A-Z0-9_]*$/
 
@@ -73,11 +67,14 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Variables" />
+      <PageHeadingBlock
+        pageTitle="Create Variables"
+        description="Configure variable names, values, and settings for use across Azion’s products."
+      />
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createVariablesService"
+        :createService="variablesService.create"
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"

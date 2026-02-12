@@ -14,9 +14,9 @@
               data-testid="title"
               class="text-xl md:text-2xl font-medium text-left"
             >
-              Welcome back
+              Welcome Back
             </h1>
-            <p class="text-sm text-color-secondary">Sign in to your account</p>
+            <p class="text-sm text-color-secondary">Sign in to your account.</p>
           </div>
 
           <!-- Email step -->

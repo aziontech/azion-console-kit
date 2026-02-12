@@ -10,7 +10,7 @@
 export const extractApiError = (httpResponse) => {
   const errorBody = httpResponse.body
 
-  if (errorBody.detail) {
+  if (typeof errorBody?.detail === 'string' && errorBody.detail) {
     return errorBody.detail
   }
 
@@ -30,5 +30,10 @@ export const extractApiError = (httpResponse) => {
     return null
   }
 
-  return findFirstError(errorBody) || 'Unknown error occurred'
+  const errorTarget =
+    errorBody && typeof errorBody.detail === 'object' && errorBody.detail !== null
+      ? errorBody.detail
+      : errorBody
+
+  return findFirstError(errorTarget) || 'Unknown error occurred'
 }

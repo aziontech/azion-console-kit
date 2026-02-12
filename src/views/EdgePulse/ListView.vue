@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Pulse"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edge Pulse"
+        description="Collect and analyze real user monitoring data to measure user performance and experience across any application."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <TabView

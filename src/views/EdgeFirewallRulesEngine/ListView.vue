@@ -1,14 +1,11 @@
 <script setup>
-  import EmptyResultsBlock from '@templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
-  import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
-  import Drawer from './Drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref, inject } from 'vue'
+  import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
-  import { storeToRefs } from 'pinia'
-  import { useAccountStore } from '@/stores/account'
+  import Drawer from '@/views/EdgeFirewallRulesEngine/Drawer'
+  import FetchListTableBlock from '@/templates/list-table-block/v2/index.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
@@ -16,8 +13,8 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const { currentTheme } = storeToRefs(useAccountStore())
+  const toast = useToast()
+  const dialog = useDialog()
 
   defineOptions({
     name: 'edge-firewall-rules-engine-list-view'
@@ -54,11 +51,6 @@
       required: true
     }
   })
-  const hasContentToList = ref(true)
-  const drawerRef = ref('')
-  const listTableBlockRef = ref('')
-  const toast = useToast()
-  const dialog = useDialog()
 
   const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
     'id',
@@ -68,6 +60,69 @@
     'last_editor',
     'active'
   ]
+
+  const hasContentToList = ref(true)
+  const drawerRef = ref('')
+  const listTableBlockRef = ref('')
+  const isLoadingButtonOrder = ref(false)
+
+  const getColumns = computed(() => [
+    {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
+      field: 'name',
+      header: 'Name',
+      disableSort: true
+    },
+    {
+      field: 'description',
+      header: 'Description',
+      filterPath: 'description.value',
+      type: 'component',
+      class: 'max-w-[250px]',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' }),
+      disableSort: true
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      disableSort: true
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      disableSort: true
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      sortField: 'status.content',
+      filterPath: 'status.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      },
+      disableSort: true
+    }
+  ])
+
+  const actions = computed(() => [
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'rule',
+      icon: 'pi pi-trash',
+      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
+    }
+  ])
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
     return await edgeFirewallRulesEngineService.listEdgeFirewallRulesEngineService({
@@ -92,14 +147,6 @@
     tracker.product.clickToCreate({
       productName: 'Rules Engine'
     })
-  }
-
-  const reloadList = () => {
-    if (hasContentToList.value) {
-      listTableBlockRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
   }
 
   const openCreateDrawer = () => {
@@ -145,63 +192,6 @@
     }
   }
 
-  const getColumns = computed(() => [
-    {
-      field: 'id',
-      header: 'ID',
-      sortField: 'id',
-      filterPath: 'id'
-    },
-    {
-      field: 'name',
-      header: 'Name',
-      disableSort: true
-    },
-    {
-      field: 'description',
-      header: 'Description',
-      filterPath: 'description.value',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' }),
-      disableSort: true
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor',
-      disableSort: true
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified',
-      disableSort: true
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      },
-      disableSort: true
-    }
-  ])
-
-  const actions = [
-    {
-      type: 'delete',
-      title: 'rule',
-      icon: 'pi pi-trash',
-      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
-    }
-  ]
-
-  const isLoadingButtonOrder = ref(false)
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {
@@ -223,12 +213,8 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const badgeClass = computed(() => {
-    if (currentTheme.value !== 'dark') {
-      return 'p-badge-lg !text-black bg-white !border-surface h-5 min-w-[20px] !text-xl'
-    } else {
-      return 'p-badge-lg !text-white bg-black !border-surface h-5 min-w-[20px] !text-xl'
-    }
+  defineExpose({
+    openCreateDrawer: openCreateRulesEngineDrawerByPhase
   })
 </script>
 <template>
@@ -241,86 +227,45 @@
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="networkListsService.listNetworkLists"
     :loadNetworkListService="networkListsService.loadNetworkList"
-    @onSuccess="reloadList"
+    @onSuccess="listTableBlockRef.reload()"
   />
 
   <FetchListTableBlock
-    v-if="hasContentToList"
     ref="listTableBlockRef"
     orderableRows
+    isTabs
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     :listService="listEdgeFirewallRulesEngineServiceWithDecorator"
-    @on-load-data="handleLoadData"
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
     emptyListMessage="No rules found."
-    @on-before-go-to-edit="handleTrackEditEvent"
     data-testid="rules-engine-list"
     :actions="actions"
-    isTabs
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    exportFileName="Firewall Rules Engine"
+    :emptyBlock="{
+      title: 'No rule has been created',
+      description: 'Click the button below to create your first rule.',
+      createButtonLabel: 'Rule',
+      documentationService: documentationService
+    }"
+    :isLoadingReorder="isLoadingButtonOrder"
+    @on-before-go-to-edit="handleTrackEditEvent"
+    @on-load-data="handleLoadData"
+    @on-review-changes="
+      ({ data, alteredRows, reload }) => updateRulesOrder(data, alteredRows, reload)
+    "
   >
-    <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
-      <div
-        class="flex gap-4"
-        data-testid="rules-engine-add-button"
-      >
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Rule"
-          :disabled="columnOrderAltered"
-          @click="openCreateRulesEngineDrawerByPhase"
-          data-testid="rules-engine-create-button"
-        />
-        <teleport
-          to="#action-bar"
-          v-if="columnOrderAltered"
-        >
-          <div
-            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
-          >
-            <PrimeButton
-              outlined
-              label="Discard Changes"
-              @click="reload"
-              data-testid="review-changes-dialog-footer-cancel-button"
-            />
-            <PrimeButton
-              label="Review Changes"
-              class="bg-surface"
-              :badgeClass="badgeClass"
-              :loading="isLoadingButtonOrder"
-              :disabled="isLoadingButtonOrder"
-              data-testid="rules-engine-save-order-button"
-              size="small"
-              type="button"
-              @click="updateRulesOrder(data, alteredRows, reload)"
-              :badge="alteredRows.length"
-            />
-          </div>
-        </teleport>
-      </div>
-    </template>
-  </FetchListTableBlock>
-  <EmptyResultsBlock
-    v-else
-    title="No rule has been created"
-    description="Click the button below to create your first rule."
-    createButtonLabel="Rule"
-    :documentationService="documentationService"
-    :inTabs="true"
-  >
-    <template #default>
+    <template #emptyBlockButton>
       <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
         icon="pi pi-plus"
-        label="Rules Engine"
-        data-testid="create_Rules Engine_button"
+        severity="secondary"
+        label="Rule"
         @click="openCreateDrawer"
+        data-testid="create_Rules Engine_button"
       />
     </template>
-  </EmptyResultsBlock>
+  </FetchListTableBlock>
 </template>

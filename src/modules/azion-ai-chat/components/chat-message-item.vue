@@ -95,7 +95,7 @@
     list-style: none;
     box-sizing: border-box;
     color: var(--text-color) !important;
-    overscroll-behavior: contain !important;
+    overscroll-behavior: auto !important;
     list-style-type: disc;
     margin-top: 1.25em;
     margin-bottom: 1.25em;

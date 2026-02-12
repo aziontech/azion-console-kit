@@ -1,6 +1,9 @@
 import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { filterOutConnectorMetrics } from './filter-connector-items'
+
 const BOT_MANAGER_SLUG = 'bot_manager'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
@@ -40,13 +43,7 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
 }
 
 const groupBy = (data, groupParams) => {
-  const shouldFilter =
-    groupParams.length === 2 &&
-    groupParams.includes('productSlug') &&
-    groupParams.includes('metricSlug')
-  const filteredData = shouldFilter ? data.filter((item) => item.accounted) : data
-
-  const groupedMap = filteredData.reduce((groupedData, item) => {
+  const groupedMap = data.reduce((groupedData, item) => {
     const key = groupParams.map((param) => item[param]).join('_')
     const valueGroup = groupedData[key] || {}
 
@@ -62,13 +59,27 @@ const groupBy = (data, groupParams) => {
 const adapt = ({ body, statusCode }) => {
   const { accountingDetail } = body.data
 
-  const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
+  const shouldShowConnectors = !hasFlagBlockApiV4()
 
-  const filteredProducts = productsGrouped.filter(
-    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
+  const filteredAccountingDetail = shouldShowConnectors
+    ? accountingDetail
+    : filterOutConnectorMetrics(accountingDetail)
+
+  const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
+
+  const productsWithUsage = new Set(
+    productsGrouped
+      .filter((item) => Number(item.accounted || 0) > 0)
+      .map((item) => item.productSlug)
   )
 
-  const productsGroupedByRegion = groupBy(accountingDetail, [
+  const filteredProducts = productsGrouped.filter((item) => {
+    return [BOT_MANAGER_SLUG].includes(item.productSlug)
+      ? false
+      : productsWithUsage.has(item.productSlug)
+  })
+
+  const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
     'productSlug',
     'metricSlug',
     'regionName'
@@ -96,14 +107,10 @@ const PRODUCT_NAMES = {
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
   ddos_protection_unlimited: 'DDoS Protection Unlimited',
-  plan_business: 'Plan Business',
-  plan_enterprise: 'Plan Enterprise',
-  plan_missioncritical: 'Plan Mission Critical',
-  support_enterprise: 'Support Enterprise',
-  support_mission_critical: 'Support Mission Critical',
   waf: 'WAF',
   tiered_cache: 'Tiered Cache',
-  edge_storage: 'Object Storage'
+  edge_storage: 'Object Storage',
+  connector: 'Connectors'
 }
 
 const METRIC_SLUGS = {
@@ -124,19 +131,16 @@ const METRIC_SLUGS = {
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
   edge_dns_queries: { title: 'Standard Queries' },
-  data_ingested: { title: 'Data Ingested (GB)', unit: 'GB' },
-  plan_business: { title: 'Plan Business' },
-  plan_enterprise: { title: 'Plan Enterprise' },
-  realtime_events_storage: { title: 'Storage (GB)', unit: 'GB' },
-  realtime_events_datascan: { title: 'DataScan (GB)', unit: 'GB' },
-  plan_missioncritical: { title: 'Plan Mission critical' },
-  support_enterprise: { title: 'Total Days', unit: 'Days' },
-  support_mission_critical: { title: 'Total Days', unit: 'Days' },
-  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' },
+  data_ingested: { title: 'Data Ingested', unit: 'GB' },
+  storage: { title: 'Storage', unit: 'GB' },
+  data_scan: { title: 'Data Scan', unit: 'GB' },
+  data_stream_data_streamed: { title: 'Data Streamed', unit: 'GB' },
   edge_storage_class_a_operations: { title: 'Class A Operations' },
   edge_storage_class_b_operations: { title: 'Class B Operations' },
   edge_storage_class_c_operations: { title: 'Class C Operations' },
-  edge_storage_data_stored: { title: 'Data Stored (GB)', unit: 'GB' }
+  edge_storage_data_stored: { title: 'Data Stored', unit: 'GB' },
+  connector_load_balancer_data_transfer: { title: 'Data Transfered', unit: 'GB' },
+  connector_shielded_connectors: { title: 'Shielded Connectors' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {
@@ -187,6 +191,29 @@ const mapDescriptions = (product, productsGrouped, productsGroupedByRegion) => {
 }
 
 const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
+  const EPSILON = 1e-9
+
+  const hasNoRegionDuplicatingParent = productsGroupedByRegion.some((regionMetric) => {
+    if (
+      regionMetric.productSlug !== metric.productSlug ||
+      regionMetric.metricSlug !== metric.metricSlug
+    ) {
+      return false
+    }
+
+    if (regionMetric.regionName !== 'No Region') {
+      return false
+    }
+
+    const parentAccounted = Number(metric.accounted || 0)
+    const noRegionAccounted = Number(regionMetric.accounted || 0)
+    return Math.abs(noRegionAccounted - parentAccounted) <= EPSILON
+  })
+
+  if (hasNoRegionDuplicatingParent) {
+    return []
+  }
+
   return productsGroupedByRegion.reduce((list, regionMetric) => {
     if (
       regionMetric.productSlug === metric.productSlug &&

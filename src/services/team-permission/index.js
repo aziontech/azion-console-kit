@@ -4,6 +4,7 @@ import { listPermissionService } from './list-permissions-service'
 import { createTeamPermissionsService } from './create-team-permission-service'
 import { loadTeamPermissionService } from './load-team-permission-service'
 import { editTeamPermissionService } from './edit-team-permission-service'
+import { teamPermissionService } from './team-permission-service'
 
 export {
   listTeamPermissionService,
@@ -11,5 +12,6 @@ export {
   listPermissionService,
   createTeamPermissionsService,
   loadTeamPermissionService,
-  editTeamPermissionService
+  editTeamPermissionService,
+  teamPermissionService
 }

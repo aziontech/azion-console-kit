@@ -248,16 +248,12 @@
   const fetchData = async (currentPage = 1) => {
     try {
       loading.value = true
+
       if (currentPage === INITIAL_PAGE) {
         data.value = []
       }
 
-      const serviceFunction =
-        typeof props.service === 'function'
-          ? props.service
-          : window[props.service] || eval(props.service)
-
-      const response = await serviceFunction({
+      const response = await props.service({
         pageSize: PAGE_SIZE,
         page: currentPage,
         search: search.value,
@@ -316,13 +312,7 @@
 
     try {
       loading.value = true
-
-      const loadServiceFunction =
-        typeof props.loadService === 'function'
-          ? props.loadService
-          : window[props.loadService] || eval(props.loadService)
-
-      const results = await loadServiceFunction({ id })
+      const results = await props.loadService({ id })
 
       if (!results) return
 

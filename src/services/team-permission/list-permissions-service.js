@@ -3,7 +3,7 @@ import { makePermissionBaseUrl } from './make-permissions-base-url'
 
 export const listPermissionService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePermissionBaseUrl()}?page_size=200`,
+    url: `${makePermissionBaseUrl()}?page_size=100`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)

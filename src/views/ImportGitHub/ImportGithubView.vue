@@ -11,6 +11,7 @@
   import { useToast } from 'primevue/usetoast'
   import { onMounted } from 'vue'
   import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
+  import { variablesService } from '@/services/v2/variables'
 
   const loadingStore = useLoadingStore()
   const deployStore = useDeploy()
@@ -23,10 +24,6 @@
       required: true
     },
     frameworkDetectorService: {
-      type: Function,
-      required: true
-    },
-    createVariablesService: {
       type: Function,
       required: true
     },
@@ -79,7 +76,7 @@
   const createServiceWithVariablesDecorator = async (formValues) => {
     if (formValues.newVariables) {
       await Promise.all(
-        formValues.newVariables.map((variable) => props.createVariablesService(variable))
+        formValues.newVariables.map((variable) => variablesService.create(variable))
       )
     }
 
@@ -149,7 +146,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Import from GitHub" />
+      <PageHeadingBlock
+        pageTitle="Import from GitHub"
+        description="Import repositories and configurations from GitHub to your account."
+      />
     </template>
     <template #content>
       <CreateFormBlock

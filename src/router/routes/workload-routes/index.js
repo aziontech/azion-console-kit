@@ -36,7 +36,7 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Create Workload`,
+            label: `Create`,
             to: `/workloads/create`
           }
         ]
@@ -58,7 +58,9 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Edit Workload`
+            label: `Edit Workload`,
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

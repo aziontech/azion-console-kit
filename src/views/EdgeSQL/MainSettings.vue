@@ -21,6 +21,7 @@
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"
+        submitDisabled
         data-testid="edit-edge-sql-database-action-bar"
       />
     </template>

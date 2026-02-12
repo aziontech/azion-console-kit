@@ -24,7 +24,7 @@ describe('AzionOnboardingWindowOpener', () => {
     sut()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      'https://meetings.hubspot.com/rafael-weber1/onboarding-session',
+      'https://links.azion.com/onboarding-session',
       '_blank'
     )
   })

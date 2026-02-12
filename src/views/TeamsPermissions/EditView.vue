@@ -1,50 +1,14 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Edit Team"
-        data-testid="teams-permissions__edit-view__page-heading"
-      />
-    </template>
-    <template #content>
-      <EditFormBlock
-        @on-load-fail="handleLoadFail"
-        :editService="props.editTeamPermissionService"
-        :loadService="props.loadTeamPermissionService"
-        :updatedRedirect="updatedRedirect"
-        :schema="validationSchema"
-        @on-edit-success="handleTrackSuccessEdit"
-        @on-edit-fail="handleTrackFailEdit"
-      >
-        <template #form>
-          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </EditFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import { inject } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { inject, ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import * as yup from 'yup'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsTeamPermissions from './FormFields/FormFieldsTeamPermissions.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-
-  import * as yup from 'yup'
-
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
+  import FormFieldsTeamPermissions from '@views/TeamsPermissions/FormFields/FormFieldsTeamPermissions.vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
     editTeamPermissionService: {
@@ -65,11 +29,29 @@
     }
   })
 
+  const validationSchema = yup.object({
+    name: yup.string().required('Name is a required field'),
+    permissions: yup.array().required('Permission is a required field').min(1),
+    isActive: yup.boolean()
+  })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
+  const teamName = ref('Edit Team Permission')
   const router = useRouter()
+
+  const setTeamName = (team) => {
+    teamName.value = team.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, team.name)
+  }
 
   const handleLoadFail = (error) => {
     const { fieldName, message } = handleTrackerError(error)
+
     router.push({ name: 'teams-permission' })
+
     tracker.product
       .failedToEdit({
         productName: 'Teams Permissions',
@@ -80,12 +62,6 @@
       .track()
   }
 
-  const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
-    permissions: yup.array().required('Permission is a required field').min(1),
-    isActive: yup.boolean()
-  })
-
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
@@ -93,6 +69,7 @@
       })
       .track()
   }
+
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -105,3 +82,37 @@
       .track()
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        :pageTitle="teamName"
+        data-testid="teams-permissions__edit-view__page-heading"
+        description="Configure permissions for team collaboration."
+      />
+    </template>
+    <template #content>
+      <EditFormBlock
+        @on-load-fail="handleLoadFail"
+        :editService="props.editTeamPermissionService"
+        :loadService="props.loadTeamPermissionService"
+        :updatedRedirect="updatedRedirect"
+        :schema="validationSchema"
+        @loaded-service-object="setTeamName"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
+      >
+        <template #form>
+          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
+</template>

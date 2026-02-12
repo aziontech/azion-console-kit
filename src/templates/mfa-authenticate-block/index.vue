@@ -32,6 +32,11 @@
               :disabled="isButtonLoading"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              autocorrect="off"
+              autocapitalize="none"
+              @input="(event) => handleInput(i, event)"
               @keydown="(event) => moveFocus(i, event)"
               :ref="(el) => (inputRefs[i] = el)"
             />
@@ -106,6 +111,17 @@
     const allDigitsFilled = () => validateCodeLength() === 6
     if (allDigitsFilled()) {
       validateCode()
+    }
+  }
+
+  const handleInput = (index, event) => {
+    const value = event?.target?.value ?? ''
+
+    if (value.length === 1 && index < MFA_CODE_LENGTH - 1) {
+      const nextInput = inputRefs.value[index + 1]
+      if (nextInput && nextInput.$el) {
+        nextInput.$el.focus()
+      }
     }
   }
 

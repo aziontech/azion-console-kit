@@ -48,14 +48,19 @@
       #value="slotProps"
     >
       <span
-        class="flex align-items-center gap-2"
+        class="flex align-items-center gap-2 max-w-full"
         :data-testid="customTestId.value"
       >
         <i
           v-if="showIcon"
           :class="`pi ${iconSelected} ${applyIconColor(iconSelected)}`"
         ></i>
-        {{ getLabelBySelectedValue(slotProps.value) }}
+        <span
+          class="truncate max-w-full"
+          :title="getLabelBySelectedValue(slotProps.value)"
+        >
+          {{ getLabelBySelectedValue(slotProps.value) }}
+        </span>
       </span>
     </template>
     <template #option="slotProps">

@@ -7,7 +7,7 @@ export async function redirectGuard({ to, router }) {
     const redirectUrl = await handleCLIRedirect()
 
     if (redirectUrl) {
-      window.location.href = redirectUrl
+      window.location.assign(redirectUrl)
       return false
     }
 

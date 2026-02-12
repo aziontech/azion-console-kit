@@ -200,17 +200,19 @@
     ref="listPaymentHistoryRef"
     isTabs
     :enableEditClick="false"
+    :allowedFilters="allowedFilters"
     :columns="loaderPaymentHistoryColumns"
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
     @on-before-go-to-edit="goToEnvoiceDetails"
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
+    exportFileName="Payment History"
   />
 
   <EmptyResultsBlock
     v-else
-    title="No payment activity has been recorded"
+    title="No payment activity found."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
     createButtonLabel="Add Credit"
@@ -242,7 +244,7 @@
   import SkeletonBlock from '@/templates/skeleton-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
@@ -322,6 +324,13 @@
     hasData: !!props.cardDefault.cardData
   }))
 
+  const allowedFilters = [
+    {
+      header: 'Invoice Number',
+      field: 'invoice_number'
+    }
+  ]
+
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
   const listPaymentHistoryRef = ref('')
@@ -370,8 +379,8 @@
   }
 
   const goToEnvoiceDetails = (item) => {
-    if (item.invoiceNumber.content) {
-      const invoiceNumber = item.invoiceNumber.content
+    if (item.billId) {
+      const invoiceNumber = item.billId
       const routeParams = { billId: invoiceNumber }
       navigateMethod('billing-invoice-details', routeParams)
     }
@@ -429,10 +438,7 @@
           component: (columnData) => {
             return columnBuilder({
               data: columnData,
-              columnAppearance: 'text-full-with-clipboard',
-              dependencies: {
-                copyContentService: props.clipboardWrite
-              }
+              columnAppearance: 'text-full-with-clipboard'
             })
           }
         },

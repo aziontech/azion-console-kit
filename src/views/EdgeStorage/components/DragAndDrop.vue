@@ -9,56 +9,83 @@
         <i class="pi pi-cloud-upload text-4xl text-color-primary"></i>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-4">
         <h3 class="text-lg font-medium text-color-primary">
           Drag files here to add them to your bucket
         </h3>
 
-        <p class="text-color-secondary">
-          Or
-          <span
-            class="transition-colors"
-            :class="
-              isProcessing
-                ? 'text-color-secondary cursor-not-allowed'
-                : 'cursor-pointer text-[var(--text-color-link)] hover:underline'
-            "
-            @click="!isProcessing && openFileSelector()"
-            >choose your files</span
-          >
-        </p>
+        <div class="flex justify-center">
+          <SplitButton
+            size="small"
+            label="Add to files"
+            @click="openFileSelector('files')"
+            :model="uploadMenuItems"
+            primary
+            class="whitespace-nowrap"
+            :disabled="isProcessing"
+            :menuButtonProps="{
+              class: 'rounded-l-none',
+              style: { color: 'var(--primary-text-color) !important' }
+            }"
+            :pt="{
+              root: { class: 'h-[2rem]' }
+            }"
+          />
+        </div>
       </div>
 
       <p class="text-sm text-color-secondary">Files larger than 300 MB cannot be uploaded.</p>
     </div>
-
-    <input
-      ref="fileInput"
-      type="file"
-      multiple
-      class="hidden"
-      :disabled="isProcessing"
-      @change="handleFileChangeDragDrop"
-    />
   </div>
 </template>
 
 <script setup>
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { onMounted, onUnmounted } from 'vue'
+  import SplitButton from 'primevue/splitbutton'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { handleFileChange, isProcessing } = useEdgeStorage()
-  const fileInput = ref(null)
+  const { uploadFiles, isProcessing } = useEdgeStorage()
   const emit = defineEmits(['reload'])
 
-  const openFileSelector = () => {
-    if (isProcessing.value) return
-    fileInput.value?.click()
-  }
+  const uploadMenuItems = [
+    {
+      label: 'Upload folder',
+      icon: 'pi pi-folder',
+      command: () => openFileSelector('folder')
+    },
+    {
+      label: 'Upload files',
+      icon: 'pi pi-upload',
+      command: () => openFileSelector('files')
+    }
+  ]
 
-  const handleFileChangeDragDrop = async (event) => {
-    await handleFileChange(event)
-    emit('reload')
+  const openFileSelector = (type = 'files') => {
+    if (isProcessing.value) return
+
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.style.display = 'none'
+
+    if (type === 'folder') {
+      input.webkitdirectory = true
+      input.multiple = false
+    } else {
+      input.multiple = true
+      input.webkitdirectory = false
+    }
+
+    input.onchange = async (event) => {
+      const files = event.target.files
+      if (files.length) {
+        await uploadFiles(files)
+        emit('reload')
+      }
+      document.body.removeChild(input)
+    }
+
+    document.body.appendChild(input)
+    input.click()
   }
 
   const handleDocumentDragOver = (event) => {

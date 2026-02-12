@@ -1,3 +1,5 @@
+import { documentationCatalog } from '@/helpers/azion-documentation-catalog'
+
 export const credentialsRoutes = {
   path: '/credentials',
   name: 'credentials',
@@ -9,6 +11,9 @@ export const credentialsRoutes = {
       path: ':tab?',
       name: 'credentials-tabs',
       component: () => import('@/views/Credentials/TabsView.vue'),
+      props: {
+        documentationService: documentationCatalog.credentials
+      },
       meta: {
         breadCrumbs: [
           {

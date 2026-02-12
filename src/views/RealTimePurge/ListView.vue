@@ -1,7 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Real-Time Purge"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Real-Time Purge"
+        description="Invalidate cached content to control content freshness across Azion’s global infrastructure."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Purge"
+            @click="handleTrackEvent"
+            createPagePath="real-time-purge/create"
+            data-testid="create_Purge_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <InlineMessage
@@ -14,7 +27,6 @@
       </InlineMessage>
       <ListTableBlock
         ref="listPurgeRef"
-        v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         addButtonLabel="Purge"
@@ -26,38 +38,34 @@
         emptyListMessage="No purge found."
         :actions="actionsRow"
         :defaultOrderingFieldName="'-last_modified'"
+        hide-last-modified-column
+        :paginator="false"
+        exportFileName="Real-Time Purge"
+        :empty-block="{
+          title: 'No Purge requests yet',
+          description: 'Create your first purge request to remove cached content.',
+          createButtonLabel: 'Purge',
+          createPagePath: 'real-time-purge/create',
+          documentationService: documentationService
+        }"
       >
       </ListTableBlock>
-      <EmptyResultsBlock
-        v-else
-        title="No purges have been added"
-        description="Click the button below to add your first purge."
-        createButtonLabel="Purge"
-        @click-to-create="handleTrackEvent"
-        createPagePath="real-time-purge/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { computed, ref, inject } from 'vue'
+  import { DataTableActionsButtons } from '@/components/DataTable'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2/purge/purge-service'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
+  // import { useRouter } from 'vue-router'
+  // import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
   import { capitalizeFirstLetter } from '@/helpers'
 
@@ -73,35 +81,33 @@
   })
 
   const listPurgeRef = ref('')
-  const route = useRoute()
-  const router = useRouter()
-  const hasContentToList = ref(true)
+  // const route = useRoute()
+  // const router = useRouter()
   const isLoading = ref(null)
   const toast = useToast()
-  const timeToReload = 9000
-  const { accountData } = useAccountStore()
+  // const timeToReload = 9000
+  // const { accountData } = useAccountStore()
   const purgeStore = usePurgeStore()
   const repurgesNeedingFocus = ref(0)
-  const feedbackPurge = ref(
-    'The purge has been successfully triggered and is now listed in the table.'
-  )
+  // const feedbackPurge = ref(
+  //   'The purge has been successfully triggered and is now listed in the table.'
+  // )
 
-  const user = accountData
+  // const user = accountData
   const countPurge = ref(0)
 
-  const handleLoadData = async (event) => {
-    countPurge.value = listPurgeRef.value.data.filter((item) => item.user === user.email).length
-    hasContentToList.value = event
-    const { isPending } = route.query
-    const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
-    if (hasPendingMismatch) {
-      isLoading.value = true
-      countPurge.value++
-      repurgesNeedingFocus.value++
-      handleTimeLoad()
-    } else {
-      router.replace({ query: {} })
-    }
+  const handleLoadData = async () => {
+    // countPurge.value = listPurgeRef.value.data?.filter((item) => item.user === user.email).length
+    // const { isPending } = route.query
+    // const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
+    // if (hasPendingMismatch) {
+    //   isLoading.value = true
+    //   countPurge.value++
+    //   repurgesNeedingFocus.value++
+    //   handleTimeLoad()
+    // } else {
+    //   router.replace({ query: {} })
+    // }
   }
 
   const handleTrackEvent = () => {
@@ -156,7 +162,7 @@
     repurgesNeedingFocus.value++
     try {
       await repurgeEvent(item)
-      await handleTimeLoad()
+      // await handleTimeLoad()
     } catch (error) {
       isLoading.value = false
     } finally {
@@ -205,39 +211,39 @@
         filterPath: 'arguments.content',
         type: 'component',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
     ]
   })
 
-  const applyFocus = (usersPurge, listPurge) => {
-    const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
-    const focusIds = newPurge.map((item) => item.id)
-    return listPurge.map((item) => ({
-      ...item,
-      focus: focusIds.includes(item.id)
-    }))
-  }
+  // const applyFocus = (usersPurge, listPurge) => {
+  //   const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
+  //   const focusIds = newPurge.map((item) => item.id)
+  //   return listPurge.map((item) => ({
+  //     ...item,
+  //     focus: focusIds.includes(item.id)
+  //   }))
+  // }
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-  const handleTimeLoad = async () => {
-    let totalOfUserPurges = 0
-    do {
-      await sleep(timeToReload)
-      const listPurge = await props.listRealTimePurgeService()
-      if (!repurgesNeedingFocus.value) return
-      const usersPurge = listPurge.filter((item) => item.user === user.email)
-      totalOfUserPurges = usersPurge.length
+  // const handleTimeLoad = async () => {
+  //   let totalOfUserPurges = 0
+  //   do {
+  //     await sleep(timeToReload)
+  //     const listPurge = await props.listRealTimePurgeService()
+  //     if (!repurgesNeedingFocus.value) return
+  //     const usersPurge = listPurge.filter((item) => item.user === user.email)
+  //     totalOfUserPurges = usersPurge.length
 
-      if (totalOfUserPurges === countPurge.value) {
-        listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
-        listPurgeRef.value.updateDataTablePagination()
-        router.replace({ query: {} })
-        showToast('success', feedbackPurge.value)
-      }
-    } while (totalOfUserPurges !== countPurge.value)
-    isLoading.value = false
-    repurgesNeedingFocus.value = 0
-  }
+  //     if (totalOfUserPurges === countPurge.value) {
+  //       listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
+  //       listPurgeRef.value.updateDataTablePagination()
+  //       router.replace({ query: {} })
+  //       showToast('success', feedbackPurge.value)
+  //     }
+  //   } while (totalOfUserPurges !== countPurge.value)
+  //   isLoading.value = false
+  //   repurgesNeedingFocus.value = 0
+  // }
 </script>

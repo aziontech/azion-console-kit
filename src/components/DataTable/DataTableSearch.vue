@@ -1,16 +1,17 @@
 <template>
   <span
-    class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+    class="flex flex-row p-input-icon-left items-center w-full max-w-[32rem]"
     data-testid="data-table-search"
   >
     <i class="pi pi-search" />
     <InputText
-      class="h-8 w-full md:min-w-[20rem]"
+      class="h-8 w-full"
       :modelValue="modelValue"
       @update:modelValue="handleInput"
       data-testid="data-table-search-input"
       :placeholder="placeholder"
       @keyup.enter="handleEnter"
+      :disabled="disabled"
     />
     <div
       v-if="hasSlot"
@@ -32,11 +33,15 @@
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: 'Search keywords...'
     },
     debounce: {
       type: Number,
       default: 0
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   })
 

@@ -58,7 +58,7 @@ describe('TeamPermissionService', () => {
 
   it('should throw when request fails with statusCode 403', async () => {
     const apiErrorMock = {
-      error: 'api error message'
+      errors: [{ detail: 'api error message' }]
     }
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -70,7 +70,7 @@ describe('TeamPermissionService', () => {
 
     const apiErrorResponse = sut(fixtures.teamPermissionMock)
 
-    expect(apiErrorResponse).rejects.toBe(apiErrorMock.error)
+    expect(apiErrorResponse).rejects.toBe(apiErrorMock.errors[0].detail)
   })
 
   it.each([

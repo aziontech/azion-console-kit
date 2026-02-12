@@ -2,14 +2,14 @@
   <div class="rounded surface-border border min-h-[194px]">
     <div
       class="text-center py-10"
-      v-if="!Object.keys(props.securityHeaders).length"
+      v-if="!props.securityHeaders || !Object.keys(props.securityHeaders).length"
     >
       <i class="pi pi-spin pi-spinner"></i>
     </div>
 
     <ul
       class="py-4"
-      v-if="Object.keys(props.securityHeaders).length"
+      v-if="props.securityHeaders && Object.keys(props.securityHeaders).length"
     >
       <li class="px-4 py-2 flex items-center">
         <small class="w-24">Rating</small>

@@ -1,7 +1,6 @@
 import { AccountHandler } from '@/helpers/account-handler'
 import * as AuthServices from '@/services/auth-services'
 import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
-import { clearCacheSensitive, clearAllCache } from '@/services/v2/base/query/queryClient'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const switchAccountRoutes = {
@@ -25,10 +24,8 @@ export const switchAccountRoutes = {
         refresh,
         EnableSocialLogin
       )
-      await clearCacheSensitive()
       next(redirect)
     } catch {
-      await clearAllCache()
       next({ name: 'login' })
     }
   }

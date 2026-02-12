@@ -1,237 +1,515 @@
-# Development Guide - PTBR
+# Development Guide
 
-## Vai desenvolver?
+This guide provides detailed information for developers working on Azion Console Kit.
 
-### Configuração recomendada da sua IDE
+## Table of Contents
 
-Caso você opte pelo VSCode sugere-se o uso dos seguintes Plugins de forma a manter e controlar o pattern de desenvolvimento aumentando a velocidade:
+- [IDE Setup](#ide-setup)
+- [Project Architecture](#project-architecture)
+- [Composables](#composables)
+- [Modules](#modules)
+- [Plugins](#plugins)
+- [Creating a New Feature](#creating-a-new-feature)
+- [Theming](#theming)
+- [API Configuration](#api-configuration)
+- [Build & Deploy](#build--deploy)
+- [Testing](#testing)
+- [Useful Resources](#useful-resources)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+---
 
-[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+## IDE Setup
 
-Outra sugestão é deixar habilitado o auto-save do VSCode configurado para aplicar as regras de formatação das definições do ESLint e Prettier.
-Para isso crie uma pasta chamada `.vscode/settings.json` com a seguinte configuração:
+### Recommended VSCode Extensions
 
-```
+For the best development experience, install these extensions:
+
+| Extension | Purpose |
+|-----------|---------|
+| [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) | Vue 3 language support (disable Vetur) |
+| [TypeScript Vue Plugin](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) | TypeScript support for Vue |
+| [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) | Code formatting |
+| [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) | Linting |
+| [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) | Tailwind autocomplete |
+
+### VSCode Settings
+
+Enable auto-format on save by creating `.vscode/settings.json`:
+
+```json
 {
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
+    "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": [
-    "javascript"
-  ],
+  "eslint.validate": ["javascript", "vue"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "files.insertFinalNewline": true
 }
 ```
 
-<font color="#f3652b">Este arquivo não deve ser comitado para não afetar preferências de outros usuários na IDE</font>
+> **Note:** This file should not be committed to avoid affecting other developers' IDE preferences.
 
-## Development
+---
 
-A estrutura segue o seguinte padrão:
+## Project Architecture
+
+### Directory Structure
 
 ```
+src/
 ├── App.vue
-├── assets
-│   └── themes
-├── router
-│   ├── routes
-│   │   ├── edge-application-routes
-│   │   └── variables-routes
-│   └── index.js
-├── services
-│   ├── axios
-│   ├── edge-application-services
-│   └── variables-services
-├── stores
-├── templates
-│   ├── create-form-block
-│   ├── footer-block
-│   ├── list-table-block
-│   ├── main-menu-block
-│   └── shell-block
-└── views
-    └── EdgeApplications
-        ├── ListView.vue
-        └── CreateView.vue
-    └── Variables
+├── assets/              # Static files (CSS, images, themes)
+│   └── themes/
+├── router/              # Route definitions
+│   ├── routes/
+│   │   ├── edge-application-routes/
+│   │   └── variables-routes/
+│   └── index.js
+├── services/            # API service layer
+│   ├── axios/
+│   ├── edge-application-services/
+│   └── variables-services/
+├── stores/              # Pinia state management
+├── templates/           # Reusable UI blocks
+│   ├── create-form-block/
+│   ├── footer-block/
+│   ├── list-table-block/
+│   ├── main-menu-block/
+│   └── shell-block/
+└── views/               # Page components
+    ├── EdgeApplications/
+    │   ├── ListView.vue
+    │   └── CreateView.vue
+    └── Variables/
         ├── ListView.vue
         └── FormView.vue
 ```
 
-Onde:
-| Diretório | Descrição |
-|----------|----------|
-| assets | Arquivos estáticos do projeto (CSS, Imagens, etc) |
-| router | Estrutura de rotas, onde `index.js` centraliza todas rotas |
-| services | Serviços separados por operação do CRUD |
-| stores | Dados que precisam ser compartilhados entre as UI's/rotas |
-| templates | Blocos disponíveis para a construção do projeto, já programados para integração |
-| views | Conjunto de pastas separados por módulos, contém cada UI necessária para cada operação do CRUDL. |
+### Directory Descriptions
 
-Abaixo você pode visualizar um diagrama da disposição destes arquivos e a forma que se interligam para implementar um módulo CRUDL de Variables:
+| Directory | Description |
+|-----------|-------------|
+| `assets/` | Static project files (CSS, images, etc.) |
+| `router/` | Route structure, where `index.js` centralizes all routes |
+| `services/` | Services separated by CRUD operation |
+| `stores/` | Data that needs to be shared between UIs/routes |
+| `templates/` | Pre-built blocks for project construction, ready for integration |
+| `views/` | Folders separated by modules, containing each UI needed for CRUDL operations |
 
-![Diagrama de Arquitetura](./docs/architecture-diagram.png)
+### Architecture Diagram
 
-### Alteração do tema
+Below you can see a diagram showing how these files are organized and interconnect to implement a CRUDL module:
 
-#### CSS
+![Architecture Diagram](./docs/architecture-diagram.png)
 
-A aplicação é nativamente tematizada com o _"look and feel"_ da Azion, sendo que o arquivo de theme é carregado dentro do arquivo `src/main.js` conforme exemplo abaixo:
+---
+
+## Composables
+
+Composables are reusable Vue 3 Composition API functions located in `src/composables/`. They encapsulate common logic that can be shared across components.
+
+### Available Composables
+
+| Composable | Description |
+|------------|-------------|
+| `useDataTable` | Complete data table logic including pagination, sorting, filtering, and CRUD operations |
+| `useDeleteDialog` | Opens standardized delete confirmation dialogs with customizable options |
+| `useTableQuery` | Handles table data fetching with support for pagination, sorting, and search |
+| `useEdgeStorage` | Manages Edge Storage bucket operations (upload, download, delete files) |
+| `useScrollToError` | Automatically scrolls to the first form validation error |
+| `useResize` | Handles element resize observations |
+| `useLayout` | Manages application layout state (sidebar, header, etc.) |
+| `useHelperCenter` | Integrates with the help center functionality |
+| `userFlag` | Handles feature flag checks |
+
+### Usage Examples
+
+**useDeleteDialog:**
+```javascript
+import { useDeleteDialog } from '@/composables/useDeleteDialog'
+
+const { openDeleteDialog } = useDeleteDialog()
+
+openDeleteDialog({
+  title: 'Delete Variable',
+  data: selectedItem,
+  deleteService: () => deleteVariableService(selectedItem.id),
+  successCallback: () => reloadTable()
+})
+```
+
+**useScrollToError:**
+```javascript
+import { useScrollToError } from '@/composables/useScrollToError'
+
+const { scrollToError, scrollToErrorInDrawer } = useScrollToError()
+
+// After form validation fails
+scrollToError(errors)
+
+// For forms inside drawers/sidebars
+scrollToErrorInDrawer(errors)
+```
+
+**useTableQuery:**
+```javascript
+import { useTableQuery } from '@/composables/useTableQuery'
+
+const {
+  isLoading,
+  data,
+  totalRecords,
+  reload,
+  updateSort,
+  updatePagination,
+  updateSearch
+} = useTableQuery({
+  listService: listVariablesService,
+  defaultOrderingFieldName: 'name',
+  itemsByPage: 10
+})
+```
+
+---
+
+## Modules
+
+Modules are self-contained feature packages located in `src/modules/`. Each module contains its own components, services, composables, and assets.
+
+### Available Modules
+
+| Module | Description |
+|--------|-------------|
+| `azion-ai-chat/` | AI-powered chat assistant integration |
+| `real-time-events/` | Real-time event streaming and display |
+| `real-time-metrics/` | Real-time metrics dashboard and visualizations |
+
+### Module Structure
+
+Each module follows a consistent structure:
+
+```
+src/modules/azion-ai-chat/
+├── assets/           # Module-specific static files
+├── components/       # Module-specific Vue components
+├── composables/      # Module-specific composables
+├── contextual-prompts/  # AI prompt configurations
+├── directives/       # Vue directives
+├── layout/           # Layout components
+└── services/         # API services for the module
+```
+
+### Using Modules
+
+Modules are typically imported and used as needed:
+
+```javascript
+import AzionAiChat from '@/modules/azion-ai-chat'
+```
+
+---
+
+## Plugins
+
+Plugins extend Vue's functionality and are located in `src/plugins/`. They are registered globally in `main.js`.
+
+### Available Plugins
+
+| Plugin | Description |
+|--------|-------------|
+| `AnalyticsTrackerAdapterPlugin` | Segment analytics integration for tracking user events |
+| `sentry/` | Sentry error tracking and session replay |
+
+### Analytics Plugin
+
+The analytics plugin provides a global `$tracker` instance for tracking user events:
+
+```javascript
+// In a component
+this.$tracker.track('button_clicked', { buttonName: 'submit' })
+
+// Using inject in Composition API
+import { inject } from 'vue'
+const tracker = inject('tracker')
+tracker.track('page_viewed', { pageName: 'Dashboard' })
+```
+
+### Sentry Plugin
+
+The Sentry plugin provides error tracking and session replay. It exposes methods via `$sentry`:
+
+```javascript
+// Capture an exception
+this.$sentry.captureException(error)
+
+// Capture a message
+this.$sentry.captureMessage('Something happened')
+
+// Set user context
+this.$sentry.setUser({ id: userId, email: userEmail })
+
+// Set custom tags
+this.$sentry.setTag('feature', 'edge-applications')
+```
+
+#### Sentry Configuration
+
+Configure Sentry via environment variables:
+
+```bash
+VITE_SENTRY_UPLOAD=true          # Enable source map uploads
+VITE_SENTRY_AUTH_TOKEN=sntrys_...  # Sentry auth token
+```
+
+#### Masking Sensitive Data
+
+Use `data-sentry-mask` attribute to mask sensitive content in session replays:
+
+```html
+<input type="password" data-sentry-mask />
+<div data-sentry-mask>Sensitive content</div>
+```
+
+---
+
+## Creating a New Feature
+
+This section walks through creating a new feature using the Variables module as an example.
+
+### Step 1: Create the Service
+
+Create a new folder in `src/services/` for your feature:
+
+```
+src/services/variables-services/
+├── make-variables-base-url.js   # Base URL getter for the API
+├── index.js                      # Exports all methods (List, Edit, Delete, Create)
+└── list-variables-service.js     # API call layer with payload normalization
+```
+
+**Example: `make-variables-base-url.js`**
+```javascript
+export const makeVariablesBaseUrl = () => {
+  return 'v4/variables'
+}
+```
+
+**Example: `list-variables-service.js`**
+```javascript
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { makeVariablesBaseUrl } from './make-variables-base-url'
+
+export const listVariablesService = async () => {
+  const httpResponse = await AxiosHttpClientAdapter.request({
+    url: makeVariablesBaseUrl(),
+    method: 'GET'
+  })
+  
+  return adapt(httpResponse)
+}
+
+const adapt = (httpResponse) => {
+  // Normalize and transform the response
+  return httpResponse.body.results.map((item) => ({
+    id: item.uuid,
+    key: item.key,
+    value: item.value
+  }))
+}
+```
+
+### Step 2: Create the View
+
+Create your view component in `src/views/YourFeature/`:
+
+```vue
+<!-- src/views/Variables/ListView.vue -->
+<template>
+  <ListTableBlock
+    :listService="listVariablesService"
+    :columns="columns"
+    :deleteService="deleteVariablesService"
+  />
+</template>
+
+<script setup>
+import ListTableBlock from '@/templates/list-table-block'
+import { listVariablesService, deleteVariablesService } from '@/services/variables-services'
+
+const columns = [
+  { field: 'key', header: 'Key' },
+  { field: 'value', header: 'Value' }
+]
+</script>
+```
+
+### Step 3: Create the Route
+
+Add your route in `src/router/index.js`:
+
+```javascript
+import { listVariablesService, deleteVariablesService } from '@/services/variables-services'
+
+const routes = [
+  {
+    path: '/variables',
+    name: 'list-variables',
+    component: () => import('@/views/Variables/ListView.vue'),
+    props: {
+      listService: listVariablesService,
+      deleteService: deleteVariablesService
+    }
+  }
+]
+```
+
+### Step 4: Add to Menu (Optional)
+
+Configure the menu item in `src/templates/main-menu-block/`:
+
+```javascript
+{
+  label: 'Variables',
+  icon: 'pi pi-cog',
+  to: '/variables'
+}
+```
+
+---
+
+## Theming
+
+### CSS Customization
+
+The application uses Azion's default theme. The theme is loaded in `src/main.js`:
 
 ```javascript
 import '@/assets/themes/scss/themes/azion-light/theme.scss'
 ```
 
-Os fontes do theme estão dentro do diretório:
-`src/assets/themes/scss`
-sendo que ao alterar os arquivos de Tokens ou qualquer arquivo destes diretórios as mesmas refletem diretamente no seu ambiente de desenvolvimento que está sendo executado.
+Theme source files are located in `src/assets/themes/scss`. Changes to token files or any files in these directories will reflect immediately in your development environment.
 
-#### Logotipo
+### Logo Customization
 
-Dentro do diretório `assets/svg/` encontra-se o arquivo `logo.vue` que pode ser sobrescrito por um arquivo SVG customizado.
-
-### How to: usar o ambiente de stage da api
-
-Para fins de desenvolvimento do time da Azion, é possível apontar para a API de stage e executar ações restritas em produção.
-
-1. Altere o target da api no arquivo `vite.config.js` para `https://stage-api.azion.net`
-
-```js
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://stage-api.azion.net',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      }
-    }
-  }
-```
-
-### How to: criando uma UI de listagem de Variables
-
-Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
-
-1. Criação do Serviço
-   - _src/services/variables-services_
-     - _make-variables-base-url.js_: método getter da URL base da API de Variables.
-     - _index.js_: interface de exposição dos métodos (Listar, Editar, Excluir, Inserir)
-     - _list-variables-service.js_: camada para chamada da API (endpoint de Listagem) e tratamento de retorno do payload (normalização, adição de helper, etc)
-2. Criação da View
-   - _ListView.vue_: através da seleção de um dos blocos (nesse exemplo: _src/templates/list-table-block_) é realizada a implementação lógica mais detalhada se necessário.
-3. Criação da Rota:
-   - _src/router/index.js_: passagem junto da rota das properties de serviço que já foram implementadas para o componente.
-4. Adição no Menu (opcional)
-   - _src/main-menu-block_: configuração da rota, nome e ícone que serão mostrados no Side Menu (se necessário).
-
-## Extras
-
-### Compilar e Minificar para produção
-
-```sh
-yarn build
-```
-
-### Executar localmente a versão de build
-
-```sh
-npm run preview
-```
-
-### Executar testes unitários com [Vitest](https://vitest.dev/)
-
-```sh
-yarn test:unit
-```
-
-### Executar testes e2e com [Cypress](https://www.cypress.io/)
-
-Antes de executar seus testes com Cypress, duplique o arquivo `cypress.env.example.json`, renomeie a cópia recém criada para `cypress.env.json` e preencha as variáveis com dados válidos ao ambiente que seus testes irão usar ( APIs de stage ou produção ).
-
-Para executar testes com interface
-
-```sh
-yarn test:e2e:dev
-```
-
-Para executar os testes via terminal
-
-```sh
-yarn test:e2e:dev-run
-```
-
-Esse comando executa os testes e2e em um servidor de desenvolvimento Vite.
-Sendo muito mais rápido que um build para produção.
-
-Embora ainda seja recomendado executar os testes no código buildado para produção com `test:e2e` antes de executar o deploy (ex.: ambientes de CI):
-
-```sh
-yarn build
-yarn test:e2e
-```
-
-### Formatação com [ESLint](https://eslint.org/)
-
-```sh
-yarn lint
-```
-
-### Deploy manual (First deploy)
-
-Para executar o deploy você pode utilizar o Azion CLI:
-
-Azion CLI (>= 0.70.0):
-
-```
-yarn build
-
-azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
-
-azioncli edge_applications publish --debug
-
-```
-
-### Deploy com GitHub Workflow
-
-Para usufruir do GitHub Workflow você precisa ter configurado dentro do seu repositório as seguintes SECRETS:
-
-| SECRET             | Descrição                                                                        |
-| ------------------ | -------------------------------------------------------------------------------- |
-| PLATFORM_KIT_TOKEN | seu Personal token da Azion para ser utilizado no CLI durante o deploy.          |
-| APPLICATION_ID     | ID da Edge Application criada anteriormente via first deploy.                    |
-| FUNCTION_ID        | ID da Edge Function criada anteriormente via first deploy.                       |
-| DOMAIN_ID          | ID do Domain vinculado a Edge Application criado anteriormente via first deploy. |
+The logo file is located at `assets/svg/logo.vue` and can be replaced with a custom SVG file.
 
 ---
 
-<font color=#f3652b>\* As informações sobre os ID's necessários para os SECRETS estarão disponíveis dentro do arquivo `azion/azion.json` após o first deploy.</font>
+## API Configuration
 
-### Issues conhecidas na versão 0.7.0 da azioncli
+### Using the Stage API
 
-Devido à incompatibilidades com o vite na versão atual da azioncli os problemas abaixo podem ocorrer:
+For Azion team development, you can point to the stage API:
 
-- No fluxo de deploy, na primeira vez, a cli acaba não criando o diretório `.edge/statics` e retorna uma mensagem de erro no terminal. Para solucionar esse problema, execute:
+1. Set the environment variable:
+   ```bash
+   VITE_ENVIRONMENT=stage
+   ```
 
-```sh
-  mkdir .edge/statics && cp -r dist/* .edge/statics
-  azioncli edge_applications publish
+2. Or modify `vite.config.js` proxy target:
+   ```javascript
+   server: {
+     proxy: {
+       '/api': {
+         target: 'https://stage-api.azion.net',
+         changeOrigin: true,
+         rewrite: (path) => path.replace(/^\/api/, ''),
+       }
+     }
+   }
+   ```
+
+---
+
+## Build & Deploy
+
+### Build for Production
+
+```bash
+yarn build
 ```
 
-- Já nos casos de edição da edge application, os estáticos gerados em `dist` não sobrescrevem os que estão em `.edge/statics`. Antes publicar a edge application pela cli, verifique se os arquivos em `dist` e `.edge/statics` possuem o mesmo nome/conteúdo. Para solucionar esse problema, execute:
+### Preview Production Build Locally
 
-```sh
-  rm -rf .edge/statics/* && cp -r dist/* .edge/statics
-  azioncli edge_applications publish
+```bash
+yarn preview
 ```
 
-### Outros links
+### Deploy with Azion CLI
 
-[vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
-[yup with vee-valide guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/#validating-with-yup)
+```bash
+yarn build
+azion link        # Select Vue preset
+azion deploy
+```
+
+### Deploy with GitHub Actions
+
+Configure these repository secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `PLATFORM_KIT_TOKEN` | Your Azion personal token for CLI deployment |
+| `APPLICATION_ID` | Edge Application ID from first deploy |
+| `FUNCTION_ID` | Edge Function ID from first deploy |
+| `DOMAIN_ID` | Domain ID linked to the Edge Application |
+
+> **Note:** These IDs are available in `azion/azion.json` after the first deploy.
+
+---
+
+## Testing
+
+### Unit Tests with Vitest
+
+```bash
+# Run with UI
+yarn test:unit
+
+# Run headless
+yarn test:unit:headless
+
+# Run with coverage
+yarn test:unit:coverage
+```
+
+### E2E Tests with Cypress
+
+1. Copy `cypress.env.example.json` to `cypress.env.json`
+2. Fill in valid credentials for your target environment
+
+```bash
+# Open Cypress UI
+yarn test:e2e:open:dev
+
+# Run headless
+yarn test:e2e:run:dev
+```
+
+For CI environments, run tests against the production build:
+
+```bash
+yarn build
+yarn test:e2e:run:stage
+```
+
+### Linting
+
+```bash
+yarn lint
+```
+
+---
+
+## Useful Resources
+
+- [VeeValidate Guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
+- [Yup with VeeValidate](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/#validating-with-yup)
+- [Vue 3 Documentation](https://vuejs.org/guide/introduction.html)
+- [PrimeVue Components](https://primevue.org/setup)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Pinia State Management](https://pinia.vuejs.org/)

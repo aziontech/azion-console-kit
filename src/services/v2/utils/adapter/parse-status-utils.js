@@ -42,3 +42,9 @@ export const parseStatusString = (status) => {
 
   return parsedStatus
 }
+
+export const parseBucketString = (bucket) => {
+  return Array.isArray(bucket) && bucket.length > 0
+    ? bucket
+    : { content: 'All Buckets', severity: 'primary' }
+}

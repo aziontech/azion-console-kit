@@ -6,8 +6,8 @@ export const PERSISTENCE_CONFIG = {
   IDB_NAME: 'azion',
   IDB_STORE_NAME: 'cache-store',
   CACHE_KEY: 'query-cache',
-  VERSION: 'v2',
-  MAX_AGE: toMilliseconds({ days: 1 }),
+  VERSION: 'v0',
+  MAX_AGE: toMilliseconds({ hours: 1 }),
   DEHYDRATE_OPTIONS: {
     shouldDehydrateQuery: (query) => {
       if (query.state.status !== 'success') {
@@ -21,5 +21,11 @@ export const PERSISTENCE_CONFIG = {
       return true
     }
   },
-  HYDRATE_OPTIONS: { defaultOptions: { queries: { gcTime: toMilliseconds({ days: 1 }) } } }
+  HYDRATE_OPTIONS: {
+    defaultOptions: {
+      queries: {
+        gcTime: toMilliseconds({ hours: 1 })
+      }
+    }
+  }
 }

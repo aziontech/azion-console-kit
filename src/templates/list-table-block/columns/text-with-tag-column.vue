@@ -18,6 +18,6 @@
   })
 
   const displayTag = computed(() => {
-    return !!Object.keys(props.tagProps).length
+    return !!(props.tagProps && Object.keys(props.tagProps).length)
   })
 </script>

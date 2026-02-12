@@ -4,7 +4,7 @@ export class DigitalCertificatesCRLService extends BaseService {
   constructor() {
     super()
     this.adapter = DigitalCertificatesCRLAdapter
-    this.baseURL = 'v4/digital_certificates/crls'
+    this.baseURL = 'v4/workspace/tls/crls'
   }
 
   listDigitalCertificatesCRL = async (params = {}) => {

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Zone" />
+      <PageHeadingBlock
+        pageTitle="Create Zone"
+        description="Configure DNS records and zone settings used for authoritative domain resolution."
+      />
     </template>
 
     <template #content>

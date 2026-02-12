@@ -1,12 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeAppErrorResponseAdapter } from './edge-app-error-response-adapter'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-
-export const errorResponseKeys = {
-  all: (edgeAppId) => ['error-responses', edgeAppId],
-  lists: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'list'],
-  details: (edgeAppId) => [...errorResponseKeys.all(edgeAppId), 'detail']
-}
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeAppErrorResponseService extends BaseService {
   constructor() {
@@ -32,16 +27,24 @@ export class EdgeAppErrorResponseService extends BaseService {
     return body
   }
 
-  listEdgeApplicationsErrorResponseService = async ({ params = {}, edgeApplicationId }) => {
+  listEdgeApplicationsErrorResponseService = async ({
+    params = { page: 1, pageSize: 10 },
+    edgeApplicationId
+  }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = errorResponseKeys.lists(edgeApplicationId)
+    const queryKey = queryKeys.application.errorResponse.list(edgeApplicationId, params)
+    const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this._ensureQueryData(
-      () => queryKey,
+    return await this.useEnsureQueryData(
+      queryKey,
       () => this.#fetchList({ params, edgeApplicationId }),
-      { persist: true }
+      { persist: false, skipCache }
     )
+  }
+
+  prefetchEdgeApplicationsErrorResponseList = async (edgeApplicationId) => {
+    return await this.listEdgeApplicationsErrorResponseService({ edgeApplicationId })
   }
 
   editEdgeApplicationErrorResponseService = async (payload, edgeApplicationId) => {
@@ -53,7 +56,9 @@ export class EdgeAppErrorResponseService extends BaseService {
     })
 
     // Remove list queries from cache (including IndexedDB) after editing
-    this.queryClient.removeQueries({ queryKey: errorResponseKeys.all(edgeApplicationId) })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.application.errorResponse.all(edgeApplicationId)
+    })
 
     return 'Your Error Responses has been edited'
   }

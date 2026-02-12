@@ -20,9 +20,11 @@
   defineEmits(['delete-bucket'])
 
   const { value: name } = useField('name')
-  const { value: edge_access } = useField('edge_access')
+  const { value: workloads_access } = useField('workloads_access', undefined, {
+    initialValue: 'read_only'
+  })
 
-  const edgeAccessOptions = [
+  const workloadsAccessOptions = [
     { label: 'Read & Write', value: 'read_write' },
     { label: 'Read Only', value: 'read_only' },
     { label: 'Restricted', value: 'restricted' }
@@ -52,20 +54,18 @@
     </FormHorizontal>
     <FormHorizontal
       title="Settings"
-      description="Define the access level and permissions for your bucket."
+      description="Define bucket access policies within the Azion platform."
     >
       <template #inputs>
         <div class="flex flex-col max-w-sm gap-2">
           <FieldDropdown
-            label="Edge Access"
-            :required="!showDangerZone"
-            name="edge_access"
-            :value="edge_access"
-            :options="edgeAccessOptions"
+            label="Workloads Access"
+            name="workloads_access"
+            :value="workloads_access"
+            :options="workloadsAccessOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select a Edge Access level"
-            description="Select the appropriate access level for your bucket based on your Application's requirements."
+            description="Set the access level for Workloads to interact with this bucket. Choose whether they can read, write, or restrict access entirely."
             data-testid="edge-storage-form__edge-access-field"
           />
         </div>

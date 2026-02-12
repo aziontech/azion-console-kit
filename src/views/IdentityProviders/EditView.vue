@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Identity Provider"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="providerName"
+        description="Configure an identity provider for single sign-on authentication."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +12,7 @@
         :loadService="loadService"
         :schema="validationSchema"
         :updatedRedirect="props.updatedRedirect"
+        @loaded-service-object="setProviderName"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
@@ -36,8 +40,9 @@
   import FormFieldsCreateIdentityProvider from './FormFields/FormFieldsCreateIdentityProvider.vue'
   import * as yup from 'yup'
   import { useRoute } from 'vue-router'
-  import { inject } from 'vue'
+  import { inject, ref } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -120,7 +125,14 @@
   })
 
   const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
   const protocol = route.params.protocol
+  const providerName = ref('Edit Identity Provider')
+
+  const setProviderName = (provider) => {
+    providerName.value = provider.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, provider.name)
+  }
 
   const editService =
     protocol === 'OIDC'

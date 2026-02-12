@@ -40,7 +40,8 @@
   ])
 
   const searchDocumentation = () => {
-    openSearchResult(search.value)
+    const sanitizedSearch = search.value.replace(/[''`""]/g, '')
+    openSearchResult(sanitizedSearch)
   }
 
   const clickMenuItem = (item) => {

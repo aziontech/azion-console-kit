@@ -25,7 +25,6 @@
 
   const {
     setCurrentGroupPageByLabels,
-    resetFilters,
     setCurrentPage,
     setDatasetAvailableFilters,
     loadCurrentReports
@@ -42,13 +41,6 @@
   })
 
   const changeGroup = async ({ value }) => {
-    const dataset = value.pagesDashboards?.[0]?.dashboards?.[0]?.dataset
-    const currentDataset = currentPage.value?.dashboards?.[0]?.dataset
-
-    if (dataset !== currentDataset) {
-      resetFilters()
-    }
-
     setCurrentGroupPageByLabels(value.label)
     await setDatasetAvailableFilters()
     await loadCurrentReports(props.userUTC)
@@ -70,13 +62,6 @@
     if (evt.index === selectedPage.value) return
 
     const newPage = groupPages.value[evt.index]
-    const dataset = newPage?.dashboards[0]?.dataset
-    const currentDataset = currentPage.value?.dashboards[0]?.dataset
-
-    if (dataset !== currentDataset) {
-      resetFilters()
-    }
-
     setCurrentPage(newPage)
     await setDatasetAvailableFilters()
     await loadCurrentReports(props.userUTC)

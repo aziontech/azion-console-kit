@@ -1,4 +1,4 @@
-import * as Helpers from '@/helpers'
+import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
 export const mfaManagementRoutes = {
   path: '/mfa-management',
@@ -9,7 +9,7 @@ export const mfaManagementRoutes = {
       name: 'list-mfa-management',
       component: () => import('@views/MFAManagement/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.mfaManagement
+        documentationService: documentationAccountsProducts.mfaManagement
       },
       meta: {
         title: 'MFA Management',

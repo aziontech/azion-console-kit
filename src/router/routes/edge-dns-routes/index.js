@@ -1,4 +1,5 @@
 import * as Helpers from '@/helpers'
+import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeDnsRoutes = {
@@ -10,7 +11,7 @@ export const edgeDnsRoutes = {
       name: 'list-edge-dns',
       component: () => import('@views/EdgeDNS/ListView.vue'),
       props: {
-        documentationService: Helpers.documentationCatalog.edgeDNS,
+        documentationService: documentationSecureProducts.edgeDNS,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
@@ -38,7 +39,11 @@ export const edgeDnsRoutes = {
             to: '/edge-dns'
           },
           {
-            label: 'Create Zone',
+            label: 'Zone',
+            to: '/edge-dns'
+          },
+          {
+            label: 'Create',
             to: '/edge-dns/create'
           }
         ]
@@ -60,7 +65,13 @@ export const edgeDnsRoutes = {
             to: '/edge-dns'
           },
           {
-            label: 'Edit Zone'
+            label: 'Zone',
+            to: '/edge-dns'
+          },
+          {
+            label: 'Edit Zone',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }

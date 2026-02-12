@@ -3,6 +3,7 @@ import {
   InternalServerError,
   InvalidApiRequestError,
   InvalidApiTokenError,
+  MethodNotAllowedError,
   NotFoundError,
   PermissionError,
   UnexpectedError
@@ -30,6 +31,8 @@ export const parseHttpResponse = (httpResponse) => {
       throw new PermissionError().message
     case 404:
       throw new NotFoundError().message
+    case 405:
+      throw new MethodNotAllowedError().message
     case 500:
       throw new InternalServerError().message
     default:

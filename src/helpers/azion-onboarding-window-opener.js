@@ -1,3 +1,3 @@
 export const azionOnboardingWindowOpener = () => {
-  window.open('https://meetings.hubspot.com/rafael-weber1/onboarding-session', '_blank')
+  window.open('https://links.azion.com/onboarding-session', '_blank')
 }

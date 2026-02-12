@@ -31,7 +31,9 @@
       >
         <template #panel-a>
           <div class="flex flex-col h-full min-h-0 min-w-0 overflow-hidden">
-            <div class="flex justify-between border-x border-t surface-border rounded-t-md p-3">
+            <div
+              class="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between border-x border-t surface-border rounded-t-md p-3"
+            >
               <Button
                 :label="labelRunQuery"
                 icon="pi pi-play"
@@ -103,6 +105,7 @@
               @view-change="handleViewChange"
               :options="resultsViewOptions"
               :title-delete-dialog="'Data'"
+              exportFileName="Query Results"
               :empty-block="{
                 title: 'Ready to execute',
                 description: 'Execute a query to see the results here'
@@ -127,7 +130,7 @@
 
   import Button from 'primevue/button'
   import Menu from 'primevue/menu'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
@@ -198,11 +201,11 @@
   } = useEdgeSQL()
   const route = useRoute()
 
-  const accountStore = useAccountStore()
+  const themeStore = useThemeStore()
   const shouldNotEditRow = ref(false)
 
   const monacoTheme = computed(() => {
-    return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
+    return themeStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
   const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
     useMonacoEditor()

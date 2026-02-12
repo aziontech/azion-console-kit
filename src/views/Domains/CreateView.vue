@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Domain"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Domain"
+        description="Configure domains, certificates, and select the security and application settings executed by this Domain."
+      ></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
@@ -189,6 +192,7 @@
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
     authorityCertificate: yup.string().nullable(),
+    subjectNameCertificate: yup.array().nullable(),
     mtlsTrustedCertificate: yup
       .string()
       .when('mtlsIsEnabled', {

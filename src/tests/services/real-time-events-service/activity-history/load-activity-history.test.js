@@ -49,6 +49,9 @@ describe('ActivityHistoryServices', () => {
       body: {
         query: expect.any(String),
         variables: {
+          and_titleEq: '',
+          and_tsEq: undefined,
+          and_userIdEq: undefined,
           tsRange_begin: '2024-02-23T18:07:25',
           tsRange_end: '2024-02-23T19:07:25'
         }
@@ -76,6 +79,7 @@ describe('ActivityHistoryServices', () => {
         { key: 'authorName', value: fixtures.activityHistory.authorName },
         { key: 'comment', value: fixtures.activityHistory.comment },
         { key: 'title', value: fixtures.activityHistory.title },
+        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
         { key: 'type', value: fixtures.activityHistory.type },
         { key: 'userId', value: fixtures.activityHistory.userId }
       ],

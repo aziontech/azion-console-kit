@@ -1,21 +1,22 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeStorageService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeStorageAdapter
-    this.baseURL = 'v4/edge_storage'
+    this.baseURL = 'v4/workspace/storage'
   }
 
-  listEdgeStorageBuckets = async (params = {}) => {
+  #fetchBucketsList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/buckets`,
       params: {
         search: '',
         fields: '',
-        ordering: 'name',
+        ordering: '-last_modified',
         page: 1,
         pageSize: 10,
         ...params
@@ -25,24 +26,59 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      ordering: '-last_modified',
+      fields: ['name', 'size', 'last_editor', 'last_modified', 'workloads_access']
+    }
+    return this.usePrefetchQuery(queryKeys.edgeStorage.buckets.list(defaultParams), () =>
+      this.#fetchBucketsList(defaultParams)
+    )
+  }
+
+  listEdgeStorageBuckets = async (params = {}) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeStorage.buckets.list(params),
+      () => this.#fetchBucketsList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createEdgeStorageBucket = async (bucket = {}) => {
+    const body = this.adapter?.transformCreateStorageBucket?.(bucket)
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/buckets`,
-      body: bucket
+      body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return data
   }
 
-  listEdgeStorageBucketFiles = async (bucketName = '', all_levels = false, prefix = '') => {
+  listEdgeStorageBucketFiles = async (
+    bucketName = '',
+    all_levels = false,
+    prefix = '',
+    continuation_token = ''
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/buckets/${bucketName}/objects`,
       params: {
         all_levels,
         prefix,
-        max_object_count: 110
+        max_object_count: 110,
+        continuation_token
       }
     })
 
@@ -50,13 +86,15 @@ export class EdgeStorageService extends BaseService {
   }
 
   updateEdgeStorageBucket = async (bucket = {}) => {
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'PATCH',
-      url: `${this.baseURL}/buckets/${bucket.name}`,
-      body: { edge_access: bucket.edge_access }
+      url: `${this.baseURL}/buckets/${bucket?.name}`,
+      body: { workloads_access: bucket.workloads_access }
     })
 
-    return `Bucket "${bucket.name}" has been updated successfully`
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
+
+    return data
   }
 
   deleteEdgeStorageBucket = async (bucketName = '') => {
@@ -64,6 +102,8 @@ export class EdgeStorageService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/buckets/${bucketName}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return `Bucket "${bucketName}" has been deleted successfully`
   }
@@ -157,7 +197,7 @@ export class EdgeStorageService extends BaseService {
   downloadEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${bucketName}/objects/${fileName}`,
+      url: `${this.baseURL}/buckets/${bucketName}/objects/${fileName}`,
       config: {
         responseType: 'blob'
       }
@@ -179,7 +219,9 @@ export class EdgeStorageService extends BaseService {
           filter: {
             tsGte: "${tsGte}"
             tsLt: "${tsLt}"
-          }
+          },
+          limit: 1000,
+          offset: 0
         ) {
           bucketName
           storedGb
@@ -203,7 +245,7 @@ export class EdgeStorageService extends BaseService {
       method: 'GET',
       url: `${this.baseURL}/credentials`,
       params: {
-        bucket: bucketName,
+        buckets: bucketName,
         ...params
       }
     })
@@ -211,10 +253,11 @@ export class EdgeStorageService extends BaseService {
     return this.adapter?.transformListEdgeStorageCredentials?.(data)
   }
   createCredential = async (credential = {}) => {
+    const body = this.adapter?.transformCreateEdgeStorageCredential?.(credential)
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/credentials`,
-      body: credential
+      body
     })
 
     return data
