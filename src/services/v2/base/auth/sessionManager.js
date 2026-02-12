@@ -23,6 +23,7 @@ import { digitalCertificatesService } from '@/services/v2/digital-certificates/d
 import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
 import { usersService } from '@/services/v2/users/users-service'
+import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -75,7 +76,8 @@ const prefetchInBackground = async () => {
     digitalCertificatesService.prefetchList(pageSize),
     digitalCertificatesCRLService.prefetchList(pageSize),
     customPageService.prefetchList(pageSize),
-    usersService.prefetchList(pageSize)
+    usersService.prefetchList(pageSize),
+    personalTokenService.prefetchList(pageSize)
   ])
 }
 

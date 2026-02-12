@@ -251,5 +251,9 @@ export const queryKeys = {
     all: ['users'],
     list: (params) => [...queryKeys.users.all, 'list', params],
     detail: (id) => [...queryKeys.users.all, 'detail', id]
+  },
+  personalToken: {
+    all: ['personal-tokens'],
+    list: (params) => [...queryKeys.personalToken.all, 'list', params]
   }
 }

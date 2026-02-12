@@ -77,7 +77,6 @@ export class EdgeFirewallFunctionService extends BaseService {
     { pageSize = 10, fields = [], page = 1, hasFilter = false, skipCache = false, search = '' }
   ) => {
     const queryKey = queryKeys.firewall.functions.list(edgeFirewallId, { pageSize, fields, page })
-    console.log('🚀 ~ EdgeFirewallFunctionService ~ queryKey:', queryKey);
     const shouldSkipCache = hasFilter || skipCache || search
     return await this.useEnsureQueryData(
       queryKey,

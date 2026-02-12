@@ -10,17 +10,17 @@ export class PersonalTokenService extends BaseService {
     this.baseURL = 'v4/iam/personal_tokens'
   }
 
-  #fetchList = async (params = { pageSize: 200, fields: [] }) => {
+  #fetchList = async ({ page = 1, pageSize = 200, search = '' } = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
-      params
+      params: { page, pageSize, search }
     })
 
     const { results, count } = data
 
     const parsedTokens = await Promise.all(
-      this.adapter?.transformListPersonalTokens?.(results, params.fields) ?? results
+      this.adapter?.transformListPersonalTokens?.(results) ?? results
     )
 
     return {
@@ -29,24 +29,22 @@ export class PersonalTokenService extends BaseService {
     }
   }
 
-  prefetchList = (pageSize = 10) => {
-    const params = {
-      page: 1,
-      pageSize,
-      fields: [],
-      ordering: '-created'
-    }
+  prefetchList = (pageSize = 200) => {
+    const params = { page: 1, pageSize }
 
-    return this.usePrefetchQuery(queryKeys.personalToken.list(params), () => this.#fetchList(params))
+    return this.usePrefetchQuery(queryKeys.personalToken.list(params), () =>
+      this.#fetchList(params)
+    )
   }
 
   listPersonalTokensService = async (params) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.search || params?.hasFilter
+    const queryParams = { page: params?.page, pageSize: params?.pageSize, search: params?.search }
 
     return await this.useEnsureQueryData(
-      queryKeys.personalToken.list(params),
-      () => this.#fetchList(params),
+      queryKeys.personalToken.list(queryParams),
+      () => this.#fetchList(queryParams),
       {
         persist: firstPage && !skipCache,
         skipCache

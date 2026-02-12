@@ -18,7 +18,7 @@
     </template>
     <template #content>
       <ListTableBlock
-        :listService="listPersonalTokensService"
+        :listService="personalTokenService.listPersonalTokensService"
         :columns="getColumns"
         addButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
@@ -47,19 +47,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listPersonalTokensService: {
-      type: Function,
-      required: true
-    },
-    deletePersonalTokenService: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       required: true,
       type: Function
@@ -72,7 +65,7 @@
       type: 'delete',
       title: 'personal token',
       icon: 'pi pi-trash',
-      service: props.deletePersonalTokenService
+      service: personalTokenService.deletePersonalTokenService
     }
   ]
 
