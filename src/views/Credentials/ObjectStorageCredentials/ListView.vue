@@ -150,6 +150,7 @@
       @on-before-go-to-add-page="handleCreateCredential"
       :actions="actions"
       @on-failed-to-delete="handleFailedToDelete"
+      default-ordering-field-name="-last_modified"
       emptyListMessage="No credentials found."
       isTabs
       :emptyBlock="{
