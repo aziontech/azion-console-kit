@@ -175,8 +175,9 @@
   })
 
   const updatedFirewall = (firewall) => {
-    edgeFirewall.value = { ...firewall }
+    edgeFirewall.value = { ...edgeFirewall.value, ...firewall }
     verifyTab(edgeFirewall.value)
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
   }
 
   onMounted(() => {

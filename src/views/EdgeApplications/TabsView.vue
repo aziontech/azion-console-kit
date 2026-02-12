@@ -204,8 +204,9 @@
   }
 
   const updatedApplication = (application) => {
-    edgeApplication.value = { ...application }
+    edgeApplication.value = { ...edgeApplication.value, ...application }
     verifyTab(edgeApplication.value)
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
   }
 
   const getTabFromIndex = (selectedTabIndex) => {
