@@ -87,7 +87,7 @@ const typeBuilders = {
 
     const result = {
       addresses: extractAddressesPostRequest(
-        payload.addresses,
+        payload.modules.loadBalancer.enabled ? payload.addresses : [payload.addresses[0]],
         payload.modules.loadBalancer.enabled
       ),
       connection_options: {
