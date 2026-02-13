@@ -25,7 +25,6 @@
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedUser.name)
   }
 
-
   const setUserName = (user) => {
     const firstName = user.first_name ?? user.firstName ?? ''
     const lastName = user.last_name ?? user.lastName ?? ''
