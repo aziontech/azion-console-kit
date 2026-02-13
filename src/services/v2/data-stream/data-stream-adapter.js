@@ -1,6 +1,6 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import * as Errors from '@/services/axios/errors'
-import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const mapDataSourceName = {
   http: 'Edge Applications',
@@ -257,6 +257,9 @@ export const DataStreamAdapter = {
       data?.map((dataStream) => {
         const dataSourceInput = dataStream.inputs.find((input) => input.type === 'raw_logs')
         const dataSetType = dataStream.outputs[0].type
+        const samplingTransform = dataStream.transform?.find((item) => item.type === 'sampling')
+        const templateId = dataStream.transform?.find((item) => item.type === 'render_template')
+        const endpointOutput = dataStream.outputs[0]
 
         return {
           id: dataStream.id,
@@ -264,10 +267,18 @@ export const DataStreamAdapter = {
           templateName: dataStream.templateName,
           dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
+          template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
+          domainOption: samplingTransform ? '1' : '0',
+          endpoint: endpointOutput.type,
+          hasSampling: !!samplingTransform,
+          samplingPercentage: samplingTransform?.attributes?.rate,
+          status: dataStream.active,
+          ...getInfoByEndpoint(endpointOutput),
+          dataSourceLabel: mapDataSourceName[dataSourceInput?.attributes?.data_source],
+          endpointLabel: endpointTypeNameMap[endpointOutput.type] || endpointOutput.type,
           active: parseStatusData(dataStream.active),
           lastEditor: dataStream.last_editor || '-',
-          lastModified: formatDateToDayMonthYearHour(dataStream.last_modified),
-          lastModify: convertToRelativeTime(dataStream.last_modified)
+          lastModified: formatDateToDayMonthYearHour(dataStream.last_modified)
         }
       }) || []
     )
@@ -332,18 +343,28 @@ export const DataStreamAdapter = {
     return parsedPayload
   },
   transformLoadDataStream(data) {
-    const [payload, workloads] = data
+    const [payload, workloads, templateData] = data
 
     const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
     const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')
     const templateId = payload.transform?.find((item) => item.type === 'render_template')
     const endpointOutput = payload.outputs[0]
 
+    let formattedDataSet = ''
+    if (templateData?.dataSet) {
+      try {
+        const dataSetJSON = JSON.parse(templateData.dataSet)
+        formattedDataSet = JSON.stringify(dataSetJSON, null, '\t')
+      } catch {
+        formattedDataSet = templateData.dataSet
+      }
+    }
+
     return {
       id: payload.id,
       name: payload.name,
       template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
-      dataSet: payload?.data_set,
+      dataSet: formattedDataSet,
       dataSource: dataSourceInput?.attributes?.data_source,
       domains: workloads,
       domainOption: samplingTransform ? '1' : '0',
