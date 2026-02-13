@@ -171,6 +171,8 @@
   }
 
   onMounted(() => {
-    initializeForm()
+    if (!props.isEdit) {
+      initializeForm()
+    }
   })
 </script>

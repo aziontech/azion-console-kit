@@ -1,17 +1,17 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { useRoute } from 'vue-router'
 
   // Import the components
-  import FormFieldsDataStream from './FormFields/FormFieldsDataStream'
-  import SamplingDialog from './Dialog/SamplingDialog'
+  import FormFieldsDataStream from '@/views/DataStream/FormFields/FormFieldsDataStream'
+  import SamplingDialog from '@/views/DataStream/Dialog/SamplingDialog'
+  import { validationSchema } from '@/views/DataStream/FormFields/composables/validation'
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
-  import { validationSchema } from './FormFields/composables/validation'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   const props = defineProps({
@@ -24,17 +24,20 @@
   const validation = validationSchema(true)
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
-  const streamName = ref('Edit Stream')
+  const store = useAccountStore()
+
+  const displaySamplingDialog = ref(false)
+  const streamName = computed(() => cachedDataStream.value?.name || 'Edit Stream')
+  const cachedDataStream = computed(() =>
+    dataStreamService.getDataStreamFromCache(route.params?.id)
+  )
+
+  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const setStreamName = (dataStream) => {
-    streamName.value = dataStream.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, dataStream.name)
   }
 
-  const store = useAccountStore()
-  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
-
-  const displaySamplingDialog = ref(false)
   const formSubmit = (onSubmit, values, formValid) => {
     if (!values.hasSampling) {
       onSubmit()
@@ -47,6 +50,12 @@
       displaySamplingDialog.value = true
     }
   }
+
+  watch(cachedDataStream, () => {
+    if (cachedDataStream.value?.name) {
+      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedDataStream.value?.name)
+    }
+  })
 </script>
 
 <template>
@@ -62,6 +71,7 @@
         :editService="dataStreamService.editDataStreamService"
         :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
+        :initialValues="cachedDataStream"
         :schema="validation"
         @loaded-service-object="setStreamName"
       >
