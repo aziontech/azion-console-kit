@@ -115,6 +115,27 @@ export class NetworkListsService extends BaseService {
 
     return 'Network list successfully deleted.'
   }
+
+  getNetworkListFromCache = (id) => {
+    if (!id) return undefined
+
+    const listTypeMap = {
+      'IP/CIDR': 'ip_cidr',
+      ASN: 'asn',
+      Countries: 'countries'
+    }
+
+    return super.getFromCache({
+      queryKey: queryKeys.networkLists.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        networkListType: listTypeMap[item.listType] || item.listType
+      })
+    })
+  }
 }
 
 export const networkListsService = new NetworkListsService()
