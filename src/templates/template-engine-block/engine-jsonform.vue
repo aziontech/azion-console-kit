@@ -41,6 +41,29 @@
 
   const formData = ref({})
   const errors = ref([])
+
+  const hasIntegrations = computed(() => {
+    const githubIntegration = props.schema.properties.platform_feature__vcs_integration__uuid
+    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
+    return hasGithubIntegration
+  })
+
+  const formSchema = computed(() => {
+    const schema = { ...props.schema }
+    schema.properties = parsePropertiesSchema(schema.properties)
+    return schema
+  })
+
+  const hasIntegrationsList = computed(() => {
+    return listOfIntegrations.value?.length > 0
+  })
+
+  const isVcsRequired = computed(() => {
+    if (!hasIntegrations.value) return false
+    const requiredFields = props.schema.required || []
+    return requiredFields.includes(vcsIntegrationFieldName.value)
+  })
+
   const customRenderers = [
     {
       tester: InputTextControlTester,
@@ -70,18 +93,10 @@
     errors.value = event.errors
   }
 
-  const isVcsRequired = computed(() => {
-    if (!hasIntegrations.value) return false
-    const requiredFields = props.schema.required || []
-    return requiredFields.includes(vcsIntegrationFieldName.value)
-  })
-
   const validateForm = () => {
     const jsonFormErrors = errors.value.filter(
       (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
     )
-
-    debugger
 
     const hasJsonFormErrors = jsonFormErrors.length > 0
     const hasVcsError = isVcsRequired.value && !selectedIntegration.value
@@ -141,22 +156,6 @@
 
     return data
   }
-
-  const hasIntegrations = computed(() => {
-    const githubIntegration = props.schema.properties.platform_feature__vcs_integration__uuid
-    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
-    return hasGithubIntegration
-  })
-
-  const formSchema = computed(() => {
-    const schema = { ...props.schema }
-    schema.properties = parsePropertiesSchema(schema.properties)
-    return schema
-  })
-
-  const hasIntegrationsList = computed(() => {
-    return listOfIntegrations.value?.length > 0
-  })
 
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
