@@ -13,6 +13,7 @@ import { loadAnotherUserService } from './load-another-user-service'
 
 const listUsersService = usersService.listUsers
 const listTeamsService = teamsService.useListTeams
+const getUserFromCache = usersService.getUserFromCacheById
 export {
   listUsersService,
   createUsersService,
@@ -25,5 +26,6 @@ export {
   loadUserService,
   editAnotherUserService,
   editUsersService,
-  loadAnotherUserService
+  loadAnotherUserService,
+  getUserFromCache
 }
