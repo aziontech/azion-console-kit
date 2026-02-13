@@ -3,10 +3,11 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider']
+    paths: ['identifySignUpProvider', 'hasSession']
   },
   state: () => ({
     account: {},
+    hasSession: false,
     identifySignUpProvider: '',
     accountStatuses: {
       BLOCKED: 'BLOCKED',
@@ -138,8 +139,12 @@ export const useAccountStore = defineStore({
     setAccountData(account) {
       this.account = { ...this.account, ...account }
     },
+    setHasSession(value) {
+      this.hasSession = !!value
+    },
     resetAccount() {
       this.account = {}
+      this.hasSession = false
       this.identifySignUpProvider = ''
     },
     setSsoSignUpMethod(method) {

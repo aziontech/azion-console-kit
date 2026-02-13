@@ -7,20 +7,23 @@ export async function accountGuard({ to, accountStore, tracker }) {
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
   const isPrivateRoute = !to.meta.isPublic
 
-  if (userNotIsLoggedIn) {
-    if (isPrivateRoute) {
-      try {
-        await loadUserAndAccountInfo()
+  if (userNotIsLoggedIn && isPrivateRoute) {
+    if (!accountStore.hasSession) {
+      setRedirectRoute(to)
+      return '/login'
+    }
 
-        if (to.meta.isPublic) {
-          return '/'
-        }
-      } catch {
-        setRedirectRoute(to)
-        await tracker.reset()
-        await sessionManager.logout()
-        return '/login'
+    try {
+      await loadUserAndAccountInfo()
+
+      if (to.meta.isPublic) {
+        return '/'
       }
+    } catch {
+      setRedirectRoute(to)
+      await tracker.reset()
+      await sessionManager.logout()
+      return '/login'
     }
   }
 }
