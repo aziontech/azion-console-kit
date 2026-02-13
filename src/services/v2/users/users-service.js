@@ -24,27 +24,24 @@ const OWNER_AS_TAG = {
   }
 }
 
-const USERS_API_FIELDS = [
-  'id',
-  'first_name',
-  'last_name',
-  'email',
-  'teams',
-  'two_factor_enabled',
-  'is_active',
-  'is_account_owner',
-  'last_modified'
-]
 const parseUser = (user) => {
   return {
     id: user.id,
     firstName: user.first_name,
     lastName: user.last_name,
     email: user.email,
+    mobile: user.mobile,
+    timezone: user.timezone,
+    language: user.language,
+    countryCallCode: user.country_call_code,
     teams: user.teams.map((team) => team.name),
+    teamsIds: user.teams.map((team) => team.id),
     mfa: ACTIVE_AS_TAG[user.two_factor_enabled],
     status: ACTIVE_AS_TAG[user.is_active],
-    owner: OWNER_AS_TAG[user.is_account_owner]
+    owner: OWNER_AS_TAG[user.is_account_owner],
+    isAccountOwner: user.is_account_owner,
+    twoFactorEnabled: user.two_factor_enabled,
+    isActive: user.is_active
   }
 }
 
@@ -76,7 +73,6 @@ export class UsersService extends BaseService {
     const params = {
       page: 1,
       pageSize,
-      fields: USERS_API_FIELDS,
       ordering: '-last_modified'
     }
 
@@ -101,15 +97,30 @@ export class UsersService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'users',
-      findFn: (item) => String(item.id) === String(id),
-      mapFn: (item) => ({
-        id: item.id,
-        firstName: item.firstName,
-        lastName: item.lastName,
-        email: item.email
-      }),
-      listPath: 'body'
+      queryKey: queryKeys.users.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        const firstName = item.firstName ?? ''
+        const lastName = item.lastName ?? ''
+        const name = `${firstName} ${lastName}`.trim() || item.email || 'User'
+
+        return {
+          id: item.id,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          email: item.email,
+          name,
+          mobile: item.mobile,
+          timezone: item.timezone,
+          language: item.language ?? 'en',
+          countryCallCode: item.countryCallCode,
+          isAccountOwner: item.isAccountOwner ?? item.owner?.content === 'Yes',
+          twoFactorEnabled: item.twoFactorEnabled ?? item.mfa?.content === 'Active',
+          isActive: item.isActive ?? item.status?.content === 'Active',
+          teamsIds: item.teamsIds ?? []
+        }
+      }
     })
   }
 }

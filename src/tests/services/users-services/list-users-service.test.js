@@ -11,6 +11,10 @@ const fixtures = {
     first_name: 'John',
     last_name: 'Doe',
     email: 'johndoe@example.com',
+    mobile: '5511999999999',
+    timezone: 'America/Sao_Paulo',
+    language: 'en',
+    country_call_code: 'BR - 55',
     two_factor_enabled: true,
     is_active: true,
     teams: [],
@@ -21,6 +25,10 @@ const fixtures = {
     first_name: 'John',
     last_name: 'Doe',
     email: 'johndoe@example.com',
+    mobile: '5511888888888',
+    timezone: 'UTC',
+    language: 'en',
+    country_call_code: 'US - 1',
     two_factor_enabled: false,
     is_active: false,
     teams: [
@@ -42,6 +50,10 @@ const fixtures = {
     first_name: 'Logged',
     last_name: 'User',
     email: 'logged@example.com',
+    mobile: '5511777777777',
+    timezone: 'America/Sao_Paulo',
+    language: 'en',
+    country_call_code: 'BR - 55',
     two_factor_enabled: true,
     is_active: true,
     teams: [],
@@ -101,7 +113,12 @@ describe('UsersServices', () => {
         firstName: fixtures.userMock.first_name,
         lastName: fixtures.userMock.last_name,
         email: fixtures.userMock.email,
-        teams: fixtures.userMock.teams,
+        mobile: fixtures.userMock.mobile,
+        timezone: fixtures.userMock.timezone,
+        language: fixtures.userMock.language,
+        countryCallCode: fixtures.userMock.country_call_code,
+        teams: [],
+        teamsIds: [],
         mfa: {
           content: 'Active',
           severity: 'success'
@@ -113,14 +130,22 @@ describe('UsersServices', () => {
         owner: {
           content: 'Yes',
           severity: 'success'
-        }
+        },
+        isAccountOwner: true,
+        twoFactorEnabled: true,
+        isActive: true
       },
       {
         id: fixtures.disabledUserMock.id,
         firstName: fixtures.disabledUserMock.first_name,
         lastName: fixtures.disabledUserMock.last_name,
         email: fixtures.disabledUserMock.email,
+        mobile: fixtures.disabledUserMock.mobile,
+        timezone: fixtures.disabledUserMock.timezone,
+        language: fixtures.disabledUserMock.language,
+        countryCallCode: fixtures.disabledUserMock.country_call_code,
         teams: ['Default Team', 'Azion Team'],
+        teamsIds: [1730, 1731],
         mfa: {
           content: 'Inactive',
           severity: 'danger'
@@ -132,7 +157,10 @@ describe('UsersServices', () => {
         owner: {
           content: 'No',
           severity: 'info'
-        }
+        },
+        isAccountOwner: false,
+        twoFactorEnabled: false,
+        isActive: false
       }
     ])
   })
