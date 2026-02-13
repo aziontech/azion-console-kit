@@ -35,9 +35,13 @@ const parseUser = (user) => {
     language: user.language,
     countryCallCode: user.country_call_code,
     teams: user.teams.map((team) => team.name),
+    teamsIds: user.teams.map((team) => team.id),
     mfa: ACTIVE_AS_TAG[user.two_factor_enabled],
     status: ACTIVE_AS_TAG[user.is_active],
-    owner: OWNER_AS_TAG[user.is_account_owner]
+    owner: OWNER_AS_TAG[user.is_account_owner],
+    isAccountOwner: user.is_account_owner,
+    twoFactorEnabled: user.two_factor_enabled,
+    isActive: user.is_active
   }
 }
 
@@ -108,9 +112,13 @@ export class UsersService extends BaseService {
           email: item.email,
           name,
           mobile: item.mobile,
-          isAccountOwner: item.owner?.content === 'Yes',
-          twoFactorEnabled: item.mfa?.content === 'Active',
-          isActive: item.status?.content === 'Active'
+          timezone: item.timezone,
+          language: item.language ?? 'en',
+          countryCallCode: item.countryCallCode,
+          isAccountOwner: item.isAccountOwner ?? item.owner?.content === 'Yes',
+          twoFactorEnabled: item.twoFactorEnabled ?? item.mfa?.content === 'Active',
+          isActive: item.isActive ?? item.status?.content === 'Active',
+          teamsIds: item.teamsIds ?? []
         }
       }
     })
