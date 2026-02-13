@@ -37,6 +37,7 @@
   const oauthGithubRef = ref(null)
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
   const selectedIntegration = ref('')
+  const vcsIntegrationError = ref('')
 
   const formData = ref({})
   const errors = ref([])
@@ -69,23 +70,25 @@
     errors.value = event.errors
   }
 
+  const isVcsRequired = computed(() => {
+    if (!hasIntegrations.value) return false
+    const requiredFields = props.schema.required || []
+    return requiredFields.includes(vcsIntegrationFieldName.value)
+  })
+
   const validateForm = () => {
-    const hasJsonFormErrors = errors.value.length > 0
+    const jsonFormErrors = errors.value.filter(
+      (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
+    )
 
-    if (hasJsonFormErrors) {
-      return false
-    }
+    debugger
 
-    if (hasIntegrations.value) {
-      const vcsField = props.schema.properties[vcsIntegrationFieldName.value]
-      const isVcsRequired = vcsField?.attrs?.required || false
+    const hasJsonFormErrors = jsonFormErrors.length > 0
+    const hasVcsError = isVcsRequired.value && !selectedIntegration.value
 
-      if (isVcsRequired && !selectedIntegration.value) {
-        return false
-      }
-    }
+    vcsIntegrationError.value = hasVcsError ? 'Git Scope is required' : ''
 
-    return true
+    return !hasJsonFormErrors && !hasVcsError
   }
 
   const getFormData = () => {
@@ -254,6 +257,12 @@
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <LabelBlock
+            v-if="isVcsRequired"
+            label="Git Scope"
+            :for="vcsIntegrationFieldName"
+            :isRequired="isVcsRequired"
+          />
           <OAuthGithub
             v-show="!hasIntegrationsList"
             ref="oauthGithubRef"
@@ -264,11 +273,6 @@
             v-if="hasIntegrationsList"
             class="flex flex-col max-w-xs w-full gap-2"
           >
-            <LabelBlock
-              :for="vcsIntegrationFieldName"
-              label="Git Scope"
-              :isRequired="true"
-            />
             <Dropdown
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
@@ -296,10 +300,16 @@
                 </div>
               </template>
             </Dropdown>
-            <small class="text-xs font-normal text-color-secondary">
-              Select the scope for this template.
-            </small>
           </div>
+          <small
+            v-if="vcsIntegrationError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ vcsIntegrationError }}
+          </small>
+          <small class="text-xs font-normal text-color-secondary">
+            Select the scope for this template.
+          </small>
         </div>
       </template>
     </FormHorizontal>
