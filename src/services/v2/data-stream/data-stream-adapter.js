@@ -265,7 +265,9 @@ export const DataStreamAdapter = {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
-          dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
+          dataSource:
+            dataSourceInput.attributes.data_source ||
+            mapDataSourceName[dataSourceInput.attributes.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
