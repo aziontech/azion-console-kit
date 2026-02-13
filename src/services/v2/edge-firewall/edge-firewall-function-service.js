@@ -48,7 +48,6 @@ export class EdgeFirewallFunctionService extends BaseService {
   }
 
   #fetchEdgeFirewallFunctions = async (edgeFirewallId, params) => {
-    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
     const { body: functionInstances, count } = await this.listFunctionsService(
       edgeFirewallId,
       params
@@ -75,14 +74,14 @@ export class EdgeFirewallFunctionService extends BaseService {
 
   listEdgeFirewallFunctionsService = async (
     edgeFirewallId,
-    params = { pageSize: 10, fields: [], page: 1 }
+    { pageSize = 10, fields = [], page = 1, hasFilter = false, skipCache = false, search = '' }
   ) => {
-    const queryKey = queryKeys.firewall.functions.list(edgeFirewallId, params)
-    const skipCache = params?.hasFilter || params?.skipCache || params?.search
+    const queryKey = queryKeys.firewall.functions.list(edgeFirewallId, { pageSize, fields, page })
+    const shouldSkipCache = hasFilter || skipCache || search
     return await this.useEnsureQueryData(
       queryKey,
-      () => this.#fetchEdgeFirewallFunctions(edgeFirewallId, params),
-      { persist: false, skipCache }
+      () => this.#fetchEdgeFirewallFunctions(edgeFirewallId, { pageSize, fields, page }),
+      { persist: false, skipCache: shouldSkipCache }
     )
   }
 
@@ -91,10 +90,11 @@ export class EdgeFirewallFunctionService extends BaseService {
    * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
    * @param {string} edgeFirewallId - The edge firewall ID
    */
-  prefetchFunctionsList = async (edgeFirewallId) => {
+  prefetchFunctionsList = async (edgeFirewallId, pageSize = 10) => {
     return await this.listEdgeFirewallFunctionsService(edgeFirewallId, {
-      pageSize: 10,
+      pageSize,
       page: 1,
+      fields: [],
       ordering: 'id'
     })
   }
