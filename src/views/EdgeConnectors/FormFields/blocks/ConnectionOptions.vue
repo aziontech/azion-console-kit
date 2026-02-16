@@ -21,6 +21,7 @@
             name="connectionOptions.host"
             :value="host"
             placeholder="example.com"
+            :disabled="props.isLoadingData"
             data-testid="edge-connectors-form__connection-options__host-field"
           />
         </div>
@@ -31,6 +32,7 @@
             name="connectionOptions.path"
             :value="path"
             placeholder="/api/v1/resource"
+            :disabled="props.isLoadingData"
             data-testid="edge-connectors-form__connection-options__path-field"
           />
         </div>
@@ -43,6 +45,7 @@
               name="connectionOptions.realIpHeader"
               :value="realIpHeader"
               placeholder="X-Real-IP"
+              :disabled="props.isLoadingData"
               data-testid="edge-connectors-form__connection-options__real-ip-header-field"
             />
           </div>
@@ -53,6 +56,7 @@
               name="connectionOptions.realPortHeader"
               :value="realPortHeader"
               placeholder="X-Real-PORT"
+              :disabled="props.isLoadingData"
               data-testid="edge-connectors-form__connection-options__real-port-header-field"
             />
           </div>
@@ -65,6 +69,8 @@
             :value="followingRedirect"
             title="Following Redirect"
             :isCard="false"
+            :disabled="props.isLoadingData"
+            :readonly="props.isLoadingData"
             description="Enable this option to automatically follow HTTP redirects from the origin server."
             data-testid="edge-connectors-form__connection-options__following-redirect-field"
           />
@@ -79,6 +85,7 @@
             optionValue="value"
             :value="dnsResolution"
             appendTo="self"
+            :disabled="props.isLoadingData"
             description="Define how DNS resolution is handled for this connection."
             data-testid="edge-connectors-form__connection-options__dns-resolution-field"
           />
@@ -93,6 +100,7 @@
             optionValue="value"
             :value="transportPolicy"
             appendTo="self"
+            :disabled="props.isLoadingData"
             description="Specify the transport protocol behavior for the connection."
             data-testid="edge-connectors-form__connection-options__transport-policy-field"
           />
@@ -118,6 +126,7 @@
             optionValue="name"
             :value="bucket"
             inputId="bucket"
+            :disabled="props.isLoadingData"
           >
             <template #footer>
               <ul class="p-2">
@@ -148,6 +157,7 @@
             name="connectionOptions.prefix"
             :value="prefix"
             placeholder="images/"
+            :disabled="props.isLoadingData"
             data-testid="edge-connectors-form__connection-options__prefix-field"
           />
         </div>
@@ -165,6 +175,7 @@
             optionValue="value"
             :value="region"
             appendTo="self"
+            :disabled="props.isLoadingData"
             description="Select the region where the live stream will be ingested to optimize latency and performance."
             data-testid="edge-connectors-form__connection-options__region-field"
           />
@@ -188,8 +199,12 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
 
-  defineProps({
+  const props = defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingData: {
       type: Boolean,
       default: false
     }

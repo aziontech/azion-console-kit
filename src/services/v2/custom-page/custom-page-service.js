@@ -1,5 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { CustomPageAdapter } from './custom-page-adapter'
+import { CustomPageAdapter, transformPageItem } from './custom-page-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class CustomPageService extends BaseService {
@@ -28,7 +28,6 @@ export class CustomPageService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: ['id', 'name', 'last_editor', 'last_modified', 'active'],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.customPages.list(defaultParams), () =>
@@ -85,6 +84,32 @@ export class CustomPageService extends BaseService {
     })
 
     return this.adapter?.transformLoadCustomPage?.(data) ?? data.data
+  }
+
+  getCustomPageFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.customPages.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        const base = {
+          id: item.id,
+          name: item.name,
+          active: item.active?.content === 'Active'
+        }
+
+        if (!item.pages) {
+          return base
+        }
+
+        return {
+          ...base,
+          pages: item.pages.map(transformPageItem)
+        }
+      }
+    })
   }
 
   deleteCustomPagesService = async (id) => {

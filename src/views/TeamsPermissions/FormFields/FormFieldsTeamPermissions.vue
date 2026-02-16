@@ -2,6 +2,7 @@
 <script setup>
   import { watch, ref, onMounted } from 'vue'
   import PickList from 'primevue/picklist'
+  import Skeleton from 'primevue/skeleton'
   import { useField } from 'vee-validate'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -17,6 +18,7 @@
 
   const permissionsList = ref([])
   const formAlredyInitialized = ref(false)
+  const loadingPermissions = ref(true)
 
   const { value: name } = useField('name')
   const { value: permissions, errorMessage: errorPermissions } = useField('permissions')
@@ -26,20 +28,24 @@
   }
 
   const fetchPermissions = async () => {
-    const teamPermissions = await props.listPermissionService()
+    try {
+      const teamPermissions = await props.listPermissionService()
 
-    const alreadySelectedPermissionsIds =
-      permissions.value?.map((permission) => permission.id) || []
+      const alreadySelectedPermissionsIds =
+        permissions.value?.map((permission) => permission.id) || []
 
-    const alreadySelectedPermissions =
-      teamPermissions.filter((permission) =>
-        alreadySelectedPermissionsIds.includes(permission.id)
-      ) || []
-    const notSelectedPermissions = teamPermissions.filter(
-      (teamPermissionItem) =>
-        !isAlreadySelected({ alreadySelectedPermissionsIds, id: teamPermissionItem.id })
-    )
-    permissionsList.value = [notSelectedPermissions, alreadySelectedPermissions]
+      const alreadySelectedPermissions =
+        teamPermissions.filter((permission) =>
+          alreadySelectedPermissionsIds.includes(permission.id)
+        ) || []
+      const notSelectedPermissions = teamPermissions.filter(
+        (teamPermissionItem) =>
+          !isAlreadySelected({ alreadySelectedPermissionsIds, id: teamPermissionItem.id })
+      )
+      permissionsList.value = [notSelectedPermissions, alreadySelectedPermissions]
+    } finally {
+      loadingPermissions.value = false
+    }
   }
 
   watch(permissionsList, (newPermissions) => {
@@ -86,7 +92,40 @@
           label="Permissions"
           isRequired
         />
+        <div
+          v-if="loadingPermissions"
+          class="flex flex-col min-[1400px]:flex-row gap-4 w-full"
+          data-testid="teams-permissions-form__permissions-field__skeleton"
+        >
+          <Skeleton
+            width="100%"
+            height="20rem"
+          />
+          <div class="flex flex-row min-[1400px]:flex-col items-center justify-center gap-2">
+            <Skeleton
+              width="2rem"
+              height="2rem"
+            />
+            <Skeleton
+              width="2rem"
+              height="2rem"
+            />
+            <Skeleton
+              width="2rem"
+              height="2rem"
+            />
+            <Skeleton
+              width="2rem"
+              height="2rem"
+            />
+          </div>
+          <Skeleton
+            width="100%"
+            height="20rem"
+          />
+        </div>
         <PickList
+          v-else
           data-testid="teams-permissions-form__permissions-field__picklist"
           v-model="permissionsList"
           :pt="{
