@@ -7,7 +7,11 @@
 
   <EdgeConnectorsFormFieldsConnectorType :isDrawer="isDrawer" />
 
-  <EdgeConnectorsFormFieldsConnectionOptions :isDrawer="isDrawer" />
+  <EdgeConnectorsFormFieldsConnectionOptions
+    :isDrawer="isDrawer"
+    :isLoadingData="isLoadingData"
+    :cachedHost="cachedHost"
+  />
 
   <EdgeConnectorsFormFieldsModules
     v-if="isHttpEnabled"
@@ -66,6 +70,14 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    isLoadingData: {
+      type: Boolean,
+      default: false
+    },
+    cachedHost: {
+      type: String,
+      default: null
     }
   })
 

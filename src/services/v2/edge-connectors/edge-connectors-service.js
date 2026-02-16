@@ -104,6 +104,12 @@ export class EdgeConnectorsService extends BaseService {
   getEdgeConnectorFromCache = (id) => {
     if (!id) return undefined
 
+    const connectorTypeMap = {
+      HTTP: 'http',
+      'Object Storage': 'storage',
+      'Live Ingest': 'live_ingest'
+    }
+
     return super.getFromCache({
       queryKey: queryKeys.edgeConnectors.all,
       id,
@@ -111,7 +117,9 @@ export class EdgeConnectorsService extends BaseService {
       select: (item) => ({
         id: item.id,
         name: item.name,
-        active: item.active?.content === 'Active'
+        type: connectorTypeMap[item.type] || item.type,
+        active: item.active?.content === 'Active',
+        cachedHost: item.header !== '-' ? item.header : null
       })
     })
   }
