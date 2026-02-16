@@ -69,7 +69,7 @@
         :exportFileName="tableName || 'Table Data'"
         :empty-block="{
           title: 'No tables yet',
-          description: 'Create your first table to store your data at the edge.',
+          description: 'Create your first table to store your data.',
           createButtonLabel: 'Table'
         }"
         :not-show-empty-block="notShowEmptyBlock"
