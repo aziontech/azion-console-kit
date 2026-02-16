@@ -29,7 +29,6 @@ export class EdgeConnectorsService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeConnectors.list(defaultParams), () =>
@@ -100,6 +99,21 @@ export class EdgeConnectorsService extends BaseService {
     })
 
     return this.adapter?.transformLoadEdgeConnectors?.(data) ?? data.data
+  }
+
+  getEdgeConnectorFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.edgeConnectors.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        active: item.active?.content === 'Active'
+      })
+    })
   }
 
   deleteEdgeConnectorsService = async (id) => {
