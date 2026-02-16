@@ -130,7 +130,7 @@
 
   import Button from 'primevue/button'
   import Menu from 'primevue/menu'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
 
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import { useSqlFormatter } from './composable/useSqlFormatter'
@@ -201,11 +201,11 @@
   } = useEdgeSQL()
   const route = useRoute()
 
-  const accountStore = useAccountStore()
+  const themeStore = useThemeStore()
   const shouldNotEditRow = ref(false)
 
   const monacoTheme = computed(() => {
-    return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
+    return themeStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
   const { monacoOptions, waitForMonaco, registerSqlAutocomplete, disposeProvider } =
     useMonacoEditor()

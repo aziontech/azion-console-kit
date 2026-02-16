@@ -14,6 +14,7 @@
           placeholder="My data stream"
           data-testid="data-stream-form__general__name-field"
           :disabled="disabled"
+          :value="name"
         />
       </div>
     </template>
@@ -23,6 +24,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+
+  import { useField } from 'vee-validate'
+
+  const { value: name } = useField('name')
 
   defineProps({
     disabled: {

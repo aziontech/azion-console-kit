@@ -29,52 +29,52 @@ const INVALIDATION_MAP = [
   {
     prefix: 'Edge Application',
     group: GROUPS.EDGE_APP,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'Application',
     group: GROUPS.EDGE_APP,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'Edge Function',
     group: GROUPS.EDGE_APP_FUNCTIONS,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'ApplicationFunctionInstance',
     group: GROUPS.EDGE_APP_FUNCTIONS,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'ApplicationRuleEngineRequestPhase',
     group: GROUPS.EDGE_APP_RULES_ENGINE,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'ApplicationRuleEngineResponsePhase',
     group: GROUPS.EDGE_APP_RULES_ENGINE,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'Origin',
     group: GROUPS.EDGE_APP_ORIGINS,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'CacheSetting',
     group: GROUPS.EDGE_APP_CACHE_SETTINGS,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'DeviceGroup',
     group: GROUPS.EDGE_APP_DEVICE_GROUPS,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'ErrorResponses',
     group: GROUPS.EDGE_APP_ERROR_RESPONSES,
-    keys: [queryKeys.edgeApp.all]
+    keys: [queryKeys.application.all]
   },
   {
     prefix: 'Firewall',
@@ -94,12 +94,12 @@ const INVALIDATION_MAP = [
   {
     prefix: 'Rule Engine',
     group: null,
-    keys: [queryKeys.edgeApp.all, queryKeys.firewall.all]
+    keys: [queryKeys.application.all, queryKeys.firewall.all]
   },
   {
     prefix: 'Edge Function',
     group: null,
-    keys: [queryKeys.edgeApp.all, queryKeys.firewall.all]
+    keys: [queryKeys.application.all, queryKeys.firewall.all]
   },
   {
     prefix: 'Team',

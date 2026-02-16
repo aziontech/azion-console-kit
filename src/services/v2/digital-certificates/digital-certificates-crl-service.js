@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DigitalCertificatesCRLAdapter } from './digital-certificates-crl-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class DigitalCertificatesCRLService extends BaseService {
   constructor() {
     super()
@@ -7,7 +8,7 @@ export class DigitalCertificatesCRLService extends BaseService {
     this.baseURL = 'v4/workspace/tls/crls'
   }
 
-  listDigitalCertificatesCRL = async (params = {}) => {
+  #fetchDigitalCertificatesCRL = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -17,6 +18,47 @@ export class DigitalCertificatesCRLService extends BaseService {
     const body = this.adapter?.transformListDigitalCertificatesCRL(data.results)
 
     return { count: data.count, body }
+  }
+
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [
+        'id',
+        'name',
+        'subject_name',
+        'issuer',
+        'status',
+        'status_detail',
+        'validity',
+        'type',
+        'challenge',
+        'authority',
+        'key_algorithm',
+        'last_editor',
+        'last_modified',
+        'managed'
+      ],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.digitalCertificatesCRL.list(defaultParams), () =>
+      this.#fetchDigitalCertificatesCRL(defaultParams)
+    )
+  }
+
+  listDigitalCertificatesCRL = async (params = {}) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.digitalCertificatesCRL.list(params),
+      () => this.#fetchDigitalCertificatesCRL(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
   }
 
   listDigitalCertificatesCRLDropdown = async ({ params }) => {
@@ -40,6 +82,8 @@ export class DigitalCertificatesCRLService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificatesCRL.all })
+
     return data
   }
 
@@ -62,6 +106,8 @@ export class DigitalCertificatesCRLService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificatesCRL.all })
+
     return 'Your CRL has been updated!'
   }
 
@@ -70,6 +116,8 @@ export class DigitalCertificatesCRLService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificatesCRL.all })
 
     return 'CRL successfully deleted!'
   }

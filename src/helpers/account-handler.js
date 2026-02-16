@@ -1,6 +1,7 @@
 import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
 import { sessionManager } from '@/services/v2/base/auth/sessionManager'
+import { useAccountStore } from '@/stores/account'
 
 export class AccountHandler {
   constructor(switchAccountService, listTypeAccountService) {
@@ -44,6 +45,7 @@ export class AccountHandler {
     await sessionManager.switchAccount()
     const accountId = await this.searchAccount(clientId)
     const { firstLogin } = await this.switchAccountService(accountId)
+    useAccountStore().setHasSession(true)
     return { name: firstLogin ? 'additional-data' : 'home' }
   }
 
@@ -54,6 +56,7 @@ export class AccountHandler {
   async switchAccountAndRedirect(accountId) {
     await sessionManager.switchAccount()
     const { firstLogin } = await this.switchAccountService(accountId)
+    useAccountStore().setHasSession(true)
 
     if (firstLogin) {
       window.location = '/signup/additional-data'

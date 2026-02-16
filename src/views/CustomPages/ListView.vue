@@ -95,14 +95,7 @@
     ]
   })
 
-  const CUSTOM_PAGES_API_FIELDS = [
-    'id',
-    'name',
-    'last_editor',
-    'last_modified',
-    'active',
-    'last_modify'
-  ]
+  const CUSTOM_PAGES_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'active']
 </script>
 
 <template>

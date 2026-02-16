@@ -7,6 +7,8 @@
       :columns="props.columns"
       :loading="isLoading"
       :empty-block="emptyBlock"
+      :lazy="props.serverPagination"
+      :totalRecords="props.serverPagination ? props.totalRecords : displayDataForView.length"
       v-model:filters="filters"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
@@ -350,6 +352,8 @@
     showGridlines: { type: Boolean, default: false },
     data: { type: Array, required: true },
     columns: { type: Array, required: true },
+    serverPagination: { type: Boolean, default: false },
+    totalRecords: { type: Number, default: 0 },
     showInsertColumn: { type: Boolean, default: true },
     addButtonLabel: { type: String, default: '' },
     disabledAddButton: { type: Boolean, default: false },

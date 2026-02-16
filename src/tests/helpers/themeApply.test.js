@@ -1,8 +1,8 @@
-import { themeSelect } from '@/helpers/theme-select'
+import { themeApply } from '@/helpers/theme-apply'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const makeSut = ({ matchesSystemThemeDark }) => {
-  const sut = themeSelect
+  const sut = themeApply
 
   vi.spyOn(window, 'matchMedia').mockReturnValueOnce({
     matches: matchesSystemThemeDark
@@ -18,7 +18,7 @@ const makeSut = ({ matchesSystemThemeDark }) => {
   }
 }
 
-describe('themeSelect', () => {
+describe('themeApply', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -41,7 +41,7 @@ describe('themeSelect', () => {
 
       vi.spyOn(document, 'querySelector').mockReturnValue(rootElementMock)
 
-      sut({ HTMLElement: rootElementMock, theme: 'system' })
+      sut('system')
 
       expect(rootElementMock.className).toBe(result)
     }
@@ -74,7 +74,7 @@ describe('themeSelect', () => {
       const { sut, rootElementMock } = makeSut({
         matchesSystemThemeDark
       })
-      sut({ HTMLElement: rootElementMock, theme: selectedTheme })
+      sut(selectedTheme)
 
       expect(rootElementMock.className).toBe(result)
     }

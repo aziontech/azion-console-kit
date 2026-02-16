@@ -3,6 +3,7 @@
     :editService="edgeAppService.editEdgeApplicationService"
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
+    :initialValues="props.initialValues ?? {}"
     :schema="validationSchema"
     @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
@@ -51,6 +52,7 @@
       required: true
     },
     edgeApplication: { type: Object },
+    initialValues: { type: Object, default: () => ({}) },
     contactSalesEdgeApplicationService: {
       type: Function,
       required: true

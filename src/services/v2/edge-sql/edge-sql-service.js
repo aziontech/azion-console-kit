@@ -70,7 +70,7 @@ export class EdgeSQLService extends BaseService {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeSql.list(),
+      queryKeys.edgeSql.list(params),
       () => this.#fetchDatabasesList(params),
       {
         persist: firstPage && !skipCache,
@@ -179,10 +179,10 @@ export class EdgeSQLService extends BaseService {
     }
   }
 
-  getTableInfo = async (databaseId, tableName) => {
+  getTableInfo = async (databaseId, tableName, options = {}) => {
     const cachedSchema = getSchemaCache(databaseId, tableName)
     const needSchema = cachedSchema == null
-    const statements = this.adapter?.buildTableInfoStatements?.(tableName, needSchema)
+    const statements = this.adapter?.buildTableInfoStatements?.(tableName, needSchema, options)
 
     const { data } = await this.http.request({
       url: `${this.baseURL}/${databaseId}/query`,
@@ -203,7 +203,8 @@ export class EdgeSQLService extends BaseService {
       adapted = adaptTableInfoFromCache(cachedSchema, data, this.adapter)
     }
 
-    return { count: adapted?.rows?.length, body: adapted }
+    const count = options?.paginate ? adapted?.totalRecords : adapted?.rows?.length
+    return { count, body: adapted }
   }
 
   queryDatabase = async (databaseId, { statements }) => {

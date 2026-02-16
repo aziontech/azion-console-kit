@@ -384,7 +384,7 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="cursor-pointer"
+        class="cursor-pointer ml-[2.5px]"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
@@ -405,7 +405,7 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="cursor-pointer"
+        class="cursor-pointer ml-[2.5px]"
         :class="
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
@@ -456,7 +456,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2">
+      <div class="flex gap-3 mt-2 h-[200px]">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -481,7 +481,7 @@
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"

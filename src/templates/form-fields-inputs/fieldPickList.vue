@@ -84,11 +84,11 @@
 </template>
 
 <script setup>
+  import { ref, onMounted, onBeforeUnmount, nextTick, computed, watch } from 'vue'
+  import { watchDebounced } from '@vueuse/core'
   import PickList from 'primevue/picklist'
-  import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
   import ProgressSpinner from 'primevue/progressspinner'
   import InputText from 'primevue/inputtext'
-  import { watchDebounced } from '@vueuse/core'
   import Divider from 'primevue/divider'
   import { useToast } from 'primevue/usetoast'
 
@@ -249,13 +249,18 @@
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
-  const calculatePage = () => {
-    const sourceTotal = props.dataPick[0].length
-    const targetTotal = props.dataPick[1].length
-    const total = sourceTotal + targetTotal
-    const result = Math.ceil(total / PAGE_SIZE)
-    page.value = result > 1 ? result : 1
-  }
+
+  watch(
+    () => props.dataPick,
+    (newDataPick) => {
+      if (newDataPick && Array.isArray(newDataPick)) {
+        data.value = newDataPick
+        originalSource.value = [...(newDataPick[0] || [])]
+        originalTarget.value = [...(newDataPick[1] || [])]
+      }
+    },
+    { deep: true }
+  )
   onMounted(async () => {
     await nextTick()
     scrollElement = document.querySelector('.p-picklist-source-list')
@@ -263,19 +268,7 @@
       scrollElement.addEventListener('scroll', handleScroll)
     }
     originalSource.value = [...props.dataPick[0]]
-    const shouldFetchMoreItems = props.dataPick[0].length < 6
-    if (shouldFetchMoreItems) {
-      calculatePage()
-      const response = await props.service({
-        pageSize: PAGE_SIZE,
-        fields: 'id, name',
-        page: page.value,
-        ordering: 'name'
-      })
-      const dataPicks = [...data.value[0], ...data.value[1]]
-      addUniqueItems(dataPicks, response.results)
-      originalSource.value = [...data.value[0]]
-    }
+    originalTarget.value = [...props.dataPick[1]]
   })
   onBeforeUnmount(() => {
     if (scrollElement) {

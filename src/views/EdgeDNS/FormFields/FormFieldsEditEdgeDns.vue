@@ -34,6 +34,8 @@
     const data = await edgeDNSService.loadEdgeDNSZoneDNSSEC(DNSZone)
     if (!data) return
 
+    dnssec.value = data.enabled ?? false
+
     if (!data.enabled) return
 
     if (data.status === 'waiting') {

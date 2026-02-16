@@ -85,7 +85,9 @@
   const formSubmit = async (onSubmit, values, formValid) => {
     await onSubmit()
     if (formValid) {
-      emit('handleWafRulesUpdated', values)
+      const updatedWafRule = { ...props.waf, ...values }
+      setWafRuleName(updatedWafRule)
+      emit('handleWafRulesUpdated', updatedWafRule)
     }
   }
 </script>

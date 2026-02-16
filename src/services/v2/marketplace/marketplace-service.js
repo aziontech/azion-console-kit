@@ -129,9 +129,10 @@ export class MarketplaceService extends BaseService {
     if (!vendor || !solution) return undefined
 
     return super.getFromCache({
-      cacheKey: 'marketplace',
-      findFn: (item) => item.vendor?.slug === vendor && item.slug === solution,
-      mapFn: (item) => ({
+      queryKey: queryKeys.marketplace.all,
+      id: solution,
+      fieldName: 'slug',
+      select: (item) => ({
         id: item.id,
         name: item.name,
         slug: item.slug,

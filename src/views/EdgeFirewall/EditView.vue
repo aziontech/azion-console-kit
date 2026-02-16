@@ -17,7 +17,8 @@
   const props = defineProps({
     loadDomains: { type: Function, required: true },
     updatedRedirect: { type: String, required: true },
-    edgeFirewall: { type: Object }
+    edgeFirewall: { type: Object },
+    initialValues: { type: Object, default: () => ({}) }
   })
 
   const loadingServices = ref(false)
@@ -35,7 +36,7 @@
   const formSubmit = async (onSubmit, values, formValid) => {
     if (!formValid) return
     await onSubmit()
-    emit('updatedFirewall', values)
+    emit('updatedFirewall', { ...props.edgeFirewall, ...values })
   }
 
   const loadEdgeFirewallService = () => {
@@ -69,6 +70,7 @@
     <EditFormBlock
       :editService="edgeFirewallService.editEdgeFirewallService"
       :loadService="loadEdgeFirewallService"
+      :initialValues="props.initialValues ?? {}"
       :schema="validationSchema"
       :updatedRedirect="updatedRedirect"
       disableRedirect

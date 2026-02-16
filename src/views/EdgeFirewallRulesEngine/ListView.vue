@@ -255,7 +255,6 @@
     emptyListMessage="No rules found."
     data-testid="rules-engine-list"
     :actions="actions"
-    :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
     exportFileName="Firewall Rules Engine"
     :emptyBlock="{
       title: 'No rule has been created',

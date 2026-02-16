@@ -8,9 +8,9 @@
   import { useToast } from 'primevue/usetoast'
   import { useDataTable } from '@/composables/useDataTable'
   import { storeToRefs } from 'pinia'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
 
-  const { currentTheme } = storeToRefs(useAccountStore())
+  const { currentTheme } = storeToRefs(useThemeStore())
 
   defineOptions({ name: 'list-table-block-v2' })
 
