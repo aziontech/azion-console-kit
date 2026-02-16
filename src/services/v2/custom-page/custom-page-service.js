@@ -1,5 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { CustomPageAdapter } from './custom-page-adapter'
+import { CustomPageAdapter, transformPageItem } from './custom-page-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class CustomPageService extends BaseService {
@@ -93,11 +93,22 @@ export class CustomPageService extends BaseService {
       queryKey: queryKeys.customPages.all,
       id,
       listPath: 'body',
-      select: (item) => ({
-        id: item.id,
-        name: item.name,
-        active: item.active?.content === 'Active'
-      })
+      select: (item) => {
+        const base = {
+          id: item.id,
+          name: item.name,
+          active: item.active?.content === 'Active'
+        }
+
+        if (!item.pages) {
+          return base
+        }
+
+        return {
+          ...base,
+          pages: item.pages.map(transformPageItem)
+        }
+      }
     })
   }
 

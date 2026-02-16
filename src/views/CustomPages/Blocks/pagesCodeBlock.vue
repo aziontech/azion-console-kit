@@ -20,24 +20,9 @@
         >
           {{ errorMessage }}
         </InlineMessage>
-        <div
-          v-if="isLoadingPages"
-          class="flex flex-col gap-3 w-full"
-          data-testid="pages-code-block__skeleton"
-        >
-          <Skeleton
-            width="100%"
-            height="2.5rem"
-          />
-          <Skeleton
-            width="100%"
-            height="15rem"
-          />
-        </div>
         <ListTableBlock
           ref="listStatusCodeRef"
           isTabs
-          v-if="hasContentToList"
           :enableEditClick="false"
           :columns="statusCodeColumns"
           :editInDrawer="openEditStatusCodeDrawer"
@@ -65,7 +50,6 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@/templates/list-table-block'
@@ -77,8 +61,6 @@
 
   const listStatusCodeRef = ref(null)
   const drawerRef = ref(null)
-  const hasContentToList = computed(() => !!pagesValue.value)
-  const isLoadingPages = computed(() => pagesValue.value === undefined)
 
   const { value: pagesValue, errorMessage, handleReset } = useField('pages')
   const {
