@@ -7,7 +7,7 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export const editOriginService = async (payload) => {
   const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/origins/${payload.id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${payload.applicationId}/origins/${payload.id}`,
     method: 'PATCH',
     body: parsedPayload
   })
@@ -15,7 +15,7 @@ export const editOriginService = async (payload) => {
   const result = parseHttpResponse(httpResponse)
 
   queryClient.removeQueries({
-    queryKey: queryKeys.application.origins.all(payload.edgeApplicationId)
+    queryKey: queryKeys.application.origins.all(payload.applicationId)
   })
 
   return result
