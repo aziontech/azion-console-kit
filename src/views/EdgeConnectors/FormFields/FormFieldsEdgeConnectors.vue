@@ -10,7 +10,6 @@
   <EdgeConnectorsFormFieldsConnectionOptions
     :isDrawer="isDrawer"
     :isLoadingData="isLoadingData"
-    :cachedHost="cachedHost"
   />
 
   <EdgeConnectorsFormFieldsModules
@@ -74,10 +73,6 @@
     isLoadingData: {
       type: Boolean,
       default: false
-    },
-    cachedHost: {
-      type: String,
-      default: null
     }
   })
 

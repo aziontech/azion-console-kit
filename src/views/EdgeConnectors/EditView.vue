@@ -19,7 +19,6 @@
             :schema="validationSchema"
             :resetForm="resetForm"
             :isLoadingData="isLoadingData"
-            :cachedHost="cachedHost"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -35,7 +34,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref } from 'vue'
   import { useRoute } from 'vue-router'
   import EditFormBlock from '@/templates/edit-form-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport.vue'
@@ -49,8 +48,7 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
 
-  const cachedData = edgeConnectorsService.getEdgeConnectorFromCache(route.params?.id) ?? {}
-  const { cachedHost, ...cachedConnector } = cachedData
+  const cachedConnector = edgeConnectorsService.getEdgeConnectorFromCache(route.params?.id) ?? {}
   const connectorName = ref(cachedConnector.name || 'Edit Connector')
   const isLoadingData = ref(true)
 

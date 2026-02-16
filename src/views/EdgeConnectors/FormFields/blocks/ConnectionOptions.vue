@@ -20,7 +20,7 @@
             description="Enter the domain or IP address of the origin server (e.g., 'example.com' or '192.168.0.1')."
             name="connectionOptions.host"
             :value="host"
-            :placeholder="props.cachedHost || 'example.com'"
+            placeholder="example.com"
             :disabled="props.isLoadingData"
             data-testid="edge-connectors-form__connection-options__host-field"
           />
@@ -207,10 +207,6 @@
     isLoadingData: {
       type: Boolean,
       default: false
-    },
-    cachedHost: {
-      type: String,
-      default: null
     }
   })
 

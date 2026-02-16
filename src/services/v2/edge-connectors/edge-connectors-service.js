@@ -1,5 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { EdgeConnectorsAdapter } from './edge-connectors-adapter'
+import { EdgeConnectorsAdapter, typeBuildersLoadRequest } from './edge-connectors-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class EdgeConnectorsService extends BaseService {
   constructor() {
@@ -104,23 +104,33 @@ export class EdgeConnectorsService extends BaseService {
   getEdgeConnectorFromCache = (id) => {
     if (!id) return undefined
 
-    const connectorTypeMap = {
-      HTTP: 'http',
-      'Object Storage': 'storage',
-      'Live Ingest': 'live_ingest'
-    }
-
     return super.getFromCache({
       queryKey: queryKeys.edgeConnectors.all,
       id,
       listPath: 'body',
-      select: (item) => ({
-        id: item.id,
-        name: item.name,
-        type: connectorTypeMap[item.type] || item.type,
-        active: item.active?.content === 'Active',
-        cachedHost: item.header !== '-' ? item.header : null
-      })
+      select: (item) => {
+        const type = item.rawType
+        const builder = typeBuildersLoadRequest[type]
+
+        if (!builder || !item.attributes) {
+          return {
+            id: item.id,
+            name: item.name,
+            type,
+            active: item.active?.content === 'Active'
+          }
+        }
+
+        const attributes = builder({ attributes: item.attributes })
+
+        return {
+          id: item.id,
+          name: item.name,
+          type,
+          active: item.active?.content === 'Active',
+          ...attributes
+        }
+      }
     })
   }
 
