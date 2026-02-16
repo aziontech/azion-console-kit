@@ -116,9 +116,9 @@
   const mapTabs = ref({ ...defaultTabs })
 
   const renderTabCurrentRouter = async () => {
-    await getEdgeService()
     const { resources } = route.params
     activeTab.value = resources ? 1 : 0
+    await getEdgeService()
   }
 
   const changeRouteByClickingOnTab = (event) => {

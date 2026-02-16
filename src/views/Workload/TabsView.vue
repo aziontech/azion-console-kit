@@ -75,10 +75,11 @@
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    workload.value = await getWorkload()
-    title.value = workload.value.name
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+
+    workload.value = await getWorkload()
+    title.value = workload.value.name
   }
 
   const visibleOnSaved = ref(false)

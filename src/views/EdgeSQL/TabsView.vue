@@ -84,9 +84,9 @@
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    await getDatabase()
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+    await getDatabase()
   }
 
   watch(activeTab, (newValue, oldValue) => {
