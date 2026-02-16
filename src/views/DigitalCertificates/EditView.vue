@@ -11,6 +11,7 @@
         :editService="editServiceRender"
         :loadService="loadServiceRender"
         :schema="validationSchema"
+        :initialValues="cachedCertificate"
         updatedRedirect="list-digital-certificates"
         @loaded-service-object="setCertificateName"
         @on-edit-success="handleTrackSuccessEdit"
@@ -20,6 +21,7 @@
           <FormFieldsEditDigitalCertificates
             :clipboardWrite="props.clipboardWrite"
             :documentationService="props.documentationService"
+            :isLoading="isDetailLoading"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -50,17 +52,6 @@
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
 
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const certificateName = ref('Edit Digital Certificate')
-
-  const setCertificateName = (certificate) => {
-    certificateName.value = certificate.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, certificate.name)
-  }
-
   const props = defineProps({
     clipboardWrite: {
       type: Function,
@@ -72,7 +63,33 @@
     }
   })
 
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const route = useRoute()
+  const breadcrumbs = useBreadcrumbs()
   const { certificateTypeList } = useDigitalCertificate()
+
+  const cachedCertificate = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return digitalCertificatesCRLService.getCRLFromCache(route.params.id) ?? {}
+    }
+    return digitalCertificatesService.getCertificateFromCache(route.params.id) ?? {}
+  })
+
+  const certificateName = ref(cachedCertificate.value?.name || 'Edit Digital Certificate')
+  const isDetailLoading = ref(true)
+
+  if (cachedCertificate.value?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedCertificate.value.name)
+  }
+
+  const setCertificateName = (certificate) => {
+    certificateName.value = certificate.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, certificate.name)
+    if ('certificate' in certificate || 'csr' in certificate) {
+      isDetailLoading.value = false
+    }
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field.'),

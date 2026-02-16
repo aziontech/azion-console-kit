@@ -16,6 +16,10 @@
     documentationService: {
       type: Function,
       required: true
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -116,6 +120,7 @@
             placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
             name="certificate"
             :value="certificate"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
             data-testid="digital-certificate__certificate-field"
           />
         </div>
@@ -127,6 +132,7 @@
             name="csr"
             disabled
             :value="csr"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -168,6 +174,7 @@
             label="Certificate"
             name="certificate"
             :value="certificate"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
             data-testid="digital-certificate__certificate-field"
             placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           />
@@ -177,44 +184,15 @@
             label="Private Key"
             name="privateKey"
             :value="privateKey"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
             placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new private key in this field to update it."
           />
         </div>
       </template>
     </FormHorizontal>
-
-    <!-- CRL case -->
-    <FormHorizontal
-      v-if="isCertificateType.crl"
-      title="Update a Server Certificate"
-      description="Paste the PEM-encoded CRL in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
-    >
-      <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            required
-            :value="name"
-            placeholder="My digital certificate"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldTextArea
-            label="Certificate"
-            name="certificate"
-            :value="certificate"
-            data-testid="digital-certificate__certificate-field"
-            placeholder="-----BEGIN CRL----&#10;-----END CRL-----"
-          />
-        </div>
-      </template>
-    </FormHorizontal>
-
     <!-- Trusted case -->
     <FormHorizontal
-      v-if="isCertificateType.trustedCertificate"
+      v-else-if="isCertificateType.trustedCertificate"
       title="Update Trusted CA Certificate"
       description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
     >
@@ -235,8 +213,39 @@
             data-testid="trusted-certificates-form__certificate-field"
             name="certificate"
             :value="certificate"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
             placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
             description="Intermediate certificates are accepted."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+
+    <!-- CRL case -->
+    <FormHorizontal
+      v-else-if="isCertificateType.crl"
+      title="Update a Server Certificate"
+      description="Paste the PEM-encoded CRL in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name"
+            name="name"
+            required
+            :value="name"
+            placeholder="My digital certificate"
+            data-testid="digital-certificate__name-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            :icon="props.isLoading ? 'pi pi-spin pi-spinner' : ''"
+            data-testid="digital-certificate__certificate-field"
+            placeholder="-----BEGIN CRL----&#10;-----END CRL-----"
           />
         </div>
       </template>
