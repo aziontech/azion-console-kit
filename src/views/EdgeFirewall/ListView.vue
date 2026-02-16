@@ -13,15 +13,6 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   const tracker = inject('tracker')
-  const EDGE_FIREWALL_API_FIELDS = [
-    'id',
-    'name',
-    'debug_rules',
-    'last_editor',
-    'last_modified',
-    'last_modify',
-    'active'
-  ]
 
   defineProps({
     documentationService: {
@@ -143,7 +134,6 @@
         emptyListMessage="No Firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
-        :apiFields="EDGE_FIREWALL_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Firewalls"

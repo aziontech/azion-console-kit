@@ -120,7 +120,7 @@
                   :options="serverRoleList"
                   optionLabel="label"
                   optionValue="value"
-                  :value="addresses[addressIndex].value.serverRole"
+                  :value="addresses[addressIndex].value.serverRole || 'primary'"
                   appendTo="self"
                   description="Define the role of the server in the load balancing setup."
                   data-testid="edge-connectors-form__address-management__server-role-field"
@@ -134,7 +134,7 @@
                     :min="1"
                     :max="100"
                     :name="`addresses[${addressIndex}].weight`"
-                    :value="addresses[addressIndex].value.weight"
+                    :value="addresses[addressIndex].value.weight || 1"
                     description="Higher weights allocate more traffic to this address."
                     data-testid="edge-connectors-form__address-management__weight-field"
                   />
@@ -157,7 +157,7 @@
         </Accordion>
       </div>
 
-      <Card v-if="!isLoadBalancerEnabled">
+      <Card v-show="!isLoadBalancerEnabled">
         <template #content>
           <div class="p-5 flex flex-col gap-5">
             <div class="flex flex-col sm:max-w-sm w-full gap-2">
@@ -225,19 +225,19 @@
 </template>
 
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Accordion from 'primevue/accordion'
+  import { computed, ref } from 'vue'
+  import { useField, useFieldArray } from 'vee-validate'
   import AccordionTab from 'primevue/accordiontab'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
+  import Divider from 'primevue/divider'
+  import Card from 'primevue/card'
+  import Accordion from 'primevue/accordion'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import { useField, useFieldArray } from 'vee-validate'
-  import Divider from 'primevue/divider'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
-  import Card from 'primevue/card'
-  import { computed, watch, ref } from 'vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsAddress' })
 
@@ -248,13 +248,7 @@
     }
   })
 
-  const { fields: addresses, push: pushAddress, remove: removeAddress } = useFieldArray('addresses')
-
-  const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
-
-  const activeAccordions = ref(0)
   const maximumAddressQuantity = 15
-
   const serverRoleList = [
     { label: 'Primary', value: 'primary' },
     { label: 'Backup', value: 'backup' }
@@ -269,8 +263,16 @@
     active: true
   }
 
+  const { fields: addresses, push: pushAddress, remove: removeAddress } = useFieldArray('addresses')
+  const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
+  const activeAccordions = ref(0)
+
   const isLoadBalancerEnabled = computed(() => {
     return loadBalancer.value
+  })
+
+  const disableAddButton = computed(() => {
+    return addresses.value.length === maximumAddressQuantity || !isLoadBalancerEnabled.value
   })
 
   const addNewAddress = () => {
@@ -285,24 +287,4 @@
     if (addresses.value.length === 1) return
     removeAddress(index)
   }
-
-  const disableAddButton = computed(() => {
-    return addresses.value.length === maximumAddressQuantity || !isLoadBalancerEnabled.value
-  })
-
-  watch(loadBalancer, (newValue) => {
-    if (newValue) {
-      if (addresses.value.length === 0) {
-        addNewAddress()
-      }
-    } else {
-      if (addresses.value.length > 1) {
-        // eslint-disable-next-line id-length
-        addresses.value.forEach((_, index) => {
-          if (index === 0) return
-          removeAddressByIndex(index)
-        })
-      }
-    }
-  })
 </script>

@@ -1,4 +1,3 @@
-import * as PersonalTokensService from '@/services/personal-tokens-services'
 import * as Helpers from '@/helpers'
 import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
@@ -12,8 +11,6 @@ export const personalTokensRoutes = {
       name: 'list-personal-tokens',
       component: () => import('@views/PersonalTokens/ListView.vue'),
       props: {
-        listPersonalTokensService: PersonalTokensService.listPersonalTokens,
-        deletePersonalTokenService: PersonalTokensService.deletePersonalToken,
         documentationService: documentationAccountsProducts.personalTokens
       },
       meta: {
@@ -31,7 +28,6 @@ export const personalTokensRoutes = {
       name: 'create-personal-token',
       component: () => import('@views/PersonalTokens/CreateView.vue'),
       props: {
-        createPersonalTokenService: PersonalTokensService.createPersonalToken,
         clipboardWrite: Helpers.clipboardWrite,
         convertDateToLocalTimezone: Helpers.convertDateToLocalTimezone
       },

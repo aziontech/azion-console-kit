@@ -18,6 +18,12 @@ import { dataStreamService } from '@/services/v2/data-stream/data-stream-service
 import { wafService } from '@/services/v2/waf/waf-service'
 import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
 import { teamPermissionService } from '@/services/team-permission/team-permission-service'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
+import { usersService } from '@/services/v2/users/users-service'
+import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -65,7 +71,13 @@ const prefetchInBackground = async () => {
     dataStreamService.prefetchList(pageSize),
     wafService.prefetchList(pageSize),
     edgeSQLService.prefetchList(pageSize),
-    teamPermissionService.prefetchList(pageSize)
+    teamPermissionService.prefetchList(pageSize),
+    networkListsService.prefetchList(pageSize),
+    digitalCertificatesService.prefetchList(pageSize),
+    digitalCertificatesCRLService.prefetchList(pageSize),
+    customPageService.prefetchList(pageSize),
+    usersService.prefetchList(pageSize),
+    personalTokenService.prefetchList(pageSize)
   ])
 }
 

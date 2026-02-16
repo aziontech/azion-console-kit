@@ -112,30 +112,24 @@
     try {
       const hasCachedValues = props.initialValues && Object.keys(props.initialValues).length > 0
 
-      // If we have cached values, use resetForm to set them immediately without marking as dirty
       if (hasCachedValues) {
         resetForm({ values: props.initialValues })
         emit('loaded-service-object', props.initialValues)
       }
 
-      // Always load full data from service
       const { id } = route.params
       const loadedValues = await props.loadService({ id })
 
-      // If loadService returns empty/undefined, keep cached values
       if (!loadedValues || Object.keys(loadedValues).length === 0) {
         return
       }
 
-      // Merge: loaded values are base, cache values override (preserving cache data)
       const mergedValues = hasCachedValues
         ? { ...loadedValues, ...props.initialValues }
         : loadedValues
 
-      // Emit with full merged data
       emit('loaded-service-object', mergedValues)
 
-      // Reset form with merged values - this sets the initial state so no dirty detection
       resetForm({ values: mergedValues })
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {

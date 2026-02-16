@@ -168,6 +168,10 @@
 
   onMounted(() => {
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
+
+    if (!isCreatePage.value) {
+      edgeStorageService.prefetchCredentials(route.params.id)
+    }
   })
 </script>
 

@@ -14,6 +14,7 @@
   import * as yup from 'yup'
   import { useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
   defineOptions({ name: 'create-personal-token' })
 
@@ -21,10 +22,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    createPersonalTokenService: {
-      type: Function,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -132,7 +129,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createPersonalTokenService"
+        :createService="personalTokenService.createPersonalTokenService"
         @on-response="handleResponse"
         @on-response-fail="handleFailedResponse"
         :initialValues="initialValues"

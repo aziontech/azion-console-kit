@@ -15,8 +15,11 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   const breadcrumbs = useBreadcrumbs()
+  const tableDefinitionsStore = useTableDefinitionsStore()
+  const pageSize = tableDefinitionsStore.getNumberOfLinesPerPage || 10
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -54,6 +57,7 @@
       show: () => mapTabs.value.mainSettings === activeTab.value,
       props: () => ({
         edgeFirewall: edgeFirewall.value,
+        initialValues: edgeFirewall.value,
         loadDomains: props.listDomainsService,
         updatedRedirect: props.edgeFirewallServices.updatedRedirect,
         isTab: true
@@ -126,7 +130,7 @@
     changeTab(index)
   }
 
-  const verifyTab = ({ edgeFunctionsEnabled }) => {
+  const verifyTab = ({ edgeFunctionsEnabled } = {}) => {
     if (!edgeFunctionsEnabled) {
       delete mapTabs.value.functions
       mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
@@ -144,7 +148,9 @@
     const preloadPromises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value))
+      preloadPromises.push(
+        edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value, pageSize)
+      )
     }
 
     preloadPromises.push(
@@ -160,14 +166,23 @@
     let selectedTab = tab
     if (!selectedTab) selectedTab = 'mainSettings'
 
-    edgeFirewall.value = await loaderEdgeFirewall()
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
+
+    edgeFirewall.value = { ...edgeFirewall.value, ...(await loaderEdgeFirewall()) }
     verifyTab(edgeFirewall.value)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
     preloadTabData()
+  }
 
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
-    changeTab(activeTabIndexByRoute)
+  // --- Cache from listing ---
+
+  const cachedFirewall = edgeFirewallService.getFirewallFromCache(edgeFirewallId.value)
+
+  if (cachedFirewall?.name) {
+    edgeFirewall.value = cachedFirewall
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedFirewall.name)
   }
 
   const title = computed(() => {
@@ -175,8 +190,9 @@
   })
 
   const updatedFirewall = (firewall) => {
-    edgeFirewall.value = { ...firewall }
+    edgeFirewall.value = { ...edgeFirewall.value, ...firewall }
     verifyTab(edgeFirewall.value)
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
   }
 
   onMounted(() => {

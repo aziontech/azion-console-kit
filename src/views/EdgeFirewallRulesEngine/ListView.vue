@@ -52,15 +52,6 @@
     }
   })
 
-  const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
-    'id',
-    'name',
-    'description',
-    'last_modified',
-    'last_editor',
-    'active'
-  ]
-
   const hasContentToList = ref(true)
   const drawerRef = ref('')
   const listTableBlockRef = ref('')
@@ -243,7 +234,6 @@
     emptyListMessage="No rules found."
     data-testid="rules-engine-list"
     :actions="actions"
-    :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
     exportFileName="Firewall Rules Engine"
     :emptyBlock="{
       title: 'No rule has been created',

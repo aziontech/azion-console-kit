@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, defineModel, computed } from 'vue'
+  import { ref, onMounted, defineModel, computed, watch } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
@@ -7,12 +7,14 @@
   import PrimeButton from 'primevue/button'
 
   import { useAccountStore } from '@/stores/account'
+  import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
 
   defineOptions({ name: 'advanced-filter-system' })
   const accountStore = useAccountStore()
 
   const userUTC = accountStore.accountUtcOffset
+  const userTimezone = accountStore.accountTimezone
   const emit = defineEmits(['updatedFilter'])
 
   const props = defineProps({
@@ -74,6 +76,8 @@
   const updatedTime = () => {
     const now = new Date()
 
+    const selectedUtcOffset = filterDataRange.value?.utcOffset || userUTC
+
     if (
       typeof filterDataRange.value.labelEnd === 'string' &&
       filterDataRange.value.labelEnd.trim() === 'now'
@@ -133,11 +137,15 @@
     const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(
       filterDataRange.value.startDate,
       filterDataRange.value.endDate,
-      userUTC
+      selectedUtcOffset
     )
     filterData.value.tsRange = {
       tsRangeBegin,
       tsRangeEnd
+    }
+
+    if (filterDataRange.value?.autoRefresh) {
+      filterData.value.tsRange.autoRefresh = { ...filterDataRange.value.autoRefresh }
     }
   }
 
@@ -159,6 +167,12 @@
 
   const onDateRangeSelect = () => {
     hasPendingDateUpdate.value = true
+  }
+
+  const onAutoRefreshTick = () => {
+    if (hasPendingDateUpdate.value) return
+    updatedTime()
+    emitUpdatedFilter()
   }
 
   const onAqlDirtyChange = (isDirty) => {
@@ -185,8 +199,38 @@
   }
 
   const updatedTimeRange = (begin, end, userUTC) => {
-    const dateBegin = begin.resetUTC(userUTC).toBeholderFormat()
-    const dateEnd = end.resetUTC(userUTC).toBeholderFormat()
+    const beginDate = new Date(begin)
+    const endDate = new Date(end)
+
+    const dateBegin = createUtcDateFromUserTimezoneParts(
+      {
+        year: beginDate.getFullYear(),
+        monthIndex: beginDate.getMonth(),
+        day: beginDate.getDate(),
+        hour: beginDate.getHours(),
+        minute: beginDate.getMinutes(),
+        second: beginDate.getSeconds(),
+        millisecond: beginDate.getMilliseconds()
+      },
+      userUTC
+    )
+      .toISOString()
+      .replace(/(\..+)/, '')
+
+    const dateEnd = createUtcDateFromUserTimezoneParts(
+      {
+        year: endDate.getFullYear(),
+        monthIndex: endDate.getMonth(),
+        day: endDate.getDate(),
+        hour: endDate.getHours(),
+        minute: endDate.getMinutes(),
+        second: endDate.getSeconds(),
+        millisecond: endDate.getMilliseconds()
+      },
+      userUTC
+    )
+      .toISOString()
+      .replace(/(\..+)/, '')
 
     return {
       tsRangeBegin: dateBegin,
@@ -198,11 +242,28 @@
     filterDataRange.value = {
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
-      label: filterData.value.tsRange.label || ''
+      label: filterData.value.tsRange.label || '',
+      utcOffset: userUTC,
+      autoRefresh: filterData.value.tsRange.autoRefresh
     }
 
     hasPendingDateUpdate.value = false
   })
+
+  watch(
+    () => filterDataRange.value?.autoRefresh,
+    (autoRefresh) => {
+      if (!filterData.value?.tsRange) return
+
+      if (!autoRefresh) {
+        delete filterData.value.tsRange.autoRefresh
+        return
+      }
+
+      filterData.value.tsRange.autoRefresh = { ...autoRefresh }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
@@ -244,7 +305,10 @@
           class="max-md:w-full"
           v-model="filterDataRange"
           :maxDays="props.filterDateRangeMaxDays"
+          :defaultUtcOffset="userUTC"
+          :userTimezone="userTimezone"
           @select="onDateRangeSelect"
+          @autoRefresh="onAutoRefreshTick"
         />
         <PrimeButton
           v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"

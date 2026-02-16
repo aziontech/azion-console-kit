@@ -57,9 +57,7 @@
   const { value: language } = useField('language')
   const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
-    initialValue: ''
-  })
+  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
 
