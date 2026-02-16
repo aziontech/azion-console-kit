@@ -68,7 +68,7 @@
         @click-to-create="createTable"
         :exportFileName="tableName || 'Table Data'"
         :empty-block="{
-          title: 'No tables have been created',
+          title: 'No tables yet',
           description: 'Create your first table to store your data at the edge.',
           createButtonLabel: 'Table'
         }"

@@ -136,8 +136,8 @@
       class="mt-0"
       exportFileName="Resources"
       :empty-block="{
-        title: 'No resources have been created',
-        description: 'Click the button below to create a resource for the service to run.',
+        title: 'No resources yet',
+        description: 'Create your first resource to enable your service to run at the edge.',
         createButtonLabel: 'Resource',
         documentationService: props.documentationServiceResource
       }"

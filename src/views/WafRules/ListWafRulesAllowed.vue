@@ -254,9 +254,9 @@
     :default-ordering-field-name="'id'"
     exportFileName="WAF Rules Allowed"
     :emptyBlock="{
-      title: 'No allowed rule has been created.',
+      title: 'No allowed rules yet',
       description:
-        'Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule.',
+        'Create allowed rules, by tunning or manually, to permit specific requests and bypass WAF blocking for trusted traffic patterns.',
       createButtonLabel: 'Allowed Rule',
       documentationService: props.documentationServiceAllowed
     }"
@@ -282,7 +282,7 @@
     <template #emptyBlock>
       <EmptyResultsBlock
         title="No allowed rule has been created."
-        description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
+        description="Create allowed rules to permit specific requests and bypass WAF blocking for trusted traffic patterns."
         createButtonLabel="Allowed Rule"
         :documentationService="props.documentationServiceAllowed"
         :inTabs="true"

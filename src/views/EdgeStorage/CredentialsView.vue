@@ -150,7 +150,7 @@
       default-ordering-field-name="-last_modified"
       exportFileName="Credentials"
       :emptyBlock="{
-        title: 'No credentials found',
+        title: 'No credentials yet',
         description: 'Create a new credential to get started'
       }"
     >
