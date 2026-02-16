@@ -399,7 +399,7 @@
     try {
       domainsOptions.value.done = false
 
-      const domains = await props.listDomainsService({ wafId: wafRuleId.value })
+      const domains = await wafService.listWafDomains(wafRuleId.value)
 
       domainsOptions.value.options = domains
     } finally {
@@ -408,7 +408,7 @@
   }
 
   const handleListNetworkListDropdown = async (params) => {
-    return await networkListsService.listNetworkLists(params, true)
+    return await networkListsService.listNetworkListsDropdown(params)
   }
 
   const handleLoadNetworkListDropdown = async ({ id }) => {
