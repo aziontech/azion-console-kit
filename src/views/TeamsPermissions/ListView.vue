@@ -12,8 +12,6 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
-
   const actions = [
     {
       label: 'Delete',
@@ -108,7 +106,6 @@
         :actions="actions"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"
