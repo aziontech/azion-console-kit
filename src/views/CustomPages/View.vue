@@ -43,6 +43,7 @@
   const initialValues = ref(defaultValues)
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
+  const cachedCustomPage = customPageService.getCustomPageFromCache(route.params?.id) ?? {}
 
   defineOptions({
     name: 'custom-pages-view'
@@ -72,7 +73,11 @@
     }
   })
 
-  const labelTitleEdit = ref('Edit Custom Page')
+  const labelTitleEdit = ref(cachedCustomPage.name || 'Edit Custom Page')
+
+  if (cachedCustomPage.name && props.mode === 'edit') {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedCustomPage.name)
+  }
 
   const title = computed(() => (props.mode === 'create' ? 'Create Custom Page' : labelTitleEdit))
 
@@ -104,6 +109,7 @@
           editService: customPageService.editCustomPagesService,
           loadService: loadService,
           schema: validationSchema,
+          initialValues: cachedCustomPage,
           title: labelTitleEdit,
           updatedRedirect: props.updatedRedirect
         }

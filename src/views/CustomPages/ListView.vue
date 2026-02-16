@@ -95,7 +95,7 @@
     ]
   })
 
-  const CUSTOM_PAGES_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'active']
+
 </script>
 
 <template>
@@ -122,7 +122,6 @@
         editPagePath="/custom-pages/edit"
         :listService="customPageService.listCustomPagesService"
         :columns="getColumns"
-        :apiFields="CUSTOM_PAGES_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
