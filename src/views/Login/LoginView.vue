@@ -30,7 +30,6 @@
 
   const route = useRoute()
   const router = useRouter()
-  
 
   const props = defineProps({
     authenticationLoginService: {
@@ -58,9 +57,9 @@
   const showForgotPasswordStep = ref(false)
 
   onMounted(async () => {
-    if(useAccountStore().hasSession) {
+    if (useAccountStore().hasSession) {
       window.location.assign('/')
-      return 
+      return
     }
 
     await sessionManager.logout()
