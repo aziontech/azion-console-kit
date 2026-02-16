@@ -1,6 +1,18 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WafAdapter } from './waf-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { transformSnakeToCamel } from '@/services/v2/utils/adaptServiceDataResponse'
+
+const ALL_THREATS = [
+  'cross_site_scripting',
+  'directory_traversal',
+  'evading_tricks',
+  'file_upload',
+  'identified_attack',
+  'remote_file_inclusion',
+  'sql_injection',
+  'unwanted_access'
+]
 export class WafService extends BaseService {
   constructor() {
     super()
@@ -35,7 +47,6 @@ export class WafService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.waf.list(defaultParams), () =>
@@ -57,6 +68,36 @@ export class WafService extends BaseService {
         skipCache
       }
     )
+  }
+
+  getWafRuleFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.waf.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        const thresholds = item.engineSettings?.attributes?.thresholds || []
+        const inputMap = Object.fromEntries(
+          thresholds.map(({ threat, sensitivity }) => [threat, sensitivity])
+        )
+
+        const threatsConfiguration = ALL_THREATS.reduce((acc, threat) => {
+          const camel = transformSnakeToCamel(threat)
+          acc[camel] = threat in inputMap
+          acc[`${camel}Sensitivity`] = inputMap[threat] || 'medium'
+          return acc
+        }, {})
+
+        return {
+          id: item.id,
+          name: item.name,
+          active: item.active?.content === 'Active',
+          ...threatsConfiguration
+        }
+      }
+    })
   }
 
   createWafRule = async (payload) => {
