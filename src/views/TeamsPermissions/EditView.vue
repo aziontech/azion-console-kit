@@ -43,7 +43,8 @@
   const teamName = ref('Edit Team Permission')
   const router = useRouter()
 
-  const cachedTeamPermission = teamPermissionService.getTeamPermissionFromCache(route.params?.id) ?? {}
+  const cachedTeamPermission =
+    teamPermissionService.getTeamPermissionFromCache(route.params?.id) ?? {}
 
   const setTeamName = (team) => {
     teamName.value = team.name
