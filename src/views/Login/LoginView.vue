@@ -19,15 +19,18 @@
 
 <script setup>
   import { onMounted, ref, inject } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import SignInBlock from '@/templates/sign-in-block'
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
-  import { useRoute, useRouter } from 'vue-router'
   import { sessionManager } from '@/services/v2/base/auth'
+  import { useAccountStore } from '@/stores/account'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const route = useRoute()
   const router = useRouter()
+  
 
   const props = defineProps({
     authenticationLoginService: {
@@ -55,6 +58,11 @@
   const showForgotPasswordStep = ref(false)
 
   onMounted(async () => {
+    if(useAccountStore().hasSession) {
+      window.location.assign('/')
+      return 
+    }
+
     await sessionManager.logout()
     const { email, activated } = route.query
     const isActivatedEmail = !!email && !activated
