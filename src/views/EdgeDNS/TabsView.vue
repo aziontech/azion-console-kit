@@ -469,7 +469,8 @@
               hideLastModifiedColumn
               :emptyBlock="{
                 title: 'No records yet',
-                description: 'Create your first DNS record to control domain resolution and routing.',
+                description:
+                  'Create your first DNS record to control domain resolution and routing.',
                 createButtonLabel: 'Record',
                 createPagePath: 'records/create',
                 documentationService: documentationService,

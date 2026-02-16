@@ -237,7 +237,8 @@
     exportFileName="Firewall Rules Engine"
     :emptyBlock="{
       title: 'No rules yet',
-      description: 'Create your first firewall rule to define security modules and enforcement behavior for incoming traffic.',
+      description:
+        'Create your first firewall rule to define security modules and enforcement behavior for incoming traffic.',
       createButtonLabel: 'Rule',
       documentationService: documentationService
     }"

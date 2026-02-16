@@ -264,7 +264,8 @@
     :expandedRowGroups="['Default', 'Request', 'Response']"
     :empty-block="{
       title: 'No rules engines yet',
-      description: 'Create your first rules engine to define conditional logic for your application.',
+      description:
+        'Create your first rules engine to define conditional logic for your application.',
       documentationService: documentationService
     }"
     :pt="{

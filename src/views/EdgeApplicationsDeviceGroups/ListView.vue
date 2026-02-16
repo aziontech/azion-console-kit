@@ -153,7 +153,8 @@
     hideLastModifiedColumn
     :emptyBlock="{
       title: 'No device groups yet',
-      description: 'Create your first device group to organize and manage custom application behaviors and cache policies.',
+      description:
+        'Create your first device group to organize and manage custom application behaviors and cache policies.',
       createButtonLabel: 'Device Group',
       createPagePath: '/edge-applications/device-groups/create',
       documentationService: props.documentationService
