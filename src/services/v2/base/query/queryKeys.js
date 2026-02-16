@@ -220,7 +220,9 @@ export const queryKeys = {
   waf: {
     all: ['waf-rules'],
     list: (params) => [...queryKeys.waf.all, 'list', params],
-    detail: (id) => [...queryKeys.waf.all, 'detail', id]
+    detail: (id) => [...queryKeys.waf.all, 'detail', id],
+    allowed: (wafId, params) => [...queryKeys.waf.all, 'allowed', wafId, params],
+    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId]
   },
   edgeSql: {
     all: ['edge-sql'],
@@ -230,7 +232,8 @@ export const queryKeys = {
   networkLists: {
     all: ['network-lists'],
     list: (params) => [...queryKeys.networkLists.all, 'list', params],
-    detail: (id) => [...queryKeys.networkLists.all, 'detail', id]
+    detail: (id) => [...queryKeys.networkLists.all, 'detail', id],
+    dropdown: (params) => [...queryKeys.networkLists.all, 'dropdown', params]
   },
   digitalCertificates: {
     all: ['digital-certificates'],

@@ -116,6 +116,23 @@ export class NetworkListsService extends BaseService {
     return 'Network list successfully deleted.'
   }
 
+  listNetworkListsDropdown = async (
+    params = { page: 1, pageSize: 100, search: '', ordering: 'name' }
+  ) => {
+    return await this.useEnsureQueryData(
+      queryKeys.networkLists.dropdown(params),
+      () => this.#fetchNetworkLists(params, true),
+      { persist: true }
+    )
+  }
+
+  prefetchNetworkListsDropdown = () => {
+    const params = { pageSize: 100, page: 1, search: '', ordering: 'name' }
+    return this.usePrefetchQuery(queryKeys.networkLists.dropdown(params), () =>
+      this.#fetchNetworkLists(params, true)
+    )
+  }
+
   getNetworkListFromCache = (id) => {
     if (!id) return undefined
 

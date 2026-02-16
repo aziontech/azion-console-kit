@@ -2,6 +2,8 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { WafAdapter } from './waf-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { transformSnakeToCamel } from '@/services/v2/utils/adaptServiceDataResponse'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
 const ALL_THREATS = [
   'cross_site_scripting',
@@ -47,6 +49,7 @@ export class WafService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
+      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.waf.list(defaultParams), () =>
@@ -231,7 +234,7 @@ export class WafService extends BaseService {
     return this.adapter?.transformLoadWafRuleAllowed?.(data)
   }
 
-  listWafRulesAllowed = async (params) => {
+  #fetchWafRulesAllowed = async (params) => {
     const { data } = await this.http.request({
       url: `${this.baseURL}/${params.wafId}/exceptions`,
       method: 'GET',
@@ -239,6 +242,64 @@ export class WafService extends BaseService {
     })
 
     return this.adapter?.transformListWafRulesAllowed?.(data)
+  }
+
+  listWafRulesAllowed = async (params) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.waf.allowed(params.wafId, params),
+      () => this.#fetchWafRulesAllowed(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
+  #fetchWafDomains = async (wafId) => {
+    const { data } = await this.http.request({
+      url: `/api/v3/waf/${wafId}/domains`,
+      method: 'GET',
+      params: { page_size: 200 }
+    })
+
+    const results = Array.isArray(data.results) ? data.results : []
+    return results.map((domain) => ({
+      domain: domain.domain,
+      id: domain.id,
+      name: domain.name
+    }))
+  }
+
+  listWafDomains = async (wafId) => {
+    return await this.useEnsureQueryData(
+      queryKeys.waf.domains(wafId),
+      () => this.#fetchWafDomains(wafId),
+      { persist: true }
+    )
+  }
+
+  prefetchTabsData = (wafId) => {
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+
+    const allowedParams = {
+      wafId,
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: 'id'
+    }
+
+    this.usePrefetchQuery(queryKeys.waf.allowed(wafId, allowedParams), () =>
+      this.#fetchWafRulesAllowed(allowedParams)
+    )
+
+    this.usePrefetchQuery(queryKeys.waf.domains(wafId), () => this.#fetchWafDomains(wafId))
+
+    networkListsService.prefetchNetworkListsDropdown()
   }
 }
 
