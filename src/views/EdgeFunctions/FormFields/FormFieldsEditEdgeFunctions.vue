@@ -58,34 +58,8 @@
     return previewState.value && runtime.value !== 'azion_lua'
   })
 
-  let initialCodeValue = ''
+  const initialCodeValue = ref('')
   const initialJsonArgsValue = ref('{}')
-
-  const unwatch = watch(name, () => {
-    initialCodeValue = code.value
-    initialJsonArgsValue.value = defaultArgs.value
-
-    schemaAzionFormString.value = azionForm.value
-
-    let parsedValue
-    try {
-      parsedValue = JSON.parse(azionForm.value)
-    } catch (error) {
-      parsedValue = {}
-    }
-
-    hasFormBuilder.value = Object.keys(parsedValue).length
-    setAzionFormData(defaultArgs.value)
-    setAzionFormSchema(parsedValue)
-    setAzionFormEmptyState(parsedValue)
-
-    emit('update:name', name.value)
-    emit('update:run', runtime.value)
-
-    if (initialCodeValue) {
-      unwatch()
-    }
-  })
 
   const hasCodeError = computed(() => {
     return !!codeError.value
@@ -210,6 +184,41 @@
     azionFormValidationErrors.value = []
 
     emit('additionalErrors', azionFormValidationErrors.value)
+  }
+
+  const initializeFormData = () => {
+    if (!name.value) return
+
+    initialCodeValue.value = code.value
+    initialJsonArgsValue.value = defaultArgs.value
+
+    schemaAzionFormString.value = azionForm.value
+
+    let parsedValue
+    try {
+      parsedValue = JSON.parse(azionForm.value)
+    } catch (error) {
+      parsedValue = {}
+    }
+
+    hasFormBuilder.value = Object.keys(parsedValue).length
+    setAzionFormData(defaultArgs.value)
+    setAzionFormSchema(parsedValue)
+    setAzionFormEmptyState(parsedValue)
+
+    emit('update:name', name.value)
+    emit('update:run', runtime.value)
+  }
+
+  initializeFormData()
+
+  if (!initialCodeValue.value) {
+    const unwatch = watch(name, () => {
+      initializeFormData()
+      if (initialCodeValue.value) {
+        unwatch()
+      }
+    })
   }
 </script>
 
