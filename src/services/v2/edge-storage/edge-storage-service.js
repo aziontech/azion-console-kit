@@ -119,7 +119,8 @@ export class EdgeStorageService extends BaseService {
     file = {},
     bucketName = '',
     onProgress = null,
-    prefix = ''
+    prefix = '',
+    signal = null
   ) => {
     const config = {}
 
@@ -137,6 +138,11 @@ export class EdgeStorageService extends BaseService {
         onProgress(progress)
       }
     }
+
+    if (signal) {
+      config.signal = signal
+    }
+
     await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(prefix)}${
