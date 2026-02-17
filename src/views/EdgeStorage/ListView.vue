@@ -50,12 +50,13 @@
             <ProgressCard />
 
             <DragAndDrop
-              v-if="showDragAndDrop"
+              v-if="!shouldShowTable"
               :selectedBucket="selectedBucket"
+              :isLoading="isFilesLoading"
               @reload="handleRefresh"
             />
             <div
-              v-else
+              v-else-if="shouldShowTable"
               class="flex flex-col gap-3 items-center border-1 border-transparent justify-center w-full"
               :class="{ 'border-dashed border-[#f3652b] rounded-md pb-4': isDragOver }"
             >
@@ -193,7 +194,9 @@
     isDownloading,
     showDragAndDrop,
     folderPath,
-    isProcessing
+    isProcessing,
+    isFilesLoading,
+    hadFilesBeforeLoading
   } = useEdgeStorage()
   const { isGreaterThanMD } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
@@ -255,8 +258,21 @@
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
   })
 
+  /**
+   * Determines whether to show the table or DragAndDrop component.
+   * During loading: uses the previous state (hadFilesBeforeLoading) to avoid flicker
+   * After loading: uses the actual data state (showDragAndDrop)
+   */
+  const shouldShowTable = computed(() => {
+    if (isFilesLoading.value) {
+      return hadFilesBeforeLoading.value
+    }
+    return !showDragAndDrop.value
+  })
+
   const selectBucket = (bucket) => {
     showDragAndDrop.value = false
+    hadFilesBeforeLoading.value = false
     selectedBucket.value = bucket
     if (!route.query?.folderPath) {
       folderPath.value = ''
@@ -267,6 +283,7 @@
   }
 
   const handleBreadcrumbClick = (item) => {
+    selectedFiles.value = []
     if (item.index === 0) {
       folderPath.value = ''
     } else {
@@ -327,6 +344,7 @@
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
+      selectedFiles.value = []
       folderPath.value += item.name
       router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
       filesTableNeedRefresh.value = true
@@ -336,6 +354,7 @@
   }
 
   const goBackToBucket = async () => {
+    selectedFiles.value = []
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
     folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
@@ -371,32 +390,41 @@
 
   const listEdgeStorageBucketFiles = async () => {
     if (needFetchToAPI.value) {
-      const { files, continuation_token } = await edgeStorageService.listEdgeStorageBucketFiles(
-        selectedBucket.value.name,
-        false,
-        folderPath.value,
-        selectedBucket.value?.continuation_token
-      )
-      if (selectedBucket.value) {
-        selectedBucket.value.continuation_token = continuation_token || null
-        const filterFiles = files.map((file) => ({
-          ...file,
-          name: file.name.replace(folderPath.value, '')
-        }))
-        if (folderPath.value && !isPaginationLoading.value) {
-          filterFiles.unshift({
-            id: '..',
-            name: '..',
-            isParentNav: true,
-            isFolder: true
-          })
+      if (!isPaginationLoading.value) {
+        // Remember if bucket had files before loading to prevent UI flicker
+        hadFilesBeforeLoading.value = (selectedBucket.value?.files?.length ?? 0) > 0
+        isFilesLoading.value = true
+      }
+      try {
+        const { files, continuation_token } = await edgeStorageService.listEdgeStorageBucketFiles(
+          selectedBucket.value.name,
+          false,
+          folderPath.value,
+          selectedBucket.value?.continuation_token
+        )
+        if (selectedBucket.value) {
+          selectedBucket.value.continuation_token = continuation_token || null
+          const filterFiles = files.map((file) => ({
+            ...file,
+            name: file.name.replace(folderPath.value, '')
+          }))
+          if (folderPath.value && !isPaginationLoading.value) {
+            filterFiles.unshift({
+              id: '..',
+              name: '..',
+              isParentNav: true,
+              isFolder: true
+            })
+          }
+          if (isPaginationLoading.value) {
+            selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
+          } else {
+            selectedBucket.value.files = filterFiles
+          }
+          filesTableNeedRefresh.value = false
         }
-        if (isPaginationLoading.value) {
-          selectedBucket.value.files = [...selectedBucket.value.files, ...filterFiles]
-        } else {
-          selectedBucket.value.files = filterFiles
-        }
-        filesTableNeedRefresh.value = false
+      } finally {
+        isFilesLoading.value = false
       }
     }
 
