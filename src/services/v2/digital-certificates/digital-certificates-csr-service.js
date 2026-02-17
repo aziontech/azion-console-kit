@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { DigitalCertificatesCSRAdapter } from '@/services/v2/digital-certificates/digital-certificates-csr-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DigitalCertificatesCSRService extends BaseService {
   constructor() {
@@ -15,6 +16,8 @@ export class DigitalCertificatesCSRService extends BaseService {
       url: this.baseURL,
       body
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
 
     return data
   }

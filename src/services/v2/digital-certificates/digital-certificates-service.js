@@ -37,6 +37,8 @@ export class DigitalCertificatesService extends BaseService {
       processError: false
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
+
     if (response?.meta?.certificate) {
       return { id: response.meta.certificate }
     }
@@ -163,6 +165,32 @@ export class DigitalCertificatesService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
 
     return 'Digital certificate successfully deleted!'
+  }
+
+  getCertificateFromCache = (id) => {
+    if (!id) return undefined
+
+    const typeMap = {
+      'TLS Certificate': 'edge_certificate',
+      'Trusted CA Certificate': 'trusted_ca_certificate'
+    }
+
+    return super.getFromCache({
+      queryKey: queryKeys.digitalCertificates.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        type: typeMap[item.type] || item.type,
+        managed: item.managed,
+        authority: item.authority,
+        status: item.status?.status?.content,
+        issuer: item.issuer,
+        subjectName: item.subjectName,
+        validity: item.validity
+      })
+    })
   }
 }
 
