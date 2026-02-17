@@ -159,8 +159,8 @@
       isTabs
       exportFileName="Application Origins"
       :emptyBlock="{
-        title: 'No origins have been created',
-        description: 'Click the button below to create your first origin.'
+        title: 'No origins yet',
+        description: 'Create your first origin to define where your application retrieves content.'
       }"
     >
       <template #emptyBlockButton>

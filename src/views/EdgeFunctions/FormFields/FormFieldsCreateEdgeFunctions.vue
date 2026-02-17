@@ -450,8 +450,8 @@
         <div v-if="selectPanelValue === selectPanelOptions[1] && !hasFormBuilder">
           <EmptyResultsBlock
             class="!min-h-[496px]"
-            title="No form have been created"
-            description="Click the button below to create configure your form."
+            title="No forms yet"
+            description="Create your first form to build and configure input fields for your function."
             createButtonLabel="Form Builder"
             @click-to-create="setDefaultFormBuilder"
           >
