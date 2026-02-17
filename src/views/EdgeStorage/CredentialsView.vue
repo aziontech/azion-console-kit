@@ -151,7 +151,8 @@
       exportFileName="Credentials"
       :emptyBlock="{
         title: 'No credentials yet',
-        description: 'Create your first credential to manage bucket access through S3 protocol with specific operation permissions.'
+        description:
+          'Create your first credential to manage bucket access through S3 protocol with specific operation permissions.'
       }"
     >
       <template #emptyBlockButton>
