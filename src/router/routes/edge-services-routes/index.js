@@ -1,4 +1,3 @@
-import * as EdgeServiceServices from '@/services/edge-service-services'
 import * as EdgeServiceResourcesServices from '@/services/edge-service-resources-services'
 import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
 import * as Helpers from '@/helpers'
@@ -13,9 +12,6 @@ export const edgeServicesRoutes = {
       name: 'list-edge-services',
       component: () => import('@views/EdgeServices/ListView.vue'),
       props: {
-        listEdgeServiceServices: EdgeServiceServices.listEdgeServiceServices,
-        deleteEdgeServiceServices: EdgeServiceServices.deleteEdgeServiceServices,
-        editEdgeServiceServices: EdgeServiceServices.editEdgeServiceServices,
         documentationService: documentationDeployProducts.edgeServices
       },
       meta: {
@@ -32,9 +28,6 @@ export const edgeServicesRoutes = {
       path: 'create',
       name: 'create-edge-services',
       component: () => import('@views/EdgeServices/CreateView.vue'),
-      props: {
-        createEdgeServiceServices: EdgeServiceServices.createEdgeServiceServices
-      },
       meta: {
         title: 'Create Edge Service',
         breadCrumbs: [
@@ -54,9 +47,6 @@ export const edgeServicesRoutes = {
       name: 'edit-edge-services',
       component: () => import('@/views/EdgeServices/TabsView.vue'),
       props: {
-        loadEdgeService: EdgeServiceServices.loadEdgeServiceServices,
-        editEdgeService: EdgeServiceServices.editEdgeServiceServices,
-        listResourcesServices: EdgeServiceResourcesServices.listResourcesServices,
         deleteResourcesServices: EdgeServiceResourcesServices.deleteResourcesServices,
         editResourcesServices: EdgeServiceResourcesServices.editResourcesServices,
         createResourcesServices: EdgeServiceResourcesServices.createResourcesServices,

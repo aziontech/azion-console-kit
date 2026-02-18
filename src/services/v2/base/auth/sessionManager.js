@@ -24,6 +24,7 @@ import { customPageService } from '@/services/v2/custom-page/custom-page-service
 import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
 import { usersService } from '@/services/v2/users/users-service'
 import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
+import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -77,7 +78,8 @@ const prefetchInBackground = async () => {
     digitalCertificatesCRLService.prefetchList(pageSize),
     customPageService.prefetchList(pageSize),
     usersService.prefetchList(pageSize),
-    personalTokenService.prefetchList(pageSize)
+    personalTokenService.prefetchList(pageSize),
+    edgeServiceService.prefetchList(pageSize)
   ])
 }
 
