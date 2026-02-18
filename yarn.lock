@@ -1733,27 +1733,27 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@jsonforms/core@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/core/-/core-3.6.0.tgz#3b03db6d15899decfea4d82631083d59e275bccc"
-  integrity sha512-Qz7qJPf/yP4ybqknZ500zggIDZRJfcufu+3efp/xNWf05mpXvxN9TdfmA++BdXi5Nr4UAgjos2kFmQpZpQaCDw==
+"@jsonforms/core@3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/core/-/core-3.7.0.tgz#444fff8860342d097443e6c33374d90fc076a8cc"
+  integrity sha512-CE9viWtwi9QWLqlWLeOul1/R1GRAyOA9y6OoUpsCc0FhyR+g5p29F3k0fUExHWxL0Sf4KHcXYkfhtqfRBPS8ww==
   dependencies:
     "@types/json-schema" "^7.0.3"
     ajv "^8.6.1"
     ajv-formats "^2.1.0"
     lodash "^4.17.21"
 
-"@jsonforms/vue-vanilla@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/vue-vanilla/-/vue-vanilla-3.6.0.tgz#30ad58dfd6f50973e86579389da0d0033ca5d5bc"
-  integrity sha512-fdvCTUVSEstnj0WFsUZohflAWxBBrkcpxUvo+scBUg6q0rcqtvT27ZZHj12EHP2YWCQo0uXZMP+ZNlO/AuzGDA==
+"@jsonforms/vue-vanilla@3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/vue-vanilla/-/vue-vanilla-3.7.0.tgz#f5a0e654090c023a3f7424fa5d330e1e45532d69"
+  integrity sha512-+wCnot4j0dXHx4cZg1bC7GunVhNCn0bYYCzsy+zJGJwQmdjQ/pdaDcF6CaS7crL/rO1lrEfW+03oJNBi50YDyw==
   dependencies:
     lodash "^4.17.21"
 
-"@jsonforms/vue@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/vue/-/vue-3.6.0.tgz#8dbf0a7d92ade1f9e747b83b755f6df91e22e11d"
-  integrity sha512-KW74d2RBeGau15LseCXiSTiUZ+9nQEyxDgaHggD2iQssrGCBSMWHj2+tGw+hWRZrk4IK99j4j4PRT2mLdexJqw==
+"@jsonforms/vue@3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@jsonforms/vue/-/vue-3.7.0.tgz#2d51e912e4b0252951f42bb6380ad005c5a709ab"
+  integrity sha512-S5NXYeu6lTh2yfNmPz17TRo32dSYqAhOe8Co2mp0lmeq1ODJNBQs8SesXqBRdVMEmMK20ZW/1i7i/38J0TGjdw==
   dependencies:
     lodash "^4.17.21"
 
@@ -3075,7 +3075,17 @@ ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^8.0.0, ajv@^8.11.0, ajv@^8.17.1, ajv@^8.6.1, ajv@^8.9.0:
+ajv@^8.0.0, ajv@^8.18.0, ajv@^8.6.1:
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.18.0.tgz#8864186b6738d003eb3a933172bb3833e10cefbc"
+  integrity sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==
+  dependencies:
+    fast-deep-equal "^3.1.3"
+    fast-uri "^3.0.1"
+    json-schema-traverse "^1.0.0"
+    require-from-string "^2.0.2"
+
+ajv@^8.11.0, ajv@^8.17.1, ajv@^8.9.0:
   version "8.17.1"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.17.1.tgz#37d9a5c776af6bc92d7f4f9510eba4c0a60d11a6"
   integrity sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==
