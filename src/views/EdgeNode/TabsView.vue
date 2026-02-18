@@ -10,18 +10,12 @@
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { useToast } from 'primevue/usetoast'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'tabs-edge-node' })
 
   const props = defineProps({
-    loadEdgeNodeService: { type: Function, required: true },
-    editEdgeNodeService: { type: Function, required: true },
-    listGroupsEdgeNodeService: { type: Function, required: true },
-    listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
-    createServiceEdgeNodeService: { type: Function, required: true },
-    loadServiceEdgeNodeService: { type: Function, required: true },
-    editServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -31,9 +25,15 @@
   const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
-  const title = ref('')
-  const edgeNode = ref()
   const toast = useToast()
+
+  const cachedNode = edgeNodeService.getEdgeNodeFromCache(edgeNodeId.value) ?? {}
+  const title = ref(cachedNode.name || '')
+  const edgeNode = ref(cachedNode)
+
+  if (cachedNode.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedNode.name)
+  }
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -45,7 +45,7 @@
 
   const getEdgeNodesData = async () => {
     try {
-      return await props.loadEdgeNodeService({ id: edgeNodeId.value })
+      return await edgeNodeService.loadEdgeNodeService({ id: edgeNodeId.value })
     } catch (error) {
       toast.add({
         closable: true,
@@ -59,11 +59,22 @@
   const mapTabs = ref({ ...defaultTabs })
 
   const renderTabCurrentRouter = async () => {
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+
+    edgeNodeService.prefetchTabsData(edgeNodeId.value, pageSize)
+
     const { services } = route.params
     activeTab.value = services ? 1 : 0
-    edgeNode.value = await getEdgeNodesData()
-    title.value = edgeNode.value.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value.name)
+
+    if (!cachedNode.name) {
+      const data = await getEdgeNodesData()
+      if (data) {
+        edgeNode.value = data
+        title.value = data.name
+        breadcrumbs.update(route.meta.breadCrumbs ?? [], route, data.name)
+      }
+    }
   }
 
   const changeRouteByClickingOnTab = (event) => {
@@ -131,9 +142,7 @@
             v-if="mapTabs.main_settings === activeTab"
             @handleEdgeNodesUpdated="updateEdgeNodesValue"
             :hiddenActionBar="!activeTab"
-            :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
-            :loadEdgeNodeService="props.loadEdgeNodeService"
-            :editEdgeNodeService="props.editEdgeNodeService"
+            :initialValues="cachedNode"
             :updatedRedirect="props.updatedRedirect"
             :isTab="true"
           />
@@ -142,11 +151,11 @@
           <ListViewServices
             v-if="mapTabs.services === activeTab"
             :edgeNodeId="edgeNodeId"
-            :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
-            :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
-            :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
-            :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-            :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
+            :createServiceEdgeNodeService="edgeNodeService.createServiceEdgeNodeService"
+            :editServiceEdgeNodeService="edgeNodeService.editServiceEdgeNodeService"
+            :loadServiceEdgeNodeService="edgeNodeService.loadServiceEdgeNodeService"
+            :listServiceEdgeNodeService="edgeNodeService.listServiceEdgeNodeService"
+            :deleteServiceEdgeNodeService="edgeNodeService.deleteServiceEdgeNodeService"
             :documentationServiceServices="props.documentationServiceServices"
           />
         </TabPanel>

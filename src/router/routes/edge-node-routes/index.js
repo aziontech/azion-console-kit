@@ -1,5 +1,3 @@
-import * as EdgeNodeService from '@/services/edge-node-services'
-import * as ServiceEdgeNode from '@/services/edge-node-service-services'
 import * as Helpers from '@/helpers'
 import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
 
@@ -13,8 +11,6 @@ export const edgeNodeRoutes = {
       name: 'list-edge-node',
       component: () => import('@views/EdgeNode/ListView.vue'),
       props: {
-        listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
-        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
         documentationService: documentationDeployProducts.edgeNode
       },
       meta: {
@@ -32,14 +28,6 @@ export const edgeNodeRoutes = {
       name: 'edit-edge-node',
       component: () => import('@/views/EdgeNode/TabsView.vue'),
       props: {
-        loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
-        editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listGroupsEdgeNodeService: EdgeNodeService.listGroupsEdgeNodeService,
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
-        deleteServiceEdgeNodeService: ServiceEdgeNode.deleteServiceEdgeNodeService,
-        createServiceEdgeNodeService: ServiceEdgeNode.createServiceEdgeNodeService,
-        loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
-        editServiceEdgeNodeService: ServiceEdgeNode.editServiceEdgeNodeService,
         documentationServiceServices: Helpers.documentationCatalog.edgeServices,
         updatedRedirect: 'list-edge-node'
       },

@@ -6,21 +6,14 @@
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'list-edge-node' })
 
-  const props = defineProps({
-    listEdgeNodeService: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeNodeService: {
-      type: Function,
-      required: true
-    },
+  defineProps({
     documentationService: {
-      type: Function,
-      required: true
+      required: true,
+      type: Function
     }
   })
 
@@ -76,7 +69,7 @@
       label: 'Delete',
       title: 'edge node',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeNodeService
+      service: edgeNodeService.deleteEdgeNodeService
     },
     {
       type: 'dialog',
@@ -111,7 +104,7 @@
     </template>
     <template #content>
       <ListTableBlock
-        :listService="listEdgeNodeService"
+        :listService="edgeNodeService.listEdgeNodeService"
         :columns="getColumns"
         editPagePath="/edge-node/edit"
         @on-load-data="handleLoadData"

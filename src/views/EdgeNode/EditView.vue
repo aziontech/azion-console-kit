@@ -7,12 +7,20 @@
   import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
+
   defineOptions({ name: 'edit-edge-node' })
   const emit = defineEmits(['handleEdgeNodesUpdated'])
   const tracker = inject('tracker')
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
-  const nodeName = ref('Edit Edge Node')
+
+  const cachedNode = edgeNodeService.getEdgeNodeFromCache(route.params?.id) ?? {}
+  const nodeName = ref(cachedNode.name || 'Edit Edge Node')
+
+  if (cachedNode.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedNode.name)
+  }
 
   const setNodeName = (node) => {
     nodeName.value = node.name
@@ -21,9 +29,7 @@
 
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
-    listGroupsEdgeNodeService: { type: Function, required: true },
-    loadEdgeNodeService: { type: Function, required: true },
-    editEdgeNodeService: { type: Function, required: true },
+    initialValues: { type: Object, default: () => ({}) },
     updatedRedirect: { type: String, required: true }
   })
 
@@ -48,9 +54,10 @@
 
 <template>
   <EditFormBlock
-    :editService="props.editEdgeNodeService"
-    :loadService="props.loadEdgeNodeService"
+    :editService="edgeNodeService.editEdgeNodeService"
+    :loadService="edgeNodeService.loadEdgeNodeService"
     :updatedRedirect="props.updatedRedirect"
+    :initialValues="Object.keys(cachedNode).length ? cachedNode : props.initialValues"
     @loaded-service-object="setNodeName"
     @on-edit-success="handleTrackSuccessEdit"
     :schema="validationSchema"
@@ -61,7 +68,7 @@
         :pageTitle="nodeName"
         description="Configure general settings and Edge Services for this Edge Node."
       />
-      <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
+      <FormFieldsEdgeNode :listGroupsService="edgeNodeService.listGroupsEdgeNodeService" />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarTemplate

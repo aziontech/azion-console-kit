@@ -41,7 +41,7 @@
   import { useToast } from 'primevue/usetoast'
   import DialogAuthorize from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import * as EdgeNodeService from '@/services/edge-node-services'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'Authorize-Dialog' })
 
@@ -58,7 +58,7 @@
         severity: 'info',
         summary: 'Processing request'
       })
-      await EdgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
+      await edgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
       emit('authorizeCancel')
     } catch (error) {
       toast.add({
