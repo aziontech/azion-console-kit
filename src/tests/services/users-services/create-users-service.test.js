@@ -53,7 +53,7 @@ describe('UsersService', () => {
           last_name: fixtures.userMock.lastName,
           timezone: fixtures.userMock.timezone,
           language: fixtures.userMock.language,
-          country_call_code: '+93',
+          country_call_code: fixtures.userMock.countryCallCode,
           email: fixtures.userMock.email,
           mobile: fixtures.userMock.mobile,
           is_account_owner: fixtures.userMock.isAccountOwner,
