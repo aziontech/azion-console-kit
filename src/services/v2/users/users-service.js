@@ -123,6 +123,120 @@ export class UsersService extends BaseService {
       }
     })
   }
+
+  deleteUser = async (id) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/${id}`
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+
+    return 'User successfully deleted'
+  }
+
+  createUser = async (payload) => {
+    await this.http.request({
+      method: 'POST',
+      url: this.baseURL,
+      body: {
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        language: payload.language,
+        timezone: payload.timezone,
+        country_call_code:
+          payload.countryCallCode?.split(' - ').slice(1).join('-') || payload.countryCallCode,
+        mobile: payload.mobile?.toString(),
+        is_account_owner: payload.isAccountOwner,
+        teams_ids: payload.teamsIds,
+        two_factor_enabled: payload.twoFactorEnabled,
+        is_active: payload.isActive
+      }
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+
+    return {
+      feedback: 'Your user has been created',
+      urlToEditView: '/users'
+    }
+  }
+
+  editAnotherUser = async (payload) => {
+    await this.http.request({
+      method: 'PATCH',
+      url: `${this.baseURL}/${payload.id}`,
+      body: {
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        language: payload.language,
+        timezone: payload.timezone,
+        country_call_code:
+          payload.countryCallCode?.split(' - ').slice(1).join('-') || payload.countryCallCode,
+        mobile: payload.mobile?.toString(),
+        is_account_owner: payload.isAccountOwner,
+        teams_ids: payload.teamsIds,
+        is_active: payload.isActive,
+        two_factor_enabled: payload.twoFactorEnabled
+      }
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+
+    return 'Your user has been updated'
+  }
+
+  editUser = async (payload) => {
+    const body = {
+      first_name: payload.firstName,
+      last_name: payload.lastName,
+      email: payload.email,
+      language: payload.language,
+      timezone: payload.timezone,
+      country_call_code:
+        payload.countryCallCode?.split(' - ').slice(1).join('-') || payload.countryCallCode,
+      mobile: payload.mobile?.toString(),
+      two_factor_enabled: payload.twoFactorEnabled
+    }
+
+    if (payload.password) {
+      body.old_password = payload.oldPassword
+      body.password = payload.password
+    }
+
+    await this.http.request({
+      method: 'PATCH',
+      url: 'v4/iam/user',
+      body
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+
+    return 'Your user has been updated'
+  }
+
+  inviteTeamMember = async (payload) => {
+    const parts = payload.name.split(' ')
+    const firstName = parts[0]
+    const lastName = parts.slice(1, parts.length).join(' ')
+
+    await this.http.request({
+      method: 'POST',
+      url: this.baseURL,
+      body: {
+        first_name: firstName,
+        last_name: lastName,
+        email: payload.email,
+        teams_ids: [payload.team]
+      }
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+
+    return 'Invite sent successfully'
+  }
 }
 
 export const usersService = new UsersService()

@@ -1,7 +1,11 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { inviteYourTeamService } from '@/services/users-services'
-import * as Errors from '@/services/axios/errors'
+import { UsersService } from '@/services/v2/users/users-service'
 import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('@/stores/account', () => ({
+  useAccountStore: () => ({
+    accountData: { user_id: 999 }
+  })
+}))
 
 const fixtures = {
   guest: {
@@ -12,118 +16,57 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = inviteYourTeamService
-
-  return {
-    sut
+  const sut = new UsersService()
+  sut.http = {
+    request: vi.fn()
   }
+  sut.queryClient = {
+    removeQueries: vi.fn(),
+    getQueryCache: vi.fn(() => ({ findAll: vi.fn(() => []) })),
+    ensureQueryData: vi.fn()
+  }
+
+  return { sut }
 }
 
-describe('UsersServices', () => {
-  it('should call API with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
-    })
-    const { sut } = makeSut()
-    const version = 'v4'
-    await sut(fixtures.guest)
+describe('UsersService', () => {
+  describe('inviteTeamMember', () => {
+    it('should call API with correct params', async () => {
+      const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users`,
-      method: 'POST',
-      body: {
-        first_name: 'Jack',
-        last_name: 'Caffe',
-        email: fixtures.guest.email,
-        teams_ids: [fixtures.guest.team]
-      }
+      await sut.inviteTeamMember(fixtures.guest)
+
+      expect(sut.http.request).toHaveBeenCalledWith({
+        url: 'v4/iam/users',
+        method: 'POST',
+        body: {
+          first_name: 'Jack',
+          last_name: 'Caffe',
+          email: fixtures.guest.email,
+          teams_ids: [fixtures.guest.team]
+        }
+      })
+    })
+
+    it('should return a feedback message on successfully invited', async () => {
+      const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
+
+      const feedbackMessage = await sut.inviteTeamMember(fixtures.guest)
+
+      expect(feedbackMessage).toBe('Invite sent successfully')
+    })
+
+    it('should remove all users queries from cache after invite', async () => {
+      const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
+
+      await sut.inviteTeamMember(fixtures.guest)
+
+      expect(sut.queryClient.removeQueries).toHaveBeenCalledWith({
+        queryKey: ['users']
+      })
     })
   })
-
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
-    })
-    const { sut } = makeSut()
-
-    const feedbackMessage = await sut(fixtures.guest)
-
-    expect(feedbackMessage).toBe('Invite sent successfully')
-  })
-
-  it.each([
-    {
-      errorKey: 'first_name',
-      apiErrorMock: 'This field is required',
-      status: 400
-    },
-    {
-      errorKey: 'last_name',
-      apiErrorMock: 'This field is required',
-      status: 400
-    },
-    {
-      errorKey: 'email',
-      apiErrorMock: 'Enter a valid email address',
-      status: 400
-    },
-    {
-      errorKey: 'teams_ids',
-      apiErrorMock: 'This list should not be empty for non-owner users.',
-      status: 400
-    },
-    {
-      errorKey: 'unmapped_key',
-      apiErrorMock: 'testing unmapped key',
-      status: 400
-    }
-  ])(
-    'Should return an API error for an key $errorKey',
-    async ({ errorKey, apiErrorMock, status }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode: status,
-        body: { [errorKey]: [apiErrorMock] }
-      })
-      const { sut } = makeSut()
-
-      const feedbackMessage = sut(fixtures.guest)
-
-      expect(feedbackMessage).rejects.toThrow(apiErrorMock)
-    }
-  )
-
-  it.each([
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
-      statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
-      })
-      const { sut } = makeSut()
-
-      const response = sut(fixtures.guest)
-
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
 })
