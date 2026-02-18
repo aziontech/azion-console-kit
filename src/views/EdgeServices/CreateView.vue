@@ -7,18 +7,12 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'create-edge-service' })
-
-  const props = defineProps({
-    createEdgeServiceServices: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validateCode = (val = '') => {
     const split = val.split(/\s*\n+\s*/).filter((row) => !!row)
@@ -81,7 +75,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeServiceServices"
+        :createService="edgeServiceService.createEdgeServiceService"
         :schema="validationSchema"
         :initialValues="initialValues"
         @on-response="handleTrackSuccessCreated"

@@ -17,17 +17,6 @@
     }
   })
 
-  const EDGE_FUNCTIONS_API_FIELDS = [
-    'id',
-    'name',
-    'active',
-    'runtime',
-    'vendor',
-    'execution_environment',
-    'reference_count',
-    'last_editor',
-    'last_modified'
-  ]
   const actions = [
     {
       label: 'Delete',
@@ -196,7 +185,6 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No Functions found."
         :actions="actions"
-        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Functions"

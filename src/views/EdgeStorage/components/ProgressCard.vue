@@ -42,7 +42,7 @@
   import { computed } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { isProcessing, operationType, processStatus } = useEdgeStorage()
+  const { isProcessing, operationType, processStatus, cancelRequest } = useEdgeStorage()
 
   const showProgress = computed(() => {
     return isProcessing.value
@@ -65,6 +65,6 @@
   })
 
   const handleCancel = () => {
-    isProcessing.value = false
+    cancelRequest()
   }
 </script>

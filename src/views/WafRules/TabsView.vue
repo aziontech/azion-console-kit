@@ -32,7 +32,8 @@
   const router = useRouter()
   const activeTab = ref(0)
   const wafRuleId = ref(route.params.id)
-  const waf = ref()
+  const cachedWafRule = wafService.getWafRuleFromCache(wafRuleId.value)
+  const waf = ref(cachedWafRule)
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -100,10 +101,20 @@
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    waf.value = await getWafDat()
-    title.value = waf.value.name
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+
+    if (cachedWafRule) {
+      title.value = cachedWafRule.name
+    }
+
+    wafService.prefetchTabsData(wafRuleId.value)
+
+    const freshWafData = await getWafDat()
+    if (freshWafData) {
+      waf.value = freshWafData
+      title.value = freshWafData.name
+    }
   }
 
   const visibleOnSaved = ref(false)

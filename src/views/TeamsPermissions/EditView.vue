@@ -9,6 +9,7 @@
   import FormFieldsTeamPermissions from '@views/TeamsPermissions/FormFields/FormFieldsTeamPermissions.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { teamPermissionService } from '@/services/team-permission'
 
   const props = defineProps({
     editTeamPermissionService: {
@@ -41,6 +42,9 @@
   const breadcrumbs = useBreadcrumbs()
   const teamName = ref('Edit Team Permission')
   const router = useRouter()
+
+  const cachedTeamPermission =
+    teamPermissionService.getTeamPermissionFromCache(route.params?.id) ?? {}
 
   const setTeamName = (team) => {
     teamName.value = team.name
@@ -97,6 +101,7 @@
         :editService="props.editTeamPermissionService"
         :loadService="props.loadTeamPermissionService"
         :updatedRedirect="updatedRedirect"
+        :initialValues="cachedTeamPermission"
         :schema="validationSchema"
         @loaded-service-object="setTeamName"
         @on-edit-success="handleTrackSuccessEdit"

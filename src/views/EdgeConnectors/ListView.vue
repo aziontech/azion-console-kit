@@ -33,8 +33,6 @@
     hasContentToList.value = event
   }
 
-  const EDGE_CONNECTORS_API_FIELDS = []
-
   const csvMapper = (rowData) => {
     return {
       name: rowData.name,
@@ -134,7 +132,6 @@
         createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         data-testid="edge-connectors-list-table-block"
-        :apiFields="EDGE_CONNECTORS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :frozen-columns="['name']"
         exportFileName="Connectors"

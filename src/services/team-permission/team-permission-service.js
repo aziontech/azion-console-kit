@@ -47,8 +47,7 @@ class TeamPermissionService extends BaseService {
     const defaultParams = {
       ordering: 'name',
       page: 1,
-      pageSize,
-      fields: ['id', 'name', 'permissions', 'is_active']
+      pageSize
     }
     return this.usePrefetchQuery(queryKeys.teamPermission.list(defaultParams), () =>
       this.#fetchTeamPermissionList(defaultParams)
@@ -67,6 +66,21 @@ class TeamPermissionService extends BaseService {
         skipCache
       }
     )
+  }
+
+  getTeamPermissionFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.teamPermission.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        isActive: item.status?.content === 'Active'
+      })
+    })
   }
 
   invalidateCache = async () => {
