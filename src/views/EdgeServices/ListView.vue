@@ -6,25 +6,14 @@
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'list-edge-service' })
 
-  const props = defineProps({
-    listEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
-    editEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
+  defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -96,7 +85,7 @@
         body: (item, updatedTable) => ({
           data: {
             selectRow: item,
-            service: props.editEdgeServiceServices
+            service: edgeServiceService.editEdgeServiceService
           },
           onClose: (opt) => opt.data.updated && updatedTable()
         })
@@ -112,7 +101,7 @@
         body: (item, updatedTable) => ({
           data: {
             selectRow: item,
-            service: props.editEdgeServiceServices
+            service: edgeServiceService.editEdgeServiceService
           },
           onClose: (opt) => opt.data.updated && updatedTable()
         })
@@ -123,7 +112,7 @@
       label: 'Delete',
       title: 'service',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeServiceServices
+      service: edgeServiceService.deleteEdgeServiceService
     }
   ]
 
@@ -160,11 +149,10 @@
     </template>
     <template #content>
       <ListTableBlock
-        :listService="listEdgeServiceServices"
+        :listService="edgeServiceService.listEdgeServiceService"
         :columns="getColumns"
         createPagePath="edge-services/create"
         editPagePath="/edge-services/edit"
-        @on-load-data="handleLoadData"
         :actions="actions"
         emptyListMessage="No services found."
         @on-before-go-to-add-page="handleTrackEventGoToCreate"

@@ -1,5 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { EdgeFunctionsAdapter } from './edge-function-adapter'
+import { EdgeFunctionsAdapter, transformEdgeFunctionItem } from './edge-function-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeFunctionService extends BaseService {
@@ -96,17 +96,6 @@ export class EdgeFunctionService extends BaseService {
     params = {
       page: 1,
       pageSize: 10,
-      fields: [
-        'id',
-        'name',
-        'active',
-        'runtime',
-        'vendor',
-        'execution_environment',
-        'reference_count',
-        'last_editor',
-        'last_modified'
-      ],
       ordering: '-last_modified'
     }
   ) => {
@@ -130,17 +119,7 @@ export class EdgeFunctionService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: [
-        'id',
-        'name',
-        'active',
-        'runtime',
-        'vendor',
-        'execution_environment',
-        'reference_count',
-        'last_editor',
-        'last_modified'
-      ],
+      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeFunction.list(defaultParams), () =>
@@ -152,17 +131,6 @@ export class EdgeFunctionService extends BaseService {
     params = {
       page: 1,
       pageSize: 10,
-      fields: [
-        'id',
-        'name',
-        'active',
-        'runtime',
-        'vendor',
-        'execution_environment',
-        'reference_count',
-        'last_editor',
-        'last_modified'
-      ],
       ordering: '-last_modified'
     }
   ) => {
@@ -177,6 +145,27 @@ export class EdgeFunctionService extends BaseService {
         skipCache
       }
     )
+  }
+
+  getEdgeFunctionFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.edgeFunction.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        if (!item.rawData) {
+          return {
+            id: item.id,
+            name: item.name?.text || item.name,
+            active: item.status?.content === 'Active'
+          }
+        }
+
+        return transformEdgeFunctionItem(item.rawData)
+      }
+    })
   }
 
   loadEdgeFunctionService = async ({ id }) => {

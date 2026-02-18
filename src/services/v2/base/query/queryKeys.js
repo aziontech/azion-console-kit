@@ -258,5 +258,19 @@ export const queryKeys = {
   personalToken: {
     all: ['personal-tokens'],
     list: (params) => [...queryKeys.personalToken.all, 'list', params]
+  },
+  edgeService: {
+    all: ['edge-services'],
+    list: (params) => [...queryKeys.edgeService.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeService.all, 'detail', id],
+    resources: {
+      all: (parentId) => [...queryKeys.edgeService.detail(parentId), 'resources'],
+      list: (parentId, params) => [
+        ...queryKeys.edgeService.detail(parentId),
+        'resources',
+        'list',
+        params
+      ]
+    }
   }
 }
