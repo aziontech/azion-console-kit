@@ -35,9 +35,9 @@
   "dependencies": {
     "@analytics/segment": "^2.1.0",
     "@guolao/vue-monaco-editor": "^1.6.0",
-    "@jsonforms/core": "3.6.0",
-    "@jsonforms/vue": "3.6.0",
-    "@jsonforms/vue-vanilla": "3.6.0",
+    "@jsonforms/core": "3.7.0",
+    "@jsonforms/vue": "3.7.0",
+    "@jsonforms/vue-vanilla": "3.7.0",
     "@mdi/font": "^7.4.47",
     "@sentry/vite-plugin": "^4.3.0",
     "@sentry/vue": "^10.27.0",
@@ -129,7 +129,9 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "d3-color": "^3.1.0",
-    "axios": "^1.13.5"
+    "axios": "^1.13.5",
+    "@jsonforms/core/ajv": "^8.18.0",
+    "@jsonforms/core/ajv-formats/ajv": "^8.18.0"
   },
   "engines": {
     "node": ">=22.18.0",
