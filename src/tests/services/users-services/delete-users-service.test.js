@@ -1,5 +1,5 @@
 import { UsersService } from '@/services/v2/users/users-service'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/stores/account', () => ({
   useAccountStore: () => ({
