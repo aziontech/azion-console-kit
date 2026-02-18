@@ -416,19 +416,11 @@ function displayLegend(chartData) {
  */
 function getMousePosition(c3Instance, hoveredElement) {
   if (c3Instance.d3 && c3Instance.svg) {
-    try {
-      return c3Instance.d3.mouse(c3Instance.svg.node())
-    } catch {
-      /* d3.mouse on SVG failed, try next method */
-    }
+    return c3Instance.d3.mouse(c3Instance.svg.node())
   }
 
   if (c3Instance.d3) {
-    try {
-      return c3Instance.d3.mouse(hoveredElement)
-    } catch {
-      /* d3.mouse on element failed, try next method */
-    }
+    return c3Instance.d3.mouse(hoveredElement)
   }
 
   const svgBounds = c3Instance.svg?.node()?.getBoundingClientRect()
