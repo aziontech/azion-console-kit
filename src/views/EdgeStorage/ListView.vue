@@ -267,18 +267,13 @@
   }
 
   const handleBreadcrumbClick = (item) => {
-    if (item.index === 0) {
-      folderPath.value = ''
-    } else {
+    let newPath = ''
+    if (item.index !== 0) {
       const folders = folderPath.value.split('/').filter((folder) => folder.trim() !== '')
       const pathToFolder = folders.slice(0, item.index).join('/')
-      folderPath.value = `${pathToFolder}/`
+      newPath = `${pathToFolder}/`
     }
-    selectedBucket.value.continuation_token = null
-    currentPage.value = 1
-    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    filesTableNeedRefresh.value = true
-    listServiceFilesRef.value?.reload()
+    router.replace({ query: newPath ? { folderPath: newPath } : {} })
   }
   const handleCreateBucketTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -323,27 +318,20 @@
     input.click()
   }
 
-  const handleEditFolder = async (item) => {
+  const handleEditFolder = (item) => {
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
-      folderPath.value += item.name
-      router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-      filesTableNeedRefresh.value = true
-      await listServiceFilesRef.value?.reload()
-      currentPage.value = 1
+      const newPath = folderPath.value + item.name
+      router.replace({ query: newPath ? { folderPath: newPath } : {} })
     }
   }
 
-  const goBackToBucket = async () => {
+  const goBackToBucket = () => {
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
-    folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
-    selectedBucket.value.continuation_token = null
-    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    filesTableNeedRefresh.value = true
-    await listServiceFilesRef.value?.reload()
-    currentPage.value = 1
+    const newPath = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    router.replace({ query: newPath ? { folderPath: newPath } : {} })
   }
   const handleMultipleDelete = () => {
     Promise.resolve().then(async () => {
@@ -471,13 +459,7 @@
         return
       }
       const newPath = folderPath.value + folderName + '/'
-      folderPath.value = newPath
       router.replace({ query: { folderPath: newPath } })
-      if (!isPaginationLoading.value) {
-        currentPage.value = 1
-      }
-      filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
     }
     isCreatingNewFolder.value = false
     newFolderName.value = ''
@@ -494,11 +476,21 @@
     if (!newId) {
       selectBucket(null)
     } else {
-      const bucket = buckets.value.find((bucket) => bucket.name === newId)
-      selectBucket(bucket)
-
-      if (route.query?.folderPath) {
-        folderPath.value = route.query.folderPath
+      if (selectedBucket.value?.name !== newId) {
+        const bucket = buckets.value.find((bucket) => bucket.name === newId)
+        selectBucket(bucket)
+      } else {
+        if (route.query?.folderPath) {
+          folderPath.value = route.query.folderPath
+        } else {
+          folderPath.value = ''
+        }
+        if (selectedBucket.value) {
+          selectedBucket.value.continuation_token = null
+        }
+        currentPage.value = 1
+        filesTableNeedRefresh.value = true
+        listServiceFilesRef.value?.reload()
       }
     }
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
@@ -510,13 +502,6 @@
       handleRouteChange()
     },
     { immediate: true }
-  )
-
-  watch(
-    () => route.params.id,
-    () => {
-      handleRouteChange()
-    }
   )
 
   watch(folderPath, () => {
