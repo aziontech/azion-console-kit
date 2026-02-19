@@ -10,7 +10,7 @@
 
   defineOptions({ name: 'list-edge-node' })
 
-  const props = defineProps({
+  defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -34,7 +34,7 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({
-          data: Array.isArray(columnData) ? columnData.map((g) => g.name || g) : columnData,
+          data: Array.isArray(columnData) ? columnData.map((group) => group.name || group) : columnData,
           columnAppearance: 'text-array-with-popup'
         })
     },

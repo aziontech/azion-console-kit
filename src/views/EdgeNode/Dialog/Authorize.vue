@@ -45,7 +45,7 @@
 
   defineOptions({ name: 'Authorize-Dialog' })
 
-  const emit = defineEmits(['authorizeCancel'])
+  defineEmits(['authorizeCancel'])
 
   const dialogRef = inject('dialogRef')
   const toast = useToast()
