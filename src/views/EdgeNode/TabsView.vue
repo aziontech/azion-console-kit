@@ -68,9 +68,7 @@
 
   const preloadTabData = async () => {
     if (!edgeNode.value) return
-    await Promise.allSettled([
-      edgeNodeService.prefetchEdgeNodeServicesList(edgeNodeId.value)
-    ])
+    await Promise.allSettled([edgeNodeService.prefetchEdgeNodeServicesList(edgeNodeId.value)])
   }
 
   const renderTabCurrentRouter = async () => {

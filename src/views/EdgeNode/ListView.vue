@@ -34,7 +34,9 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({
-          data: Array.isArray(columnData) ? columnData.map((group) => group.name || group) : columnData,
+          data: Array.isArray(columnData)
+            ? columnData.map((group) => group.name || group)
+            : columnData,
           columnAppearance: 'text-array-with-popup'
         })
     },
