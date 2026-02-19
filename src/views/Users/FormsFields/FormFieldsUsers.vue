@@ -84,8 +84,17 @@
   }
 
   const setCountryCallCodeForEditForm = () => {
-    return filteredCountriesMobile.value.find((country) => country.value === countryCallCode.value)
-      ?.value
+    const currentValue = countryCallCode.value
+    if (!currentValue) return undefined
+
+    const exactMatch = filteredCountriesMobile.value.find(
+      (country) => country.value === currentValue
+    )
+    if (exactMatch) return exactMatch.value
+
+    return filteredCountriesMobile.value.find(
+      (country) => country.value.endsWith(` - ${currentValue}`)
+    )?.value
   }
 
   const fetchTimezone = async () => {
@@ -167,6 +176,18 @@
   watch(isAccountOwner, (newValue) => {
     if (newValue && !isInitializing.value) {
       teamsIds.value = []
+    }
+  })
+
+  watch(countryCallCode, (newValue) => {
+    if (loadingCountry.value || !filteredCountriesMobile.value.length || !newValue) return
+
+    const hasMatch = filteredCountriesMobile.value.some((c) => c.value === newValue)
+    if (!hasMatch) {
+      const matched = setCountryCallCodeForEditForm()
+      if (matched) {
+        countryCallCode.value = matched
+      }
     }
   })
 
