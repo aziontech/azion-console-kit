@@ -152,12 +152,8 @@
       )
     }
 
-    promises.push(
-      deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
-    )
-    promises.push(
-      cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
-    )
+    promises.push(deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize))
+    promises.push(cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize))
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
       promises.push(
