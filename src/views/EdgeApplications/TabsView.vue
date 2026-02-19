@@ -28,6 +28,7 @@
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -133,42 +134,41 @@
     mapTabs.value = { ...defaultTabs.value }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeApplication.value) return
 
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    const preloadPromises = []
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
-    if (hasFlagBlockApiV4()) {
-      preloadPromises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
+    const tasks = []
 
-      preloadPromises.push(
+    if (hasFlagBlockApiV4()) {
+      tasks.push(() => props.originsServices.prefetchOriginsList(edgeApplicationId.value))
+      tasks.push(() =>
         edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(
           edgeApplicationId.value
         )
       )
     }
 
-    preloadPromises.push(
+    tasks.push(() =>
       deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
     )
-
-    preloadPromises.push(
+    tasks.push(() =>
       cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
     )
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
-      preloadPromises.push(
+      tasks.push(() =>
         edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value, pageSize)
       )
     }
 
-    preloadPromises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
+    tasks.push(() => rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
 
-    await Promise.allSettled(preloadPromises)
+    schedulePrefetch(tasks, 4)
   }
 
   const renderTabByCurrentRouter = async () => {

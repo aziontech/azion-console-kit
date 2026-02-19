@@ -12,6 +12,7 @@
   import PrimeButton from 'primevue/button'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -104,7 +105,7 @@
   const renderTabCurrentRouter = () => {
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
-    edgeServiceService.prefetchTabsData(edgeServiceId.value, pageSize)
+    schedulePrefetch([() => edgeServiceService.prefetchTabsData(edgeServiceId.value, pageSize)])
 
     const { resources } = route.params
     activeTab.value = resources ? 1 : 0
