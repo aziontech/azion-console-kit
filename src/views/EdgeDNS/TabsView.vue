@@ -197,13 +197,13 @@
     }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeDNS.value) return
 
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    await edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
+    edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
   }
 
   const renderTabCurrentRouter = async () => {
