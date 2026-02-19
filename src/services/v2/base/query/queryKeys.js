@@ -272,5 +272,19 @@ export const queryKeys = {
         params
       ]
     }
+  },
+  edgeNode: {
+    all: ['edge-nodes'],
+    list: (params) => [...queryKeys.edgeNode.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeNode.all, 'detail', id],
+    services: {
+      all: (parentId) => [...queryKeys.edgeNode.detail(parentId), 'services'],
+      list: (parentId, params) => [
+        ...queryKeys.edgeNode.detail(parentId),
+        'services',
+        'list',
+        params
+      ]
+    }
   }
 }
