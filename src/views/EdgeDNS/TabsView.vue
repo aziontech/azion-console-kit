@@ -21,7 +21,6 @@
   import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -204,7 +203,7 @@
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    schedulePrefetch([() => edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)])
+    edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
   }
 
   const renderTabCurrentRouter = async () => {

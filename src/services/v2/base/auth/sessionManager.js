@@ -80,18 +80,24 @@ const prefetchInBackground = () => {
     () => edgeServiceService.prefetchList(pageSize)
   ]
 
-  schedulePrefetch(tasks, 4)
+  schedulePrefetch(tasks)
 }
+
+let hasPrefetched = false
 
 export const sessionManager = {
   afterLogin() {
+    if (hasPrefetched) return
+    hasPrefetched = true
     prefetchInBackground()
   },
   async switchAccount() {
+    hasPrefetched = false
     await clearAllData()
     sendSwitchAccountBroadcast()
   },
   async logout() {
+    hasPrefetched = false
     await clearAllData()
   }
 }

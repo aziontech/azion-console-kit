@@ -28,7 +28,6 @@
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -142,33 +141,33 @@
 
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
-    const tasks = []
+    const promises = []
 
     if (hasFlagBlockApiV4()) {
-      tasks.push(() => props.originsServices.prefetchOriginsList(edgeApplicationId.value))
-      tasks.push(() =>
+      promises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
+      promises.push(
         edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(
           edgeApplicationId.value
         )
       )
     }
 
-    tasks.push(() =>
+    promises.push(
       deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
     )
-    tasks.push(() =>
+    promises.push(
       cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
     )
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
-      tasks.push(() =>
+      promises.push(
         edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value, pageSize)
       )
     }
 
-    tasks.push(() => rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
+    promises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
 
-    schedulePrefetch(tasks, 4)
+    Promise.allSettled(promises)
   }
 
   const renderTabByCurrentRouter = async () => {

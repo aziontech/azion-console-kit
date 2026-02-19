@@ -12,7 +12,6 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { wafService } from '@/services/v2/waf/waf-service'
-  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -109,7 +108,7 @@
       title.value = cachedWafRule.name
     }
 
-    schedulePrefetch([() => wafService.prefetchTabsData(wafRuleId.value)])
+    wafService.prefetchTabsData(wafRuleId.value)
 
     const freshWafData = await getWafDat()
     if (freshWafData) {

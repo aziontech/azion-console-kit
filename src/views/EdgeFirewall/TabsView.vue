@@ -11,7 +11,6 @@
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
-  import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -146,17 +145,17 @@
   const preloadTabData = () => {
     if (!edgeFirewall.value) return
 
-    const tasks = []
+    const promises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      tasks.push(() =>
+      promises.push(
         edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value, pageSize)
       )
     }
 
-    tasks.push(() => edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value))
+    promises.push(edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value))
 
-    schedulePrefetch(tasks)
+    Promise.allSettled(promises)
   }
 
   const renderTabCurrentRouter = async () => {
