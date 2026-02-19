@@ -25,6 +25,7 @@ import { digitalCertificatesCRLService } from '@/services/v2/digital-certificate
 import { usersService } from '@/services/v2/users/users-service'
 import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
+import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
 const STORAGE_KEY = 'tableDefinitions'
 const DEFAULT_PAGE_SIZE = 10
@@ -46,7 +47,15 @@ const getPageSize = () => {
   }
 }
 
-const prefetchInBackground = async () => {
+const scheduleIdleTask = (callback) => {
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(callback)
+  } else {
+    setTimeout(callback, 1)
+  }
+}
+
+const prefetchInBackground = () => {
   const accountStore = useAccountStore()
 
   if (!accountStore.isClientAccount) {
@@ -55,43 +64,52 @@ const prefetchInBackground = async () => {
 
   const pageSize = getPageSize()
 
-  await Promise.allSettled([
-    solutionService.prefetchList(hasFlagBlockApiV4()),
-    edgeAppService.prefetchList(pageSize),
-    workloadService.prefetchList(pageSize),
-    edgeFirewallService.prefetchList(pageSize)
-  ])
+  scheduleIdleTask(async () => {
+    await Promise.allSettled([
+      solutionService.prefetchList(hasFlagBlockApiV4()),
+      edgeAppService.prefetchList(pageSize),
+      workloadService.prefetchList(pageSize),
+      edgeFirewallService.prefetchList(pageSize)
+    ])
 
-  Promise.allSettled([
-    variablesService.prefetchList(),
-    marketplaceService.prefetchMarketplace(),
-    edgeStorageService.prefetchList(pageSize),
-    edgeDNSService.prefetchList(pageSize),
-    edgeFunctionService.prefetchList(pageSize),
-    edgeConnectorsService.prefetchList(pageSize),
-    dataStreamService.prefetchList(pageSize),
-    wafService.prefetchList(pageSize),
-    edgeSQLService.prefetchList(pageSize),
-    teamPermissionService.prefetchList(pageSize),
-    networkListsService.prefetchList(pageSize),
-    digitalCertificatesService.prefetchList(pageSize),
-    digitalCertificatesCRLService.prefetchList(pageSize),
-    customPageService.prefetchList(pageSize),
-    usersService.prefetchList(pageSize),
-    personalTokenService.prefetchList(pageSize),
-    edgeServiceService.prefetchList(pageSize)
-  ])
+    Promise.allSettled([
+      variablesService.prefetchList(),
+      marketplaceService.prefetchMarketplace(),
+      edgeStorageService.prefetchList(pageSize),
+      edgeDNSService.prefetchList(pageSize),
+      edgeFunctionService.prefetchList(pageSize),
+      edgeConnectorsService.prefetchList(pageSize),
+      dataStreamService.prefetchList(pageSize),
+      wafService.prefetchList(pageSize),
+      edgeSQLService.prefetchList(pageSize),
+      teamPermissionService.prefetchList(pageSize),
+      networkListsService.prefetchList(pageSize),
+      digitalCertificatesService.prefetchList(pageSize),
+      digitalCertificatesCRLService.prefetchList(pageSize),
+      customPageService.prefetchList(pageSize),
+      usersService.prefetchList(pageSize),
+      personalTokenService.prefetchList(pageSize),
+      edgeServiceService.prefetchList(pageSize),
+      edgeNodeService.prefetchList(pageSize)
+    ])
+  })
 }
+
+let hasPrefetched = false
 
 export const sessionManager = {
   afterLogin() {
-    queueMicrotask(prefetchInBackground)
+    if (hasPrefetched) return
+    hasPrefetched = true
+    prefetchInBackground()
   },
   async switchAccount() {
+    hasPrefetched = false
     await clearAllData()
     sendSwitchAccountBroadcast()
   },
   async logout() {
+    hasPrefetched = false
     await clearAllData()
   }
 }
