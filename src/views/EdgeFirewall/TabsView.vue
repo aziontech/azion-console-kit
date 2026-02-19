@@ -142,22 +142,20 @@
     mapTabs.value = { ...defaultTabs }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeFirewall.value) return
 
-    const preloadPromises = []
+    const promises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      preloadPromises.push(
+      promises.push(
         edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value, pageSize)
       )
     }
 
-    preloadPromises.push(
-      edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value)
-    )
+    promises.push(edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value))
 
-    await Promise.allSettled(preloadPromises)
+    Promise.allSettled(promises)
   }
 
   const renderTabCurrentRouter = async () => {
