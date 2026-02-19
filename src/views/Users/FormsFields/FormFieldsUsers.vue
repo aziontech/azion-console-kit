@@ -92,8 +92,8 @@
     )
     if (exactMatch) return exactMatch.value
 
-    return filteredCountriesMobile.value.find(
-      (country) => country.value.endsWith(` - ${currentValue}`)
+    return filteredCountriesMobile.value.find((country) =>
+      country.value.endsWith(` - ${currentValue}`)
     )?.value
   }
 
@@ -182,7 +182,7 @@
   watch(countryCallCode, (newValue) => {
     if (loadingCountry.value || !filteredCountriesMobile.value.length || !newValue) return
 
-    const hasMatch = filteredCountriesMobile.value.some((c) => c.value === newValue)
+    const hasMatch = filteredCountriesMobile.value.some((country) => country.value === newValue)
     if (!hasMatch) {
       const matched = setCountryCallCodeForEditForm()
       if (matched) {
