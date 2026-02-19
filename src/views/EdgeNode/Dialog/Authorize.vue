@@ -45,8 +45,6 @@
 
   defineOptions({ name: 'Authorize-Dialog' })
 
-  const emit = defineEmits(['authorizeCancel'])
-
   const dialogRef = inject('dialogRef')
   const toast = useToast()
   const params = dialogRef.value.data
@@ -59,7 +57,6 @@
         summary: 'Processing request'
       })
       await edgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
-      emit('authorizeCancel')
     } catch (error) {
       toast.add({
         closable: true,
