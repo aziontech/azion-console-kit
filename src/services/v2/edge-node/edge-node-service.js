@@ -61,6 +61,16 @@ export class EdgeNodeService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 200) => {
+    const params = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: 'id'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeNode.list(params), () => this.#fetchList(params))
+  }
+
   listEdgeNodeService = async (params) => {
     const firstPage = params?.page === 1
     const skipCache = params?.skipCache || params?.search || params?.hasFilter
