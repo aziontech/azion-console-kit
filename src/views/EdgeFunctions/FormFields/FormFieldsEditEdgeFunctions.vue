@@ -192,16 +192,24 @@
     initialCodeValue.value = code.value
     initialJsonArgsValue.value = defaultArgs.value
 
-    schemaAzionFormString.value = azionForm.value
+    const rawValue = azionForm.value
+
+    if (typeof rawValue === 'string') {
+      schemaAzionFormString.value = rawValue
+    }
 
     let parsedValue
     try {
-      parsedValue = JSON.parse(azionForm.value)
+      parsedValue = typeof rawValue === 'string' ? JSON.parse(rawValue) : rawValue
     } catch (error) {
       parsedValue = {}
     }
 
-    hasFormBuilder.value = Object.keys(parsedValue).length
+    if (!parsedValue || typeof parsedValue !== 'object') {
+      parsedValue = {}
+    }
+
+    hasFormBuilder.value = !!Object.keys(parsedValue).length
     setAzionFormData(defaultArgs.value)
     setAzionFormSchema(parsedValue)
     setAzionFormEmptyState(parsedValue)
@@ -220,6 +228,12 @@
       }
     })
   }
+
+  watch(azionForm, (newValue) => {
+    if (typeof newValue === 'string' && name.value) {
+      initializeFormData()
+    }
+  })
 </script>
 
 <template>

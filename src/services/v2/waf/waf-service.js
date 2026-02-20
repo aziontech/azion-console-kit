@@ -174,6 +174,8 @@ export class WafService extends BaseService {
       body: adaptedPayload
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
     return {
       feedback: 'Your waf rule allowed has been created'
     }
@@ -202,7 +204,11 @@ export class WafService extends BaseService {
       })
     })
 
-    return Promise.allSettled(requests)
+    const results = await Promise.allSettled(requests)
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
+    return results
   }
 
   deleteWafRuleAllowed = async ({ wafId, allowedId }) => {
@@ -210,6 +216,8 @@ export class WafService extends BaseService {
       url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
       method: 'DELETE'
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'WAF allowed rule successfully deleted'
   }
@@ -221,6 +229,8 @@ export class WafService extends BaseService {
       method: 'PUT',
       body: adaptedPayload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'Your waf rule allowed has been updated'
   }
