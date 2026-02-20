@@ -172,12 +172,12 @@
     let selectedTab = tab
     if (!tab) selectedTab = 'main-settings'
 
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
+
     edgeApplication.value = { ...edgeApplication.value, ...(await handleLoadEdgeApplication()) }
     isApplicationLoaded.value = true
     verifyTab(edgeApplication.value)
-
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
-    changeTab(activeTabIndexByRoute)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
     preloadTabData()
