@@ -54,8 +54,12 @@
       </div>
     </div>
     <template #footer>
-      <div class="flex justify-between items-center w-full">
-        <div class="flex flex-wrap text-xs font-normal justify-start gap-1">
+      <div
+        class="flex justify-between items-center w-full flex-col-reverse sm:flex-row gap-2 sm:gap-0"
+      >
+        <div
+          class="flex flex-wrap text-xs font-normal justify-start w-full gap-2 sm:gap-0 sm:w-auto"
+        >
           <span>Have a technical issue? Contact</span>
           <span>
             <a
@@ -72,10 +76,10 @@
               target="_blank"
               data-testid="feedback-dialog__dialog-footer__support-link"
               >Azion Support</a
-            >
+            >.
           </span>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full sm:w-auto">
           <PrimeButton
             type="button"
             label="Cancel"
