@@ -1,36 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Create Team"
-        data-testid="teams-permissions__create-view__page-heading"
-        description="Configure permissions for team collaboration."
-      />
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createTeamPermissionsService"
-        :cleanFormCallback="resetForm"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-        @on-response="handleTrackSuccessCreated"
-        @on-response-fail="handleTrackFailCreated"
-      >
-        <template #form>
-          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -39,22 +6,12 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { teamPermissionService } from '@/services/v2/team-permission'
 
   import * as yup from 'yup'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createTeamPermissionsService: {
-      type: Function,
-      required: true
-    },
-    listPermissionService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
@@ -66,6 +23,10 @@
     name: '',
     permissions: [],
     isActive: true
+  }
+
+  const resetForm = () => {
+    return initialValues
   }
 
   const handleTrackSuccessCreated = () => {
@@ -86,3 +47,38 @@
       .track()
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Create Team"
+        data-testid="teams-permissions__create-view__page-heading"
+        description="Configure permissions for team collaboration."
+      />
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="teamPermissionService.create"
+        :cleanFormCallback="resetForm"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+        @on-response="handleTrackSuccessCreated"
+        @on-response-fail="handleTrackFailCreated"
+      >
+        <template #form>
+          <FormFieldsTeamPermissions
+            :listPermissionService="teamPermissionService.listPermissions"
+          />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>
