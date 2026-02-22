@@ -1,6 +1,6 @@
 <script setup>
   import { useField } from 'vee-validate'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
@@ -28,6 +28,7 @@
   const filteredCountriesMobile = ref([])
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const selectedCountryCallCode = ref(null)
+  const isNormalizingCountry = ref(false)
 
   const { value: firstName } = useField('firstName')
   const { value: lastName } = useField('lastName')
@@ -49,7 +50,7 @@
         (item) => item.value === countryCallCode.value
       )
     }
-    if (!countryCallCode.value) {
+    if (!selectedCountryCallCode.value && !countryCallCode.value) {
       selectedCountryCallCode.value = optionsCountriesMobile.value[0]
     }
   }
@@ -84,7 +85,23 @@
   }
 
   watch(selectedCountryCallCode, (newCountryCallCode) => {
-    countryCallCode.value = newCountryCallCode.value
+    if (isNormalizingCountry.value) return
+    if (newCountryCallCode?.value) {
+      countryCallCode.value = newCountryCallCode.value
+    }
+  })
+
+  watch(countryCallCode, (newValue) => {
+    if (isNormalizingCountry.value) return
+    if (!optionsCountriesMobile.value.length) return
+    if (selectedCountryCallCode.value?.value === newValue) return
+
+    const match = optionsCountriesMobile.value.find((item) => item.value === newValue)
+    if (match) {
+      isNormalizingCountry.value = true
+      selectedCountryCallCode.value = match
+      nextTick(() => { isNormalizingCountry.value = false })
+    }
   })
 
   const isLoadingCountry = computed(() => {

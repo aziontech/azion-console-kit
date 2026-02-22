@@ -21,8 +21,7 @@ const adapt = (payload) => {
     email: payload.email,
     language: payload.language,
     timezone: payload.timezone,
-    country_call_code:
-      payload.countryCallCode?.split(' - ').slice(1).join('-') || payload.countryCallCode,
+    country_call_code: payload.countryCallCode,
     mobile: payload.mobile?.toString(),
     two_factor_enabled: payload.twoFactorEnabled
   }

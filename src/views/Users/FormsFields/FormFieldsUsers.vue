@@ -75,7 +75,9 @@
 
     if (props.isEditForm) {
       const userCountry = setCountryCallCodeForEditForm()
-      countryCallCode.value = userCountry || firstCountry
+      if (userCountry) {
+        countryCallCode.value = userCountry
+      }
       loadingCountry.value = false
       return
     }
