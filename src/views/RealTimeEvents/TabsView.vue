@@ -84,6 +84,10 @@
       type: Object,
       required: true
     },
+    edgePulse: {
+      type: Object,
+      required: true
+    },
     loadFieldsData: {
       type: Function,
       required: true
