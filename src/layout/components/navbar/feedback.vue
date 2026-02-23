@@ -58,7 +58,7 @@
         class="flex justify-between items-center w-full flex-col-reverse sm:flex-row gap-2 sm:gap-0"
       >
         <div
-          class="flex flex-wrap text-xs font-normal justify-start w-full gap-2 sm:gap-0 sm:w-auto"
+          class="flex flex-wrap text-xs font-normal justify-start w-full gap-1 sm:gap-0 sm:w-auto"
         >
           <span>Have a technical issue? Contact</span>
           <span>
@@ -93,9 +93,8 @@
             type="button"
             severity="secondary"
             label="Send feedback"
-            class="w-36"
+            class="sm:w-36"
             size="small"
-            icon="pi pi-send"
             :loading="loading"
             @click="sendFeedback()"
             data-testid="feedback-dialog__dialog-footer__confirm-button"
