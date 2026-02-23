@@ -9,26 +9,7 @@
   import FormFieldsTeamPermissions from '@views/TeamsPermissions/FormFields/FormFieldsTeamPermissions.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
-  import { teamPermissionService } from '@/services/team-permission'
-
-  const props = defineProps({
-    editTeamPermissionService: {
-      type: Function,
-      required: true
-    },
-    loadTeamPermissionService: {
-      type: Function,
-      required: true
-    },
-    listPermissionService: {
-      type: Function,
-      required: true
-    },
-    updatedRedirect: {
-      type: String,
-      required: true
-    }
-  })
+  import { teamPermissionService } from '@/services/v2/team-permission'
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
@@ -98,9 +79,9 @@
     <template #content>
       <EditFormBlock
         @on-load-fail="handleLoadFail"
-        :editService="props.editTeamPermissionService"
-        :loadService="props.loadTeamPermissionService"
-        :updatedRedirect="updatedRedirect"
+        :editService="teamPermissionService.edit"
+        :loadService="teamPermissionService.load"
+        updatedRedirect="teams-permission"
         :initialValues="cachedTeamPermission"
         :schema="validationSchema"
         @loaded-service-object="setTeamName"
@@ -108,7 +89,9 @@
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
-          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
+          <FormFieldsTeamPermissions
+            :listPermissionService="teamPermissionService.listPermissions"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
