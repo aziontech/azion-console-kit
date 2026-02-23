@@ -4,7 +4,7 @@
   import * as yup from 'yup'
   import { ref, inject, defineExpose } from 'vue'
   import FormFieldsEdgeService from '../FormFields/FormFieldsEdgeService'
-  import { createEdgeServiceServices } from '@/services/edge-service-services'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   defineOptions({
@@ -82,7 +82,7 @@
     v-if="showCreateDrawer"
     v-model:visible="showCreateEdgeServicesDrawer"
     drawerId="create-edge-service-drawer"
-    :createService="createEdgeServiceServices"
+    :createService="edgeServiceService.createEdgeServiceService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"

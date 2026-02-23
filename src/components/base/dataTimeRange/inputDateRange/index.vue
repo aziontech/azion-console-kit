@@ -9,6 +9,8 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    createStartOfDay,
+    createEndOfDay,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -140,6 +142,45 @@
     } else {
       model.value.labelEnd = ''
     }
+
+    const label = typeof model.value?.label === 'string' ? model.value.label.trim() : ''
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+
+    const hasNonAbsoluteState =
+      Boolean(label) ||
+      Boolean(labelStart) ||
+      Boolean(labelEnd) ||
+      Boolean(model.value?.relative) ||
+      Boolean(model.value?.relativeStart) ||
+      Boolean(model.value?.relativeEnd) ||
+      labelStart.toLowerCase() === 'now' ||
+      labelEnd.toLowerCase() === 'now'
+
+    const shouldInitializeClickedDayRange =
+      props.mode === 'absolute' &&
+      date &&
+      (hasNonAbsoluteState || !hasInitializedAbsoluteRange.value)
+
+    if (shouldInitializeClickedDayRange) {
+      if (props.editingField === 'start') {
+        model.value.startDate = createStartOfDay(date)
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+      } else {
+        model.value.endDate = createEndOfDay(date)
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+      hasInitializedAbsoluteRange.value = true
+      selectedDate.value = date
+      selectedTime.value = ''
+      hasChanges.value = false
+      emitSelectIfValid()
+      return
+    }
+
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
@@ -232,6 +273,7 @@
       if (props.editingField === 'start') {
         model.value.startDate = newDate
         model.value.labelStart = ''
+        model.value.relativeStart = null
         hasInitializedAbsoluteRange.value = true
         const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
 
@@ -247,23 +289,9 @@
           model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
         }
       } else {
-        const hasStart = Boolean(model.value.startDate)
-        const startEqualsCurrentEnd =
-          hasStart &&
-          Boolean(model.value.endDate) &&
-          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
-
-        const shouldInitializeStartDate =
-          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
-
         model.value.endDate = newDate
         model.value.labelEnd = ''
-
-        if (shouldInitializeStartDate) {
-          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
-          model.value.labelStart = ''
-          hasInitializedAbsoluteRange.value = true
-        }
+        model.value.relativeEnd = null
       }
     }
   }

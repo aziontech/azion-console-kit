@@ -727,7 +727,7 @@
         :field="col.field"
         :header="selectedItems.length === 0 ? col.header : ''"
         :sortField="selectedItems.length > 0 ? null : col?.sortField"
-        headerClass="relative w-[20rem]"
+        headerClass="relative w-[20rem] overflow-visible"
         :class="{ 'hover:cursor-pointer ': !disabledList }"
         data-testid="data-table-column"
       >

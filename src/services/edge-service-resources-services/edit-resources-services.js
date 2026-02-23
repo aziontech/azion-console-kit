@@ -1,6 +1,8 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeResourcesBaseUrl } from './make-resources-base-url'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export const editResourcesServices = async (payload) => {
   const { id, edgeServiceId } = payload
@@ -12,7 +14,9 @@ export const editResourcesServices = async (payload) => {
     body: adaptPayload
   })
 
-  return parseHttpResponse(httpResponse)
+  const result = parseHttpResponse(httpResponse)
+  queryClient.removeQueries({ queryKey: queryKeys.edgeService.all })
+  return result
 }
 
 const adapt = (payload) => {

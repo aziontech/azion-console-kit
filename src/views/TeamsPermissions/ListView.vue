@@ -5,14 +5,11 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
-  import { teamPermissionService } from '@/services/team-permission'
-  import { deleteTeamPermissionService } from '@/services/team-permission'
+  import { teamPermissionService } from '@/services/v2/team-permission'
   import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
 
   const actions = [
     {
@@ -20,7 +17,7 @@
       type: 'delete',
       title: 'team',
       icon: 'pi pi-trash',
-      service: deleteTeamPermissionService
+      service: teamPermissionService.delete
     }
   ]
 
@@ -101,14 +98,13 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        :listService="teamPermissionService.listTeamPermissionService"
+        :listService="teamPermissionService.list"
         :columns="getColumns"
         editPagePath="/teams-permission/edit"
         emptyListMessage="No teams found."
         :actions="actions"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"

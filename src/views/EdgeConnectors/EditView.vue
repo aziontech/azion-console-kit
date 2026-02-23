@@ -10,6 +10,7 @@
       <EditFormBlock
         :editService="edgeConnectorsService.editEdgeConnectorsService"
         :loadService="edgeConnectorsService.loadEdgeConnectorsService"
+        :initialValues="cachedConnector"
         :schema="validationSchema"
         @loaded-service-object="setConnectorName"
       >
@@ -17,6 +18,7 @@
           <FormFieldsEdgeConnectors
             :schema="validationSchema"
             :resetForm="resetForm"
+            :isLoadingData="isLoadingData"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -45,10 +47,18 @@
 
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
-  const connectorName = ref('Edit Connector')
+
+  const cachedConnector = edgeConnectorsService.getEdgeConnectorFromCache(route.params?.id) ?? {}
+  const connectorName = ref(cachedConnector.name || 'Edit Connector')
+  const isLoadingData = ref(true)
+
+  if (cachedConnector.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedConnector.name)
+  }
 
   const setConnectorName = (connector) => {
     connectorName.value = connector.name
+    isLoadingData.value = false
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, connector.name)
   }
 </script>

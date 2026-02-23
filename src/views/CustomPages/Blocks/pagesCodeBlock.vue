@@ -23,7 +23,6 @@
         <ListTableBlock
           ref="listStatusCodeRef"
           isTabs
-          v-if="hasContentToList"
           :enableEditClick="false"
           :columns="statusCodeColumns"
           :editInDrawer="openEditStatusCodeDrawer"
@@ -62,7 +61,6 @@
 
   const listStatusCodeRef = ref(null)
   const drawerRef = ref(null)
-  const hasContentToList = computed(() => !!pagesValue.value)
 
   const { value: pagesValue, errorMessage, handleReset } = useField('pages')
   const {
