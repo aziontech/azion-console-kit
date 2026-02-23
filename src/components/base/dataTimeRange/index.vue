@@ -10,6 +10,8 @@
     <InputDateRange
       v-model="model"
       :maxDays="maxDays"
+      :editingField="editingField"
+      :isOverlayOpen="isOverlayOpen"
       @select="emit('select', $event)"
       @open="openOverlay($event, 1)"
     />

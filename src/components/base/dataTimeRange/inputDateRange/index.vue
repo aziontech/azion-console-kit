@@ -39,6 +39,10 @@
     editingField: {
       type: String,
       default: 'start'
+    },
+    isOverlayOpen: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -402,7 +406,10 @@
       v-if="model.label"
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
+      :class="[
+        isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
+        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+      ]"
       @click="openStart"
       readonly
     />
@@ -413,11 +420,12 @@
     >
       <InputText
         class="cursor-pointer ml-[2.5px]"
-        :class="
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelStart || startDateInput)}ch`
         }"
@@ -434,11 +442,12 @@
       </div>
       <InputText
         class="cursor-pointer ml-[2.5px]"
-        :class="
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelEnd || endDateInput)}ch`
         }"
