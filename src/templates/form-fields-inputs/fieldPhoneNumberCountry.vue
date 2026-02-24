@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
   import FieldPhoneNumber from '@/templates/form-fields-inputs/fieldPhoneNumber'
 
@@ -13,7 +13,8 @@
   const emit = defineEmits(['countries-loaded'])
 
   const options = ref([])
-  const loading = ref(true)
+
+  const loading = computed(() => !options.value.length)
 
   const { value: countryCallCode } = useField('countryCallCode')
 
@@ -33,7 +34,7 @@
   }
 
   watch(countryCallCode, (newValue) => {
-    if (loading.value || !options.value.length || !newValue) return
+    if (!options.value.length || !newValue) return
 
     const hasMatch = options.value.some((country) => country.value === newValue)
     if (!hasMatch) {
@@ -50,7 +51,6 @@
     const countries = await props.listCountriesPhoneService()
     options.value = countries
     normalizeCountryCode(countries)
-    loading.value = false
     emit('countries-loaded', countries)
   })
 </script>
