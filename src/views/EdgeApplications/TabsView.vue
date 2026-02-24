@@ -125,6 +125,7 @@
     }, {})
   }
   const verifyTab = (edgeApplication) => {
+    if (!edgeApplication) return
     if (edgeFunctionsEnabled.value && !edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()

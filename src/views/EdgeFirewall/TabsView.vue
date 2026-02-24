@@ -130,7 +130,10 @@
     changeTab(index)
   }
 
-  const verifyTab = ({ edgeFunctionsEnabled } = {}) => {
+  const verifyTab = (firewall) => {
+    if (!firewall) return
+
+    const { edgeFunctionsEnabled } = firewall
     if (!edgeFunctionsEnabled) {
       delete mapTabs.value.functions
       mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
