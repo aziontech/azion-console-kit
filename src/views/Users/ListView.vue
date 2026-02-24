@@ -47,18 +47,6 @@
     }
   ]
 
-  const USERS_API_FIELDS = [
-    'id',
-    'first_name',
-    'last_name',
-    'email',
-    'teams',
-    'two_factor_enabled',
-    'is_active',
-    'is_account_owner',
-    'last_modified'
-  ]
-
   const csvMapper = (rowData) => {
     return {
       firstName: rowData.firstName,
@@ -168,7 +156,6 @@
         emptyListMessage="No users found."
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        :apiFields="USERS_API_FIELDS"
         :frozenColumns="['firstName']"
         exportFileName="Users"
         :csvMapper="csvMapper"
