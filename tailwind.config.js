@@ -6,6 +6,9 @@ export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
+    fontFamily: {
+      sans: ['Sora', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji']
+    },
     listStyleType: {
       none: 'none',
       disc: 'disc',
@@ -45,7 +48,11 @@ export default {
         'graph-card': '552px'
       },
       fontFamily: {
-        robotomono: ['Roboto Mono']
+        roboto: ['Roboto'],
+        robotomono: ['Roboto Mono'],
+        sora: ['Sora'],
+        protomono: ['Proto Mono'],
+        mono: ['Proto Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', 'monospace']
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',

@@ -49,7 +49,7 @@
     "@vueuse/core": "^10.11.1",
     "analytics": "^0.8.19",
     "axios": "^1.13.5",
-    "azion-theme": "^1.16.2",
+    "azion-theme": "^1.17.0",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
