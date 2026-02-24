@@ -62,7 +62,6 @@
     passwordRequirementsList.value[3].valid = hasSpecialChar
     return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
   }
-
 </script>
 
 <template>

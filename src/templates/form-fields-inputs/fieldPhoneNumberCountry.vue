@@ -25,9 +25,7 @@
     const hasExactMatch = countries.some((country) => country.value === currentValue)
     if (hasExactMatch) return
 
-    const partialMatch = countries.find((country) =>
-      country.value.endsWith(` - ${currentValue}`)
-    )
+    const partialMatch = countries.find((country) => country.value.endsWith(` - ${currentValue}`))
     if (partialMatch) {
       countryCallCode.value = partialMatch.value
     }
@@ -38,9 +36,7 @@
 
     const hasMatch = options.value.some((country) => country.value === newValue)
     if (!hasMatch) {
-      const partialMatch = options.value.find((country) =>
-        country.value.endsWith(` - ${newValue}`)
-      )
+      const partialMatch = options.value.find((country) => country.value.endsWith(` - ${newValue}`))
       if (partialMatch) {
         countryCallCode.value = partialMatch.value
       }
