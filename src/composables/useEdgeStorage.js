@@ -28,6 +28,7 @@ const selectedFiles = ref([])
 const isDownloading = ref(false)
 const showDragAndDrop = ref(false)
 const folderPath = ref('')
+const abortController = ref(null)
 
 const processProgress = computed(() => {
   if (operationType.value === 'upload') {
@@ -157,9 +158,11 @@ export const useEdgeStorage = () => {
       currentItemProgress.value = 0
       totalBytesProcessed.value = 0
       totalBytesToProcess.value = itemsToProcess.value.reduce((sum, file) => sum + file.size, 0)
+      abortController.value = new AbortController()
 
       try {
         for (const file of itemsToProcess.value) {
+          if (abortController.value.signal.aborted) break
           currentProcessingItem.value = {
             name: file.name,
             size: formatBytes(file.size),
@@ -175,13 +178,18 @@ export const useEdgeStorage = () => {
               file,
               selectedBucket.value.name,
               onProgress,
-              folderPath.value
+              folderPath.value,
+              abortController.value.signal
             )
             processedItems.value.push(file)
             totalBytesProcessed.value += file.size
             currentItemProgress.value = 100
             processCount.value++
           } catch (fileError) {
+            if (fileError.code === 'ERR_CANCELED' || fileError.name === 'CanceledError') {
+              isProcessing.value = false
+              break
+            }
             failedItems.value.push({ file, error: fileError })
           }
         }
@@ -397,6 +405,14 @@ export const useEdgeStorage = () => {
     }
   }
 
+  const cancelRequest = () => {
+    if (abortController.value) {
+      abortController.value.abort()
+    }
+    isProcessing.value = false
+    currentProcessingItem.value = null
+  }
+
   return {
     buckets,
     selectedBucket,
@@ -425,6 +441,7 @@ export const useEdgeStorage = () => {
     selectedFiles,
     isDownloading,
     showDragAndDrop,
-    folderPath
+    folderPath,
+    cancelRequest
   }
 }

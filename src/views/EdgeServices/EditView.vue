@@ -5,19 +5,19 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'edit-edge-service' })
 
-  const emit = defineEmits(['handleEdgeServiceUpdated'])
+  const emit = defineEmits(['handleEdgeServiceUpdated', 'loaded-service-object'])
 
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
-    loadEdgeService: { type: Function, required: true },
-    editEdgeService: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    updatedRedirect: { type: String, required: true },
+    initialValues: { type: Object, default: () => ({}) }
   })
 
   const validateCode = (val = '') => {
@@ -60,17 +60,19 @@
 <template>
   <div>
     <EditFormBlock
-      :editService="props.editEdgeService"
-      :loadService="props.loadEdgeService"
+      :editService="edgeServiceService.editEdgeServiceService"
+      :loadService="edgeServiceService.loadEdgeServiceService"
       :updatedRedirect="updatedRedirect"
+      :initialValues="props.initialValues"
       :schema="validationSchema"
       :disableRedirect="true"
       :isTabs="true"
       @on-edit-success="handleTrackSuccessEdit"
       @on-edit-fail="handleTrackFailEdit"
+      @loaded-service-object="(data) => emit('loaded-service-object', data)"
     >
-      <template #form>
-        <FormCreateEdgeService />
+      <template #form="{ loading }">
+        <FormCreateEdgeService :loading="loading" />
       </template>
       <template #action-bar="{ onSubmit, onCancel, loading, values }">
         <ActionBarTemplate

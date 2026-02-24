@@ -43,7 +43,8 @@ const transformMap = {
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
-  threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
+  threatsConfiguration: (value) => parseThreatTypes(value.engine_settings),
+  engineSettings: (value) => value.engine_settings
 }
 
 const getPrefix = ({ match }) => {

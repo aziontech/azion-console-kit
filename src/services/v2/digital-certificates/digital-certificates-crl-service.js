@@ -121,6 +121,21 @@ export class DigitalCertificatesCRLService extends BaseService {
 
     return 'CRL successfully deleted!'
   }
+
+  getCRLFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.digitalCertificatesCRL.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        type: 'CRL'
+      })
+    })
+  }
 }
 
 export const digitalCertificatesCRLService = new DigitalCertificatesCRLService()

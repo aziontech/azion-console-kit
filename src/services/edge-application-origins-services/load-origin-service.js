@@ -5,9 +5,9 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 
 const baseService = new BaseService()
 
-const fetchOrigin = async ({ edgeApplicationId, id }) => {
+const fetchOrigin = async ({ applicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/origins/${id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${applicationId}/origins/${id}`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)

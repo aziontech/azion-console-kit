@@ -9,6 +9,8 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    createStartOfDay,
+    createEndOfDay,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -37,6 +39,10 @@
     editingField: {
       type: String,
       default: 'start'
+    },
+    isOverlayOpen: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -140,6 +146,45 @@
     } else {
       model.value.labelEnd = ''
     }
+
+    const label = typeof model.value?.label === 'string' ? model.value.label.trim() : ''
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+
+    const hasNonAbsoluteState =
+      Boolean(label) ||
+      Boolean(labelStart) ||
+      Boolean(labelEnd) ||
+      Boolean(model.value?.relative) ||
+      Boolean(model.value?.relativeStart) ||
+      Boolean(model.value?.relativeEnd) ||
+      labelStart.toLowerCase() === 'now' ||
+      labelEnd.toLowerCase() === 'now'
+
+    const shouldInitializeClickedDayRange =
+      props.mode === 'absolute' &&
+      date &&
+      (hasNonAbsoluteState || !hasInitializedAbsoluteRange.value)
+
+    if (shouldInitializeClickedDayRange) {
+      if (props.editingField === 'start') {
+        model.value.startDate = createStartOfDay(date)
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+      } else {
+        model.value.endDate = createEndOfDay(date)
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+      hasInitializedAbsoluteRange.value = true
+      selectedDate.value = date
+      selectedTime.value = ''
+      hasChanges.value = false
+      emitSelectIfValid()
+      return
+    }
+
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
@@ -232,6 +277,7 @@
       if (props.editingField === 'start') {
         model.value.startDate = newDate
         model.value.labelStart = ''
+        model.value.relativeStart = null
         hasInitializedAbsoluteRange.value = true
         const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
 
@@ -247,23 +293,9 @@
           model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
         }
       } else {
-        const hasStart = Boolean(model.value.startDate)
-        const startEqualsCurrentEnd =
-          hasStart &&
-          Boolean(model.value.endDate) &&
-          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
-
-        const shouldInitializeStartDate =
-          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
-
         model.value.endDate = newDate
         model.value.labelEnd = ''
-
-        if (shouldInitializeStartDate) {
-          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
-          model.value.labelStart = ''
-          hasInitializedAbsoluteRange.value = true
-        }
+        model.value.relativeEnd = null
       }
     }
   }
@@ -374,7 +406,10 @@
       v-if="model.label"
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
+      :class="[
+        isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
+        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+      ]"
       @click="openStart"
       readonly
     />
@@ -385,11 +420,12 @@
     >
       <InputText
         class="cursor-pointer ml-[2.5px]"
-        :class="
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelStart || startDateInput)}ch`
         }"
@@ -406,11 +442,12 @@
       </div>
       <InputText
         class="cursor-pointer ml-[2.5px]"
-        :class="
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelEnd || endDateInput)}ch`
         }"

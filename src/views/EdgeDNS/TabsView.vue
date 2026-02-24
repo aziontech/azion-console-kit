@@ -197,13 +197,13 @@
     }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeDNS.value) return
 
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    await edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
+    edgeDNSRecordsService.prefetchRecordsList(edgeDNSId.value, pageSize)
   }
 
   const renderTabCurrentRouter = async () => {
@@ -468,8 +468,9 @@
               @on-before-go-to-edit="handleTrackEventGoToEdit"
               hideLastModifiedColumn
               :emptyBlock="{
-                title: 'No record has been created',
-                description: 'Click the button below to create your first record.',
+                title: 'No records yet',
+                description:
+                  'Create your first DNS record to control domain resolution and routing.',
                 createButtonLabel: 'Record',
                 createPagePath: 'records/create',
                 documentationService: documentationService,

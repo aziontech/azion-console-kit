@@ -7,7 +7,6 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateEdgeFunctions from './FormFields/FormFieldsCreateEdgeFunctions'
-  import MobileCodePreview from './components/mobile-code-preview.vue'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useLoadingStore } from '@/stores/loading'
@@ -120,7 +119,6 @@
         pageTitle="Create Function"
         description="Configure function code, triggers, and execution settings."
       >
-        <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>
     <template #content>

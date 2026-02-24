@@ -2,6 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import Skeleton from 'primevue/skeleton'
   import { computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
   import { useField } from 'vee-validate'
@@ -9,6 +10,10 @@
 
   defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
       type: Boolean,
       default: false
     }
@@ -57,26 +62,34 @@
   >
     <template #inputs>
       <div class="flex flex-col h-full gap-2">
-        <vue-monaco-editor
-          v-model:value="code"
-          language="shell"
-          name="code"
-          :theme="theme"
-          class="min-h-[200px] overflow-clip surface-border border rounded-md"
-          :class="{ 'border-red-500 border': codeError }"
-          :options="editorOptions"
-          data-testid="edge-service-form__variables-field"
+        <Skeleton
+          v-if="loading"
+          height="200px"
+          width="100%"
+          borderRadius="6px"
         />
-        <small
-          v-if="codeError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ codeError }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Enter the list of variables and values for the resource. Example:
-          <code>port=3306</code>.
-        </small>
+        <template v-else>
+          <vue-monaco-editor
+            v-model:value="code"
+            language="shell"
+            name="code"
+            :theme="theme"
+            class="min-h-[200px] overflow-clip surface-border border rounded-md"
+            :class="{ 'border-red-500 border': codeError }"
+            :options="editorOptions"
+            data-testid="edge-service-form__variables-field"
+          />
+          <small
+            v-if="codeError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ codeError }}
+          </small>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Enter the list of variables and values for the resource. Example:
+            <code>port=3306</code>.
+          </small>
+        </template>
       </div>
     </template>
   </FormHorizontal>
