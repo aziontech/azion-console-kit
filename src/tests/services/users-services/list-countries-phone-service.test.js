@@ -1,23 +1,5 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listCountriesPhoneService } from '@/services/users-services'
-import graphQLApi from '@/services/axios/makeGraphQl'
-import { describe, expect, it, vi } from 'vitest'
-import { InvalidDataStructureError } from '@/services/axios/errors'
-
-const fixtures = {
-  countriesMock: [
-    {
-      name: 'Afghanistan',
-      code2: 'AF',
-      phone: '93'
-    },
-    {
-      name: 'Aland Islands',
-      code2: 'AX',
-      phone: '358-18'
-    }
-  ]
-}
+import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {
   const sut = listCountriesPhoneService
@@ -28,67 +10,38 @@ const makeSut = () => {
 }
 
 describe('UsersServices', () => {
-  it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
-        data: {
-          allCountries: []
-        }
-      }
-    })
-
-    const { sut } = makeSut()
-
-    await sut()
-
-    expect(requestSpy).toHaveBeenCalledWith(
-      {
-        url: `cities/`,
-        method: 'POST',
-        body: {
-          query: 'query allCountries {allCountries { name, code2, phone } }'
-        }
-      },
-      graphQLApi
-    )
-  })
-
-  it('should parsed correctly each countries', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: {
-        data: {
-          allCountries: fixtures.countriesMock
-        }
-      }
-    })
+  it('should return a non-empty list of countries', async () => {
     const { sut } = makeSut()
 
     const result = await sut()
 
-    expect(result).toEqual([
-      {
-        label: 'AF (Afghanistan) +93',
-        labelFormat: 'AF +93',
-        value: 'AF - 93'
-      },
-      {
-        label: 'AX (Aland Islands) +358-18',
-        labelFormat: 'AX +358-18',
-        value: 'AX - 358-18'
-      }
-    ])
+    expect(result.length).toBeGreaterThan(0)
   })
-  it('should throw if response body is not an array', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: undefined
-    })
+
+  it('should parsed correctly each countries', async () => {
     const { sut } = makeSut()
 
-    const response = sut()
+    const result = await sut()
 
-    expect(response).rejects.toThrow(new InvalidDataStructureError().message)
+    const brazil = result.find((country) => country.value === 'BR - 55')
+
+    expect(brazil).toEqual({
+      label: 'BR (Brazil) +55',
+      labelFormat: 'BR +55',
+      value: 'BR - 55'
+    })
+  })
+
+  it('should return countries with correct format', async () => {
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    result.forEach((country) => {
+      expect(country).toHaveProperty('label')
+      expect(country).toHaveProperty('labelFormat')
+      expect(country).toHaveProperty('value')
+      expect(country.value).toMatch(/^[A-Z]{2} - .+$/)
+    })
   })
 })

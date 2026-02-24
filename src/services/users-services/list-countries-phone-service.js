@@ -1,43 +1,62 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
-import { makeCountriesListBaseUrl } from './make-countries-list-base-url'
-import { InvalidDataStructureError } from '../axios/errors'
+const COUNTRIES = [
+  { name: 'Afghanistan', code2: 'AF', phone: '93' },
+  { name: 'Albania', code2: 'AL', phone: '355' },
+  { name: 'Algeria', code2: 'DZ', phone: '213' },
+  { name: 'Argentina', code2: 'AR', phone: '54' },
+  { name: 'Australia', code2: 'AU', phone: '61' },
+  { name: 'Austria', code2: 'AT', phone: '43' },
+  { name: 'Belgium', code2: 'BE', phone: '32' },
+  { name: 'Bolivia', code2: 'BO', phone: '591' },
+  { name: 'Brazil', code2: 'BR', phone: '55' },
+  { name: 'Canada', code2: 'CA', phone: '1' },
+  { name: 'Chile', code2: 'CL', phone: '56' },
+  { name: 'China', code2: 'CN', phone: '86' },
+  { name: 'Colombia', code2: 'CO', phone: '57' },
+  { name: 'Costa Rica', code2: 'CR', phone: '506' },
+  { name: 'Cuba', code2: 'CU', phone: '53' },
+  { name: 'Czech Republic', code2: 'CZ', phone: '420' },
+  { name: 'Denmark', code2: 'DK', phone: '45' },
+  { name: 'Ecuador', code2: 'EC', phone: '593' },
+  { name: 'Egypt', code2: 'EG', phone: '20' },
+  { name: 'Finland', code2: 'FI', phone: '358' },
+  { name: 'France', code2: 'FR', phone: '33' },
+  { name: 'Germany', code2: 'DE', phone: '49' },
+  { name: 'Greece', code2: 'GR', phone: '30' },
+  { name: 'India', code2: 'IN', phone: '91' },
+  { name: 'Indonesia', code2: 'ID', phone: '62' },
+  { name: 'Ireland', code2: 'IE', phone: '353' },
+  { name: 'Israel', code2: 'IL', phone: '972' },
+  { name: 'Italy', code2: 'IT', phone: '39' },
+  { name: 'Japan', code2: 'JP', phone: '81' },
+  { name: 'Mexico', code2: 'MX', phone: '52' },
+  { name: 'Netherlands', code2: 'NL', phone: '31' },
+  { name: 'New Zealand', code2: 'NZ', phone: '64' },
+  { name: 'Norway', code2: 'NO', phone: '47' },
+  { name: 'Paraguay', code2: 'PY', phone: '595' },
+  { name: 'Peru', code2: 'PE', phone: '51' },
+  { name: 'Philippines', code2: 'PH', phone: '63' },
+  { name: 'Poland', code2: 'PL', phone: '48' },
+  { name: 'Portugal', code2: 'PT', phone: '351' },
+  { name: 'Russia', code2: 'RU', phone: '7' },
+  { name: 'South Africa', code2: 'ZA', phone: '27' },
+  { name: 'South Korea', code2: 'KR', phone: '82' },
+  { name: 'Spain', code2: 'ES', phone: '34' },
+  { name: 'Sweden', code2: 'SE', phone: '46' },
+  { name: 'Switzerland', code2: 'CH', phone: '41' },
+  { name: 'Thailand', code2: 'TH', phone: '66' },
+  { name: 'Turkey', code2: 'TR', phone: '90' },
+  { name: 'Ukraine', code2: 'UA', phone: '380' },
+  { name: 'United Arab Emirates', code2: 'AE', phone: '971' },
+  { name: 'United Kingdom', code2: 'GB', phone: '44' },
+  { name: 'United States', code2: 'US', phone: '1' },
+  { name: 'Uruguay', code2: 'UY', phone: '598' },
+  { name: 'Venezuela', code2: 'VE', phone: '58' }
+]
 
 export const listCountriesPhoneService = async () => {
-  const payload = {
-    query: 'query allCountries {allCountries { name, code2, phone } }'
-  }
-
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeCountriesListBaseUrl()}/`,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
-
-  httpResponse = adapt(httpResponse)
-  return parseHttpResponse(httpResponse)
-}
-
-const adapt = (httpResponse) => {
-  const { statusCode, body } = httpResponse
-
-  if (!body || !body.data?.allCountries) {
-    throw new InvalidDataStructureError().message
-  }
-
-  const allCountriesFormatted = body.data.allCountries
-    .filter((item) => item.phone && item.code2)
-    .map((item) => ({
-      label: `${item.code2} (${item.name}) +${item.phone}`,
-      labelFormat: `${item.code2} +${item.phone}`,
-      value: `${item.code2} - ${item.phone}`
-    }))
-
-  return {
-    body: allCountriesFormatted,
-    statusCode
-  }
+  return COUNTRIES.filter((item) => item.phone && item.code2).map((item) => ({
+    label: `${item.code2} (${item.name}) +${item.phone}`,
+    labelFormat: `${item.code2} +${item.phone}`,
+    value: `${item.code2} - ${item.phone}`
+  }))
 }
