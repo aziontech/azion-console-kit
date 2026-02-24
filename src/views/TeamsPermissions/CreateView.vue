@@ -29,10 +29,24 @@
     return initialValues
   }
 
-  const handleTrackSuccessCreated = () => {
+  const handleResponse = (response) => {
     tracker.product.productCreated({
       productName: 'Teams Permissions'
     })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your team permission has been created',
+      actions: {
+        link: {
+          label: 'View Team Permission',
+          callback: () => response.redirectToUrl(`/teams-permission/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailCreated = (error) => {
@@ -63,8 +77,9 @@
         :cleanFormCallback="resetForm"
         :schema="validationSchema"
         :initialValues="initialValues"
-        @on-response="handleTrackSuccessCreated"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailCreated"
+        disableToast
       >
         <template #form>
           <FormFieldsTeamPermissions
