@@ -54,19 +54,22 @@
         :title="tableName"
         :isLoading="isLoadingQuery"
         :columns="tableColumns"
+        :serverPagination="!isColumnView"
+        :totalRecords="tableTotalRecords"
         :delete-service="deleteService"
         data-testid="table-list"
         @row-edit-saved="handleActionRowTable"
         @row-edit-cancel="onRowEditCancel"
         @reload-table="selectTable(selectedTable)"
+        @page="handlePage"
         :disabled-action="isApplyingChanges"
         @view-change="handleViewChange"
         :title-delete-dialog="titleDeleteDialog"
         @click-to-create="createTable"
         :exportFileName="tableName || 'Table Data'"
         :empty-block="{
-          title: 'No tables have been created',
-          description: 'Create your first table to store your data at the edge.',
+          title: 'No tables yet',
+          description: 'Create your first table to store your data.',
           createButtonLabel: 'Table'
         }"
         :not-show-empty-block="notShowEmptyBlock"
@@ -124,6 +127,9 @@
   const alterColumnQuery = ref('')
   const columns = ref([])
   const tableRows = ref([])
+  const tableTotalRecords = ref(0)
+  const currentPage = ref(1)
+  const currentPageSize = ref(10)
   const isLoadingQuery = ref(false)
   const notShowEmptyBlock = ref(false)
 
@@ -312,7 +318,12 @@
     selectedTable.value = table
     notShowEmptyBlock.value = true
     try {
-      const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name)
+      currentPage.value = 1
+      const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name, {
+        paginate: true,
+        page: currentPage.value,
+        pageSize: currentPageSize.value
+      })
       columns.value = result.body.tableSchema.map(({ name, type }) => ({
         field: name,
         tagType: type?.toLowerCase?.() ?? String(type || ''),
@@ -322,6 +333,31 @@
 
       tableRows.value = result.body.rows
       tableSchema.value = result.body.tableSchema
+      tableTotalRecords.value = result.count || 0
+    } finally {
+      isLoadingQuery.value = false
+    }
+  }
+
+  const handlePage = async (event) => {
+    if (!selectedTable.value || isColumnView.value) return
+
+    currentPage.value = Number(event?.page) + 1
+    currentPageSize.value = Number(event?.rows) || currentPageSize.value
+
+    isLoadingQuery.value = true
+    try {
+      const result = await edgeSQLService.getTableInfo(
+        currentDatabase.value.id,
+        selectedTable.value.name,
+        {
+          paginate: true,
+          page: currentPage.value,
+          pageSize: currentPageSize.value
+        }
+      )
+      tableRows.value = result.body.rows
+      tableTotalRecords.value = result.count || 0
     } finally {
       isLoadingQuery.value = false
     }

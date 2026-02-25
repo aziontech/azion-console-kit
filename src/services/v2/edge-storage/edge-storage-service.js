@@ -2,6 +2,13 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
+const DEFAULT_CREDENTIALS_PARAMS = {
+  page: 1,
+  pageSize: 10,
+  fields: [],
+  ordering: '-last_modified'
+}
+
 export class EdgeStorageService extends BaseService {
   constructor() {
     super()
@@ -112,7 +119,8 @@ export class EdgeStorageService extends BaseService {
     file = {},
     bucketName = '',
     onProgress = null,
-    prefix = ''
+    prefix = '',
+    signal = null
   ) => {
     const config = {}
 
@@ -130,6 +138,11 @@ export class EdgeStorageService extends BaseService {
         onProgress(progress)
       }
     }
+
+    if (signal) {
+      config.signal = signal
+    }
+
     await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(prefix)}${
@@ -240,7 +253,7 @@ export class EdgeStorageService extends BaseService {
     return data.data.edgeStorageMetrics
   }
 
-  listCredentials = async (bucketName, params = {}) => {
+  #fetchCredentials = async (bucketName, params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/credentials`,
@@ -249,8 +262,29 @@ export class EdgeStorageService extends BaseService {
         ...params
       }
     })
-
     return this.adapter?.transformListEdgeStorageCredentials?.(data)
+  }
+
+  prefetchCredentials = (bucketName, pageSize = 10) => {
+    const params = {
+      ...DEFAULT_CREDENTIALS_PARAMS,
+      pageSize
+    }
+    return this.usePrefetchQuery(queryKeys.edgeStorage.credentials.list(bucketName, params), () =>
+      this.#fetchCredentials(bucketName, params)
+    )
+  }
+
+  listCredentials = async (bucketName, params = {}) => {
+    const mergedParams = { ...DEFAULT_CREDENTIALS_PARAMS, ...params }
+    const firstPage = mergedParams.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeStorage.credentials.list(bucketName, mergedParams),
+      () => this.#fetchCredentials(bucketName, mergedParams),
+      { persist: firstPage && !skipCache, skipCache }
+    )
   }
   createCredential = async (credential = {}) => {
     const body = this.adapter?.transformCreateEdgeStorageCredential?.(credential)
@@ -260,6 +294,8 @@ export class EdgeStorageService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
+
     return data
   }
   deleteCredential = async (credentialId) => {
@@ -267,6 +303,8 @@ export class EdgeStorageService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/credentials/${credentialId}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
   }
 }
 export const edgeStorageService = new EdgeStorageService()

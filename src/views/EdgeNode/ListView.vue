@@ -6,18 +6,11 @@
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'list-edge-node' })
 
-  const props = defineProps({
-    listEdgeNodeService: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeNodeService: {
-      type: Function,
-      required: true
-    },
+  defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -40,7 +33,12 @@
       header: 'Group',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
+        columnBuilder({
+          data: Array.isArray(columnData)
+            ? columnData.map((group) => group.name || group)
+            : columnData,
+          columnAppearance: 'text-array-with-popup'
+        })
     },
     {
       field: 'status',
@@ -76,7 +74,7 @@
       label: 'Delete',
       title: 'edge node',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeNodeService
+      service: edgeNodeService.deleteEdgeNodeService
     },
     {
       type: 'dialog',
@@ -84,12 +82,13 @@
       icon: 'pi pi-fw pi-check-square',
       dialog: {
         component: Authorize,
-        body: (item) => ({
+        body: (item, reload) => ({
           data: {
             edgeNodeID: item.id,
             openDialog: true,
             rerender: Math.random()
-          }
+          },
+          onClose: (opt) => opt.data?.updated && reload()
         })
       }
     }
@@ -111,7 +110,7 @@
     </template>
     <template #content>
       <ListTableBlock
-        :listService="listEdgeNodeService"
+        :listService="edgeNodeService.listEdgeNodeService"
         :columns="getColumns"
         editPagePath="/edge-node/edit"
         @on-load-data="handleLoadData"

@@ -9,6 +9,7 @@
         <FieldGroupRadio
           label="Option"
           nameField="domainOption"
+          :value="domainOption"
           :isCard="true"
           :options="domainsRadioOptions"
           data-testid="data-stream-form__domains__options-field"

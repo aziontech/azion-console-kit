@@ -18,6 +18,8 @@
   const breadcrumbs = useBreadcrumbs()
   const networkListName = ref('Network List')
 
+  const cachedNetworkList = networkListsService.getNetworkListFromCache(route.params?.id) ?? {}
+
   const props = defineProps({
     listCountriesService: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
@@ -98,6 +100,7 @@
       <EditFormBlock
         :editService="networkListsService.editNetworkList"
         :loadService="networkListsService.loadNetworkList"
+        :initialValues="cachedNetworkList"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
         @loaded-service-object="setNetworkListName"

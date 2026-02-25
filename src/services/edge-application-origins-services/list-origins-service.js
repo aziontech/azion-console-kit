@@ -25,15 +25,15 @@ export const listOriginsService = async ({
 }) => {
   const params = { id, orderBy, sort, page, pageSize }
 
-  const queryKey = baseService.queryKeys.edgeApp.origins.all(id)
+  const queryKey = baseService.queryKeys.application.origins.all(id)
   const firstPage = page === 1
   return await baseService.useEnsureQueryData(queryKey, () => fetchList(params), {
     persist: firstPage
   })
 }
 
-export const prefetchOriginsList = async (edgeApplicationId) => {
-  return await listOriginsService({ id: edgeApplicationId, page: 1, pageSize: 200 })
+export const prefetchOriginsList = async (applicationId) => {
+  return await listOriginsService({ id: applicationId, page: 1, pageSize: 200 })
 }
 
 const adapt = (httpResponse) => {

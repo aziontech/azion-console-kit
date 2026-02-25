@@ -3,13 +3,16 @@
     <QuickSelect
       v-model="model"
       :maxDays="maxDays"
-      @select="handleSelect"
+      @select="emit('select', $event)"
+      @autoRefresh="emit('autoRefresh', $event)"
       @open="openOverlay($event, 0)"
     />
     <InputDateRange
       v-model="model"
       :maxDays="maxDays"
-      @select="handleSelect"
+      :editingField="editingField"
+      :isOverlayOpen="isOverlayOpen"
+      @select="emit('select', $event)"
       @open="openOverlay($event, 1)"
     />
 
@@ -52,7 +55,8 @@
               panelOnly
               v-model="model"
               :maxDays="maxDays"
-              @select="handleSelect"
+              @select="emit('select', $event)"
+              @autoRefresh="emit('autoRefresh', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -63,7 +67,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="handleSelect"
+              @select="emit('select', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -75,7 +79,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="handleSelect"
+              @select="emit('select', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -93,16 +97,37 @@
             </div>
           </TabPanel>
         </TabView>
+
+        <div
+          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
+          :class="{
+            'px-4 mt-1': activeTab === 3
+          }"
+        >
+          <div class="text-xs text-color-secondary">
+            UTC:
+            <span class="text-color font-medium">{{ userTimezone }}</span>
+          </div>
+          <Dropdown
+            v-model="model.utcOffset"
+            :options="utcOffsetOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-auto"
+            :pt="{ input: { class: 'text-xs' } }"
+          />
+        </div>
       </div>
     </OverlayPanel>
   </div>
 </template>
 
 <script setup>
-  import { defineModel, nextTick, ref, computed } from 'vue'
+  import { computed, defineModel, nextTick, onMounted, ref, watch } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -114,15 +139,24 @@
   const props = defineProps({
     maxDays: {
       type: Number
+    },
+    defaultUtcOffset: {
+      type: String,
+      default: '+0000'
+    },
+    userTimezone: {
+      type: String,
+      default: '+0000'
     }
   })
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'autoRefresh'])
 
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
+  const hasInitializedUtcOffset = ref(false)
 
   const model = defineModel({
     type: Object,
@@ -147,42 +181,47 @@
     }
   })
 
-  const maxDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    return new Date()
+  const utcOffsetOptions = computed(() => {
+    const offsets = []
+    for (let hour = -12; hour <= 14; hour++) {
+      const sign = hour >= 0 ? '+' : '-'
+      const absHour = Math.abs(hour)
+      const hh = String(absHour).padStart(2, '0')
+      offsets.push({
+        label: `UTC${sign}${hh}:00`,
+        value: `${sign}${hh}00`
+      })
+    }
+
+    return [
+      {
+        label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
+        value: props.defaultUtcOffset
+      },
+      { label: 'UTC+00:00', value: '+0000' },
+      ...offsets
+    ]
   })
-  const minDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    const now = new Date()
-    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
-  })
 
-  const clampToBounds = (date) => {
-    if (!date) return date
-    const parsed = new Date(date)
-    if (!props.maxDays || props.maxDays <= 0) return parsed
-    const min = minDate.value
-    const max = maxDate.value
-    if (min && parsed < min) return new Date(min)
-    if (max && parsed > max) return new Date(max)
-    return parsed
+  watch(
+    () => model.value?.utcOffset,
+    () => {
+      if (!hasInitializedUtcOffset.value) return
+      emit('select', model.value)
+    }
+  )
+
+  const formatUtcOffsetLabel = (offset) => {
+    const normalized = typeof offset === 'string' ? offset.trim() : ''
+    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
+    if (!match) return 'UTC'
+    return `UTC${match[1]}${match[2]}:${match[3]}`
   }
 
-  const clampModelRangeInPlace = () => {
-    if (!model.value) return
-    if (model.value.startDate) model.value.startDate = clampToBounds(model.value.startDate)
-    if (model.value.endDate) model.value.endDate = clampToBounds(model.value.endDate)
-  }
-
-  const handleSelect = () => {
-    clampModelRangeInPlace()
-    emit('select', model.value)
-  }
-
-  const openOverlay = async (payload, tabIndex) => {
-    activeTab.value = tabIndex
-    const event = tabIndex === 0 ? payload : payload?.event
-    const field = tabIndex === 0 ? undefined : payload?.field
+  const openOverlay = async (payload) => {
+    activeTab.value = 0
+    const event = payload?.event ?? payload
+    const field = payload?.field
     if (field === 'start' || field === 'end') editingField.value = field
 
     if (!event) return
@@ -216,7 +255,7 @@
     model.value.startDate = result.startDate
     model.value.endDate = result.endDate
 
-    handleSelect()
+    emit('select', model.value)
   }
 
   const setNow = () => {
@@ -224,14 +263,21 @@
     model.value.label = ''
 
     if (editingField.value === 'start') {
-      model.value.startDate = clampToBounds(now)
+      model.value.startDate = now
       model.value.labelStart = 'now'
     } else {
-      model.value.endDate = clampToBounds(now)
+      model.value.endDate = now
       model.value.labelEnd = 'now'
     }
 
-    handleSelect()
+    emit('select', model.value)
     closeOverlay()
   }
+
+  onMounted(() => {
+    if (!model.value?.utcOffset) {
+      model.value.utcOffset = props.defaultUtcOffset
+    }
+    hasInitializedUtcOffset.value = true
+  })
 </script>

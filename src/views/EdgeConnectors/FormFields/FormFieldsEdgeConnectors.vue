@@ -7,7 +7,10 @@
 
   <EdgeConnectorsFormFieldsConnectorType :isDrawer="isDrawer" />
 
-  <EdgeConnectorsFormFieldsConnectionOptions :isDrawer="isDrawer" />
+  <EdgeConnectorsFormFieldsConnectionOptions
+    :isDrawer="isDrawer"
+    :isLoadingData="isLoadingData"
+  />
 
   <EdgeConnectorsFormFieldsModules
     v-if="isHttpEnabled"
@@ -15,12 +18,16 @@
   />
 
   <EdgeConnectorsFormFieldsLoadBalancerConfiguration
-    v-if="enableLoadBalancerConfiguration"
+    :class="{
+      hidden: !enableLoadBalancerConfiguration
+    }"
     :isDrawer="isDrawer"
   />
 
   <EdgeConnectorsFormFieldsAddress
-    v-if="isHttpEnabled"
+    :class="{
+      hidden: !isHttpEnabled
+    }"
     :isDrawer="isDrawer"
   />
 
@@ -38,17 +45,17 @@
 </template>
 
 <script setup>
-  import EdgeConnectorsFormFieldsGeneral from './blocks/General.vue'
-  import EdgeConnectorsFormFieldsConnectorType from './blocks/ConnectorType.vue'
-  import EdgeConnectorsFormFieldsConnectionOptions from './blocks/ConnectionOptions.vue'
-  import EdgeConnectorsFormFieldsModules from './blocks/Modules.vue'
-  import EdgeConnectorsFormFieldsLoadBalancerConfiguration from './blocks/LoadBalancerConfiguration.vue'
-  import EdgeConnectorsFormFieldsAddress from './blocks/Address.vue'
-  import EdgeConnectorsFormFieldsOriginIpAcl from './blocks/OriginIpAcl.vue'
-  import EdgeConnectorsFormFieldsHmac from './blocks/hmac.vue'
-  import EdgeConnectorsFormFieldsStatus from './blocks/Status.vue'
-  import { useField } from 'vee-validate'
   import { computed } from 'vue'
+  import { useField } from 'vee-validate'
+  import EdgeConnectorsFormFieldsGeneral from '@/views/EdgeConnectors/FormFields/blocks/General.vue'
+  import EdgeConnectorsFormFieldsConnectorType from '@/views/EdgeConnectors/FormFields/blocks/ConnectorType.vue'
+  import EdgeConnectorsFormFieldsConnectionOptions from '@/views/EdgeConnectors/FormFields/blocks/ConnectionOptions.vue'
+  import EdgeConnectorsFormFieldsModules from '@/views/EdgeConnectors/FormFields/blocks/Modules.vue'
+  import EdgeConnectorsFormFieldsLoadBalancerConfiguration from '@/views/EdgeConnectors/FormFields/blocks/LoadBalancerConfiguration.vue'
+  import EdgeConnectorsFormFieldsAddress from '@/views/EdgeConnectors/FormFields/blocks/Address.vue'
+  import EdgeConnectorsFormFieldsOriginIpAcl from '@/views/EdgeConnectors/FormFields/blocks/OriginIpAcl.vue'
+  import EdgeConnectorsFormFieldsHmac from '@/views/EdgeConnectors/FormFields/blocks/hmac.vue'
+  import EdgeConnectorsFormFieldsStatus from '@/views/EdgeConnectors/FormFields/blocks/Status.vue'
 
   defineProps({
     hiddenTitle: {
@@ -60,6 +67,10 @@
       default: false
     },
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingData: {
       type: Boolean,
       default: false
     }

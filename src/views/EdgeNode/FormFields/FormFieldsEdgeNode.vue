@@ -12,16 +12,26 @@
     listGroupsService: {
       type: Function,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   })
 
   const { value: groups } = useField('groups')
 
   const groupsList = ref([])
+  const loadingGroups = ref(false)
 
   const fetchGroups = async () => {
-    const result = await props.listGroupsService()
-    groupsList.value = result
+    loadingGroups.value = true
+    try {
+      const result = await props.listGroupsService()
+      groupsList.value = result
+    } finally {
+      loadingGroups.value = false
+    }
   }
 
   onMounted(async () => {
@@ -73,10 +83,12 @@
           <MultiSelect
             v-model="groups"
             :options="groupsList"
+            :loading="loadingGroups"
+            :disabled="loadingGroups"
             filter
             autoFilterFocus
             optionLabel="name"
-            placeholder="Select groups"
+            :placeholder="loadingGroups ? 'Loading groups...' : 'Select groups'"
             class="w-full"
             display="chip"
           />
@@ -100,6 +112,7 @@
           rootClass="w-full"
           auto
           isCard
+          :disabled="props.loading"
           title="Add-On Services"
           subtitle="Enables you to instantiate add-on services from your own Services Library."
         />

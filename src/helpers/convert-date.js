@@ -209,6 +209,19 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
   })
 }
 
+const convertUnitToMilliseconds = (unit, value) => {
+  switch (unit) {
+    case 'seconds':
+      return value * 1000
+    case 'minutes':
+      return value * 60 * 1000
+    case 'hours':
+      return value * 60 * 60 * 1000
+    default:
+      return null
+  }
+}
+
 const getCurrentDateTimeIntl = () => {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -340,6 +353,43 @@ const getOffset = (timeZone = 'UTC', date = new Date()) => {
   return `UTC${sinal}${offset}`
 }
 
+const parseUtcOffsetToMinutes = (utcOffset = '+0000') => {
+  if (typeof utcOffset !== 'string') return 0
+  const match = utcOffset.trim().match(/^([+-])(\d{2})(\d{2})$/)
+  if (!match) return 0
+
+  const sign = match[1] === '-' ? -1 : 1
+  const hours = Number(match[2])
+  const minutes = Number(match[3])
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return 0
+
+  return sign * (hours * 60 + minutes)
+}
+
+const createUtcDateFromUserTimezoneParts = (parts, utcOffset) => {
+  const { year, monthIndex, day, hour = 0, minute = 0, second = 0, millisecond = 0 } = parts ?? {}
+
+  const offsetMinutes = parseUtcOffsetToMinutes(utcOffset)
+  const utcMillis =
+    Date.UTC(year, monthIndex, day, hour, minute, second, millisecond) -
+    offsetMinutes * MINUTE_IN_MILLISECONDS
+
+  return new Date(utcMillis)
+}
+
+const getUtcIsoRangeForUserDay = ({ year, monthIndex, day }, utcOffset) => {
+  const begin = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 0, minute: 0, second: 0, millisecond: 0 },
+    utcOffset
+  )
+  const end = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 23, minute: 59, second: 59, millisecond: 999 },
+    utcOffset
+  )
+
+  return { begin: begin.toISOString(), end: end.toISOString() }
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -354,5 +404,9 @@ export {
   getRemainingDays,
   getCurrentDateTimeIntl,
   convertToRelativeTime,
-  getOffset
+  getOffset,
+  parseUtcOffsetToMinutes,
+  createUtcDateFromUserTimezoneParts,
+  getUtcIsoRangeForUserDay,
+  convertUnitToMilliseconds
 }

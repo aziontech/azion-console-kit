@@ -124,7 +124,12 @@
     tsRange: {
       tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
       tsRangeEnd: new Date(),
-      label: 'Last 5 minutes'
+      label: 'Last 5 minutes',
+      autoRefresh: {
+        enabled: false,
+        every: 10,
+        unit: 'seconds'
+      }
     },
     fields: [],
     dataset: ''
@@ -286,10 +291,13 @@
     const tsRange = filterData.value.selected.tsRange
 
     if (tsRange) {
+      const preservedAutoRefresh = advancedFilterModel.value?.tsRange?.autoRefresh
+
       advancedFilterModel.value.tsRange = {
         tsRangeBegin: tsRange.begin,
         tsRangeEnd: tsRange.end,
-        label: tsRange.meta?.label || ''
+        label: tsRange.meta?.label || '',
+        autoRefresh: preservedAutoRefresh
       }
     }
   }
@@ -302,10 +310,12 @@
     const { tsRange, fields } = advancedFilterModel.value
 
     if (tsRange?.tsRangeBegin && tsRange?.tsRangeEnd) {
+      const preservedAutoRefresh = tsRange?.autoRefresh
+
       setTimeRange({
         tsRangeBegin: tsRange.tsRangeBegin,
         tsRangeEnd: tsRange.tsRangeEnd,
-        meta: { option: 'custom', label: tsRange.label }
+        meta: { option: 'custom', label: tsRange.label, autoRefresh: preservedAutoRefresh }
       })
     }
 

@@ -8,6 +8,15 @@ export default class Aql {
     this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
+  buildOperatorsRegex() {
+    const patterns = this.operators.map((op) => {
+      const escaped = op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')
+      return /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
+    })
+
+    return new RegExp(patterns.join('|'), 'i')
+  }
+
   #isDomainWorkloadField(fieldName) {
     if (!fieldName) return false
     return String(fieldName).toLowerCase() === this.handleTextDomainWorkload.singularLabel
@@ -425,12 +434,11 @@ export default class Aql {
     let erros = []
     if (!queryText) return []
 
+    const escapedOperatorsRegex = this.buildOperatorsRegex()
+
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        const escapedOperatorsRegex = new RegExp(
-          this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
-        )
         let match = expression.toLowerCase().match(escapedOperatorsRegex)
         let operatorFound = match ? match[0] : null
         if (operatorFound) {
@@ -463,9 +471,6 @@ export default class Aql {
         }
       })
     } else {
-      const escapedOperatorsRegex = new RegExp(
-        this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
-      )
       let match = queryText.toLowerCase().match(escapedOperatorsRegex)
       let operatorFound = match ? match[0] : null
       if (operatorFound) {

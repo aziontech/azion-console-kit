@@ -9,6 +9,8 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    createStartOfDay,
+    createEndOfDay,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -37,6 +39,10 @@
     editingField: {
       type: String,
       default: 'start'
+    },
+    isOverlayOpen: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -62,15 +68,12 @@
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
-  const maxDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    return new Date()
-  })
-  const minDate = computed(() => {
-    if (!props.maxDays || props.maxDays <= 0) return null
-    const now = new Date()
-    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
-  })
+  const sizeInput = (value) => {
+    if (value.length > 5) {
+      return value.length
+    }
+    return 7
+  }
 
   const inputValue = computed({
     get: () => {
@@ -110,7 +113,6 @@
     if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
 
     if (!start || !end) return false
-
     return new Date(start).getTime() > new Date(end).getTime()
   })
 
@@ -119,25 +121,11 @@
     emit('select', model.value)
   }
 
-  const sizeInput = (value) => {
-    if (value.length > 5) {
-      return value.length
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      updateRelativeRange()
     }
-    return 7
-  }
-
-  const clampToBounds = (date) => {
-    if (!date) return date
-    const parsed = new Date(date)
-    if (!props.maxDays || props.maxDays <= 0) return parsed
-
-    const min = minDate.value
-    const max = maxDate.value
-
-    if (min && parsed < min) return new Date(min)
-    if (max && parsed > max) return new Date(max)
-    return parsed
-  }
+  })
 
   const openStart = (event) => {
     selectedTime.value = ''
@@ -158,7 +146,46 @@
     } else {
       model.value.labelEnd = ''
     }
-    selectedDate.value = clampToBounds(date)
+
+    const label = typeof model.value?.label === 'string' ? model.value.label.trim() : ''
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+
+    const hasNonAbsoluteState =
+      Boolean(label) ||
+      Boolean(labelStart) ||
+      Boolean(labelEnd) ||
+      Boolean(model.value?.relative) ||
+      Boolean(model.value?.relativeStart) ||
+      Boolean(model.value?.relativeEnd) ||
+      labelStart.toLowerCase() === 'now' ||
+      labelEnd.toLowerCase() === 'now'
+
+    const shouldInitializeClickedDayRange =
+      props.mode === 'absolute' &&
+      date &&
+      (hasNonAbsoluteState || !hasInitializedAbsoluteRange.value)
+
+    if (shouldInitializeClickedDayRange) {
+      if (props.editingField === 'start') {
+        model.value.startDate = createStartOfDay(date)
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+      } else {
+        model.value.endDate = createEndOfDay(date)
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+      hasInitializedAbsoluteRange.value = true
+      selectedDate.value = date
+      selectedTime.value = ''
+      hasChanges.value = false
+      emitSelectIfValid()
+      return
+    }
+
+    selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
     emitSelectIfValid()
@@ -171,10 +198,8 @@
     } else {
       model.value.labelEnd = ''
     }
-    const newDate = clampToBounds(new Date(selectedYear.value, selectedMonth.value, 1))
+    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
     selectedDate.value = newDate
-    selectedMonth.value = newDate.getMonth()
-    selectedYear.value = newDate.getFullYear()
     updateSelectedDateTime()
     hasChanges.value = false
     emitSelectIfValid()
@@ -248,11 +273,11 @@
       const [hours, minutes] = time.split(':')
       const newDate = new Date(selectedDate.value)
       newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
-      const boundedDate = clampToBounds(newDate)
 
       if (props.editingField === 'start') {
-        model.value.startDate = boundedDate
+        model.value.startDate = newDate
         model.value.labelStart = ''
+        model.value.relativeStart = null
         hasInitializedAbsoluteRange.value = true
         const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
 
@@ -265,26 +290,12 @@
           newDate.getMinutes() === currentEndDate.getMinutes()
 
         if (isSameHourAndMinuteAsEnd) {
-          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
+          model.value.startDate = new Date(newDate.getTime() - 5 * 60 * 1000)
         }
       } else {
-        const hasStart = Boolean(model.value.startDate)
-        const startEqualsCurrentEnd =
-          hasStart &&
-          Boolean(model.value.endDate) &&
-          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
-
-        const shouldInitializeStartDate =
-          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
-
-        model.value.endDate = boundedDate
+        model.value.endDate = newDate
         model.value.labelEnd = ''
-
-        if (shouldInitializeStartDate) {
-          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
-          model.value.labelStart = ''
-          hasInitializedAbsoluteRange.value = true
-        }
+        model.value.relativeEnd = null
       }
     }
   }
@@ -299,8 +310,7 @@
         now
       )
 
-      const boundedStart = clampToBounds(newStartDate)
-      const boundedEnd = clampToBounds(newEndDate)
+      const calculatedDate = relativeDirection.value === 'last' ? newStartDate : newEndDate
 
       model.value.relative = {
         direction: relativeDirection.value,
@@ -311,7 +321,7 @@
 
       const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
-        model.value.startDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
+        model.value.startDate = calculatedDate
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
         model.value.relativeStart = {
           direction: relativeDirection.value,
@@ -326,7 +336,7 @@
           model.value.label = ''
         }
       } else {
-        model.value.endDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
+        model.value.endDate = calculatedDate
         model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
         model.value.relativeEnd = {
           direction: relativeDirection.value,
@@ -346,27 +356,26 @@
     const parsedDate = parseDateSimple(tempInputValue.value)
 
     if (parsedDate) {
-      const boundedParsedDate = clampToBounds(parsedDate)
       if (props.editingField === 'start') {
-        model.value.startDate = boundedParsedDate
+        model.value.startDate = parsedDate
         model.value.labelStart = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure end date is not before start date
-        if (model.value.endDate && boundedParsedDate > model.value.endDate) {
-          model.value.endDate = boundedParsedDate
+        if (model.value.endDate && parsedDate > model.value.endDate) {
+          model.value.endDate = parsedDate
           model.value.labelEnd = ''
         }
       } else {
-        model.value.endDate = boundedParsedDate
+        model.value.endDate = parsedDate
         model.value.labelEnd = ''
         if (props.mode === 'absolute') {
           hasInitializedAbsoluteRange.value = true
         }
         // Ensure start date is not after end date
-        if (model.value.startDate && boundedParsedDate < model.value.startDate) {
-          model.value.startDate = boundedParsedDate
+        if (model.value.startDate && parsedDate < model.value.startDate) {
+          model.value.startDate = parsedDate
           model.value.labelStart = ''
         }
       }
@@ -389,12 +398,6 @@
     model.value.endDate = new Date(model.value.endDate)
   }
 
-  onMounted(() => {
-    if (props.mode === 'relative') {
-      updateRelativeRange()
-    }
-  })
-
   defineExpose({})
 </script>
 <template>
@@ -403,7 +406,10 @@
       v-if="model.label"
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
+      :class="[
+        isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
+        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+      ]"
       @click="openStart"
       readonly
     />
@@ -413,12 +419,13 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="cursor-pointer"
-        :class="
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelStart || startDateInput)}ch`
         }"
@@ -434,12 +441,13 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="cursor-pointer"
-        :class="
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelEnd || endDateInput)}ch`
         }"
@@ -485,7 +493,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2">
+      <div class="flex gap-3 mt-2 h-[200px]">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -493,8 +501,6 @@
           :showButtonBar="false"
           :showWeek="false"
           :dateFormat="'dd/mm/yy'"
-          :minDate="minDate"
-          :maxDate="maxDate"
           class="w-full"
           @date-select="onDateSelect"
           :pt="{
@@ -512,7 +518,7 @@
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"

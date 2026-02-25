@@ -5,11 +5,17 @@ import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataRe
 const transformMap = {
   id: (value) => value.id,
   name: (value) => value.name,
-  debugRules: (value) => value.debug_rules,
+  debugRules: (value) => value.debug,
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
-  active: (value) => parseStatusData(value.active)
+  active: (value) => parseStatusData(value.active),
+  edgeFunctionsEnabled: (value) => value.modules?.functions?.enabled,
+  networkProtectionEnabled: (value) => value.modules?.network_protection?.enabled,
+  wafEnabled: (value) => value.modules?.waf?.enabled,
+  ddosProtectionUnmetered: (value) => value.modules?.ddos_protection?.enabled,
+  isActive: (value) => value.active,
+  domains: (value) => value.domains || []
 }
 
 export const EdgeFirewallAdapter = {

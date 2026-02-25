@@ -79,6 +79,24 @@ export class DataStreamService extends BaseService {
     )
   }
 
+  getDataStreamFromCache = (id) => {
+    if (!id) return undefined
+
+    const queries = this.queryClient.getQueryCache().findAll({
+      predicate: (query) => {
+        const key = query.queryKey
+        if (!Array.isArray(key)) return false
+        return key[0] === 'data-streams'
+      }
+    })
+
+    const firstQuery = queries[0]
+    const body = firstQuery?.state?.data?.body
+    const foundItem = body?.find((item) => String(item?.id) === String(id))
+
+    return foundItem ?? undefined
+  }
+
   listTemplates = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -172,24 +190,28 @@ export class DataStreamService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
     const filterWorkloads = data.data.transform?.find((item) => item.type === 'filter_workloads')
+    const templateTransform = data.data.transform?.find((item) => item.type === 'render_template')
+    const templateId = templateTransform?.attributes?.template
 
-    const workloads = filterWorkloads
-      ? await this.handlesWorkloads(filterWorkloads.attributes?.workloads)
-      : await this.handlesWorkloads([])
+    const [workloads, templateData] = await Promise.all([
+      filterWorkloads
+        ? this.handlesWorkloads(filterWorkloads.attributes?.workloads)
+        : this.handlesWorkloads([]),
+      templateId ? this.loadTemplateService({ id: templateId }) : null
+    ])
 
-    return this.#getTransformed('transformLoadDataStream', [data.data, workloads])
+    return this.#getTransformed('transformLoadDataStream', [data.data, workloads, templateData])
   }
 
   handlesWorkloads = async (workloadsIds) => {
     const pageSize = 100
     let page = 1
-    let allWorkloads = []
     let fetchedAll = false
+    const allWorkloads = []
 
-    const idsToFind = new Set(workloadsIds)
-    const foundMap = new Map()
+    const selectedIds = new Set(workloadsIds || [])
 
-    while (!fetchedAll && foundMap.size < workloadsIds.length) {
+    while (!fetchedAll) {
       const response = await this.listWorkloadsService({
         page,
         pageSize: pageSize,
@@ -197,13 +219,7 @@ export class DataStreamService extends BaseService {
       })
       const results = response.results
 
-      allWorkloads = [...allWorkloads, ...results]
-
-      results.forEach((workload) => {
-        if (idsToFind.has(workload.id)) {
-          foundMap.set(workload.id, workload)
-        }
-      })
+      allWorkloads.push(...results)
 
       if (results.length < pageSize) {
         fetchedAll = true
@@ -212,11 +228,10 @@ export class DataStreamService extends BaseService {
       page++
     }
 
-    const found = Array.from(foundMap.values())
+    const availableWorkloads = allWorkloads.filter((workload) => !selectedIds.has(workload.id))
+    const selectedWorkloads = allWorkloads.filter((workload) => selectedIds.has(workload.id))
 
-    const notFoundIds = allWorkloads.filter((workload) => !workloadsIds.includes(workload.id))
-
-    return [notFoundIds, found]
+    return [availableWorkloads, selectedWorkloads]
   }
 
   listWorkloadsService = async (params) => {

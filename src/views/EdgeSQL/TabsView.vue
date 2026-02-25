@@ -149,6 +149,7 @@
         </TabPanel>
         <TabPanel
           header="Settings"
+          v-if="false"
           :pt="{
             root: { 'data-testid': 'sql-database-tabs__tab__settings' }
           }"

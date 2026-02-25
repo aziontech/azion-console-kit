@@ -10,12 +10,20 @@
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { usersService } from '@/services/v2/users/users-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const userName = ref('Edit User')
+
+  const cachedUser = usersService.getUserFromCacheById(route.params.id) ?? {}
+
+  if (cachedUser?.name) {
+    userName.value = cachedUser.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedUser.name)
+  }
 
   const setUserName = (user) => {
     const firstName = user.first_name ?? user.firstName ?? ''
@@ -111,7 +119,10 @@
 
     currentEmail.value = userData.email
 
-    return userData
+    return {
+      ...cachedUser,
+      ...userData
+    }
   }
 
   const handleResponse = () => {
@@ -139,6 +150,7 @@
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
         @on-edit-fail="handleTrackFailedEdit"
+        :initialValues="cachedUser"
       >
         <template #form>
           <FormFieldsUsers

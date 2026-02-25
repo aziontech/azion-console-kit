@@ -1,5 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { EdgeConnectorsAdapter } from './edge-connectors-adapter'
+import { EdgeConnectorsAdapter, typeBuildersLoadRequest } from './edge-connectors-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class EdgeConnectorsService extends BaseService {
   constructor() {
@@ -29,7 +29,6 @@ export class EdgeConnectorsService extends BaseService {
     const defaultParams = {
       page: 1,
       pageSize,
-      fields: [],
       ordering: '-last_modified'
     }
     return this.usePrefetchQuery(queryKeys.edgeConnectors.list(defaultParams), () =>
@@ -100,6 +99,39 @@ export class EdgeConnectorsService extends BaseService {
     })
 
     return this.adapter?.transformLoadEdgeConnectors?.(data) ?? data.data
+  }
+
+  getEdgeConnectorFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.edgeConnectors.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        const type = item.rawType
+        const builder = typeBuildersLoadRequest[type]
+
+        if (!builder || !item.attributes) {
+          return {
+            id: item.id,
+            name: item.name,
+            type,
+            active: item.active?.content === 'Active'
+          }
+        }
+
+        const attributes = builder({ attributes: item.attributes })
+
+        return {
+          id: item.id,
+          name: item.name,
+          type,
+          active: item.active?.content === 'Active',
+          ...attributes
+        }
+      }
+    })
   }
 
   deleteEdgeConnectorsService = async (id) => {

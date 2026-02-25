@@ -145,8 +145,9 @@
     exportFileName="Application Cache Settings"
     hideLastModifiedColumn
     :emptyBlock="{
-      title: 'No cache settings have been created',
-      description: 'Click the button below to create your first cache setting.',
+      title: 'No cache settings yet',
+      description:
+        'Create your first cache setting to control how your content is stored and delivered.',
       createButtonLabel: 'Cache Setting',
       createPagePath: '/edge-applications/cache-settings/create',
       documentationService: documentationService,

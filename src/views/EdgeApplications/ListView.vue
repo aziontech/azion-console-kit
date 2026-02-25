@@ -123,15 +123,6 @@
       }
     ]
   })
-
-  const EDGE_APPLICATION_API_FIELDS = [
-    'id',
-    'name',
-    'last_editor',
-    'last_modified',
-    'product_version',
-    'active'
-  ]
 </script>
 
 <template>
@@ -159,7 +150,6 @@
         editPagePath="/applications/edit"
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
-        :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No applications found."

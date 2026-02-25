@@ -21,7 +21,7 @@ export const listCountriesService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const countriesFormated = httpResponse.body.data.allCountries.map((countryItem) => {
+  const countriesFormated = httpResponse.body.data?.allCountries.map((countryItem) => {
     const formattedItem = {
       name: countryItem.name,
       value: countryItem.code2

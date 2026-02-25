@@ -1,30 +1,21 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import { inject, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { inject } from 'vue'
   import * as yup from 'yup'
   import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
+
   defineOptions({ name: 'edit-edge-node' })
   const emit = defineEmits(['handleEdgeNodesUpdated'])
   const tracker = inject('tracker')
-  const route = useRoute()
-  const breadcrumbs = useBreadcrumbs()
-  const nodeName = ref('Edit Edge Node')
-
-  const setNodeName = (node) => {
-    nodeName.value = node.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, node.name)
-  }
 
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
     listGroupsEdgeNodeService: { type: Function, required: true },
-    loadEdgeNodeService: { type: Function, required: true },
-    editEdgeNodeService: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    updatedRedirect: { type: String, required: true },
+    edgeNode: { type: Object, default: () => ({}) },
+    initialValues: { type: Object, default: () => ({}) }
   })
 
   const validationSchema = yup.object({
@@ -34,11 +25,14 @@
     hasServices: yup.boolean().label('Service')
   })
 
+  const loadEdgeNodeService = async ({ id }) => {
+    return await edgeNodeService.loadEdgeNodeService({ id })
+  }
+
   const formSubmit = async (onSubmit, values, formValid) => {
+    if (!formValid) return
     await onSubmit()
-    if (formValid) {
-      emit('handleEdgeNodesUpdated', values)
-    }
+    emit('handleEdgeNodesUpdated', values)
   }
 
   const handleTrackSuccessEdit = () => {
@@ -48,20 +42,20 @@
 
 <template>
   <EditFormBlock
-    :editService="props.editEdgeNodeService"
-    :loadService="props.loadEdgeNodeService"
+    :editService="edgeNodeService.editEdgeNodeService"
+    :loadService="loadEdgeNodeService"
+    :initialValues="props.initialValues ?? {}"
     :updatedRedirect="props.updatedRedirect"
-    @loaded-service-object="setNodeName"
-    @on-edit-success="handleTrackSuccessEdit"
+    disableRedirect
     :schema="validationSchema"
     :isTabs="true"
+    @on-edit-success="handleTrackSuccessEdit"
   >
-    <template #form>
-      <PageHeadingBlock
-        :pageTitle="nodeName"
-        description="Configure general settings and Edge Services for this Edge Node."
+    <template #form="{ loading }">
+      <FormFieldsEdgeNode
+        :listGroupsService="props.listGroupsEdgeNodeService"
+        :loading="loading"
       />
-      <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarTemplate

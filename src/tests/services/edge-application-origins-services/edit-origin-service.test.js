@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   originMock: {
     id: '0000000-00000000-00a0a00s0as0-000000',
-    edgeApplicationId: 123,
+    applicationId: 123,
     name: 'New Origin',
     originType: 'single_origin',
     originKey: '0000000-00000000-00a0a00s0as0-000000',
@@ -30,7 +30,7 @@ const fixtures = {
   },
   originTypeObjectStorage: {
     id: '0000000-00000000-00a0a00s0as0-000000',
-    edgeApplicationId: 123,
+    applicationId: 123,
     name: 'New Origin',
     originProtocolPolicy: 'http',
     originType: 'object_storage',
@@ -39,14 +39,14 @@ const fixtures = {
   },
   requestPayloadMockLiveIngest: {
     id: '0000000-00000000-00a0a00s0as0-000000',
-    edgeApplicationId: 123,
+    applicationId: 123,
     name: 'New Origin',
     originType: 'live_ingest',
     streamingEndpoint: 'br-east-1.azioningest.net'
   },
   emptyPrefixOrigin: {
     id: '0000000-00000000-00a0a00s0as0-000000',
-    edgeApplicationId: 123,
+    applicationId: 123,
     name: 'New Origin',
     originProtocolPolicy: 'http',
     originType: 'object_storage',
@@ -83,7 +83,7 @@ describe('EdgeApplicationOriginsServices', () => {
     await sut(fixtures.originMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.originMock.edgeApplicationId}/origins/${fixtures.originMock.id}`,
+      url: `${version}/edge_applications/${fixtures.originMock.applicationId}/origins/${fixtures.originMock.id}`,
       method: 'PATCH',
       body: {
         origin_type: fixtures.originMock.originType,
@@ -113,7 +113,7 @@ describe('EdgeApplicationOriginsServices', () => {
     await sut(fixtures.originTypeObjectStorage)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.originTypeObjectStorage.edgeApplicationId}/origins/${fixtures.originTypeObjectStorage.id}`,
+      url: `${version}/edge_applications/${fixtures.originTypeObjectStorage.applicationId}/origins/${fixtures.originTypeObjectStorage.id}`,
       method: 'PATCH',
       body: {
         origin_type: fixtures.originTypeObjectStorage.originType,
@@ -135,7 +135,7 @@ describe('EdgeApplicationOriginsServices', () => {
     await sut(fixtures.requestPayloadMockLiveIngest)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.requestPayloadMockLiveIngest.edgeApplicationId}/origins/${fixtures.requestPayloadMockLiveIngest.id}`,
+      url: `${version}/edge_applications/${fixtures.requestPayloadMockLiveIngest.applicationId}/origins/${fixtures.requestPayloadMockLiveIngest.id}`,
       method: 'PATCH',
       body: {
         origin_type: fixtures.requestPayloadMockLiveIngest.originType,
@@ -156,7 +156,7 @@ describe('EdgeApplicationOriginsServices', () => {
     await sut(fixtures.emptyPrefixOrigin)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.emptyPrefixOrigin.edgeApplicationId}/origins/${fixtures.emptyPrefixOrigin.id}`,
+      url: `${version}/edge_applications/${fixtures.emptyPrefixOrigin.applicationId}/origins/${fixtures.emptyPrefixOrigin.id}`,
       method: 'PATCH',
       body: {
         origin_type: fixtures.emptyPrefixOrigin.originType,
@@ -173,7 +173,7 @@ describe('EdgeApplicationOriginsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    const feedbackMessage = await sut(fixtures.originMock, fixtures.applicationId)
 
     expect(feedbackMessage).toBe('Your Origin has been edited')
   })

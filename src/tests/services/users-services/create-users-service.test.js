@@ -1,7 +1,11 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { createUsersService } from '@/services/users-services'
+import { UsersService } from '@/services/v2/users/users-service'
 import { describe, expect, it, vi } from 'vitest'
-import * as Errors from '@/services/axios/errors'
+
+vi.mock('@/stores/account', () => ({
+  useAccountStore: () => ({
+    accountData: { user_id: 999 }
+  })
+}))
 
 const fixtures = {
   userMock: {
@@ -14,101 +18,71 @@ const fixtures = {
     mobile: '+1-123-456-7890',
     isAccountOwner: true,
     teamsIds: 1,
-    twoFactorEnabled: true
+    twoFactorEnabled: true,
+    isActive: true
   }
 }
 
 const makeSut = () => {
-  const sut = createUsersService
-
-  return {
-    sut
+  const sut = new UsersService()
+  sut.http = {
+    request: vi.fn()
   }
+  sut.queryClient = {
+    removeQueries: vi.fn(),
+    getQueryCache: vi.fn(() => ({ findAll: vi.fn(() => []) })),
+    ensureQueryData: vi.fn()
+  }
+
+  return { sut }
 }
 
-describe('UsersServices', () => {
-  it('should call API with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
-    })
-    const { sut } = makeSut()
-    const version = 'v4'
-    await sut(fixtures.userMock)
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users`,
-      method: 'POST',
-      body: {
-        first_name: fixtures.userMock.firstName,
-        last_name: fixtures.userMock.lastName,
-        timezone: fixtures.userMock.timezone,
-        language: fixtures.userMock.language,
-        country_call_code: fixtures.userMock.countryCallCode,
-        email: fixtures.userMock.email,
-        mobile: fixtures.userMock.mobile,
-        is_account_owner: fixtures.userMock.isAccountOwner,
-        teams_ids: fixtures.userMock.teamsIds,
-        two_factor_enabled: fixtures.userMock.twoFactorEnabled
-      }
-    })
-  })
-
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
-    })
-    const { sut } = makeSut()
-
-    const data = await sut(fixtures.userMock)
-
-    expect(data.feedback).toBe('Your user has been created')
-  })
-
-  it.each([
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
-      statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with status code $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
-      })
+describe('UsersService', () => {
+  describe('createUser', () => {
+    it('should call API with correct params', async () => {
       const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
 
-      const response = sut(fixtures.userMock)
+      await sut.createUser(fixtures.userMock)
 
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
-
-  it('should throw first api error when request fails with status code 400', async () => {
-    const expectedError = 'user with this Email already exists.'
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 400,
-      body: { email: [expectedError] }
+      expect(sut.http.request).toHaveBeenCalledWith({
+        url: 'v4/iam/users',
+        method: 'POST',
+        body: {
+          first_name: fixtures.userMock.firstName,
+          last_name: fixtures.userMock.lastName,
+          timezone: fixtures.userMock.timezone,
+          language: fixtures.userMock.language,
+          country_call_code: fixtures.userMock.countryCallCode,
+          email: fixtures.userMock.email,
+          mobile: fixtures.userMock.mobile,
+          is_account_owner: fixtures.userMock.isAccountOwner,
+          teams_ids: fixtures.userMock.teamsIds,
+          two_factor_enabled: fixtures.userMock.twoFactorEnabled,
+          is_active: fixtures.userMock.isActive
+        }
+      })
     })
-    const { sut } = makeSut()
 
-    const response = sut(fixtures.userMock)
+    it('should return a feedback message on successfully created', async () => {
+      const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
 
-    expect(response).rejects.toBe(expectedError)
+      const data = await sut.createUser(fixtures.userMock)
+
+      expect(data.feedback).toBe('Your user has been created')
+      expect(data.urlToEditView).toBe('/users')
+    })
+
+    it('should remove all users queries from cache after create', async () => {
+      const { sut } = makeSut()
+      sut.http.request.mockResolvedValueOnce({ status: 201 })
+
+      await sut.createUser(fixtures.userMock)
+
+      expect(sut.queryClient.removeQueries).toHaveBeenCalledWith({
+        queryKey: ['users']
+      })
+    })
   })
 })

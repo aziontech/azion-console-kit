@@ -26,93 +26,98 @@ export const queryKeys = {
     categories: () => [...queryKeys.marketplace.all, 'categories'],
     detail: (vendor, slug) => [...queryKeys.marketplace.all, 'detail', vendor, slug]
   },
-  edgeApp: {
-    all: ['edge-apps'],
+  application: {
+    all: ['application'],
     detail: (id) => {
-      return [...queryKeys.edgeApp.all, id]
+      return [...queryKeys.application.all, id]
     },
     list: (id, params) => {
-      return [...queryKeys.edgeApp.all, id, 'list', params]
+      return [...queryKeys.application.all, id, 'list', params]
     },
     origins: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'origins'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'origins'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'origins',
         'list',
         params
       ],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'origins', 'detail', id]
+      detail: (parentId, id) => [...queryKeys.application.detail(parentId), 'origins', 'detail', id]
     },
     cacheSettings: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'cache-settings'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'cache-settings'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'cache-settings',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'cache-settings',
         'detail',
         id
       ]
     },
     deviceGroups: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'device-groups'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'device-groups'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'device-groups',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'device-groups',
         'detail',
         id
       ]
     },
     errorResponse: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'error-responses'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'error-responses'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'error-responses',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'error-responses',
         'detail',
         id
       ]
     },
     rulesEngine: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'rules-engine'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'rules-engine'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'rules-engine',
         'list',
         params
       ],
       detail: (parentId, id) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'rules-engine',
         'detail',
         id
       ]
     },
     functionInstance: {
-      all: (parentId) => [...queryKeys.edgeApp.detail(parentId), 'functions'],
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'functions'],
       list: (parentId, params) => [
-        ...queryKeys.edgeApp.detail(parentId),
+        ...queryKeys.application.detail(parentId),
         'functions',
         'list',
         params
       ],
-      detail: (parentId, id) => [...queryKeys.edgeApp.detail(parentId), 'functions', 'detail', id]
+      detail: (parentId, id) => [
+        ...queryKeys.application.detail(parentId),
+        'functions',
+        'detail',
+        id
+      ]
     }
   },
   workload: {
@@ -143,10 +148,10 @@ export const queryKeys = {
   teams: {
     all: ['teams', 'list']
   },
-  edgeAppV3: {
-    all: ['edge-apps-v3'],
-    list: (params) => [...queryKeys.edgeAppV3.all, 'list', params],
-    detail: (id) => [...queryKeys.edgeAppV3.all, 'detail', id]
+  applicationV3: {
+    all: ['application-v3'],
+    list: (params) => [...queryKeys.applicationV3.all, 'list', params],
+    detail: (id) => [...queryKeys.applicationV3.all, 'detail', id]
   },
   billing: {
     all: ['billing'],
@@ -164,7 +169,18 @@ export const queryKeys = {
   edgeDNS: {
     all: ['edge-dns'],
     list: (params) => [...queryKeys.edgeDNS.all, 'list', params],
-    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id]
+    detail: (id) => [...queryKeys.edgeDNS.all, 'detail', id],
+    dnssec: (id) => [...queryKeys.edgeDNS.detail(id), 'dnssec'],
+    records: {
+      all: (parentId) => [...queryKeys.edgeDNS.detail(parentId), 'records'],
+      list: (parentId, params) => [
+        ...queryKeys.edgeDNS.detail(parentId),
+        'records',
+        'list',
+        params
+      ],
+      detail: (parentId, id) => [...queryKeys.edgeDNS.detail(parentId), 'records', 'detail', id]
+    }
   },
   edgeStorage: {
     all: ['edge-storage'],
@@ -205,7 +221,9 @@ export const queryKeys = {
   waf: {
     all: ['waf-rules'],
     list: (params) => [...queryKeys.waf.all, 'list', params],
-    detail: (id) => [...queryKeys.waf.all, 'detail', id]
+    detail: (id) => [...queryKeys.waf.all, 'detail', id],
+    allowed: (wafId, params) => [...queryKeys.waf.all, 'allowed', wafId, params],
+    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId]
   },
   edgeSql: {
     all: ['edge-sql'],
@@ -216,5 +234,63 @@ export const queryKeys = {
     all: ['appcues'],
     tags: () => [...queryKeys.appcues.all, 'tags'],
     launchpads: () => [...queryKeys.appcues.all, 'launchpads']
+  },
+  networkLists: {
+    all: ['network-lists'],
+    list: (params) => [...queryKeys.networkLists.all, 'list', params],
+    detail: (id) => [...queryKeys.networkLists.all, 'detail', id],
+    dropdown: (params) => [...queryKeys.networkLists.all, 'dropdown', params]
+  },
+  digitalCertificates: {
+    all: ['digital-certificates'],
+    list: (params) => [...queryKeys.digitalCertificates.all, 'list', params],
+    detail: (id) => [...queryKeys.digitalCertificates.all, 'detail', id]
+  },
+  customPages: {
+    all: ['custom-pages'],
+    list: (params) => [...queryKeys.customPages.all, 'list', params],
+    detail: (id) => [...queryKeys.customPages.all, 'detail', id]
+  },
+  digitalCertificatesCRL: {
+    all: ['digital-certificates-crl'],
+    list: (params) => [...queryKeys.digitalCertificatesCRL.all, 'list', params],
+    detail: (id) => [...queryKeys.digitalCertificatesCRL.all, 'detail', id]
+  },
+  users: {
+    all: ['users'],
+    list: (params) => [...queryKeys.users.all, 'list', params],
+    detail: (id) => [...queryKeys.users.all, 'detail', id]
+  },
+  personalToken: {
+    all: ['personal-tokens'],
+    list: (params) => [...queryKeys.personalToken.all, 'list', params]
+  },
+  edgeService: {
+    all: ['edge-services'],
+    list: (params) => [...queryKeys.edgeService.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeService.all, 'detail', id],
+    resources: {
+      all: (parentId) => [...queryKeys.edgeService.detail(parentId), 'resources'],
+      list: (parentId, params) => [
+        ...queryKeys.edgeService.detail(parentId),
+        'resources',
+        'list',
+        params
+      ]
+    }
+  },
+  edgeNode: {
+    all: ['edge-nodes'],
+    list: (params) => [...queryKeys.edgeNode.all, 'list', params],
+    detail: (id) => [...queryKeys.edgeNode.all, 'detail', id],
+    services: {
+      all: (parentId) => [...queryKeys.edgeNode.detail(parentId), 'services'],
+      list: (parentId, params) => [
+        ...queryKeys.edgeNode.detail(parentId),
+        'services',
+        'list',
+        params
+      ]
+    }
   }
 }

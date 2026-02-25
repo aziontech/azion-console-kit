@@ -3,10 +3,11 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider']
+    paths: ['identifySignUpProvider', 'hasSession']
   },
   state: () => ({
     account: {},
+    hasSession: false,
     identifySignUpProvider: '',
     accountStatuses: {
       BLOCKED: 'BLOCKED',
@@ -79,6 +80,15 @@ export const useAccountStore = defineStore({
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     },
+    accountTimezone(state) {
+      return state.account?.timezone
+    },
+    timezoneInfo() {
+      return {
+        timezone: this.accountTimezone,
+        utcOffset: this.accountUtcOffset
+      }
+    },
     ssoSignUpMethod(state) {
       return state.identifySignUpProvider
     },
@@ -129,8 +139,12 @@ export const useAccountStore = defineStore({
     setAccountData(account) {
       this.account = { ...this.account, ...account }
     },
+    setHasSession(value) {
+      this.hasSession = !!value
+    },
     resetAccount() {
       this.account = {}
+      this.hasSession = false
       this.identifySignUpProvider = ''
     },
     setSsoSignUpMethod(method) {

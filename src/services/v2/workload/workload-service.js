@@ -342,9 +342,9 @@ export class WorkloadService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'workloads',
-      findFn: (item) => String(item.id) === String(id),
-      mapFn: (item) => ({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
         id: item.id,
         name: item.name?.text ?? item.name,
         workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
@@ -358,15 +358,15 @@ export class WorkloadService extends BaseService {
     if (!id) return undefined
 
     return super.getFromCache({
-      cacheKey: 'workloads',
-      findFn: (item) => String(item.id) === String(id),
-      mapFn: (item) => ({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
         id: item.id,
         name: item.name?.text ?? item.name,
         active: item.active?.content === 'Active',
         domainName: item.workloadHostname?.content,
         environment: item.infrastructure === 'Production' ? 'production' : 'staging',
-        cnames: item.domains.join('\n') || ''
+        cnames: item?.domains?.join('\n') || ''
       }),
       listPath: 'body'
     })
