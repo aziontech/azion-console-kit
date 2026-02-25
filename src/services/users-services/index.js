@@ -3,7 +3,6 @@ import { loadAccountDetailsService } from './get-account-detail-service'
 import { listCountriesPhoneService } from './list-countries-phone-service'
 import { listTimezonesService } from './list-timezones-service'
 import { teamsService } from './list-teams-service'
-import { loadUserService } from './load-user-service'
 import { loadAnotherUserService } from './load-another-user-service'
 
 const listUsersService = usersService.listUsers
@@ -25,7 +24,6 @@ export {
   listCountriesPhoneService,
   listTimezonesService,
   listTeamsService,
-  loadUserService,
   loadUserSettings,
   editAnotherUserService,
   editUsersService,
