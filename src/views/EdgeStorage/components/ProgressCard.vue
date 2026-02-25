@@ -53,11 +53,15 @@
   })
 
   const iconClass = computed(() => {
-    return operationType.value === 'upload' ? 'pi pi-file' : 'pi pi-trash'
+    if (operationType.value === 'upload') return 'pi pi-file'
+    if (operationType.value === 'move') return 'pi pi-arrow-right-arrow-left'
+    return 'pi pi-trash'
   })
 
   const actionText = computed(() => {
-    return operationType.value === 'upload' ? 'Uploading' : 'Deleting'
+    if (operationType.value === 'upload') return 'Uploading'
+    if (operationType.value === 'move') return 'Moving'
+    return 'Deleting'
   })
 
   const itemText = computed(() => {

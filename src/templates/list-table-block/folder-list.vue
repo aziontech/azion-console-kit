@@ -22,6 +22,7 @@
     'on-row-click-edit-folder',
     'delete-selected-items',
     'download-selected-items',
+    'move-selected-items',
     'page',
     'save-new-folder',
     'cancel-new-folder',
@@ -746,6 +747,14 @@
                 class="px-4"
                 :disabled="isDownloading"
                 @click="emit('download-selected-items')"
+              />
+              <PrimeButton
+                size="small"
+                outlined
+                icon="pi pi-arrow-right-arrow-left"
+                label="Move"
+                class="px-4"
+                @click="emit('move-selected-items')"
               />
               <PrimeButton
                 size="small"
