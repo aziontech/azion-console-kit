@@ -2,7 +2,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref, watch, inject } from 'vue'
+  import { computed, ref, watch, inject, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -63,6 +63,12 @@
   })
 
   const isLoadingData = ref(true)
+
+  /**
+   * Provides the loading state to descendant components.
+   * Used by the skeleton system to determine when to show/hide skeleton loaders.
+   */
+  provide('editFormLoading', isLoadingData)
 
   let formHasUpdated, visibleOnSaved
 

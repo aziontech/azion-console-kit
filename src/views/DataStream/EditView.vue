@@ -4,6 +4,7 @@
 
   // Import the components
   import FormFieldsDataStream from '@/views/DataStream/FormFields/FormFieldsDataStream'
+  import FormFieldsDataStreamSkeleton from '@/views/DataStream/FormFields/FormFieldsDataStreamSkeleton'
   import SamplingDialog from '@/views/DataStream/Dialog/SamplingDialog'
   import { validationSchema } from '@/views/DataStream/FormFields/composables/validation'
   import EditFormBlock from '@/templates/edit-form-block'
@@ -13,6 +14,7 @@
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { useFormSkeleton } from '@/composables/useFormSkeleton'
 
   const props = defineProps({
     updatedRedirect: {
@@ -27,15 +29,41 @@
   const store = useAccountStore()
 
   const displaySamplingDialog = ref(false)
+
+  /**
+   * Tracks the form loading state at the parent level.
+   * Starts as true and becomes false once EditFormBlock emits `loaded-service-object`,
+   * indicating that the loadService has completed.
+   */
+  const formIsLoading = ref(true)
+
   const streamName = computed(() => cachedDataStream.value?.name || 'Edit Stream')
   const cachedDataStream = computed(() =>
     dataStreamService.getDataStreamFromCache(route.params?.id)
   )
 
+  /**
+   * Skeleton visibility is determined by the useFormSkeleton composable.
+   * - `isLoading` tracks whether the form data has been loaded
+   * - `cachedData` comes from TanStack Query cache via getDataStreamFromCache
+   *
+   * Skeleton shows only during initial load when no cache exists.
+   * If cache is available, the form renders immediately without skeleton.
+   */
+  const { showSkeleton } = useFormSkeleton({
+    isLoading: formIsLoading,
+    cachedData: cachedDataStream
+  })
+
   const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const setStreamName = (dataStream) => {
+    formIsLoading.value = false
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, dataStream.name)
+  }
+
+  const handleLoadFail = () => {
+    formIsLoading.value = false
   }
 
   const formSubmit = (onSubmit, values, formValid) => {
@@ -74,9 +102,14 @@
         :initialValues="cachedDataStream"
         :schema="validation"
         @loaded-service-object="setStreamName"
+        @on-load-fail="handleLoadFail"
       >
         <template #form>
-          <FormFieldsDataStream isEdit />
+          <FormFieldsDataStreamSkeleton v-if="showSkeleton" />
+          <FormFieldsDataStream
+            v-else
+            isEdit
+          />
         </template>
         <template
           v-if="hasNoPermissionToEditDataStream"

@@ -15,9 +15,13 @@
         disableAfterCreateToastFeedback
         @on-edit-fail="handleTrackFailEdit"
         @on-edit-success="successSubmit"
+        @loaded-service-object="handleLoadedServiceObject"
+        @on-load-fail="handleLoadFail"
       >
         <template #form>
+          <FormFieldsYourSettingsSkeleton v-if="showSkeleton" />
           <FormFieldsYourSettings
+            v-else
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
           />
@@ -45,6 +49,8 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
+  import FormFieldsYourSettingsSkeleton from './FormFields/FormFieldsYourSettingsSkeleton.vue'
+  import { useFormSkeleton } from '@/composables/useFormSkeleton'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -89,6 +95,23 @@
     }
   })
 
+  /**
+   * Tracks the form loading state at the parent level.
+   * Starts as true and becomes false once EditFormBlock emits `loaded-service-object`,
+   * indicating that the loadService has completed.
+   */
+  const formIsLoading = ref(true)
+
+  /**
+   * Skeleton visibility is determined by the useFormSkeleton composable.
+   * - `isLoading` tracks whether the form data has been loaded
+   *
+   * Skeleton shows only during initial load when no cache exists.
+   */
+  const { showSkeleton } = useFormSkeleton({
+    isLoading: formIsLoading
+  })
+
   const userData = ref({})
   const userChanges = ref({})
 
@@ -96,6 +119,14 @@
     userData.value = await props.loadUserService()
 
     return userData.value
+  }
+
+  const handleLoadedServiceObject = () => {
+    formIsLoading.value = false
+  }
+
+  const handleLoadFail = () => {
+    formIsLoading.value = false
   }
 
   const showToast = (severity, detail, summary = severity) => {
