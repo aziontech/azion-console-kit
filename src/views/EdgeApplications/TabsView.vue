@@ -11,7 +11,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
+  import { computed, ref, provide, inject, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import EditView from './EditView.vue'
@@ -20,7 +20,8 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
   import PrimeButton from 'primevue/button'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
@@ -70,9 +71,6 @@
     edgeApplication.value = cachedEdgeApplication
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedEdgeApplication.name)
   }
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const componentsRefs = ref(null)
 
@@ -223,9 +221,18 @@
     if (tab === 'error-responses') handleTrackClickToEditErrorResponses()
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', { changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved })
+  const tabViewRef = ref(null)
+
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
+    }
+  }
 
   provide('edgeApplication', edgeApplication)
   provide('isApplicationLoaded', isApplicationLoaded)
@@ -253,16 +260,6 @@
 
   const imageProcessorEnabled = computed(() => {
     return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
-  })
-
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    }
-
-    tabHasUpdate.oldTab = oldValue
-    tabHasUpdate.nextTab = newValue
-    tabHasUpdate.updated = generateCurrentTimestamp()
   })
 
   const tabs = ref([
@@ -406,14 +403,20 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div
         class="h-full w-full"
         v-if="edgeApplication"
       >
         <div class="flex align-center justify-between relative">
           <TabView
+            ref="tabViewRef"
             :activeIndex="activeTab"
-            @tab-click="({ index = 0 }) => changeTab(index)"
+            @tab-click="handleTabClick"
             class="flex-1"
           >
             <TabPanel

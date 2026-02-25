@@ -1,12 +1,13 @@
 <script setup>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
+  import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -51,12 +52,19 @@
 
   const router = useRouter()
   const toast = useToast()
-  const blockViewRedirection = ref(props.unSaved)
 
-  const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
+  const isDirty = useIsFormDirty()
+
+  const unsaved = useUnsavedChanges({
+    enableRouteGuard: true,
+    enableBeforeUnload: true
   })
+
+  unsaved.addDirtySource(isDirty)
+
+  if (!props.unSaved) {
+    unsaved.disable()
+  }
 
   const classForm = computed(() => {
     return attrs.class || 'flex flex-col min-h-[calc(100vh-300px)]'
@@ -122,10 +130,11 @@
   const onSubmit = handleSubmit(
     async (values) => {
       try {
-        blockViewRedirection.value = false
+        unsaved.disable()
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
+        unsaved.enable()
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
           emit('on-response-fail', error.message[0] || error)
@@ -164,7 +173,11 @@
         :errors="errors"
       />
     </form>
-    <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+    <DialogUnsaved
+      :visible="unsaved.isDialogVisible.value"
+      @leave="unsaved.confirmLeave"
+      @stay="unsaved.cancelLeave"
+    />
     <slot
       name="action-bar"
       :onSubmit="onSubmit"
