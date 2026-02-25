@@ -90,6 +90,7 @@ export class TeamPermissionService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.teams.all })
 
     return {
+      id: data.data.id,
       feedback: 'Your Team Permission has been created',
       urlToEditView: `/teams-permission/edit/${data.data.id}`
     }

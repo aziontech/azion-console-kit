@@ -120,8 +120,8 @@
     currentEmail.value = userData.email
 
     return {
-      ...userData,
-      ...cachedUser
+      ...cachedUser,
+      ...userData
     }
   }
 

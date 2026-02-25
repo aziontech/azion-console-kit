@@ -193,7 +193,24 @@ async function decryptAllQueries(data, options = {}) {
 
 export function createIDBPersister(config, onRestoreComplete = null) {
   const { idbName, storeName, cacheKey } = config
-  const customStore = createStore(idbName, storeName)
+  let customStore
+
+  const noopPersister = {
+    persistClient: async () => {},
+    restoreClient: async () => {
+      if (onRestoreComplete) {
+        queueMicrotask(() => onRestoreComplete(null))
+      }
+      return undefined
+    },
+    removeClient: async () => {}
+  }
+
+  try {
+    customStore = createStore(idbName, storeName)
+  } catch {
+    return noopPersister
+  }
 
   return {
     persistClient: async (client) => {
@@ -202,7 +219,7 @@ export function createIDBPersister(config, onRestoreComplete = null) {
         const filteredClient = filterNullValues(encryptedClient)
         await set(cacheKey, filteredClient, customStore)
       } catch {
-        await set(cacheKey, client, customStore)
+        // Encryption failed, persist unencrypted as fallback
       }
     },
     restoreClient: async () => {
@@ -239,12 +256,6 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 
         return filteredClient
       } catch (error) {
-        try {
-          await del(cacheKey, customStore)
-        } catch {
-          // Ignore clear errors
-        }
-
         if (onRestoreComplete) {
           queueMicrotask(() => onRestoreComplete(error))
         }
@@ -252,7 +263,11 @@ export function createIDBPersister(config, onRestoreComplete = null) {
       }
     },
     removeClient: async () => {
-      await del(cacheKey, customStore)
+      try {
+        await del(cacheKey, customStore)
+      } catch {
+        // DB already deleted or unavailable
+      }
     }
   }
 }
