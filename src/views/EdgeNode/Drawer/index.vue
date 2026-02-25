@@ -5,6 +5,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'drawer-service' })
 
@@ -12,18 +13,6 @@
   const props = defineProps({
     edgeNodeId: {
       type: String,
-      required: true
-    },
-    createServiceEdgeNodeService: {
-      type: Function,
-      required: true
-    },
-    editServiceEdgeNodeService: {
-      type: Function,
-      required: true
-    },
-    loadServiceEdgeNodeService: {
-      type: Function,
       required: true
     },
     listServiceEdgeNodeService: {
@@ -61,18 +50,17 @@
   })
 
   const editService = async (payload) => {
-    return await props.editServiceEdgeNodeService({
+    return await edgeNodeService.editEdgeNodeServiceService({
       ...payload,
       edgeNodeId: props.edgeNodeId
     })
   }
 
   const loadService = async (payload) => {
-    const edgeNode = await props.loadServiceEdgeNodeService({
+    return await edgeNodeService.loadEdgeNodeServiceDetailService({
       ...payload,
       edgeNodeId: props.edgeNodeId
     })
-    return edgeNode
   }
 
   const handleToggleDrawer = (value) => {
@@ -100,7 +88,7 @@
   <CreateDrawerBlock
     v-if="loadCreateServiceDrawer"
     v-model:visible="showCreateServiceDrawer"
-    :createService="createServiceEdgeNodeService"
+    :createService="edgeNodeService.createEdgeNodeServiceService"
     :schema="validationSchema"
     :isOverlapped="isOverlapped"
     :initialValues="initialValues"

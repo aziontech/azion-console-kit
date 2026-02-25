@@ -62,6 +62,8 @@
     validationSchema: props.schema
   })
 
+  const isLoadingData = ref(true)
+
   let formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
@@ -142,6 +144,8 @@
       }
 
       goBackToList()
+    } finally {
+      isLoadingData.value = false
     }
   }
 
@@ -204,6 +208,7 @@
       <slot
         name="form"
         :errors="errors"
+        :loading="isLoadingData"
       />
 
       <slot

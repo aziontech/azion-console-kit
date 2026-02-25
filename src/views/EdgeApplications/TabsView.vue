@@ -125,6 +125,7 @@
     }, {})
   }
   const verifyTab = (edgeApplication) => {
+    if (!edgeApplication) return
     if (edgeFunctionsEnabled.value && !edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()
@@ -133,42 +134,37 @@
     mapTabs.value = { ...defaultTabs.value }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeApplication.value) return
 
     const tableDefinitions = useTableDefinitionsStore()
     const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
 
-    const preloadPromises = []
     const edgeFunctionsProperty = hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
 
-    if (hasFlagBlockApiV4()) {
-      preloadPromises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
+    const promises = []
 
-      preloadPromises.push(
+    if (hasFlagBlockApiV4()) {
+      promises.push(props.originsServices.prefetchOriginsList(edgeApplicationId.value))
+      promises.push(
         edgeAppErrorResponseService.prefetchEdgeApplicationsErrorResponseList(
           edgeApplicationId.value
         )
       )
     }
 
-    preloadPromises.push(
-      deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize)
-    )
-
-    preloadPromises.push(
-      cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize)
-    )
+    promises.push(deviceGroupService.prefetchDeviceGroupsList(edgeApplicationId.value, pageSize))
+    promises.push(cacheSettingsService.prefetchCacheSettingsList(edgeApplicationId.value, pageSize))
 
     if (edgeApplication.value[edgeFunctionsProperty]) {
-      preloadPromises.push(
+      promises.push(
         edgeApplicationFunctionService.prefetchFunctionsList(edgeApplicationId.value, pageSize)
       )
     }
 
-    preloadPromises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
+    promises.push(rulesEngineService.prefetchRulesEngineList(edgeApplicationId.value))
 
-    await Promise.allSettled(preloadPromises)
+    Promise.allSettled(promises)
   }
 
   const renderTabByCurrentRouter = async () => {
@@ -177,12 +173,12 @@
     let selectedTab = tab
     if (!tab) selectedTab = 'main-settings'
 
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
+
     edgeApplication.value = { ...edgeApplication.value, ...(await handleLoadEdgeApplication()) }
     isApplicationLoaded.value = true
     verifyTab(edgeApplication.value)
-
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
-    changeTab(activeTabIndexByRoute)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeApplication.value?.name)
     preloadTabData()

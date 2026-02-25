@@ -407,6 +407,36 @@ function displayLegend(chartData) {
 }
 
 /**
+ * Resolves the mouse cursor position relative to the chart SVG.
+ * Uses d3.mouse as the primary method with DOM rect fallback.
+ *
+ * @param {Object} c3Instance - The C3 internal chart instance
+ * @param {HTMLElement} hoveredElement - The DOM element being hovered
+ * @returns {Array|null} - [x, y] coordinates or null if unable to resolve
+ */
+function getMousePosition(c3Instance, hoveredElement) {
+  if (c3Instance.d3 && c3Instance.svg) {
+    return c3Instance.d3.mouse(c3Instance.svg.node())
+  }
+
+  if (c3Instance.d3) {
+    return c3Instance.d3.mouse(hoveredElement)
+  }
+
+  const svgBounds = c3Instance.svg?.node()?.getBoundingClientRect()
+  const elementBounds = hoveredElement?.getBoundingClientRect()
+
+  if (svgBounds && elementBounds) {
+    return [
+      elementBounds.left - svgBounds.left + elementBounds.width / 2,
+      elementBounds.top - svgBounds.top + elementBounds.height / 2
+    ]
+  }
+
+  return null
+}
+
+/**
  * Format the properties for the C3 graph
  *
  * @param {Object} options - The options object
@@ -531,6 +561,31 @@ export function FormatC3GraphProps({
     },
     tooltip: {
       show: window.innerWidth > CHART_RULES.SCREEN_XSMALL_BREAKPOINT,
+      position(tooltipData, tooltipWidth, tooltipHeight, hoveredElement) {
+        const c3Instance = this.internal || this
+        const TOOLTIP_GAP = 15
+
+        const mousePosition = getMousePosition(c3Instance, hoveredElement)
+        const cursorX = mousePosition ? mousePosition[0] : 0
+        const cursorY = mousePosition ? mousePosition[1] : 0
+        const availableWidth = c3Instance.currentWidth || 800
+        const availableHeight = c3Instance.currentHeight || 300
+
+        const isMouseOnRightHalf = cursorX > availableWidth / 2
+
+        let left = isMouseOnRightHalf ? cursorX - tooltipWidth - TOOLTIP_GAP : cursorX + TOOLTIP_GAP
+
+        left = Math.max(0, Math.min(left, availableWidth - tooltipWidth))
+
+        let top = cursorY + TOOLTIP_GAP
+        const isTooltipOverflowingBottom = top + tooltipHeight > availableHeight
+
+        if (isTooltipOverflowingBottom) {
+          top = Math.max(0, availableHeight - tooltipHeight - TOOLTIP_GAP)
+        }
+
+        return { top, left }
+      },
       contents(d, defaultTitleFormat, defaultValueFormat, color) {
         if (chartData.type === 'ordered-bar') {
           const { index } = d[0]

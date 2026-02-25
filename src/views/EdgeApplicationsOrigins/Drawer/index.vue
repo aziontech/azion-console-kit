@@ -199,14 +199,14 @@
     payload.id = payload.originKey
     return await props.editOriginService({
       ...payload,
-      edgeApplicationId: props.edgeApplicationId
+      applicationId: props.edgeApplicationId
     })
   }
 
   const loadService = async (payload) => {
     const edgeNode = await props.loadOriginService({
       ...payload,
-      edgeApplicationId: props.edgeApplicationId
+      applicationId: props.edgeApplicationId
     })
     return edgeNode
   }

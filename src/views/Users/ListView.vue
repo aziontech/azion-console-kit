@@ -24,18 +24,6 @@
     }
   })
 
-  const USERS_API_FIELDS = [
-    'id',
-    'first_name',
-    'last_name',
-    'email',
-    'teams',
-    'two_factor_enabled',
-    'is_active',
-    'is_account_owner',
-    'last_modified'
-  ]
-
   const actions = computed(() => [
     {
       label: 'Delete',
@@ -46,72 +34,84 @@
     }
   ])
 
-  const getColumns = computed(() => [
-    {
-      field: 'firstName',
-      header: 'First Name',
-      sortField: 'first_name'
-    },
-    {
-      field: 'lastName',
-      header: 'Last Name',
-      sortField: 'last_name'
-    },
-    {
-      field: 'email',
-      header: 'Email Address'
-    },
-    {
-      field: 'teams',
-      header: 'Teams',
-      disableSort: true,
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-array-with-popup'
-        })
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'firstName',
+        header: 'First Name',
+        sortField: 'first_name'
+      },
+      {
+        field: 'lastName',
+        header: 'Last Name',
+        sortField: 'last_name'
+      },
+      {
+        field: 'email',
+        header: 'Email Address'
+      },
+      {
+        field: 'teams',
+        header: 'Teams',
+        disableSort: true,
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-array-with-popup'
+          })
+      },
+      {
+        field: 'mfa',
+        header: 'MFA',
+        type: 'component',
+        disableSort: true,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'owner',
+        header: 'Account Owner',
+        filterPath: 'owner.content',
+        type: 'component',
+        disableSort: true,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        disableSort: true,
+        filterPath: 'status.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
-    },
-    {
-      field: 'mfa',
-      header: 'MFA',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    },
-    {
-      field: 'owner',
-      header: 'Account Owner',
-      filterPath: 'owner.content',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      disableSort: true,
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    }
-  ])
+    ]
+  })
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'User'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'User'
+    })
+  }
 
   const csvMapper = (rowData) => {
     return {
@@ -123,18 +123,6 @@
       owner: rowData.owner?.content || rowData.owner,
       status: rowData.status?.content || rowData.status
     }
-  }
-
-  const handleTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'User'
-    })
-  }
-
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'User'
-    })
   }
 </script>
 
@@ -166,7 +154,6 @@
         emptyListMessage="No users found."
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        :apiFields="USERS_API_FIELDS"
         :frozenColumns="['firstName']"
         exportFileName="Users"
         :csvMapper="csvMapper"

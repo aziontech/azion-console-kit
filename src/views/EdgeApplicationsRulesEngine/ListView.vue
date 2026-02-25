@@ -284,8 +284,9 @@
     exportFileName="Application Rules Engine"
     :expandedRowGroups="['Default', 'Request', 'Response']"
     :empty-block="{
-      title: 'No rules engine have been created',
-      description: 'Click the button below to create your first rules engine.',
+      title: 'No rules engines yet',
+      description:
+        'Create your first rules engine to define conditional logic for your application.',
       documentationService: documentationService
     }"
     :pt="{

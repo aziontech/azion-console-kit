@@ -53,14 +53,6 @@
     }
   })
 
-  const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
-    'id',
-    'name',
-    'description',
-    'last_modified',
-    'last_editor',
-    'active'
-  ]
   const hasContentToList = ref(true)
   const drawerRef = ref('')
   const listTableBlockRef = ref('')
@@ -257,8 +249,9 @@
     :actions="actions"
     exportFileName="Firewall Rules Engine"
     :emptyBlock="{
-      title: 'No rule has been created',
-      description: 'Click the button below to create your first rule.',
+      title: 'No rules yet',
+      description:
+        'Create your first firewall rule to define security modules and enforcement behavior for incoming traffic.',
       createButtonLabel: 'Rule',
       documentationService: documentationService
     }"

@@ -312,8 +312,8 @@ export function useDataTable(props, emit) {
   }
 
   const updateDataTablePagination = () => {
-    const FIRST_NUMBER_PAGE = 1
-    firstItemIndex.value = FIRST_NUMBER_PAGE
+    const FIRST_INDEX = 0
+    firstItemIndex.value = FIRST_INDEX
   }
 
   // Sorting
@@ -324,8 +324,8 @@ export function useDataTable(props, emit) {
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     await reload({ ordering })
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
@@ -335,8 +335,8 @@ export function useDataTable(props, emit) {
   // Search
   const fetchOnSearch = () => {
     if (!props.lazy) return
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     reload()
   }
 
@@ -393,8 +393,8 @@ export function useDataTable(props, emit) {
       }
 
       const filterParams = buildFilterParams()
-      const firstPage = 1
-      firstItemIndex.value = firstPage
+      const firstIndex = 0
+      firstItemIndex.value = firstIndex
 
       const success = await reload(filterParams)
 
@@ -422,8 +422,8 @@ export function useDataTable(props, emit) {
     }
 
     const filterParams = buildFilterParams()
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     reload(filterParams)
   }
 

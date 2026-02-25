@@ -6,8 +6,12 @@ import { PERSISTENCE_CONFIG } from './config'
 
 let restorePromise = null
 let resolveRestore = null
-let rejectRestore = null
 let unsubscribePersistence = null
+
+const deleteCorruptedDatabase = () => {
+  if (typeof indexedDB === 'undefined') return
+  indexedDB.deleteDatabase(PERSISTENCE_CONFIG.IDB_NAME)
+}
 
 export const persister = createIDBPersister(
   {
@@ -17,10 +21,9 @@ export const persister = createIDBPersister(
   },
   (error) => {
     if (error) {
-      rejectRestore(error)
-    } else {
-      resolveRestore()
+      deleteCorruptedDatabase()
     }
+    resolveRestore()
   }
 )
 
@@ -37,9 +40,8 @@ const loadConfig = () => {
 
 export const queryPlugin = {
   install(app) {
-    restorePromise = new Promise((resolve, reject) => {
+    restorePromise = new Promise((resolve) => {
       resolveRestore = resolve
-      rejectRestore = reject
     })
 
     const [unsubscribe] = persistQueryClient(loadConfig())

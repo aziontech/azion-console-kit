@@ -4,15 +4,17 @@ export class ErrorHandler {
     UNEXPECTED_ERROR: 'An unexpected error occurred. Please try again.'
   }
 
-  constructor(status, messages) {
+  constructor(status, messages, code) {
     this.status = status
     this.message = Array.isArray(messages) ? messages : [messages]
+    this.code = code
   }
 
   static create(error) {
     const status = error?.response?.status || 500
+    const code = error?.code || null
     const messages = this._extractMessages(error)
-    return new ErrorHandler(status, messages)
+    return new ErrorHandler(status, messages, code)
   }
 
   static createMeta(axiosError) {

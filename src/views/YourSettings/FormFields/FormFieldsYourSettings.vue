@@ -1,12 +1,12 @@
 <script setup>
   import { useField } from 'vee-validate'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { onMounted, ref } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import InputMask from 'primevue/inputmask'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldPhoneNumberCountry from '@/templates/form-fields-inputs/fieldPhoneNumberCountry'
   import InputPassword from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import LabelBlock from '@/templates/label-block'
@@ -24,35 +24,16 @@
 
   const optionsTimezone = ref([])
   const isForceMFA = ref(false)
-  const optionsCountriesMobile = ref([])
-  const filteredCountriesMobile = ref([])
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
-  const selectedCountryCallCode = ref(null)
 
   const { value: firstName } = useField('firstName')
   const { value: lastName } = useField('lastName')
   const { value: timezone } = useField('timezone')
   const { value: language } = useField('language')
   const { value: email } = useField('email')
-  const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
-
-  const fetchCountries = async () => {
-    const result = await props.listCountriesPhoneService()
-    optionsCountriesMobile.value = result
-    filteredCountriesMobile.value = [...optionsCountriesMobile.value]
-    if (countryCallCode.value) {
-      selectedCountryCallCode.value = optionsCountriesMobile.value.find(
-        (item) => item.value === countryCallCode.value
-      )
-    }
-    if (!countryCallCode.value) {
-      selectedCountryCallCode.value = optionsCountriesMobile.value[0]
-    }
-  }
 
   const fetchTimezone = async () => {
     const result = await props.listTimezonesService()
@@ -60,7 +41,6 @@
   }
 
   onMounted(async () => {
-    await fetchCountries()
     await fetchTimezone()
   })
 
@@ -82,14 +62,6 @@
     passwordRequirementsList.value[3].valid = hasSpecialChar
     return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
   }
-
-  watch(selectedCountryCallCode, (newCountryCallCode) => {
-    countryCallCode.value = newCountryCallCode.value
-  })
-
-  const isLoadingCountry = computed(() => {
-    return !filteredCountriesMobile.value.length
-  })
 </script>
 
 <template>
@@ -191,71 +163,12 @@
         />
       </div>
 
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__mobile"
-      >
-        <LabelBlock
-          data-testid="your-settings-form__mobile__label"
-          for="mobile"
-          label="Phone Number"
-          isRequired
-        />
-        <div class="flex gap-2">
-          <div class="p-inputgroup">
-            <Dropdown
-              data-testid="your-settings-form__country-code__dropdown"
-              filter
-              autoFilterFocus
-              appendTo="self"
-              id="countryCallCode"
-              name="countryCallCode"
-              :options="filteredCountriesMobile"
-              optionLabel="labelFormat"
-              :loading="isLoadingCountry"
-              :disabled="isLoadingCountry"
-              :class="{ 'p-invalid': errorCountryCallCode }"
-              class="w-2/3 surface-border border-r-0"
-              v-model="selectedCountryCallCode"
-              :pt="{
-                filterInput: {
-                  class: 'w-full',
-                  'data-testid': 'your-settings-form__country-code__filter-input'
-                }
-              }"
-            >
-              <template #option="{ option }">
-                {{ option.label }}
-              </template>
-            </Dropdown>
-
-            <InputMask
-              data-testid="your-settings-form__mobile__input"
-              date="phone"
-              v-model="mobile"
-              class="w-full"
-              name="mobile"
-              :disabled="isLoadingCountry"
-              mask="?99999999999999999999"
-              placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile }"
-            />
-          </div>
-        </div>
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="your-settings-form__mobile__description"
-        >
-          The phone number of the user. Include country and region code.
-        </small>
-        <small
-          data-testid="your-settings-form__mobile__error-message"
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorMobile }}
-        </small>
-      </div>
+      <FieldPhoneNumberCountry
+        :listCountriesPhoneService="listCountriesPhoneService"
+        label="Phone Number"
+        description="The phone number of the user. Include country and region code."
+        data-testid="your-settings-form__phone"
+      />
     </template>
   </FormHorizontal>
 
