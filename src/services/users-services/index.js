@@ -14,6 +14,7 @@ const editUsersService = usersService.editUser
 const inviteYourTeamService = usersService.inviteTeamMember
 const listTeamsService = teamsService.useListTeams
 const getUserFromCache = usersService.getUserFromCacheById
+const loadUserSettings = usersService.loadUserSettings
 
 export {
   listUsersService,
@@ -25,6 +26,7 @@ export {
   listTimezonesService,
   listTeamsService,
   loadUserService,
+  loadUserSettings,
   editAnotherUserService,
   editUsersService,
   loadAnotherUserService,
