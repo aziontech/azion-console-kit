@@ -270,6 +270,20 @@ function getRemainingDays(dateStr) {
   return Math.floor(days)
 }
 
+const getDateRangeByHourRange = (hourRange) => {
+  const accountStore = useAccountStore()
+  const startDate = new Date().toUTC(accountStore.account.utc_offset)
+  const endDate = new Date().toUTC(accountStore.account.utc_offset)
+  startDate.setHours(startDate.getHours() - parseInt(hourRange))
+  const formattedStartDate = startDate.toUTC(accountStore.account.utc_offset).toBeholderFormat()
+  const formattedEndDate = endDate.toUTC(accountStore.account.utc_offset).toBeholderFormat()
+
+  return {
+    startDate: formattedStartDate,
+    endDate: formattedEndDate
+  }
+}
+
 const convertToRelativeTime = (date) => {
   if (!date) return '-'
   const now = new Date()
@@ -408,5 +422,6 @@ export {
   parseUtcOffsetToMinutes,
   createUtcDateFromUserTimezoneParts,
   getUtcIsoRangeForUserDay,
-  convertUnitToMilliseconds
+  convertUnitToMilliseconds,
+  getDateRangeByHourRange
 }

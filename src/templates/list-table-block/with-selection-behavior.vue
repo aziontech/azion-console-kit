@@ -19,6 +19,7 @@
       :emptyListMessage="emptyListMessage"
       dataKey="id"
       data-testid="data-table"
+      @row-click="({ data }) => editItemSelected(data)"
     >
       <template
         #header
