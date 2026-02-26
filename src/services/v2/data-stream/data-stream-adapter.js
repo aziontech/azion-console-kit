@@ -79,21 +79,18 @@ const parseByEndpointType = (payload) => {
         }
       }
     case 's3':
-      const obj = {
+      return {
         type: 's3',
         attributes: {
           access_key: payload.accessKey,
           region: payload.region,
-          object_key_prefix: payload.objectKey,
+          object_key_prefix: payload.objectKey || null,
           bucket_name: payload.bucket,
           content_type: payload.contentType,
-          host_url: payload.host
+          host_url: payload.host,
+          ...(payload.secretKey && { secret_key: payload.secretKey })
         }
       }
-      if (payload.secretKey) {
-        obj.attributes.secret_key = payload.secretKey
-      }
-      return obj
     case 'big_query':
       return {
         type: 'big_query',
@@ -170,9 +167,9 @@ const parseByEndpointType = (payload) => {
 }
 
 const getInfoByEndpoint = (payload) => {
-  const endpointAttributes = payload.attributes
+  const endpointAttributes = payload?.attributes
 
-  switch (payload.type) {
+  switch (payload?.type) {
     case 'standard':
       return {
         endpointUrl: endpointAttributes.url,
@@ -255,29 +252,29 @@ export const DataStreamAdapter = {
   transformListDataStream(data) {
     return (
       data?.map((dataStream) => {
-        const dataSourceInput = dataStream.inputs.find((input) => input.type === 'raw_logs')
-        const dataSetType = dataStream.outputs[0].type
+        const dataSourceInput = dataStream.inputs?.find((input) => input.type === 'raw_logs')
+        const dataSetType = dataStream.outputs?.[0]?.type
         const samplingTransform = dataStream.transform?.find((item) => item.type === 'sampling')
         const templateId = dataStream.transform?.find((item) => item.type === 'render_template')
-        const endpointOutput = dataStream.outputs[0]
+        const endpointOutput = dataStream.outputs?.[0]
 
         return {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
           dataSource:
-            dataSourceInput.attributes.data_source ||
-            mapDataSourceName[dataSourceInput.attributes.data_source],
+            dataSourceInput?.attributes?.data_source ||
+            mapDataSourceName[dataSourceInput?.attributes?.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
-          endpoint: endpointOutput.type,
+          endpoint: endpointOutput?.type,
           hasSampling: !!samplingTransform,
           samplingPercentage: samplingTransform?.attributes?.rate,
           status: dataStream.active,
           ...getInfoByEndpoint(endpointOutput),
           dataSourceLabel: mapDataSourceName[dataSourceInput?.attributes?.data_source],
-          endpointLabel: endpointTypeNameMap[endpointOutput.type] || endpointOutput.type,
+          endpointLabel: endpointTypeNameMap[endpointOutput?.type] || endpointOutput?.type,
           active: parseStatusData(dataStream.active),
           lastEditor: dataStream.last_editor || '-',
           lastModified: formatDateToDayMonthYearHour(dataStream.last_modified)
@@ -347,10 +344,10 @@ export const DataStreamAdapter = {
   transformLoadDataStream(data) {
     const [payload, workloads, templateData] = data
 
-    const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
+    const dataSourceInput = payload.inputs?.find((input) => input.type === 'raw_logs')
     const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')
     const templateId = payload.transform?.find((item) => item.type === 'render_template')
-    const endpointOutput = payload.outputs[0]
+    const endpointOutput = payload.outputs?.[0]
 
     let formattedDataSet = ''
     if (templateData?.dataSet) {
@@ -371,7 +368,7 @@ export const DataStreamAdapter = {
       domains: workloads,
       domainOption: samplingTransform ? '1' : '0',
       status: payload.active,
-      endpoint: endpointOutput.type,
+      endpoint: endpointOutput?.type,
       hasSampling: !!samplingTransform,
       samplingPercentage: samplingTransform?.attributes?.rate,
       ...getInfoByEndpoint(endpointOutput)
