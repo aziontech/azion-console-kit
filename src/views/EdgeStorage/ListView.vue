@@ -84,6 +84,7 @@
                 exportFileName="Files"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
+                @move-selected-items="handleMoveSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
@@ -163,11 +164,14 @@
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { formatBytes } from '@/helpers/format-bytes'
+  import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
   import ProgressCard from './components/ProgressCard.vue'
   import DataTable from '@/components/DataTable'
 
@@ -181,11 +185,13 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
+  const dialog = useDialog()
   const breadcrumbs = useBreadcrumbs()
   const {
     buckets,
     selectedBucket,
     deleteMultipleFiles,
+    moveFiles,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -204,6 +210,12 @@
       icon: 'pi pi-download',
       type: 'action',
       commandAction: (item) => handleDownload(item)
+    },
+    {
+      label: 'Move',
+      icon: 'pi pi-arrow-right-arrow-left',
+      type: 'action',
+      commandAction: (item) => handleOpenMoveDialog([item])
     },
     {
       title: 'File',
@@ -355,6 +367,36 @@
         selectedFiles.value = []
       }
     })
+  }
+
+  const handleOpenMoveDialog = (files) => {
+    const totalSize = files.reduce((sum, file) => sum + (file.sizeBytes || 0), 0)
+    const formattedSize = totalSize > 0 ? formatBytes(totalSize) : ''
+
+    dialog.open(MoveObjectDialog, {
+      data: {
+        files,
+        currentFolderPath: folderPath.value,
+        bucketName: selectedBucket.value.name,
+        totalSize: formattedSize
+      },
+      onClose: async (options) => {
+        if (options?.data?.updated && 'destinationPath' in (options?.data || {})) {
+          const filesToMove = files.map((file) => ({
+            name: file.name,
+            fullPath: folderPath.value ? folderPath.value + file.name : file.name
+          }))
+          selectedFiles.value = []
+          await moveFiles(filesToMove, options.data.destinationPath)
+          filesTableNeedRefresh.value = true
+          listServiceFilesRef.value?.reload()
+        }
+      }
+    })
+  }
+
+  const handleMoveSelectedItems = () => {
+    handleOpenMoveDialog(selectedFiles.value)
   }
 
   const listEdgeStorageBucketFiles = async () => {

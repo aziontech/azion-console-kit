@@ -7,6 +7,16 @@ import JSZip from 'jszip'
 import { useRoute } from 'vue-router'
 
 /**
+ * Enum for Edge Storage operation types
+ * @enum {string}
+ */
+export const EDGE_STORAGE_OPERATION_TYPE = {
+  UPLOAD: 'upload',
+  DELETE: 'delete',
+  MOVE: 'move'
+}
+
+/**
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
  */
@@ -31,7 +41,7 @@ const folderPath = ref('')
 const abortController = ref(null)
 
 const processProgress = computed(() => {
-  if (operationType.value === 'upload') {
+  if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD) {
     if (!totalBytesToProcess.value) return 0
     const completedFilesBytes = processedItems.value.reduce((sum, file) => sum + file.size, 0)
     const currentFileBytes =
@@ -41,7 +51,9 @@ const processProgress = computed(() => {
     const totalProgress =
       ((completedFilesBytes + currentFileBytes) / totalBytesToProcess.value) * 100
     return Math.round(Math.min(totalProgress, 100))
-  } else if (operationType.value === 'delete') {
+  } else if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE) {
+    return currentItemProgress.value
+  } else if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.MOVE) {
     return currentItemProgress.value
   }
   return 0
@@ -50,8 +62,8 @@ const processProgress = computed(() => {
 const processStatus = computed(() => {
   return {
     total: itemsToProcess.value.length,
-    uploaded: operationType.value === 'upload' ? processCount.value : 0,
-    deleted: operationType.value === 'delete' ? processCount.value : 0,
+    uploaded: operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD ? processCount.value : 0,
+    deleted: operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE ? processCount.value : 0,
     completed: processCount.value,
     failed: failedItems.value.length,
     current: currentProcessingItem.value,
@@ -149,7 +161,7 @@ export const useEdgeStorage = () => {
         itemsToProcess.value = filesArray
       }
 
-      operationType.value = 'upload'
+      operationType.value = EDGE_STORAGE_OPERATION_TYPE.UPLOAD
       isProcessing.value = true
       processCount.value = 1
       processedItems.value = []
@@ -278,9 +290,9 @@ export const useEdgeStorage = () => {
     if (!selectedBucket.value || !fileNames.length) return
 
     itemsToProcess.value = fileNames
-    operationType.value = 'delete'
+    operationType.value = EDGE_STORAGE_OPERATION_TYPE.DELETE
     isProcessing.value = true
-    processCount.value = 1
+    processCount.value = 0
     processedItems.value = []
     failedItems.value = []
     currentProcessingItem.value = null
@@ -342,6 +354,79 @@ export const useEdgeStorage = () => {
         'error',
         'Deletion Failed',
         'An unexpected error occurred during deletion. Please try again.'
+      )
+    }
+  }
+
+  const moveFiles = async (files, destinationPrefix) => {
+    if (!selectedBucket.value || !files.length) return
+
+    itemsToProcess.value = files
+    operationType.value = EDGE_STORAGE_OPERATION_TYPE.MOVE
+    isProcessing.value = true
+    processCount.value = 0
+    processedItems.value = []
+    failedItems.value = []
+    currentProcessingItem.value = null
+    currentItemProgress.value = 0
+
+    try {
+      const onProgress = (progress) => {
+        currentProcessingItem.value = {
+          name: progress.fileName
+        }
+        currentItemProgress.value = progress.percentage
+        processCount.value = progress.step === 'done' ? progress.completed : progress.completed + 1
+      }
+
+      const results = await edgeStorageService.moveEdgeStorageBucketFiles(
+        selectedBucket.value.name,
+        files,
+        destinationPrefix,
+        onProgress
+      )
+
+      const successResults = results.filter((result) => result.success)
+      const failureResults = results.filter((result) => !result.success)
+
+      processedItems.value = successResults
+      failedItems.value = failureResults
+
+      currentProcessingItem.value = null
+      isProcessing.value = false
+
+      const successCount = successResults.length
+      const failureCount = failureResults.length
+
+      if (successCount) {
+        filesTableNeedRefresh.value = true
+
+        const hasFailures = failureCount > 0
+        const toastType = hasFailures ? 'warn' : 'success'
+        const toastTitle = hasFailures ? 'Move Partially Completed' : 'Move Successful'
+        const successText = `${successCount} file${successCount > 1 ? 's' : ''} moved successfully`
+        const toastMessage = hasFailures ? `${successText}, ${failureCount} failed` : successText
+
+        handleToast(toastType, toastTitle, toastMessage)
+      }
+
+      if (failureCount && !successCount) {
+        handleToast(
+          'error',
+          'Move Failed',
+          `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to move`
+        )
+      }
+
+      return results
+    } catch (error) {
+      currentProcessingItem.value = null
+      isProcessing.value = false
+
+      handleToast(
+        'error',
+        'Move Failed',
+        'An unexpected error occurred during move. Please try again.'
       )
     }
   }
@@ -432,6 +517,7 @@ export const useEdgeStorage = () => {
     createFolder,
     removeFiles,
     deleteMultipleFiles,
+    moveFiles,
     getBucketSelected,
     bucketTableNeedRefresh,
     validationSchema,

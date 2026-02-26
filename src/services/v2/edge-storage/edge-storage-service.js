@@ -154,6 +154,83 @@ export class EdgeStorageService extends BaseService {
     return 'File added successfully'
   }
 
+  copyEdgeStorageBucketFile = async (bucketName = '', objectKey = '', newObjectKey = '') => {
+    await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(objectKey)}/copy/${encodeURIComponent(newObjectKey)}`,
+      body: {}
+    })
+    return `File "${objectKey}" copied to "${newObjectKey}" successfully`
+  }
+
+  moveEdgeStorageBucketFiles = async (
+    bucketName = '',
+    files = [],
+    destinationPrefix = '',
+    onProgress = null
+  ) => {
+    const results = []
+    const totalFiles = files.length
+    const totalSteps = totalFiles * 2
+
+    for (let idx = 0; idx < totalFiles; idx++) {
+      const file = files[idx]
+      const sourceKey = file.fullPath
+      const destKey = destinationPrefix + file.name
+
+      if (onProgress && typeof onProgress === 'function') {
+        onProgress({
+          fileName: file.name,
+          completed: idx,
+          total: totalFiles,
+          percentage: Math.round(((idx * 2) / totalSteps) * 100),
+          step: 'copying'
+        })
+      }
+
+      try {
+        await this.copyEdgeStorageBucketFile(bucketName, sourceKey, destKey)
+
+        if (onProgress && typeof onProgress === 'function') {
+          onProgress({
+            fileName: file.name,
+            completed: idx,
+            total: totalFiles,
+            percentage: Math.round(((idx * 2 + 1) / totalSteps) * 100),
+            step: 'deleting'
+          })
+        }
+
+        await this.deleteEdgeStorageBucketFiles(bucketName, sourceKey)
+
+        if (onProgress && typeof onProgress === 'function') {
+          onProgress({
+            fileName: file.name,
+            completed: idx + 1,
+            total: totalFiles,
+            percentage: Math.round(((idx * 2 + 2) / totalSteps) * 100),
+            step: 'done'
+          })
+        }
+
+        results.push({
+          fileName: file.name,
+          success: true,
+          message: `File "${file.name}" moved successfully`
+        })
+      } catch (error) {
+        results.push({
+          fileName: file.name,
+          success: false,
+          error,
+          message: `Failed to move file "${file.name}"`
+        })
+      }
+    }
+
+    return results
+  }
+
   deleteEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     await this.http.request({
       method: 'DELETE',
