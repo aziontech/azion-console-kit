@@ -2,9 +2,10 @@
   import { ref, computed, inject, watch } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import SelectButton from 'primevue/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
@@ -138,7 +139,7 @@
           header: 'Name',
           type: 'component',
           sortField: 'name',
-          style: 'max-width: 300px',
+          style: columnStyles.priority(2, 200, 350),
           component: (columnData) => {
             return columnBuilder({
               data: columnData,
@@ -150,18 +151,21 @@
           field: 'id',
           header: 'ID',
           sortField: 'id',
-          filterPath: 'id'
+          filterPath: 'id',
+          style: COLUMN_STYLES.FIT_CONTENT
         },
         {
           field: 'issuer',
           header: 'Issuer',
-          sortField: 'issuer'
+          sortField: 'issuer',
+          style: columnStyles.priority(2, 150, 250)
         },
         {
           field: 'status',
           header: 'Status',
           sortField: 'status',
           type: 'component',
+          style: COLUMN_STYLES.FIT_CONTENT,
           component: (columnData) =>
             columnBuilder({
               data: { ...columnData.status, tooltipText: columnData.statusDetail },
@@ -172,13 +176,15 @@
           field: 'lastEditor',
           header: 'Last Editor',
           sortField: 'last_editor',
-          filterPath: 'last_editor'
+          filterPath: 'last_editor',
+          style: COLUMN_STYLES.PRIORITY_SM
         },
         {
           field: 'lastModified',
           header: 'Last Modified',
           sortField: 'lastModified',
-          filterPath: 'lastModified'
+          filterPath: 'lastModified',
+          style: COLUMN_STYLES.FIT_CONTENT
         }
       ]
     }
@@ -188,7 +194,7 @@
         header: 'Name',
         type: 'component',
         sortField: 'name',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -200,33 +206,36 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'subjectName',
         header: 'Subject Names',
         sortField: 'subject_name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
       {
         field: 'issuer',
         header: 'Issuer',
-        sortField: 'issuer'
+        sortField: 'issuer',
+        style: columnStyles.priority(2, 150, 250)
       },
       {
         field: 'type',
         header: 'Type',
-        sortField: 'type'
+        sortField: 'type',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'validity',
         header: 'Expiration Date',
         sortField: 'validity',
         type: 'component',
-        style: 'max-width: 300px',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
       },
@@ -235,6 +244,7 @@
         header: 'Status',
         sortField: 'status',
         type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: { ...columnData.status, tooltipText: columnData.statusDetail },
@@ -246,6 +256,7 @@
         header: 'Managed',
         sortField: 'managed',
         type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: { content: columnData, severity: columnData ? 'success' : 'danger' },
@@ -255,29 +266,34 @@
       {
         field: 'challenge',
         header: 'Challenge',
-        sortField: 'challenge'
+        sortField: 'challenge',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'authority',
         header: 'Authority',
-        sortField: 'authority'
+        sortField: 'authority',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'keyAlgorithm',
         header: 'Key Algorithm',
-        sortField: 'key_algorithm'
+        sortField: 'key_algorithm',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor'
+        filterPath: 'last_editor',
+        style: COLUMN_STYLES.PRIORITY_SM
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified'
+        filterPath: 'lastModified',
+        style: COLUMN_STYLES.FIT_CONTENT
       }
     ]
   })

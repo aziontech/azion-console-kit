@@ -1,10 +1,11 @@
 <script setup>
+  import { computed } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed } from 'vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import { mfaService } from '@/services/v2/mfa/mfa-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   defineProps({
     documentationService: {
       type: Function,
@@ -35,14 +36,15 @@
     {
       field: 'name',
       header: 'Name',
-      sortField: 'name'
+      sortField: 'name',
+      style: columnStyles.priority(2, 200, 350)
     },
     {
       field: 'email',
       header: 'Email',
       sortField: 'email',
       type: 'component',
-      style: 'max-width: 300px',
+      style: columnStyles.priority(3, 200, 300),
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -56,6 +58,7 @@
       sortField: 'confirmed',
       filterPath: 'confirmed.content',
       type: 'component',
+      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
