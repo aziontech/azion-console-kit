@@ -84,7 +84,7 @@
             />
           </TabPanel>
           <TabPanel header="Now">
-            <div class="flex flex-col gap-4 max-w-[300px] px-4 mb-2">
+            <div class="flex flex-col gap-4 max-w-[300px] mb-2">
               <div class="text-sm text-color-secondary">
                 Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
               </div>
@@ -101,7 +101,7 @@
         <div
           class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
           :class="{
-            'px-4 mt-1': activeTab === 3
+            'p-1 mb-2': activeTab === 3
           }"
         >
           <div class="text-xs text-color-secondary">

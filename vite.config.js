@@ -95,7 +95,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
         }),
         '/graphql/cities': createProxyConfig({
-          target: `${URLStartPrefix}cities.azion.${DomainSuffix}`,
+          target: `${URLStartPrefix}cities.azion.${IS_PROD ? 'com' : 'net'}`,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         }),
         '/api/webhook/console_feedback': createProxyConfig({
