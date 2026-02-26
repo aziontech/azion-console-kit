@@ -255,7 +255,7 @@ export const DataStreamAdapter = {
   transformListDataStream(data) {
     return (
       data?.map((dataStream) => {
-        const dataSourceInput = dataStream.inputs.find((input) => input.type === 'raw_logs')
+        const dataSourceInput = dataStream.inputs?.find((input) => input.type === 'raw_logs')
         const dataSetType = dataStream.outputs[0].type
         const samplingTransform = dataStream.transform?.find((item) => item.type === 'sampling')
         const templateId = dataStream.transform?.find((item) => item.type === 'render_template')
@@ -266,8 +266,8 @@ export const DataStreamAdapter = {
           name: dataStream.name,
           templateName: dataStream.templateName,
           dataSource:
-            dataSourceInput.attributes.data_source ||
-            mapDataSourceName[dataSourceInput.attributes.data_source],
+            dataSourceInput?.attributes?.data_source ||
+            mapDataSourceName[dataSourceInput?.attributes?.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
@@ -347,7 +347,7 @@ export const DataStreamAdapter = {
   transformLoadDataStream(data) {
     const [payload, workloads, templateData] = data
 
-    const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
+    const dataSourceInput = payload.inputs?.find((input) => input.type === 'raw_logs')
     const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')
     const templateId = payload.transform?.find((item) => item.type === 'render_template')
     const endpointOutput = payload.outputs[0]
