@@ -431,6 +431,28 @@ export const useEdgeStorage = () => {
     }
   }
 
+  const renameFile = async (file, newName) => {
+    if (!selectedBucket.value || !file || !newName) return
+
+    const bucketName = selectedBucket.value.name
+    const currentObjectKey = folderPath.value ? folderPath.value + file.name : file.name
+    const newObjectKey = folderPath.value ? folderPath.value + newName : newName
+
+    try {
+      await edgeStorageService.renameEdgeStorageBucketFile(
+        bucketName,
+        currentObjectKey,
+        newObjectKey
+      )
+      filesTableNeedRefresh.value = true
+      handleToast('success', 'Rename Successful', `File renamed to "${newName}" successfully`)
+    } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred during rename.'
+      handleToast('error', 'Rename Failed', errorMessage)
+      throw error
+    }
+  }
+
   const handleFileChange = async (event) => {
     const files = event.dataTransfer?.files || event.target?.files
     if (files.length) {
@@ -518,6 +540,7 @@ export const useEdgeStorage = () => {
     removeFiles,
     deleteMultipleFiles,
     moveFiles,
+    renameFile,
     getBucketSelected,
     bucketTableNeedRefresh,
     validationSchema,
