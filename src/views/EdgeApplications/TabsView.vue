@@ -213,7 +213,6 @@
     router.push({ name: 'edit-application', params, query: {} })
   }
   const changeTab = (index) => {
-    verifyTab(edgeApplication.value)
     const tab = getTabFromIndex(index)
     activeTab.value = index
     changeRouteByTab(tab)
