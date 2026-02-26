@@ -63,10 +63,10 @@ export default class Aql {
           let beginValue = begin
           let endValue = end
 
-          if (operatorInfo.type === 'IntRange') {
+          if (operatorInfo?.type === 'IntRange') {
             beginValue = parseInt(begin, 10)
             endValue = parseInt(end, 10)
-          } else if (operatorInfo.type === 'FloatRange') {
+          } else if (operatorInfo?.type === 'FloatRange') {
             beginValue = parseFloat(begin)
             endValue = parseFloat(end)
           }
@@ -74,14 +74,14 @@ export default class Aql {
           return {
             field: field,
             value: { begin: beginValue, end: endValue },
-            operator: operatorInfo.value,
+            operator: operatorInfo?.value,
             valueField: this.convertFieldToCamelCase(field),
-            type: operatorInfo.type || 'Int'
+            type: operatorInfo?.type || 'Int'
           }
         }
 
         let parsedValue
-        if (suggestion && operatorInfo?.type.toLowerCase() === 'int') {
+        if (suggestion && operatorInfo?.type?.toLowerCase() === 'int') {
           parsedValue = Number(value)
         } else if (
           operator.toUpperCase() === 'IN' &&
@@ -95,9 +95,9 @@ export default class Aql {
         return {
           field: field,
           value: parsedValue,
-          operator: operatorInfo.value,
+          operator: operatorInfo?.value,
           valueField: this.convertFieldToCamelCase(field),
-          type: operatorInfo.type || 'Int'
+          type: operatorInfo?.type || 'Int'
         }
       })
       .filter((item) => item !== null)
