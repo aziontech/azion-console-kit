@@ -12,7 +12,7 @@ export const settingsRoutes = {
       props: {
         listCountriesPhoneService: UsersService.listCountriesPhoneService,
         listTimezonesService: UsersService.listTimezonesService,
-        loadUserService: UsersService.loadUserService,
+        loadUserService: UsersService.loadUserSettings,
         editUsersService: UsersService.editUsersService
       },
       meta: {
