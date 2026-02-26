@@ -14,6 +14,23 @@ export default {
       app,
       sendDefaultPii: true,
       enableLogs: true,
+      beforeSend(event, hint) {
+        const exception = hint?.originalException
+
+        if (typeof exception === 'string') {
+          event.exception = {
+            values: [
+              {
+                type: 'NonErrorException',
+                value: exception || '<empty string>'
+              }
+            ]
+          }
+          event.tags = { ...event.tags, nonErrorException: true }
+        }
+
+        return event
+      },
       integrations: [
         ...(router ? [Sentry.browserTracingIntegration({ router })] : []),
 
@@ -28,7 +45,18 @@ export default {
             'input[name*="hmacSecretKey"]',
             'div[data-sentry-mask] input'
           ],
-          unmask: ['[data-sentry-unmask]']
+          unmask: ['[data-sentry-unmask]'],
+          slowClickIgnoreSelectors: [
+            '.p-button',
+            '.p-row-toggler',
+            '.p-menuitem-link',
+            '.p-tabview-nav-link',
+            '.p-paginator-page',
+            '.p-checkbox',
+            '.p-radiobutton',
+            'a[download]',
+            'a[target="_blank"]'
+          ]
         })
       ]
     })
