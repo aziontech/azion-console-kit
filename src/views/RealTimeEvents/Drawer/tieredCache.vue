@@ -42,7 +42,7 @@
     'Time, in seconds, the cached object is considered valid (not expired). After the time expiration, when a new request occurs, L2 Caching queries the data on the origin (upstream).'
 
   const getValueByKey = (key) => {
-    const item = details.value.data.find((obj) => obj.key === key)
+    const item = details.value.data?.find((obj) => obj.key === key)
     return item ? item.value : '-'
   }
 

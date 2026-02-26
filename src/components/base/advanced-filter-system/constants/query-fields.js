@@ -63,7 +63,7 @@ const formatFieldData = (fieldData) => ({
 
 const extractFieldFormat = (fields, dataset) => {
   const datasetField = fields.fieldsDataSet.fields.find(({ name }) => name === dataset)
-  return datasetField.type.ofType.fields.reduce((formattedFields, fieldData) => {
+  return datasetField?.type?.ofType?.fields?.reduce((formattedFields, fieldData) => {
     const hasAliasName = FILTERS_RULES().ALIAS_MAPPING[fieldData.name]
     const newField = {
       [fieldData.name]: formatFieldData(fieldData)
