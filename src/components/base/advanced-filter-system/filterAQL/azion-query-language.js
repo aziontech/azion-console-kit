@@ -81,7 +81,7 @@ export default class Aql {
         }
 
         let parsedValue
-        if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
+        if (suggestion && operatorInfo?.type.toLowerCase() === 'int') {
           parsedValue = Number(value)
         } else if (
           operator.toUpperCase() === 'IN' &&
