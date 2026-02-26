@@ -1,12 +1,13 @@
 <script setup>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
 
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
+  import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 
   defineOptions({ name: 'form-accordion' })
 
@@ -46,12 +47,22 @@
 
   const router = useRouter()
   const toast = useToast()
-  const blockViewRedirection = ref(props.unSaved)
 
-  const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
+  const isFormReady = ref(props.unSaved)
+
+  const isDirty = useIsFormDirty()
+
+  const unsaved = useUnsavedChanges({
+    isReady: isFormReady,
+    enableRouteGuard: true,
+    enableBeforeUnload: true
   })
+
+  unsaved.addDirtySource(isDirty)
+
+  if (!props.unSaved) {
+    unsaved.disable()
+  }
 
   const { meta, errors, handleSubmit, isSubmitting, values, resetForm } = useForm({
     validationSchema: props.schema,
@@ -92,11 +103,11 @@
   const onSubmit = handleSubmit(
     async (values) => {
       try {
-        blockViewRedirection.value = false
+        unsaved.disable()
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
-        blockViewRedirection.value = true
+        unsaved.enable()
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
@@ -132,7 +143,11 @@
         :errors="errors"
       />
     </form>
-    <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+    <DialogUnsaved
+      :visible="unsaved.isDialogVisible.value"
+      @leave="unsaved.confirmLeave"
+      @stay="unsaved.cancelLeave"
+    />
     <slot
       name="action-bar-accordion"
       :onSubmit="onSubmit"
