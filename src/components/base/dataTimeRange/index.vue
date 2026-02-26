@@ -113,6 +113,8 @@
             :options="utcOffsetOptions"
             optionLabel="label"
             optionValue="value"
+            filter
+            filterPlaceholder="Search timezone"
             class="w-auto"
             :pt="{ input: { class: 'text-xs' } }"
           />
@@ -133,6 +135,7 @@
   import TabPanel from 'primevue/tabpanel'
   import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
   import { shiftQuickRange } from './utils/quick-range-navigation'
+  import { convertUtcNumberToOffset } from '@/helpers/convert-date'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
@@ -147,6 +150,10 @@
     userTimezone: {
       type: String,
       default: '+0000'
+    },
+    listTimezonesService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -157,6 +164,8 @@
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
   const hasInitializedUtcOffset = ref(false)
+  const timezoneOptions = ref([])
+  const isLoadingTimezones = ref(false)
 
   const model = defineModel({
     type: Object,
@@ -182,26 +191,32 @@
   })
 
   const utcOffsetOptions = computed(() => {
-    const offsets = []
-    for (let hour = -12; hour <= 14; hour++) {
-      const sign = hour >= 0 ? '+' : '-'
-      const absHour = Math.abs(hour)
-      const hh = String(absHour).padStart(2, '0')
-      offsets.push({
-        label: `UTC${sign}${hh}:00`,
-        value: `${sign}${hh}00`
-      })
+    const accountOption = {
+      label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
+      value: props.defaultUtcOffset
     }
 
-    return [
-      {
-        label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
-        value: props.defaultUtcOffset
-      },
-      { label: 'UTC+00:00', value: '+0000' },
-      ...offsets
-    ]
+    if (!timezoneOptions.value.length) {
+      return [accountOption]
+    }
+
+    const apiOptions = timezoneOptions.value.map((tz) => ({
+      label: tz.label,
+      value: convertUtcNumberToOffset(tz.utc)
+    }))
+
+    return [accountOption, ...apiOptions]
   })
+
+  const fetchTimezones = async () => {
+    isLoadingTimezones.value = true
+    try {
+      const result = await props.listTimezonesService()
+      timezoneOptions.value = result.listTimeZones
+    } finally {
+      isLoadingTimezones.value = false
+    }
+  }
 
   watch(
     () => model.value?.utcOffset,
@@ -274,10 +289,11 @@
     closeOverlay()
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     if (!model.value?.utcOffset) {
       model.value.utcOffset = props.defaultUtcOffset
     }
     hasInitializedUtcOffset.value = true
+    await fetchTimezones()
   })
 </script>
