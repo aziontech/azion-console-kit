@@ -59,6 +59,7 @@ const getConfig = () => {
         : [])
     ],
     resolve: {
+      preserveSymlinks: true, // Vite doesn't follow the symlink (@aziontech/icons in dev mode)
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
