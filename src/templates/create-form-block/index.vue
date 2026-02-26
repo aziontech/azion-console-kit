@@ -53,14 +53,10 @@
   const router = useRouter()
   const toast = useToast()
 
-  const isDirty = useIsFormDirty()
-
   const unsaved = useUnsavedChanges({
     enableRouteGuard: true,
     enableBeforeUnload: true
   })
-
-  unsaved.addDirtySource(isDirty)
 
   if (!props.unSaved) {
     unsaved.disable()
@@ -74,6 +70,9 @@
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
+
+  const isDirty = useIsFormDirty()
+  unsaved.addDirtySource(isDirty)
 
   const onCancel = () => {
     router.go(-1)

@@ -2,7 +2,7 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { ref, nextTick, onBeforeUnmount } from 'vue'
+  import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -79,7 +79,8 @@
         enableBeforeUnload: true
       })
 
-  const unregisterDirtySource = unsaved.addDirtySource(isDirty)
+  const effectiveDirty = computed(() => isFormReady.value && isDirty.value)
+  const unregisterDirtySource = unsaved.addDirtySource(effectiveDirty)
 
   onBeforeUnmount(() => {
     unregisterDirtySource()

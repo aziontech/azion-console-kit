@@ -56,3 +56,4 @@ specs.json
 .claude/
 CLAUDE.md
 docs/ARCHITECTURE.md
+hooks/
