@@ -506,6 +506,7 @@
           :pt="{
             header: { class: 'hidden' },
             table: { class: 'w-full' },
+            weekday: { class: 'font-medium' },
             daylabel: {
               style: {
                 padding: '0px !important',
@@ -576,6 +577,14 @@
             class="w-full"
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
+          />
+          <PrimeButton
+            label="Apply"
+            @click="updateRange"
+            severity="secondary"
+            :disabled="mode !== 'absolute'"
+            class="whitespace-nowrap w-28"
+            size="small"
           />
         </div>
       </div>
