@@ -50,15 +50,11 @@
 
   const isFormReady = ref(props.unSaved)
 
-  const isDirty = useIsFormDirty()
-
   const unsaved = useUnsavedChanges({
     isReady: isFormReady,
     enableRouteGuard: true,
     enableBeforeUnload: true
   })
-
-  unsaved.addDirtySource(isDirty)
 
   if (!props.unSaved) {
     unsaved.disable()
@@ -68,6 +64,9 @@
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
+
+  const isDirty = useIsFormDirty()
+  unsaved.addDirtySource(isDirty)
 
   const showToast = (severity, detail) => {
     if (!detail) return
