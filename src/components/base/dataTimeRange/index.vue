@@ -135,7 +135,7 @@
   import TabPanel from 'primevue/tabpanel'
   import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
   import { shiftQuickRange } from './utils/quick-range-navigation'
-  import { convertUtcNumberToOffset } from './utils/timezone-helpers'
+  import { convertUtcNumberToOffset } from '@/helpers/convert-date'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
