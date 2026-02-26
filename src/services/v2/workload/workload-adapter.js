@@ -12,12 +12,12 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
-function extractAzionAppSubdomain(fullDomains) {
+function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
 
   fullDomains.forEach((full) => {
-    const { domain, subdomain } = getPrimaryDomain(full)
+    const { domain, subdomain } = getPrimaryDomain(full, zones)
 
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
@@ -135,8 +135,8 @@ export const WorkloadAdapter = {
       }
     })
   },
-  transformLoadWorkload({ data: workload }, workloadDeployment) {
-    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains)
+  transformLoadWorkload({ data: workload }, workloadDeployment, zones = []) {
+    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains, zones)
     return {
       id: workload.id,
       name: workload.name,

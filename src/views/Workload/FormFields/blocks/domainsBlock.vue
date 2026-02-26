@@ -75,8 +75,8 @@
     }
   }
 
-  const updateDomainType = (domainId, value) => {
-    const domain = domainsList.value.find((domainItem) => domainItem.id === domainId)
+  const updateDomainType = (index, value) => {
+    const domain = domainsList.value[index]
     if (domain) {
       domain.domain = value
     }
@@ -186,7 +186,7 @@
                   :class="{ 'p-invalid': domainsErrorMessage }"
                   :value="domain.subdomain"
                   @blur="handleLetEncrypt"
-                  @input="updateDomainSubdomain(index, $event.target.value)"
+                  @input="updateDomainSubdomain(index, $event)"
                   data-testid="domains-form__subdomain-field"
                 />
               </div>
