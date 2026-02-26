@@ -32,8 +32,14 @@
     dnssec: yup.boolean()
   })
 
-  const loadEdgeDNSService = () => {
-    return props.edgeDNS
+  const loadEdgeDNSService = async () => {
+    const zoneData = props.edgeDNS
+    try {
+      const dnssecData = await edgeDNSService.loadEdgeDNSZoneDNSSEC(zoneData.id)
+      return { ...zoneData, dnssec: dnssecData?.enabled ?? false }
+    } catch {
+      return { ...zoneData, dnssec: false }
+    }
   }
 
   const handleCopy = (nameserver) => {
