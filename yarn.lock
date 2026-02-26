@@ -75,6 +75,11 @@
   resolved "https://registry.yarnpkg.com/@analytics/type-utils/-/type-utils-0.6.4.tgz#b309211ace40691c25e8640c911fcd31ce082c1e"
   integrity sha512-Ou1gQxFakOWLcPnbFVsrPb8g1wLLUZYYJXDPjHkG07+5mustGs5yqACx42UAu4A6NszNN6Z5gGxhyH45zPWRxw==
 
+"@aziontech/icons@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.0.4.tgz#673e37e1dfce63d17f35a2567303bbb17a290704"
+  integrity sha512-nR5aAkqSnQMpjXIaELqljW6o0jK9pPDhVK1TTH+rrpuTSekyJMoK6xqyX/DrhCz8DhGpfIYKD30yb6qE6aywhg==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.27.1":
   version "7.27.1"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.27.1.tgz#200f715e66d52a23b221a9435534a91cc13ad5be"
@@ -7722,11 +7727,6 @@ primeflex@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/primeflex/-/primeflex-3.3.1.tgz#361dddf6eb5db50d733e4cddd4b6e376a3d7bd68"
   integrity sha512-zaOq3YvcOYytbAmKv3zYc+0VNS9Wg5d37dfxZnveKBFPr7vEIwfV5ydrpiouTft8MVW6qNjfkaQphHSnvgQbpQ==
-
-primeicons@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/primeicons/-/primeicons-7.0.0.tgz#6b25c3fdcb29bb745a3035bdc1ed5902f4a419cf"
-  integrity sha512-jK3Et9UzwzTsd6tzl2RmwrVY/b8raJ3QZLzoDACj+oTJ0oX7L9Hy+XnVwgo4QVKlKpnP/Ur13SXV/pVh4LzaDw==
 
 primevue@3.35.0:
   version "3.35.0"
