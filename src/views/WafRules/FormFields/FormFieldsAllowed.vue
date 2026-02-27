@@ -55,11 +55,11 @@
   }
 
   const isField = (condition) => {
-    return condition?.match.includes('specific_')
+    return condition?.match?.includes('specific_') || false
   }
 
   const labelFieldCondition = (condition) => {
-    return condition.match.includes('_value') ? 'Value' : 'Name'
+    return condition?.match?.includes('_value') ? 'Value' : 'Name'
   }
 </script>
 
