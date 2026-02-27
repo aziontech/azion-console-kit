@@ -83,11 +83,11 @@ export const EdgeFunctionsAdapter = {
     return {
       id: edgeApplicationFunction.id,
       name: edgeApplicationFunction.name,
-      functionInstanced: edgeFunction.data.name,
+      functionInstanced: edgeFunction?.data?.name,
       lastEditor: edgeApplicationFunction.lastEditor,
       lastModified: formatDateToDayMonthYearHour(edgeApplicationFunction.lastModified),
       lastModify: convertToRelativeTime(edgeApplicationFunction.lastModified),
-      version: edgeFunction.data.version
+      version: edgeFunction?.data?.version
     }
   },
 
