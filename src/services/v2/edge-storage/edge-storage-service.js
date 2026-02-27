@@ -231,6 +231,27 @@ export class EdgeStorageService extends BaseService {
     return results
   }
 
+  renameEdgeStorageBucketFile = async (
+    bucketName = '',
+    currentObjectKey = '',
+    newObjectKey = ''
+  ) => {
+    await this.copyEdgeStorageBucketFile(bucketName, currentObjectKey, newObjectKey)
+
+    try {
+      await this.deleteEdgeStorageBucketFiles(bucketName, currentObjectKey)
+    } catch (deleteError) {
+      try {
+        await this.deleteEdgeStorageBucketFiles(bucketName, newObjectKey)
+      } catch {
+        // rollback cleanup failed — both files now exist
+      }
+      throw deleteError
+    }
+
+    return `File renamed from "${currentObjectKey}" to "${newObjectKey}" successfully`
+  }
+
   deleteEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     await this.http.request({
       method: 'DELETE',

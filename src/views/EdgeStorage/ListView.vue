@@ -81,6 +81,9 @@
                 :headerContainer="headerContainer"
                 :buttonsContainer="buttonsContainer"
                 :containerWidth="containerWidth"
+                :renamingItem="renamingItem"
+                :renameValue="renameValue"
+                :isRenaming="isRenaming"
                 exportFileName="Files"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
@@ -92,6 +95,9 @@
                 @save-new-folder="handleSaveNewFolder"
                 @cancel-new-folder="handleCancelNewFolder"
                 @update:newFolderName="newFolderName = $event"
+                @save-rename="handleSaveRename"
+                @cancel-rename="handleCancelRename"
+                @update:renameValue="renameValue = $event"
                 class="w-full"
               >
                 <template #search-slot>
@@ -192,6 +198,7 @@
     selectedBucket,
     deleteMultipleFiles,
     moveFiles,
+    renameFile,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -210,6 +217,12 @@
       icon: 'pi pi-download',
       type: 'action',
       commandAction: (item) => handleDownload(item)
+    },
+    {
+      label: 'Rename',
+      icon: 'pi pi-pencil',
+      type: 'action',
+      commandAction: (item) => startRenaming(item)
     },
     {
       label: 'Move',
@@ -262,6 +275,9 @@
   const currentPage = ref(1)
   const isCreatingNewFolder = ref(false)
   const newFolderName = ref('')
+  const renamingItem = ref(null)
+  const renameValue = ref('')
+  const isRenaming = ref(false)
 
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
@@ -510,6 +526,36 @@
   const handleCancelNewFolder = () => {
     isCreatingNewFolder.value = false
     newFolderName.value = ''
+  }
+
+  const startRenaming = (item) => {
+    renamingItem.value = item
+    renameValue.value = item.name
+  }
+
+  const handleSaveRename = async () => {
+    const newName = renameValue.value.trim()
+    if (!newName || newName === renamingItem.value.name) {
+      handleCancelRename()
+      return
+    }
+
+    try {
+      isRenaming.value = true
+      await renameFile(renamingItem.value, newName)
+      renamingItem.value = null
+      renameValue.value = ''
+      listServiceFilesRef.value?.reload()
+    } catch {
+      // toast already shown by composable
+    } finally {
+      isRenaming.value = false
+    }
+  }
+
+  const handleCancelRename = () => {
+    renamingItem.value = null
+    renameValue.value = ''
   }
 
   const handleRouteChange = () => {
