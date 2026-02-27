@@ -43,6 +43,7 @@ export const EdgeAppAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformListDropdownEdgeApp(data) {
+    if (!Array.isArray(data)) return []
     return data.map((edgeApplication) => ({
       id: edgeApplication.id,
       name: edgeApplication.name
