@@ -581,9 +581,9 @@
           <PrimeButton
             label="Apply"
             @click="updateRange"
-            severity="secondary"
+            outlined
             :disabled="mode !== 'absolute'"
-            class="whitespace-nowrap w-28"
+            class="whitespace-nowrap w-20"
             size="small"
           />
         </div>

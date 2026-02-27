@@ -109,15 +109,21 @@
             <span class="text-color font-medium">{{ userTimezone }}</span>
           </div>
           <Dropdown
-            v-model="model.utcOffset"
+            v-model="selectedUtcOption"
             :options="utcOffsetOptions"
             optionLabel="label"
-            optionValue="value"
             filter
+            appendTo="self"
             filterPlaceholder="Search timezone"
             class="w-auto"
             :pt="{ input: { class: 'text-xs' } }"
-          />
+            @change="onUtcOffsetChange"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">{{ slotProps.value.label }}</span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+          </Dropdown>
         </div>
       </div>
     </OverlayPanel>
@@ -125,7 +131,7 @@
 </template>
 
 <script setup>
-  import { computed, defineModel, nextTick, onMounted, ref, watch } from 'vue'
+  import { computed, defineModel, nextTick, onMounted, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from 'primevue/button'
@@ -166,6 +172,7 @@
   const hasInitializedUtcOffset = ref(false)
   const timezoneOptions = ref([])
   const isLoadingTimezones = ref(false)
+  const selectedUtcOption = ref(null)
 
   const model = defineModel({
     type: Object,
@@ -208,23 +215,29 @@
     return [accountOption, ...apiOptions]
   })
 
+  const syncSelectedUtcOption = () => {
+    if (model.value?.utcOffset) {
+      selectedUtcOption.value =
+        utcOffsetOptions.value.find((opt) => opt.value === model.value.utcOffset) ?? null
+    }
+  }
+
   const fetchTimezones = async () => {
     isLoadingTimezones.value = true
     try {
       const result = await props.listTimezonesService()
       timezoneOptions.value = result.listTimeZones
+      syncSelectedUtcOption()
     } finally {
       isLoadingTimezones.value = false
     }
   }
 
-  watch(
-    () => model.value?.utcOffset,
-    () => {
-      if (!hasInitializedUtcOffset.value) return
-      emit('select', model.value)
-    }
-  )
+  const onUtcOffsetChange = (event) => {
+    if (!hasInitializedUtcOffset.value) return
+    model.value.utcOffset = event.value?.value
+    emit('select', model.value)
+  }
 
   const formatUtcOffsetLabel = (offset) => {
     const normalized = typeof offset === 'string' ? offset.trim() : ''
@@ -293,6 +306,7 @@
     if (!model.value?.utcOffset) {
       model.value.utcOffset = props.defaultUtcOffset
     }
+    syncSelectedUtcOption()
     hasInitializedUtcOffset.value = true
     await fetchTimezones()
   })
