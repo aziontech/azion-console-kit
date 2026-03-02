@@ -1,11 +1,13 @@
 <script setup>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref, watch, inject } from 'vue'
+  import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
+  import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+  import { useTabUnsaved } from '@/composables/useTabUnsaved'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -51,8 +53,6 @@
     'onError'
   ])
 
-  const blockViewRedirection = ref(true)
-
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -63,27 +63,27 @@
   })
 
   const isLoadingData = ref(true)
-
-  let formHasUpdated, visibleOnSaved
-
-  if (props.isTabs) {
-    const unsavedStatus = inject('unsaved')
-
-    formHasUpdated = unsavedStatus.formHasUpdated
-    visibleOnSaved = unsavedStatus.visibleOnSaved
-  }
+  const isFormReady = ref(false)
 
   const isDirty = useIsFormDirty()
 
-  const formHasChanges = computed(() => {
-    return blockViewRedirection.value && isDirty.value
-  })
+  // When inside tabs, register dirty source with the parent TabsView context.
+  // The route guard is owned by the TabsView's composable instance.
+  const tabContext = props.isTabs ? useTabUnsaved() : undefined
 
-  watch(formHasChanges, () => {
-    if (!props.isTabs) return
+  const unsaved = tabContext
+    ? tabContext.unsaved
+    : useUnsavedChanges({
+        isReady: isFormReady,
+        enableRouteGuard: true,
+        enableBeforeUnload: true
+      })
 
-    formHasUpdated.value = formHasChanges.value
-    visibleOnSaved.value = false
+  const effectiveDirty = computed(() => isFormReady.value && isDirty.value)
+  const unregisterDirtySource = unsaved.addDirtySource(effectiveDirty)
+
+  onBeforeUnmount(() => {
+    unregisterDirtySource()
   })
 
   const goBackToList = () => {
@@ -133,6 +133,11 @@
       emit('loaded-service-object', mergedValues)
 
       resetForm({ values: mergedValues })
+
+      // Wait for child FormField onMounted hooks to fire,
+      // then re-reset to capture any values they set as the clean baseline.
+      await nextTick()
+      resetForm({ values: { ...values } })
     } catch (error) {
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
@@ -140,12 +145,13 @@
         emit('on-load-fail', error)
         showToast('error', error)
 
-        blockViewRedirection.value = false
+        unsaved.disable()
       }
 
       goBackToList()
     } finally {
       isLoadingData.value = false
+      isFormReady.value = true
     }
   }
 
@@ -158,20 +164,18 @@
           showToast('success', feedback || 'edited successfully')
         }
 
-        blockViewRedirection.value = false
+        unsaved.disable()
 
         emit('on-edit-success', feedback)
 
         if (props.disableRedirect) {
           resetForm({ values })
-          blockViewRedirection.value = true
+          unsaved.enable()
           return
         }
 
         goBackToList()
       } catch (error) {
-        blockViewRedirection.value = false
-
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
@@ -194,9 +198,10 @@
 </script>
 
 <template>
-  <DialogUnsavedBlock
-    :blockRedirectUnsaved="formHasChanges"
-    :isTabs="isTabs"
+  <DialogUnsaved
+    :visible="unsaved.isDialogVisible.value"
+    @leave="unsaved.confirmLeave"
+    @stay="unsaved.cancelLeave"
   />
 
   <div class="flex flex-col min-h-[calc(100vh-300px)]">

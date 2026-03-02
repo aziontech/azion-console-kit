@@ -43,6 +43,7 @@ export const EdgeAppAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformListDropdownEdgeApp(data) {
+    if (!Array.isArray(data)) return []
     return data.map((edgeApplication) => ({
       id: edgeApplication.id,
       name: edgeApplication.name
@@ -53,10 +54,10 @@ export const EdgeAppAdapter = {
     return {
       id: data?.id,
       name: data?.name,
-      edgeCacheEnabled: data?.modules?.cache.enabled,
-      edgeFunctionsEnabled: data?.modules?.functions.enabled,
-      applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
-      imageProcessorEnabled: data?.modules?.image_processor.enabled,
+      edgeCacheEnabled: data?.modules?.cache?.enabled,
+      edgeFunctionsEnabled: data?.modules?.functions?.enabled,
+      applicationAcceleratorEnabled: data?.modules?.application_accelerator?.enabled,
+      imageProcessorEnabled: data?.modules?.image_processor?.enabled,
       tieredCacheEnabled: data?.modules?.tiered_cache?.enabled,
 
       isActive: data?.active,

@@ -102,7 +102,7 @@
 
   const handlePaste = (event) => {
     event.preventDefault()
-    const pastedData = event.clipboardData.getData('text')
+    const pastedData = event.clipboardData?.getData('text') || ''
 
     for (let mfaDigitIndex = 0; mfaDigitIndex < pastedData.length; mfaDigitIndex++) {
       digitsMfa[mfaDigitIndex].value.value = pastedData[mfaDigitIndex]
@@ -132,7 +132,7 @@
     //check delete code
     if (event.key === 'Backspace' || event.keyCode === 8) {
       const nextInput = inputRefs.value[index - 1]
-      if (index) {
+      if (index && nextInput?.$el) {
         nextInput.$el.focus()
       }
       digitsMfa[index].value.value = ''
@@ -148,7 +148,7 @@
         //get the next input
         const nextInput = inputRefs.value[index + 1]
         digitsMfa[index].value.value = parseInt(event.key)
-        setTimeout(() => nextInput.$el.focus(), 100)
+        setTimeout(() => nextInput?.$el?.focus(), 100)
       }
 
       if (index === MFA_CODE_LENGTH - 1) {

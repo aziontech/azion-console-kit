@@ -81,9 +81,13 @@
                 :headerContainer="headerContainer"
                 :buttonsContainer="buttonsContainer"
                 :containerWidth="containerWidth"
+                :renamingItem="renamingItem"
+                :renameValue="renameValue"
+                :isRenaming="isRenaming"
                 exportFileName="Files"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
+                @move-selected-items="handleMoveSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
@@ -91,6 +95,9 @@
                 @save-new-folder="handleSaveNewFolder"
                 @cancel-new-folder="handleCancelNewFolder"
                 @update:newFolderName="newFolderName = $event"
+                @save-rename="handleSaveRename"
+                @cancel-rename="handleCancelRename"
+                @update:renameValue="renameValue = $event"
                 class="w-full"
               >
                 <template #search-slot>
@@ -164,11 +171,14 @@
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { formatBytes } from '@/helpers/format-bytes'
+  import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
   import ProgressCard from './components/ProgressCard.vue'
   import DataTable from '@/components/DataTable'
 
@@ -182,11 +192,14 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
+  const dialog = useDialog()
   const breadcrumbs = useBreadcrumbs()
   const {
     buckets,
     selectedBucket,
     deleteMultipleFiles,
+    moveFiles,
+    renameFile,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -205,6 +218,18 @@
       icon: 'pi pi-download',
       type: 'action',
       commandAction: (item) => handleDownload(item)
+    },
+    {
+      label: 'Rename',
+      icon: 'pi pi-pencil',
+      type: 'action',
+      commandAction: (item) => startRenaming(item)
+    },
+    {
+      label: 'Move',
+      icon: 'pi pi-arrow-right-arrow-left',
+      type: 'action',
+      commandAction: (item) => handleOpenMoveDialog([item])
     },
     {
       title: 'File',
@@ -254,6 +279,9 @@
   const currentPage = ref(1)
   const isCreatingNewFolder = ref(false)
   const newFolderName = ref('')
+  const renamingItem = ref(null)
+  const renameValue = ref('')
+  const isRenaming = ref(false)
 
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
@@ -359,6 +387,36 @@
         selectedFiles.value = []
       }
     })
+  }
+
+  const handleOpenMoveDialog = (files) => {
+    const totalSize = files.reduce((sum, file) => sum + (file.sizeBytes || 0), 0)
+    const formattedSize = totalSize > 0 ? formatBytes(totalSize) : ''
+
+    dialog.open(MoveObjectDialog, {
+      data: {
+        files,
+        currentFolderPath: folderPath.value,
+        bucketName: selectedBucket.value.name,
+        totalSize: formattedSize
+      },
+      onClose: async (options) => {
+        if (options?.data?.updated && 'destinationPath' in (options?.data || {})) {
+          const filesToMove = files.map((file) => ({
+            name: file.name,
+            fullPath: folderPath.value ? folderPath.value + file.name : file.name
+          }))
+          selectedFiles.value = []
+          await moveFiles(filesToMove, options.data.destinationPath)
+          filesTableNeedRefresh.value = true
+          listServiceFilesRef.value?.reload()
+        }
+      }
+    })
+  }
+
+  const handleMoveSelectedItems = () => {
+    handleOpenMoveDialog(selectedFiles.value)
   }
 
   const listEdgeStorageBucketFiles = async () => {
@@ -472,6 +530,36 @@
   const handleCancelNewFolder = () => {
     isCreatingNewFolder.value = false
     newFolderName.value = ''
+  }
+
+  const startRenaming = (item) => {
+    renamingItem.value = item
+    renameValue.value = item.name
+  }
+
+  const handleSaveRename = async () => {
+    const newName = renameValue.value.trim()
+    if (!newName || newName === renamingItem.value.name) {
+      handleCancelRename()
+      return
+    }
+
+    try {
+      isRenaming.value = true
+      await renameFile(renamingItem.value, newName)
+      renamingItem.value = null
+      renameValue.value = ''
+      listServiceFilesRef.value?.reload()
+    } catch {
+      // toast already shown by composable
+    } finally {
+      isRenaming.value = false
+    }
+  }
+
+  const handleCancelRename = () => {
+    renamingItem.value = null
+    renameValue.value = ''
   }
 
   const handleRouteChange = () => {

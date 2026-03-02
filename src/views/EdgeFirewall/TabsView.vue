@@ -11,9 +11,10 @@
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
-  import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
+  import { computed, ref, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
@@ -43,9 +44,6 @@
   const activeTab = ref(0)
   const edgeFirewallId = ref(route.params.id)
   const edgeFirewall = ref()
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const componentsRefs = ref(null)
 
@@ -124,10 +122,6 @@
     const tabNames = Object.keys(mapTabs.value)
     const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
     return selectedTab
-  }
-
-  const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    changeTab(index)
   }
 
   const verifyTab = (firewall) => {
@@ -215,24 +209,18 @@
     })
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 </script>
 
 <template>
@@ -245,14 +233,20 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div
         class="h-full w-full"
         v-if="edgeFirewall"
       >
         <div class="flex align-center justify-between relative">
           <TabView
+            ref="tabViewRef"
             :activeIndex="activeTab"
-            @tab-click="changeRouteByClickingOnTab"
+            @tab-click="handleTabClick"
             class="flex-1"
           >
             <TabPanel
