@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, provide, watch, reactive, onMounted } from 'vue'
+  import { computed, ref, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ContentBlock from '@/templates/content-block'
@@ -8,7 +8,8 @@
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
@@ -28,9 +29,6 @@
   const edgeNodeId = ref(route.params.id)
   const edgeNode = ref()
   const toast = useToast()
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const defaultTabs = {
     main_settings: 0,
@@ -80,10 +78,6 @@
     preloadTabData()
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    changeTab(event.index)
-  }
-
   const updateEdgeNodesValue = (edgeNodeValues) => {
     edgeNode.value = { ...edgeNode.value, ...edgeNodeValues }
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value?.name)
@@ -103,24 +97,18 @@
     })
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 
   onMounted(() => {
     renderTabCurrentRouter()
@@ -137,13 +125,19 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div
         class="w-full h-full"
         v-if="edgeNode"
       >
         <TabView
+          ref="tabViewRef"
           :activeIndex="activeTab"
-          @tab-click="changeRouteByClickingOnTab"
+          @tab-click="handleTabClick"
           class="w-full h-full"
         >
           <TabPanel header="Main Settings">

@@ -4,11 +4,12 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { ref, provide, reactive, watch } from 'vue'
+  import { ref, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import EditView from './EditView.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
 
   defineOptions({ name: 'tabs-workloads' })
 
@@ -30,9 +31,6 @@
   const activeTab = ref(0)
   const workloadId = ref(route.params.id)
   const workload = ref()
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const getWorkload = async () => {
     try {
@@ -71,6 +69,19 @@
     })
   }
 
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
+
+  const tabViewRef = ref(null)
+
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
+    }
+  }
+
   const title = ref('')
 
   const renderTabCurrentRouter = async () => {
@@ -80,25 +91,6 @@
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
-
-  const visibleOnSaved = ref(false)
-
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
-
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
-    }
-  })
 
   renderTabCurrentRouter()
 </script>
@@ -112,9 +104,15 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <TabView
+        ref="tabViewRef"
         :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
+        @tab-click="handleTabClick"
         class="w-full h-full"
         v-if="workload"
       >

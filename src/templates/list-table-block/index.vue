@@ -643,7 +643,7 @@
       throw new Error('Please provide an id for each data item through the service adapter')
     }
     selectedId.value = selectedID
-    menuRef.value[selectedID].toggle(event)
+    menuRef.value[selectedID]?.toggle(event)
   }
 
   const editItemSelected = ({ data: item }) => {

@@ -1,14 +1,9 @@
 <template>
-  <PrimeButton
+  <i
     v-if="!panelOnly"
-    icon="pi pi-calendar"
-    outlined
-    size="small"
-    @click="emit('open', $event)"
-    :pt="{
-      icon: { class: 'max-md:m-0' }
-    }"
-  />
+    class="pi pi-calendar inline-flex items-center justify-center border-l border-t border-b surface-border rounded-l-md text-muted-color text-sm w-[2.125rem] h-[2.125rem]"
+    aria-hidden="true"
+  ></i>
 
   <template v-else>
     <div class="flex gap-2">
@@ -45,7 +40,7 @@
 
     <div class="mt-4">
       <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2">
+      <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
         <PrimeButton
           v-for="range in commonDateRanges"
           :key="range.value"

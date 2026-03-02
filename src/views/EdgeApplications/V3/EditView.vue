@@ -5,7 +5,7 @@
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
     :initialValues="props.initialValues"
-    @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
+    @on-edit-success="handleTrackSuccessEdit"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
     isTabs
@@ -43,7 +43,6 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const unsavedStatus = inject('unsaved')
   const isApplicationLoaded = inject('isApplicationLoaded', ref(true))
 
   const props = defineProps({
@@ -90,10 +89,6 @@
         }
       })
     })
-  }
-
-  const updatedStatusUnSaved = () => {
-    unsavedStatus.formHasUpdated = false
   }
 
   const handleTrackSuccessEdit = () => {

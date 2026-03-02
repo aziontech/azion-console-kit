@@ -8,9 +8,10 @@
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
-  import { ref, provide, reactive, watch, computed } from 'vue'
+  import { ref, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
 
   defineOptions({ name: 'tabs-waf-rules' })
@@ -34,9 +35,6 @@
   const wafRuleId = ref(route.params.id)
   const cachedWafRule = wafService.getWafRuleFromCache(wafRuleId.value)
   const waf = ref(cachedWafRule)
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const componentsRefs = ref(null)
 
@@ -96,7 +94,6 @@
   const updateWafRulesValue = async (waf) => {
     title.value = waf.name
     waf.value = await getWafDat()
-    formHasUpdated.value = false
   }
 
   const renderTabCurrentRouter = async () => {
@@ -117,24 +114,18 @@
     }
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 
   renderTabCurrentRouter()
 </script>
@@ -148,13 +139,19 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div
         class="flex align-center justify-between relative"
         v-if="waf"
       >
         <TabView
+          ref="tabViewRef"
           :activeIndex="activeTab"
-          @tab-click="changeRouteByClickingOnTab"
+          @tab-click="handleTabClick"
           class="flex-1"
         >
           <TabPanel
