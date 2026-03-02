@@ -2,7 +2,6 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import fieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -22,6 +21,37 @@
 
   const digitalCertificateDrawerRef = ref('')
   const statusDigitalCertificate = ref('')
+  const certificateOptions = ref([])
+  const certificateLoading = ref(false)
+
+  const fetchCertificates = async () => {
+    certificateLoading.value = true
+    try {
+      const response = await digitalCertificatesService.listDigitalCertificatesDropdown({
+        type: 'edge_certificate',
+        fields: ['id,name,status,authority,type,subject_name'],
+        pageSize: 100,
+        page: 1,
+        ordering: 'name'
+      })
+
+      certificateOptions.value = response.body.flatMap((group) =>
+        (group.items || []).map((item) => ({
+          label: item.name,
+          value: item.id,
+          authority: item.authority,
+          status: item.status,
+          subjectName: item.subjectName,
+          icon: item.icon,
+          group: group.label
+        }))
+      )
+    } finally {
+      certificateLoading.value = false
+    }
+  }
+
+  fetchCertificates()
 
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
@@ -62,27 +92,17 @@
   const showTlsAndCipherDropdown = computed(
     () => protocols.value.http.useHttps || protocols.value.http.useHttp3
   )
+
   const onDigitalCertificateSuccess = ({ id, authority }) => {
     tls.value.certificate = id
     authorityCertificate.value = authority
-  }
-
-  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return await digitalCertificatesService.listDigitalCertificatesDropdown({
-      type: 'edge_certificate',
-      fields: ['id,name,status,authority,type,subject_name'],
-      ...queryParams
-    })
-  }
-
-  const loadDigitalCertificateDecorator = async ({ id }) => {
-    return await digitalCertificatesService.loadDigitalCertificate({ id, isDropdown: true })
+    fetchCertificates()
   }
 
   const warningDigitalCertificateMessage = computed(() => {
     if (statusDigitalCertificate.value === 'pending') {
       return {
-        text: 'This certificate is pending validation and HTTPS may not work until it’s validated',
+        text: 'This certificate is pending validation and HTTPS may not work until it\u2019s validated',
         color: 'text-[var(--p-tag-warning-color)]'
       }
     } else if (statusDigitalCertificate.value === 'failed') {
@@ -95,17 +115,10 @@
     return ''
   })
 
-  const moreOptions = ['authority', 'icon', 'status', 'subjectName']
-
-  const selectCertificate = ({ status, authority, subjectName }) => {
-    statusDigitalCertificate.value = status
-    authorityCertificate.value = authority
-    subjectNameCertificate.value = subjectName
-  }
-
-  const iconColor = {
-    'pi-times-circle': 'text-[var(--error-color)]',
-    'pi-exclamation-triangle': 'text-[var(--p-tag-warning-color)]'
+  const selectCertificate = (option) => {
+    statusDigitalCertificate.value = option.status
+    authorityCertificate.value = option.authority
+    subjectNameCertificate.value = option.subjectName
   }
 
   const loadInitialTls = {
@@ -187,30 +200,18 @@
         v-if="protocols.http.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <fieldDropdownLazyLoader
-            ref="dropdownCertificate"
+          <FieldDropdown
             data-testid="domains-form__edge-certificate-field"
             label="Digital Certificate"
             name="tls.certificate"
-            showGroup
-            optionGroupLabel="group"
-            optionGroupChildren="items"
-            defaultGroup="My certificates"
-            :defaultPosition="1"
-            :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-            :loadService="loadDigitalCertificateDecorator"
-            optionLabel="name"
+            :options="certificateOptions"
+            :loading="certificateLoading"
+            optionLabel="label"
             optionValue="value"
             :value="tls?.certificate"
-            appendTo="self"
+            filter
             placeholder="Select a certificate"
-            enableCustomLabel
-            keyToFilter="status"
-            :moreOptions="moreOptions"
             @onSelectOption="selectCertificate"
-            :iconColor="iconColor"
-            showIcon
-            enableWorkaroundLabelToDisabledOptions
           >
             <template #footer>
               <ul class="p-2">
@@ -231,7 +232,7 @@
                 </li>
               </ul>
             </template>
-          </fieldDropdownLazyLoader>
+          </FieldDropdown>
           <small
             v-if="warningDigitalCertificateMessage"
             :class="warningDigitalCertificateMessage.color"
