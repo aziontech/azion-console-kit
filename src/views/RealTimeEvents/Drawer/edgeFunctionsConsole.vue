@@ -42,21 +42,13 @@
   )
 
   const getValueByKey = (key) => {
-    const item = details.value.data.find((obj) => obj.key === key)
+    const item = details.value.data?.find((obj) => obj.key === key)
     return item ? item.value : '-'
   }
 
-  const tags = computed(() => {
-    if (details.value.level) {
-      return [
-        {
-          text: details.value.level.content,
-          severity: details.value.level.severity,
-          icon: details.value.level.icon
-        }
-      ]
-    }
-    return []
+  const title = computed(() => {
+    if (!details.value.lineSource) return 'More Details'
+    return `More Details: Line Source - ${details.value.lineSource}`
   })
 
   defineExpose({
@@ -67,17 +59,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="`Line Source - ${details.lineSource ?? ''}`"
-          :date="details.ts"
-          :tags="tags"
-          :loading="loading"
-          hideDivider
-        />
         <TabView
           class="w-full h-full"
           v-if="!loading"

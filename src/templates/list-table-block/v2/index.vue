@@ -8,9 +8,9 @@
   import { useToast } from 'primevue/usetoast'
   import { useDataTable } from '@/composables/useDataTable'
   import { storeToRefs } from 'pinia'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
 
-  const { currentTheme } = storeToRefs(useAccountStore())
+  const { currentTheme } = storeToRefs(useThemeStore())
 
   defineOptions({ name: 'list-table-block-v2' })
 
@@ -120,6 +120,10 @@
     emptyBlock: {
       type: Object,
       default: () => ({})
+    },
+    isLoadingReorder: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -191,6 +195,7 @@
     table.forEach((row, index) => {
       if (row.position) {
         row.position.value = index
+        row.position.max = table.length - 1
         row.position.altered = row.position.immutableValue !== row.position.value
       }
     })
@@ -520,6 +525,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        :style="col.style"
         :class="[col.disableSort ? '' : 'hover:cursor-pointer', col.class]"
         data-testid="data-table-column"
         class="lg:break-words lg:whitespace-normal"
@@ -531,7 +537,10 @@
             </template>
             <template v-else>
               <template v-if="col.type !== 'component'">
-                <div :data-testid="`list-table-block__column__${col.field}__row`">
+                <div
+                  :data-testid="`list-table-block__column__${col.field}__row`"
+                  :class="col.dynamicClass ? col.dynamicClass(rowData[col.field]) : ''"
+                >
                   {{ rowData[col.field] }}
                 </div>
               </template>
@@ -609,7 +618,7 @@
 
     <teleport
       to="#action-bar"
-      v-if="columnOrderAltered"
+      v-if="columnOrderAltered && !isLoading"
     >
       <slot
         name="reorderFooter"
@@ -634,10 +643,11 @@
             data-testid="rules-engine-save-order-button"
             size="small"
             type="button"
+            :loading="isLoadingReorder"
             @click="
               emit('on-review-changes', { data: data, alteredRows: alteredRows, reload: reload })
             "
-            :badge="alteredRows.length"
+            :badge="!isLoadingReorder ? alteredRows.length : undefined"
           />
         </div>
       </slot>

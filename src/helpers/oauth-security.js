@@ -138,11 +138,15 @@ class OAuthSecurityGuard {
   setupProtections() {
     const originalPostMessage = window.postMessage
     window.postMessage = (message, targetOrigin, transfer) => {
-      if (targetOrigin && targetOrigin !== '*') {
+      if (!targetOrigin || targetOrigin === 'undefined' || targetOrigin === 'null') {
+        targetOrigin = window.location.origin
+      }
+
+      if (targetOrigin !== '*') {
         try {
           const targetUrl = new URL(targetOrigin)
           const isTrustedOrigin = OAUTH_SECURITY_CONFIG.trustedOrigins.some(
-            (trusted) => targetUrl.origin === trusted || targetUrl.origin.endsWith(trusted)
+            (trusted) => targetUrl.origin === trusted
           )
           const isSameOrigin = targetUrl.origin === window.location.origin
 
@@ -151,10 +155,13 @@ class OAuthSecurityGuard {
             console.warn('Blocked postMessage to untrusted origin:', targetUrl.origin)
             return
           }
-        } catch {
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.warn('Blocked postMessage with invalid targetOrigin:', targetOrigin, error)
           return
         }
       }
+
       return originalPostMessage.call(window, message, targetOrigin, transfer)
     }
 

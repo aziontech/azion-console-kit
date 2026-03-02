@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, provide, watch, reactive } from 'vue'
+  import { computed, ref, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ContentBlock from '@/templates/content-block'
@@ -8,20 +8,16 @@
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'tabs-edge-node' })
 
   const props = defineProps({
-    loadEdgeNodeService: { type: Function, required: true },
-    editEdgeNodeService: { type: Function, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
-    createServiceEdgeNodeService: { type: Function, required: true },
-    loadServiceEdgeNodeService: { type: Function, required: true },
-    editServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -31,21 +27,29 @@
   const breadcrumbs = useBreadcrumbs()
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
-  const title = ref('')
   const edgeNode = ref()
   const toast = useToast()
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
 
   const defaultTabs = {
     main_settings: 0,
     services: 1
   }
 
+  // --- Cache from listing ---
+  const cachedEdgeNode = edgeNodeService.getEdgeNodeFromCache(edgeNodeId.value)
+
+  if (cachedEdgeNode?.name) {
+    edgeNode.value = cachedEdgeNode
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedEdgeNode.name)
+  }
+
+  const title = computed(() => {
+    return edgeNode.value?.name || ''
+  })
+
   const getEdgeNodesData = async () => {
     try {
-      return await props.loadEdgeNodeService({ id: edgeNodeId.value })
+      return await edgeNodeService.loadEdgeNodeService({ id: edgeNodeId.value })
     } catch (error) {
       toast.add({
         closable: true,
@@ -53,27 +57,30 @@
         summary: 'Error',
         detail: error
       })
+
+      return router.push({ name: props.updatedRedirect })
     }
   }
 
   const mapTabs = ref({ ...defaultTabs })
 
+  const preloadTabData = async () => {
+    if (!edgeNode.value) return
+    await Promise.allSettled([edgeNodeService.prefetchEdgeNodeServicesList(edgeNodeId.value)])
+  }
+
   const renderTabCurrentRouter = async () => {
     const { services } = route.params
     activeTab.value = services ? 1 : 0
-    edgeNode.value = await getEdgeNodesData()
-    title.value = edgeNode.value.name
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value.name)
+
+    edgeNode.value = { ...edgeNode.value, ...(await getEdgeNodesData()) }
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value?.name)
+    preloadTabData()
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    changeTab(event.index)
-  }
-
-  const updateEdgeNodesValue = async (edgeNodeValues) => {
-    title.value = edgeNodeValues.name
-    edgeNode.value = await getEdgeNodesData()
-    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNodeValues.name)
+  const updateEdgeNodesValue = (edgeNodeValues) => {
+    edgeNode.value = { ...edgeNode.value, ...edgeNodeValues }
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value?.name)
   }
 
   const changeTab = (index) => {
@@ -90,26 +97,22 @@
     })
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 
-  renderTabCurrentRouter()
+  onMounted(() => {
+    renderTabCurrentRouter()
+  })
 </script>
 
 <template>
@@ -118,39 +121,47 @@
       <PageHeadingBlock
         :pageTitle="title"
         :entityName="edgeNode?.name"
+        description="Configure general settings and Edge Services for this Edge Node."
       />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
+      <div
         class="w-full h-full"
+        v-if="edgeNode"
       >
-        <TabPanel header="Main Settings">
-          <EditView
-            v-if="mapTabs.main_settings === activeTab"
-            @handleEdgeNodesUpdated="updateEdgeNodesValue"
-            :hiddenActionBar="!activeTab"
-            :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
-            :loadEdgeNodeService="props.loadEdgeNodeService"
-            :editEdgeNodeService="props.editEdgeNodeService"
-            :updatedRedirect="props.updatedRedirect"
-            :isTab="true"
-          />
-        </TabPanel>
-        <TabPanel header="Services">
-          <ListViewServices
-            v-if="mapTabs.services === activeTab"
-            :edgeNodeId="edgeNodeId"
-            :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
-            :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
-            :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
-            :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-            :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
-            :documentationServiceServices="props.documentationServiceServices"
-          />
-        </TabPanel>
-      </TabView>
+        <TabView
+          ref="tabViewRef"
+          :activeIndex="activeTab"
+          @tab-click="handleTabClick"
+          class="w-full h-full"
+        >
+          <TabPanel header="Main Settings">
+            <EditView
+              v-if="mapTabs.main_settings === activeTab"
+              @handleEdgeNodesUpdated="updateEdgeNodesValue"
+              :hiddenActionBar="!activeTab"
+              :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
+              :updatedRedirect="props.updatedRedirect"
+              :isTab="true"
+              :edgeNode="edgeNode"
+              :initialValues="edgeNode"
+            />
+          </TabPanel>
+          <TabPanel header="Services">
+            <ListViewServices
+              v-if="mapTabs.services === activeTab"
+              :edgeNodeId="edgeNodeId"
+              :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
+              :documentationServiceServices="props.documentationServiceServices"
+            />
+          </TabPanel>
+        </TabView>
+      </div>
     </template>
   </ContentBlock>
 </template>

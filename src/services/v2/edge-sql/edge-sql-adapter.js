@@ -252,14 +252,30 @@ export const EdgeSQLAdapter = {
   },
 
   adaptTableInfo({ data }, tableSchema) {
-    const tableInfo = data[0]
-    const rows = formatRowsForDisplay(tableInfo.results?.rows || [])
-    const columnNames = tableSchema.map((col) => col.name)
+    const list = Array.isArray(data) ? data : []
+
+    const isSchemaFromResponse = !Array.isArray(tableSchema) || tableSchema.length === 0
+    const schemaIndex = isSchemaFromResponse ? 0 : -1
+    const selectIndex = isSchemaFromResponse ? 1 : 0
+    const countIndex = isSchemaFromResponse ? 2 : 1
+
+    const resolvedSchema = isSchemaFromResponse
+      ? this.adaptTableSchemaFromPragmaRows(list[schemaIndex]?.results?.rows || [])
+      : tableSchema
+
+    const tableInfo = list[selectIndex]
+    const rows = formatRowsForDisplay(tableInfo?.results?.rows || [])
+    const columnNames = (resolvedSchema || []).map((col) => col.name)
     const mappedRows = mapRowsToObjects(columnNames, rows)
+
+    const countValueRaw = list[countIndex]?.results?.rows?.[0]?.[0]
+    const count = Number(countValueRaw)
+    const totalRecords = Number.isFinite(count) ? count : mappedRows.length
 
     return {
       rows: mappedRows,
-      tableSchema
+      tableSchema: resolvedSchema,
+      totalRecords
     }
   },
 
@@ -340,10 +356,28 @@ export const EdgeSQLAdapter = {
   },
 
   buildTableInfoStatements(tableName, needSchema) {
+    const options = arguments.length > 2 && arguments[2] ? arguments[2] : {}
+    const { paginate = false, page = 1, pageSize = 10 } = options
+
+    const safePage = Math.max(1, Number(page) || 1)
+    const safePageSize = Math.max(1, Number(pageSize) || 10)
+    const offset = (safePage - 1) * safePageSize
+
+    const selectStmt = paginate
+      ? `SELECT * FROM ${tableName} LIMIT ${safePageSize} OFFSET ${offset}`
+      : `SELECT * FROM ${tableName}`
+
+    const statements = []
     if (needSchema) {
-      return [`PRAGMA table_info(${tableName});`, `SELECT * FROM ${tableName}`]
+      statements.push(`PRAGMA table_info(${tableName});`)
     }
-    return [`SELECT * FROM ${tableName}`]
+    statements.push(selectStmt)
+
+    if (paginate) {
+      statements.push(`SELECT COUNT(*) FROM ${tableName}`)
+    }
+
+    return statements
   },
 
   adaptQueryResult({ data }, isCountSelect) {

@@ -11,12 +11,16 @@
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
-  import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
+  import { computed, ref, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   const breadcrumbs = useBreadcrumbs()
+  const tableDefinitionsStore = useTableDefinitionsStore()
+  const pageSize = tableDefinitionsStore.getNumberOfLinesPerPage || 10
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -41,9 +45,6 @@
   const edgeFirewallId = ref(route.params.id)
   const edgeFirewall = ref()
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
-
   const componentsRefs = ref(null)
 
   const tabs = ref([
@@ -54,6 +55,7 @@
       show: () => mapTabs.value.mainSettings === activeTab.value,
       props: () => ({
         edgeFirewall: edgeFirewall.value,
+        initialValues: edgeFirewall.value,
         loadDomains: props.listDomainsService,
         updatedRedirect: props.edgeFirewallServices.updatedRedirect,
         isTab: true
@@ -122,11 +124,10 @@
     return selectedTab
   }
 
-  const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    changeTab(index)
-  }
+  const verifyTab = (firewall) => {
+    if (!firewall) return
 
-  const verifyTab = ({ edgeFunctionsEnabled }) => {
+    const { edgeFunctionsEnabled } = firewall
     if (!edgeFunctionsEnabled) {
       delete mapTabs.value.functions
       mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
@@ -138,20 +139,20 @@
     mapTabs.value = { ...defaultTabs }
   }
 
-  const preloadTabData = async () => {
+  const preloadTabData = () => {
     if (!edgeFirewall.value) return
 
-    const preloadPromises = []
+    const promises = []
 
     if (edgeFirewall.value.edgeFunctionsEnabled) {
-      preloadPromises.push(edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value))
+      promises.push(
+        edgeFirewallFunctionService.prefetchFunctionsList(edgeFirewallId.value, pageSize)
+      )
     }
 
-    preloadPromises.push(
-      edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value)
-    )
+    promises.push(edgeFirewallRulesEngineService.prefetchRulesEngineList(edgeFirewallId.value))
 
-    await Promise.allSettled(preloadPromises)
+    Promise.allSettled(promises)
   }
 
   const renderTabCurrentRouter = async () => {
@@ -160,14 +161,23 @@
     let selectedTab = tab
     if (!selectedTab) selectedTab = 'mainSettings'
 
-    edgeFirewall.value = await loaderEdgeFirewall()
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
+    changeTab(activeTabIndexByRoute)
+
+    edgeFirewall.value = { ...edgeFirewall.value, ...(await loaderEdgeFirewall()) }
     verifyTab(edgeFirewall.value)
 
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
     preloadTabData()
+  }
 
-    const activeTabIndexByRoute = mapTabs.value[selectedTab]
-    changeTab(activeTabIndexByRoute)
+  // --- Cache from listing ---
+
+  const cachedFirewall = edgeFirewallService.getFirewallFromCache(edgeFirewallId.value)
+
+  if (cachedFirewall?.name) {
+    edgeFirewall.value = cachedFirewall
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedFirewall.name)
   }
 
   const title = computed(() => {
@@ -175,8 +185,9 @@
   })
 
   const updatedFirewall = (firewall) => {
-    edgeFirewall.value = { ...firewall }
+    edgeFirewall.value = { ...edgeFirewall.value, ...firewall }
     verifyTab(edgeFirewall.value)
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFirewall.value?.name)
   }
 
   onMounted(() => {
@@ -198,24 +209,18 @@
     })
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 </script>
 
 <template>
@@ -228,14 +233,20 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div
         class="h-full w-full"
         v-if="edgeFirewall"
       >
         <div class="flex align-center justify-between relative">
           <TabView
+            ref="tabViewRef"
             :activeIndex="activeTab"
-            @tab-click="changeRouteByClickingOnTab"
+            @tab-click="handleTabClick"
             class="flex-1"
           >
             <TabPanel

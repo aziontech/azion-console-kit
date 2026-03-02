@@ -1,21 +1,16 @@
 <script setup>
+  import { computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, inject } from 'vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { teamPermissionService } from '@/services/v2/team-permission'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    listTeamPermissionService: { required: true, type: Function },
-    deleteTeamPermissionService: { required: true, type: Function },
-    documentationService: { required: true, type: Function }
-  })
-
-  const TEAM_PERMISSIONS_API_FIELDS = ['id', 'name', 'permissions', 'is_active']
 
   const actions = [
     {
@@ -23,7 +18,7 @@
       type: 'delete',
       title: 'team',
       icon: 'pi pi-trash',
-      service: props.deleteTeamPermissionService
+      service: teamPermissionService.delete
     }
   ]
 
@@ -41,7 +36,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -54,6 +49,7 @@
         header: 'Permissions',
         type: 'component',
         disableSort: true,
+        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
@@ -62,6 +58,7 @@
         header: 'Status',
         type: 'component',
         sortField: 'is_active',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -104,14 +101,13 @@
     </template>
     <template #content>
       <FetchListTableBlock
-        :listService="listTeamPermissionService"
+        :listService="teamPermissionService.list"
         :columns="getColumns"
         editPagePath="/teams-permission/edit"
         emptyListMessage="No teams found."
         :actions="actions"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :apiFields="TEAM_PERMISSIONS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"
@@ -122,7 +118,7 @@
           description: 'Create your first team to define and assign permissions to users.',
           createButtonLabel: 'Team',
           createPagePath: 'teams-permission/create',
-          documentationService: documentationService
+          documentationService: documentationAccountsProducts.teamPermissions
         }"
       >
       </FetchListTableBlock>

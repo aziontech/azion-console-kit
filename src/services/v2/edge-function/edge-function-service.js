@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { EdgeFunctionsAdapter } from './edge-function-adapter'
+import { EdgeFunctionsAdapter, transformEdgeFunctionItem } from './edge-function-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class EdgeFunctionService extends BaseService {
   constructor() {
@@ -68,7 +69,7 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
-  listEdgeFunctions = async (params = { pageSize: 100, fields: [] }) => {
+  listEdgeFunctions = async (params = { page: 1, pageSize: 10, fields: [] }) => {
     if (!params.executionEnvironment) return []
 
     const { data } = await this.http.request({
@@ -91,7 +92,13 @@ export class EdgeFunctionService extends BaseService {
     }
   }
 
-  listEdgeFunctionsService = async (params = { pageSize: 100, fields: [] }) => {
+  #fetchFunctionsList = async (
+    params = {
+      page: 1,
+      pageSize: 10,
+      ordering: '-last_modified'
+    }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(),
@@ -106,6 +113,59 @@ export class EdgeFunctionService extends BaseService {
       count,
       body: transformed
     }
+  }
+
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.edgeFunction.list(defaultParams), () =>
+      this.#fetchFunctionsList(defaultParams)
+    )
+  }
+
+  listEdgeFunctionsService = async (
+    params = {
+      page: 1,
+      pageSize: 10,
+      ordering: '-last_modified'
+    }
+  ) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.edgeFunction.list(params),
+      () => this.#fetchFunctionsList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
+  getEdgeFunctionFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.edgeFunction.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        if (!item.rawData) {
+          return {
+            id: item.id,
+            name: item.name?.text || item.name,
+            active: item.status?.content === 'Active'
+          }
+        }
+
+        return transformEdgeFunctionItem(item.rawData)
+      }
+    })
   }
 
   loadEdgeFunctionService = async ({ id }) => {
@@ -126,6 +186,8 @@ export class EdgeFunctionService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFunction.all })
+
     return {
       feedback: 'Your Function has been created',
       urlToEditView: `/functions/edit/${data.data.id}`,
@@ -142,6 +204,8 @@ export class EdgeFunctionService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFunction.all })
+
     return 'Your Function has been updated'
   }
 
@@ -150,6 +214,8 @@ export class EdgeFunctionService extends BaseService {
       method: 'DELETE',
       url: this.#getUrl(id)
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeFunction.all })
 
     return 'Function successfully deleted'
   }

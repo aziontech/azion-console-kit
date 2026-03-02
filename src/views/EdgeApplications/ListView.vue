@@ -1,13 +1,14 @@
 <script setup>
   import { computed, inject } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
-  import { INFORMATION_TEXTS } from '@/helpers'
-  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { INFORMATION_TEXTS } from '@/helpers'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'list-edge-applications' })
@@ -82,7 +83,7 @@
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -94,7 +95,8 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'active',
@@ -102,6 +104,7 @@
         sortField: 'active',
         filterPath: 'active',
         type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -113,25 +116,18 @@
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor'
+        filterPath: 'last_editor',
+        style: COLUMN_STYLES.PRIORITY_SM
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified'
+        filterPath: 'lastModified',
+        style: COLUMN_STYLES.FIT_CONTENT
       }
     ]
   })
-
-  const EDGE_APPLICATION_API_FIELDS = [
-    'id',
-    'name',
-    'last_editor',
-    'last_modified',
-    'product_version',
-    'active'
-  ]
 </script>
 
 <template>
@@ -159,7 +155,6 @@
         editPagePath="/applications/edit"
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
-        :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No applications found."

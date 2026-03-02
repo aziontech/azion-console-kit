@@ -45,14 +45,21 @@ export class EdgeFirewallRulesEngineService extends BaseService {
     return { body, count: totalCount }
   }
 
-  listEdgeFirewallRulesEngineService = async (params = { id: '', fields: '', search: '' }) => {
-    const queryKey = queryKeys.firewall.rulesEngine.list(params.id, params)
-    const skipCache = params?.hasFilter || params?.skipCache || params?.search
+  listEdgeFirewallRulesEngineService = async ({
+    id = '',
+    fields = [],
+    search = '',
+    skipCache = false,
+    hasFilter = false
+  }) => {
+    const queryKey = queryKeys.firewall.rulesEngine.list(id, { fields, search })
+
+    const shouldSkipCache = hasFilter || skipCache || search
 
     return await this.useEnsureQueryData(
       queryKey,
-      () => this.#fetchEdgeFirewallRulesEngineList(params),
-      { persist: false, skipCache }
+      () => this.#fetchEdgeFirewallRulesEngineList({ id, fields, search }),
+      { persist: false, skipCache: shouldSkipCache }
     )
   }
 
@@ -63,9 +70,7 @@ export class EdgeFirewallRulesEngineService extends BaseService {
    */
   prefetchRulesEngineList = async (edgeFirewallId) => {
     return await this.listEdgeFirewallRulesEngineService({
-      id: edgeFirewallId,
-      fields: ['id', 'name', 'description', 'last_modified', 'last_editor', 'active'],
-      search: ''
+      id: edgeFirewallId
     })
   }
 
@@ -78,7 +83,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return { feedback: 'Rule Engine successfully created' }
   }
@@ -92,7 +99,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rule Engine successfully updated'
   }
@@ -123,7 +132,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       body
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rules Engine successfully ordered'
   }
@@ -134,7 +145,9 @@ export class EdgeFirewallRulesEngineService extends BaseService {
       url: this.#getUrl(edgeFirewallId, `/${ruleEngineId}`)
     })
 
-    this.queryClient.removeQueries({ queryKey: queryKeys.firewall.all })
+    this.queryClient.removeQueries({
+      queryKey: queryKeys.firewall.rulesEngine.all(edgeFirewallId)
+    })
 
     return 'Rules Engine successfully deleted'
   }

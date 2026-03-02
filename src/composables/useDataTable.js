@@ -144,11 +144,11 @@ export function useDataTable(props, emit) {
           originalEvent: {
             page: 0,
             first: 0,
-            rows: 10,
+            rows: itemsByPage.value,
             pageCount: 39
           },
           first: 0,
-          rows: 10,
+          rows: itemsByPage.value,
           sortField: null,
           sortOrder: null,
           multiSortMeta: [],
@@ -159,7 +159,6 @@ export function useDataTable(props, emit) {
         }
         const numberOfLinesPerPage = event.rows
         tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-        itemsByPage.value = numberOfLinesPerPage
         minimumOfItemsPerPage.value = numberOfLinesPerPage
         firstItemIndex.value = event.first
       }
@@ -313,8 +312,8 @@ export function useDataTable(props, emit) {
   }
 
   const updateDataTablePagination = () => {
-    const FIRST_NUMBER_PAGE = 1
-    firstItemIndex.value = FIRST_NUMBER_PAGE
+    const FIRST_INDEX = 0
+    firstItemIndex.value = FIRST_INDEX
   }
 
   // Sorting
@@ -325,8 +324,8 @@ export function useDataTable(props, emit) {
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     await reload({ ordering })
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
@@ -336,8 +335,8 @@ export function useDataTable(props, emit) {
   // Search
   const fetchOnSearch = () => {
     if (!props.lazy) return
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     reload()
   }
 
@@ -394,8 +393,8 @@ export function useDataTable(props, emit) {
       }
 
       const filterParams = buildFilterParams()
-      const firstPage = 1
-      firstItemIndex.value = firstPage
+      const firstIndex = 0
+      firstItemIndex.value = firstIndex
 
       const success = await reload(filterParams)
 
@@ -423,8 +422,8 @@ export function useDataTable(props, emit) {
     }
 
     const filterParams = buildFilterParams()
-    const firstPage = 1
-    firstItemIndex.value = firstPage
+    const firstIndex = 0
+    firstItemIndex.value = firstIndex
     reload(filterParams)
   }
 
@@ -550,16 +549,16 @@ export function useDataTable(props, emit) {
 
     const name = generateExportFilename(filenameBase, 'xlsx')
     try {
-      const mod = await import('xlsx')
-      const XLSX = mod.default ?? mod
-      const headerRow = fields
-      const dataRows = nonEmptyRows.map((row) => fields.map((fieldName) => row?.[fieldName]))
-      const worksheetData = [headerRow, ...dataRows]
-      const wb = XLSX.utils.book_new()
-      const ws = XLSX.utils.aoa_to_sheet(worksheetData)
+      const { Workbook } = await import('exceljs')
+      const workbook = new Workbook()
+      const worksheet = workbook.addWorksheet('Sheet1')
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
-      const arrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      worksheet.addRow(fields)
+      nonEmptyRows.forEach((row) => {
+        worksheet.addRow(fields.map((fieldName) => row?.[fieldName]))
+      })
+
+      const arrayBuffer = await workbook.xlsx.writeBuffer()
       const blob = new Blob([arrayBuffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })

@@ -3,13 +3,16 @@
     <QuickSelect
       v-model="model"
       :maxDays="maxDays"
-      @select="handleSelect"
+      @select="emit('select', $event)"
+      @autoRefresh="emit('autoRefresh', $event)"
       @open="openOverlay($event, 0)"
     />
     <InputDateRange
       v-model="model"
       :maxDays="maxDays"
       @select="handleSelect"
+      :editingField="editingField"
+      :isOverlayOpen="isOverlayOpen"
       @open="openOverlay($event, 1)"
     />
 
@@ -53,6 +56,7 @@
               v-model="model"
               :maxDays="maxDays"
               @select="handleSelect"
+              @autoRefresh="emit('autoRefresh', $event)"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -80,7 +84,7 @@
             />
           </TabPanel>
           <TabPanel header="Now">
-            <div class="flex flex-col gap-4 max-w-[300px] px-4 mb-2">
+            <div class="flex flex-col gap-4 max-w-[300px] mb-2">
               <div class="text-sm text-color-secondary">
                 Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
               </div>
@@ -93,36 +97,82 @@
             </div>
           </TabPanel>
         </TabView>
+
+        <div
+          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
+          :class="{
+            'p-1 mb-2': activeTab === 3
+          }"
+        >
+          <div class="text-xs text-color-secondary">
+            UTC:
+            <span class="text-color font-medium">{{ userTimezone }}</span>
+          </div>
+          <Dropdown
+            v-model="selectedUtcOption"
+            :options="utcOffsetOptions"
+            optionLabel="label"
+            filter
+            appendTo="self"
+            filterPlaceholder="Search timezone"
+            class="w-auto"
+            :pt="{ input: { class: 'text-xs' } }"
+            @change="onUtcOffsetChange"
+          >
+            <template #value="slotProps">
+              <span v-if="slotProps.value">{{ slotProps.value.label }}</span>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+          </Dropdown>
+        </div>
       </div>
     </OverlayPanel>
   </div>
 </template>
 
 <script setup>
-  import { defineModel, nextTick, ref, computed } from 'vue'
+  import { computed, defineModel, nextTick, onMounted, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
   import OverlayPanel from 'primevue/overlaypanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
   import { shiftQuickRange } from './utils/quick-range-navigation'
+  import { convertUtcNumberToOffset } from '@/helpers/convert-date'
 
   defineOptions({ name: 'DataTimeRange', inheritAttrs: true })
 
   const props = defineProps({
     maxDays: {
       type: Number
+    },
+    defaultUtcOffset: {
+      type: String,
+      default: '+0000'
+    },
+    userTimezone: {
+      type: String,
+      default: '+0000'
+    },
+    listTimezonesService: {
+      type: Function,
+      required: true
     }
   })
 
-  const emit = defineEmits(['select'])
+  const emit = defineEmits(['select', 'autoRefresh'])
 
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const editingField = ref('start')
   const isOverlayOpen = ref(false)
+  const hasInitializedUtcOffset = ref(false)
+  const timezoneOptions = ref([])
+  const isLoadingTimezones = ref(false)
+  const selectedUtcOption = ref(null)
 
   const model = defineModel({
     type: Object,
@@ -151,10 +201,29 @@
     if (!props.maxDays || props.maxDays <= 0) return null
     return new Date()
   })
+
   const minDate = computed(() => {
     if (!props.maxDays || props.maxDays <= 0) return null
     const now = new Date()
     return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
+
+  const utcOffsetOptions = computed(() => {
+    const accountOption = {
+      label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
+      value: props.defaultUtcOffset
+    }
+
+    if (!timezoneOptions.value.length) {
+      return [accountOption]
+    }
+
+    const apiOptions = timezoneOptions.value.map((tz) => ({
+      label: tz.label,
+      value: convertUtcNumberToOffset(tz.utc)
+    }))
+
+    return [accountOption, ...apiOptions]
   })
 
   const clampToBounds = (date) => {
@@ -179,10 +248,42 @@
     emit('select', model.value)
   }
 
+  const formatUtcOffsetLabel = (offset) => {
+    const normalized = typeof offset === 'string' ? offset.trim() : ''
+    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
+    if (!match) return 'UTC'
+    return `UTC${match[1]}${match[2]}:${match[3]}`
+  }
+
+  const syncSelectedUtcOption = () => {
+    if (model.value?.utcOffset) {
+      selectedUtcOption.value =
+        utcOffsetOptions.value.find((opt) => opt.value === model.value.utcOffset) ?? null
+    }
+  }
+
+  const fetchTimezones = async () => {
+    isLoadingTimezones.value = true
+    try {
+      const result = await props.listTimezonesService()
+      timezoneOptions.value = result.listTimeZones
+      syncSelectedUtcOption()
+    } finally {
+      isLoadingTimezones.value = false
+    }
+  }
+
+  const onUtcOffsetChange = (event) => {
+    if (!hasInitializedUtcOffset.value) return
+    model.value.utcOffset = event.value?.value
+    emit('select', model.value)
+  }
+
   const openOverlay = async (payload, tabIndex) => {
     activeTab.value = tabIndex
     const event = tabIndex === 0 ? payload : payload?.event
     const field = tabIndex === 0 ? undefined : payload?.field
+
     if (field === 'start' || field === 'end') editingField.value = field
 
     if (!event) return
@@ -234,4 +335,13 @@
     handleSelect()
     closeOverlay()
   }
+
+  onMounted(async () => {
+    if (!model.value?.utcOffset) {
+      model.value.utcOffset = props.defaultUtcOffset
+    }
+    syncSelectedUtcOption()
+    hasInitializedUtcOffset.value = true
+    await fetchTimezones()
+  })
 </script>

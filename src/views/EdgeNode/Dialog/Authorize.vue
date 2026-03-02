@@ -41,11 +41,11 @@
   import { useToast } from 'primevue/usetoast'
   import DialogAuthorize from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import * as EdgeNodeService from '@/services/edge-node-services'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'Authorize-Dialog' })
 
-  const emit = defineEmits(['authorizeCancel'])
+  defineEmits(['authorizeCancel'])
 
   const dialogRef = inject('dialogRef')
   const toast = useToast()
@@ -58,25 +58,24 @@
         severity: 'info',
         summary: 'Processing request'
       })
-      await EdgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
-      emit('authorizeCancel')
+      await edgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Successfully authorized!'
+      })
+      dialogRef.value.close({ updated: true })
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
         summary: error
       })
-    } finally {
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Successfully authorized!'
-      })
-      closeDialog()
+      dialogRef.value.close({ updated: false })
     }
   }
 
   const closeDialog = () => {
-    dialogRef.value.close()
+    dialogRef.value.close({ updated: false })
   }
 </script>

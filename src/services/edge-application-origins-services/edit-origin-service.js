@@ -7,15 +7,16 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export const editOriginService = async (payload) => {
   const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/origins/${payload.id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${payload.applicationId}/origins/${payload.id}`,
     method: 'PATCH',
     body: parsedPayload
   })
 
   const result = parseHttpResponse(httpResponse)
 
-  // Remove list and detail queries from cache (including IndexedDB) after editing
-  queryClient.removeQueries({ queryKey: queryKeys.edgeApp.origins.all(payload.edgeApplicationId) })
+  queryClient.removeQueries({
+    queryKey: queryKeys.application.origins.all(payload.applicationId)
+  })
 
   return result
 }

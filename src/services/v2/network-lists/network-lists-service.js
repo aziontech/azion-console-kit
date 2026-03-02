@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { NetworkListsAdapter } from './network-lists-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class NetworkListsService extends BaseService {
   constructor() {
     super()
@@ -7,10 +8,7 @@ export class NetworkListsService extends BaseService {
     this.baseURL = 'v4/workspace/network_lists'
   }
 
-  listNetworkLists = async (
-    params = { fields: '', search: '', ordering: '', page: 1, pageSize: 10 },
-    isDropdown = false
-  ) => {
+  #fetchNetworkLists = async (params = {}, isDropdown = false) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -31,6 +29,39 @@ export class NetworkListsService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: ['id', 'name', 'type', 'last_editor', 'last_modified'],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.networkLists.list(defaultParams), () =>
+      this.#fetchNetworkLists(defaultParams)
+    )
+  }
+
+  listNetworkLists = async (
+    params = { fields: '', search: '', ordering: '', page: 1, pageSize: 10 },
+    isDropdown = false
+  ) => {
+    if (isDropdown) {
+      return this.#fetchNetworkLists(params, true)
+    }
+
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.networkLists.list(params),
+      () => this.#fetchNetworkLists(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
   createNetworkLists = async (payload) => {
     const bodyRequest = this.adapter?.transformCreateNetworkList?.(payload)
 
@@ -39,6 +70,8 @@ export class NetworkListsService extends BaseService {
       url: this.baseURL,
       body: bodyRequest
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.networkLists.all })
 
     return response.data
   }
@@ -67,6 +100,8 @@ export class NetworkListsService extends BaseService {
       body: bodyRequest
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.networkLists.all })
+
     return 'Your Network List has been updated.'
   }
 
@@ -76,7 +111,47 @@ export class NetworkListsService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.networkLists.all })
+
     return 'Network list successfully deleted.'
+  }
+
+  listNetworkListsDropdown = async (
+    params = { page: 1, pageSize: 100, search: '', ordering: 'name' }
+  ) => {
+    return await this.useEnsureQueryData(
+      queryKeys.networkLists.dropdown(params),
+      () => this.#fetchNetworkLists(params, true),
+      { persist: true }
+    )
+  }
+
+  prefetchNetworkListsDropdown = () => {
+    const params = { pageSize: 100, page: 1, search: '', ordering: 'name' }
+    return this.usePrefetchQuery(queryKeys.networkLists.dropdown(params), () =>
+      this.#fetchNetworkLists(params, true)
+    )
+  }
+
+  getNetworkListFromCache = (id) => {
+    if (!id) return undefined
+
+    const listTypeMap = {
+      'IP/CIDR': 'ip_cidr',
+      ASN: 'asn',
+      Countries: 'countries'
+    }
+
+    return super.getFromCache({
+      queryKey: queryKeys.networkLists.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        id: item.id,
+        name: item.name,
+        networkListType: listTypeMap[item.listType] || item.listType
+      })
+    })
   }
 }
 

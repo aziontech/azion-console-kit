@@ -1,30 +1,20 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import ContentBlock from '@/templates/content-block'
-  import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, inject } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'list-edge-service' })
 
-  const props = defineProps({
-    listEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
-    editEdgeServiceServices: {
-      type: Function,
-      required: true
-    },
+  defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -46,7 +36,7 @@
       field: 'name',
       header: 'Name',
       type: 'component',
-      style: 'max-width: 300px',
+      style: columnStyles.priority(2, 200, 350),
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -58,13 +48,15 @@
       field: 'id',
       header: 'ID',
       sortField: 'id',
-      filterPath: 'id'
+      filterPath: 'id',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'labelActive',
       header: 'Status',
       filterPath: 'labelActive.content',
       type: 'component',
+      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) =>
         columnBuilder({
           data: columnData,
@@ -75,13 +67,15 @@
       field: 'lastEditor',
       header: 'Last Editor',
       sortField: 'last_editor',
-      filterPath: 'last_editor'
+      filterPath: 'last_editor',
+      style: COLUMN_STYLES.PRIORITY_SM
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified'
+      filterPath: 'lastModified',
+      style: COLUMN_STYLES.FIT_CONTENT
     }
   ])
 
@@ -96,7 +90,7 @@
         body: (item, updatedTable) => ({
           data: {
             selectRow: item,
-            service: props.editEdgeServiceServices
+            service: edgeServiceService.editEdgeServiceService
           },
           onClose: (opt) => opt.data.updated && updatedTable()
         })
@@ -112,7 +106,7 @@
         body: (item, updatedTable) => ({
           data: {
             selectRow: item,
-            service: props.editEdgeServiceServices
+            service: edgeServiceService.editEdgeServiceService
           },
           onClose: (opt) => opt.data.updated && updatedTable()
         })
@@ -123,7 +117,7 @@
       label: 'Delete',
       title: 'service',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeServiceServices
+      service: edgeServiceService.deleteEdgeServiceService
     }
   ]
 
@@ -160,11 +154,10 @@
     </template>
     <template #content>
       <ListTableBlock
-        :listService="listEdgeServiceServices"
+        :listService="edgeServiceService.listEdgeServiceService"
         :columns="getColumns"
         createPagePath="edge-services/create"
         editPagePath="/edge-services/edit"
-        @on-load-data="handleLoadData"
         :actions="actions"
         emptyListMessage="No services found."
         @on-before-go-to-add-page="handleTrackEventGoToCreate"

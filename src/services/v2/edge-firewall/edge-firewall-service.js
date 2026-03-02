@@ -2,28 +2,17 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallAdapter } from './edge-firewall-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-export const DEFAULT_FIELDS = [
-  'id',
-  'name',
-  'debug_rules',
-  'last_editor',
-  'last_modified',
-  'last_modify',
-  'active'
-]
-
 export class EdgeFirewallService extends BaseService {
   constructor() {
     super()
     this.adapter = EdgeFirewallAdapter
     this.baseURL = 'v4/workspace/firewalls'
-    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (
     params = {
       pageSize: 10,
-      fields: this.fieldsDefault
+      fields: []
     }
   ) => {
     const { data } = await this.http.request({
@@ -44,18 +33,15 @@ export class EdgeFirewallService extends BaseService {
     }
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: this.fieldsDefault,
+      fields: [],
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(queryKeys.firewall.list(params), () => this.#fetchList(params), {
-      persist: !params.search,
-      skipCache: params.search
-    })
+    return this.usePrefetchQuery(queryKeys.firewall.list(params), () => this.#fetchList(params))
   }
 
   listEdgeFirewallService = async (params) => {
@@ -70,6 +56,21 @@ export class EdgeFirewallService extends BaseService {
         skipCache
       }
     )
+  }
+
+  getFirewallFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.firewall.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        ...item,
+        name: item.name?.text ?? item.name,
+        isActive: item.active?.content === 'Active'
+      })
+    })
   }
 
   listEdgeFirewallServiceDropdown = async (

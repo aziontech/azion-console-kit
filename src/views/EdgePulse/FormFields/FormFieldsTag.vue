@@ -1,6 +1,6 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
+  import { useThemeStore } from '@/stores/theme'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -14,7 +14,7 @@
     scrollBeyondLastLine: false
   })
 
-  const store = useAccountStore()
+  const store = useThemeStore()
 
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'

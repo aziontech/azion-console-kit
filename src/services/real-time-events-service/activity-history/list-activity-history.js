@@ -7,6 +7,9 @@ import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = false
+const shouldLimitRequestUri = true
+
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
 
@@ -53,7 +56,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const data = response.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
-    summary: buildSummary(activityHistoryEvents),
+    summary: buildSummary(activityHistoryEvents, shouldLimitRequestUri, shouldShowTsColumn),
     userId: activityHistoryEvents.userId,
     ts: activityHistoryEvents.ts,
     tsFormat: getCurrentTimezone(activityHistoryEvents.ts)

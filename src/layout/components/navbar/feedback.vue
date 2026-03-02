@@ -54,27 +54,52 @@
       </div>
     </div>
     <template #footer>
-      <div class="flex justify-content-end gap-2">
-        <PrimeButton
-          type="button"
-          label="Cancel"
-          outlined
-          size="small"
-          class="w-20"
-          @click="visible = false"
-          data-testid="feedback-dialog__dialog-footer__cancel-button"
-        />
-        <PrimeButton
-          type="button"
-          severity="secondary"
-          label="Send feedback"
-          class="w-36"
-          size="small"
-          icon="pi pi-send"
-          :loading="loading"
-          @click="sendFeedback()"
-          data-testid="feedback-dialog__dialog-footer__confirm-button"
-        />
+      <div
+        class="flex justify-between items-center w-full flex-col-reverse sm:flex-row gap-2 sm:gap-0"
+      >
+        <div
+          class="flex flex-wrap text-xs font-normal justify-start w-full gap-1 sm:gap-0 sm:w-auto"
+        >
+          <span>Have a technical issue? Contact</span>
+          <span>
+            <a
+              class="text-[var(--text-color-link)] hover:text-[var(--text-color-link-hover)] cursor-pointer hover:underline"
+              small
+              @click="openCopilot"
+              data-testid="feedback-dialog__dialog-footer__copilot-link"
+              >Azion Copilot</a
+            >
+            or
+            <a
+              class="text-[var(--text-color-link)] hover:text-[var(--text-color-link-hover)] cursor-pointer hover:underline"
+              :href="AZION_CONTACT_SUPPORT"
+              target="_blank"
+              data-testid="feedback-dialog__dialog-footer__support-link"
+              >Azion Support</a
+            >.
+          </span>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <PrimeButton
+            type="button"
+            label="Cancel"
+            outlined
+            size="small"
+            class="w-20"
+            @click="visible = false"
+            data-testid="feedback-dialog__dialog-footer__cancel-button"
+          />
+          <PrimeButton
+            type="button"
+            severity="secondary"
+            label="Send feedback"
+            class="sm:w-36"
+            size="small"
+            :loading="loading"
+            @click="sendFeedback()"
+            data-testid="feedback-dialog__dialog-footer__confirm-button"
+          />
+        </div>
       </div>
     </template>
   </Dialog>
@@ -85,6 +110,8 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import { createFeedbackServices } from '@/services/feedback-services'
+  import { useLayout } from '@/composables/use-layout'
+  import { AZION_CONTACT_SUPPORT } from '@/helpers/azion-documentation-window-opener'
   import { useToast } from 'primevue/usetoast'
   import Dialog from 'primevue/dialog'
   import Dropdown from 'primevue/dropdown'
@@ -96,7 +123,7 @@
   const props = defineProps({
     styleTextColor: {
       type: String,
-      default: () => 'text-white'
+      default: () => 'text-color'
     },
     class: {
       type: String
@@ -108,6 +135,7 @@
   })
 
   const { accountData: account } = storeToRefs(useAccountStore())
+  const { OpenSidebarComponent } = useLayout()
   const toast = useToast()
 
   const visible = ref(false)
@@ -120,6 +148,11 @@
     { name: 'Idea', code: 'idea' },
     { name: 'Other', code: 'other' }
   ]
+
+  const openCopilot = () => {
+    visible.value = false
+    OpenSidebarComponent('copilot')
+  }
 
   const resetForm = () => {
     selectedIssueType.value = 'issue'

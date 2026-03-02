@@ -26,7 +26,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after creating
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return {
@@ -58,7 +58,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after editing
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rule successfully updated'
@@ -73,7 +73,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after deleting
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rule successfully deleted'
@@ -100,7 +100,7 @@ export class RulesEngineService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after reordering
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.rulesEngine.all(edgeApplicationId)
+      queryKey: queryKeys.application.rulesEngine.all(edgeApplicationId)
     })
 
     return 'Rules Engine successfully ordered'
@@ -160,14 +160,16 @@ export class RulesEngineService extends BaseService {
 
     const transformedData = this.adapter?.transformListRulesEngine?.(allRules, phase) ?? allRules
 
+    transformedData.sort((dataA, dataB) => dataA.position.value - dataB.position.value)
+
     return transformedData
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
-
+    delete params.pageSize
     return await this.useEnsureQueryData(
-      queryKeys.edgeApp.rulesEngine.list(edgeApplicationId, params),
+      queryKeys.application.rulesEngine.list(edgeApplicationId, params),
       async () => {
         const [requestRules, responseRules] = await Promise.all([
           this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
@@ -195,6 +197,7 @@ export class RulesEngineService extends BaseService {
    */
   prefetchRulesEngineList = async (edgeApplicationId) => {
     const defaultParams = {
+      page: 1,
       fields: [
         'id',
         'name',
@@ -205,7 +208,7 @@ export class RulesEngineService extends BaseService {
         'last_modified',
         'last_editor'
       ],
-      ordering: ''
+      ordering: 'id'
     }
 
     return await this.listRulesEngineRequestAndResponsePhase({

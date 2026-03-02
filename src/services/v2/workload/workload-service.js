@@ -6,6 +6,7 @@ import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { edgeDNSService } from '../edge-dns/edge-dns-service'
 
 export const DEFAULT_FIELDS = [
   'name',
@@ -29,6 +30,7 @@ export class WorkloadService extends BaseService {
     this.workloadDeployment = workloadDeploymentService
     this.digitalCertificate = digitalCertificatesService
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
+    this.edgeDNS = edgeDNSService
 
     this._certificateId = null
     this._objLetEncrypt = null
@@ -56,12 +58,19 @@ export class WorkloadService extends BaseService {
       url: `${this.baseURL}/${id}`
     })
 
-    const workloadDeployment = await this.workloadDeployment.listWorkloadDeployment(id)
+    const [workloadDeployment, zonesResponse] = await Promise.all([
+      this.workloadDeployment.listWorkloadDeployment(id),
+      this.edgeDNS
+        .listEdgeDNSService({ fields: ['domain'], active: 'True' })
+        .catch(() => ({ body: [] }))
+    ])
 
-    return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
+    const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
+
+    return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0], zones) ?? data
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
@@ -69,7 +78,7 @@ export class WorkloadService extends BaseService {
       ordering: '-last_modified'
     }
 
-    await this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
+    return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
   #ensureCertificate = async (payload) => {
@@ -336,6 +345,40 @@ export class WorkloadService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return `Workload successfully deleted.`
+  }
+
+  getWorkloadFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
+      }),
+      listPath: 'body'
+    })
+  }
+
+  getDomainFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.workload.all,
+      id,
+      select: (item) => ({
+        id: item.id,
+        name: item.name?.text ?? item.name,
+        active: item.active?.content === 'Active',
+        domainName: item.workloadHostname?.content,
+        environment: item.infrastructure === 'Production' ? 'production' : 'staging',
+        cnames: item?.domains?.join('\n') || ''
+      }),
+      listPath: 'body'
+    })
   }
 }
 

@@ -1,10 +1,11 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
-  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import edgeConnectorsGif from '@/assets/images/edgeConnectors.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -54,20 +55,24 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        style: columnStyles.priority(2, 200, 350)
       },
       {
         field: 'originType',
-        header: 'Type'
+        header: 'Type',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'hostHeader',
-        header: 'Header'
+        header: 'Header',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'addresses',
         header: 'Address',
         type: 'component',
+        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
@@ -76,6 +81,7 @@
         header: 'Key',
         type: 'component',
         filterPath: 'originKey.content',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData.content,
@@ -159,8 +165,8 @@
       isTabs
       exportFileName="Application Origins"
       :emptyBlock="{
-        title: 'No origins have been created',
-        description: 'Click the button below to create your first origin.'
+        title: 'No origins yet',
+        description: 'Create your first origin to define where your application retrieves content.'
       }"
     >
       <template #emptyBlockButton>

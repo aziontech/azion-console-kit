@@ -54,3 +54,7 @@ src/views/Playground/PlaygroundView.vue
 .vulcan
 specs.json
 .claude/
+.opencode/
+CLAUDE.md
+docs/ARCHITECTURE.md
+hooks/

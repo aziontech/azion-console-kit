@@ -1,9 +1,10 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useToast } from 'primevue/usetoast'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { EdgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import CredentialDrawer from '../Drawer/index.vue'
 
   defineOptions({ name: 'object-storage-credentials-list-view' })
@@ -24,12 +25,14 @@
   const getColumns = computed(() => [
     {
       field: 'name',
-      header: 'Name'
+      header: 'Name',
+      style: columnStyles.priority(2, 200, 350)
     },
     {
       field: 'accessKey',
       header: 'Access Key',
       type: 'component',
+      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({ data: columnData, columnAppearance: 'text-with-clipboard' })
       }
@@ -38,7 +41,7 @@
       field: 'capabilities',
       header: 'Capabilities',
       type: 'component',
-      style: 'max-width: 300px',
+      style: columnStyles.priority(3, 200, 300),
       component: (columnData) => {
         return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }
@@ -47,6 +50,7 @@
       field: 'bucket',
       header: 'Bucket',
       type: 'component',
+      style: columnStyles.priority(2, 150, 250),
       component: (columnData) => {
         if (Array.isArray(columnData)) {
           return columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
@@ -61,23 +65,27 @@
     },
     {
       field: 'createDate',
-      header: 'Create Date'
+      header: 'Create Date',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'expirationDate',
-      header: 'Expiration Date'
+      header: 'Expiration Date',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'lastEditor',
       header: 'Last Editor',
       sortField: 'last_editor',
-      filterPath: 'last_editor'
+      filterPath: 'last_editor',
+      style: COLUMN_STYLES.PRIORITY_SM
     },
     {
       field: 'lastModify',
       header: 'Last Modified',
       sortField: 'lastModify',
-      filterPath: 'lastModify'
+      filterPath: 'lastModify',
+      style: COLUMN_STYLES.FIT_CONTENT
     }
   ])
 
@@ -150,6 +158,7 @@
       @on-before-go-to-add-page="handleCreateCredential"
       :actions="actions"
       @on-failed-to-delete="handleFailedToDelete"
+      default-ordering-field-name="-last_modified"
       emptyListMessage="No credentials found."
       isTabs
       :emptyBlock="{

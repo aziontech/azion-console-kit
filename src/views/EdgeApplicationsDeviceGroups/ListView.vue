@@ -1,10 +1,11 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
-  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
-  import PrimeButton from 'primevue/button'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -38,7 +39,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -52,6 +53,7 @@
         type: 'component',
         filterPath: 'id',
         sortField: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -63,7 +65,7 @@
         field: 'userAgent',
         header: 'User Agent',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(3, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -152,8 +154,9 @@
     exportFileName="Application Device Groups"
     hideLastModifiedColumn
     :emptyBlock="{
-      title: 'No device groups have been created',
-      description: 'Click the button below to create your first device group.',
+      title: 'No device groups yet',
+      description:
+        'Create your first device group to organize and manage custom application behaviors and cache policies.',
       createButtonLabel: 'Device Group',
       createPagePath: '/edge-applications/device-groups/create',
       documentationService: props.documentationService

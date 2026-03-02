@@ -50,12 +50,13 @@ export const edgeDnsRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-edge-dns',
-      component: () => import('@views/EdgeDNS/EditView.vue'),
+      component: () => import('@views/EdgeDNS/TabsView.vue'),
       props: {
         clipboardWrite: Helpers.clipboardWrite,
-        updatedRedirect: 'list-edge-dns'
+        updatedRedirect: 'list-edge-dns',
+        documentationService: Helpers.documentationCatalog.records
       },
       meta: {
         title: 'Edit Zone',
@@ -72,27 +73,6 @@ export const edgeDnsRoutes = {
             label: 'Edit Zone',
             dynamic: true,
             routeParam: 'id'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id/records',
-      name: 'edge-dns-records',
-      component: () => import('@views/EdgeDNS/EditView.vue'),
-      props: {
-        clipboardWrite: Helpers.clipboardWrite,
-        documentationService: Helpers.documentationCatalog.records
-      },
-      meta: {
-        title: 'Edit Record',
-        breadCrumbs: [
-          {
-            label: 'Edge DNS',
-            to: '/edge-dns'
-          },
-          {
-            label: 'Edit Record'
           }
         ]
       }

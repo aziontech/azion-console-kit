@@ -68,7 +68,7 @@ describe('ImageProcessorServices', () => {
 
     expect(response).toEqual({
       qtype: fixtures.edgeDns.qtype,
-      ts: fixtures.edgeDns.ts,
+      ts: '2024-02-23T18:07:25.000Z',
       qTypeDescription:
         'Address Mapping record (A Record), also known as a DNS host record, stores a hostname and its corresponding IPv4 address.',
       data: [
@@ -77,6 +77,7 @@ describe('ImageProcessorServices', () => {
         { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
         { key: 'solutionId', value: fixtures.edgeDns.solutionId },
         { key: 'statusCode', value: fixtures.edgeDns.statusCode },
+        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
         { key: 'uuid', value: fixtures.edgeDns.uuid },
         { key: 'zoneId', value: fixtures.edgeDns.zoneId }
       ]

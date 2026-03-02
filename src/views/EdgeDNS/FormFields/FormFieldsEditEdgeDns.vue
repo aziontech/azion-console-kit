@@ -23,7 +23,7 @@
   const { value: id } = useField('id')
   const { value: domain } = useField('domain')
   const { value: nameservers } = useField('nameservers')
-  const { value: dnssec } = useField('dnssec')
+  const { value: dnssec, resetField: resetDnssecField } = useField('dnssec')
 
   const dnssecData = ref([])
   const refreshDNSSECTime = 5000
@@ -33,6 +33,8 @@
   const loadEdgeDNSSEC = async (DNSZone) => {
     const data = await edgeDNSService.loadEdgeDNSZoneDNSSEC(DNSZone)
     if (!data) return
+
+    resetDnssecField({ value: data.enabled ?? false })
 
     if (!data.enabled) return
 

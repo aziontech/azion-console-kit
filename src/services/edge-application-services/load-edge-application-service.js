@@ -15,7 +15,7 @@ const fetchEdgeApplication = async ({ id }) => {
 
 export const loadEdgeApplicationService = async ({ id }) => {
   return await baseService.useEnsureQueryData(
-    baseService.queryKeys.edgeAppV3.detail(id),
+    baseService.queryKeys.applicationV3.detail(id),
     () => fetchEdgeApplication({ id }),
     {
       persist: false

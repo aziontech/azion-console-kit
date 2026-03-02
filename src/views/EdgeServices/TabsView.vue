@@ -5,19 +5,18 @@
   import EditView from '@/views/EdgeServices/EditView'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
-  import { ref, watch, provide, reactive, computed } from 'vue'
+  import { ref, computed, nextTick } from 'vue'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
-  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-  import { useToast } from 'primevue/usetoast'
+  import { provideTabUnsaved } from '@/composables/useTabUnsaved'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import PrimeButton from 'primevue/button'
+  import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
-    loadEdgeService: { type: Function, required: true },
-    editEdgeService: { type: Function, required: true },
-    listResourcesServices: { type: Function, required: true },
     deleteResourcesServices: { type: Function, required: true },
     editResourcesServices: { type: Function, required: true },
     createResourcesServices: { type: Function, required: true },
@@ -28,14 +27,11 @@
 
   const route = useRoute()
   const router = useRouter()
-  const toast = useToast()
   const breadcrumbs = useBreadcrumbs()
 
   const activeTab = ref(0)
   const edgeServiceId = ref(route.params.id)
-
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
-  const formHasUpdated = ref(false)
+  const cachedService = edgeServiceService.getEdgeServiceFromCache(edgeServiceId.value) ?? {}
 
   const componentsRefs = ref(null)
 
@@ -44,7 +40,7 @@
     resources: 1
   }
 
-  const title = ref('')
+  const title = ref(cachedService.name || '')
 
   const tabs = ref([
     {
@@ -54,9 +50,8 @@
       show: () => mapTabs.value.main_settings === activeTab.value,
       props: () => ({
         hiddenActionBar: !activeTab.value,
-        loadEdgeService: props.loadEdgeService,
-        editEdgeService: props.editEdgeService,
         updatedRedirect: props.updatedRedirect,
+        initialValues: cachedService,
         isTab: true
       })
     },
@@ -71,7 +66,7 @@
         createResourcesServices: props.createResourcesServices,
         editResourcesServices: props.editResourcesServices,
         loadResourcesServices: props.loadResourcesServices,
-        listResourcesServices: props.listResourcesServices,
+        listResourcesServices: edgeServiceService.listResourcesService,
         deleteResourcesServices: props.deleteResourcesServices,
         documentationServiceResource: props.documentationServiceResource
       })
@@ -93,21 +88,6 @@
     }
   })
 
-  const getEdgeService = async () => {
-    try {
-      const result = await props.loadEdgeService({ id: edgeServiceId.value })
-      title.value = result.name
-      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, result.name)
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Loading failed',
-        detail: error
-      })
-    }
-  }
-
   const updateEdgeServiceValue = (value) => {
     title.value = value.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, value.name)
@@ -115,14 +95,17 @@
 
   const mapTabs = ref({ ...defaultTabs })
 
-  const renderTabCurrentRouter = async () => {
-    await getEdgeService()
-    const { resources } = route.params
-    activeTab.value = resources ? 1 : 0
+  if (cachedService.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedService.name)
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    changeTab(event.index)
+  const renderTabCurrentRouter = () => {
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+    edgeServiceService.prefetchTabsData(edgeServiceId.value, pageSize)
+
+    const { resources } = route.params
+    activeTab.value = resources ? 1 : 0
   }
 
   const changeTab = (index) => {
@@ -139,24 +122,18 @@
     })
   }
 
-  const visibleOnSaved = ref(false)
+  const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
-  provide('unsaved', {
-    changeTab,
-    tabHasUpdate,
-    formHasUpdated,
-    visibleOnSaved
-  })
+  const tabViewRef = ref(null)
 
-  watch(activeTab, (newValue, oldValue) => {
-    if (visibleOnSaved.value) {
-      return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
+  const handleTabClick = ({ index = 0 }) => {
+    requestTabChange(activeTab.value, index)
+    if (unsaved.isDialogVisible.value && tabViewRef.value) {
+      nextTick(() => {
+        tabViewRef.value.d_activeIndex = activeTab.value
+      })
     }
-  })
+  }
 
   renderTabCurrentRouter()
 </script>
@@ -171,11 +148,17 @@
       />
     </template>
     <template #content>
+      <DialogUnsaved
+        :visible="unsaved.isDialogVisible.value"
+        @leave="unsaved.confirmLeave"
+        @stay="unsaved.cancelLeave"
+      />
       <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
+            ref="tabViewRef"
             :activeIndex="activeTab"
-            @tab-click="changeRouteByClickingOnTab"
+            @tab-click="handleTabClick"
             class="flex-1"
           >
             <TabPanel
@@ -218,6 +201,7 @@
               :is="tab.component"
               v-if="tab.show()"
               @handleEdgeServiceUpdated="updateEdgeServiceValue"
+              @loaded-service-object="updateEdgeServiceValue"
               v-bind="tab.props()"
             />
           </template>

@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, inject, watch } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
 
@@ -27,11 +27,13 @@
 
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
+
+  const cachedFunction = edgeFunctionService.getEdgeFunctionFromCache(route.params?.id) ?? {}
   const isLoading = ref(false)
   const additionalErrors = ref([])
   const updateObject = ref({})
   const runtime = ref(null)
-  const name = ref('')
+  const name = ref(cachedFunction.name || '')
 
   const handleTrackSuccessEdit = () => {
     tracker.product
@@ -66,7 +68,10 @@
       return isValidJson
     }),
     active: yup.boolean(),
-    runtime: yup.string()
+    runtime: yup.string(),
+    runtimeFormat: yup.object().nullable(),
+    executionEnvironment: yup.string(),
+    isProprietaryCode: yup.boolean()
   })
 
   const hasAdditionalErrors = () => {
@@ -75,6 +80,11 @@
 
   const handleAdditionalErrors = (errors) => {
     additionalErrors.value = errors
+  }
+
+  const setFunctionData = (edgeFunction) => {
+    name.value = edgeFunction.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFunction.name)
   }
 
   const formSubmit = async (onSubmit) => {
@@ -88,12 +98,6 @@
     await onSubmit()
     isLoading.value = false
   }
-
-  watch(name, (newName) => {
-    if (newName) {
-      breadcrumbs.update(route.meta.breadCrumbs ?? [], route, newName)
-    }
-  })
 </script>
 
 <template>
@@ -114,6 +118,8 @@
         :editService="edgeFunctionService.editEdgeFunctionService"
         :loadService="edgeFunctionService.loadEdgeFunctionService"
         :updatedRedirect="props.updatedRedirect"
+        :initialValues="cachedFunction"
+        @loaded-service-object="setFunctionData"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
         :schema="validationSchema"

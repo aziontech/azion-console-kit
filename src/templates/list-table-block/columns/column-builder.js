@@ -41,7 +41,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'text-format-with-popup':
       return h(TextFormatWithPopupColumn, {
-        text: data.text || data,
+        text: data?.text || data,
         showCopy: dependencies?.showCopy || false
       })
     case 'text-array-with-popup':

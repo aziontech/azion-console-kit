@@ -33,8 +33,21 @@ const transformMap = {
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
-  active: (value) => parseStatusData(value.active)
+  active: (value) => parseStatusData(value.active),
+  pages: (value) => value.pages
 }
+
+export const transformPageItem = (item) => ({
+  id: item.code === 'default' ? 0 : item.code,
+  code: { value: nullable(item.code) },
+  type: nullable(item.page.type),
+  customStatusCode: nullable(item.page.attributes.custom_status_code),
+  connector: nullable(item.page.attributes.connector),
+  ttl: nullable(item.page.attributes.ttl),
+  uri: nullable(item.page.attributes.uri),
+  contentType: nullable(item.page.attributes.content_type),
+  response: nullable(item.page.attributes.response)
+})
 
 export const CustomPageAdapter = {
   transformListCustomPage(data, fields) {
@@ -64,17 +77,7 @@ export const CustomPageAdapter = {
       last_modified: data.last_modified,
       active: data.active,
       product_version: data.product_version,
-      pages: data.pages.map((item) => ({
-        id: item.code === 'default' ? 0 : item.code,
-        code: { value: nullable(item.code) },
-        type: nullable(item.page.type),
-        customStatusCode: nullable(item.page.attributes.custom_status_code),
-        connector: nullable(item.page.attributes.connector),
-        ttl: nullable(item.page.attributes.ttl),
-        uri: nullable(item.page.attributes.uri),
-        contentType: nullable(item.page.attributes.content_type),
-        response: nullable(item.page.attributes.response)
-      }))
+      pages: data.pages.map(transformPageItem)
     }
 
     return response

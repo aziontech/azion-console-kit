@@ -31,6 +31,7 @@ export const EdgeFirewallFunctionAdapter = {
   },
 
   transformListFunctionsDropdown(data) {
+    if (!Array.isArray(data)) return []
     return data.map((item) => ({
       name: item.name,
       id: item.id

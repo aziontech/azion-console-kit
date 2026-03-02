@@ -169,7 +169,7 @@ const formatDateToMonthYear = (date) => {
 }
 
 const formatDateToDayMonthYearHour = (date, timezone) => {
-  if (!date) return null
+  if (!date) return 'Not Available'
 
   if (typeof date === 'string' && date.match(/^[A-Z][a-z]+\s+\d+,\s+\d{4}/)) {
     return date
@@ -207,6 +207,19 @@ const formatDateToDayMonthYearHour = (date, timezone) => {
     second: '2-digit',
     hour12: true
   })
+}
+
+const convertUnitToMilliseconds = (unit, value) => {
+  switch (unit) {
+    case 'seconds':
+      return value * 1000
+    case 'minutes':
+      return value * 60 * 1000
+    case 'hours':
+      return value * 60 * 60 * 1000
+    default:
+      return null
+  }
 }
 
 const getCurrentDateTimeIntl = () => {
@@ -340,6 +353,62 @@ const getOffset = (timeZone = 'UTC', date = new Date()) => {
   return `UTC${sinal}${offset}`
 }
 
+const parseUtcOffsetToMinutes = (utcOffset = '+0000') => {
+  if (typeof utcOffset !== 'string') return 0
+  const match = utcOffset.trim().match(/^([+-])(\d{2})(\d{2})$/)
+  if (!match) return 0
+
+  const sign = match[1] === '-' ? -1 : 1
+  const hours = Number(match[2])
+  const minutes = Number(match[3])
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return 0
+
+  return sign * (hours * 60 + minutes)
+}
+
+const createUtcDateFromUserTimezoneParts = (parts, utcOffset) => {
+  const { year, monthIndex, day, hour = 0, minute = 0, second = 0, millisecond = 0 } = parts ?? {}
+
+  const offsetMinutes = parseUtcOffsetToMinutes(utcOffset)
+  const utcMillis =
+    Date.UTC(year, monthIndex, day, hour, minute, second, millisecond) -
+    offsetMinutes * MINUTE_IN_MILLISECONDS
+
+  return new Date(utcMillis)
+}
+
+const getUtcIsoRangeForUserDay = ({ year, monthIndex, day }, utcOffset) => {
+  const begin = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 0, minute: 0, second: 0, millisecond: 0 },
+    utcOffset
+  )
+  const end = createUtcDateFromUserTimezoneParts(
+    { year, monthIndex, day, hour: 23, minute: 59, second: 59, millisecond: 999 },
+    utcOffset
+  )
+
+  return { begin: begin.toISOString(), end: end.toISOString() }
+}
+
+/**
+ * Converts a numeric UTC offset (as returned by the timezones API) to the
+ * string format used throughout the application (e.g. "+0300", "-0530").
+ *
+ * The API returns values like 300 for +03:00, -530 for -05:30, etc.
+ *
+ * @param {number} utcNumber - Numeric UTC offset (e.g. 300, -530, 0)
+ * @returns {string} UTC offset string in "+HHMM" format (e.g. "+0300", "-0530")
+ */
+const convertUtcNumberToOffset = (utcNumber) => {
+  const sign = utcNumber >= 0 ? '+' : '-'
+  const abs = Math.abs(utcNumber)
+  const hours = Math.floor(abs / 100)
+  const minutes = abs % 100
+  const hh = String(hours).padStart(2, '0')
+  const mm = String(minutes).padStart(2, '0')
+  return `${sign}${hh}${mm}`
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -354,5 +423,10 @@ export {
   getRemainingDays,
   getCurrentDateTimeIntl,
   convertToRelativeTime,
-  getOffset
+  getOffset,
+  parseUtcOffsetToMinutes,
+  createUtcDateFromUserTimezoneParts,
+  getUtcIsoRangeForUserDay,
+  convertUnitToMilliseconds,
+  convertUtcNumberToOffset
 }

@@ -9,7 +9,7 @@
         <span>{{ currentStatus.current?.name || 'Processing...' }}</span>
       </div>
       <PrimeButton
-        v-if="operationType === 'upload'"
+        v-if="operationType === EDGE_STORAGE_OPERATION_TYPE.UPLOAD"
         icon="pi pi-times-circle"
         size="small"
         outlined
@@ -40,9 +40,9 @@
   import ProgressBar from 'primevue/progressbar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { useEdgeStorage } from '@/composables/useEdgeStorage'
+  import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE } from '@/composables/useEdgeStorage'
 
-  const { isProcessing, operationType, processStatus } = useEdgeStorage()
+  const { isProcessing, operationType, processStatus, cancelRequest } = useEdgeStorage()
 
   const showProgress = computed(() => {
     return isProcessing.value
@@ -53,11 +53,16 @@
   })
 
   const iconClass = computed(() => {
-    return operationType.value === 'upload' ? 'pi pi-file' : 'pi pi-trash'
+    if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD) return 'pi pi-file'
+    if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.MOVE)
+      return 'pi pi-arrow-right-arrow-left'
+    return 'pi pi-trash'
   })
 
   const actionText = computed(() => {
-    return operationType.value === 'upload' ? 'Uploading' : 'Deleting'
+    if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD) return 'Uploading'
+    if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.MOVE) return 'Moving'
+    return 'Deleting'
   })
 
   const itemText = computed(() => {
@@ -65,6 +70,6 @@
   })
 
   const handleCancel = () => {
-    isProcessing.value = false
+    cancelRequest()
   }
 </script>

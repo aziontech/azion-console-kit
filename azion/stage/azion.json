@@ -4,13 +4,14 @@
   "preset": "vue",
   "env": "production",
   "prefix": "20240821142547",
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": {
     "id": 28363,
     "name": "__DEFAULT__",
     "file": ".edge/worker.js",
     "args": "azion/stage/args.json",
-    "instance-id": 27187,
+    "instance-id": 46105,
     "instance-name": "__DEFAULT__",
     "cache-id": 0
   },

@@ -1,10 +1,10 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -25,6 +25,90 @@
     }
   })
 
+  const actions = computed(() => [
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'user',
+      icon: 'pi pi-trash',
+      service: props.deleteUsersService
+    }
+  ])
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'firstName',
+        header: 'First Name',
+        sortField: 'first_name',
+        style: columnStyles.priority(2, 150, 250)
+      },
+      {
+        field: 'lastName',
+        header: 'Last Name',
+        sortField: 'last_name',
+        style: columnStyles.priority(2, 150, 250)
+      },
+      {
+        field: 'email',
+        header: 'Email Address',
+        style: columnStyles.priority(3, 200, 300)
+      },
+      {
+        field: 'teams',
+        header: 'Teams',
+        disableSort: true,
+        type: 'component',
+        style: columnStyles.priority(3, 200, 300),
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-array-with-popup'
+          })
+      },
+      {
+        field: 'mfa',
+        header: 'MFA',
+        type: 'component',
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'owner',
+        header: 'Account Owner',
+        filterPath: 'owner.content',
+        type: 'component',
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        disableSort: true,
+        filterPath: 'status.content',
+        type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      }
+    ]
+  })
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
       productName: 'User'
@@ -37,28 +121,6 @@
     })
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'user',
-      icon: 'pi pi-trash',
-      service: props.deleteUsersService
-    }
-  ]
-
-  const USERS_API_FIELDS = [
-    'id',
-    'first_name',
-    'last_name',
-    'email',
-    'teams',
-    'two_factor_enabled',
-    'is_active',
-    'is_account_owner',
-    'last_modified'
-  ]
-
   const csvMapper = (rowData) => {
     return {
       firstName: rowData.firstName,
@@ -70,66 +132,6 @@
       status: rowData.status?.content || rowData.status
     }
   }
-
-  const getColumns = computed(() => [
-    {
-      field: 'firstName',
-      header: 'First Name',
-      sortField: 'first_name'
-    },
-    {
-      field: 'lastName',
-      header: 'Last Name',
-      sortField: 'last_name'
-    },
-    {
-      field: 'email',
-      header: 'Email Address'
-    },
-    {
-      field: 'teams',
-      header: 'Teams',
-      disableSort: true
-    },
-    {
-      field: 'mfa',
-      header: 'MFA',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    },
-    {
-      field: 'owner',
-      header: 'Account Owner',
-      filterPath: 'owner.content',
-      type: 'component',
-      disableSort: true,
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      disableSort: true,
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    }
-  ])
 </script>
 
 <template>
@@ -160,7 +162,6 @@
         emptyListMessage="No users found."
         :actions="actions"
         :defaultOrderingFieldName="'-last_modified'"
-        :apiFields="USERS_API_FIELDS"
         :frozenColumns="['firstName']"
         exportFileName="Users"
         :csvMapper="csvMapper"

@@ -33,7 +33,7 @@ export class CacheSettingsService extends BaseService {
   listCacheSettingsService = async (edgeApplicationId, params = { pageSize: 100, page: 1 }) => {
     await waitForPersistenceRestore()
 
-    const queryKey = queryKeys.edgeApp.cacheSettings.list(edgeApplicationId, params)
+    const queryKey = queryKeys.application.cacheSettings.list(edgeApplicationId, params)
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
     return await this.useEnsureQueryData(
@@ -51,10 +51,10 @@ export class CacheSettingsService extends BaseService {
    * Uses prefetch to avoid duplicate requests when the same query is called multiple times.
    * @param {string} edgeApplicationId - The edge application ID
    */
-  prefetchCacheSettingsList = async (edgeApplicationId) => {
+  prefetchCacheSettingsList = async (edgeApplicationId, pageSize = 10) => {
     return await this.listCacheSettingsService(edgeApplicationId, {
-      pageSize: 10,
       page: 1,
+      pageSize,
       fields: [],
       ordering: 'id'
     })
@@ -73,7 +73,7 @@ export class CacheSettingsService extends BaseService {
     await waitForPersistenceRestore()
 
     return await this.useEnsureQueryData(
-      queryKeys.edgeApp.cacheSettings.detail(edgeApplicationId, cacheSettingId),
+      queryKeys.application.cacheSettings.detail(edgeApplicationId, cacheSettingId),
       () => this.#fetchCacheSetting(edgeApplicationId, cacheSettingId),
       { persist: false }
     )
@@ -90,7 +90,7 @@ export class CacheSettingsService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after creating
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+      queryKey: queryKeys.application.cacheSettings.all(edgeApplicationId)
     })
 
     return {
@@ -110,7 +110,7 @@ export class CacheSettingsService extends BaseService {
 
     // Remove list and detail queries from cache (including IndexedDB) after editing
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+      queryKey: queryKeys.application.cacheSettings.all(edgeApplicationId)
     })
 
     return 'Cache Settings successfully edited'
@@ -124,7 +124,7 @@ export class CacheSettingsService extends BaseService {
 
     // Remove list queries from cache (including IndexedDB) after deleting
     this.queryClient.removeQueries({
-      queryKey: queryKeys.edgeApp.cacheSettings.all(edgeApplicationId)
+      queryKey: queryKeys.application.cacheSettings.all(edgeApplicationId)
     })
 
     return 'Cache Setting successfully deleted'

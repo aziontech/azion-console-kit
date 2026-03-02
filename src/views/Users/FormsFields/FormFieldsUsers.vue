@@ -5,10 +5,10 @@
   import { computed, ref, watch } from 'vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldPhoneNumber from '@/templates/form-fields-inputs/fieldPhoneNumber'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import InputMask from 'primevue/inputmask'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import MultiSelect from 'primevue/multiselect'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
@@ -56,10 +56,7 @@
   const { value: timezone } = useField('timezone')
   const { value: language } = useField('language')
   const { value: email } = useField('email')
-  const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
-    initialValue: ''
-  })
+  const { value: countryCallCode } = useField('countryCallCode')
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
 
@@ -77,7 +74,9 @@
 
     if (props.isEditForm) {
       const userCountry = setCountryCallCodeForEditForm()
-      countryCallCode.value = userCountry || firstCountry
+      if (userCountry) {
+        countryCallCode.value = userCountry
+      }
       loadingCountry.value = false
       return
     }
@@ -86,8 +85,17 @@
   }
 
   const setCountryCallCodeForEditForm = () => {
-    return filteredCountriesMobile.value.find((country) => country.value === countryCallCode.value)
-      ?.value
+    const currentValue = countryCallCode.value
+    if (!currentValue) return undefined
+
+    const exactMatch = filteredCountriesMobile.value.find(
+      (country) => country.value === currentValue
+    )
+    if (exactMatch) return exactMatch.value
+
+    return filteredCountriesMobile.value.find((country) =>
+      country.value.endsWith(` - ${currentValue}`)
+    )?.value
   }
 
   const fetchTimezone = async () => {
@@ -134,7 +142,7 @@
         language: language.value || 'en',
         email: email.value,
         countryCallCode: initialCountry,
-        mobile: mobile.value,
+        mobile: '',
         isAccountOwner: accountIsOwner.value,
         teamsIds: [defaultTeamId],
         twoFactorEnabled: forceMfaEnabled,
@@ -169,6 +177,18 @@
   watch(isAccountOwner, (newValue) => {
     if (newValue && !isInitializing.value) {
       teamsIds.value = []
+    }
+  })
+
+  watch(countryCallCode, (newValue) => {
+    if (loadingCountry.value || !filteredCountriesMobile.value.length || !newValue) return
+
+    const hasMatch = filteredCountriesMobile.value.some((country) => country.value === newValue)
+    if (!hasMatch) {
+      const matched = setCountryCallCodeForEditForm()
+      if (matched) {
+        countryCallCode.value = matched
+      }
     }
   })
 
@@ -269,67 +289,13 @@
         />
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <LabelBlock
-          data-testid="users-form__phone-field__label"
-          label="Phone Number"
-          isRequired
-        />
-        <div class="flex gap-2">
-          <div class="p-inputgroup">
-            <Dropdown
-              data-testid="users-form__phone-field__dropdown"
-              filter
-              autoFilterFocus
-              appendTo="self"
-              id="countryCallCode"
-              name="countryCallCode"
-              :options="filteredCountriesMobile"
-              optionLabel="labelFormat"
-              optionValue="value"
-              :loading="loadingCountry"
-              :disabled="loadingCountry"
-              :class="{ 'p-invalid': errorCountryCallCode }"
-              class="surface-border border-r-0 w-1/4"
-              v-model="countryCallCode"
-              :pt="{
-                filterInput: {
-                  class: 'w-full'
-                }
-              }"
-            >
-              <template #option="{ option }">
-                {{ option.label }}
-              </template>
-            </Dropdown>
-            <InputMask
-              date="phone"
-              v-model="mobile"
-              name="mobile"
-              class="w-full"
-              :disabled="loadingCountry"
-              mask="?99999999999999999999"
-              placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile }"
-              data-testid="users-form__phone-field__input"
-            />
-          </div>
-        </div>
-        <small
-          v-if="errorMobile"
-          data-testid="users-form__phone-field__error-message"
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorMobile }}
-        </small>
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="users-form__phone-field__description"
-        >
-          The phone number of the user. Include country and region code.
-        </small>
-      </div>
+      <FieldPhoneNumber
+        :options="filteredCountriesMobile"
+        :loading="loadingCountry"
+        label="Phone Number"
+        description="The phone number of the user. Include country and region code."
+        data-testid="users-form__phone-field"
+      />
     </template>
   </FormHorizontal>
 

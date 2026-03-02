@@ -4,6 +4,9 @@ import { buildSummary, capitalizeFirstLetter } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { getCurrentTimezone } from '@/helpers'
 
+const shouldShowTsColumn = true
+const shouldLimitRequestUri = false
+
 export const loadActivityHistory = async (filter) => {
   const payload = adapt(filter)
 
@@ -67,6 +70,6 @@ const adaptResponse = (response) => {
     title: activityHistoryEvents.title,
     type: capitalizeFirstLetter(activityHistoryEvents.type),
     ts: getCurrentTimezone(activityHistoryEvents.ts),
-    data: buildSummary(activityHistoryEvents)
+    data: buildSummary(activityHistoryEvents, shouldLimitRequestUri, shouldShowTsColumn)
   }
 }

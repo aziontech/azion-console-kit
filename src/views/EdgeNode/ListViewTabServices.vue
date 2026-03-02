@@ -7,16 +7,13 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
+  import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'list-edge-node-resources-tab' })
 
   const props = defineProps({
     edgeNodeId: { type: String, required: true },
-    createServiceEdgeNodeService: { type: Function, required: true },
-    editServiceEdgeNodeService: { type: Function, required: true },
-    loadServiceEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true }
   })
 
@@ -64,21 +61,18 @@
   }
 
   const listServicesWithDecorator = async (payload) => {
-    return await props.listServiceEdgeNodeService({
-      ...payload,
-      edgeNodeId: props.edgeNodeId,
-      bound: true
-    })
+    return await edgeNodeService.listEdgeNodeServicesService(props.edgeNodeId, payload)
   }
 
   const unbindServicesWithDecorator = async (id) => {
-    return await props.deleteServiceEdgeNodeService({
+    return await edgeNodeService.deleteEdgeNodeServiceService({
       edgeNodeId: props.edgeNodeId,
       id
     })
   }
 
   const reloadServicesList = () => {
+    edgeNodeService.invalidateEdgeNodeServicesCache(props.edgeNodeId)
     if (hasContentToList.value) {
       listServiceEdgeNodeRef.value.reload()
       return
@@ -113,9 +107,6 @@
       ref="drawerServiceRef"
       :edgeNodeId="edgeNodeId"
       :listServiceEdgeNodeService="listServiceEdgeNodeService"
-      :createServiceEdgeNodeService="createServiceEdgeNodeService"
-      :editServiceEdgeNodeService="editServiceEdgeNodeService"
-      :loadServiceEdgeNodeService="loadServiceEdgeNodeService"
       @onSuccess="reloadServicesList"
     />
     <div v-if="hasContentToList">

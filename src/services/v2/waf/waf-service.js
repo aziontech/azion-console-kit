@@ -1,5 +1,20 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WafAdapter } from './waf-adapter'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { transformSnakeToCamel } from '@/services/v2/utils/adaptServiceDataResponse'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { useTableDefinitionsStore } from '@/stores/table-definitions'
+
+const ALL_THREATS = [
+  'cross_site_scripting',
+  'directory_traversal',
+  'evading_tricks',
+  'file_upload',
+  'identified_attack',
+  'remote_file_inclusion',
+  'sql_injection',
+  'unwanted_access'
+]
 export class WafService extends BaseService {
   constructor() {
     super()
@@ -7,9 +22,7 @@ export class WafService extends BaseService {
     this.baseURL = 'v4/workspace/wafs'
   }
 
-  listWafRules = async (
-    params = { search: '', fields: '', ordering: 'name', page: 1, pageSize: 10 }
-  ) => {
+  #fetchWafRulesList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -32,6 +45,64 @@ export class WafService extends BaseService {
     }
   }
 
+  prefetchList = (pageSize = 10) => {
+    const defaultParams = {
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: '-last_modified'
+    }
+    return this.usePrefetchQuery(queryKeys.waf.list(defaultParams), () =>
+      this.#fetchWafRulesList(defaultParams)
+    )
+  }
+
+  listWafRules = async (
+    params = { search: '', fields: '', ordering: 'name', page: 1, pageSize: 10 }
+  ) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.waf.list(params),
+      () => this.#fetchWafRulesList(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
+  getWafRuleFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.waf.all,
+      id,
+      listPath: 'body',
+      select: (item) => {
+        const thresholds = item.engineSettings?.attributes?.thresholds || []
+        const inputMap = Object.fromEntries(
+          thresholds.map(({ threat, sensitivity }) => [threat, sensitivity])
+        )
+
+        const threatsConfiguration = ALL_THREATS.reduce((acc, threat) => {
+          const camel = transformSnakeToCamel(threat)
+          acc[camel] = threat in inputMap
+          acc[`${camel}Sensitivity`] = inputMap[threat] || 'medium'
+          return acc
+        }, {})
+
+        return {
+          id: item.id,
+          name: item.name,
+          active: item.active?.content === 'Active',
+          ...threatsConfiguration
+        }
+      }
+    })
+  }
+
   createWafRule = async (payload) => {
     const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
     const { data: response } = await this.http.request({
@@ -39,6 +110,8 @@ export class WafService extends BaseService {
       url: this.baseURL,
       body: adaptedPayload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return response.data
   }
@@ -51,6 +124,8 @@ export class WafService extends BaseService {
       body: adaptedPayload
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
     return 'Your WAF rule has been updated.'
   }
 
@@ -59,6 +134,8 @@ export class WafService extends BaseService {
       method: 'DELETE',
       url: `${this.baseURL}/${wafId}`
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'WAF Rule successfully deleted.'
   }
@@ -81,6 +158,8 @@ export class WafService extends BaseService {
       body
     })
 
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
     return {
       feedback: 'Your WAF rule has been cloned',
       urlToEditView: `/waf/edit/${response.data.id}`
@@ -94,6 +173,8 @@ export class WafService extends BaseService {
       method: 'POST',
       body: adaptedPayload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return {
       feedback: 'Your waf rule allowed has been created'
@@ -123,7 +204,11 @@ export class WafService extends BaseService {
       })
     })
 
-    return Promise.allSettled(requests)
+    const results = await Promise.allSettled(requests)
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
+
+    return results
   }
 
   deleteWafRuleAllowed = async ({ wafId, allowedId }) => {
@@ -131,6 +216,8 @@ export class WafService extends BaseService {
       url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
       method: 'DELETE'
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'WAF allowed rule successfully deleted'
   }
@@ -142,6 +229,8 @@ export class WafService extends BaseService {
       method: 'PUT',
       body: adaptedPayload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.waf.all })
 
     return 'Your waf rule allowed has been updated'
   }
@@ -155,7 +244,7 @@ export class WafService extends BaseService {
     return this.adapter?.transformLoadWafRuleAllowed?.(data)
   }
 
-  listWafRulesAllowed = async (params) => {
+  #fetchWafRulesAllowed = async (params) => {
     const { data } = await this.http.request({
       url: `${this.baseURL}/${params.wafId}/exceptions`,
       method: 'GET',
@@ -163,6 +252,64 @@ export class WafService extends BaseService {
     })
 
     return this.adapter?.transformListWafRulesAllowed?.(data)
+  }
+
+  listWafRulesAllowed = async (params) => {
+    const firstPage = params?.page === 1
+    const skipCache = params?.skipCache || params?.hasFilter || params?.search
+
+    return await this.useEnsureQueryData(
+      queryKeys.waf.allowed(params.wafId, params),
+      () => this.#fetchWafRulesAllowed(params),
+      {
+        persist: firstPage && !skipCache,
+        skipCache
+      }
+    )
+  }
+
+  #fetchWafDomains = async (wafId) => {
+    const { data } = await this.http.request({
+      url: `/api/v3/waf/${wafId}/domains`,
+      method: 'GET',
+      params: { page_size: 200 }
+    })
+
+    const results = Array.isArray(data.results) ? data.results : []
+    return results.map((domain) => ({
+      domain: domain.domain,
+      id: domain.id,
+      name: domain.name
+    }))
+  }
+
+  listWafDomains = async (wafId) => {
+    return await this.useEnsureQueryData(
+      queryKeys.waf.domains(wafId),
+      () => this.#fetchWafDomains(wafId),
+      { persist: true }
+    )
+  }
+
+  prefetchTabsData = (wafId) => {
+    const tableDefinitions = useTableDefinitionsStore()
+    const pageSize = tableDefinitions.getNumberOfLinesPerPage || 10
+
+    const allowedParams = {
+      wafId,
+      page: 1,
+      pageSize,
+      fields: [],
+      ordering: 'id'
+    }
+
+    this.usePrefetchQuery(queryKeys.waf.allowed(wafId, allowedParams), () =>
+      this.#fetchWafRulesAllowed(allowedParams)
+    )
+
+    this.usePrefetchQuery(queryKeys.waf.domains(wafId), () => this.#fetchWafDomains(wafId))
+
+    networkListsService.prefetchNetworkListsDropdown()
   }
 }
 

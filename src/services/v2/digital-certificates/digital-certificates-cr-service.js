@@ -1,4 +1,5 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class DigitalCertificatesCRService extends BaseService {
   constructor() {
@@ -12,6 +13,8 @@ export class DigitalCertificatesCRService extends BaseService {
       url: this.baseURL,
       body: payload
     })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificates.all })
   }
 }
 

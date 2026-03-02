@@ -14,6 +14,8 @@
   import { InputNumberControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-number/inputNumberControlTester'
   import TextareaControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/textarea/textareaControlRenderer.vue'
   import { TextareaControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/textarea/textareaControlTester'
+  import DropdownControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/dropdown/dropdownControlRenderer.vue'
+  import { DropdownControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/dropdown/dropdownControlTester'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import OAuthGithub from './oauth-github.vue'
 
@@ -35,9 +37,33 @@
   const oauthGithubRef = ref(null)
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
   const selectedIntegration = ref('')
+  const vcsIntegrationError = ref('')
 
   const formData = ref({})
   const errors = ref([])
+
+  const hasIntegrations = computed(() => {
+    const githubIntegration = props.schema.properties.platform_feature__vcs_integration__uuid
+    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
+    return hasGithubIntegration
+  })
+
+  const formSchema = computed(() => {
+    const schema = { ...props.schema }
+    schema.properties = parsePropertiesSchema(schema.properties)
+    return schema
+  })
+
+  const hasIntegrationsList = computed(() => {
+    return listOfIntegrations.value?.length > 0
+  })
+
+  const isVcsRequired = computed(() => {
+    if (!hasIntegrations.value) return false
+    const requiredFields = props.schema.required || []
+    return requiredFields.includes(vcsIntegrationFieldName.value)
+  })
+
   const customRenderers = [
     {
       tester: InputTextControlTester,
@@ -54,6 +80,10 @@
     {
       tester: TextareaControlTester,
       renderer: TextareaControlRenderer
+    },
+    {
+      tester: DropdownControlTester,
+      renderer: DropdownControlRenderer
     }
   ]
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
@@ -64,22 +94,16 @@
   }
 
   const validateForm = () => {
-    const hasJsonFormErrors = errors.value.length > 0
+    const jsonFormErrors = errors.value.filter(
+      (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
+    )
 
-    if (hasJsonFormErrors) {
-      return false
-    }
+    const hasJsonFormErrors = jsonFormErrors.length > 0
+    const hasVcsError = isVcsRequired.value && !selectedIntegration.value
 
-    if (hasIntegrations.value) {
-      const vcsField = props.schema.properties[vcsIntegrationFieldName.value]
-      const isVcsRequired = vcsField?.attrs?.required || false
+    vcsIntegrationError.value = hasVcsError ? 'Git Scope is required' : ''
 
-      if (isVcsRequired && !selectedIntegration.value) {
-        return false
-      }
-    }
-
-    return true
+    return !hasJsonFormErrors && !hasVcsError
   }
 
   const getFormData = () => {
@@ -132,22 +156,6 @@
 
     return data
   }
-
-  const hasIntegrations = computed(() => {
-    const githubIntegration = props.schema.properties.platform_feature__vcs_integration__uuid
-    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
-    return hasGithubIntegration
-  })
-
-  const formSchema = computed(() => {
-    const schema = { ...props.schema }
-    schema.properties = parsePropertiesSchema(schema.properties)
-    return schema
-  })
-
-  const hasIntegrationsList = computed(() => {
-    return listOfIntegrations.value?.length > 0
-  })
 
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
@@ -248,6 +256,12 @@
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <LabelBlock
+            v-if="isVcsRequired"
+            label="Git Scope"
+            :for="vcsIntegrationFieldName"
+            :isRequired="isVcsRequired"
+          />
           <OAuthGithub
             v-show="!hasIntegrationsList"
             ref="oauthGithubRef"
@@ -258,11 +272,6 @@
             v-if="hasIntegrationsList"
             class="flex flex-col max-w-xs w-full gap-2"
           >
-            <LabelBlock
-              :for="vcsIntegrationFieldName"
-              label="Git Scope"
-              :isRequired="true"
-            />
             <Dropdown
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
@@ -290,10 +299,16 @@
                 </div>
               </template>
             </Dropdown>
-            <small class="text-xs font-normal text-color-secondary">
-              Select the scope for this template.
-            </small>
           </div>
+          <small
+            v-if="vcsIntegrationError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ vcsIntegrationError }}
+          </small>
+          <small class="text-xs font-normal text-color-secondary">
+            Select the scope for this template.
+          </small>
         </div>
       </template>
     </FormHorizontal>

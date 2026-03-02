@@ -39,7 +39,7 @@
   }
 
   const getValueByKey = (key) => {
-    const item = details.value.data.find((obj) => obj.key === key)
+    const item = details.value.data?.find((obj) => obj.key === key)
     return item ? item.value : '-'
   }
 
@@ -52,16 +52,9 @@
     }
   )
 
-  const tags = computed(() => {
-    if (details.value.jobName?.content) {
-      return [
-        {
-          text: details.value.jobName.content,
-          severity: details.value.jobName.severity
-        }
-      ]
-    }
-    return []
+  const title = computed(() => {
+    if (!details.value.url) return 'More Details'
+    return `More Details: ${details.value.url}`
   })
 
   defineExpose({
@@ -72,18 +65,10 @@
 <template>
   <InfoDrawerBlock
     v-model:visible="showDrawer"
-    title="More Details"
+    :title="title"
   >
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
-        <InfoSection
-          :title="details.url"
-          :date="details.ts"
-          :tags="tags"
-          :loading="loading"
-          hideDivider
-        />
-
         <TabView
           class="w-full h-full"
           v-if="!loading"

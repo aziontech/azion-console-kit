@@ -9,6 +9,8 @@
     formatDateSimple,
     parseDateSimple,
     createRelativeRange,
+    createStartOfDay,
+    createEndOfDay,
     MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
@@ -37,6 +39,10 @@
     editingField: {
       type: String,
       default: 'start'
+    },
+    isOverlayOpen: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -158,7 +164,46 @@
     } else {
       model.value.labelEnd = ''
     }
-    selectedDate.value = clampToBounds(date)
+
+    const label = typeof model.value?.label === 'string' ? model.value.label.trim() : ''
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+
+    const hasNonAbsoluteState =
+      Boolean(label) ||
+      Boolean(labelStart) ||
+      Boolean(labelEnd) ||
+      Boolean(model.value?.relative) ||
+      Boolean(model.value?.relativeStart) ||
+      Boolean(model.value?.relativeEnd) ||
+      labelStart.toLowerCase() === 'now' ||
+      labelEnd.toLowerCase() === 'now'
+
+    const shouldInitializeClickedDayRange =
+      props.mode === 'absolute' &&
+      date &&
+      (hasNonAbsoluteState || !hasInitializedAbsoluteRange.value)
+
+    if (shouldInitializeClickedDayRange) {
+      if (props.editingField === 'start') {
+        model.value.startDate = createStartOfDay(date)
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+      } else {
+        model.value.endDate = createEndOfDay(date)
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+      hasInitializedAbsoluteRange.value = true
+      selectedDate.value = date
+      selectedTime.value = ''
+      hasChanges.value = false
+      emitSelectIfValid()
+      return
+    }
+
+    selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
     emitSelectIfValid()
@@ -253,6 +298,7 @@
       if (props.editingField === 'start') {
         model.value.startDate = boundedDate
         model.value.labelStart = ''
+        model.value.relativeStart = null
         hasInitializedAbsoluteRange.value = true
         const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
 
@@ -268,23 +314,9 @@
           model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
         }
       } else {
-        const hasStart = Boolean(model.value.startDate)
-        const startEqualsCurrentEnd =
-          hasStart &&
-          Boolean(model.value.endDate) &&
-          new Date(model.value.startDate).getTime() === new Date(model.value.endDate).getTime()
-
-        const shouldInitializeStartDate =
-          !hasInitializedAbsoluteRange.value && (!hasStart || startEqualsCurrentEnd)
-
-        model.value.endDate = boundedDate
+        model.value.endDate = newDate
         model.value.labelEnd = ''
-
-        if (shouldInitializeStartDate) {
-          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
-          model.value.labelStart = ''
-          hasInitializedAbsoluteRange.value = true
-        }
+        model.value.relativeEnd = null
       }
     }
   }
@@ -403,7 +435,10 @@
       v-if="model.label"
       :value="model.label"
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
-      :class="isInvalidRange ? 'p-invalid text-[var(--error-color)]' : ''"
+      :class="[
+        isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
+        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+      ]"
       @click="openStart"
       readonly
     />
@@ -413,12 +448,13 @@
       class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
     >
       <InputText
-        class="cursor-pointer"
-        :class="
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelStart || startDateInput)}ch`
         }"
@@ -434,12 +470,13 @@
         <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
       </div>
       <InputText
-        class="cursor-pointer"
-        :class="
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
-            : 'border-none'
-        "
+            : 'border-none',
+          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
         :style="{
           width: `${sizeInput(model.labelEnd || endDateInput)}ch`
         }"
@@ -485,7 +522,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2">
+      <div class="flex gap-3 mt-2 h-[200px]">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -500,6 +537,7 @@
           :pt="{
             header: { class: 'hidden' },
             table: { class: 'w-full' },
+            weekday: { class: 'font-medium' },
             daylabel: {
               style: {
                 padding: '0px !important',
@@ -512,7 +550,7 @@
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"
@@ -570,6 +608,14 @@
             class="w-full"
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
+          />
+          <PrimeButton
+            label="Apply"
+            @click="updateRange"
+            outlined
+            :disabled="mode !== 'absolute'"
+            class="whitespace-nowrap w-20"
+            size="small"
           />
         </div>
       </div>

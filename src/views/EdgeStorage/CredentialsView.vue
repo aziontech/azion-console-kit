@@ -145,12 +145,14 @@
       :isTabs="true"
       :editInDrawer="false"
       emptyListMessage="No credentials found"
-      :paginator="false"
+      :paginator="true"
       :enableEditClick="false"
+      default-ordering-field-name="-last_modified"
       exportFileName="Credentials"
       :emptyBlock="{
-        title: 'No credentials found',
-        description: 'Create a new credential to get started'
+        title: 'No credentials yet',
+        description:
+          'Create your first credential to manage bucket access through S3 protocol with specific operation permissions.'
       }"
     >
       <template #emptyBlockButton>

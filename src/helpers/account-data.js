@@ -7,7 +7,6 @@ import {
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
-import { sessionManager } from '@/services/v2/base/auth'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
@@ -27,41 +26,36 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.permissions = userResults.permissions
   accountInfo.email = userResults.email
   accountInfo.user_id = userResults.id
-  accountInfo.colorTheme = accountStore.account.colorTheme
   accountInfo.isDeveloperSupportPlan = true
 
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
-
-  await sessionManager.afterLogin()
 }
 
-export const loadProfileAndAccountInfo = async () => {
+export const loadBillingData = async () => {
   const accountStore = useAccountStore()
   const { account, accountIsNotRegular } = accountStore
 
-  const promises = [
-    accountIsNotRegular
-      ? billingGqlService.getCreditAndExpirationDate().then(({ credit, formatCredit, days }) => {
-          accountStore.setAccountData({
-            credit,
-            formatCredit,
-            days
-          })
-        })
-      : Promise.resolve(),
+  if (!accountIsNotRegular) return
+  if (account.formatCredit) return
 
-    account.client_id
-      ? contractService
-          .getContractServicePlan(account.client_id)
-          .then(({ isDeveloperSupportPlan, yourServicePlan }) => {
-            accountStore.setAccountData({
-              isDeveloperSupportPlan,
-              yourServicePlan
-            })
-          })
-      : Promise.resolve()
-  ]
+  const billingData = await billingGqlService.getCreditAndExpirationDate()
+  if (!billingData) return
 
-  await Promise.all(promises)
+  const { credit, formatCredit, days } = billingData
+  accountStore.setAccountData({ credit, formatCredit, days })
+}
+
+export const loadContractData = async () => {
+  const accountStore = useAccountStore()
+  const { account } = accountStore
+
+  if (!account?.client_id) return
+  if (account.yourServicePlan) return
+
+  const contractData = await contractService.getContractServicePlan(account.client_id)
+  if (!contractData) return
+
+  const { isDeveloperSupportPlan, yourServicePlan } = contractData
+  accountStore.setAccountData({ isDeveloperSupportPlan, yourServicePlan })
 }

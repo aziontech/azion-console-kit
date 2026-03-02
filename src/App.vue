@@ -3,8 +3,9 @@
   import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+  import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
-  import { themeSelect } from '@/helpers'
+  import { themeApply } from '@/helpers'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
@@ -15,19 +16,11 @@
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()
-  const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
+  const themeStore = useThemeStore()
+  const { hasActiveUserId, account } = storeToRefs(accountStore)
+  const { currentTheme } = storeToRefs(themeStore)
 
   const route = useRoute()
-
-  watch(
-    () => route,
-    (to) => {
-      const hasId = to.params.id
-      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
-      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
-    },
-    { immediate: true, deep: true }
-  )
 
   const updateTrackingTraits = () => {
     const {
@@ -58,10 +51,30 @@
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
-  const root = document.querySelector(':root')
-  watch(currentTheme, (theme) => themeSelect({ HTMLElement: root, theme }))
+  watch(currentTheme, (theme) => {
+    themeApply(theme)
+  })
+
   watch(account, () => {
     updateTrackingTraits()
+  })
+
+  watch(
+    () => route,
+    (to) => {
+      const hasId = to.params.id
+      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
+      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
+    },
+    { immediate: true, deep: true }
+  )
+
+  window.matchMedia(DARK_SCHEME_QUERY).addEventListener('change', (event) => {
+    if (currentTheme.value === 'system') {
+      themeApply(event.matches ? 'dark' : 'light')
+    }
+
+    themeStore.setResolvedTheme(currentTheme.value)
   })
 </script>
 

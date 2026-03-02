@@ -70,16 +70,24 @@ const transformMap = {
   isProprietaryCode: (value) => value.is_proprietary_code || false
 }
 
+export const transformEdgeFunctionItem = (rawData) => {
+  const adapt = Object.fromEntries(
+    Object.entries(transformMap).map(([key, fn]) => [key, fn(rawData)])
+  )
+  adapt.runtimeFormat = LANGUAGE_WITH_ICON[adapt.runtime]
+  return adapt
+}
+
 export const EdgeFunctionsAdapter = {
   transformLoadEdgeFunctionByEdgeApplicationFunction(edgeApplicationFunction, edgeFunction) {
     return {
       id: edgeApplicationFunction.id,
       name: edgeApplicationFunction.name,
-      functionInstanced: edgeFunction.data.name,
+      functionInstanced: edgeFunction?.data?.name,
       lastEditor: edgeApplicationFunction.lastEditor,
       lastModified: formatDateToDayMonthYearHour(edgeApplicationFunction.lastModified),
       lastModify: convertToRelativeTime(edgeApplicationFunction.lastModified),
-      version: edgeFunction.data.version
+      version: edgeFunction?.data?.version
     }
   },
 
@@ -112,7 +120,8 @@ export const EdgeFunctionsAdapter = {
           vendor: edgeFunction.vendor,
           referenceCount: edgeFunction.reference_count,
           lastModify: convertToRelativeTime(edgeFunction.last_modified),
-          lastModified: formatDateToDayMonthYearHour(edgeFunction.last_modified)
+          lastModified: formatDateToDayMonthYearHour(edgeFunction.last_modified),
+          rawData: edgeFunction
         }
       }) || []
     )

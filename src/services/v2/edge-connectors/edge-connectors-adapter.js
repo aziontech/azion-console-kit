@@ -87,7 +87,7 @@ const typeBuilders = {
 
     const result = {
       addresses: extractAddressesPostRequest(
-        payload.addresses,
+        payload.modules.loadBalancer.enabled ? payload.addresses : [payload.addresses[0]],
         payload.modules.loadBalancer.enabled
       ),
       connection_options: {
@@ -107,7 +107,7 @@ const typeBuilders = {
   }
 }
 
-const typeBuildersLoadRequest = {
+export const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
     connectionOptions: {
       region: data.attributes.region
@@ -186,6 +186,7 @@ export const EdgeConnectorsAdapter = {
           id: edgeConnectors.id,
           name: edgeConnectors.name,
           type: edgeConnectorsTypes[edgeConnectors?.type],
+          rawType: edgeConnectors?.type,
           header: edgeConnectors?.attributes?.connection_options?.host || '-',
           address: edgeConnectors?.attributes?.addresses
             ? edgeConnectors?.attributes?.addresses
@@ -197,7 +198,8 @@ export const EdgeConnectorsAdapter = {
           active: parseStatusData(edgeConnectors.active),
           lastEditor: edgeConnectors?.last_editor,
           lastModified: formatDateToDayMonthYearHour(edgeConnectors.last_modified),
-          lastModify: convertToRelativeTime(edgeConnectors.last_modified)
+          lastModify: convertToRelativeTime(edgeConnectors.last_modified),
+          attributes: edgeConnectors?.attributes
         }
       }) || []
     )

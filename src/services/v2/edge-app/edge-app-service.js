@@ -2,29 +2,18 @@ import { EdgeAppAdapter } from './edge-app-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-export const DEFAULT_FIELDS = [
-  'id',
-  'name',
-  'last_editor',
-  'last_modified',
-  'product_version',
-  'active'
-]
-
 export class EdgeAppService extends BaseService {
   adapter = EdgeAppAdapter
   baseURL = 'v4/workspace/applications'
-  fieldsDefault = DEFAULT_FIELDS
 
   #fetchList = async (
     params = {
-      pageSize: 10,
-      fields: this.fieldsDefault
+      pageSize: 10
     }
   ) => {
     const { data } = await this.http.request({ method: 'GET', url: this.baseURL, params })
     const { count, results } = data
-    const body = this.adapter?.transformListEdgeApp?.(results, params.fields) ?? results
+    const body = this.adapter?.transformListEdgeApp?.(results) ?? results
     return { body, count }
   }
 
@@ -44,31 +33,20 @@ export class EdgeAppService extends BaseService {
     return this.adapter?.transformLoadEdgeApp?.(data) ?? data.data
   }
 
-  prefetchList = async (pageSize = 10) => {
+  prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: this.fieldsDefault,
+      fields: [],
       ordering: '-last_modified'
     }
-
-    const firstPage = params?.page === 1
-    const skipCache = params?.hasFilter || params?.skipCache || params?.search
-
-    return await this.useEnsureQueryData(
-      queryKeys.edgeApp.list(params),
-      () => this.#fetchList(params),
-      {
-        persist: firstPage && !skipCache,
-        skipCache
-      }
-    )
+    return this.usePrefetchQuery(queryKeys.application.list(params), () => this.#fetchList(params))
   }
 
   create = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     const { data } = await this.http.request({ method: 'POST', url: this.baseURL, body })
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.application.all })
     return data
   }
 
@@ -79,7 +57,7 @@ export class EdgeAppService extends BaseService {
       url: `${this.baseURL}/${payload.id}/clone`,
       body
     })
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.application.all })
     return {
       feedback: 'Your Application has been cloned',
       urlToEditView: `/applications/edit/${data.data.id}`,
@@ -90,20 +68,20 @@ export class EdgeAppService extends BaseService {
   edit = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
     await this.http.request({ method: 'PATCH', url: `${this.baseURL}/${payload.id}`, body })
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.application.all })
     return 'Your application has been updated'
   }
 
   delete = async (id) => {
     await this.http.request({ method: 'DELETE', url: `${this.baseURL}/${id}` })
-    this.queryClient.removeQueries({ queryKey: queryKeys.edgeApp.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.application.all })
     return 'Resource successfully deleted'
   }
 
   listEdgeApplicationsService = async (params) => {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
     const firstPage = params?.page === 1
-    const queryKey = queryKeys.edgeApp.list(params)
+    const queryKey = queryKeys.application.list(params)
 
     return await this.useEnsureQueryData(queryKey, () => this.#fetchList(params), {
       persist: firstPage && !skipCache,
@@ -114,7 +92,7 @@ export class EdgeAppService extends BaseService {
   listEdgeApplicationsServiceDropdown = this.#fetchDropdown
 
   loadEdgeApplicationService = async (payload) => {
-    const queryKey = queryKeys.edgeApp.detail(payload.id)
+    const queryKey = queryKeys.application.detail(payload.id)
     return await this.useEnsureQueryData(queryKey, () => this.#fetchOne(payload), {
       persist: false
     })
@@ -127,6 +105,27 @@ export class EdgeAppService extends BaseService {
   editEdgeApplicationService = this.edit
 
   deleteEdgeApplicationService = this.delete
+
+  getApplicationFromCache = (id) => {
+    if (!id) return undefined
+
+    return super.getFromCache({
+      queryKey: queryKeys.application.all,
+      id,
+      listPath: 'body',
+      select: (item) => ({
+        ...item,
+        name: item.name.text,
+        debugRules: item.debug,
+        isActive: item.active?.content === 'Active',
+        active: item.active?.content === 'Active',
+        applicationAccelerator: item.applicationAcceleratorEnabled,
+        caching: item.edgeCacheEnabled,
+        edgeFunctions: item.edgeFunctionsEnabled,
+        imageOptimization: item.imageProcessorEnabled
+      })
+    })
+  }
 }
 
 export const edgeAppService = new EdgeAppService()

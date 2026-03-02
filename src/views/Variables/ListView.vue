@@ -1,35 +1,19 @@
 <script setup>
+  import { h, computed, ref, inject } from 'vue'
   import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { h, computed, ref, inject } from 'vue'
+  import { variablesService } from '@/services/v2/variables'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { clipboardWrite, documentationCatalog } from '@/helpers'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'variables-view' })
-
-  const props = defineProps({
-    listVariablesService: {
-      required: true,
-      type: Function
-    },
-    deleteVariablesService: {
-      required: true,
-      type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const enableRedirect = ref(true)
   const refListTable = ref()
@@ -40,7 +24,7 @@
       type: 'delete',
       title: 'variable',
       icon: 'pi pi-trash',
-      service: props.deleteVariablesService
+      service: variablesService.delete
     }
   ]
 
@@ -52,14 +36,15 @@
     return [
       {
         field: 'key',
-        header: 'Key'
+        header: 'Key',
+        style: columnStyles.priority(2, 200, 350)
       },
       {
         field: 'value',
         header: 'Value',
         type: 'component',
         filterPath: 'value.content',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(3, 200, 300),
         component: (columnData) => {
           if (columnData.isSecret) {
             return h('span', `${columnData.content}`)
@@ -68,7 +53,7 @@
               data: columnData.content,
               columnAppearance: 'text-format-with-popup',
               dependencies: {
-                showCopy: props.clipboardWrite
+                showCopy: clipboardWrite
               }
             })
           }
@@ -78,13 +63,15 @@
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor'
+        filterPath: 'last_editor',
+        style: COLUMN_STYLES.PRIORITY_SM
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified'
+        filterPath: 'lastModified',
+        style: COLUMN_STYLES.FIT_CONTENT
       }
     ]
   })
@@ -132,7 +119,7 @@
       <ListTableBlock
         @on-before-go-to-edit="checkIfIsEditable"
         @on-before-go-to-add-page="handleTrackEvent"
-        :listService="listVariablesService"
+        :listService="variablesService.list"
         :columns="getColumns"
         editPagePath="/variables/edit"
         ref="refListTable"
@@ -153,7 +140,7 @@
             'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
           createPagePath: 'variables/create',
-          documentationService: props.documentationService
+          documentationService: documentationCatalog.variables
         }"
       />
     </template>

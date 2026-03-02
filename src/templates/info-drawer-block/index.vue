@@ -61,7 +61,7 @@
     }"
   >
     <template #header>
-      <h2 class="text-xl">{{ props.title }}</h2>
+      <h2 class="text-xl truncate">{{ props.title }}</h2>
       <div class="flex gap-2 items-center">
         <ConsoleFeedback styleTextColor="text-color" />
         <Button

@@ -1,10 +1,11 @@
 <script setup>
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
-  import Drawer from './Drawer'
-  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import Drawer from './Drawer'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -72,7 +73,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -84,15 +85,18 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'browserCache',
-        header: 'Browser Cache'
+        header: 'Browser Cache',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'cdnCache',
-        header: 'Cache'
+        header: 'Cache',
+        style: COLUMN_STYLES.FIT_CONTENT
       }
     ]
   })
@@ -145,8 +149,9 @@
     exportFileName="Application Cache Settings"
     hideLastModifiedColumn
     :emptyBlock="{
-      title: 'No cache settings have been created',
-      description: 'Click the button below to create your first cache setting.',
+      title: 'No cache settings yet',
+      description:
+        'Create your first cache setting to control how your content is stored and delivered.',
       createButtonLabel: 'Cache Setting',
       createPagePath: '/edge-applications/cache-settings/create',
       documentationService: documentationService,

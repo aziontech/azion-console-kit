@@ -3,8 +3,9 @@
     :editService="edgeAppService.editEdgeApplicationService"
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
+    :initialValues="props.initialValues ?? {}"
     :schema="validationSchema"
-    @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
+    @on-edit-success="handleTrackSuccessEdit"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
     isTabs
@@ -43,7 +44,6 @@
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 
   const tracker = inject('tracker')
-  const unsavedStatus = inject('unsaved')
 
   const props = defineProps({
     updatedRedirect: {
@@ -51,6 +51,7 @@
       required: true
     },
     edgeApplication: { type: Object },
+    initialValues: { type: Object, default: () => ({}) },
     contactSalesEdgeApplicationService: {
       type: Function,
       required: true
@@ -65,10 +66,6 @@
 
   const loadEdgeApplication = async () => {
     return props.edgeApplication
-  }
-
-  const updatedStatusUnSaved = () => {
-    unsavedStatus.formHasUpdated = false
   }
 
   const handleTrackSuccessEdit = () => {

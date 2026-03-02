@@ -81,9 +81,13 @@
                 :headerContainer="headerContainer"
                 :buttonsContainer="buttonsContainer"
                 :containerWidth="containerWidth"
+                :renamingItem="renamingItem"
+                :renameValue="renameValue"
+                :isRenaming="isRenaming"
                 exportFileName="Files"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
+                @move-selected-items="handleMoveSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @download-selected-items="handleDownload(selectedFiles)"
@@ -91,6 +95,9 @@
                 @save-new-folder="handleSaveNewFolder"
                 @cancel-new-folder="handleCancelNewFolder"
                 @update:newFolderName="newFolderName = $event"
+                @save-rename="handleSaveRename"
+                @cancel-rename="handleCancelRename"
+                @update:renameValue="renameValue = $event"
                 class="w-full"
               >
                 <template #search-slot>
@@ -157,17 +164,21 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ListTableBlock from '@/templates/list-table-block/folder-list.vue'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import BucketListTable from './components/BucketListTable.vue'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+  import { formatBytes } from '@/helpers/format-bytes'
+  import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
   import ProgressCard from './components/ProgressCard.vue'
   import DataTable from '@/components/DataTable'
 
@@ -181,11 +192,14 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
+  const dialog = useDialog()
   const breadcrumbs = useBreadcrumbs()
   const {
     buckets,
     selectedBucket,
     deleteMultipleFiles,
+    moveFiles,
+    renameFile,
     uploadFiles,
     filesTableNeedRefresh,
     handleDownload,
@@ -206,6 +220,18 @@
       commandAction: (item) => handleDownload(item)
     },
     {
+      label: 'Rename',
+      icon: 'pi pi-pencil',
+      type: 'action',
+      commandAction: (item) => startRenaming(item)
+    },
+    {
+      label: 'Move',
+      icon: 'pi pi-arrow-right-arrow-left',
+      type: 'action',
+      commandAction: (item) => handleOpenMoveDialog([item])
+    },
+    {
       title: 'File',
       label: 'Delete',
       icon: 'pi pi-trash',
@@ -217,15 +243,18 @@
   const getColumns = [
     {
       field: 'name',
-      header: 'Name'
+      header: 'Name',
+      style: columnStyles.priority(3, 200, 350)
     },
     {
       field: 'size',
-      header: 'Size'
+      header: 'Size',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'lastModified',
-      header: 'Last Modified'
+      header: 'Last Modified',
+      style: COLUMN_STYLES.FIT_CONTENT
     }
   ]
   const uploadMenuItems = [
@@ -250,6 +279,9 @@
   const currentPage = ref(1)
   const isCreatingNewFolder = ref(false)
   const newFolderName = ref('')
+  const renamingItem = ref(null)
+  const renameValue = ref('')
+  const isRenaming = ref(false)
 
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
@@ -267,18 +299,13 @@
   }
 
   const handleBreadcrumbClick = (item) => {
-    if (item.index === 0) {
-      folderPath.value = ''
-    } else {
+    let newPath = ''
+    if (item.index !== 0) {
       const folders = folderPath.value.split('/').filter((folder) => folder.trim() !== '')
       const pathToFolder = folders.slice(0, item.index).join('/')
-      folderPath.value = `${pathToFolder}/`
+      newPath = `${pathToFolder}/`
     }
-    selectedBucket.value.continuation_token = null
-    currentPage.value = 1
-    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    filesTableNeedRefresh.value = true
-    listServiceFilesRef.value?.reload()
+    router.replace({ query: newPath ? { folderPath: newPath } : {} })
   }
   const handleCreateBucketTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -323,27 +350,20 @@
     input.click()
   }
 
-  const handleEditFolder = async (item) => {
+  const handleEditFolder = (item) => {
     if (item.isParentNav) {
       goBackToBucket()
     } else if (item.isFolder) {
-      folderPath.value += item.name
-      router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-      filesTableNeedRefresh.value = true
-      await listServiceFilesRef.value?.reload()
-      currentPage.value = 1
+      const newPath = folderPath.value + item.name
+      router.replace({ query: newPath ? { folderPath: newPath } : {} })
     }
   }
 
-  const goBackToBucket = async () => {
+  const goBackToBucket = () => {
     const pathSegments = folderPath.value.split('/').filter((segment) => segment !== '')
     pathSegments.pop()
-    folderPath.value = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
-    selectedBucket.value.continuation_token = null
-    router.replace({ query: folderPath.value ? { folderPath: folderPath.value } : {} })
-    filesTableNeedRefresh.value = true
-    await listServiceFilesRef.value?.reload()
-    currentPage.value = 1
+    const newPath = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
+    router.replace({ query: newPath ? { folderPath: newPath } : {} })
   }
   const handleMultipleDelete = () => {
     Promise.resolve().then(async () => {
@@ -367,6 +387,36 @@
         selectedFiles.value = []
       }
     })
+  }
+
+  const handleOpenMoveDialog = (files) => {
+    const totalSize = files.reduce((sum, file) => sum + (file.sizeBytes || 0), 0)
+    const formattedSize = totalSize > 0 ? formatBytes(totalSize) : ''
+
+    dialog.open(MoveObjectDialog, {
+      data: {
+        files,
+        currentFolderPath: folderPath.value,
+        bucketName: selectedBucket.value.name,
+        totalSize: formattedSize
+      },
+      onClose: async (options) => {
+        if (options?.data?.updated && 'destinationPath' in (options?.data || {})) {
+          const filesToMove = files.map((file) => ({
+            name: file.name,
+            fullPath: folderPath.value ? folderPath.value + file.name : file.name
+          }))
+          selectedFiles.value = []
+          await moveFiles(filesToMove, options.data.destinationPath)
+          filesTableNeedRefresh.value = true
+          listServiceFilesRef.value?.reload()
+        }
+      }
+    })
+  }
+
+  const handleMoveSelectedItems = () => {
+    handleOpenMoveDialog(selectedFiles.value)
   }
 
   const listEdgeStorageBucketFiles = async () => {
@@ -471,13 +521,7 @@
         return
       }
       const newPath = folderPath.value + folderName + '/'
-      folderPath.value = newPath
       router.replace({ query: { folderPath: newPath } })
-      if (!isPaginationLoading.value) {
-        currentPage.value = 1
-      }
-      filesTableNeedRefresh.value = true
-      listServiceFilesRef.value?.reload()
     }
     isCreatingNewFolder.value = false
     newFolderName.value = ''
@@ -488,17 +532,57 @@
     newFolderName.value = ''
   }
 
+  const startRenaming = (item) => {
+    renamingItem.value = item
+    renameValue.value = item.name
+  }
+
+  const handleSaveRename = async () => {
+    const newName = renameValue.value.trim()
+    if (!newName || newName === renamingItem.value.name) {
+      handleCancelRename()
+      return
+    }
+
+    try {
+      isRenaming.value = true
+      await renameFile(renamingItem.value, newName)
+      renamingItem.value = null
+      renameValue.value = ''
+      listServiceFilesRef.value?.reload()
+    } catch {
+      // toast already shown by composable
+    } finally {
+      isRenaming.value = false
+    }
+  }
+
+  const handleCancelRename = () => {
+    renamingItem.value = null
+    renameValue.value = ''
+  }
+
   const handleRouteChange = () => {
     const newId = route.params.id
 
     if (!newId) {
       selectBucket(null)
     } else {
-      const bucket = buckets.value.find((bucket) => bucket.name === newId)
-      selectBucket(bucket)
-
-      if (route.query?.folderPath) {
-        folderPath.value = route.query.folderPath
+      if (selectedBucket.value?.name !== newId) {
+        const bucket = buckets.value.find((bucket) => bucket.name === newId)
+        selectBucket(bucket)
+      } else {
+        if (route.query?.folderPath) {
+          folderPath.value = route.query.folderPath
+        } else {
+          folderPath.value = ''
+        }
+        if (selectedBucket.value) {
+          selectedBucket.value.continuation_token = null
+        }
+        currentPage.value = 1
+        filesTableNeedRefresh.value = true
+        listServiceFilesRef.value?.reload()
       }
     }
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
@@ -510,13 +594,6 @@
       handleRouteChange()
     },
     { immediate: true }
-  )
-
-  watch(
-    () => route.params.id,
-    () => {
-      handleRouteChange()
-    }
   )
 
   watch(folderPath, () => {

@@ -5,7 +5,7 @@
     :columns="columns"
     :actions="actions"
     :apiFields="fields"
-    defaultOrderingFieldName="-lastModified"
+    defaultOrderingFieldName="-last_modified"
     enableEditClick
     editPagePath="/object-storage"
     exportFileName="Buckets"

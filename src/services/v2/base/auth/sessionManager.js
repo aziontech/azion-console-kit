@@ -1,14 +1,34 @@
 import { clearAllCache } from '../query/queryClient'
-import { persister, pauseQueryPersistence } from '../query/queryPlugin'
+import { persister, pauseQueryPersistence } from '@/services/v2/base/query/queryPlugin'
+import { useAccountStore } from '@/stores/account'
+import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 import { solutionService } from '@/services/v2/marketplace/solution-service'
+import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
-import { useAccountStore } from '@/stores/account'
-import { sendSwitchAccountBroadcast } from './session-broadcast'
+import { variablesService } from '@/services/v2/variables'
+import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
+import { wafService } from '@/services/v2/waf/waf-service'
+import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
+import { teamPermissionService } from '@/services/team-permission/team-permission-service'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
+import { usersService } from '@/services/v2/users/users-service'
+import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
+import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
+import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
-const DEFAULT_PAGE_SIZE = 10
 const STORAGE_KEY = 'tableDefinitions'
+const DEFAULT_PAGE_SIZE = 10
 
 const clearAllData = async () => {
   await pauseQueryPersistence()
@@ -18,7 +38,7 @@ const clearAllData = async () => {
   await persister.removeClient()
 }
 
-const getPageSizeFromStorage = () => {
+const getPageSize = () => {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
     return stored?.numberOfLinesPerPage ?? DEFAULT_PAGE_SIZE
@@ -27,35 +47,69 @@ const getPageSizeFromStorage = () => {
   }
 }
 
-const prefetchForClientAccount = async () => {
+const scheduleIdleTask = (callback) => {
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(callback)
+  } else {
+    setTimeout(callback, 1)
+  }
+}
+
+const prefetchInBackground = () => {
   const accountStore = useAccountStore()
 
   if (!accountStore.isClientAccount) {
     return
   }
 
-  const { hasFlagBlockApiV4 } = await import('@/composables/user-flag')
-  const pageSize = getPageSizeFromStorage()
+  const pageSize = getPageSize()
 
-  const promises = [
-    solutionService.prefetchList(hasFlagBlockApiV4()),
-    edgeAppService.prefetchList(pageSize),
-    workloadService.prefetchList(pageSize),
-    edgeFirewallService.prefetchList(pageSize)
-  ]
+  scheduleIdleTask(async () => {
+    await Promise.allSettled([
+      solutionService.prefetchList(hasFlagBlockApiV4()),
+      edgeAppService.prefetchList(pageSize),
+      workloadService.prefetchList(pageSize),
+      edgeFirewallService.prefetchList(pageSize)
+    ])
 
-  await Promise.allSettled(promises)
+    Promise.allSettled([
+      variablesService.prefetchList(),
+      marketplaceService.prefetchMarketplace(),
+      edgeStorageService.prefetchList(pageSize),
+      edgeDNSService.prefetchList(pageSize),
+      edgeFunctionService.prefetchList(pageSize),
+      edgeConnectorsService.prefetchList(pageSize),
+      dataStreamService.prefetchList(pageSize),
+      wafService.prefetchList(pageSize),
+      edgeSQLService.prefetchList(pageSize),
+      teamPermissionService.prefetchList(pageSize),
+      networkListsService.prefetchList(pageSize),
+      digitalCertificatesService.prefetchList(pageSize),
+      digitalCertificatesCRLService.prefetchList(pageSize),
+      customPageService.prefetchList(pageSize),
+      usersService.prefetchList(pageSize),
+      personalTokenService.prefetchList(pageSize),
+      edgeServiceService.prefetchList(pageSize),
+      edgeNodeService.prefetchList(pageSize)
+    ])
+  })
 }
 
+let hasPrefetched = false
+
 export const sessionManager = {
-  async afterLogin() {
-    await prefetchForClientAccount()
+  afterLogin() {
+    if (hasPrefetched) return
+    hasPrefetched = true
+    prefetchInBackground()
   },
   async switchAccount() {
+    hasPrefetched = false
     await clearAllData()
     sendSwitchAccountBroadcast()
   },
   async logout() {
+    hasPrefetched = false
     await clearAllData()
   }
 }
