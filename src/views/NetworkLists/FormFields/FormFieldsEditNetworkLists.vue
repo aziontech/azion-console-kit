@@ -5,6 +5,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeTag from 'primevue/tag'
+  import { FieldTextareaSkeleton } from '@/templates/form-skeleton'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
@@ -16,6 +17,10 @@
     listCountriesService: {
       type: Function,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -42,6 +47,9 @@
   })
   const isCountriesNetworkType = computed(() => {
     return networkListType.value === 'countries'
+  })
+  const isLoadingNetworkType = computed(() => {
+    return props.loading && (!networkListType.value || !itemsValues.value)
   })
 
   onMounted(async () => {
@@ -88,11 +96,26 @@
           />
         </template>
       </FieldGroupRadio>
+      <FieldTextareaSkeleton
+        v-if="isLoadingNetworkType"
+        label-width="2rem"
+        textarea-height="8rem"
+        :show-description="true"
+        description-width="90%"
+      />
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="isAsnNetWorkType"
+        v-else-if="isAsnNetWorkType"
       >
+        <FieldTextareaSkeleton
+          v-if="props.loading"
+          label-width="2rem"
+          textarea-height="4rem"
+          :show-description="true"
+          description-width="90%"
+        />
         <FieldTextArea
+          v-else
           label="List"
           required
           placeholder="13335&#10;53331"
@@ -105,9 +128,17 @@
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="isIpCidrNetworkType"
+        v-else-if="isIpCidrNetworkType"
       >
+        <FieldTextareaSkeleton
+          v-if="props.loading"
+          label-width="2rem"
+          textarea-height="16rem"
+          :show-description="true"
+          description-width="90%"
+        />
         <FieldTextArea
+          v-else
           label="List"
           required
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"

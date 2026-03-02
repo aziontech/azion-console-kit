@@ -8,6 +8,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import SkeletonBlock from '@/templates/skeleton-block'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
@@ -17,6 +18,7 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const networkListName = ref('Network List')
+  const isPageHeadingLoaded = ref(false)
 
   const cachedNetworkList = networkListsService.getNetworkListFromCache(route.params?.id) ?? {}
 
@@ -28,6 +30,7 @@
   const setNetworkListName = (networkList) => {
     networkListName.value = networkList.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, networkList.name)
+    isPageHeadingLoaded.value = true
   }
   const options = ref([
     { name: 'ASN', value: 'asn' },
@@ -91,10 +94,16 @@
 <template>
   <ContentBlock>
     <template #heading>
+      <SkeletonBlock
+        v-if="!isPageHeadingLoaded"
+        width="100%"
+        height="4rem"
+      />
       <PageHeadingBlock
+        v-else
         :pageTitle="networkListName"
         description="Configure IP addresses and ranges used by security rules."
-      ></PageHeadingBlock>
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -107,8 +116,8 @@
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
-        <template #form>
-          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
+        <template #form="{ loading }">
+          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" :loading="loading" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
