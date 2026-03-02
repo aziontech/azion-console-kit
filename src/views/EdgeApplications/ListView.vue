@@ -144,6 +144,7 @@
             label="Application"
             @click="handleTrackEvent"
             createPagePath="/applications/create?origin=list"
+            helpCenterPath="/edge-applications"
             data-testid="create_Application_button"
           />
         </template>
