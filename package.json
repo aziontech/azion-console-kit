@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.53.0",
+  "version": "1.54.1",
   "private": false,
   "type": "module",
   "repository": {
@@ -50,6 +50,7 @@
     "analytics": "^0.8.19",
     "axios": "^1.13.5",
     "azion-theme": "^1.16.2",
+    "@aziontech/icons": "^1.0.4",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
@@ -64,7 +65,6 @@
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^3.2.0",
     "primeflex": "^3.3.1",
-    "primeicons": "^7.0.0",
     "primevue": "3.35.0",
     "psl": "^1.15.0",
     "qrcode.vue": "^3.4.1",

@@ -51,6 +51,41 @@ export class UsersService extends BaseService {
     this.baseURL = 'v4/iam/users'
   }
 
+  #fetchCurrentUser = async () => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: 'v4/iam/user'
+    })
+
+    const user = data.data
+    return {
+      id: user.id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      language: user.language,
+      timezone: user.timezone,
+      countryCallCode: user.country_call_code,
+      mobile: user.mobile || '',
+      isAccountOwner: user.is_account_owner,
+      teamsIds: user.teams.map((team) => team.id),
+      twoFactorEnabled: user.two_factor_enabled,
+      dateJoined: user.date_joined,
+      isActive: user.is_active,
+      isStaff: user.is_staff,
+      isTrial: user.is_trial,
+      lastLogin: user.last_login,
+      phone: user.phone,
+      teams: user.teams
+    }
+  }
+
+  loadUserSettings = async () => {
+    return await this.useEnsureQueryData(queryKeys.user.info(), () => this.#fetchCurrentUser(), {
+      persist: true
+    })
+  }
+
   #fetchList = async (params = { pageSize: 10 }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -213,6 +248,7 @@ export class UsersService extends BaseService {
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.users.all })
+    this.queryClient.removeQueries({ queryKey: queryKeys.user.all })
 
     return 'Your user has been updated'
   }

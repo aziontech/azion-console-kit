@@ -23,6 +23,7 @@ export const EdgeFirewallAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformListEdgeFirewallDropdown(data) {
+    if (!Array.isArray(data)) return []
     return data.map((edgeFirewall) => ({
       id: edgeFirewall.id,
       name: edgeFirewall.name

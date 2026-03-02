@@ -48,7 +48,7 @@ export const useAccountStore = defineStore({
       return hasPermissionToEdit || state.account.is_account_owner
     },
     hasPermissionToViewDataStream(state) {
-      return !!state.account.permissions.find(
+      return !!state.account.permissions?.find(
         (permission) => permission.name === 'View Data Stream'
       )
     },

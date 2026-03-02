@@ -1,15 +1,16 @@
 <script setup>
-  import { computed, ref, provide } from 'vue'
+  import { computed, ref } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import PrimeButton from 'primevue/button'
   import { capitalizeFirstLetter } from '@/helpers'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import { provideDrawerUnsaved } from '@/composables/useDrawerUnsaved'
 
   defineOptions({
     name: 'create-drawer-block'
@@ -66,8 +67,6 @@
   const { scrollToErrorInDrawer } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
-  const blockViewRedirection = ref(true)
-  const formDrawerHasUpdated = ref(false)
   const isExpanded = ref(props.expandedDefault)
 
   const toggleExpandDrawer = () => {
@@ -79,27 +78,27 @@
     initialValues: props.initialValues
   })
 
+  const isDirty = useIsFormDirty()
+
+  const closeAndReset = () => {
+    emit('update:visible', false)
+    resetForm()
+  }
+
+  const { requestClose, unsaved } = provideDrawerUnsaved(closeAndReset)
+
+  unsaved.addDirtySource(isDirty)
+
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
-      if (formHasChanges.value) {
-        formDrawerHasUpdated.value = !formDrawerHasUpdated.value
-        changeVisibleDrawer(!value, false)
+      if (!value) {
+        requestClose()
         return
       }
-      changeVisibleDrawer(value, true)
+      emit('update:visible', value)
     }
   })
-
-  const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
-    return blockViewRedirection.value && isDirty.value
-  })
-
-  const changeVisibleDrawer = (isVisible, isResetForm) => {
-    emit('update:visible', isVisible)
-    if (isResetForm) resetForm()
-  }
 
   const toggleDrawerVisibility = (isVisible) => {
     visibleDrawer.value = isVisible
@@ -137,18 +136,17 @@
     async (values, formContext) => {
       try {
         const response = await props.createService(values)
-        blockViewRedirection.value = false
+        unsaved.disable()
         emit('onSuccess', { ...response, showToastWithActions })
         if (!props.disableToast) showToast('success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
-          blockViewRedirection.value = true
+          unsaved.enable()
           return
         }
         formContext.resetForm()
         toggleDrawerVisibility(false)
       } catch (error) {
-        blockViewRedirection.value = true
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
@@ -168,13 +166,10 @@
 
   const handleGoBack = () => {
     showGoBack.value = false
-    toggleDrawerVisibility(false)
+    unsaved.disable()
+    emit('update:visible', false)
+    resetForm()
   }
-
-  provide('drawerUnsaved', {
-    changeVisibleDrawer,
-    formDrawerHasUpdated
-  })
 </script>
 
 <template>
@@ -250,9 +245,10 @@
         </slot>
       </div>
     </Sidebar>
-    <DialogUnsavedBlock
-      :blockRedirectUnsaved="formHasChanges"
-      :isDrawer="true"
+    <DialogUnsaved
+      :visible="unsaved.isDialogVisible.value"
+      @leave="unsaved.confirmLeave"
+      @stay="unsaved.cancelLeave"
     />
   </Teleport>
 </template>

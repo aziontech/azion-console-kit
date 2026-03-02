@@ -10,6 +10,7 @@
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -62,19 +63,28 @@
       field: 'id',
       header: 'ID',
       sortField: 'id',
-      filterPath: 'id'
+      filterPath: 'id',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'name',
       header: 'Name',
-      disableSort: true
+      disableSort: true,
+      style: columnStyles.priority(1, 150),
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+      }
     },
     {
       field: 'description',
       header: 'Description',
       filterPath: 'description.value',
       type: 'component',
-      class: 'max-w-[250px]',
+      style: columnStyles.priority(5, 350, 400),
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' }),
       disableSort: true
@@ -82,12 +92,14 @@
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      disableSort: true
+      disableSort: true,
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      disableSort: true
+      disableSort: true,
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'status',
@@ -95,6 +107,7 @@
       sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
+      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,

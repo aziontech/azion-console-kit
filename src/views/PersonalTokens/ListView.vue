@@ -41,13 +41,14 @@
 </template>
 
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { ref, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -72,30 +73,34 @@
   const getColumns = ref([
     {
       field: 'name',
-      header: 'Name'
+      header: 'Name',
+      style: columnStyles.priority(2, 200, 350)
     },
     {
       field: 'description',
       header: 'Description',
       type: 'component',
-      style: 'max-width: 250px',
+      style: columnStyles.priority(3, 200, 300),
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
     },
     {
       field: 'scope',
-      header: 'Scope'
+      header: 'Scope',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'expiresAt',
       sortField: 'expiresAtDate',
-      header: 'Expiration Date'
+      header: 'Expiration Date',
+      style: COLUMN_STYLES.FIT_CONTENT
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified'
+      filterPath: 'lastModified',
+      style: COLUMN_STYLES.FIT_CONTENT
     }
   ])
 
