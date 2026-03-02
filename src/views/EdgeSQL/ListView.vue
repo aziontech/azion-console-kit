@@ -2,16 +2,15 @@
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
 
-  import InlineMessage from 'primevue/inlinemessage'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import InlineMessage from 'primevue/inlinemessage'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { useEdgeSQL } from './composable/useEdgeSQL'
   import * as Helpers from '@/helpers'
   import { DataTableActionsButtons } from '@/components/DataTable'
-  import { useEdgeSQL } from './composable/useEdgeSQL'
 
   defineOptions({ name: 'list-edge-sql-databases' })
 
@@ -119,7 +118,7 @@
       field: 'name',
       header: 'Name',
       type: 'component',
-      style: columnStyles.priority(2, 200, 350),
+      style: 'max-width: 300px',
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -131,7 +130,6 @@
       field: 'status',
       header: 'Status',
       type: 'component',
-      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) =>
         columnBuilder({
           data: columnData,
@@ -142,15 +140,13 @@
       field: 'lastEditor',
       header: 'Last Editor',
       sortField: 'last_editor',
-      filterPath: 'last_editor',
-      style: COLUMN_STYLES.PRIORITY_SM
+      filterPath: 'last_editor'
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified',
-      style: COLUMN_STYLES.FIT_CONTENT
+      filterPath: 'lastModified'
     }
   ])
 

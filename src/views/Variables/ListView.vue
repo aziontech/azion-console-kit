@@ -1,14 +1,13 @@
 <script setup>
-  import { h, computed, ref, inject } from 'vue'
   import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { variablesService } from '@/services/v2/variables'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
-  import { clipboardWrite, documentationCatalog } from '@/helpers'
+  import { h, computed, ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { variablesService } from '@/services/v2/variables'
+  import { clipboardWrite, documentationCatalog } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -36,15 +35,14 @@
     return [
       {
         field: 'key',
-        header: 'Key',
-        style: columnStyles.priority(2, 200, 350)
+        header: 'Key'
       },
       {
         field: 'value',
         header: 'Value',
         type: 'component',
         filterPath: 'value.content',
-        style: columnStyles.priority(3, 200, 300),
+        style: 'max-width: 300px',
         component: (columnData) => {
           if (columnData.isSecret) {
             return h('span', `${columnData.content}`)
@@ -63,15 +61,13 @@
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor',
-        style: COLUMN_STYLES.PRIORITY_SM
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'lastModified'
       }
     ]
   })

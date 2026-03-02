@@ -41,15 +41,14 @@
 </template>
 
 <script setup>
-  import { computed, ref, onBeforeMount } from 'vue'
-  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useAccountStore } from '@/stores/account'
+  import { useRouter } from 'vue-router'
+  import { computed, ref, onBeforeMount } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'client-management-view' })
@@ -76,14 +75,12 @@
     return [
       {
         field: 'name',
-        header: 'Name',
-        style: columnStyles.priority(2, 200, 350)
+        header: 'Name'
       },
       {
         sortField: 'company_name',
         field: 'company',
-        header: 'Company Name',
-        style: columnStyles.priority(2, 200, 350)
+        header: 'Company Name'
       },
       {
         disableSort: true,
@@ -91,7 +88,6 @@
         sortField: 'is_active',
         header: 'Status',
         type: 'component',
-        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,

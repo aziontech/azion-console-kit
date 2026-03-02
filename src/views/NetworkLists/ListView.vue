@@ -1,11 +1,10 @@
 <script setup>
   import { computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -60,7 +59,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -72,28 +71,24 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'listType',
         header: 'List Type',
-        sortField: 'type',
-        style: COLUMN_STYLES.FIT_CONTENT
+        sortField: 'type'
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor',
-        style: COLUMN_STYLES.PRIORITY_SM
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'lastModified'
       }
     ]
   })

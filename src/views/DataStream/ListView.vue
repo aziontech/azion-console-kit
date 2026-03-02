@@ -70,16 +70,15 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import ContentBlock from '@/templates/content-block'
   import { onBeforeRouteLeave } from 'vue-router'
   import InlineMessage from 'primevue/inlinemessage'
-  import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
-  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { useAccountStore } from '@/stores/account'
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'data-stream-view' })
@@ -182,7 +181,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -194,32 +193,27 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'dataSource',
         header: 'Source',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT
+        disableSort: true
       },
       {
         field: 'templateName',
         header: 'Template',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT
+        disableSort: true
       },
       {
         field: 'endpointType',
         header: 'Connector',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT
+        disableSort: true
       },
       {
         field: 'active',
         header: 'Status',
         type: 'component',
-        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -230,15 +224,13 @@
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor',
-        style: COLUMN_STYLES.PRIORITY_SM
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'lastModified'
       }
     ]
   })

@@ -1,13 +1,12 @@
 <script setup>
+  import ContentBlock from '@/templates/content-block'
+  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
-  import Authorize from '@/views/EdgeNode/Dialog/Authorize'
 
   defineOptions({ name: 'list-edge-node' })
 
@@ -23,19 +22,16 @@
   const getColumns = computed(() => [
     {
       field: 'name',
-      header: 'Name',
-      style: columnStyles.priority(2, 200, 350)
+      header: 'Name'
     },
     {
       field: 'hashId',
-      header: 'Hash ID',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Hash ID'
     },
     {
       field: 'groups',
       header: 'Group',
       type: 'component',
-      style: columnStyles.priority(3, 200, 300),
       component: (columnData) =>
         columnBuilder({
           data: Array.isArray(columnData)
@@ -48,7 +44,6 @@
       field: 'status',
       header: 'Status',
       type: 'component',
-      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) =>
         columnBuilder({
           data: columnData,
@@ -59,15 +54,13 @@
       field: 'lastEditor',
       header: 'Last Editor',
       sortField: 'last_editor',
-      filterPath: 'last_editor',
-      style: COLUMN_STYLES.PRIORITY_SM
+      filterPath: 'last_editor'
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified',
-      style: COLUMN_STYLES.FIT_CONTENT
+      filterPath: 'lastModified'
     }
   ])
 

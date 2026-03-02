@@ -2,12 +2,11 @@
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from 'primevue/button'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
-  import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
   import DrawerFunction from './Drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -56,7 +55,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -68,29 +67,25 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'functionInstanced',
         header: 'Function',
         sortField: 'edge_function',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT
+        disableSort: true
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor',
-        style: COLUMN_STYLES.PRIORITY_SM
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'lastModified'
       }
     ]
   })

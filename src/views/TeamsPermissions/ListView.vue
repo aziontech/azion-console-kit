@@ -1,13 +1,12 @@
 <script setup>
-  import { computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { teamPermissionService } from '@/services/v2/team-permission'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
-  import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { computed, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { teamPermissionService } from '@/services/v2/team-permission'
+  import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -36,7 +35,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -49,7 +48,6 @@
         header: 'Permissions',
         type: 'component',
         disableSort: true,
-        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       },
@@ -58,7 +56,6 @@
         header: 'Status',
         type: 'component',
         sortField: 'is_active',
-        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,

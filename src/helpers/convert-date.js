@@ -169,7 +169,7 @@ const formatDateToMonthYear = (date) => {
 }
 
 const formatDateToDayMonthYearHour = (date, timezone) => {
-  if (!date) return 'Not Available'
+  if (!date) return null
 
   if (typeof date === 'string' && date.match(/^[A-Z][a-z]+\s+\d+,\s+\d{4}/)) {
     return date

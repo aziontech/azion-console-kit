@@ -44,19 +44,19 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
-  import { useRouter, onBeforeRouteLeave } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
-  import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { useLoadingStore } from '@/stores/loading'
-  import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { computed, ref } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { onBeforeRouteLeave } from 'vue-router'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   defineOptions({ name: 'identity-providers-view' })
 
   const props = defineProps({
@@ -98,14 +98,12 @@
         type: 'component',
         filterPath: 'name.text',
         sortField: 'name.text',
-        style: columnStyles.priority(3, 200, 350),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-with-tag' })
       },
       {
         field: 'protocol',
-        header: 'Protocol',
-        style: COLUMN_STYLES.FIT_CONTENT
+        header: 'Protocol'
       }
     ]
   })
