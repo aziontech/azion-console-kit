@@ -34,3 +34,8 @@ jobs:
         run: yarn lint
       - name: Run Prettier Formatting
         run: yarn prettier --check src/
+      - name: Architecture Conformance Report
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          yarn architecture:report --format markdown >> $GITHUB_STEP_SUMMARY
