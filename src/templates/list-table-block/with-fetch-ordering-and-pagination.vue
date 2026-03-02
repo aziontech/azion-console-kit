@@ -342,7 +342,6 @@
           :sortField="col?.sortField"
           data-testid="data-table-column"
           :style="col.style"
-          :class="col.class"
           :frozen="frozenColumns.includes(col.field)"
           :alignFrozen="'left'"
           :headerStyle="frozenColumns.includes(col.field) ? 'width: 300px' : ''"
@@ -360,7 +359,6 @@
                 <div
                   :data-testid="`list-table-block__column__${col.field}__row`"
                   class="overflow-hidden whitespace-nowrap text-ellipsis"
-                  :class="col.dynamicClass ? col.dynamicClass(rowData[col.field]) : ''"
                 >
                   {{ rowData[col.field] }}
                 </div>

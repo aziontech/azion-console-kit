@@ -1,11 +1,10 @@
 <script setup>
-  import { computed, inject } from 'vue'
-  import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { computed, inject } from 'vue'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -78,7 +77,7 @@
       header: 'Name',
       filterPath: 'name.text',
       type: 'component',
-      style: columnStyles.priority(2, 200, 350),
+      style: 'max-width: 300px',
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -90,24 +89,20 @@
       field: 'id',
       header: 'ID',
       sortField: 'id',
-      filterPath: 'id',
-      style: COLUMN_STYLES.FIT_CONTENT
+      filterPath: 'id'
     },
     {
       field: 'version',
-      header: 'Version',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Version'
     },
     {
       field: 'referenceCount',
-      header: 'Ref. Count',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Ref. Count'
     },
     {
       field: 'vendor',
       header: 'Vendor',
       type: 'component',
-      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({
           data: {
@@ -123,7 +118,6 @@
       header: 'Language',
       filterPath: 'runtime.content',
       type: 'component',
-      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -133,8 +127,7 @@
     },
     {
       field: 'executionEnvironment',
-      header: 'Initiator Type',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Initiator Type'
     },
     {
       field: 'status',
@@ -142,7 +135,6 @@
       sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
-      style: COLUMN_STYLES.FIT_CONTENT,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -154,15 +146,13 @@
       field: 'lastEditor',
       header: 'Last Editor',
       sortField: 'last_editor',
-      filterPath: 'last_editor',
-      style: COLUMN_STYLES.PRIORITY_SM
+      filterPath: 'last_editor'
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified',
-      style: COLUMN_STYLES.FIT_CONTENT
+      filterPath: 'lastModified'
     }
   ])
 </script>

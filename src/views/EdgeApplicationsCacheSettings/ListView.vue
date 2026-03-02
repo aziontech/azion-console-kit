@@ -1,11 +1,10 @@
 <script setup>
-  import { computed, ref, inject } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
+  import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -73,7 +72,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -85,18 +84,15 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'browserCache',
-        header: 'Browser Cache',
-        style: COLUMN_STYLES.FIT_CONTENT
+        header: 'Browser Cache'
       },
       {
         field: 'cdnCache',
-        header: 'Cache',
-        style: COLUMN_STYLES.FIT_CONTENT
+        header: 'Cache'
       }
     ]
   })

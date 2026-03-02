@@ -164,7 +164,6 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ListTableBlock from '@/templates/list-table-block/folder-list.vue'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import BucketListTable from './components/BucketListTable.vue'
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
@@ -243,18 +242,15 @@
   const getColumns = [
     {
       field: 'name',
-      header: 'Name',
-      style: columnStyles.priority(3, 200, 350)
+      header: 'Name'
     },
     {
       field: 'size',
-      header: 'Size',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Size'
     },
     {
       field: 'lastModified',
-      header: 'Last Modified',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Last Modified'
     }
   ]
   const uploadMenuItems = [

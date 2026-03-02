@@ -55,16 +55,15 @@
 </template>
 
 <script setup>
-  import { computed, ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-  import InlineMessage from 'primevue/inlinemessage'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { purgeService } from '@/services/v2/purge/purge-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import InlineMessage from 'primevue/inlinemessage'
+  import { computed, ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useToast } from 'primevue/usetoast'
+  import { purgeService } from '@/services/v2/purge/purge-service'
   // import { useRouter } from 'vue-router'
   // import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
@@ -192,30 +191,25 @@
       {
         field: 'time',
         header: 'Date',
-        sortField: 'ts',
-        style: COLUMN_STYLES.FIT_CONTENT
+        sortField: 'ts'
       },
       {
         field: 'user',
-        header: 'User',
-        style: columnStyles.priority(2, 150, 250)
+        header: 'User'
       },
       {
         field: 'layer',
-        header: 'Layer',
-        style: COLUMN_STYLES.FIT_CONTENT
+        header: 'Layer'
       },
       {
         field: 'type',
-        header: 'Type',
-        style: COLUMN_STYLES.FIT_CONTENT
+        header: 'Type'
       },
       {
         field: 'arguments',
         header: 'Arguments',
         filterPath: 'arguments.content',
         type: 'component',
-        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-array-with-popup' })
       }

@@ -8,7 +8,6 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import TableBlock from '@/templates/list-table-block/v2/index.vue'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -75,7 +74,6 @@
   const selectedPhase = ref('Request phase')
   const currentPhase = ref('request')
   const hasContentToList = ref(true)
-  const isLoadingButtonOrder = ref(false)
 
   const getColumns = computed(() => {
     return [
@@ -89,21 +87,12 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'name',
         header: 'Name',
-        disableSort: true,
-        style: columnStyles.priority(1, 150),
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
+        disableSort: true
       },
       {
         field: 'status',
@@ -111,7 +100,6 @@
         type: 'component',
         filterPath: 'active',
         sortField: 'active',
-        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -123,28 +111,17 @@
       {
         field: 'description',
         header: 'Description',
-        disableSort: true,
-        type: 'component',
-        style: columnStyles.priority(5, 350, 400),
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
+        disableSort: true
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT
+        disableSort: true
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
-        disableSort: true,
-        style: COLUMN_STYLES.FIT_CONTENT,
-        dynamicClass: (columnData) => (columnData === 'Not Available' ? 'text-color-secondary' : '')
+        disableSort: true
       }
     ]
   })
@@ -197,6 +174,8 @@
     currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
+
+  const isLoadingButtonOrder = ref(false)
 
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true

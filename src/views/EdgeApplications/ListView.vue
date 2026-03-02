@@ -1,14 +1,13 @@
 <script setup>
   import { computed, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import CloneBlock from '@/templates/clone-block'
-  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS } from '@/helpers'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import CloneBlock from '@/templates/clone-block'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'list-edge-applications' })
@@ -83,7 +82,7 @@
         header: 'Name',
         filterPath: 'name.text',
         type: 'component',
-        style: columnStyles.priority(2, 200, 350),
+        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -95,8 +94,7 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'id'
       },
       {
         field: 'active',
@@ -104,7 +102,6 @@
         sortField: 'active',
         filterPath: 'active',
         type: 'component',
-        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -116,15 +113,13 @@
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor',
-        style: COLUMN_STYLES.PRIORITY_SM
+        filterPath: 'last_editor'
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified',
-        style: COLUMN_STYLES.FIT_CONTENT
+        filterPath: 'lastModified'
       }
     ]
   })

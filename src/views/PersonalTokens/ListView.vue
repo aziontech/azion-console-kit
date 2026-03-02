@@ -41,14 +41,13 @@
 </template>
 
 <script setup>
-  import { ref, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
-  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
+  import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -73,34 +72,30 @@
   const getColumns = ref([
     {
       field: 'name',
-      header: 'Name',
-      style: columnStyles.priority(2, 200, 350)
+      header: 'Name'
     },
     {
       field: 'description',
       header: 'Description',
       type: 'component',
-      style: columnStyles.priority(3, 200, 300),
+      style: 'max-width: 250px',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'text-format-with-popup' })
     },
     {
       field: 'scope',
-      header: 'Scope',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Scope'
     },
     {
       field: 'expiresAt',
       sortField: 'expiresAtDate',
-      header: 'Expiration Date',
-      style: COLUMN_STYLES.FIT_CONTENT
+      header: 'Expiration Date'
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
       sortField: 'lastModified',
-      filterPath: 'lastModified',
-      style: COLUMN_STYLES.FIT_CONTENT
+      filterPath: 'lastModified'
     }
   ])
 
