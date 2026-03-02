@@ -1,10 +1,10 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, inject } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -25,19 +25,7 @@
     }
   })
 
-  const handleTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'User'
-    })
-  }
-
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'User'
-    })
-  }
-
-  const actions = [
+  const actions = computed(() => [
     {
       label: 'Delete',
       type: 'delete',
@@ -45,41 +33,33 @@
       icon: 'pi pi-trash',
       service: props.deleteUsersService
     }
-  ]
-
-  const csvMapper = (rowData) => {
-    return {
-      firstName: rowData.firstName,
-      lastName: rowData.lastName,
-      email: rowData.email,
-      teams: rowData.teams,
-      mfa: rowData.mfa?.content || rowData.mfa,
-      owner: rowData.owner?.content || rowData.owner,
-      status: rowData.status?.content || rowData.status
-    }
-  }
+  ])
 
   const getColumns = computed(() => {
     return [
       {
         field: 'firstName',
         header: 'First Name',
-        sortField: 'first_name'
+        sortField: 'first_name',
+        style: columnStyles.priority(2, 150, 250)
       },
       {
         field: 'lastName',
         header: 'Last Name',
-        sortField: 'last_name'
+        sortField: 'last_name',
+        style: columnStyles.priority(2, 150, 250)
       },
       {
         field: 'email',
-        header: 'Email Address'
+        header: 'Email Address',
+        style: columnStyles.priority(3, 200, 300)
       },
       {
         field: 'teams',
         header: 'Teams',
         disableSort: true,
         type: 'component',
+        style: columnStyles.priority(3, 200, 300),
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -91,6 +71,7 @@
         header: 'MFA',
         type: 'component',
         disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -104,6 +85,7 @@
         filterPath: 'owner.content',
         type: 'component',
         disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -117,6 +99,7 @@
         disableSort: true,
         filterPath: 'status.content',
         type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -126,6 +109,29 @@
       }
     ]
   })
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'User'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'User'
+    })
+  }
+
+  const csvMapper = (rowData) => {
+    return {
+      firstName: rowData.firstName,
+      lastName: rowData.lastName,
+      email: rowData.email,
+      teams: rowData.teams,
+      mfa: rowData.mfa?.content || rowData.mfa,
+      owner: rowData.owner?.content || rowData.owner,
+      status: rowData.status?.content || rowData.status
+    }
+  }
 </script>
 
 <template>

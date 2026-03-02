@@ -2,11 +2,12 @@
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
-  import DrawerFunction from './Drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
   import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -55,7 +56,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -67,25 +68,29 @@
         field: 'id',
         header: 'ID',
         sortField: 'id',
-        filterPath: 'id'
+        filterPath: 'id',
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'functionInstanced',
         header: 'Function',
         sortField: 'edge_function',
-        disableSort: true
+        disableSort: true,
+        style: COLUMN_STYLES.FIT_CONTENT
       },
       {
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
-        filterPath: 'last_editor'
+        filterPath: 'last_editor',
+        style: COLUMN_STYLES.PRIORITY_SM
       },
       {
         field: 'lastModified',
         header: 'Last Modified',
         sortField: 'lastModified',
-        filterPath: 'lastModified'
+        filterPath: 'lastModified',
+        style: COLUMN_STYLES.FIT_CONTENT
       }
     ]
   })

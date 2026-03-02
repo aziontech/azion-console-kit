@@ -1,12 +1,13 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
-  import { useAccountStore } from '@/stores/account'
-  import { useRouter } from 'vue-router'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, onBeforeMount } from 'vue'
+  import { useRouter } from 'vue-router'
+  import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
+  import { COLUMN_STYLES, columnStyles } from '@/helpers/column-styles'
+  import { useAccountStore } from '@/stores/account'
   import { DataTableActionsButtons } from '@/components/DataTable'
 
   defineOptions({ name: 'group-management-view' })
@@ -34,7 +35,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -47,7 +48,7 @@
         field: 'company',
         header: 'Company Name',
         type: 'component',
-        style: 'max-width: 300px',
+        style: columnStyles.priority(2, 200, 350),
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -61,6 +62,7 @@
         sortField: 'is_active',
         header: 'Status',
         type: 'component',
+        style: COLUMN_STYLES.FIT_CONTENT,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
