@@ -108,22 +108,25 @@
             UTC:
             <span class="text-color font-medium">{{ userTimezone }}</span>
           </div>
-          <Dropdown
-            v-model="selectedUtcOption"
-            :options="utcOffsetOptions"
-            optionLabel="label"
-            filter
-            appendTo="self"
-            filterPlaceholder="Search timezone"
-            class="w-auto"
-            :pt="{ input: { class: 'text-xs' } }"
-            @change="onUtcOffsetChange"
-          >
-            <template #value="slotProps">
-              <span v-if="slotProps.value">{{ slotProps.value.label }}</span>
-              <span v-else>{{ slotProps.placeholder }}</span>
-            </template>
-          </Dropdown>
+          <div class="flex gap-2 items-center">
+            <span class="text-xs text-color-secondary">UTC Offset:</span>
+            <Dropdown
+              v-model="selectedUtcOption"
+              :options="utcOffsetOptions"
+              optionLabel="label"
+              filter
+              appendTo="body"
+              filterPlaceholder="Search timezone"
+              class="w-auto"
+              :pt="{ input: { class: 'text-xs' } }"
+              @change="onUtcOffsetChange"
+            >
+              <template #value="slotProps">
+                <span v-if="slotProps.value">{{ slotProps.value.label }}</span>
+                <span v-else>{{ slotProps.placeholder }}</span>
+              </template>
+            </Dropdown>
+          </div>
         </div>
       </div>
     </OverlayPanel>
