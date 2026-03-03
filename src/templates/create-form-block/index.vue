@@ -2,9 +2,8 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, ref, onMounted, nextTick, useAttrs } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
   import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
@@ -53,7 +52,10 @@
   const router = useRouter()
   const toast = useToast()
 
+  const isFormReady = ref(false)
+
   const unsaved = useUnsavedChanges({
+    isReady: isFormReady,
     enableRouteGuard: true,
     enableBeforeUnload: true
   })
@@ -73,6 +75,12 @@
 
   const isDirty = useIsFormDirty()
   unsaved.addDirtySource(isDirty)
+
+  onMounted(async () => {
+    await nextTick()
+    resetForm({ values: { ...values } })
+    isFormReady.value = true
+  })
 
   const onCancel = () => {
     router.go(-1)
