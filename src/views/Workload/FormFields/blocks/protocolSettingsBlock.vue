@@ -8,7 +8,7 @@
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   import {
@@ -22,36 +22,7 @@
   const digitalCertificateDrawerRef = ref('')
   const statusDigitalCertificate = ref('')
   const certificateOptions = ref([])
-  const certificateLoading = ref(false)
-
-  const fetchCertificates = async () => {
-    certificateLoading.value = true
-    try {
-      const response = await digitalCertificatesService.listDigitalCertificatesDropdown({
-        type: 'edge_certificate',
-        fields: ['id,name,status,authority,type,subject_name'],
-        pageSize: 100,
-        page: 1,
-        ordering: 'name'
-      })
-
-      certificateOptions.value = response.body.flatMap((group) =>
-        (group.items || []).map((item) => ({
-          label: item.name,
-          value: item.id,
-          authority: item.authority,
-          status: item.status,
-          subjectName: item.subjectName,
-          icon: item.icon,
-          group: group.label
-        }))
-      )
-    } finally {
-      certificateLoading.value = false
-    }
-  }
-
-  fetchCertificates()
+  const certificateLoading = ref(true)
 
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
@@ -127,6 +98,33 @@
     minimumVersion: 'tls_1_3'
   }
 
+  const fetchCertificates = async () => {
+    certificateLoading.value = true
+    try {
+      const response = await digitalCertificatesService.listDigitalCertificatesDropdown({
+        type: 'edge_certificate',
+        fields: ['id,name,status,authority,type,subject_name'],
+        pageSize: 100,
+        page: 1,
+        ordering: 'name'
+      })
+
+      certificateOptions.value = response.body.flatMap((group) =>
+        (group.items || []).map((item) => ({
+          label: item.name,
+          value: item.id,
+          authority: item.authority,
+          status: item.status,
+          subjectName: item.subjectName,
+          icon: item.icon,
+          group: group.label
+        }))
+      )
+    } finally {
+      certificateLoading.value = false
+    }
+  }
+
   watch(tls, (newTls) => {
     if (!newTls) {
       tls.value = loadInitialTls
@@ -135,6 +133,10 @@
       loadInitialTls.ciphers = newTls.ciphers
       loadInitialTls.minimumVersion = newTls.minimumVersion
     }
+  })
+
+  onMounted(() => {
+    fetchCertificates()
   })
 </script>
 <template>
