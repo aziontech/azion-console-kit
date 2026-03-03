@@ -2,6 +2,7 @@
   import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import TextArea from 'primevue/textarea'
+  import Skeleton from 'primevue/skeleton'
   import LabelBlock from '@/templates/label-block'
 
   const emit = defineEmits(['blur', 'input'])
@@ -55,6 +56,10 @@
     aditionalError: {
       type: String,
       default: ''
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -98,6 +103,13 @@
     emit('input', event.target.value)
   }
 
+  const textareaHeight = computed(() => {
+    const rows = Number(props.rows)
+    // Each row is approximately 1.5rem (24px), with minimum height of 2.75rem (44px)
+    const height = Math.max(rows * 1.5, 2.75)
+    return `${height}rem`
+  })
+
   defineExpose({ inputRef })
 </script>
 
@@ -117,7 +129,15 @@
       :class="props.icon"
       class="text-color-secondary top-5 right-5"
     />
+    <!-- Skeleton only for textarea input -->
+    <Skeleton
+      v-if="props.loading"
+      width="100%"
+      :height="textareaHeight"
+      borderRadius="6px"
+    />
     <TextArea
+      v-else
       v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
       v-model="inputValue"
       ref="inputRef"

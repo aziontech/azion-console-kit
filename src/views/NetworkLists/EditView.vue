@@ -8,7 +8,6 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import SkeletonBlock from '@/templates/skeleton-block'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
@@ -94,13 +93,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <SkeletonBlock
-        v-if="!isPageHeadingLoaded"
-        width="100%"
-        height="4rem"
-      />
       <PageHeadingBlock
-        v-else
         :pageTitle="networkListName"
         description="Configure IP addresses and ranges used by security rules."
       />
@@ -117,7 +110,10 @@
         :schema="validationSchema"
       >
         <template #form="{ loading }">
-          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" :loading="loading" />
+          <FormFieldsEditNetworkLists
+            :listCountriesService="props.listCountriesService"
+            :loading="loading"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport

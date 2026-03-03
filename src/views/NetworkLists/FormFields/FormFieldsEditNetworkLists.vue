@@ -5,7 +5,6 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeTag from 'primevue/tag'
-  import { FieldTextareaSkeleton } from '@/templates/form-skeleton'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
@@ -96,32 +95,18 @@
           />
         </template>
       </FieldGroupRadio>
-      <FieldTextareaSkeleton
-        v-if="isLoadingNetworkType"
-        label-width="2rem"
-        textarea-height="8rem"
-        :show-description="true"
-        description-width="90%"
-      />
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-else-if="isAsnNetWorkType"
+        v-if="isAsnNetWorkType"
       >
-        <FieldTextareaSkeleton
-          v-if="props.loading"
-          label-width="2rem"
-          textarea-height="4rem"
-          :show-description="true"
-          description-width="90%"
-        />
         <FieldTextArea
-          v-else
           label="List"
           required
           placeholder="13335&#10;53331"
           name="itemsValues"
           rows="2"
           :value="itemsValues"
+          :loading="isLoadingNetworkType || props.loading"
           data-testid="network-list-form__asn-list"
           description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
@@ -130,21 +115,14 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-else-if="isIpCidrNetworkType"
       >
-        <FieldTextareaSkeleton
-          v-if="props.loading"
-          label-width="2rem"
-          textarea-height="16rem"
-          :show-description="true"
-          description-width="90%"
-        />
         <FieldTextArea
-          v-else
           label="List"
           required
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
           name="itemsValues"
           rows="16"
           :value="itemsValues"
+          :loading="isLoadingNetworkType || props.loading"
           data-testid="network-list-form__ipcidr-list"
         >
           <template #description>
