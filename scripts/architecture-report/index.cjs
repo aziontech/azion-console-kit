@@ -13,8 +13,11 @@
  * Options:
  *   --format <markdown|json>  Output format (default: markdown)
  *   --output <file>           Write report to file instead of stdout
+ *   --min-score <number>      Minimum overall score (0-100). Exits with code 1 if below threshold.
  *
- * Exit code is always 0 (reports are informational, not blocking).
+ * Exit code:
+ *   0 — score meets threshold (or no threshold set)
+ *   1 — score below threshold (blocks CI)
  */
 const fs = require('fs')
 const path = require('path')
@@ -26,12 +29,13 @@ const { format } = require('./reporter.cjs')
  * Parses CLI arguments into an options object.
  *
  * @param {string[]} argv - Process arguments (process.argv.slice(2))
- * @returns {{ format: 'markdown'|'json', output: string|null }}
+ * @returns {{ format: 'markdown'|'json', output: string|null, minScore: number|null }}
  */
 function parseArgs(argv) {
   const options = {
     format: 'markdown',
-    output: null
+    output: null,
+    minScore: null
   }
 
   for (let i = 0; i < argv.length; i++) {
@@ -47,6 +51,14 @@ function parseArgs(argv) {
     } else if (argv[i] === '--output' && argv[i + 1]) {
       options.output = argv[i + 1]
       i++
+    } else if (argv[i] === '--min-score' && argv[i + 1]) {
+      const value = parseInt(argv[i + 1], 10)
+      if (isNaN(value) || value < 0 || value > 100) {
+        console.error(`Invalid min-score "${argv[i + 1]}". Must be a number between 0 and 100.`)
+        process.exit(1)
+      }
+      options.minScore = value
+      i++
     } else if (argv[i] === '--help' || argv[i] === '-h') {
       console.log(`
 Architecture Conformance Report
@@ -57,6 +69,7 @@ Usage:
 Options:
   --format <markdown|json>  Output format (default: markdown)
   --output <file>           Write report to file instead of stdout
+  --min-score <number>      Minimum overall score (0-100). Exits with code 1 if below.
   --help, -h                Show this help message
 `)
       process.exit(0)
@@ -68,7 +81,7 @@ Options:
 
 /**
  * Main execution function.
- * Orchestrates: scan -> score -> format -> output.
+ * Orchestrates: scan -> score -> format -> output -> quality gate.
  */
 async function main() {
   const options = parseArgs(process.argv.slice(2))
@@ -94,9 +107,26 @@ async function main() {
   } else {
     console.log(report)
   }
+
+  // Quality gate: fail if score is below threshold
+  if (options.minScore !== null) {
+    const { score } = scores.overall
+    if (score < options.minScore) {
+      console.error(
+        `\nQuality gate FAILED: overall score ${score}% is below minimum threshold of ${options.minScore}%`
+      )
+      console.error(
+        `${scores.overall.filesWithViolations} files with violations must be fixed before merging.`
+      )
+      process.exit(1)
+    }
+    console.error(
+      `\nQuality gate PASSED: overall score ${score}% meets minimum threshold of ${options.minScore}%`
+    )
+  }
 }
 
 main().catch((error) => {
   console.error('Failed to generate architecture report:', error.message)
-  process.exit(0) // Informational — do not block CI
+  process.exit(1)
 })

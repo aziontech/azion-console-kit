@@ -22,7 +22,7 @@ const CONVENTIONS = {
 
 module.exports = {
   meta: {
-    type: 'suggestion',
+    type: 'problem',
     docs: {
       description:
         'Files must follow naming conventions: *-service.js/ts, *-adapter.js/ts, use*.js/ts, *-store.js/ts.',

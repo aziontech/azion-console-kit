@@ -12,8 +12,8 @@
  * @returns {string} Status emoji and label
  */
 function getStatus(score) {
-  if (score >= 90) return '\u2705 Clean'
-  if (score >= 60) return '\u26A0\uFE0F Needs Work'
+  if (score === 100) return '\u2705 Perfect'
+  if (score >= 90) return '\u26A0\uFE0F Needs Work'
   return '\u274C Critical'
 }
 

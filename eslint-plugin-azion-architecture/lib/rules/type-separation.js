@@ -3,7 +3,7 @@ const { classifyPath } = require('../utils/path-classifier')
 
 module.exports = {
   meta: {
-    type: 'suggestion',
+    type: 'problem',
     docs: {
       description:
         'API types (.types.ts) must not be mixed with app contracts (.contracts.ts) in the same file.',

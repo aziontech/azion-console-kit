@@ -31,7 +31,7 @@
     "format": "prettier --write src/",
     "prepare": "husky install",
     "generate-specs-json": "npx find-cypress-specs --names --json > specs.json",
-    "lint:architecture": "eslint src/ --rule '{\"azion-architecture/no-direct-http-in-components\": \"error\"}' --no-fix",
+    "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
     "architecture:report": "node scripts/architecture-report/index.cjs"
   },
   "dependencies": {

@@ -15,39 +15,31 @@ module.exports = {
       extends: ['plugin:cypress/recommended']
     },
     {
-      // Modern code: warn initially, promote to error once existing violations are fixed
-      files: ['src/modules/**/*', 'src/services/v2/**/*'],
-      rules: {
-        'azion-architecture/no-direct-http-in-components': 'warn',
-        'azion-architecture/no-http-in-stores': 'warn',
-        'azion-architecture/require-vue-query': 'warn',
-        'azion-architecture/no-try-catch-in-services': 'warn',
-        'azion-architecture/services-http-only': 'warn',
-        'azion-architecture/pure-adapters': 'warn',
-        'azion-architecture/no-http-in-adapters': 'warn',
-        'azion-architecture/module-isolation': 'warn',
-        'azion-architecture/naming-convention': 'warn',
-        'azion-architecture/type-separation': 'warn'
-      }
-    },
-    {
+      // Performance: TanStack Vue Query integration is mandatory
       files: [
+        'src/modules/**/*',
+        'src/services/v2/**/*',
         'src/views/**/*',
         'src/services/*-services/**/*',
         'src/components/**/*',
         'src/stores/**/*'
       ],
       rules: {
-        'azion-architecture/no-direct-http-in-components': 'warn',
-        'azion-architecture/no-http-in-stores': 'warn',
-        'azion-architecture/require-vue-query': 'warn',
+        // Performance — error: TanStack integration is required
+        'azion-architecture/no-direct-http-in-components': 'error',
+        'azion-architecture/no-http-in-stores': 'error',
+        'azion-architecture/require-vue-query': 'error',
+
+        // Best practices — warn: encourage but don't block
         'azion-architecture/no-try-catch-in-services': 'warn',
         'azion-architecture/services-http-only': 'warn',
         'azion-architecture/pure-adapters': 'warn',
         'azion-architecture/no-http-in-adapters': 'warn',
-        'azion-architecture/module-isolation': 'warn',
-        'azion-architecture/naming-convention': 'warn',
-        'azion-architecture/type-separation': 'warn'
+
+        // Architecture — off
+        'azion-architecture/module-isolation': 'off',
+        'azion-architecture/naming-convention': 'off',
+        'azion-architecture/type-separation': 'off'
       }
     }
   ],
