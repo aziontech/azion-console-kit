@@ -1,6 +1,11 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isHttpOrServiceImport, isTypeOnlyImport, isErrorImport } = require('../utils/import-resolver')
+const {
+  isHttpOrServiceImport,
+  isTypeOnlyImport,
+  isErrorImport,
+  isV2ServiceImport
+} = require('../utils/import-resolver')
 
 module.exports = {
   meta: {
@@ -36,6 +41,10 @@ module.exports = {
         if (isTypeOnlyImport(source)) return
         // Allow error imports (error types, error handlers)
         if (isErrorImport(source)) return
+        // Allow v2 service imports — they extend BaseService and expose
+        // Vue Query methods (.useQuery, .useMutation), so components can
+        // safely call service.useListXxx() without a separate composable.
+        if (isV2ServiceImport(source)) return
 
         if (isHttpOrServiceImport(source)) {
           context.report({

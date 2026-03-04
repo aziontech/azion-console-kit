@@ -32,6 +32,7 @@
     "prepare": "husky install",
     "generate-specs-json": "npx find-cypress-specs --names --json > specs.json",
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
+    "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
     "architecture:report": "node scripts/architecture-report/index.cjs"
   },
   "dependencies": {
@@ -96,7 +97,6 @@
     "cypress-plugin-tab": "^1.0.5",
     "cypress-real-events": "^1.13.0",
     "eslint": "^8.45.0",
-    "eslint-plugin-azion-architecture": "file:./eslint-plugin-azion-architecture",
     "eslint-plugin-cypress": "^2.13.3",
     "eslint-plugin-no-unsanitized": "^4.0.2",
     "eslint-plugin-security": "^3.0.1",

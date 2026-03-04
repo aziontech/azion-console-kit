@@ -13,7 +13,8 @@
  */
 function getStatus(score) {
   if (score === 100) return '\u2705 Perfect'
-  if (score >= 90) return '\u26A0\uFE0F Needs Work'
+  if (score >= 90) return '\u2705 Good'
+  if (score >= 75) return '\u26A0\uFE0F Needs Work'
   return '\u274C Critical'
 }
 

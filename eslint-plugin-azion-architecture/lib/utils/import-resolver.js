@@ -106,6 +106,15 @@ function isErrorImport(source) {
   return /\/errors?([/.]|$)/.test(source)
 }
 
+/**
+ * Checks if an import source points to a v2 service (BaseService-based).
+ * V2 services extend BaseService and expose Vue Query methods (.useQuery, .useMutation),
+ * making them safe to import in components.
+ */
+function isV2ServiceImport(source) {
+  return /^@\/services\/v2\//.test(source) || /\/services\/v2\//.test(source)
+}
+
 module.exports = {
   categorizeImport,
   isHttpImport,
@@ -116,5 +125,6 @@ module.exports = {
   isDomImport,
   isVueQueryImport,
   isTypeOnlyImport,
-  isErrorImport
+  isErrorImport,
+  isV2ServiceImport
 }
