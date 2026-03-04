@@ -1,9 +1,9 @@
 const editRoute =
   (name, params = {}) =>
-    ({ id }) => ({
-      name,
-      params: { id: String(id), ...params }
-    })
+  ({ id }) => ({
+    name,
+    params: { id: String(id), ...params }
+  })
 
 const tryParseJson = (value) => {
   if (!value) return null
@@ -71,9 +71,19 @@ const ROUTE_MAP = {
     parentType: 'Firewall',
     tab: 'functions'
   },
-  'DNS Record': { edit: 'edit-edge-dns', list: 'list-edge-dns', parentType: 'DNS Zone', tab: 'records' },
+  'DNS Record': {
+    edit: 'edit-edge-dns',
+    list: 'list-edge-dns',
+    parentType: 'DNS Zone',
+    tab: 'records'
+  },
   'DNS Zone': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
-  'DNS DNSSec': { edit: 'edit-edge-dns', list: 'list-edge-dns', parentType: 'DNS Zone', tab: 'records' },
+  'DNS DNSSec': {
+    edit: 'edit-edge-dns',
+    list: 'list-edge-dns',
+    parentType: 'DNS Zone',
+    tab: 'records'
+  },
   WAF: { edit: 'edit-waf-rules', list: 'list-waf-rules' },
   Workload: { edit: 'edit-workload', list: 'list-workloads' },
   Application: { edit: 'edit-application', list: 'list-applications' },

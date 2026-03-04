@@ -174,11 +174,11 @@ export class ActivityHistoryService extends BaseService {
     const combinedOrEntries = [
       ...(search
         ? [
-          '{ titleIlike: $search }',
-          '{ authorNameIlike: $search }',
-          '{ authorEmailIlike: $search }',
-          '{ resourceTypeIlike: $search }'
-        ]
+            '{ titleIlike: $search }',
+            '{ authorNameIlike: $search }',
+            '{ authorEmailIlike: $search }',
+            '{ resourceTypeIlike: $search }'
+          ]
         : []),
       ...dynamic.orEntries
     ]
@@ -300,11 +300,11 @@ export class ActivityHistoryService extends BaseService {
     const combinedOrEntries = [
       ...(search
         ? [
-          '{ titleIlike: $search }',
-          '{ authorNameIlike: $search }',
-          '{ authorEmailIlike: $search }',
-          '{ resourceTypeIlike: $search }'
-        ]
+            '{ titleIlike: $search }',
+            '{ authorNameIlike: $search }',
+            '{ authorEmailIlike: $search }',
+            '{ resourceTypeIlike: $search }'
+          ]
         : []),
       ...dynamic.orEntries
     ]
