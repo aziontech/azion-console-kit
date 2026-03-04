@@ -99,7 +99,10 @@ export const ActivityHistoryAdapter = {
           userAgent: element.userAgent || '-',
           requestData: formatRequestData(element.requestData),
           remotePort: element.remotePort || '-',
-          comment: element.comment || '-'
+          comment: element.comment || '-',
+          parentResourceType: element.parentResourceType || null,
+          parentResourceId: element.parentResourceId || null,
+          parentResourceName: element.parentResourceName || null
         })) || []
 
       return parsedEvents

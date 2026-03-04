@@ -1,9 +1,9 @@
 const editRoute =
   (name, params = {}) =>
-  ({ id }) => ({
-    name,
-    params: { id: String(id), ...params }
-  })
+    ({ id }) => ({
+      name,
+      params: { id: String(id), ...params }
+    })
 
 const tryParseJson = (value) => {
   if (!value) return null
@@ -59,9 +59,21 @@ const ROUTE_MAP = {
   Certificate: { edit: 'edit-digital-certificates', list: 'list-digital-certificates' },
   DataStream: { edit: 'edit-data-stream', list: 'list-data-stream' },
   Firewall: { edit: 'edit-firewall', list: 'list-firewalls' },
-  'DNS Record': { edit: 'edge-dns-records', list: 'list-dns-records' },
-  'DNS DNSSec': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
+  FirewallRuleEngine: {
+    edit: 'edit-firewall',
+    list: 'edit-firewall',
+    parentType: 'Firewall',
+    tab: 'rulesEngine'
+  },
+  FirewallFunctionInstance: {
+    edit: 'edit-firewall',
+    list: 'edit-firewall',
+    parentType: 'Firewall',
+    tab: 'functions'
+  },
+  'DNS Record': { edit: 'edit-edge-dns', list: 'list-edge-dns', parentType: 'DNS Zone', tab: 'records' },
   'DNS Zone': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
+  'DNS DNSSec': { edit: 'edit-edge-dns', list: 'list-edge-dns', parentType: 'DNS Zone', tab: 'records' },
   WAF: { edit: 'edit-waf-rules', list: 'list-waf-rules' },
   Workload: { edit: 'edit-workload', list: 'list-workloads' },
   Application: { edit: 'edit-application', list: 'list-applications' },
@@ -141,6 +153,24 @@ const extractId = (event) => {
   return id !== null && String(id).trim() !== '' ? id : null
 }
 
+const resolveParentRoute = (event, routeConfig, resolvedAction) => {
+  const parentResourceId = event?.parentResourceId
+  if (!parentResourceId) return null
+
+  const routeName = routeConfig[resolvedAction]
+  if (!routeName) return null
+
+  const params = { id: String(parentResourceId) }
+  if (routeConfig.tab) {
+    params.tab = routeConfig.tab
+  }
+
+  return {
+    name: routeName,
+    params: { ...params, ...(routeConfig.params || {}) }
+  }
+}
+
 export const resolveActivityHistoryRoute = (event = {}) => {
   const resourceType = normalizeResourceType(event?.resourceType)
   const action = event?.type
@@ -149,6 +179,12 @@ export const resolveActivityHistoryRoute = (event = {}) => {
   const resolvedAction = resolveAction(action)
 
   if (!routeConfig || !resolvedAction) return null
+
+  // Check if this resource type requires parent routing
+  if (routeConfig.parentType) {
+    const parentRoute = resolveParentRoute(event, routeConfig, resolvedAction)
+    if (parentRoute) return parentRoute
+  }
 
   if (resourceType === 'BucketObject') {
     if (resolvedAction !== 'edit') return listRoute(routeConfig.list)()

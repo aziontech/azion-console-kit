@@ -38,7 +38,10 @@ const buildDynamicFilters = (filter = {}) => {
     userIp: { operator: 'Eq', type: 'String' },
     userAgent: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     uuid: { operator: 'Eq', type: 'String' },
-    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
+    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    parentResourceType: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    parentResourceId: { operator: 'Eq', type: 'String' },
+    parentResourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
   }
 
   const normalized = normalizeFilterArray(filter)
@@ -103,7 +106,10 @@ const ALLOWED_ORDERING_FIELDS = new Set([
   'userAgent',
   'remotePort',
   'comment',
-  'uuid'
+  'uuid',
+  'parentResourceType',
+  'parentResourceId',
+  'parentResourceName'
 ])
 
 const orderingToOrderBy = (ordering) => {
@@ -168,11 +174,11 @@ export class ActivityHistoryService extends BaseService {
     const combinedOrEntries = [
       ...(search
         ? [
-            '{ titleIlike: $search }',
-            '{ authorNameIlike: $search }',
-            '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }'
-          ]
+          '{ titleIlike: $search }',
+          '{ authorNameIlike: $search }',
+          '{ authorEmailIlike: $search }',
+          '{ resourceTypeIlike: $search }'
+        ]
         : []),
       ...dynamic.orEntries
     ]
@@ -212,6 +218,9 @@ export class ActivityHistoryService extends BaseService {
           userAgent
           uuid
           resourceName
+          parentResourceType
+          parentResourceId
+          parentResourceName
         }
       }`
 
@@ -291,11 +300,11 @@ export class ActivityHistoryService extends BaseService {
     const combinedOrEntries = [
       ...(search
         ? [
-            '{ titleIlike: $search }',
-            '{ authorNameIlike: $search }',
-            '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }'
-          ]
+          '{ titleIlike: $search }',
+          '{ authorNameIlike: $search }',
+          '{ authorEmailIlike: $search }',
+          '{ resourceTypeIlike: $search }'
+        ]
         : []),
       ...dynamic.orEntries
     ]
