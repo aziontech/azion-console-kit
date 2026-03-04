@@ -320,11 +320,16 @@
     valueNetworkId.value = props.parentSelectedFilter.network?.id
     selectedFilter.value = props.parentSelectedFilter
     const { disabledIP, disabledCountries } = selectedFilter.value.network?.value || {}
-    listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
-    listFields.value.find((item) => item.value === 'ip_address').networkListDisabled = disabledIP
-    listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
-    listFields.value.find((item) => item.value === 'country').networkListDisabled =
-      disabledCountries
+    const ipField = listFields.value.find((item) => item.value === 'ip_address')
+    if (ipField) {
+      ipField.disabled = disabledIP
+      ipField.networkListDisabled = disabledIP
+    }
+    const countryField = listFields.value.find((item) => item.value === 'country')
+    if (countryField) {
+      countryField.disabled = disabledCountries
+      countryField.networkListDisabled = disabledCountries
+    }
 
     selectedFilterAdvanced.value = props.parentSelectedFilterAdvanced
     nextTick(() => {

@@ -12,12 +12,12 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
-function extractAzionAppSubdomain(fullDomains) {
+function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
 
   fullDomains.forEach((full) => {
-    const { domain, subdomain } = getPrimaryDomain(full)
+    const { domain, subdomain } = getPrimaryDomain(full, zones)
 
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
@@ -124,6 +124,9 @@ export const WorkloadAdapter = {
         lastEditor: workload.last_editor,
         productVersion: workload.product_version,
         protocols: workload.protocols,
+        tls: workload.tls,
+        mtls: workload.mtls,
+        workloadDomainAllowAccess: workload.workload_domain_allow_access,
         infrastructure: workload.infrastructure === 1 ? 'Production' : 'Staging',
         active: workload.active
           ? { content: 'Active', severity: 'success' }
@@ -135,8 +138,52 @@ export const WorkloadAdapter = {
       }
     })
   },
-  transformLoadWorkload({ data: workload }, workloadDeployment) {
-    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains)
+  transformCachedWorkloadToEdit(item) {
+    return {
+      id: item.id,
+      name: item.name?.text ?? item.name,
+      active: item.active?.content === 'Active',
+      workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
+      infrastructure: item.infrastructure === 'Production' ? '1' : '2',
+      isLocked: item.isLocked,
+      workloadHostnameAllowAccess: item.workloadDomainAllowAccess,
+      initialDomains: item.domains,
+      tls: item.tls
+        ? {
+            minimumVersion: item.tls.minimum_version,
+            ciphers: item.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
+            certificate: item.tls.certificate || 0
+          }
+        : undefined,
+      protocols: item.protocols?.http
+        ? {
+            http: {
+              useHttp3: item.protocols.http.quic_ports !== null,
+              useHttps: item.protocols.http.https_ports !== null,
+              httpPorts: item.protocols.http.http_ports?.map((port) =>
+                HTTP_PORT_LIST_OPTIONS.find((option) => option.value === port)
+              ) || [HTTP_PORT_LIST_OPTIONS[0]],
+              httpsPorts: item.protocols.http.https_ports?.map((port) =>
+                HTTPS_PORT_LIST_OPTIONS.find((option) => option.value === port)
+              ) || [HTTPS_PORT_LIST_OPTIONS[0]],
+              quicPorts: item.protocols.http.quic_ports?.map((port) =>
+                HTTP3_PORT_LIST_OPTIONS.find((option) => option.value === port)
+              ) || [HTTP3_PORT_LIST_OPTIONS[0]]
+            }
+          }
+        : undefined,
+      mtls: item.mtls
+        ? {
+            isEnabled: item.mtls.enabled,
+            verification: item.mtls.config?.verification?.toLowerCase() || null,
+            certificate: item.mtls.config?.certificate,
+            crl: item.mtls.config?.crl
+          }
+        : undefined
+    }
+  },
+  transformLoadWorkload({ data: workload }, workloadDeployment, zones = []) {
+    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains, zones)
     return {
       id: workload.id,
       name: workload.name,

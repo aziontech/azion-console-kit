@@ -6,19 +6,7 @@ import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
-
-export const DEFAULT_FIELDS = [
-  'name',
-  'domains',
-  'workload_domain',
-  'infrastructure',
-  'active',
-  'last_modified',
-  'id',
-  'last_editor',
-  'product_version',
-  'workload_domain'
-]
+import { edgeDNSService } from '../edge-dns/edge-dns-service'
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -29,12 +17,12 @@ export class WorkloadService extends BaseService {
     this.workloadDeployment = workloadDeploymentService
     this.digitalCertificate = digitalCertificatesService
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
+    this.edgeDNS = edgeDNSService
 
     this._certificateId = null
     this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
-    this.fieldsDefault = DEFAULT_FIELDS
   }
 
   #fetchList = async (params = { pageSize: 10 }) => {
@@ -51,21 +39,26 @@ export class WorkloadService extends BaseService {
   }
 
   #fetchOne = async ({ id }) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.baseURL}/${id}`
-    })
+    const [workloadDeployment, zonesResponse, workloadResponse] = await Promise.all([
+      this.workloadDeployment.listWorkloadDeployment(id),
+      this.edgeDNS
+        .listEdgeDNSService({ fields: ['domain'], active: 'True' })
+        .catch(() => ({ body: [] })),
+      this.http.request({ method: 'GET', url: `${this.baseURL}/${id}` })
+    ])
 
-    const workloadDeployment = await this.workloadDeployment.listWorkloadDeployment(id)
+    const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
 
-    return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) ?? data
+    return (
+      this.adapter?.transformLoadWorkload?.(workloadResponse.data, workloadDeployment[0], zones) ??
+      workloadResponse.data
+    )
   }
 
   prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
       pageSize,
-      fields: this.fieldsDefault,
       ordering: '-last_modified'
     }
 
@@ -149,16 +142,16 @@ export class WorkloadService extends BaseService {
     }
   }
 
-  listWorkloads = async (params) => {
-    const firstPage = params?.page === 1
-    const skipCache = params?.skipCache || params?.hasFilter
+  listWorkloads = async ({ skipCache, hasFilter, ...apiParams } = {}) => {
+    const firstPage = apiParams?.page === 1
+    const shouldSkipCache = skipCache || hasFilter
 
     return await this.useEnsureQueryData(
-      queryKeys.workload.list({ ...params, fields: this.fieldsDefault }),
-      () => this.#fetchList(params),
+      queryKeys.workload.list(apiParams),
+      () => this.#fetchList(apiParams),
       {
-        persist: firstPage && !skipCache,
-        skipCache
+        persist: firstPage && !shouldSkipCache,
+        skipCache: shouldSkipCache
       }
     )
   }
@@ -344,12 +337,7 @@ export class WorkloadService extends BaseService {
     return super.getFromCache({
       queryKey: queryKeys.workload.all,
       id,
-      select: (item) => ({
-        id: item.id,
-        name: item.name?.text ?? item.name,
-        workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
-        infrastructure: item.infrastructure === 'Production' ? '1' : '2'
-      }),
+      select: (item) => this.adapter.transformCachedWorkloadToEdit(item),
       listPath: 'body'
     })
   }

@@ -1,3 +1,121 @@
+<script setup>
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport.vue'
+  import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
+  import { capitalizeFirstLetter } from '@/helpers'
+  import { ref, computed, onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+
+  defineOptions({ name: 'edit-form-block-no-header' })
+
+  const props = defineProps({
+    editService: {
+      type: Function,
+      required: true
+    },
+    loadService: {
+      type: Function,
+      required: true
+    },
+    initialDataSetter: {
+      type: Function,
+      required: true
+    },
+    formData: {
+      type: Object,
+      required: true
+    },
+    formMeta: {
+      type: Object,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
+    }
+  })
+
+  const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
+
+  const isLoading = ref(false)
+  const teleportLoad = ref(false)
+  const isFormReady = ref(false)
+
+  const isTouched = computed(() => props.formMeta.touched)
+
+  const unsaved = useUnsavedChanges({
+    isReady: isFormReady,
+    enableRouteGuard: true,
+    enableBeforeUnload: true
+  })
+
+  unsaved.addDirtySource(isTouched)
+
+  const showToast = (severity, detail) => {
+    if (!detail) return
+
+    const options = {
+      closable: true,
+      severity,
+      summary: capitalizeFirstLetter(severity),
+      detail
+    }
+
+    toast.add(options)
+  }
+
+  const goBackToList = () => {
+    if (props.updatedRedirect) {
+      router.push({ name: props.updatedRedirect })
+      return
+    }
+    router.go(-1)
+  }
+
+  const handleCancel = () => {
+    goBackToList()
+  }
+
+  const loadInitialData = async () => {
+    try {
+      const { id } = route.params
+      isLoading.value = true
+      const initialData = await props.loadService({ id })
+      props.initialDataSetter(initialData)
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      isLoading.value = false
+      isFormReady.value = true
+    }
+  }
+
+  const handleSubmit = async () => {
+    try {
+      isLoading.value = true
+      await props.editService(props.formData)
+      showToast('success', 'edited successfully')
+      unsaved.disable()
+      goBackToList()
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      setTimeout(() => {
+        isLoading.value = false
+      }, 800)
+    }
+  }
+
+  loadInitialData()
+
+  onMounted(() => {
+    teleportLoad.value = true
+  })
+</script>
+
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <form
@@ -8,9 +126,10 @@
 
       <slot name="raw-form" />
     </form>
-    <DialogUnsavedBlock
-      :leavePage="leavePage"
-      :blockRedirectUnsaved="hasModifications"
+    <DialogUnsaved
+      :visible="unsaved.isDialogVisible.value"
+      @leave="unsaved.confirmLeave"
+      @stay="unsaved.cancelLeave"
     />
   </div>
   <Teleport
@@ -25,116 +144,3 @@
     />
   </Teleport>
 </template>
-
-<script>
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import { capitalizeFirstLetter } from '@/helpers'
-
-  export default {
-    name: 'edit-form-block-no-header',
-    components: {
-      ActionBarTemplate,
-      DialogUnsavedBlock
-    },
-    data: () => ({
-      isLoading: false,
-      blockViewRedirection: true,
-      teleportLoad: false
-    }),
-    props: {
-      editService: {
-        type: Function,
-        required: true
-      },
-      loadService: {
-        type: Function,
-        required: true
-      },
-      initialDataSetter: {
-        type: Function,
-        required: true
-      },
-      formData: {
-        type: Object,
-        required: true
-      },
-      formMeta: {
-        type: Object,
-        required: true
-      },
-      updatedRedirect: {
-        type: String,
-        required: true
-      }
-    },
-    async created() {
-      await this.loadInitialData()
-    },
-    mounted() {
-      this.teleportLoad = true
-    },
-    methods: {
-      showToast(severity, detail) {
-        if (!detail) return
-
-        const options = {
-          closable: true,
-          severity,
-          summary: capitalizeFirstLetter(severity),
-          detail
-        }
-
-        this.$toast.add(options)
-      },
-      leavePage(dialogUnsaved) {
-        dialogUnsaved = false
-        this.handleCancel()
-        return dialogUnsaved
-      },
-      goBackToList() {
-        if (this.updatedRedirect) {
-          this.$router.push({ name: this.updatedRedirect })
-          return
-        }
-        this.$router.go(-1)
-      },
-      handleCancel() {
-        this.goBackToList()
-      },
-      async loadInitialData() {
-        try {
-          const { id } = this.$route.params
-          this.isLoading = true
-          const initialData = await this.loadService({ id })
-          this.initialDataSetter(initialData)
-        } catch (error) {
-          this.showToast('error', error)
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async handleSubmit() {
-        try {
-          this.isLoading = true
-          await this.editService(this.formData)
-          this.showToast('success', 'edited successfully')
-          this.blockViewRedirection = false
-          this.goBackToList()
-        } catch (error) {
-          this.blockViewRedirection = true
-          this.showToast('error', error)
-        } finally {
-          setTimeout(() => {
-            this.isLoading = false
-          }, 800)
-        }
-      }
-    },
-    computed: {
-      hasModifications() {
-        return this.formMeta.touched && this.blockViewRedirection
-      }
-    }
-  }
-</script>

@@ -63,7 +63,7 @@ const formatFieldData = (fieldData) => ({
 
 const extractFieldFormat = (fields, dataset) => {
   const datasetField = fields.fieldsDataSet.fields.find(({ name }) => name === dataset)
-  return datasetField.type.ofType.fields.reduce((formattedFields, fieldData) => {
+  return datasetField?.type?.ofType?.fields?.reduce((formattedFields, fieldData) => {
     const hasAliasName = FILTERS_RULES().ALIAS_MAPPING[fieldData.name]
     const newField = {
       [fieldData.name]: formatFieldData(fieldData)
@@ -83,7 +83,7 @@ const extractFieldFormat = (fields, dataset) => {
 const formatOperatorData = (operator, fieldName, field) => ({
   value: fieldName.operatorValue,
   group: ALIAS_MAPPING_OPERATOR[operator.name] || fieldName.name,
-  type: FILTERS_RULES().FILTER_LIKE_TYPE[operator.name] || operator.type.name || 'String',
+  type: FILTERS_RULES().FILTER_LIKE_TYPE[operator.name] || operator.type?.name || 'String',
   props: {
     placeholder: field?.placeholder,
     services: MAP_SERVICE_OPERATION[operator.name] || []

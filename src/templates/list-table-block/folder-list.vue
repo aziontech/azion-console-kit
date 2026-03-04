@@ -22,10 +22,14 @@
     'on-row-click-edit-folder',
     'delete-selected-items',
     'download-selected-items',
+    'move-selected-items',
     'page',
     'save-new-folder',
     'cancel-new-folder',
-    'update:new-folder-name'
+    'update:new-folder-name',
+    'save-rename',
+    'cancel-rename',
+    'update:renameValue'
   ])
 
   const props = defineProps({
@@ -140,6 +144,18 @@
     containerWidth: {
       type: Number,
       default: 0
+    },
+    renamingItem: {
+      type: Object,
+      default: null
+    },
+    renameValue: {
+      type: String,
+      default: ''
+    },
+    isRenaming: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -316,7 +332,7 @@
       throw new Error('Please provide an id for each data item through the service adapter')
     }
     selectedId.value = selectedID
-    menuRef.value[selectedID].toggle(event)
+    menuRef.value[selectedID]?.toggle(event)
   }
 
   const editItemSelected = (item) => {
@@ -401,9 +417,17 @@
     emit('update:newFolderName', event.target.value)
   }
 
+  const handleRenameInput = (event) => {
+    emit('update:renameValue', event.target.value)
+  }
+
   const showActions = (rowData) => {
     return (
-      !rowData.isFolder && !rowData.isParentNav && !rowData.isNewFolder && !rowData.isSkeletonRow
+      !rowData.isFolder &&
+      !rowData.isParentNav &&
+      !rowData.isNewFolder &&
+      !rowData.isSkeletonRow &&
+      !(props.renamingItem && rowData.id === props.renamingItem.id)
     )
   }
 
@@ -749,6 +773,14 @@
               />
               <PrimeButton
                 size="small"
+                outlined
+                icon="pi pi-arrow-right-arrow-left"
+                label="Move"
+                class="px-4"
+                @click="emit('move-selected-items')"
+              />
+              <PrimeButton
+                size="small"
                 icon="pi pi-trash"
                 label="Delete"
                 severity="danger"
@@ -790,6 +822,43 @@
                 size="small"
                 outlined
                 @click="emit('cancel-new-folder')"
+              />
+            </div>
+          </template>
+          <template
+            v-else-if="
+              col.field === 'name' && props.renamingItem && rowData.id === props.renamingItem.id
+            "
+          >
+            <div class="flex items-center gap-2">
+              <InputText
+                :value="props.renameValue"
+                @input="handleRenameInput"
+                @keyup.enter="!props.isRenaming && emit('save-rename')"
+                @keyup.escape="!props.isRenaming && emit('cancel-rename')"
+                placeholder="Enter new name"
+                class="flex-1"
+                :disabled="props.isRenaming"
+                autofocus
+                size="small"
+              />
+              <PrimeButton
+                :icon="props.isRenaming ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+                size="small"
+                outlined
+                @click="emit('save-rename')"
+                :disabled="
+                  props.isRenaming ||
+                  !props.renameValue.trim() ||
+                  props.renameValue === props.renamingItem.name
+                "
+              />
+              <PrimeButton
+                icon="pi pi-times"
+                size="small"
+                outlined
+                :disabled="props.isRenaming"
+                @click="emit('cancel-rename')"
               />
             </div>
           </template>

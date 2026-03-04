@@ -97,7 +97,7 @@
   })
 
   const timeName = computed(
-    () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
+    () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange)?.name
   )
 
   const listFields = ref([

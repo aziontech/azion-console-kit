@@ -40,7 +40,7 @@
   const wafTotalProcessedTooltip = 'Total number of processed requests.'
 
   const getValueByKey = (key) => {
-    const item = details.value.data.find((obj) => obj.key === key)
+    const item = details.value.data?.find((obj) => obj.key === key)
     return item ? item.value : '-'
   }
 
