@@ -83,7 +83,14 @@ export const listChangelogService = async () => {
     }
 
     const allItems = changelogLaunchpads.flatMap(extractChangelogItems)
-    return allItems
+    
+    const uniqueItems = Array.from(
+      new Map(
+        allItems.map((item) => [`${item.description}|${item.time}`, item])
+      ).values()
+    )
+    
+    return uniqueItems
   } catch {
     return []
   }
