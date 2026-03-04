@@ -45,9 +45,12 @@
     handleToast(response)
     closeCreateDrawer()
   }
+  const closeEditDrawer = () => {
+    showEditCustomPagesDrawer.value = false
+  }
   const handleEditedCustomPages = () => {
     emit('onSuccess')
-    closeCreateDrawer()
+    closeEditDrawer()
   }
   const handleToast = (response) => {
     const toast = {
