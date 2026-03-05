@@ -11,117 +11,70 @@ const fixtures = {
   activityEvent: {
     type: 'activity',
     data: {
-      user: {
-        email: 'services@azion.com',
-        name: 'Services Azion'
-      },
+      user: { email: 'services@azion.com', name: 'Services Azion' },
       activity_type: 'deleted',
-      resource: {
-        type: 'unknown',
-        name: 'Dns Zone rodrigomaria.github.io',
-        id: null
-      },
+      resource: { type: 'unknown', name: 'Dns Zone rodrigomaria.github.io', id: null },
       timestamp: '2026-03-04T19:45:54Z',
       description: 'Dns Zone rodrigomaria.github.io was deleted',
-      metadata: {
-        id: 263658,
-        name: 'teste-stream',
-        domain: 'rodrigomaria.github.io',
-        active: true,
-        nameservers: ['ns1.aziondns.net', 'ns2.aziondns.com', 'ns3.aziondns.org'],
-        product_version: '2.0',
-        user_ip: '186.195.68.17',
-        user_agent:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
-      }
-    }
-  },
-  activityCreatedEvent: {
-    type: 'activity',
-    data: {
-      user: {
-        email: 'services@azion.com',
-        name: 'Services Azion'
-      },
-      activity_type: 'created',
-      resource: {
-        type: 'unknown',
-        name: 'Dns Zone rodrigomaria.github.io',
-        id: null
-      },
-      timestamp: '2026-03-04T19:46:19Z',
-      description: 'Dns Zone rodrigomaria.github.io was created',
-      metadata: {
-        id: 263659,
-        name: 'teste-2',
-        domain: 'rodrigomaria.github.io',
-        active: true,
-        nameservers: ['ns1.aziondns.net', 'ns2.aziondns.com', 'ns3.aziondns.org'],
-        product_version: '2.0',
-        user_ip: '186.195.68.17',
-        user_agent:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
-      }
+      metadata: { id: 263658 }
     }
   }
 }
 
-const makeSut = (options = {}) => {
-  const sut = new SSEClient({
-    url: fixtures.url,
-    ...options
-  })
+let lastEventSource = null
 
-  return {
-    sut
-  }
-}
-
-// Mock EventSource
 class MockEventSource {
+  static CONNECTING = 0
+  static OPEN = 1
+  static CLOSED = 2
+
   constructor(url, options = {}) {
     this.url = url
-    this.options = options
-    this.readyState = 0 // CONNECTING
+    this.withCredentials = options.withCredentials ?? false
+    this.readyState = MockEventSource.CONNECTING
     this.onopen = null
     this.onerror = null
     this.onmessage = null
-    this.listeners = new Map()
+    lastEventSource = this
 
-    // Simulate async connection
     setTimeout(() => {
-      this.readyState = 1 // OPEN
-      if (this.onopen) this.onopen()
+      if (this.readyState !== MockEventSource.CLOSED) {
+        this.readyState = MockEventSource.OPEN
+        if (this.onopen) this.onopen()
+      }
     }, 0)
   }
 
-  addEventListener(type, callback) {
-    if (!this.listeners.has(type)) {
-      this.listeners.set(type, new Set())
-    }
-    this.listeners.get(type).add(callback)
-  }
-
-  removeEventListener(type, callback) {
-    const typeListeners = this.listeners.get(type)
-    if (typeListeners) {
-      typeListeners.delete(callback)
-    }
-  }
-
   close() {
-    this.readyState = 2 // CLOSED
+    this.readyState = MockEventSource.CLOSED
   }
 
-  // Test helpers
   simulateMessage(data) {
     const event = { data: JSON.stringify(data) }
     if (this.onmessage) this.onmessage(event)
   }
 
+  simulateRawMessage(rawData) {
+    const event = { data: rawData }
+    if (this.onmessage) this.onmessage(event)
+  }
+
   simulateError() {
-    this.readyState = 2 // CLOSED
+    this.readyState = MockEventSource.CLOSED
     if (this.onerror) this.onerror({})
+  }
+}
+
+MockEventSource.CONNECTING = 0
+MockEventSource.OPEN = 1
+MockEventSource.CLOSED = 2
+
+const makeSut = (options = {}) => {
+  lastEventSource = null
+  const sut = new SSEClient({ url: fixtures.url, ...options })
+  return {
+    sut,
+    getEventSource: () => lastEventSource
   }
 }
 
@@ -138,9 +91,8 @@ describe('SSEClient', () => {
   })
 
   describe('constructor', () => {
-    it('should create an instance with default options', () => {
+    it('should create an instance with default state', () => {
       const { sut } = makeSut()
-
       const state = sut.getState()
 
       expect(state.isConnected).toBe(false)
@@ -149,227 +101,241 @@ describe('SSEClient', () => {
       expect(state.lastError).toBe(null)
     })
 
-    it('should throw an error if URL is not provided', () => {
+    it('should throw if URL is not provided', () => {
       expect(() => new SSEClient({})).toThrow('[SSE] URL is required')
-    })
-
-    it('should accept custom options', () => {
-      const { sut } = makeSut({
-        reconnectMaxAttempts: 5,
-        reconnectBaseDelay: 500
-      })
-
-      // Options are used internally, we can verify they work via behavior
-      expect(sut.getState()).toBeDefined()
     })
   })
 
   describe('connect', () => {
-    it('should create an EventSource with the correct URL', () => {
-      const { sut } = makeSut()
+    it('should create EventSource with correct URL and credentials', () => {
+      const { sut, getEventSource } = makeSut()
       sut.connect()
 
-      // EventSource is created (we can't directly access it but we can test behavior)
-      expect(sut.getState().isConnected).toBe(false) // Before onopen
+      const es = getEventSource()
+      expect(es.url).toBe(fixtures.url)
+      expect(es.withCredentials).toBe(true)
     })
 
-    it('should not throw if connect is called twice', () => {
+    it('should emit open and set isConnected on connection', () => {
       const { sut } = makeSut()
+      const openHandler = vi.fn()
+
+      sut.on('open', openHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      expect(openHandler).toHaveBeenCalled()
+      expect(sut.getState().isConnected).toBe(true)
+      expect(sut.getState().reconnectAttempts).toBe(0)
+    })
+
+    it('should be idempotent when called twice', () => {
+      const { sut } = makeSut()
+      sut.connect()
+      const firstES = lastEventSource
 
       sut.connect()
-      expect(() => sut.connect()).not.toThrow()
+      expect(lastEventSource).toBe(firstES)
     })
   })
 
   describe('disconnect', () => {
-    it('should disconnect and reset state', () => {
+    it('should close connection and emit close event', () => {
       const { sut } = makeSut()
+      const closeHandler = vi.fn()
+
+      sut.on('close', closeHandler)
       sut.connect()
+      vi.advanceTimersByTime(1)
+
       sut.disconnect()
 
-      const state = sut.getState()
-
-      expect(state.isConnected).toBe(false)
-      expect(state.clientId).toBe(null)
+      expect(closeHandler).toHaveBeenCalled()
+      expect(sut.getState().isConnected).toBe(false)
+      expect(sut.getState().clientId).toBe(null)
     })
   })
 
-  describe('event handling', () => {
-    it('should emit message events to subscribers', () => {
-      const { sut } = makeSut()
+  describe('message handling', () => {
+    it('should parse JSON and emit to message listeners', () => {
+      const { sut, getEventSource } = makeSut()
       const messageHandler = vi.fn()
 
       sut.on('message', messageHandler)
       sut.connect()
+      vi.advanceTimersByTime(1)
 
-      // Advance timers to let connection open
-      vi.advanceTimersByTime(10)
+      getEventSource().simulateMessage(fixtures.connectedEvent)
 
-      // Simulate calling the handler directly
-      messageHandler(fixtures.connectedEvent)
       expect(messageHandler).toHaveBeenCalledWith(fixtures.connectedEvent)
     })
 
-    it('should emit typed events to subscribers (connected)', () => {
-      const { sut } = makeSut()
+    it('should emit typed events based on data.type', () => {
+      const { sut, getEventSource } = makeSut()
       const connectedHandler = vi.fn()
 
       sut.on('connected', connectedHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
 
-      // Simulate calling the handler
-      connectedHandler(fixtures.connectedEvent)
+      getEventSource().simulateMessage(fixtures.connectedEvent)
 
       expect(connectedHandler).toHaveBeenCalledWith(fixtures.connectedEvent)
     })
 
-    it('should emit activity events with new format', () => {
-      const { sut } = makeSut()
+    it('should store clientId from connected event', () => {
+      const { sut, getEventSource } = makeSut()
+
+      sut.connect()
+      vi.advanceTimersByTime(1)
+      getEventSource().simulateMessage(fixtures.connectedEvent)
+
+      expect(sut.getState().clientId).toBe('0001a')
+    })
+
+    it('should emit activity events', () => {
+      const { sut, getEventSource } = makeSut()
       const activityHandler = vi.fn()
 
       sut.on('activity', activityHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
 
-      // Simulate calling the handler with new activity format
-      activityHandler(fixtures.activityEvent)
+      getEventSource().simulateMessage(fixtures.activityEvent)
 
       expect(activityHandler).toHaveBeenCalledWith(fixtures.activityEvent)
-      expect(activityHandler).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'activity',
-          data: expect.objectContaining({
-            activity_type: 'deleted',
-            description: 'Dns Zone rodrigomaria.github.io was deleted'
-          })
-        })
-      )
     })
 
-    it('should return an unsubscribe function', () => {
-      const { sut } = makeSut()
+    it('should not emit on invalid JSON', () => {
+      const { sut, getEventSource } = makeSut()
+      const messageHandler = vi.fn()
+
+      sut.on('message', messageHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      getEventSource().simulateRawMessage('not-json')
+
+      expect(messageHandler).not.toHaveBeenCalled()
+    })
+
+    it('should not process messages twice (no duplicate listener)', () => {
+      const { sut, getEventSource } = makeSut()
+      const messageHandler = vi.fn()
+
+      sut.on('message', messageHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      getEventSource().simulateMessage(fixtures.connectedEvent)
+
+      expect(messageHandler).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('event subscription', () => {
+    it('should return unsubscribe function from on()', () => {
+      const { sut, getEventSource } = makeSut()
       const handler = vi.fn()
 
-      sut.on('message', handler)
+      const unsubscribe = sut.on('message', handler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
 
-      // Unsubscribe should not throw
-      expect(() => sut.off('message', handler)).not.toThrow()
+      unsubscribe()
+      getEventSource().simulateMessage(fixtures.connectedEvent)
+
+      expect(handler).not.toHaveBeenCalled()
     })
 
-    it('should handle multiple subscribers for same event', () => {
-      const { sut } = makeSut()
+    it('should support multiple subscribers for same event', () => {
+      const { sut, getEventSource } = makeSut()
       const handler1 = vi.fn()
       const handler2 = vi.fn()
 
       sut.on('message', handler1)
       sut.on('message', handler2)
+      sut.connect()
+      vi.advanceTimersByTime(1)
 
-      // Simulate calling handlers
-      handler1(fixtures.connectedEvent)
-      handler2(fixtures.connectedEvent)
+      getEventSource().simulateMessage(fixtures.connectedEvent)
 
-      expect(handler1).toHaveBeenCalledWith(fixtures.connectedEvent)
-      expect(handler2).toHaveBeenCalledWith(fixtures.connectedEvent)
+      expect(handler1).toHaveBeenCalledTimes(1)
+      expect(handler2).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('reconnection', () => {
-    it('should not reconnect when intentionally closed', () => {
+    it('should attempt reconnection with exponential backoff', () => {
+      const { sut } = makeSut({ reconnectMaxAttempts: 3, reconnectBaseDelay: 1000 })
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      lastEventSource.simulateError()
+      expect(sut.getState().reconnectAttempts).toBe(1)
+
+      vi.advanceTimersByTime(1000)
+      lastEventSource.simulateError()
+      expect(sut.getState().reconnectAttempts).toBe(2)
+
+      vi.advanceTimersByTime(2000)
+      lastEventSource.simulateError()
+      expect(sut.getState().reconnectAttempts).toBe(3)
+    })
+
+    it('should emit maxReconnectAttempts after exhausting retries', () => {
+      const { sut } = makeSut({ reconnectMaxAttempts: 1, reconnectBaseDelay: 100 })
+      const maxHandler = vi.fn()
+
+      sut.on('maxReconnectAttempts', maxHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      lastEventSource.simulateError()
+      vi.advanceTimersByTime(100)
+
+      lastEventSource.simulateError()
+
+      expect(maxHandler).toHaveBeenCalled()
+    })
+
+    it('should not reconnect after intentional disconnect', () => {
       const { sut } = makeSut()
 
       sut.connect()
+      vi.advanceTimersByTime(1)
+
       sut.disconnect()
+      vi.advanceTimersByTime(60000)
 
-      // Advance timers to check if reconnection happens
-      vi.advanceTimersByTime(5000)
-
-      const state = sut.getState()
-      expect(state.isConnected).toBe(false)
+      expect(sut.getState().isConnected).toBe(false)
+      expect(sut.getState().reconnectAttempts).toBe(0)
     })
   })
 
   describe('getState', () => {
-    it('should return a copy of the state', () => {
+    it('should return immutable copy', () => {
       const { sut } = makeSut()
       const state1 = sut.getState()
       const state2 = sut.getState()
 
-      expect(state1).not.toBe(state2) // Different references
-      expect(state1).toEqual(state2) // Same values
+      expect(state1).not.toBe(state2)
+      expect(state1).toEqual(state2)
     })
   })
 
   describe('destroy', () => {
-    it('should cleanup all resources', () => {
-      const { sut } = makeSut()
+    it('should disconnect and clear all listeners', () => {
+      const { sut, getEventSource } = makeSut()
       const handler = vi.fn()
 
       sut.on('message', handler)
       sut.connect()
+      vi.advanceTimersByTime(1)
+
       sut.destroy()
 
-      const state = sut.getState()
-
-      expect(state.isConnected).toBe(false)
-    })
-  })
-
-  describe('error handling', () => {
-    it('should handle errors gracefully', () => {
-      const { sut } = makeSut()
-      const errorHandler = vi.fn()
-
-      sut.on('error', errorHandler)
-      sut.connect()
-
-      // Simulate error by calling the handler directly
-      const testError = new Error('Test error')
-      errorHandler(testError)
-
-      expect(errorHandler).toHaveBeenCalledWith(testError)
-    })
-  })
-
-  describe('activity event format', () => {
-    it('should have correct structure for connected event', () => {
-      const event = fixtures.connectedEvent
-
-      expect(event).toHaveProperty('type', 'connected')
-      expect(event).toHaveProperty('client_id')
-      expect(event).toHaveProperty('timestamp')
-    })
-
-    it('should have correct structure for activity event', () => {
-      const event = fixtures.activityEvent
-
-      expect(event).toHaveProperty('type', 'activity')
-      expect(event).toHaveProperty('data')
-      expect(event.data).toHaveProperty('user')
-      expect(event.data).toHaveProperty('activity_type')
-      expect(event.data).toHaveProperty('resource')
-      expect(event.data).toHaveProperty('timestamp')
-      expect(event.data).toHaveProperty('description')
-      expect(event.data).toHaveProperty('metadata')
-    })
-
-    it('should have user info in activity event', () => {
-      const {
-        data: { user }
-      } = fixtures.activityEvent
-
-      expect(user).toHaveProperty('email')
-      expect(user).toHaveProperty('name')
-    })
-
-    it('should have resource info in activity event', () => {
-      const {
-        data: { resource }
-      } = fixtures.activityEvent
-
-      expect(resource).toHaveProperty('type')
-      expect(resource).toHaveProperty('name')
-    })
-
-    it('should support different activity types', () => {
-      expect(fixtures.activityEvent.data.activity_type).toBe('deleted')
-      expect(fixtures.activityCreatedEvent.data.activity_type).toBe('created')
+      expect(sut.getState().isConnected).toBe(false)
     })
   })
 })

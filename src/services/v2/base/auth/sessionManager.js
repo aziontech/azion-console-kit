@@ -3,7 +3,7 @@ import { persister, pauseQueryPersistence } from '@/services/v2/base/query/query
 import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-import { sseService } from '@services/v2/base/sse/sse-service'
+import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
@@ -103,17 +103,17 @@ export const sessionManager = {
     if (hasPrefetched) return
     hasPrefetched = true
     prefetchInBackground()
-    sseService.start()
+    startCacheSync()
   },
   async switchAccount() {
     hasPrefetched = false
-    sseService.stop()
+    resetCacheSync()
     await clearAllData()
     sendSwitchAccountBroadcast()
   },
   async logout() {
     hasPrefetched = false
-    sseService.stop()
+    resetCacheSync()
     await clearAllData()
   }
 }

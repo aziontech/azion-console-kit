@@ -1,5 +1,5 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { sseService } from '@services/v2/base/sse/sse-service'
+import { cacheSyncService } from '@/services/v2/base/cache-sync/cache-sync-service'
 
 /**
  * Composable for accessing SSE connection state in Vue components
@@ -29,13 +29,13 @@ export function useSSE() {
 
   onMounted(() => {
     // Sync initial state from service
-    const state = sseService.state
+    const state = cacheSyncService.state
     isConnected.value = state.isConnected
     clientId.value = state.clientId
 
     // Subscribe to connection events
     unsubscribers.push(
-      sseService.on('connected', (data) => {
+      cacheSyncService.on('connected', (data) => {
         isConnected.value = true
         clientId.value = data.client_id
         lastEvent.value = data
@@ -44,26 +44,26 @@ export function useSSE() {
     )
 
     unsubscribers.push(
-      sseService.on('open', () => {
+      cacheSyncService.on('open', () => {
         isConnected.value = true
       })
     )
 
     unsubscribers.push(
-      sseService.on('close', () => {
+      cacheSyncService.on('close', () => {
         isConnected.value = false
         clientId.value = null
       })
     )
 
     unsubscribers.push(
-      sseService.on('error', (err) => {
+      cacheSyncService.on('error', (err) => {
         error.value = err
       })
     )
 
     unsubscribers.push(
-      sseService.on('activity', (data) => {
+      cacheSyncService.on('activity', (data) => {
         lastEvent.value = data
       })
     )
@@ -85,7 +85,7 @@ export function useSSE() {
    * @returns {Function} Unsubscribe function
    */
   function subscribe(event, callback) {
-    const unsubscribe = sseService.on(event, callback)
+    const unsubscribe = cacheSyncService.on(event, callback)
     unsubscribers.push(unsubscribe)
     return unsubscribe
   }

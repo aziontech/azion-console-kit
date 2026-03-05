@@ -146,15 +146,10 @@ export class SSEClient {
   }
 
   #createEventSource() {
-    try {
-      this.#eventSource = new EventSource(this.#options.url, {
-        withCredentials: this.#options.withCredentials
-      })
-
-      this.#setupEventHandlers()
-    } catch (error) {
-      this.#handleError(error)
-    }
+    this.#eventSource = new EventSource(this.#options.url, {
+      withCredentials: this.#options.withCredentials
+    })
+    this.#setupEventHandlers()
   }
 
   #setupEventHandlers() {
@@ -172,15 +167,9 @@ export class SSEClient {
       this.#handleError(error)
     }
 
-    // Handle 'message' events (default event type)
     this.#eventSource.onmessage = (event) => {
       this.#handleMessage(event)
     }
-
-    // Handle named events
-    this.#eventSource.addEventListener('message', (event) => {
-      this.#handleMessage(event)
-    })
   }
 
   /**
@@ -203,7 +192,7 @@ export class SSEClient {
         this.#state.clientId = data.client_id
       }
     } catch {
-      // Silently fail on parse error
+      // parse errors are expected for non-JSON messages
     }
   }
 
@@ -262,7 +251,7 @@ export class SSEClient {
         try {
           callback(data)
         } catch {
-          // Silently fail on listener error
+          // prevent listener errors from breaking other listeners
         }
       })
     }
@@ -303,5 +292,3 @@ export class SSEClient {
     this.#listeners.clear()
   }
 }
-
-export default SSEClient
