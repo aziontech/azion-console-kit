@@ -129,13 +129,14 @@ describe('SSEClient', () => {
       expect(sut.getState().reconnectAttempts).toBe(0)
     })
 
-    it('should be idempotent when called twice', () => {
+    it('should close existing connection and create new one when called twice', () => {
       const { sut } = makeSut()
       sut.connect()
       const firstES = lastEventSource
 
       sut.connect()
-      expect(lastEventSource).toBe(firstES)
+      expect(firstES.readyState).toBe(MockEventSource.CLOSED)
+      expect(lastEventSource).not.toBe(firstES)
     })
   })
 

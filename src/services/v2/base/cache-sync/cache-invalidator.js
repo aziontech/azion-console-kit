@@ -17,6 +17,15 @@ export class CacheInvalidator {
     if (!description) return
 
     const keysToInvalidate = getKeysForEvents([description])
+
+    // eslint-disable-next-line no-console
+    console.log(
+      '[CacheSync]',
+      description,
+      '→',
+      keysToInvalidate.length ? keysToInvalidate : 'no match'
+    )
+
     if (keysToInvalidate.length === 0) return
 
     await Promise.allSettled(

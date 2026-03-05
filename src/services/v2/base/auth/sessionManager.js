@@ -103,7 +103,11 @@ export const sessionManager = {
     if (hasPrefetched) return
     hasPrefetched = true
     prefetchInBackground()
-    startCacheSync()
+
+    const accountStore = useAccountStore()
+    if (accountStore.isClientAccount) {
+      startCacheSync()
+    }
   },
   async switchAccount() {
     hasPrefetched = false
