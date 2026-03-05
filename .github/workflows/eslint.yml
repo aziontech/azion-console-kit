@@ -38,6 +38,9 @@ jobs:
         run: yarn lint
       - name: Run Prettier Formatting
         run: yarn prettier --check src/
+      - name: Fetch base branch for diff
+        if: github.event_name == 'pull_request'
+        run: git fetch origin ${{ github.base_ref }}
       - name: Architecture Lint (Changed Files)
         if: github.event_name == 'pull_request'
         run: yarn lint:architecture:changed --base origin/${{ github.base_ref }}
