@@ -82,11 +82,11 @@
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true, sortable: true },
     { field: 'operation', header: 'Operation', visible: true, sortable: true },
-    { field: 'resourceType', header: 'Resource', visible: true, sortable: true },
-    { field: 'resourceName', header: 'Resource Name', visible: true, sortable: true },
+    { field: 'parentResourceType', header: 'Resource', visible: true, sortable: true },
+    { field: 'parentResourceName', header: 'Resource Name', visible: true, sortable: true },
     // I am leaving the code commented out because the API does not yet provide this data.
-    // { field: 'resourceItem', header: 'Resource Item', visible: true },
-    // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
+    { field: 'resourceType', header: 'Resource Item', visible: true },
+    { field: 'resourceName', header: 'Resource Item Name', visible: true },
     { field: 'authorEmail', header: 'Author Email', visible: true, sortable: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },
@@ -322,7 +322,7 @@
         <template v-if="col.field === 'operation'">
           <OperationTag :operation="rowData.operation" />
         </template>
-        <template v-else-if="col.field === 'resourceName' || col.field === 'resourceItemName'">
+        <template v-else-if="col.field === 'resourceName' || col.field === 'parentResourceName'">
           <span
             v-if="rowData[col.field]"
             @click="handleRowClick({ data: rowData })"
