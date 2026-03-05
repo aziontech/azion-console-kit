@@ -39,6 +39,16 @@ const parseRelativeDate = (dateStr) => {
   return `${diffDays} days ago`
 }
 
+const parseDateForSorting = (dateStr) => {
+  if (!dateStr || typeof dateStr !== 'string') return new Date(0)
+
+  const parts = dateStr.split('/')
+  if (parts.length !== 3) return new Date(dateStr)
+
+  const [day, month, year] = parts
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+}
+
 const extractChangelogItems = (launchpad) => {
   const actions = launchpad.steps?.[0]?.actions || {}
   const items = []
@@ -56,7 +66,7 @@ const extractChangelogItems = (launchpad) => {
       if (interactionData.text && interactionData.text.includes('|')) {
         const parsed = parseTextWithPipe(interactionData.text)
         items.push({
-          time: parseRelativeDate(parsed.date),
+          time: parsed.date,
           description: parsed.description
         })
       }
@@ -90,7 +100,16 @@ export const listChangelogService = async () => {
       ).values()
     )
     
-    return uniqueItems
+    const sortedItems = uniqueItems.sort((itemA, itemB) => {
+      const dateA = parseDateForSorting(itemA.time)
+      const dateB = parseDateForSorting(itemB.time)
+      return dateB - dateA
+    })
+    
+    return sortedItems.map((item) => ({
+      ...item,
+      time: parseRelativeDate(item.time)
+    }))
   } catch {
     return []
   }
