@@ -129,6 +129,16 @@ const getConfig = () => {
         '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
+        }),
+        /**
+         * FIXME: SSE endpoint will be changed in the future.
+         * Current: stage-beholder.azion.net/events/stream
+         * This proxy routes SSE connections to the beholder service.
+         * Update the target URL when the final endpoint is defined.
+         */
+        '/events/stream': createProxyConfig({
+          target: `${URLStartPrefix}beholder.azion.net`,
+          rewrite: (path) => path.replace(/^\/events/, '')
         })
       }
     }
