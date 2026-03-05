@@ -27,7 +27,6 @@
   const store = useAccountStore()
 
   const displaySamplingDialog = ref(false)
-
   const streamName = computed(() => cachedDataStream.value?.name || 'Edit Stream')
   const cachedDataStream = computed(() =>
     dataStreamService.getDataStreamFromCache(route.params?.id)
@@ -77,9 +76,7 @@
         @loaded-service-object="setStreamName"
       >
         <template #form>
-          <FormFieldsDataStream
-            isEdit
-          />
+          <FormFieldsDataStream isEdit />
         </template>
         <template
           v-if="hasNoPermissionToEditDataStream"
