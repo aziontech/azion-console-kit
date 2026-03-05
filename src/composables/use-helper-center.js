@@ -1,9 +1,11 @@
 import { reactive, computed, readonly } from 'vue'
 import { getHelpCenterDocumentationService } from '@/services/help-center-services'
+import { getDocumentationUrl } from '@/services/help-center-services/documentation-mapping'
 import { useRoute } from 'vue-router'
 const state = reactive({
   articleContent: null,
-  mainContent: []
+  mainContent: [],
+  forcedPath: null
 })
 
 export function useHelperCenter() {
@@ -39,28 +41,59 @@ export function useHelperCenter() {
     clearArticleContent() {
       state.articleContent = null
     },
+    setForcedPath(path) {
+      state.forcedPath = path
+    },
+    clearForcedPath() {
+      state.forcedPath = null
+    },
     async setArticleContent({ url, filename = 'index.html' }) {
       state.articleContent = await getHelpCenterArticle(url, filename)
     },
-    updatedMainContent: async () => {
-      const currentPath = getCurrentPath()
+    updatedMainContent: async (overridePath) => {
+      const currentPath = overridePath ?? state.forcedPath ?? getCurrentPath()
 
       const { data } = await getHelpCenterDocumentationService({
         url: currentPath
       })
 
       state.mainContent = data
+    },
+    setMainContentByProduct: async (productIdentifier) => {
+      const documentationUrl = getDocumentationUrl(productIdentifier)
+      if (documentationUrl) {
+        const { data } = await getHelpCenterDocumentationService({
+          url: documentationUrl
+        })
+        state.mainContent = data
+      }
     }
   }
 
   const getters = {
+    getForcedPath: computed(() => state.forcedPath),
     getArticleContent: computed(() => state.articleContent),
     getMainContent: computed(() => state.mainContent),
     getHtmlArticle: async (filename) => {
-      const currentPath = getCurrentPath()
-      const parsedFilename = parseFilename(filename)
+      // Check if filename already contains a URL (starts with http or https)
+      const isFullUrl = filename.startsWith('http://') || filename.startsWith('https://')
 
-      state.articleContent = await fetchArticleContent(currentPath, parsedFilename)
+      if (isFullUrl) {
+        // For full URLs, pass as url parameter with empty filename
+        state.articleContent = await fetchArticleContent(filename, '')
+      } else {
+        const currentPath = state.forcedPath ?? getCurrentPath()
+        const finalFilename = parseFilename(filename)
+        state.articleContent = await fetchArticleContent(currentPath, finalFilename)
+      }
+    },
+    getDocumentationContent: async (pathName) => {
+      const { data } = await getHelpCenterDocumentationService({
+        url: getDocumentationUrl(pathName)
+      });
+
+
+      state.articleContent = data;
     }
   }
 

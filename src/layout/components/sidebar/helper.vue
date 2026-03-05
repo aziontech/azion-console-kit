@@ -1,8 +1,9 @@
 <script setup>
-  import { openSearchResult, windowOpen } from '@/helpers'
+  import { openSearchResult } from '@/helpers'
   import DiscordLogo from '@assets/svg/discord-logo'
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
+  import { getDocumentationUrl } from '@/services/help-center-services/documentation-mapping'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import PrimeMenu from 'primevue/menu'
@@ -24,18 +25,33 @@
     {
       label: 'Documentation',
       link: 'https://www.azion.com/en/documentation',
-      isLinkExternal: true
+      type: 'external'
     },
-    { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
+    { label: 'API', link: 'https://api.azion.com', type: 'external' },
     {
       label: 'Release notes',
       link: 'https://www.azion.com/en/documentation/products/release-notes/',
-      isLinkExternal: true
+      type: 'external'
+    },
+    {
+      label: 'Object Storage',
+      url: 'OBJECT_STORAGE',
+      type: 'documentation'
+    },
+    {
+      label: 'SQL Database',
+      url: 'SQL_DATABASE',
+      type: 'documentation'
+    },
+    {
+      label: 'Variables',
+      url: 'VARIABLES',
+      type: 'documentation'
     },
     {
       label: 'Get Assistance (Support)',
       open: 'copilot',
-      isLinkExternal: true
+      type: 'internal'
     }
   ])
 
@@ -45,8 +61,15 @@
   }
 
   const clickMenuItem = (item) => {
-    if (item.link) {
-      windowOpen(item.link)
+    if (item.type === 'documentation' && item.url) {
+      // Get the documentation URL for the selected item
+      const documentationUrl = getDocumentationUrl(item.url)
+      // Set the main content to show the same documentation in recommended articles
+      getters.updatedMainContent(documentationUrl)
+      // Set the article content to display the selected documentation
+      getters.getDocumentationContent(item.url)
+    } else if (item.type === 'external') {
+      openSearchResult(item.label.toLowerCase())
     } else if (item.open) {
       OpenSidebarComponent(item.open)
     }
@@ -64,13 +87,18 @@
     actions.updatedMainContent()
   })
 
-  watch(isSidebarActive, () => {
-    if (!isSidebarActive) {
+  watch(isSidebarActive, (isActive) => {
+    if (!isActive) {
       actions.clearArticleContent()
+      actions.clearForcedPath()
     }
   })
 
   onMounted(() => {
+    if(getters.getForcedPath.value) {
+      getters.getDocumentationContent(getters.getForcedPath.value)
+    }
+
     actions.updatedMainContent()
   })
 </script>
@@ -121,7 +149,7 @@
                 <template #item="{ item }">
                   <a
                     class="flex items-center h-[35px] cursor-pointer px-2"
-                    @click="getters.getHtmlArticle(item)"
+                    @click="getters.getDocumentationContent(item)"
                   >
                     <span>{{ item }}</span>
                     <i class="pi pi-chevron-right text-sm ml-auto"></i>
@@ -164,15 +192,7 @@
                   class="flex items-center h-[35px] cursor-pointer px-2"
                   @click="clickMenuItem(item)"
                 >
-                  <i
-                    v-if="!item.isLinkExternal"
-                    class="pi pi-send text-sm mr-2"
-                  ></i>
                   <span>{{ item.label }}</span>
-                  <i
-                    v-if="item.isLinkExternal"
-                    class="pi text-sm ml-auto pi-external-link"
-                  ></i>
                 </a>
               </template>
             </PrimeMenu>
@@ -207,3 +227,4 @@
     </div>
   </div>
 </template>
+
