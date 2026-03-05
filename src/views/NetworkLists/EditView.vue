@@ -17,7 +17,6 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const networkListName = ref('Network List')
-  const isPageHeadingLoaded = ref(false)
 
   const cachedNetworkList = networkListsService.getNetworkListFromCache(route.params?.id) ?? {}
 
@@ -29,7 +28,6 @@
   const setNetworkListName = (networkList) => {
     networkListName.value = networkList.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, networkList.name)
-    isPageHeadingLoaded.value = true
   }
   const options = ref([
     { name: 'ASN', value: 'asn' },
