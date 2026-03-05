@@ -256,6 +256,44 @@ ruleTester.run('pure-adapters', rule, {
       ]
     },
 
+    // Adapter calling this.http.get() — forbidden
+    {
+      code: `
+        export class UsersAdapter {
+          async toUser(response) {
+            const extra = await this.http.get('/details')
+            return { id: response.uuid, extra }
+          }
+        }
+      `,
+      filename: 'src/modules/users/adapters/users-adapter.js',
+      errors: [
+        {
+          messageId: 'noHttpMethod',
+          data: { fileName: 'users-adapter.js', method: 'get' }
+        }
+      ]
+    },
+
+    // Adapter calling this.http.post() — forbidden
+    {
+      code: `
+        export class UsersAdapter {
+          async transform(data) {
+            await this.http.post('/notify', data)
+            return data
+          }
+        }
+      `,
+      filename: 'src/modules/users/adapters/users-adapter.js',
+      errors: [
+        {
+          messageId: 'noHttpMethod',
+          data: { fileName: 'users-adapter.js', method: 'post' }
+        }
+      ]
+    },
+
     // Multiple violations in one adapter
     {
       code: `

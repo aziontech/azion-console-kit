@@ -35,7 +35,6 @@ module.exports = {
         'azion-architecture/no-try-catch-in-services': 'warn',
         'azion-architecture/services-http-only': 'warn',
         'azion-architecture/pure-adapters': 'warn',
-        'azion-architecture/no-http-in-adapters': 'warn',
         'azion-architecture/module-isolation': 'off',
         'azion-architecture/naming-convention': 'off',
         'azion-architecture/type-separation': 'off'
@@ -61,7 +60,7 @@ module.exports = {
       // Legacy code: tracked for migration, not blocking
       files: [
         'src/views/**/*',
-        'src/services/*-services/**/*',
+        'src/services/!(v2|axios)/**/*',
         'src/components/**/*',
         'src/stores/**/*',
         'src/composables/**/*'
@@ -73,7 +72,6 @@ module.exports = {
         'azion-architecture/no-try-catch-in-services': 'warn',
         'azion-architecture/services-http-only': 'warn',
         'azion-architecture/pure-adapters': 'warn',
-        'azion-architecture/no-http-in-adapters': 'warn',
         'azion-architecture/module-isolation': 'off',
         'azion-architecture/naming-convention': 'off',
         'azion-architecture/type-separation': 'off'

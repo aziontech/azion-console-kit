@@ -15,7 +15,9 @@ module.exports = {
       noSideEffects:
         'Adapter "{{fileName}}" has side effect: {{detail}}. Adapters must be pure transformation functions (API ↔ App).',
       noHttpImport:
-        'Adapter "{{fileName}}" imports HTTP module "{{source}}". Adapters must not make HTTP calls.'
+        'Adapter "{{fileName}}" imports HTTP module "{{source}}". Adapters must not make HTTP calls.',
+      noHttpMethod:
+        'Adapter "{{fileName}}" calls this.http.{{method}}(). Adapters must not make HTTP calls.'
     }
   },
 
@@ -82,6 +84,20 @@ module.exports = {
             node,
             messageId: 'noSideEffects',
             data: { fileName, detail: `accesses document.${node.property.name}` }
+          })
+        }
+
+        // Detect this.http.get(), this.http.post(), etc.
+        if (
+          node.parent.type === 'CallExpression' &&
+          node.parent.callee === node &&
+          node.object.type === 'MemberExpression' &&
+          node.object.property.name === 'http'
+        ) {
+          context.report({
+            node,
+            messageId: 'noHttpMethod',
+            data: { fileName, method: node.property.name }
           })
         }
       }

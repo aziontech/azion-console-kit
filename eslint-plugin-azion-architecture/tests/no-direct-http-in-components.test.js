@@ -70,6 +70,12 @@ ruleTester.run('no-direct-http-in-components', rule, {
       filename: 'src/views/Users/UserList.vue'
     },
 
+    // Component importing from v2 service — allowed (BaseService exposes Vue Query methods)
+    {
+      code: `import { listUsers } from '@/services/v2/users/users-service'`,
+      filename: 'src/modules/users/components/user-list.vue'
+    },
+
     // Component with non-HTTP code — no violations
     {
       code: `
@@ -89,21 +95,6 @@ ruleTester.run('no-direct-http-in-components', rule, {
         {
           messageId: 'noDirectHttp',
           data: { fileName: 'user-list.vue', source: 'axios' }
-        }
-      ]
-    },
-
-    // Component importing from @/services/v2/xxx/xxx-service — forbidden
-    {
-      code: `import { listUsers } from '@/services/v2/users/users-service'`,
-      filename: 'src/modules/users/components/user-list.vue',
-      errors: [
-        {
-          messageId: 'noDirectHttp',
-          data: {
-            fileName: 'user-list.vue',
-            source: '@/services/v2/users/users-service'
-          }
         }
       ]
     },

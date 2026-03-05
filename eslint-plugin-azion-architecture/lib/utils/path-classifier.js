@@ -12,7 +12,7 @@ const path = require('path')
  *   - 'store' → no-http-in-stores
  *   - 'composable' → require-vue-query
  *   - 'service' → no-try-catch-in-services, services-http-only
- *   - 'adapter' → pure-adapters, no-http-in-adapters
+ *   - 'adapter' → pure-adapters
  */
 function classifyPath(filePath) {
   const normalized = filePath.replace(/\\/g, '/')
@@ -53,8 +53,8 @@ function classifyPath(filePath) {
     }
   }
 
-  // Legacy services: src/services/<name>-services/...
-  if (/src\/services\/[^/]+-services\//.test(normalized)) {
+  // Legacy services: src/services/<name>/... (excluding v2/ and axios/)
+  if (/src\/services\/(?!v2\/|axios\/)([^/]+)\//.test(normalized)) {
     return {
       zone: 'legacy',
       role: inferRole(normalized),

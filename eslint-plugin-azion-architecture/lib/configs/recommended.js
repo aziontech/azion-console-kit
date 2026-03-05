@@ -17,7 +17,6 @@ module.exports = {
     'azion-architecture/no-try-catch-in-services': 'warn',
     'azion-architecture/services-http-only': 'warn',
     'azion-architecture/pure-adapters': 'warn',
-    'azion-architecture/no-http-in-adapters': 'warn',
 
     // Architecture — disabled
     'azion-architecture/module-isolation': 'off',
