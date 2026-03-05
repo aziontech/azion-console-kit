@@ -1,4 +1,3 @@
-const path = require('path')
 const { classifyPath, getModuleFromImport } = require('../utils/path-classifier')
 
 module.exports = {

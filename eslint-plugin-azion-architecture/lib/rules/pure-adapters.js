@@ -1,6 +1,6 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isHttpImport, isHttpOrServiceImport } = require('../utils/import-resolver')
+const { isHttpOrServiceImport } = require('../utils/import-resolver')
 
 module.exports = {
   meta: {

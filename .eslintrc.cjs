@@ -50,6 +50,14 @@ module.exports = {
       }
     },
     {
+      files: ['scripts/**/*.cjs'],
+      env: { node: true },
+      rules: {
+        'no-console': 'off',
+        'id-length': 'off'
+      }
+    },
+    {
       // Legacy code: tracked for migration, not blocking
       files: [
         'src/views/**/*',
