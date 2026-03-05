@@ -93,19 +93,17 @@ export const listChangelogService = async () => {
     }
 
     const allItems = changelogLaunchpads.flatMap(extractChangelogItems)
-    
+
     const uniqueItems = Array.from(
-      new Map(
-        allItems.map((item) => [`${item.description}|${item.time}`, item])
-      ).values()
+      new Map(allItems.map((item) => [`${item.description}|${item.time}`, item])).values()
     )
-    
+
     const sortedItems = uniqueItems.sort((itemA, itemB) => {
       const dateA = parseDateForSorting(itemA.time)
       const dateB = parseDateForSorting(itemB.time)
       return dateB - dateA
     })
-    
+
     return sortedItems.map((item) => ({
       ...item,
       time: parseRelativeDate(item.time)

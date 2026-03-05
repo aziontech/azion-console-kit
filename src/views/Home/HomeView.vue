@@ -12,7 +12,7 @@
   import MarketplaceTrendsCard from '@/templates/home-cards-block/marketplace-trends-card.vue'
   import CommunicationsCard from '@/templates/home-cards-block/communications-card.vue'
   import ResourcesBlock from '@/templates/home-cards-block/resources-block.vue'
-  // import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
+  import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
   import MetricsBlock from '@/templates/home-cards-block/metrics-block.vue'
   import { useResize } from '@/composables/useResize'
   import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
@@ -101,15 +101,15 @@
           </div>
           <MetricsBlock />
           <ResourcesBlock />
-          <!-- <LastActivitiesBlock /> -->
+          <LastActivitiesBlock />
         </div>
         <div
           class="flex flex-col w-full gap-8"
           :class="homeStyle.secondColumn"
         >
+          <CommunicationsCard />
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />
-          <CommunicationsCard />
           <AzionChangelogCard />
         </div>
       </section>

@@ -29,8 +29,8 @@
       header: 'Resource'
     },
     {
-      field: 'resourceName',
-      header: 'Resource Name',
+      field: 'parentResourceName',
+      header: 'Parent Resource Name',
       enableClick: true
     },
     {
@@ -48,7 +48,8 @@
       const response = await activityHistoryService.listActivityHistoryEvents({
         offset: 0,
         limit: 5,
-        search: ''
+        search: '',
+        ordering: '-ts'
       })
       activities.value = response.body || []
     } catch (error) {
