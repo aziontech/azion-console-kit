@@ -79,7 +79,7 @@
     return {
       showAddButtonTab: !!tab?.showAddButtonTab,
       label: tab?.addButtonLabel || tab?.header || 'Create',
-      click: () => componentsRefs.value[0].openCreateDrawer?.()
+      click: () => componentsRefs.value?.[0]?.openCreateDrawer?.()
     }
   })
 

@@ -42,10 +42,11 @@
   })
 
   const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {
-    const submit = await handleSubmit(
-      (values) => {
+    const submit = handleSubmit(
+      (values, formContext) => {
         const transformedValues = transformValuesByType(values)
         emit('onSuccess', transformedValues)
+        formContext.resetForm({ values })
         onCancel()
       },
       ({ errors }) => {
