@@ -82,11 +82,10 @@
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true, sortable: true },
     { field: 'operation', header: 'Operation', visible: true, sortable: true },
-    { field: 'parentResourceType', header: 'Resource', visible: true, sortable: true },
-    { field: 'parentResourceName', header: 'Resource Name', visible: true, sortable: true },
-    // I am leaving the code commented out because the API does not yet provide this data.
-    { field: 'resourceType', header: 'Resource Item', visible: true },
-    { field: 'resourceName', header: 'Resource Item Name', visible: true },
+    { field: 'resourceType', header: 'Resource Type', visible: true },
+    { field: 'resourceName', header: 'Resource Name', visible: true },
+    { field: 'parentResourceType', header: 'Parent Resource Type', visible: true, sortable: true },
+    { field: 'parentResourceName', header: 'Parent Resource Name', visible: true, sortable: true },
     { field: 'authorEmail', header: 'Author Email', visible: true, sortable: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },

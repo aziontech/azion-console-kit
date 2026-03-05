@@ -177,7 +177,10 @@ export class ActivityHistoryService extends BaseService {
             '{ titleIlike: $search }',
             '{ authorNameIlike: $search }',
             '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }'
+            '{ resourceTypeIlike: $search }',
+            '{ resourceNameIlike: $search }',
+            '{ parentResourceNameIlike: $search }',
+            '{ parentResourceTypeIlike: $search }'
           ]
         : []),
       ...dynamic.orEntries

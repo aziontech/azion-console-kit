@@ -134,12 +134,19 @@ const PARENT_ROUTE_MAP = {
   }
 }
 
+const routePurge = { edit: 'list-real-time-purge', list: 'list-real-time-purge' }
+const routeCertificate = { edit: 'edit-digital-certificates', list: 'list-digital-certificates' }
+
 const ROUTE_MAP = {
   NetworkList: { edit: 'edit-network-list', list: 'list-network-list' },
   'Network List': { edit: 'edit-network-list', list: 'list-network-list' },
   Function: { edit: 'edit-functions', list: 'list-functions' },
-  Certificate: { edit: 'edit-digital-certificates', list: 'list-digital-certificates' },
-  DataStream: { edit: 'edit-data-stream', list: 'list-data-stream' },
+  'Tls Certificate': routeCertificate,
+  'Tls Certificate Revocation List': routeCertificate,
+  'Tls Certificate Signing Request': routeCertificate,
+  'Tls Certificate Request': routeCertificate,
+  Stream: { edit: 'edit-data-stream', list: 'list-data-stream' },
+  'Stream Template': { edit: 'edit-data-stream', list: 'list-data-stream' },
   Firewall: { edit: 'edit-firewall', list: 'list-firewalls' },
   'Firewall Request Rule': {
     edit: 'edit-firewall',
@@ -176,8 +183,12 @@ const ROUTE_MAP = {
   'Storage Bucket Object': { edit: 'object-storage-view', list: 'object-storage-view' },
   Connector: { edit: 'edit-connectors', list: 'list-connectors' },
   Schema: { edit: 'database-sql-database', list: 'list-sql-databases' },
+  'Sql Database': { edit: 'database-sql-database', list: 'list-sql-databases' },
   CustomPages: { edit: 'edit-custom-pages', list: 'list-custom-pages' },
-  'Purge Cache Key': { edit: 'list-real-time-purge', list: 'list-real-time-purge' },
+  'Purge Cache Key': routePurge,
+  'Purge Cache Key L2': routePurge,
+  'Purge URL': routePurge,
+  'Purge Wildcard': routePurge,
   'Account Credential': {
     edit: 'credentials-tabs',
     list: 'credentials-tabs',
