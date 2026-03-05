@@ -10,7 +10,7 @@
             <div
               v-for="(item, index) in changelogItems"
               :key="index"
-              class="flex items-start min-h-[70px] w-full"
+              class="flex items-start min-h-[70px] w-full py-1"
             >
               <div class="flex flex-col items-center self-stretch">
                 <div

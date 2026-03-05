@@ -15,6 +15,7 @@
   // import LastActivitiesBlock from '@/templates/home-cards-block/last-activities-block.vue'
   import MetricsBlock from '@/templates/home-cards-block/metrics-block.vue'
   import { useResize } from '@/composables/useResize'
+  import AzionChangelogCard from '@/templates/home-cards-block/azion-changelog-card.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -109,9 +110,7 @@
           <MonthlyUsageCard @viewAll="navigateToUsage" />
           <MarketplaceTrendsCard />
           <CommunicationsCard />
-          <!-- 
-          Ocultado até ser revisado o processo de changelog
-          <AzionChangelogCard /> -->
+          <AzionChangelogCard />
         </div>
       </section>
     </template>
