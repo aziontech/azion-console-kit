@@ -22,6 +22,9 @@ jobs:
         run: apk add --no-cache curl bash git
       - name: Configure Git Safe Directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Fetch base branch for diff
+        if: github.event_name == 'pull_request'
+        run: git fetch origin ${{ github.base_ref }}
       - uses: actions/cache@v4
         with:
           path: '**/node_modules'
@@ -38,9 +41,6 @@ jobs:
         run: yarn lint
       - name: Run Prettier Formatting
         run: yarn prettier --check src/
-      - name: Fetch base branch for diff
-        if: github.event_name == 'pull_request'
-        run: git fetch origin ${{ github.base_ref }}
       - name: Architecture Lint (Changed Files)
         if: github.event_name == 'pull_request'
         run: yarn lint:architecture:changed --base origin/${{ github.base_ref }}
