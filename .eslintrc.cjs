@@ -7,7 +7,7 @@ const Module = require('module')
 const resolveFilename = Module._resolveFilename
 Module._resolveFilename = function (request, parent, isMain, options) {
   if (request === 'eslint-plugin-azion-architecture') {
-    return require.resolve(`${__dirname}/eslint-plugin-azion-architecture`)
+    return require.resolve(`${__dirname}/eslint/plugin`)
   }
   return resolveFilename.call(this, request, parent, isMain, options)
 }

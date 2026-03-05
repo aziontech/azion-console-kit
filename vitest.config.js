@@ -21,7 +21,7 @@ export default mergeConfig(
         '.github',
         'docs',
         'public',
-        'eslint-plugin-azion-architecture'
+        'eslint'
       ],
       root: fileURLToPath(new URL('./', import.meta.url)),
       transformMode: {
