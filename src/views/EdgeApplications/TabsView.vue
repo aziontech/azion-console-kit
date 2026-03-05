@@ -114,11 +114,12 @@
   }
 
   const reindexMapTabs = () => {
-    mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+    let counter = 0
+    mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key]) => {
       if (!hasFlagBlockApiV4() && (key === 'origins' || key === 'error-responses')) {
         return acc
       }
-      acc[key] = index
+      acc[key] = counter++
       return acc
     }, {})
   }
