@@ -7,8 +7,9 @@
   import DataTable from '@/components/DataTable'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import OperationTag from './OperationTag.vue'
-  import { createRelativeRange } from '@utils/date.js'
+  import { createStartOfDay } from '@utils/date.js'
   import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
+  import { listTimezonesService } from '@/services/users-services'
 
   const props = defineProps({
     listService: {
@@ -35,32 +36,57 @@
   const totalRecords = ref(0)
   const searchValue = ref('')
   const now = new Date()
-  const { startDate, endDate } = createRelativeRange(5, 'minutes', 'last', now)
+  const startDate = createStartOfDay(now)
+  const endDate = now
   const dateRange = ref({
     startDate,
     endDate,
-    label: 'Last 5 minutes',
-    labelStart: 'Last 5 minutes',
-    labelEnd: 'Last 5 minutes',
+    label: 'Today',
+    labelStart: 'Today',
+    labelEnd: 'Today',
     relative: {
       direction: 'last',
-      value: 5,
-      unit: 'minutes'
+      value: 0,
+      unit: 'days'
     }
   })
   const appliedFilters = ref([])
   const first = ref(0)
   const rows = ref(100)
+  const sortField = ref('date')
+  const sortOrder = ref(-1)
+
+  const SORT_FIELD_MAP = {
+    date: 'ts',
+    operation: 'type',
+    resourceType: 'resourceType',
+    resourceName: 'resourceName',
+    resourceId: 'resourceId',
+    authorEmail: 'authorEmail',
+    authorIp: 'userIp',
+    authorName: 'authorName',
+    accountId: 'accountId',
+    userAgent: 'userAgent',
+    remotePort: 'remotePort',
+    comment: 'comment',
+    uuid: 'uuid'
+  }
+
+  const ordering = computed(() => {
+    if (!sortField.value) return null
+    const apiField = SORT_FIELD_MAP[sortField.value] || null
+    if (!apiField) return null
+    return sortOrder.value === -1 ? `-${apiField}` : apiField
+  })
 
   const allColumns = ref([
-    { field: 'date', header: 'Date', visible: true },
-    { field: 'operation', header: 'Operation', visible: true },
-    { field: 'resourceType', header: 'Resource', visible: true },
+    { field: 'date', header: 'Date', visible: true, sortable: true },
+    { field: 'operation', header: 'Operation', visible: true, sortable: true },
+    { field: 'resourceType', header: 'Resource Type', visible: true },
     { field: 'resourceName', header: 'Resource Name', visible: true },
-    // I am leaving the code commented out because the API does not yet provide this data.
-    // { field: 'resourceItem', header: 'Resource Item', visible: true },
-    // { field: 'resourceItemName', header: 'Resource Item Name', visible: true },
-    { field: 'authorEmail', header: 'Author Email', visible: true },
+    { field: 'parentResourceType', header: 'Parent Resource Type', visible: true, sortable: true },
+    { field: 'parentResourceName', header: 'Parent Resource Name', visible: true, sortable: true },
+    { field: 'authorEmail', header: 'Author Email', visible: true, sortable: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },
     { field: 'accountId', header: 'Account ID', visible: false },
@@ -99,7 +125,8 @@
         search: searchValue.value,
         begin,
         end,
-        filter: appliedFilters.value
+        filter: appliedFilters.value,
+        ordering: ordering.value
       })
 
       data.value = response.body || []
@@ -137,6 +164,13 @@
   const handlePage = (event) => {
     first.value = event.first
     rows.value = event.rows
+    loadData()
+  }
+
+  const handleSort = (event) => {
+    sortField.value = event.sortField
+    sortOrder.value = event.sortOrder
+    first.value = 0
     loadData()
   }
 
@@ -217,12 +251,15 @@
     :columns="visibleColumns"
     :paginator="true"
     :lazy="true"
+    :sortField="sortField"
+    :sortOrder="sortOrder"
     :appliedFilters="appliedFilters"
     :searchValue="searchValue"
     :notShowEmptyBlock="true"
     emptyListMessage="Has no data"
     dataKey="id"
     @page="handlePage"
+    @sort="handleSort"
     :empty-block="{
       title: 'No activity has been recorded',
       description: 'No activities found.',
@@ -252,6 +289,7 @@
               <DataTimeRange
                 v-model="dateRange"
                 :maxDays="183"
+                :listTimezonesService="listTimezonesService"
                 @select="handleDateRangeChange"
               />
               <DataTable.ColumnSelector
@@ -276,18 +314,18 @@
       :key="col.field"
       :field="col.field"
       :header="col.header"
-      :sortable="col.field === 'date'"
+      :sortable="!!col.sortable"
       :style="getColumnStyle(col.field)"
     >
       <template #body="{ data: rowData }">
         <template v-if="col.field === 'operation'">
           <OperationTag :operation="rowData.operation" />
         </template>
-        <template v-else-if="col.field === 'resourceName' || col.field === 'resourceItemName'">
+        <template v-else-if="col.field === 'resourceName' || col.field === 'parentResourceName'">
           <span
             v-if="rowData[col.field]"
             @click="handleRowClick({ data: rowData })"
-            class="text-[var(--text-color-link)] cursor-pointer hover:underline"
+            class="text-color cursor-pointer hover:underline"
           >
             {{ rowData[col.field] }}
           </span>

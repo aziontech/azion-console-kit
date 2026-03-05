@@ -53,35 +53,143 @@ const extractBucketObjectInfo = (event) => {
 
 const listRoute = (name) => () => ({ name })
 
+/**
+ * Maps child resourceType to the appropriate tab for each parentResourceType.
+ * This enables routing to the correct tab when navigating from activity history.
+ */
+const CHILD_TO_TAB_MAP = {
+  Application: {
+    'Application Cache Setting': 'cache-settings',
+    'Application Function Instance': 'functions',
+    'Application Request Rule': 'rules-engine',
+    'Application Device Group': 'device-groups',
+    'Application Origin': 'origins',
+    'Application Error Response': 'error-responses'
+  },
+  Bucket: {
+    BucketObject: null,
+    'Storage Bucket Object': null
+  },
+  Waf: {
+    'Waf Exception': 'allowed'
+  },
+  Schema: {
+    Table: 'tables',
+    Tables: 'tables',
+    Editor: 'editor',
+    Settings: 'settings'
+  },
+  CustomPages: {},
+  'Purge:cachekey': {},
+  Credential: {
+    ObjectStorageCredential: 'object-storage',
+    Credential: 'object-storage'
+  },
+  Workload: {
+    'Workload Deployment': null // Workload Deployment redirects to parent Workload
+  }
+}
+
+/**
+ * Maps parentResourceType to its route configuration.
+ * This defines how to navigate to parent resources.
+ */
+const PARENT_ROUTE_MAP = {
+  Application: {
+    edit: 'edit-application',
+    list: 'list-applications'
+  },
+  Bucket: {
+    edit: 'object-storage-edit',
+    list: 'object-storage-list'
+  },
+  Connector: {
+    edit: 'edit-connectors',
+    list: 'list-connectors'
+  },
+  Schema: {
+    edit: 'database-sql-database',
+    list: 'list-sql-databases'
+  },
+  CustomPages: {
+    edit: 'edit-custom-pages',
+    list: 'list-custom-pages'
+  },
+  'Purge:cachekey': {
+    edit: 'list-real-time-purge',
+    list: 'list-real-time-purge'
+  },
+  Credential: {
+    edit: 'credentials-tabs',
+    list: 'credentials-tabs',
+    defaultTab: 'object-storage'
+  },
+  Workload: {
+    edit: 'edit-workload',
+    list: 'list-workloads'
+  },
+  Waf: {
+    edit: 'edit-waf-rules',
+    list: 'list-waf-rules'
+  }
+}
+
+const routePurge = { edit: 'list-real-time-purge', list: 'list-real-time-purge' }
+const routeCertificate = { edit: 'edit-digital-certificates', list: 'list-digital-certificates' }
+
 const ROUTE_MAP = {
   NetworkList: { edit: 'edit-network-list', list: 'list-network-list' },
+  'Network List': { edit: 'edit-network-list', list: 'list-network-list' },
   Function: { edit: 'edit-functions', list: 'list-functions' },
-  Certificate: { edit: 'edit-digital-certificates', list: 'list-digital-certificates' },
-  DataStream: { edit: 'edit-data-stream', list: 'list-data-stream' },
+  'Tls Certificate': routeCertificate,
+  'Tls Certificate Revocation List': routeCertificate,
+  'Tls Certificate Signing Request': routeCertificate,
+  'Tls Certificate Request': routeCertificate,
+  Stream: { edit: 'edit-data-stream', list: 'list-data-stream' },
+  'Stream Template': { edit: 'edit-data-stream', list: 'list-data-stream' },
   Firewall: { edit: 'edit-firewall', list: 'list-firewalls' },
-  FirewallRuleEngine: {
+  'Firewall Request Rule': {
     edit: 'edit-firewall',
-    list: 'list-firewall-rule-engine',
-    params: { tab: 'rulesEngine' }
+    list: 'edit-firewall',
+    parentType: 'Firewall',
+    tab: 'rulesEngine'
   },
-  FirewallFunctionInstance: {
+  'Firewall Function Instance': {
     edit: 'edit-firewall',
-    list: 'list-firewall-function-instance',
-    params: { tab: 'functions' }
+    list: 'edit-firewall',
+    parentType: 'Firewall',
+    tab: 'functions'
   },
-  'DNS Record': { edit: 'edge-dns-records', list: 'list-dns-records' },
-  'DNS DNSSec': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
+  'Dns Zone Record': {
+    edit: 'edit-edge-dns',
+    list: 'list-edge-dns',
+    parentType: 'DNS Zone',
+    tab: 'records'
+  },
   'DNS Zone': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
-  WAF: { edit: 'edit-waf-rules', list: 'list-waf-rules' },
+  'DNS DNSSec': {
+    edit: 'edit-edge-dns',
+    list: 'list-edge-dns',
+    parentType: 'DNS Zone',
+    tab: 'records'
+  },
+  WAF: { edit: 'edit-waf-rules', list: 'list-waf-rules', tab: 'allowed' },
+
   Workload: { edit: 'edit-workload', list: 'list-workloads' },
+  'Workload Deployment': { edit: 'edit-workload', list: 'list-workloads' },
   Application: { edit: 'edit-application', list: 'list-applications' },
   Bucket: { edit: 'object-storage-edit', list: 'object-storage-list' },
   BucketObject: { edit: 'object-storage-view', list: 'object-storage-view' },
+  'Storage Bucket Object': { edit: 'object-storage-view', list: 'object-storage-view' },
   Connector: { edit: 'edit-connectors', list: 'list-connectors' },
   Schema: { edit: 'database-sql-database', list: 'list-sql-databases' },
+  'Sql Database': { edit: 'database-sql-database', list: 'list-sql-databases' },
   CustomPages: { edit: 'edit-custom-pages', list: 'list-custom-pages' },
-  'Purge:cachekey': { edit: 'list-real-time-purge', list: 'list-real-time-purge' },
-  Credential: {
+  'Purge Cache Key': routePurge,
+  'Purge Cache Key L2': routePurge,
+  'Purge URL': routePurge,
+  'Purge Wildcard': routePurge,
+  'Account Credential': {
     edit: 'credentials-tabs',
     list: 'credentials-tabs',
     params: { tab: 'object-storage' }
@@ -99,6 +207,7 @@ const resolveAction = (action) => {
     case 'updated':
     case 'update':
     case 'created':
+    case 'changed':
       return 'edit'
     case 'deleted':
     case 'removed':
@@ -133,7 +242,71 @@ const normalizeResourceType = (resourceType) => {
     'dns zone': 'DNS Zone',
     'dns dnssec': 'DNS DNSSec',
     schema: 'Schema',
-    schemas: 'Schema'
+    schemas: 'Schema',
+    // Application Cache Setting
+    'application cache setting': 'Application Cache Setting',
+    applicationcachesetting: 'Application Cache Setting',
+    applicationcachesettings: 'Application Cache Setting',
+    cachesetting: 'Application Cache Setting',
+    cachesettings: 'Application Cache Setting',
+    // Application Function Instance
+    'application function instance': 'Application Function Instance',
+    applicationfunctioninstance: 'Application Function Instance',
+    functioninstance: 'Application Function Instance',
+    // Application Request Rule
+    'application request rule': 'Application Request Rule',
+    applicationrequestrule: 'Application Request Rule',
+    'request rule': 'Application Request Rule',
+    requestrule: 'Application Request Rule',
+    rulesengine: 'Application Request Rule',
+    'rules engine': 'Application Request Rule',
+    // Application Device Group
+    'application device group': 'Application Device Group',
+    applicationdevicegroup: 'Application Device Group',
+    devicegroup: 'Application Device Group',
+    'device group': 'Application Device Group',
+    // Application Origin
+    'application origin': 'Application Origin',
+    applicationorigin: 'Application Origin',
+    // Application Error Response
+    'application error response': 'Application Error Response',
+    applicationerrorresponse: 'Application Error Response',
+    errorresponse: 'Application Error Response',
+    'error response': 'Application Error Response',
+    // SQL Database
+    table: 'Table',
+    tables: 'Table',
+    editor: 'Editor'
+  }
+
+  return aliases[normalized] || raw
+}
+
+/**
+ * Normalizes parentResourceType to standard format
+ */
+const normalizeParentResourceType = (parentResourceType) => {
+  const raw = String(parentResourceType || '').trim()
+  if (!raw) return null
+
+  const normalized = raw.toLowerCase()
+  const aliases = {
+    application: 'Application',
+    applications: 'Application',
+    bucket: 'Bucket',
+    buckets: 'Bucket',
+    connector: 'Connector',
+    connectors: 'Connector',
+    schema: 'Schema',
+    schemas: 'Schema',
+    custompages: 'CustomPages',
+    'custom pages': 'CustomPages',
+    'purge:cachekey': 'Purge:cachekey',
+    purge: 'Purge:cachekey',
+    credential: 'Credential',
+    credentials: 'Credential',
+    workload: 'Workload',
+    workloads: 'Workload'
   }
 
   return aliases[normalized] || raw
@@ -150,16 +323,106 @@ const extractId = (event) => {
   return id !== null && String(id).trim() !== '' ? id : null
 }
 
+/**
+ * Determines the appropriate tab for a child resource within a parent.
+ * @param {string} parentResourceType - The normalized parent resource type
+ * @param {string} resourceType - The normalized child resource type
+ * @returns {string|null} - The tab name or null if no specific tab
+ */
+const resolveTabForChild = (parentResourceType, resourceType) => {
+  const tabMap = CHILD_TO_TAB_MAP[parentResourceType]
+  if (!tabMap) return null
+
+  // Try exact match first
+  if (tabMap[resourceType]) return tabMap[resourceType]
+
+  // Try case-insensitive match
+  const normalizedResourceType = resourceType?.toLowerCase()
+  for (const [key, value] of Object.entries(tabMap)) {
+    if (key.toLowerCase() === normalizedResourceType) {
+      return value
+    }
+  }
+
+  return null
+}
+
+/**
+ * Resolves route when navigating to a parent resource with a specific tab
+ * based on the child resource type.
+ */
+const resolveParentRouteWithTab = (event, resolvedAction) => {
+  const parentResourceType = normalizeParentResourceType(event?.parentResourceType)
+  const parentResourceId = event?.parentResourceId
+  const resourceType = normalizeResourceType(event?.resourceType)
+
+  if (!parentResourceType || !parentResourceId) return null
+
+  const parentConfig = PARENT_ROUTE_MAP[parentResourceType]
+  if (!parentConfig) return null
+
+  const routeName = parentConfig[resolvedAction]
+  if (!routeName) return null
+
+  // Determine the appropriate tab based on the child resource type
+  const tab = resolveTabForChild(parentResourceType, resourceType)
+
+  const params = { id: String(parentResourceId) }
+  if (tab) {
+    params.tab = tab
+  } else if (parentConfig.defaultTab) {
+    params.tab = parentConfig.defaultTab
+  }
+
+  return {
+    name: routeName,
+    params: { ...params, ...(parentConfig.params || {}) }
+  }
+}
+
+const resolveParentRoute = (event, routeConfig, resolvedAction) => {
+  const parentResourceId = event?.parentResourceId
+  if (!parentResourceId) return null
+
+  const routeName = routeConfig[resolvedAction]
+  if (!routeName) return null
+
+  const params = { id: String(parentResourceId) }
+  if (routeConfig.tab) {
+    params.tab = routeConfig.tab
+  }
+
+  return {
+    name: routeName,
+    params: { ...params, ...(routeConfig.params || {}) }
+  }
+}
+
 export const resolveActivityHistoryRoute = (event = {}) => {
   const resourceType = normalizeResourceType(event?.resourceType)
+  const parentResourceType = normalizeParentResourceType(event?.parentResourceType)
   const action = event?.type
 
-  const routeConfig = ROUTE_MAP[resourceType]
   const resolvedAction = resolveAction(action)
+  if (!resolvedAction) return null
 
-  if (!routeConfig || !resolvedAction) return null
+  // First, check if there's a parentResourceType with parentResourceId
+  // This indicates a child resource that should navigate to its parent with the correct tab
+  if (parentResourceType && event?.parentResourceId) {
+    const parentRoute = resolveParentRouteWithTab(event, resolvedAction)
+    if (parentRoute) return parentRoute
+  }
 
-  if (resourceType === 'BucketObject') {
+  const routeConfig = ROUTE_MAP[resourceType]
+  if (!routeConfig) return null
+
+  // Check if this resource type requires parent routing (legacy support)
+  if (routeConfig.parentType) {
+    const parentRoute = resolveParentRoute(event, routeConfig, resolvedAction)
+    if (parentRoute) return parentRoute
+  }
+
+  if (resourceType === 'BucketObject' || resourceType === 'Storage Bucket Object') {
     if (resolvedAction !== 'edit') return listRoute(routeConfig.list)()
 
     const { bucketName, folderPath } = extractBucketObjectInfo(event)

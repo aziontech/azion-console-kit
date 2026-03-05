@@ -38,7 +38,10 @@ const buildDynamicFilters = (filter = {}) => {
     userIp: { operator: 'Eq', type: 'String' },
     userAgent: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
     uuid: { operator: 'Eq', type: 'String' },
-    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
+    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    parentResourceType: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    parentResourceId: { operator: 'Eq', type: 'String' },
+    parentResourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
   }
 
   const normalized = normalizeFilterArray(filter)
@@ -83,6 +86,42 @@ const buildDynamicFilters = (filter = {}) => {
   }
 }
 
+const normalizeOrdering = (ordering) => {
+  if (!ordering) return 'ts'
+  const value = String(ordering).trim()
+  if (!value) return 'ts'
+  return value
+}
+
+const ALLOWED_ORDERING_FIELDS = new Set([
+  'ts',
+  'type',
+  'resourceType',
+  'resourceName',
+  'resourceId',
+  'authorEmail',
+  'authorName',
+  'accountId',
+  'userIp',
+  'userAgent',
+  'remotePort',
+  'comment',
+  'uuid',
+  'parentResourceType',
+  'parentResourceId',
+  'parentResourceName'
+])
+
+const orderingToOrderBy = (ordering) => {
+  const value = normalizeOrdering(ordering)
+  const isDesc = value.startsWith('-')
+  const field = isDesc ? value.slice(1) : value
+  if (!field || !ALLOWED_ORDERING_FIELDS.has(field)) return ['ts_DESC']
+
+  const suffix = isDesc ? 'DESC' : 'ASC'
+  return [`${field}_${suffix}`]
+}
+
 export class ActivityHistoryService extends BaseService {
   constructor() {
     super()
@@ -123,7 +162,8 @@ export class ActivityHistoryService extends BaseService {
     dateRange = 30,
     begin,
     end,
-    filter = []
+    filter = [],
+    ordering
   }) => {
     const hasExplicitRange = Boolean(begin && end)
     const { offSetEnd, offSetStart } = hasExplicitRange
@@ -137,7 +177,10 @@ export class ActivityHistoryService extends BaseService {
             '{ titleIlike: $search }',
             '{ authorNameIlike: $search }',
             '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }'
+            '{ resourceTypeIlike: $search }',
+            '{ resourceNameIlike: $search }',
+            '{ parentResourceNameIlike: $search }',
+            '{ parentResourceTypeIlike: $search }'
           ]
         : []),
       ...dynamic.orEntries
@@ -160,7 +203,7 @@ export class ActivityHistoryService extends BaseService {
             ${orClause}
             ${dynamic.andFields}
           }, 
-          orderBy: [ts_DESC]
+          orderBy: [${orderingToOrderBy(ordering).join(', ')}]
         ) { 
           ts
           title
@@ -178,6 +221,9 @@ export class ActivityHistoryService extends BaseService {
           userAgent
           uuid
           resourceName
+          parentResourceType
+          parentResourceId
+          parentResourceName
         }
       }`
 
