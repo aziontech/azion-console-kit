@@ -1,6 +1,6 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isHttpOrServiceImport } = require('../utils/import-resolver')
+const { isHttpOrServiceImport, isTypeOnlyImport, isFetchCall } = require('../utils/import-resolver')
 
 module.exports = {
   meta: {
@@ -33,6 +33,8 @@ module.exports = {
       ImportDeclaration(node) {
         const source = node.source.value
 
+        if (isTypeOnlyImport(source)) return
+
         if (isHttpOrServiceImport(source)) {
           context.report({
             node,
@@ -43,8 +45,8 @@ module.exports = {
       },
 
       CallExpression(node) {
-        // Detect fetch()
-        if (node.callee.name === 'fetch') {
+        // Detect fetch() or window.fetch()
+        if (isFetchCall(node)) {
           context.report({
             node,
             messageId: 'noSideEffects',

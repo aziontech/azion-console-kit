@@ -4,7 +4,8 @@ const {
   isHttpOrServiceImport,
   isTypeOnlyImport,
   isErrorImport,
-  isV2ServiceImport
+  isV2ServiceImport,
+  isFetchCall
 } = require('../utils/import-resolver')
 
 module.exports = {
@@ -56,14 +57,7 @@ module.exports = {
       },
 
       CallExpression(node) {
-        // Detect fetch() or window.fetch()
-        const isFetch =
-          node.callee.name === 'fetch' ||
-          (node.callee.type === 'MemberExpression' &&
-            node.callee.object.name === 'window' &&
-            node.callee.property.name === 'fetch')
-
-        if (isFetch) {
+        if (isFetchCall(node)) {
           context.report({
             node,
             messageId: 'noFetchCall',

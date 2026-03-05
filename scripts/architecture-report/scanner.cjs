@@ -94,6 +94,32 @@ function createBucket() {
 }
 
 /**
+ * Adds violations from an ESLint result to a bucket.
+ *
+ * @param {object} bucket - Target bucket
+ * @param {import('eslint').ESLint.LintResult} result - ESLint result
+ * @param {import('eslint').Linter.LintMessage[]} archViolations - Filtered architecture violations
+ */
+function addViolationsToBucket(bucket, result, archViolations) {
+  bucket.files += 1
+  for (const violation of archViolations) {
+    bucket.violations.push({
+      file: path.relative(PROJECT_ROOT, result.filePath),
+      ruleId: violation.ruleId,
+      message: violation.message,
+      severity: violation.severity,
+      line: violation.line,
+      column: violation.column
+    })
+    if (violation.severity === 2) {
+      bucket.errorCount += 1
+    } else {
+      bucket.warningCount += 1
+    }
+  }
+}
+
+/**
  * Scans the codebase for architecture violations using ESLint.
  *
  * Uses ESLint's Node.js API to lint files matching the target patterns,
@@ -124,62 +150,13 @@ async function scan() {
     const { type, name } = classifyFile(result.filePath)
 
     if (type === 'module') {
-      if (!modules[name]) {
-        modules[name] = createBucket()
-      }
-      modules[name].files += 1
-      for (const violation of archViolations) {
-        modules[name].violations.push({
-          file: path.relative(PROJECT_ROOT, result.filePath),
-          ruleId: violation.ruleId,
-          message: violation.message,
-          severity: violation.severity, // 1 = warn, 2 = error
-          line: violation.line,
-          column: violation.column
-        })
-        if (violation.severity === 2) {
-          modules[name].errorCount += 1
-        } else {
-          modules[name].warningCount += 1
-        }
-      }
+      if (!modules[name]) modules[name] = createBucket()
+      addViolationsToBucket(modules[name], result, archViolations)
     } else if (type === 'v2Service') {
-      if (!v2Services[name]) {
-        v2Services[name] = createBucket()
-      }
-      v2Services[name].files += 1
-      for (const violation of archViolations) {
-        v2Services[name].violations.push({
-          file: path.relative(PROJECT_ROOT, result.filePath),
-          ruleId: violation.ruleId,
-          message: violation.message,
-          severity: violation.severity,
-          line: violation.line,
-          column: violation.column
-        })
-        if (violation.severity === 2) {
-          v2Services[name].errorCount += 1
-        } else {
-          v2Services[name].warningCount += 1
-        }
-      }
+      if (!v2Services[name]) v2Services[name] = createBucket()
+      addViolationsToBucket(v2Services[name], result, archViolations)
     } else {
-      legacy.files += 1
-      for (const violation of archViolations) {
-        legacy.violations.push({
-          file: path.relative(PROJECT_ROOT, result.filePath),
-          ruleId: violation.ruleId,
-          message: violation.message,
-          severity: violation.severity,
-          line: violation.line,
-          column: violation.column
-        })
-        if (violation.severity === 2) {
-          legacy.errorCount += 1
-        } else {
-          legacy.warningCount += 1
-        }
-      }
+      addViolationsToBucket(legacy, result, archViolations)
     }
   }
 

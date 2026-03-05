@@ -36,7 +36,7 @@ module.exports = {
     const { role } = classifyPath(filename)
 
     if (role !== 'service') return {}
-    if (EXCLUDED_PATHS.some((p) => normalized.includes(p))) return {}
+    if (EXCLUDED_PATHS.some((pattern) => normalized.includes(pattern))) return {}
 
     const fileName = path.basename(filename)
 

@@ -5,7 +5,7 @@
 
 const HTTP_PACKAGES = ['axios', 'node-fetch', 'got', 'ky', 'ofetch']
 
-const HTTP_PATTERNS = [/^axios/, /httpService/i, /http-service/i, /api-client/i, /apiClient/i]
+const HTTP_PATTERNS = [/^axios(\/|$)/, /httpService/i, /http-service/i, /api-client/i, /apiClient/i]
 
 const SERVICE_PATTERNS = [
   /^@\/services\//,
@@ -47,15 +47,15 @@ const SERVICE_EXCEPTIONS = [
  */
 function categorizeImport(source) {
   if (HTTP_PACKAGES.includes(source)) return 'http'
-  if (HTTP_PATTERNS.some((p) => p.test(source))) return 'http'
-  if (SERVICE_PATTERNS.some((p) => p.test(source))) {
+  if (HTTP_PATTERNS.some((pattern) => pattern.test(source))) return 'http'
+  if (SERVICE_PATTERNS.some((pattern) => pattern.test(source))) {
     // Check if it's actually a utility/helper, not a real service
-    if (SERVICE_EXCEPTIONS.some((p) => p.test(source))) return 'other'
+    if (SERVICE_EXCEPTIONS.some((pattern) => pattern.test(source))) return 'other'
     return 'service'
   }
-  if (STORE_PATTERNS.some((p) => p.test(source))) return 'store'
-  if (COMPOSABLE_PATTERNS.some((p) => p.test(source))) return 'composable'
-  if (DOM_PATTERNS.some((p) => p.test(source))) return 'dom'
+  if (STORE_PATTERNS.some((pattern) => pattern.test(source))) return 'store'
+  if (COMPOSABLE_PATTERNS.some((pattern) => pattern.test(source))) return 'composable'
+  if (DOM_PATTERNS.some((pattern) => pattern.test(source))) return 'dom'
   if (VUE_QUERY_IMPORTS.includes(source)) return 'vue-query'
 
   return 'other'
@@ -107,6 +107,18 @@ function isErrorImport(source) {
 }
 
 /**
+ * Checks if a CallExpression AST node is a fetch() or window.fetch() call.
+ */
+function isFetchCall(node) {
+  return (
+    node.callee.name === 'fetch' ||
+    (node.callee.type === 'MemberExpression' &&
+      node.callee.object.name === 'window' &&
+      node.callee.property.name === 'fetch')
+  )
+}
+
+/**
  * Checks if an import source points to a v2 service (BaseService-based).
  * V2 services extend BaseService and expose Vue Query methods (.useQuery, .useMutation),
  * making them safe to import in components.
@@ -126,5 +138,6 @@ module.exports = {
   isVueQueryImport,
   isTypeOnlyImport,
   isErrorImport,
-  isV2ServiceImport
+  isV2ServiceImport,
+  isFetchCall
 }

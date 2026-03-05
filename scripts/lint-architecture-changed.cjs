@@ -19,7 +19,7 @@
  *   2 - Script error
  */
 
-const { execSync } = require('child_process')
+const { execFileSync } = require('child_process')
 const path = require('path')
 const { ESLint } = require('eslint')
 
@@ -58,17 +58,19 @@ function parseArgs(argv) {
 
 function getChangedFiles(base) {
   try {
-    const output = execSync(`git diff --name-only --diff-filter=AM ${base}...HEAD`, {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf-8'
-    })
+    const output = execFileSync(
+      'git',
+      ['diff', '--name-only', '--diff-filter=AM', `${base}...HEAD`],
+      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
+    )
     return output.trim().split('\n').filter(Boolean)
   } catch {
     try {
-      const output = execSync(`git diff --name-only --diff-filter=AM ${base} HEAD`, {
-        cwd: PROJECT_ROOT,
-        encoding: 'utf-8'
-      })
+      const output = execFileSync(
+        'git',
+        ['diff', '--name-only', '--diff-filter=AM', base, 'HEAD'],
+        { cwd: PROJECT_ROOT, encoding: 'utf-8' }
+      )
       return output.trim().split('\n').filter(Boolean)
     } catch (error) {
       console.error(`Failed to get changed files against base "${base}"`)
@@ -95,7 +97,7 @@ async function lintFiles(filePaths) {
     }
   })
 
-  const absolutePaths = filePaths.map((f) => path.resolve(PROJECT_ROOT, f))
+  const absolutePaths = filePaths.map((file) => path.resolve(PROJECT_ROOT, file))
 
   const filesToLint = []
   for (const filePath of absolutePaths) {
@@ -147,10 +149,10 @@ function printReport(violations, changedCount, lintedCount) {
   }
 
   console.log('VIOLATIONS:\n')
-  for (const v of violations) {
-    console.log(`  ${v.file}:${v.line}:${v.column}`)
-    console.log(`    Rule: ${v.rule}`)
-    console.log(`    ${v.message}\n`)
+  for (const violation of violations) {
+    console.log(`  ${violation.file}:${violation.line}:${violation.column}`)
+    console.log(`    Rule: ${violation.rule}`)
+    console.log(`    ${violation.message}\n`)
   }
 
   console.log('Fix: Use composables with Vue Query (useQuery/useMutation) for server state.')
@@ -169,7 +171,7 @@ async function main() {
     `Found ${changedFiles.length} changed files, ${governedFiles.length} under architecture governance.\n`
   )
 
-  if (governedFiles.length === 0) {
+  if (!governedFiles.length) {
     console.log('No governed files changed. Skipping architecture lint.')
     process.exit(0)
   }

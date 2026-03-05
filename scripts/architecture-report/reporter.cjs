@@ -109,7 +109,7 @@ function formatMarkdown(scores) {
   }
 
   // Legacy section
-  if (scores.legacy.filesTotal > 0) {
+  if (scores.legacy.filesTotal) {
     lines.push('## Legacy Code (src/views/, src/stores/, src/components/, src/composables/)')
     lines.push('')
     lines.push(tableHeader)
@@ -150,8 +150,8 @@ function formatJson(scores) {
  * @param {'markdown'|'json'} format - Output format
  * @returns {string} Formatted report
  */
-function format(scores, format) {
-  if (format === 'json') {
+function format(scores, outputFormat) {
+  if (outputFormat === 'json') {
     return formatJson(scores)
   }
   return formatMarkdown(scores)

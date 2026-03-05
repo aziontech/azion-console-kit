@@ -33,7 +33,7 @@ module.exports = {
     if (role !== 'service') return {}
 
     // Exclude base infrastructure services
-    if (EXCLUDED_PATHS.some((p) => normalized.includes(p))) return {}
+    if (EXCLUDED_PATHS.some((pattern) => normalized.includes(pattern))) return {}
 
     const fileName = path.basename(filename)
 

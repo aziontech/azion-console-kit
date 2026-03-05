@@ -1,6 +1,6 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isHttpOrServiceImport, isTypeOnlyImport } = require('../utils/import-resolver')
+const { isHttpOrServiceImport, isTypeOnlyImport, isFetchCall } = require('../utils/import-resolver')
 
 module.exports = {
   meta: {
@@ -45,14 +45,7 @@ module.exports = {
       },
 
       CallExpression(node) {
-        // Detect fetch() or window.fetch()
-        const isFetch =
-          node.callee.name === 'fetch' ||
-          (node.callee.type === 'MemberExpression' &&
-            node.callee.object.name === 'window' &&
-            node.callee.property.name === 'fetch')
-
-        if (isFetch) {
+        if (isFetchCall(node)) {
           context.report({
             node,
             messageId: 'noFetchInStore',

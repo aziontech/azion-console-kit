@@ -13,7 +13,7 @@
  * @returns {number} Number of unique files with violations
  */
 function countFilesWithViolations(violations) {
-  const uniqueFiles = new Set(violations.map((v) => v.file))
+  const uniqueFiles = new Set(violations.map((violation) => violation.file))
   return uniqueFiles.size
 }
 
@@ -74,20 +74,20 @@ function calculateScores(scanResults) {
 
   // Calculate overall score across all buckets
   const allScored = [...Object.values(modules), ...Object.values(v2Services), legacy]
-  const totalFiles = allScored.reduce((sum, s) => sum + s.filesTotal, 0)
-  const totalFilesWithViolations = allScored.reduce((sum, s) => sum + s.filesWithViolations, 0)
+  const totalFiles = allScored.reduce((sum, scored) => sum + scored.filesTotal, 0)
+  const totalFilesWithViolations = allScored.reduce((sum, scored) => sum + scored.filesWithViolations, 0)
   const totalFilesClean = totalFiles - totalFilesWithViolations
-  const totalErrors = allScored.reduce((sum, s) => sum + s.errorCount, 0)
-  const totalWarnings = allScored.reduce((sum, s) => sum + s.warningCount, 0)
-  const totalViolations = allScored.reduce((sum, s) => sum + s.violationCount, 0)
+  const totalErrors = allScored.reduce((sum, scored) => sum + scored.errorCount, 0)
+  const totalWarnings = allScored.reduce((sum, scored) => sum + scored.warningCount, 0)
+  const totalViolations = allScored.reduce((sum, scored) => sum + scored.violationCount, 0)
   const overallScore =
     totalFiles === 0 ? 100 : Math.round((1 - totalFilesWithViolations / totalFiles) * 100)
 
   // Aggregate top violations by rule across all buckets
   const ruleCounts = {}
   const allViolations = [
-    ...Object.values(scanResults.modules).flatMap((b) => b.violations),
-    ...Object.values(scanResults.v2Services).flatMap((b) => b.violations),
+    ...Object.values(scanResults.modules).flatMap((bucket) => bucket.violations),
+    ...Object.values(scanResults.v2Services).flatMap((bucket) => bucket.violations),
     ...scanResults.legacy.violations
   ]
   for (const violation of allViolations) {
@@ -95,7 +95,7 @@ function calculateScores(scanResults) {
   }
   const topViolations = Object.entries(ruleCounts)
     .map(([ruleId, count]) => ({ ruleId, count }))
-    .sort((a, b) => b.count - a.count)
+    .sort((entryA, entryB) => entryB.count - entryA.count)
 
   return {
     modules,

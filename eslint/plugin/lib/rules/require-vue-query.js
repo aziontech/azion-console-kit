@@ -66,7 +66,7 @@ module.exports = {
         if (hasServiceImport && !hasVueQueryImport && !hasBaseServiceUsage) {
           // Find the service import node to report on
           const serviceImportNode = node.body.find(
-            (n) => n.type === 'ImportDeclaration' && isServiceImport(n.source.value)
+            (bodyNode) => bodyNode.type === 'ImportDeclaration' && isServiceImport(bodyNode.source.value)
           )
 
           if (serviceImportNode) {
