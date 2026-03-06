@@ -94,7 +94,7 @@
       <PageHeadingBlock
         :pageTitle="networkListName"
         description="Configure IP addresses and ranges used by security rules."
-      ></PageHeadingBlock>
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -107,8 +107,11 @@
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
-        <template #form>
-          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
+        <template #form="{ loading }">
+          <FormFieldsEditNetworkLists
+            :listCountriesService="props.listCountriesService"
+            :loading="loading"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
