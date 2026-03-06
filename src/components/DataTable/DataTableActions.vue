@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-2 items-center w-full justify-end"
+    class="flex gap-2 items-center justify-end"
     :class="containerClass"
     data-testid="data-table-actions"
   >
