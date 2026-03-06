@@ -30,10 +30,14 @@
     "package-audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/",
     "prepare": "husky install",
-    "generate-specs-json": "npx find-cypress-specs --names --json > specs.json"
+    "generate-specs-json": "npx find-cypress-specs --names --json > specs.json",
+    "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
+    "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
+    "architecture:report": "node scripts/architecture-report/index.cjs"
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
+    "@aziontech/icons": "^1.0.4",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.6.0",
     "@jsonforms/vue": "3.6.0",
@@ -50,7 +54,6 @@
     "analytics": "^0.8.19",
     "axios": "^1.13.5",
     "azion-theme": "^1.16.2",
-    "@aziontech/icons": "^1.0.4",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
