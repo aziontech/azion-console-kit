@@ -87,10 +87,13 @@ const validationSchema = (isEdit) =>
       },
       then: (schema) => schema.max(150).required('Secret Key is a required field')
     }),
-    objectKey: yup.string().when('endpoint', {
-      is: 's3',
-      then: (schema) => schema.max(150)
-    }),
+    objectKey: yup
+      .string()
+      .nullable()
+      .when('endpoint', {
+        is: 's3',
+        then: (schema) => schema.max(150)
+      }),
     contentType: yup.string().when('endpoint', {
       is: 's3',
       then: (schema) => schema.required('Content Type is a required field')

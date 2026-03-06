@@ -1,0 +1,10 @@
+{
+  "name": "eslint-plugin-azion-architecture",
+  "version": "1.0.0",
+  "description": "ESLint plugin for enforcing Azion Console Kit architectural patterns",
+  "main": "index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=8.0.0"
+  }
+}

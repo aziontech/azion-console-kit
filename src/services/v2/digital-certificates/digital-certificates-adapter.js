@@ -47,7 +47,7 @@ export const DigitalCertificatesAdapter = {
 
   transformCreateDigitalCertificateLetEncrypt(payload, sourceCertificate) {
     const payloadRequest = {
-      name: `Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
+      name: `Lets Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
       certificate: null,
       private_key: null,
       type: 'edge_certificate',

@@ -191,7 +191,7 @@ const getInfoByEndpoint = (payload) => {
       return {
         accessKey: endpointAttributes.access_key,
         region: endpointAttributes.region,
-        objectKey: endpointAttributes.object_key_prefix,
+        objectKey: endpointAttributes.object_key_prefix || '',
         bucket: endpointAttributes.bucket_name,
         contentType: endpointAttributes.content_type,
         host: endpointAttributes.host_url,

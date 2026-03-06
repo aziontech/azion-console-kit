@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.54.1",
+  "version": "1.54.3",
   "private": false,
   "type": "module",
   "repository": {
@@ -30,10 +30,14 @@
     "package-audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/",
     "prepare": "husky install",
-    "generate-specs-json": "npx find-cypress-specs --names --json > specs.json"
+    "generate-specs-json": "npx find-cypress-specs --names --json > specs.json",
+    "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
+    "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
+    "architecture:report": "node scripts/architecture-report/index.cjs"
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
+    "@aziontech/icons": "^1.0.4",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.6.0",
     "@jsonforms/vue": "3.6.0",

@@ -20,7 +20,8 @@ export default mergeConfig(
         '.vite',
         '.github',
         'docs',
-        'public'
+        'public',
+        'eslint'
       ],
       root: fileURLToPath(new URL('./', import.meta.url)),
       transformMode: {
