@@ -27,7 +27,11 @@ describe('CacheInvalidator', () => {
     getKeysForEvents.mockReturnValue([['application'], ['workload']])
 
     await sut.invalidate({
-      data: { description: 'Edge Application was updated' }
+      data: {
+        resource: { type: 'edge_application' },
+        activity_type: 'edited',
+        description: 'Edge Application was updated'
+      }
     })
 
     expect(getKeysForEvents).toHaveBeenCalledWith(['Edge Application was updated'])
@@ -36,11 +40,27 @@ describe('CacheInvalidator', () => {
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['workload'] })
   })
 
-  it('should do nothing when event has no description', async () => {
+  it('should do nothing when required fields are missing', async () => {
     await sut.invalidate({ data: {} })
 
     expect(getKeysForEvents).not.toHaveBeenCalled()
     expect(mockInvalidateQueries).not.toHaveBeenCalled()
+  })
+
+  it('should do nothing when resource.type is missing', async () => {
+    await sut.invalidate({
+      data: { activity_type: 'edited', description: 'Test' }
+    })
+
+    expect(getKeysForEvents).not.toHaveBeenCalled()
+  })
+
+  it('should do nothing when activity_type is missing', async () => {
+    await sut.invalidate({
+      data: { resource: { type: 'edge_application' }, description: 'Test' }
+    })
+
+    expect(getKeysForEvents).not.toHaveBeenCalled()
   })
 
   it('should do nothing when event is null', async () => {
@@ -53,7 +73,11 @@ describe('CacheInvalidator', () => {
     getKeysForEvents.mockReturnValue([])
 
     await sut.invalidate({
-      data: { description: 'Unknown resource was created' }
+      data: {
+        resource: { type: 'unknown_resource' },
+        activity_type: 'created',
+        description: 'Unknown resource was created'
+      }
     })
 
     expect(mockInvalidateQueries).not.toHaveBeenCalled()
@@ -64,7 +88,13 @@ describe('CacheInvalidator', () => {
     mockInvalidateQueries.mockRejectedValueOnce(new Error('fail'))
 
     await expect(
-      sut.invalidate({ data: { description: 'Edge Application was deleted' } })
+      sut.invalidate({
+        data: {
+          resource: { type: 'edge_application' },
+          activity_type: 'deleted',
+          description: 'Edge Application was deleted'
+        }
+      })
     ).resolves.not.toThrow()
   })
 })
