@@ -1,164 +1,155 @@
-import { queryClient } from '../query/queryClient'
-import {
-  activityHistoryService,
-  SYNC_INTERVAL_MINUTES
-} from '@/services/v2/activity-history/activity-history-service'
-import { getKeysForEvents } from './invalidation-map'
-import { toMilliseconds } from '../query/config'
+import { SSEClient } from '../sse/sse-client'
+import { CacheInvalidator } from './cache-invalidator'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
 
-const POLL_INTERVAL = toMilliseconds({ minutes: SYNC_INTERVAL_MINUTES })
-// Cache sync polling disabled (prevents periodic activity-history requests).
-const CACHE_SYNC_POLLING_ENABLED = false
+const SSE_ENDPOINT = '/events/stream'
 
+/**
+ * CacheSyncService - Orchestrates SSE connection and cache invalidation.
+ *
+ * Owns:
+ * - ONE TabCoordinator (primary tab election)
+ * - ONE BroadcastManager (cross-tab messaging for tab coordination)
+ * - ONE SSEClient (EventSource connection, only on primary tab)
+ * - ONE CacheInvalidator (converts activity events to query invalidations)
+ *
+ * Cross-tab query sync is handled by broadcastQueryClient (queryClient.js).
+ */
 class CacheSyncService {
-  constructor() {
-    this.broadcast = null
-    this.tabCoordinator = null
-    this.pollIntervalId = null
-    this.isInitialized = false
+  #client = null
+  #broadcast = null
+  #tabCoordinator = null
+  #invalidator = new CacheInvalidator()
+  #isInitialized = false
+  #closedReconnectTimeoutId = null
+  #state = {
+    isConnected: false,
+    clientId: null
   }
 
-  get isPrimary() {
-    return this.tabCoordinator?.isPrimary ?? false
+  get state() {
+    return { ...this.#state }
   }
 
-  async invalidateQueries(eventTitles) {
-    const keysToInvalidate = getKeysForEvents(eventTitles)
-
-    for (const pattern of keysToInvalidate) {
-      // Get ALL queries from cache
-      const allQueries = queryClient.getQueryCache().getAll()
-
-      // Manually filter queries that match the pattern
-      // Pattern: ['origins', 'list'] should match ['origins', '123', 'list', 1, 200]
-      const matchingQueries = allQueries.filter((query) => {
-        return this.#queryKeyMatchesPattern(query.queryKey, pattern)
-      })
-
-      // Remove each matching query from cache
-      for (const query of matchingQueries) {
-        const isPersisted = query.meta?.persist !== false
-
-        if (!isPersisted) {
-          continue
-        }
-
-        // Skip if query doesn't have data (was never fetched)
-        if (!query.state.data) {
-          continue
-        }
-
-        try {
-          await queryClient.removeQueries({ queryKey: query.queryKey, exact: true })
-          await queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
-          await queryClient.refetchQueries({ queryKey: query.queryKey, exact: true })
-        } catch (error) {
-          // Silently fail
-        }
-      }
-    }
-  }
-
-  #queryKeyMatchesPattern(queryKey, pattern) {
-    if (!Array.isArray(queryKey) || !Array.isArray(pattern)) {
-      return false
-    }
-
-    if (pattern.length === 0) {
-      return false
-    }
-
-    if (queryKey.length < pattern.length) {
-      return false
-    }
-
-    let patternIndex = 0
-
-    for (
-      let queryIndex = 0;
-      queryIndex < queryKey.length && patternIndex < pattern.length;
-      queryIndex++
-    ) {
-      if (queryKey[queryIndex] === pattern[patternIndex]) {
-        patternIndex++
-      }
-    }
-
-    return patternIndex === pattern.length
-  }
-
-  async poll() {
-    if (!this.isPrimary) return
-
-    try {
-      const eventTitles = await activityHistoryService.listRecentEvents({
-        intervalMinutes: SYNC_INTERVAL_MINUTES
-      })
-
-      if (eventTitles.length > 0) {
-        await this.invalidateQueries(eventTitles)
-      }
-    } catch (error) {
-      // Silently fail
-    }
-  }
-
-  startPolling() {
-    if (!CACHE_SYNC_POLLING_ENABLED) return
-    this.stopPolling()
-    this.poll()
-    this.pollIntervalId = setInterval(() => this.poll(), POLL_INTERVAL)
-  }
-
-  stopPolling() {
-    if (this.pollIntervalId) {
-      clearInterval(this.pollIntervalId)
-      this.pollIntervalId = null
-    }
+  get isConnected() {
+    return this.#state.isConnected
   }
 
   start() {
-    if (this.isInitialized) return
+    if (this.#isInitialized) return
+    this.#isInitialized = true
 
-    this.isInitialized = true
+    this.#broadcast = new BroadcastManager('cache-sync')
+    this.#broadcast.start()
 
-    this.broadcast = new BroadcastManager('cache-sync')
-    this.broadcast.start()
-
-    this.tabCoordinator = new TabCoordinator(this.broadcast, {
-      onBecomePrimary: () => {
-        if (!CACHE_SYNC_POLLING_ENABLED) return
-        this.startPolling()
-      },
-      onLosePrimary: () => this.stopPolling()
+    this.#tabCoordinator = new TabCoordinator(this.#broadcast, {
+      onBecomePrimary: () => this.#connectSSE(),
+      onLosePrimary: () => this.#disconnectSSE()
     })
 
-    this.tabCoordinator.start()
+    this.#tabCoordinator.start()
   }
 
   stop() {
-    if (!this.isInitialized) return
+    if (!this.#isInitialized) return
 
-    this.isInitialized = false
-    this.stopPolling()
-    this.tabCoordinator?.stop()
-    this.broadcast?.close()
-    this.broadcast = null
-    this.tabCoordinator = null
+    this.#clearClosedReconnectTimeout()
+    this.#disconnectSSE()
+    this.#tabCoordinator?.stop()
+    this.#broadcast?.close()
+
+    this.#tabCoordinator = null
+    this.#broadcast = null
+    this.#isInitialized = false
   }
 
-  reset() {
-    this.stop()
+  /**
+   * @param {string} event
+   * @param {Function} callback
+   * @returns {Function} unsubscribe
+   */
+  on(event, callback) {
+    if (!this.#client) return () => {}
+    return this.#client.on(event, callback)
+  }
+
+  /**
+   * @param {string} event
+   * @param {Function} callback
+   */
+  off(event, callback) {
+    this.#client?.off(event, callback)
+  }
+
+  #connectSSE() {
+    if (this.#client) return
+
+    this.#client = new SSEClient({
+      url: SSE_ENDPOINT,
+      withCredentials: true
+    })
+
+    this.#client.on('open', () => {
+      this.#state.isConnected = true
+    })
+
+    this.#client.on('connected', (data) => {
+      this.#state.isConnected = true
+      this.#state.clientId = data.client_id
+    })
+
+    this.#client.on('activity', (event) => {
+      this.#invalidator.invalidate(event)
+    })
+
+    this.#client.on('close', () => {
+      this.#state.isConnected = false
+      this.#state.isConnected = false
+      this.#scheduleReconnect()
+    })
+
+    this.#client.on('error', () => {
+      this.#state.isConnected = false
+    })
+
+    this.#client.on('maxReconnectAttempts', () => {
+      this.#state.isConnected = false
+    })
+
+    this.#client.connect()
+  }
+
+  #disconnectSSE() {
+    if (this.#client) {
+      this.#client.destroy()
+      this.#client = null
+    }
+    this.#state.isConnected = false
+    this.#state.clientId = null
+  }
+
+  #scheduleReconnect() {
+    this.#clearClosedReconnectTimeout()
+    this.#closedReconnectTimeoutId = setTimeout(() => {
+      this.#disconnectSSE()
+      this.#connectSSE()
+    }, 1000)
+  }
+
+  #clearClosedReconnectTimeout() {
+    if (this.#closedReconnectTimeoutId) {
+      clearTimeout(this.#closedReconnectTimeoutId)
+      this.#closedReconnectTimeoutId = null
+    }
   }
 }
 
-const cacheSyncService = new CacheSyncService()
+export const cacheSyncService = new CacheSyncService()
 
 export function startCacheSync() {
   cacheSyncService.start()
 }
 
 export function resetCacheSync() {
-  cacheSyncService.reset()
+  cacheSyncService.stop()
 }

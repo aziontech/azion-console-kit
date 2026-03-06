@@ -112,7 +112,7 @@ export function getKeysForEvents(eventTitles) {
   if (!Array.isArray(eventTitles) || eventTitles.length === 0) return []
 
   const mappings = [...INVALIDATION_MAP].sort(
-    (aPrefix, bPrefix) => (bPrefix?.length ?? 0) - (aPrefix?.length ?? 0)
+    (first, second) => (second.prefix?.length ?? 0) - (first.prefix?.length ?? 0)
   )
   const processedGroups = new Set()
   const keysToInvalidate = []
