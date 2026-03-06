@@ -129,6 +129,10 @@ const getConfig = () => {
         '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
+        }),
+        '/appcues': createProxyConfig({
+          target: 'https://api.appcues.com',
+          rewrite: (path) => path.replace(/^\/appcues/, '')
         })
       }
     }

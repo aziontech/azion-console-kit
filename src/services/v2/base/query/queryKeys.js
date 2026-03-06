@@ -17,7 +17,8 @@ export const queryKeys = {
   },
   solutions: {
     all: ['solutions'],
-    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type]
+    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type],
+    trending: () => [...queryKeys.solutions.all, 'trending']
   },
   marketplace: {
     all: ['marketplace'],
@@ -228,6 +229,11 @@ export const queryKeys = {
     all: ['edge-sql'],
     list: (params) => [...queryKeys.edgeSql.all, 'list', params],
     detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
+  },
+  appcues: {
+    all: ['appcues'],
+    tags: () => [...queryKeys.appcues.all, 'tags'],
+    launchpads: () => [...queryKeys.appcues.all, 'launchpads']
   },
   networkLists: {
     all: ['network-lists'],

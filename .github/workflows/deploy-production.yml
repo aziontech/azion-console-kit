@@ -38,3 +38,4 @@ jobs:
           VITE_SSO_GOOGLE: ${{ secrets.PROD_SSO_GOOGLE }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
+          VITE_APPCUES_ACCOUNT_ID: ${{ secrets.APPCUES_ACCOUNT_ID }}

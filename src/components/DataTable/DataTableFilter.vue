@@ -24,7 +24,7 @@
       .filter((col) => col.header && col.header !== 'Last Modified')
       .map((col) => ({
         label: col.header,
-        value: col.sortField || col.field?.toLowerCase()
+        value: col.sortField || col.field
       }))
 
     return filterOptions
@@ -59,6 +59,13 @@
     overlayPanel.value.toggle(event)
   }
 
+  const openForFilter = ({ field, value } = {}, event) => {
+    selectedField.value = field || null
+    filterValue.value = value ?? ''
+    isEmailValid.value = true
+    overlayPanel.value.show(event)
+  }
+
   const handleCancel = () => {
     overlayPanel.value.hide()
     selectedField.value = null
@@ -91,7 +98,7 @@
     isEmailValid.value = true
   }
 
-  defineExpose({ toggle })
+  defineExpose({ toggle, openForFilter })
 </script>
 <template>
   <OverlayPanel
