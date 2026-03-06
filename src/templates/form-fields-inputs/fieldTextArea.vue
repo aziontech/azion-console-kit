@@ -103,10 +103,13 @@
     emit('input', event.target.value)
   }
 
+  const ROW_HEIGHT_REM = 1.5
+  const MIN_HEIGHT_REM = 2.75
+  const PADDING_REM = 1.5
+
   const textareaHeight = computed(() => {
     const rows = Number(props.rows)
-    // Each row is approximately 1.5rem (24px), with minimum height of 2.75rem (44px)
-    const height = Math.max(rows * 1.5, 2.75)
+    const height = Math.max(rows * ROW_HEIGHT_REM + PADDING_REM, MIN_HEIGHT_REM)
     return `${height}rem`
   })
 

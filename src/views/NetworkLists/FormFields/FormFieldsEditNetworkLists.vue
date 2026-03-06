@@ -47,9 +47,6 @@
   const isCountriesNetworkType = computed(() => {
     return networkListType.value === 'countries'
   })
-  const isLoadingNetworkType = computed(() => {
-    return props.loading && (!networkListType.value || !itemsValues.value)
-  })
 
   onMounted(async () => {
     await fetchCountries()
@@ -106,7 +103,7 @@
           name="itemsValues"
           rows="2"
           :value="itemsValues"
-          :loading="isLoadingNetworkType || props.loading"
+          :loading="props.loading"
           data-testid="network-list-form__asn-list"
           description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
@@ -122,7 +119,7 @@
           name="itemsValues"
           rows="16"
           :value="itemsValues"
-          :loading="isLoadingNetworkType || props.loading"
+          :loading="props.loading"
           data-testid="network-list-form__ipcidr-list"
         >
           <template #description>
