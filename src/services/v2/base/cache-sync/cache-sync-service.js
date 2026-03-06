@@ -21,6 +21,7 @@ class CacheSyncService {
   #tabCoordinator = null
   #invalidator = new CacheInvalidator()
   #isInitialized = false
+  #closedReconnectTimeoutId = null
   #state = {
     isConnected: false,
     clientId: null
@@ -52,6 +53,7 @@ class CacheSyncService {
   stop() {
     if (!this.#isInitialized) return
 
+    this.#clearClosedReconnectTimeout()
     this.#disconnectSSE()
     this.#tabCoordinator?.stop()
     this.#broadcast?.close()
@@ -102,6 +104,8 @@ class CacheSyncService {
 
     this.#client.on('close', () => {
       this.#state.isConnected = false
+      this.#state.isConnected = false
+      this.#scheduleReconnect()
     })
 
     this.#client.on('error', () => {
@@ -122,6 +126,21 @@ class CacheSyncService {
     }
     this.#state.isConnected = false
     this.#state.clientId = null
+  }
+
+  #scheduleReconnect() {
+    this.#clearClosedReconnectTimeout()
+    this.#closedReconnectTimeoutId = setTimeout(() => {
+      this.#disconnectSSE()
+      this.#connectSSE()
+    }, 1000)
+  }
+
+  #clearClosedReconnectTimeout() {
+    if (this.#closedReconnectTimeoutId) {
+      clearTimeout(this.#closedReconnectTimeoutId)
+      this.#closedReconnectTimeoutId = null
+    }
   }
 }
 

@@ -24,6 +24,7 @@ mockSSEClient.on.mockImplementation((event, cb) => {
 const mockInvalidate = vi.fn().mockResolvedValue(undefined)
 
 let onBecomePrimaryCallback = null
+// eslint-disable-next-line no-unused-vars
 let onLosePrimaryCallback = null
 
 vi.mock('@services/v2/base/sse/sse-client', () => ({

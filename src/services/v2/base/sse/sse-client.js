@@ -59,8 +59,7 @@ const DEFAULT_OPTIONS = {
   withCredentials: true,
   reconnectMaxAttempts: 10,
   reconnectBaseDelay: 1000,
-  reconnectMaxDelay: 30000,
-  inactivityTimeout: 60000
+  reconnectMaxDelay: 30000
 }
 
 export class SSEClient {
@@ -74,7 +73,6 @@ export class SSEClient {
   }
   #listeners = new Map()
   #reconnectTimeoutId = null
-  #inactivityTimeoutId = null
   #isIntentionallyClosed = false
 
   /**
@@ -159,18 +157,15 @@ export class SSEClient {
       this.#state.isConnected = true
       this.#state.reconnectAttempts = 0
       this.#state.lastError = null
-      this.#resetInactivityTimeout()
       this.#emit('open', {})
     }
 
     this.#eventSource.onerror = () => {
-      this.#clearInactivityTimeout()
       const error = new Error('SSE connection error')
       this.#handleError(error)
     }
 
     this.#eventSource.onmessage = (event) => {
-      this.#resetInactivityTimeout()
       this.#handleMessage(event)
     }
   }
@@ -260,22 +255,6 @@ export class SSEClient {
     }
   }
 
-  #resetInactivityTimeout() {
-    this.#clearInactivityTimeout()
-    this.#inactivityTimeoutId = setTimeout(() => {
-      if (this.#state.isConnected && !this.#isIntentionallyClosed) {
-        this.#handleError(new Error('SSE inactivity timeout'))
-      }
-    }, this.#options.inactivityTimeout)
-  }
-
-  #clearInactivityTimeout() {
-    if (this.#inactivityTimeoutId) {
-      clearTimeout(this.#inactivityTimeoutId)
-      this.#inactivityTimeoutId = null
-    }
-  }
-
   #cleanupEventSource() {
     if (this.#eventSource) {
       this.#eventSource.onopen = null
@@ -288,7 +267,6 @@ export class SSEClient {
 
   #cleanup() {
     this.#clearReconnectTimeout()
-    this.#clearInactivityTimeout()
     this.#cleanupEventSource()
 
     this.#state.isConnected = false

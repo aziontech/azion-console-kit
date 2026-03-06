@@ -18,6 +18,13 @@ const fixtures = {
       description: 'Dns Zone rodrigomaria.github.io was deleted',
       metadata: { id: 263658 }
     }
+  },
+  pingEvent: {
+    type: 'ping'
+  },
+  closedEvent: {
+    type: 'closed',
+    reason: 'timeout'
   }
 }
 
@@ -234,6 +241,37 @@ describe('SSEClient', () => {
     })
   })
 
+  describe('ping event', () => {
+    it('should emit ping event to listeners', () => {
+      const { sut, getEventSource } = makeSut()
+      const pingHandler = vi.fn()
+
+      sut.on('ping', pingHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      getEventSource().simulateMessage(fixtures.pingEvent)
+
+      expect(pingHandler).toHaveBeenCalledWith(fixtures.pingEvent)
+      expect(sut.getState().isConnected).toBe(true)
+    })
+  })
+
+  describe('closed event', () => {
+    it('should emit closed event to listeners', () => {
+      const { sut, getEventSource } = makeSut()
+      const closedHandler = vi.fn()
+
+      sut.on('closed', closedHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      getEventSource().simulateMessage(fixtures.closedEvent)
+
+      expect(closedHandler).toHaveBeenCalledWith(fixtures.closedEvent)
+    })
+  })
+
   describe('event subscription', () => {
     it('should return unsubscribe function from on()', () => {
       const { sut, getEventSource } = makeSut()
@@ -327,7 +365,7 @@ describe('SSEClient', () => {
 
   describe('destroy', () => {
     it('should disconnect and clear all listeners', () => {
-      const { sut, getEventSource } = makeSut()
+      const { sut } = makeSut()
       const handler = vi.fn()
 
       sut.on('message', handler)
