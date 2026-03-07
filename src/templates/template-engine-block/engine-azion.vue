@@ -43,6 +43,11 @@
 
   onMounted(async () => {
     await initializeForm()
+    const groupsToCheck = inputSchema.value.groups || []
+    const fieldNames = extractFieldNames(groupsToCheck)
+    if (fieldNames.includes(vcsIntegrationFieldName.value)) {
+      await loadIntegrationOnShowButton()
+    }
   })
 
   onBeforeUnmount(() => {
