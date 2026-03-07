@@ -73,7 +73,7 @@
       await loadListIntegrations()
     } catch (error) {
       error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.detail}`,
+        summary: `GitHub integration failed: ${error.message}`,
         severity: 'error'
       }))
     } finally {
