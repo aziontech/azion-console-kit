@@ -96,8 +96,20 @@
   }
 
   const handleGithubIntegrationMessage = async (event) => {
+    if (event.origin !== window.location.origin) return
+
     if (event.data.event === 'integration-data') {
       await saveIntegration(event.data)
+    }
+    if (event.data.event === 'integration-connected') {
+      await listIntegrations()
+    }
+    if (event.data.event === 'integration-error') {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'GitHub integration failed'
+      })
     }
   }
 
