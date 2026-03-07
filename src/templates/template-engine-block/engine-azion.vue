@@ -43,6 +43,11 @@
 
   onMounted(async () => {
     await initializeForm()
+    const groupsToCheck = inputSchema.value.groups || []
+    const fieldNames = extractFieldNames(groupsToCheck)
+    if (fieldNames.includes(vcsIntegrationFieldName.value)) {
+      await loadIntegrationOnShowButton()
+    }
   })
 
   onBeforeUnmount(() => {
@@ -91,8 +96,20 @@
   }
 
   const handleGithubIntegrationMessage = async (event) => {
+    if (event.origin !== window.location.origin) return
+
     if (event.data.event === 'integration-data') {
       await saveIntegration(event.data)
+    }
+    if (event.data.event === 'integration-connected') {
+      await listIntegrations()
+    }
+    if (event.data.event === 'integration-error') {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'GitHub integration failed'
+      })
     }
   }
 
@@ -126,7 +143,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
       error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.detail}`,
+        summary: `GitHub integration failed: ${error.message}`,
         severity: 'error'
       }))
     } finally {

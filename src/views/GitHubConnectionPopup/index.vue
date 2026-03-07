@@ -67,14 +67,20 @@
 
   const sendPostMessage = () => {
     const platformUrl = window.location.origin
-    const data = {
-      event: 'integration-data',
-      data: route.query
-    }
+
     if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(data, platformUrl)
+      if (route.query.code) {
+        window.opener.postMessage({ event: 'integration-data', data: route.query }, platformUrl)
+      } else if (route.query.error) {
+        window.opener.postMessage({ event: 'integration-error', data: route.query }, platformUrl)
+      } else {
+        window.opener.postMessage(
+          { event: 'integration-connected', data: route.query },
+          platformUrl
+        )
+      }
     }
 
-    window.parent.close()
+    window.close()
   }
 </script>
