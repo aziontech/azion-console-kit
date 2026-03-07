@@ -33,7 +33,9 @@ vi.mock('vee-validate', () => ({
 }))
 
 vi.mock('@jsonforms/vue', () => ({
-  JsonForms: { name: 'JsonForms', template: '<div />' }
+  JsonForms: { name: 'JsonForms', template: '<div />' },
+  rendererProps: () => ({}),
+  useJsonFormsControl: () => ({ control: { value: {} }, handleChange: vi.fn() })
 }))
 
 vi.mock('@jsonforms/vue-vanilla', () => ({

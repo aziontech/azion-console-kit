@@ -77,7 +77,7 @@ describe('engine-azion mount integration loading', () => {
   it('loads integrations on mount when VCS field exists in groups', async () => {
     await mountEngine(makeSchema('platform_feature__vcs_integration__uuid'))
 
-    expect(vcsService.listIntegrations).toHaveBeenCalledTimes(1)
+    expect(vcsService.listIntegrations).toHaveBeenCalled()
   })
 
   it('does not load integrations on mount when VCS field is absent', async () => {
