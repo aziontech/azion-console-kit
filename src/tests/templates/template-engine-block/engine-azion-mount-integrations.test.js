@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { shallowMount, flushPromises } from '@vue/test-utils'
 import EngineAzion from '@/templates/template-engine-block/engine-azion.vue'
 import { vcsService } from '@/services/v2/vcs/vcs-service'
@@ -45,8 +45,10 @@ const makeSchema = (fieldName) => ({
   ]
 })
 
+const wrappers = []
+
 const mountEngine = async (schema) => {
-  shallowMount(EngineAzion, {
+  const wrapper = shallowMount(EngineAzion, {
     props: { schema, isDrawer: false },
     global: {
       stubs: {
@@ -59,12 +61,17 @@ const mountEngine = async (schema) => {
       }
     }
   })
+  wrappers.push(wrapper)
   await flushPromises()
 }
 
 describe('engine-azion mount integration loading', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    wrappers.splice(0).forEach((wrapper) => wrapper.unmount())
   })
 
   it('loads integrations on mount when VCS field exists in groups', async () => {
