@@ -16,7 +16,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
+  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
@@ -362,14 +362,12 @@
                   class="flex flex-col items-center justify-center h-full gap-2"
                 >
                   <p>Configure the form builder.</p>
-                  <!--
                   <PrimeButton
                     outlined
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
                   />
-                  -->
                 </div>
                 <div class="absolute right-2.5 bottom-2 surface-section">
                   <PrimeButton
