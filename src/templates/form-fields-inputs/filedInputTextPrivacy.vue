@@ -46,11 +46,6 @@
       type: String,
       default: ''
     },
-    /**
-     * Controls the privacy state of the field.
-     * false = private (locked) | true = public (unlocked)
-     * Use with v-model:isPublic
-     */
     isPublic: {
       type: Boolean,
       default: false
@@ -63,6 +58,9 @@
   const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
 
+  const isFocused = ref(false)
+  const isHovered = ref(false)
+
   const customTestId = computed(() => {
     const id = attrs['data-testid'] || 'field-text-privacy'
     return {
@@ -74,6 +72,21 @@
     }
   })
 
+  // Unified border class: error takes priority, then hover/focus, then default
+  const groupBorderClass = computed(() => {
+    if (aditionalError.value || veeValidateErrorMessage.value) return '!border-red-500'
+    if (isFocused.value || isHovered.value) return '!border-[#f3652b]'
+    return ''
+  })
+
+  const groupShadowClass = computed(() => {
+    if (isFocused.value || isHovered.value) {
+      const color = aditionalError.value || veeValidateErrorMessage.value ? '#ef4444' : '#f3652b'
+      return `shadow-[0_0_0_1px_${color}]`
+    }
+    return ''
+  })
+
   const {
     value: inputValue,
     errorMessage: veeValidateErrorMessage,
@@ -82,6 +95,9 @@
   } = useField(name, undefined, {
     initialValue: props.value
   })
+
+  // Expose aditionalError as a ref so computed above can read it reactively
+  const aditionalError = computed(() => props.aditionalError)
 
   const onBlur = (event) => {
     handleBlur(event)
@@ -98,6 +114,21 @@
     emit('update:isPublic', !props.isPublic)
   }
 
+  const onGroupFocusIn = () => {
+    isFocused.value = true
+  }
+  const onGroupFocusOut = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      isFocused.value = false
+    }
+  }
+  const onGroupMouseEnter = () => {
+    isHovered.value = true
+  }
+  const onGroupMouseLeave = () => {
+    isHovered.value = false
+  }
+
   defineExpose({ inputRef })
 </script>
 
@@ -110,7 +141,14 @@
     :isRequired="attrs.required"
   />
 
-  <div class="p-inputgroup">
+  <div
+    class="p-inputgroup rounded transition-shadow duration-150"
+    :class="[groupShadowClass, disabled ? 'opacity-50 pointer-events-none' : '']"
+    @focusin="onGroupFocusIn"
+    @focusout="onGroupFocusOut"
+    @mouseenter="onGroupMouseEnter"
+    @mouseleave="onGroupMouseLeave"
+  >
     <InputText
       v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
       v-model="inputValue"
@@ -122,39 +160,54 @@
       :readonly="readonly"
       :disabled="disabled"
       :placeholder="props.placeholder"
-      :class="[{ 'p-invalid': aditionalError || veeValidateErrorMessage }, props.class]"
+      :class="[
+        '!border-r-0 !outline-none !shadow-none transition-colors duration-150',
+        groupBorderClass,
+        { 'p-invalid': aditionalError || veeValidateErrorMessage },
+        props.class
+      ]"
       @input="onChange"
       @keypress.enter.prevent
       @blur="onBlur"
     />
 
-    <!-- Privacy switch toggle -->
+    <!-- Privacy switch suffix -->
     <span
       :data-testid="customTestId.privacySwitch"
       :title="isPublic ? 'Public – click to make private' : 'Private – click to make public'"
-      :aria-label="isPublic ? 'Field is public. Click to make private.' : 'Field is private. Click to make public.'"
+      :aria-label="
+        isPublic
+          ? 'Field is public. Click to make private.'
+          : 'Field is private. Click to make public.'
+      "
       :aria-pressed="isPublic"
       role="switch"
       tabindex="0"
-      class="p-inputgroup-addon px-2 flex items-center justify-center select-none bg-transparent cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:rounded"
-      :class="{
-        'opacity-50 cursor-not-allowed pointer-events-none': disabled || readonly
-      }"
+      class="p-inputgroup-addon !bg-[var(--input-bg,var(--surface-0))] !border-l-0 cursor-pointer outline-none transition-colors duration-150 select-none"
+      :class="[
+        groupBorderClass,
+        { 'opacity-50 cursor-not-allowed pointer-events-none': disabled || readonly }
+      ]"
       @click="togglePrivacy"
       @keydown.enter.prevent="togglePrivacy"
       @keydown.space.prevent="togglePrivacy"
     >
+      <!-- Switch track -->
       <span
         class="relative w-9 h-5 rounded-full transition-colors duration-200"
-        :class="isPublic ? 'privacy-switch--public' : 'privacy-switch--private'"
+        :class="
+          isPublic
+            ? 'bg-[#f3652b] hover:bg-[#d95522]'
+            : 'bg-[var(--input-switch-slider-off-bg)] hover:bg-[var(--input-switch-slider-off-hover-bg)]'
+        "
       >
+        <!-- Switch knob -->
         <span
           class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-sm transition-transform duration-200"
           :class="isPublic ? 'translate-x-4' : 'translate-x-0'"
         >
-          <!-- Both icons rendered with transition -->
           <span class="relative w-3 h-3">
-            <!-- Lock closed (private/inactive) -->
+            <!-- 🔒 Locked (private) -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
@@ -166,15 +219,21 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
-              class="absolute inset-0 transition-all duration-200"
+              class="absolute inset-0 transition-all duration-200 text-gray-500"
               :class="isPublic ? 'opacity-0 scale-75' : 'opacity-100 scale-100'"
-              :style="{ color: 'var(--text-color-secondary, #6c757d)' }"
             >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <rect
+                x="3"
+                y="11"
+                width="18"
+                height="11"
+                rx="2"
+                ry="2"
+              />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
 
-            <!-- Lock open (public/active) -->
+            <!-- 🔓 Unlocked (public) -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
@@ -186,11 +245,17 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
-              class="absolute inset-0 transition-all duration-200"
+              class="absolute inset-0 transition-all duration-200 text-orange-700"
               :class="isPublic ? 'opacity-100 scale-100' : 'opacity-0 scale-75'"
-              :style="{ color: '#c2410c' }"
             >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <rect
+                x="3"
+                y="11"
+                width="18"
+                height="11"
+                rx="2"
+                ry="2"
+              />
               <path d="M7 11V7a5 5 0 0 1 9.9-1" />
             </svg>
           </span>
@@ -219,33 +284,9 @@
 </template>
 
 <style scoped>
-/* CSS variables for theming - Tailwind can't handle these */
-.privacy-switch--private {
-  background-color: var(--surface-300, #d1d5db) !important;
-}
-
-.privacy-switch--private:hover {
-  background-color: var(--surface-400, #9ca3af) !important;
-}
-
-.privacy-switch--public {
-  background-color: #f3652b !important;
-}
-
-.privacy-switch--public:hover {
-  background-color: var(--primary-600, #f3652b) !important;
-}
-
-.p-inputgroup-addon:focus-visible {
-  outline-color: var(--primary-color, #3b82f6);
-}
-
-.p-inputgroup-addon {
-  background-color: #282828  !important;
-  border-left:none;
-}
-
-.p-inputtext {
-  border-right: none;
-}
+  /* Suppress PrimeVue's own focus ring on the InputText — managed at group level */
+  :deep(.p-inputtext:focus) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 </style>
