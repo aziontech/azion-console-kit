@@ -16,6 +16,8 @@
   import { TextareaControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/textarea/textareaControlTester'
   import DropdownControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/dropdown/dropdownControlRenderer.vue'
   import { DropdownControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/dropdown/dropdownControlTester'
+  import InputTextPrivacyControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text-privacy/inputTextPrivacyControlRenderer.vue'
+  import { InputTextPrivacyControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text-privacy/inputTextPrivacyControlTester'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import OAuthGithub from './oauth-github.vue'
 
@@ -84,6 +86,10 @@
     {
       tester: DropdownControlTester,
       renderer: DropdownControlRenderer
+    },
+    {
+      tester: InputTextPrivacyControlTester,
+      renderer: InputTextPrivacyControlRenderer
     }
   ]
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
