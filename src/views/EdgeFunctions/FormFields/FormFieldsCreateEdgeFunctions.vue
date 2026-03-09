@@ -276,7 +276,6 @@
         </template>
       </FormHorizontal>
     </TabPanel>
-    
 
     <TabPanel header="Code">
       <div v-if="activeTab === 1">
@@ -322,7 +321,7 @@
             @update:modelValue="codeEditorArgsUpdate"
           />
         </div>
-        
+
         <div v-if="hasFormBuilder">
           <ResizableSplitter
             class="!z-20 relative"

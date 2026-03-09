@@ -130,9 +130,7 @@
         disableToast
       >
         <template #form>
-          <FormFieldsCreateEdgeFunctions
-            @additionalErrors="handleAdditionalErrors"
-          />
+          <FormFieldsCreateEdgeFunctions @additionalErrors="handleAdditionalErrors" />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
