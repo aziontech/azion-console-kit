@@ -1,7 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InlineMessage from 'primevue/inlinemessage'
 
