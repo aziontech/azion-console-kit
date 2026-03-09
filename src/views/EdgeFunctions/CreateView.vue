@@ -58,7 +58,6 @@
     active: yup.boolean(),
     runtime: yup.string()
   })
-  const updateObject = ref({})
 
   const initialValues = {
     name: '',
@@ -131,10 +130,7 @@
         disableToast
       >
         <template #form>
-          <FormFieldsCreateEdgeFunctions
-            v-model:preview-data="updateObject"
-            @additionalErrors="handleAdditionalErrors"
-          />
+          <FormFieldsCreateEdgeFunctions @additionalErrors="handleAdditionalErrors" />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
