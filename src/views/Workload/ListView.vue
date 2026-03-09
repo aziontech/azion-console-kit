@@ -23,19 +23,6 @@
 
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
-  const DOMAINS_API_FIELDS = [
-    'name',
-    'domains',
-    'workload_domain',
-    'infrastructure',
-    'active',
-    'last_modified',
-    'id',
-    'last_editor',
-    'product_version',
-    'workload_domain'
-  ]
-
   const columnsHiddenByDefault = ['lastEditor', 'protocols']
 
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
@@ -218,7 +205,6 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
         :actions="actions"
-        :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
         :frozenColumns="['name']"

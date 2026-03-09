@@ -20,5 +20,9 @@ export default function afterEachRoute(to, from, failure) {
     .track()
   tracker.identify(userId)
 
-  sessionManager.afterLogin()
+  const isOnboardingStep = to.name === 'additional-data'
+
+  if (!isOnboardingStep) {
+    sessionManager.afterLogin()
+  }
 }
