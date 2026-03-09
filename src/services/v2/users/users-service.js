@@ -81,9 +81,13 @@ export class UsersService extends BaseService {
   }
 
   loadUserSettings = async () => {
-    return await this.useEnsureQueryData(queryKeys.user.info(), () => this.#fetchCurrentUser(), {
-      persist: true
-    })
+    return await this.useEnsureQueryData(
+      queryKeys.user.settings(),
+      () => this.#fetchCurrentUser(),
+      {
+        persist: true
+      }
+    )
   }
 
   #fetchList = async (params = { pageSize: 10 }) => {
