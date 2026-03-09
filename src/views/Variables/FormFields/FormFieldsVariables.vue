@@ -1,18 +1,15 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FiledInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
 
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InlineMessage from 'primevue/inlinemessage'
 
-  import { ref } from 'vue'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-variables' })
 
   const { value: key } = useField('key')
   const { value: value } = useField('value')
-  const isPublic = ref(false)
 </script>
 
 <template>
@@ -45,18 +42,6 @@
           description="Enter the data associated with the variable key."
           data-testid="variables-form__value-field"
           sensitive
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FiledInputTextPrivacy
-          label="Value"
-          required
-          name="value"
-          placeholder="VARIABLE_VALUE"
-          :value="value"
-          v-model:isPublic="isPublic"
-          description="Enter the data associated with the variable key."
-          data-testid="variables-form__value-field"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
