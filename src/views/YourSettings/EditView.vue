@@ -15,15 +15,19 @@
         disableAfterCreateToastFeedback
         @on-edit-fail="handleTrackFailEdit"
         @on-edit-success="successSubmit"
+        @loaded-service-object="isFormLoading = false"
       >
-        <template #form>
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading || isFormLoading" />
           <FormFieldsYourSettings
+            v-else
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
+            v-if="!isFormLoading"
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
@@ -45,6 +49,7 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -89,6 +94,7 @@
     }
   })
 
+  const isFormLoading = ref(true)
   const userData = ref({})
   const userChanges = ref({})
 

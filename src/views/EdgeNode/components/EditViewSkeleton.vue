@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <BreadcrumbSkeleton />
+      <BreadcrumbSkeleton :widths="['6rem', '10rem']" />
     </template>
     <template #content>
       <div class="h-full w-full">
@@ -20,9 +20,9 @@
   import FormSkeletonGenerator from '@/templates/skeleton-block/FormSkeletonGenerator.vue'
   import ActionBarSkeleton from '@/templates/skeleton-block/ActionBarSkeleton.vue'
 
-  defineOptions({ name: 'edit-view-skeleton' })
+  defineOptions({ name: 'edge-node-edit-view-skeleton' })
 
-  const tabWidths = ['5.5rem', '3.5rem', '6rem', '5rem', '6rem', '7.5rem', '5.5rem']
+  const tabWidths = ['7rem', '4.5rem']
 
   const formConfig = [
     {
@@ -34,34 +34,15 @@
       titleWidth: '10rem',
       descriptionWidths: ['100%', '85%'],
       fields: [
-        {
-          type: 'radio',
-          labelWidth: '8rem',
-          count: 3,
-          optionLabelWidth: '10rem',
-          optionDescWidth: '20rem'
-        },
-        {
-          type: 'input-row',
-          inputs: [
-            { labelWidth: '6rem' },
-            { labelWidth: '7rem' }
-          ]
-        }
+        { type: 'input', labelWidth: '4.5rem', hasHelper: true },
+        { type: 'input', labelWidth: '6.5rem', maxWidth: 'sm:max-w-3xl', hasHelper: true }
       ]
     },
     {
-      titleWidth: '7rem',
-      descriptionWidths: ['100%', '90%', '60%'],
+      titleWidth: '13rem',
+      descriptionWidths: ['100%', '85%'],
       fields: [
-        { type: 'module-cards', labelWidth: '10rem', count: 6 }
-      ]
-    },
-    {
-      titleWidth: '8rem',
-      descriptionWidths: ['100%', '95%', '85%'],
-      fields: [
-        { type: 'switch-justified', labelWidth: '4rem', descriptionWidth: '90%' }
+        { type: 'switch-justified', labelWidth: '8rem', descriptionWidth: '90%' }
       ]
     }
   ]

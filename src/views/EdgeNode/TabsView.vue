@@ -8,6 +8,7 @@
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
+  import EditViewSkeleton from '@/views/EdgeNode/components/EditViewSkeleton.vue'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
@@ -28,6 +29,7 @@
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
   const edgeNode = ref()
+  const isEdgeNodeLoaded = ref(false)
   const toast = useToast()
 
   const defaultTabs = {
@@ -74,6 +76,7 @@
     activeTab.value = services ? 1 : 0
 
     edgeNode.value = { ...edgeNode.value, ...(await getEdgeNodesData()) }
+    isEdgeNodeLoaded.value = true
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeNode.value?.name)
     preloadTabData()
   }
@@ -97,6 +100,10 @@
     })
   }
 
+  const shouldShowSkeleton = computed(() => {
+    return !edgeNode.value || !isEdgeNodeLoaded.value
+  })
+
   const { unsaved, requestTabChange } = provideTabUnsaved(changeTab)
 
   const tabViewRef = ref(null)
@@ -116,7 +123,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -130,10 +138,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="w-full h-full"
-        v-if="edgeNode"
-      >
+      <div class="w-full h-full">
         <TabView
           ref="tabViewRef"
           :activeIndex="activeTab"

@@ -2,7 +2,7 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
+  import { ref, computed, nextTick, onBeforeUnmount, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -151,8 +151,34 @@
       goBackToList()
     } finally {
       isLoadingData.value = false
-      isFormReady.value = true
+      settleAndActivateDirtyTracking()
     }
+  }
+
+  /**
+   * After loading finishes, child components (e.g. dropdowns) may still run
+   * async callbacks that set form fields (like selectCertificate setting
+   * authorityCertificate). We watch for value changes to settle, then
+   * re-establish the clean baseline before activating dirty tracking.
+   */
+  let settleTimer = null
+
+  const settleAndActivateDirtyTracking = () => {
+    const activate = () => {
+      clearTimeout(settleTimer)
+      settleTimer = setTimeout(() => {
+        stopWatch()
+        resetForm({ values: { ...values } })
+        isFormReady.value = true
+      }, 300)
+    }
+
+    const stopWatch = watch(
+      () => JSON.stringify(values),
+      () => activate()
+    )
+
+    activate()
   }
 
   const onSubmit = handleSubmit(

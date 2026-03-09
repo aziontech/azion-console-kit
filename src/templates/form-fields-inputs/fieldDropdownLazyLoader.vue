@@ -208,7 +208,7 @@
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied'])
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied', 'onLoaded'])
 
   const PAGE_INCREMENT = 1
   const PAGE_SIZE = 100
@@ -233,6 +233,7 @@
 
   onMounted(async () => {
     await fetchData()
+    emit('onLoaded')
   })
 
   const hasDescriptionSlot = !!slots.description
@@ -610,7 +611,21 @@
   }
 
   const checkValueInList = (value) => {
-    const existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+    const isGroupedData =
+      data.value.length > 0 &&
+      data.value.some((item) => item[props.optionGroupLabel] && item[props.optionGroupChildren])
+
+    let existitemInList = false
+
+    if (isGroupedData) {
+      existitemInList = data.value.some((group) =>
+        group[props.optionGroupChildren]?.some(
+          (item) => item[props.optionValue] === value
+        )
+      )
+    } else {
+      existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+    }
 
     if (!existitemInList) {
       loadSelectedValue(value)

@@ -161,7 +161,7 @@
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied', 'onClear'])
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied', 'onClear', 'onLoaded'])
   const PAGE_INCREMENT = 1
   const PAGE_SIZE = 100
   const INITIAL_PAGE = 1
@@ -184,6 +184,7 @@
 
   onMounted(async () => {
     await fetchData()
+    emit('onLoaded')
   })
 
   const hasDescriptionSlot = !!slots.description
