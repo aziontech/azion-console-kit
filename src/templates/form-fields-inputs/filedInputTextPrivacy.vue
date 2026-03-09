@@ -72,7 +72,6 @@
     }
   })
 
-  // Unified border class: error takes priority, then hover/focus, then default
   const groupBorderClass = computed(() => {
     if (aditionalError.value || veeValidateErrorMessage.value) return '!border-red-500'
     if (isFocused.value || isHovered.value) return '!border-[#f3652b]'
@@ -96,7 +95,6 @@
     initialValue: props.value
   })
 
-  // Expose aditionalError as a ref so computed above can read it reactively
   const aditionalError = computed(() => props.aditionalError)
 
   const onBlur = (event) => {
@@ -171,7 +169,6 @@
       @blur="onBlur"
     />
 
-    <!-- Privacy switch suffix -->
     <span
       :data-testid="customTestId.privacySwitch"
       :title="isPublic ? 'Public – click to make private' : 'Private – click to make public'"
@@ -192,7 +189,6 @@
       @keydown.enter.prevent="togglePrivacy"
       @keydown.space.prevent="togglePrivacy"
     >
-      <!-- Switch track -->
       <span
         class="relative w-9 h-5 rounded-full transition-colors duration-200"
         :class="
@@ -201,13 +197,11 @@
             : 'bg-[var(--input-switch-slider-off-bg)] hover:bg-[var(--input-switch-slider-off-hover-bg)]'
         "
       >
-        <!-- Switch knob -->
         <span
           class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-sm transition-transform duration-200"
           :class="isPublic ? 'translate-x-4' : 'translate-x-0'"
         >
           <span class="relative w-3 h-3">
-            <!-- 🔒 Locked (private) -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
@@ -233,7 +227,6 @@
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
 
-            <!-- 🔓 Unlocked (public) -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
@@ -284,7 +277,6 @@
 </template>
 
 <style scoped>
-  /* Suppress PrimeVue's own focus ring on the InputText — managed at group level */
   :deep(.p-inputtext:focus) {
     outline: none !important;
     box-shadow: none !important;
