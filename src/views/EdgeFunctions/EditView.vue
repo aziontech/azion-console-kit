@@ -9,7 +9,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
-  import MobileCodePreview from './components/mobile-code-preview.vue'
 
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
@@ -31,7 +30,6 @@
   const cachedFunction = edgeFunctionService.getEdgeFunctionFromCache(route.params?.id) ?? {}
   const isLoading = ref(false)
   const additionalErrors = ref([])
-  const updateObject = ref({})
   const runtime = ref(null)
   const name = ref(cachedFunction.name || '')
 
@@ -106,12 +104,7 @@
       <PageHeadingBlock
         :pageTitle="name"
         description="Configure function code, triggers, and execution settings."
-      >
-        <MobileCodePreview
-          :updateObject="updateObject"
-          :runtime="runtime"
-        />
-      </PageHeadingBlock>
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -126,7 +119,6 @@
       >
         <template #form>
           <FormFieldsEditEdgeFunctions
-            v-model:preview-data="updateObject"
             v-model:run="runtime"
             v-model:name="name"
             @additionalErrors="handleAdditionalErrors"

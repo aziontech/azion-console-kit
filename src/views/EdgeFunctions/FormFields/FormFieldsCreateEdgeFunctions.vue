@@ -9,7 +9,6 @@
   import { useResize } from '@/composables/useResize'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
-  import CodePreview from '../components/code-preview.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -28,13 +27,10 @@
     isDrawer: {
       type: Boolean,
       default: false
-    },
-    previewData: {
-      type: Object
     }
   })
 
-  const emit = defineEmits(['update:previewData', 'additionalErrors'])
+  const emit = defineEmits(['additionalErrors'])
   let SPLITTER_PROPS = ref({
     height: '50vh',
     layout: 'horizontal',
@@ -45,7 +41,6 @@
 
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
-  const showPreview = ref(true)
   const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
@@ -134,17 +129,6 @@
     return !!azionFormError.value
   })
 
-  const updateObject = computed(() => {
-    const previewValues = {
-      code: code.value,
-      args: defaultArgs.value
-    }
-
-    emit('update:previewData', previewValues)
-
-    return previewValues
-  })
-
   const onChangeAzionForm = (event) => {
     azionFormValidationErrors.value = event.errors || []
 
@@ -225,12 +209,12 @@
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <FieldText
-              label="Name"
               required
+              label="Name"
               name="name"
+              description="Give a unique and descriptive name to identify the Function."
               placeholder="My Function"
               :value="name"
-              description="Give a unique and descriptive name to identify the Function."
             />
           </div>
         </template>
@@ -239,18 +223,18 @@
       <FormHorizontal
         class="mt-8"
         title="Runtime"
-        :isDrawer="isDrawer"
         description="The execution runtime used to run your Function"
+        :isDrawer="isDrawer"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
             <FieldTextIcon
-              label="Runtime"
-              name="LANGUAGE_LABEL"
-              icon="pi pi-lock"
               disabled
-              :value="LANGUAGE_LABEL"
+              label="Runtime"
+              icon="pi pi-lock"
+              name="LANGUAGE_LABEL"
               description="Currently, only JavaScript is supported."
+              :value="LANGUAGE_LABEL"
             />
           </div>
         </template>
@@ -266,8 +250,8 @@
           <div class="flex flex-col w-full gap-2">
             <FieldGroupRadio
               required
-              nameField="executionEnvironment"
               isCard
+              nameField="executionEnvironment"
               :options="executionEnvironmentOptions"
             />
           </div>
@@ -282,69 +266,34 @@
         <template #inputs>
           <div class="flex w-full sm:max-w-lg gap-2">
             <FieldSwitchBlock
-              nameField="active"
+              title="Active"
               name="active"
+              nameField="active"
               auto
               :isCard="false"
-              title="Active"
             />
           </div>
         </template>
       </FormHorizontal>
     </TabPanel>
+    
 
     <TabPanel header="Code">
-      <ResizableSplitter
-        v-if="activeTab === 1"
-        :style="{ height: SPLITTER_PROPS.height }"
-        class="mt-8 surface-border border rounded-md hidden md:flex"
-        @resizeend="showPreview = true"
-        :initialTopPanelPercent="60"
-        direction="vertical"
-        :panelSizes="SPLITTER_PROPS.panelsSizes"
-        @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
-      >
-        <template #panel-a>
-          <div class="flex flex-col h-full gap-2">
-            <CodeEditor
-              v-model="code"
-              :initialValue="HelloWorldSample"
-              runtime="javascript"
-              :errors="hasCodeError"
-            />
-            <small
-              v-if="codeError"
-              class="p-error text-xs font-normal"
-            >
-              {{ codeError }}
-            </small>
-          </div>
-        </template>
-        <template #panel-b>
-          <div
-            v-if="showPreview"
-            class="h-full"
+      <div v-if="activeTab === 1">
+        <div class="flex flex-col h-full gap-2 mt-8">
+          <CodeEditor
+            v-model="code"
+            :initialValue="HelloWorldSample"
+            runtime="javascript"
+            :errors="hasCodeError"
+          />
+          <small
+            v-if="codeError"
+            class="p-error text-xs font-normal"
           >
-            <CodePreview :updateObject="updateObject" />
-          </div>
-        </template>
-      </ResizableSplitter>
-      <div
-        v-if="activeTab === 1"
-        class="flex flex-col mt-0 surface-border border rounded-md gap-2 md:hidden h-[50vh]"
-      >
-        <CodeEditor
-          v-model="code"
-          :initialValue="HelloWorldSample"
-          runtime="javascript"
-          :errors="hasCodeError"
-        />
-        <small
-          v-if="codeError"
-          class="p-error text-xs font-normal"
-        >
-          {{ codeError }}
-        </small>
+            {{ codeError }}
+          </small>
+        </div>
       </div>
     </TabPanel>
 
@@ -363,26 +312,17 @@
           />
         </div>
 
-        <ResizableSplitter
-          class="!z-20 relative"
-          :style="{ height: SPLITTER_PROPS.height }"
-          direction="vertical"
-          :panelSizes="SPLITTER_PROPS.panelsSizes"
-          :initialTopPanelPercent="60"
-          @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
-          v-if="!showFormBuilder"
-        >
-          <template #panel-a>
-            <CodeEditor
-              v-model="defaultArgs"
-              runtime="json"
-              :initialValue="defaultArgs"
-              :minimap="false"
-              :errors="hasArgsError"
-              @update:modelValue="codeEditorArgsUpdate"
-            />
-          </template>
-        </ResizableSplitter>
+        <div v-if="!showFormBuilder">
+          <CodeEditor
+            v-model="defaultArgs"
+            runtime="json"
+            :initialValue="defaultArgs"
+            :minimap="false"
+            :errors="hasArgsError"
+            @update:modelValue="codeEditorArgsUpdate"
+          />
+        </div>
+        
         <div v-if="hasFormBuilder">
           <ResizableSplitter
             class="!z-20 relative"

@@ -58,7 +58,6 @@
     active: yup.boolean(),
     runtime: yup.string()
   })
-  const updateObject = ref({})
 
   const initialValues = {
     name: '',
@@ -132,7 +131,6 @@
       >
         <template #form>
           <FormFieldsCreateEdgeFunctions
-            v-model:preview-data="updateObject"
             @additionalErrors="handleAdditionalErrors"
           />
         </template>
