@@ -197,6 +197,20 @@
     }
   })
 
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
+    if (!start || !end) return false
+
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
   const maxDate = computed(() => {
     if (!props.maxDays || props.maxDays <= 0) return null
     return new Date()
@@ -244,6 +258,7 @@
   }
 
   const handleSelect = () => {
+    if (isInvalidRange.value) return
     clampModelRangeInPlace()
     emit('select', model.value)
   }
