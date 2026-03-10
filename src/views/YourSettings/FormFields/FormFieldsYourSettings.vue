@@ -1,6 +1,6 @@
 <script setup>
   import { useField } from 'vee-validate'
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
@@ -12,8 +12,8 @@
   import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
-    listTimezonesService: {
-      type: Function,
+    timezoneOptions: {
+      type: Array,
       required: true
     },
     listCountriesPhoneService: {
@@ -22,7 +22,6 @@
     }
   })
 
-  const optionsTimezone = ref([])
   const isForceMFA = ref(false)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
 
@@ -34,15 +33,6 @@
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
-
-  const fetchTimezone = async () => {
-    const result = await props.listTimezonesService()
-    optionsTimezone.value = result.listTimeZones
-  }
-
-  onMounted(async () => {
-    await fetchTimezone()
-  })
 
   const passwordRequirementsList = ref([
     { label: '8 characters', valid: false },
@@ -98,9 +88,9 @@
             label="Timezone"
             required
             name="timezone"
-            :options="optionsTimezone"
-            :loading="!timezone || !optionsTimezone.length"
-            :disabled="!optionsTimezone.length"
+            :options="timezoneOptions"
+            :loading="!timezone || !timezoneOptions.length"
+            :disabled="!timezoneOptions.length"
             optionLabel="label"
             optionValue="value"
             :value="timezone"

@@ -43,9 +43,7 @@
     {
       titleWidth: '4rem',
       descriptionWidths: [],
-      fields: [
-        { type: 'switch-justified', labelWidth: '4rem' }
-      ]
+      fields: [{ type: 'switch-justified', labelWidth: '4rem' }]
     }
   ]
 </script>

@@ -24,9 +24,7 @@
     {
       titleWidth: '7rem',
       descriptionWidths: ['100%', '90%'],
-      fields: [
-        { type: 'textarea', labelWidth: '5rem' }
-      ]
+      fields: [{ type: 'textarea', labelWidth: '5rem' }]
     },
     {
       titleWidth: '5rem',

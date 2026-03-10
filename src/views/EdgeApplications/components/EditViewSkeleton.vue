@@ -43,26 +43,19 @@
         },
         {
           type: 'input-row',
-          inputs: [
-            { labelWidth: '6rem' },
-            { labelWidth: '7rem' }
-          ]
+          inputs: [{ labelWidth: '6rem' }, { labelWidth: '7rem' }]
         }
       ]
     },
     {
       titleWidth: '7rem',
       descriptionWidths: ['100%', '90%', '60%'],
-      fields: [
-        { type: 'module-cards', labelWidth: '10rem', count: 6 }
-      ]
+      fields: [{ type: 'module-cards', labelWidth: '10rem', count: 6 }]
     },
     {
       titleWidth: '8rem',
       descriptionWidths: ['100%', '95%', '85%'],
-      fields: [
-        { type: 'switch-justified', labelWidth: '4rem', descriptionWidth: '90%' }
-      ]
+      fields: [{ type: 'switch-justified', labelWidth: '4rem', descriptionWidth: '90%' }]
     }
   ]
 </script>

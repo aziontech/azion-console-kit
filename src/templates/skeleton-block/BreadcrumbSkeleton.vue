@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="w-full md:min-h-16 flex md:flex-row flex-col gap-4 md:justify-between items-center"
-  >
+  <div class="w-full md:min-h-16 flex md:flex-row flex-col gap-4 md:justify-between items-center">
     <div class="w-full md:w-auto flex flex-col">
       <div class="flex gap-1 items-center overflow-auto w-full p-0">
         <template

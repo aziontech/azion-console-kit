@@ -619,9 +619,7 @@
 
     if (isGroupedData) {
       existitemInList = data.value.some((group) =>
-        group[props.optionGroupChildren]?.some(
-          (item) => item[props.optionValue] === value
-        )
+        group[props.optionGroupChildren]?.some((item) => item[props.optionValue] === value)
       )
     } else {
       existitemInList = data.value?.some((item) => item[props.optionValue] === value)

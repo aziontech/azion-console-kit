@@ -41,9 +41,7 @@
     {
       titleWidth: '13rem',
       descriptionWidths: ['100%', '85%'],
-      fields: [
-        { type: 'switch-justified', labelWidth: '8rem', descriptionWidth: '90%' }
-      ]
+      fields: [{ type: 'switch-justified', labelWidth: '8rem', descriptionWidth: '90%' }]
     }
   ]
 </script>

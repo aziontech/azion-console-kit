@@ -33,9 +33,7 @@
     {
       titleWidth: '8rem',
       descriptionWidths: ['100%', '85%'],
-      fields: [
-        { type: 'radio-cards', count: 2 }
-      ]
+      fields: [{ type: 'radio-cards', count: 2 }]
     },
     {
       titleWidth: '6rem',
@@ -44,10 +42,7 @@
         { type: 'input', labelWidth: '9rem', hasHelper: true },
         {
           type: 'input-row',
-          inputs: [
-            { labelWidth: '5rem' },
-            { labelWidth: '4rem' }
-          ]
+          inputs: [{ labelWidth: '5rem' }, { labelWidth: '4rem' }]
         },
         { type: 'switch', labelWidth: '8rem', descriptionWidth: '16rem' },
         { type: 'switch', labelWidth: '16rem', descriptionWidth: '24rem' }
@@ -74,9 +69,7 @@
     {
       titleWidth: '17rem',
       descriptionWidths: ['100%', '85%'],
-      fields: [
-        { type: 'switch', labelWidth: '12rem' }
-      ]
+      fields: [{ type: 'switch', labelWidth: '12rem' }]
     },
     {
       titleWidth: '4rem',

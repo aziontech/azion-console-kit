@@ -20,8 +20,8 @@
         <template #form="{ loading }">
           <FormSkeleton v-if="loading || isFormLoading" />
           <FormFieldsYourSettings
-            v-else
-            :listTimezonesService="listTimezonesService"
+            v-show="!loading && !isFormLoading"
+            :timezoneOptions="optionsTimezone"
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
@@ -97,11 +97,18 @@
   const isFormLoading = ref(true)
   const userData = ref({})
   const userChanges = ref({})
+  const optionsTimezone = ref([])
 
   const loadUser = async () => {
-    userData.value = await props.loadUserService()
+    const [user, timezones] = await Promise.all([
+      props.loadUserService(),
+      props.listTimezonesService()
+    ])
 
-    return userData.value
+    optionsTimezone.value = timezones.listTimeZones
+    userData.value = user
+
+    return user
   }
 
   const showToast = (severity, detail, summary = severity) => {
