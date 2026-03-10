@@ -17,8 +17,12 @@
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
-        <template #form>
-          <FormFieldsWorkload isEdit />
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading" />
+          <FormFieldsWorkload
+            v-show="!loading"
+            isEdit
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
@@ -39,6 +43,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'

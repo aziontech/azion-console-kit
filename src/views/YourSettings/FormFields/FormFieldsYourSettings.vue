@@ -11,7 +11,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import LabelBlock from '@/templates/label-block'
 
-  const props = defineProps({
+  defineProps({
     timezoneOptions: {
       type: Array,
       required: true
