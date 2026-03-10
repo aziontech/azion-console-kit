@@ -10,7 +10,6 @@
 
   import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
   import FormSkeleton from './components/FormSkeleton.vue'
-  import MobileCodePreview from './components/mobile-code-preview.vue'
 
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
@@ -109,12 +108,7 @@
       <PageHeadingBlock
         :pageTitle="name"
         description="Configure function code, triggers, and execution settings."
-      >
-        <MobileCodePreview
-          :updateObject="updateObject"
-          :runtime="runtime"
-        />
-      </PageHeadingBlock>
+      />
     </template>
     <template #content>
       <EditFormBlock
