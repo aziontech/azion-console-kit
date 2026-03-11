@@ -20,7 +20,7 @@
    * - content: Required main content area
    * - footer: Required action button area
    */
- defineProps({
+  defineProps({
     title: {
       type: String,
       required: true
@@ -30,7 +30,6 @@
       default: false
     }
   })
-
 </script>
 
 <template>

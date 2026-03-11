@@ -130,7 +130,6 @@
    */
   const goToSettings = () => {
     currentStep.value = 'settings'
-  
 
     nextTick(() => {
       // Scroll to step 2 but keep step 1 visible (center alignment)
