@@ -151,6 +151,8 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { useDeploy } from '@/stores/deploy'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 
   const props = defineProps({
     getLogsService: {
@@ -326,7 +328,8 @@
   }
 
   const goToDomainEditView = () => {
-    router.push(`/domains/edit/${results.value.domain.id}`)
+    const routerName = hasFlagBlockApiV4() ? 'domains': 'workloads'
+    router.push(`/${routerName}/edit/${results.value.domain.id}`)
   }
 
   onMounted(() => {
