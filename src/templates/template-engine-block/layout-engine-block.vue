@@ -8,25 +8,22 @@
    * This component centralizes shared functionality between engine-azion.vue and
    * engine-jsonform.vue, including VCS integration handling and common lifecycle hooks.
    *
-   * Structure (DeployTemplateCard style):
-   * - Header: title
-   * - Content: Preview (image/thumbnail) + Info Block
-   * - Description Section: Git configuration text
-   * - Inputs Section: grid of up to 2 columns (via slot)
-   * - Footer: Next button (full width)
+   * Uses BaseDeployCard for layout structure.
    *
    * Slots:
-   * - #header: Custom header content (optional)
    * - #preview: Preview image or custom preview (e.g., iframe)
    * - #info: Template info block (title, description, links)
    * - #github-connection: Area for GitHub/VCS integration UI
    * - #inputs: Form inputs rendered in grid (max 2 cols)
+   * - #form-content: Additional form content
    * - #footer-actions: Custom footer actions (optional)
    */
-  import { ref, computed, onBeforeUnmount } from 'vue'
+  import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import PrimeButton from 'primevue/button'
+  import BaseDeployCard from '../deploy-template/BaseDeployCard.vue'
+  import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
 
   // ============================================================================
   // Props - Common props shared between all engine implementations
@@ -112,7 +109,7 @@
       default: false
     },
 
-    // Footer action
+    // Footer action - Step 1 (Next button)
     /**
      * Label for the Next button
      */
@@ -140,18 +137,46 @@
     showNextButton: {
       type: Boolean,
       default: true
+    },
+
+    // Footer action - Step 2 (Deploy button)
+    /**
+     * Label for the Deploy button
+     */
+    deployLabel: {
+      type: String,
+      default: 'Deploy'
+    },
+    /**
+     * Loading state for the Deploy button
+     */
+    loadingDeploy: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Disabled state for the Deploy button
+     */
+    disabledDeploy: {
+      type: Boolean,
+      default: false
     }
   })
 
   // ============================================================================
   // Emits
   // ============================================================================
-  const emit = defineEmits(['next'])
+  const emit = defineEmits(['next', 'deploy'])
 
   // ============================================================================
   // Common State
   // ============================================================================
   const toast = useToast()
+
+  // Step Navigation State
+  const currentStep = ref('repository')
+  const isTransitioning = ref(false)
+  const step2Ref = ref(null)
 
   // VCS Integration State
   const callbackUrl = ref('')
@@ -174,26 +199,6 @@
   const hasIntegrationsList = computed(() => {
     return listOfIntegrations.value?.length > 0
   })
-
-  /**
-   * Check if preview image should be shown
-   */
-  // const hasPreview = computed(() => !!props.previewSrc)
-
-  /**
-   * Check if GitHub link should be shown
-   */
-  // const hasGithubLink = computed(() => !!props.githubUrl)
-
-  /**
-   * Check if template icon should be shown
-   */
-  // const hasTemplateIcon = computed(() => !!props.templateIcon)
-
-  /**
-   * Check if template info block should be shown
-   */
-  // const hasTemplateInfo = computed(() => !!props.templateTitle)
 
   /**
    * Fixed description text for Git configuration section
@@ -297,11 +302,39 @@
     addEventListenerToGithubIntegration()
   }
 
+  // ============================================================================
+  // Step Navigation Methods
+  // ============================================================================
   /**
-   * Handles the Next button click
+   * Navigate to settings step (step 2)
+   * Smooth scrolls to step 2, keeping step 1 visible
    */
-  const handleNext = () => {
+  const goToSettings = () => {
+    currentStep.value = 'settings'
     emit('next')
+
+    nextTick(() => {
+      // Scroll to step 2 but keep step 1 visible (center alignment)
+      step2Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+    })
+  }
+
+  /**
+   * Handle deploy action from settings step
+   */
+  const handleDeploy = () => {
+    emit('deploy')
+  }
+
+  /**
+   * Reset flow to first step
+   */
+  const reset = () => {
+    currentStep.value = 'repository'
+    isTransitioning.value = false
   }
 
   // ============================================================================
@@ -331,155 +364,211 @@
     formErrors,
     // Toast
     toast,
-    // Template Info
-    // hasTemplateIcon
+    // Step Navigation
+    currentStep,
+    step2Ref,
+    reset,
+    goToSettings
   })
 </script>
 
 <template>
-  <div class="flex flex-col max-w-2xl min-h-[400px] border surface-border rounded-md">
-    <div class="h-14 px-6 border-b surface-border flex items-center">
-      <slot name="header">
-        <div class="flex-1 text-color text-xl font-semibold leading-5">
-          {{ props.title || 'Start from Template' }}
-        </div>
-      </slot>
-    </div>
-
-    <div class="p-6 bg-[var(—surface-50)] flex flex-col gap-6 flex-1">
-      <div
-        class="bg-[var(—surface-50)]rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
-      >
-        <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
-          <slot name="preview">
-            <div
-              class="w-full h-48 bg-surface-section rounded-lg flex flex-col justify-center items-center overflow-hidden"
+  <div class="layout-engine-block flex flex-col gap-6">
+    <!-- Step 1: Repository Card - Always visible -->
+    <BaseDeployCard
+      :title="props.title || 'Start from Template'"
+      :step-index="0"
+    >
+      <!-- Content Slot -->
+      <template #content>
+        <!-- Preview + Info Block -->
+        <div
+          class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
+        >
+          <!-- Preview Image -->
+          <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
+            <slot
+              name="preview"
+              :preview-src="props.previewSrc"
+              :preview-alt="props.previewAlt"
             >
-              <img
-                :src="props.previewSrc"
-                :alt="props.previewAlt || props.templateTitle"
-                class="w-full h-40 object-cover"
-              />
-            </div>
-          </slot>
-        </div>
+              <div
+                class="w-full h-48 bg-surface-section rounded-lg flex flex-col justify-center items-center overflow-hidden"
+              >
+                <img
+                  v-if="props.previewSrc"
+                  :src="props.previewSrc"
+                  :alt="props.previewAlt || props.templateTitle"
+                  class="w-full h-40 object-cover"
+                />
+              </div>
+            </slot>
+          </div>
 
-        <div class="flex-1 py-4 pr-4 flex flex-col gap-3">
-          <slot
-            name="info"
-            :templateTitle="props.templateTitle"
-            :templateUrl="props.templateUrl"
-            :templateIcon="props.templateIcon"
-            :templateDescription="props.templateDescription"
-            :githubUrl="props.githubUrl"
-          >
-            <div
-              v-if="props.templateTitle"
-              class="flex items-center gap-2.5"
+          <!-- Info Block -->
+          <div class="flex-1 py-4 pr-4 flex flex-col gap-3">
+            <slot
+              name="info"
+              :template-title="props.templateTitle"
+              :template-url="props.templateUrl"
+              :template-icon="props.templateIcon"
+              :template-description="props.templateDescription"
+              :github-url="props.githubUrl"
             >
-              <img
-                v-if="props.templateIcon"
-                class="w-7 h-7 rounded"
-                :src="props.templateIcon"
-                alt=""
-              />
-              <div class="flex-1 flex items-center gap-1.5">
-                <div class="flex-1 flex flex-col justify-center gap-1">
-                  <div class="flex items-center gap-1.5">
-                    <a
-                      v-if="props.templateUrl"
-                      :href="props.templateUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-sm font-semibold text-color hover:text-primary transition-colors line-clamp-1"
-                    >
-                      {{ props.templateTitle }}
-                    </a>
-                    <span
-                      v-else
-                      class="text-sm font-semibold text-color line-clamp-1"
-                    >
-                      {{ props.templateTitle }}
-                    </span>
-                    <div
-                      v-if="props.templateUrl"
-                      class="w-3 h-3 relative overflow-hidden"
-                    >
-                      <i class="pi pi-external-link text-[10px] text-color-secondary"></i>
+              <!-- Template Title with Icon -->
+              <div
+                v-if="props.templateTitle"
+                class="flex items-center gap-2.5"
+              >
+                <img
+                  v-if="props.templateIcon"
+                  class="w-7 h-7 rounded"
+                  :src="props.templateIcon"
+                  alt=""
+                />
+                <div class="flex-1 flex items-center gap-1.5">
+                  <div class="flex-1 flex flex-col justify-center gap-1">
+                    <div class="flex items-center gap-1.5">
+                      <a
+                        v-if="props.templateUrl"
+                        :href="props.templateUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-sm font-semibold text-color hover:text-primary transition-colors line-clamp-1"
+                      >
+                        {{ props.templateTitle }}
+                      </a>
+                      <span
+                        v-else
+                        class="text-sm font-semibold text-color line-clamp-1"
+                      >
+                        {{ props.templateTitle }}
+                      </span>
+                      <div
+                        v-if="props.templateUrl"
+                        class="w-3 h-3 relative overflow-hidden"
+                      >
+                        <i class="pi pi-external-link text-[10px] text-color-secondary" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <p class="text-xs text-color-secondary leading-4">
-              {{ props.templateDescription }}
-            </p>
+              <!-- Description -->
+              <p class="text-xs text-color-secondary leading-4">
+                {{ props.templateDescription }}
+              </p>
 
-            <div class="flex flex-col gap-1.5">
-              <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
-              <div class="flex items-center gap-1">
-                <i class="pi pi-github text-color-secondary text-[14px]"></i>
-                <span class="text-[10px] text-color-secondary leading-3 line-clamp-3">
-                  {{ props.githubUrl }}
-                </span>
+              <!-- GitHub Source -->
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
+                <div class="flex items-center gap-1">
+                  <i class="pi pi-github text-color-secondary text-[14px]" />
+                  <span class="text-[10px] text-color-secondary leading-3 line-clamp-3">
+                    {{ props.githubUrl }}
+                  </span>
+                </div>
               </div>
-            </div>
-          </slot>
+            </slot>
+          </div>
         </div>
-      </div>
 
-      <div class="text-xs text-color-secondary leading-4">
-        {{ gitDescription }}
-      </div>
+        <!-- Git Description -->
+        <div class="text-xs text-color-secondary leading-4">
+          {{ gitDescription }}
+        </div>
 
-      <slot
-        name="github-connection"
-        :hasIntegrationsList="hasIntegrationsList"
-        :listOfIntegrations="listOfIntegrations"
-        :isIntegrationsLoading="isIntegrationsLoading"
-        :oauthGithubRef="oauthGithubRef"
-        :triggerConnectWithGithub="triggerConnectWithGithub"
-        :setCallbackUrl="setCallbackUrl"
-        :vcsIntegrationFieldName="vcsIntegrationFieldName"
-      />
-
-      <div
-        v-if="$slots.inputs"
-        class="flex flex-col gap-4"
-      >
+        <!-- GitHub Connection Slot -->
         <slot
-          name="inputs"
-          :schema="props.schema"
-          :isDrawer="props.isDrawer"
-          :formData="formData"
-          :formErrors="formErrors"
+          name="github-connection"
+          :has-integrations-list="hasIntegrationsList"
+          :list-of-integrations="listOfIntegrations"
+          :is-integrations-loading="isIntegrationsLoading"
+          :oauth-github-ref="oauthGithubRef"
+          :trigger-connect-with-github="triggerConnectWithGithub"
+          :set-callback-url="setCallbackUrl"
+          :vcs-integration-field-name="vcsIntegrationFieldName"
         />
-      </div>
 
-      <slot
-        name="form-content"
-        :schema="props.schema"
-        :isDrawer="props.isDrawer"
-        :formData="formData"
-        :formErrors="formErrors"
-      />
+        <!-- Inputs Slot -->
+        <div
+          v-if="$slots.inputs"
+          class="flex flex-col gap-4"
+        >
+          <slot
+            name="inputs"
+            :schema="props.schema"
+            :is-drawer="props.isDrawer"
+            :form-data="formData"
+            :form-errors="formErrors"
+            :has-integrations-list="hasIntegrationsList"
+            :list-of-integrations="listOfIntegrations"
+            :is-integrations-loading="isIntegrationsLoading"
+            :oauth-github-ref="oauthGithubRef"
+            :trigger-connect-with-github="triggerConnectWithGithub"
+            :set-callback-url="setCallbackUrl"
+            :vcs-integration-field-name="vcsIntegrationFieldName"
+          />
+        </div>
+
+        <!-- Form Content Slot -->
+        <slot
+          name="form-content"
+          :schema="props.schema"
+          :is-drawer="props.isDrawer"
+          :form-data="formData"
+          :form-errors="formErrors"
+        />
+      </template>
+
+      <!-- Footer Slot -->
+      <template
+        v-if="props.showNextButton || $slots['footer-actions']"
+        #footer
+      >
+        <slot name="footer-actions">
+          <PrimeButton
+            class="w-full flex-row-reverse"
+            :label="props.nextLabel"
+            :loading="props.loading"
+            :disabled="props.disabled"
+            severity="primary"
+            @click="goToSettings"
+          />
+        </slot>
+      </template>
+    </BaseDeployCard>
+
+    <!-- Step 2: Template Settings Card - Hidden until Next is clicked -->
+    <div
+      ref="step2Ref"
+      v-show="currentStep === 'settings'"
+    >
+      <TemplateSettingsCard
+        :title="'Template Settings'"
+        :preview-src="props.previewSrc"
+        :preview-alt="props.previewAlt"
+        :template-title="props.templateTitle"
+        :template-url="props.templateUrl"
+        :github-url="props.githubUrl"
+        :loading-deploy="props.loadingDeploy"
+        :disabled="props.disabledDeploy"
+        :deploy-label="props.deployLabel"
+        @deploy="handleDeploy"
+      >
+        <!-- Pass through settings content slot -->
+        <template #content>
+          <slot name="settings-content" />
+        </template>
+      </TemplateSettingsCard>
     </div>
 
+    <!-- Browse Templates Link -->
     <div
-      v-if="props.showNextButton || $slots['footer-actions']"
-      class="h-14 px-6 border-t surface-border flex flex-col justify-center"
+      class="mt-8 justify-start text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
-      <slot name="footer-actions">
-        <PrimeButton
-          class="w-full flex-row-reverse"
-          :label="props.nextLabel"
-          :loading="props.loading"
-          :disabled="props.disabled"
-          severity="primary"
-          @click="handleNext"
-        />
-      </slot>
+      <span class="cursor-pointer flex justify-center"> Browse Templates → </span>
     </div>
   </div>
 </template>
