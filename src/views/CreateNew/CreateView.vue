@@ -9,7 +9,7 @@
   import { useToast } from 'primevue/usetoast'
 
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  // import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import FormLoading from '@/templates/template-engine-block/form-loading.vue'
 
@@ -149,14 +149,10 @@
           </div>
         </div>
       </div>
-      <PageHeadingBlock
-        :pageTitle="solution.name"
-        :description="solution.headline"
-        v-if="!isLoading"
-      />
+
       <div
-        class="flex flex-col sm:flex-row gap-4 lg:items-center"
-        v-if="!isLoading"
+        class="flex flex-col sm:flex-row gap-4 lg:items-center none"
+        v-if="false"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div
