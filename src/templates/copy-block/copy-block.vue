@@ -64,3 +64,9 @@
     if (timeoutId) clearTimeout(timeoutId)
   })
 </script>
+
+<style scoped>
+  :deep(.p-button:focus) {
+    box-shadow: none;
+  }
+</style>
