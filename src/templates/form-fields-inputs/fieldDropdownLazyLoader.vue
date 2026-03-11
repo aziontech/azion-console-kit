@@ -125,7 +125,7 @@
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
-  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect, watch } from 'vue'
+  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect, watch, inject } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import LabelBlock from '@/templates/label-block'
 
@@ -231,8 +231,12 @@
   const disableEmitInit = ref(props.disableEmitFirstRender)
   const alreadyLoadedData = ref(false)
 
+  const registerAsyncFormChild = inject('registerAsyncFormChild', null)
+  const notifyFormChildReady = registerAsyncFormChild?.()
+
   onMounted(async () => {
     await fetchData()
+    notifyFormChildReady?.()
     emit('onLoaded')
   })
 
@@ -377,9 +381,9 @@
               [props.optionLabel]: item.name,
               [props.optionValue]: item.id,
               ...props?.moreOptions?.reduce(
-                (additionalFields, option) => ({
+                (additionalFields, fieldKey) => ({
                   ...additionalFields,
-                  [option]: item[option]
+                  [fieldKey]: item[fieldKey]
                 }),
                 {}
               )
@@ -481,9 +485,9 @@
         [props.optionLabel]: results.name,
         [props.optionValue]: results.id,
         ...props?.moreOptions?.reduce(
-          (additionalFields, option) => ({
+          (additionalFields, fieldKey) => ({
             ...additionalFields,
-            [option]: results[option]
+            [fieldKey]: results[fieldKey]
           }),
           {}
         )
@@ -610,23 +614,23 @@
     loading
   }
 
-  const checkValueInList = (value) => {
+  const checkValueInList = async (value) => {
     const isGroupedData =
       data.value.length > 0 &&
       data.value.some((item) => item[props.optionGroupLabel] && item[props.optionGroupChildren])
 
-    let existitemInList = false
+    let existsInList = false
 
     if (isGroupedData) {
-      existitemInList = data.value.some((group) =>
+      existsInList = data.value.some((group) =>
         group[props.optionGroupChildren]?.some((item) => item[props.optionValue] === value)
       )
     } else {
-      existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+      existsInList = data.value?.some((item) => item[props.optionValue] === value)
     }
 
-    if (!existitemInList) {
-      loadSelectedValue(value)
+    if (!existsInList) {
+      await loadSelectedValue(value)
       alreadyLoadedData.value = true
     }
   }

@@ -13,9 +13,9 @@
           class="mb-2"
         />
         <Skeleton
-          v-for="(w, i) in block.descriptionWidths || ['100%', '80%']"
-          :key="i"
-          :width="w"
+          v-for="(descWidth, descIndex) in block.descriptionWidths || ['100%', '80%']"
+          :key="descIndex"
+          :width="descWidth"
           height="1rem"
         />
       </div>
@@ -134,8 +134,8 @@
             />
             <div class="flex flex-col gap-3">
               <div
-                v-for="i in field.count || 2"
-                :key="i"
+                v-for="radioIndex in field.count || 2"
+                :key="radioIndex"
                 class="flex items-start gap-2"
               >
                 <Skeleton
@@ -165,8 +165,8 @@
             class="flex flex-col gap-3"
           >
             <Skeleton
-              v-for="i in field.count || 2"
-              :key="i"
+              v-for="cardIndex in field.count || 2"
+              :key="cardIndex"
               width="100%"
               height="3.5rem"
               borderRadius="6px"
@@ -185,8 +185,8 @@
               class="mb-3"
             />
             <div
-              v-for="i in field.count || 4"
-              :key="i"
+              v-for="moduleIndex in field.count || 4"
+              :key="moduleIndex"
               class="border-round p-4 mb-3"
               style="border: 1px solid var(--surface-border)"
             >
@@ -216,8 +216,8 @@
             class="flex gap-6 max-sm:flex-col"
           >
             <div
-              v-for="(input, i) in field.inputs"
-              :key="i"
+              v-for="(input, inputIndex) in field.inputs"
+              :key="inputIndex"
               class="flex flex-col w-full gap-2"
               :class="input.maxWidth || 'sm:max-w-xs'"
             >

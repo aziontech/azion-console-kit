@@ -3,15 +3,15 @@
     <div class="w-full md:w-auto flex flex-col">
       <div class="flex gap-1 items-center overflow-auto w-full p-0">
         <template
-          v-for="(w, i) in widths"
-          :key="i"
+          v-for="(breadcrumbWidth, breadcrumbIndex) in widths"
+          :key="breadcrumbIndex"
         >
           <ChevronRightIcon
-            v-if="i > 0"
+            v-if="breadcrumbIndex > 0"
             class="text-color-secondary mx-2"
           />
           <Skeleton
-            :width="w"
+            :width="breadcrumbWidth"
             height="1.125rem"
             class="bg-surface-200 dark:bg-surface-700"
           />
