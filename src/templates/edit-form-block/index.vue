@@ -2,7 +2,7 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
+  import { ref, computed, nextTick, onBeforeUnmount, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -79,6 +79,17 @@
         enableBeforeUnload: true
       })
 
+  const asyncChildPromises = []
+  const registerAsyncFormChild = () => {
+    let resolve
+    const promise = new Promise((promiseResolve) => {
+      resolve = promiseResolve
+    })
+    asyncChildPromises.push(promise)
+    return resolve
+  }
+  provide('registerAsyncFormChild', registerAsyncFormChild)
+
   const effectiveDirty = computed(() => isFormReady.value && isDirty.value)
   const unregisterDirtySource = unsaved.addDirtySource(effectiveDirty)
 
@@ -151,6 +162,9 @@
       goBackToList()
     } finally {
       isLoadingData.value = false
+      await Promise.all(asyncChildPromises)
+      await nextTick()
+      resetForm({ values: { ...values } })
       isFormReady.value = true
     }
   }

@@ -1,10 +1,11 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { ref, nextTick } from 'vue'
+  import { ref, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
@@ -92,11 +93,17 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
+  const shouldShowSkeleton = computed(() => {
+    if (!workload.value) return true
+    return false
+  })
+
   renderTabCurrentRouter()
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -114,7 +121,6 @@
         :activeIndex="activeTab"
         @tab-click="handleTabClick"
         class="w-full h-full"
-        v-if="workload"
       >
         <TabPanel
           header="Main Settings"

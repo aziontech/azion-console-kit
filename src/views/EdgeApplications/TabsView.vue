@@ -19,6 +19,7 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import PrimeButton from 'primevue/button'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
@@ -262,6 +263,12 @@
     return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
   })
 
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeApplication.value) return true
+    if (hasFlagBlockApiV4() && !isApplicationLoaded.value) return true
+    return false
+  })
+
   const tabs = ref([
     {
       header: 'Main Settings',
@@ -390,7 +397,11 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
@@ -408,10 +419,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeApplication"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"
