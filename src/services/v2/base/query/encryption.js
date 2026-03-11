@@ -60,7 +60,11 @@ function getEncryptionSecret() {
  * Uses a stable identifier to ensure data can be decrypted across sessions
  * @returns {Promise<CryptoKey>} The encryption key
  */
+let _encryptionKey = null
+
 async function getEncryptionKey() {
+  if (_encryptionKey) return _encryptionKey
+
   const secret = getEncryptionSecret()
 
   // Use localStorage instead of sessionStorage to persist across browser restarts
@@ -74,7 +78,8 @@ async function getEncryptionKey() {
   const encoder = new TextEncoder()
   const salt = await crypto.subtle.digest('SHA-256', encoder.encode(persistentId))
 
-  return deriveKey(secret, new Uint8Array(salt))
+  _encryptionKey = await deriveKey(secret, new Uint8Array(salt))
+  return _encryptionKey
 }
 
 /**
@@ -83,12 +88,10 @@ async function getEncryptionKey() {
  * @returns {string} Base64 encoded string
  */
 function uint8ArrayToBase64(bytes) {
-  // Use a more robust method that handles all bytes correctly
-  // Convert bytes to binary string, then to base64
+  const CHUNK_SIZE = 32768
   let binary = ''
-  const len = bytes.byteLength
-  for (let index = 0; index < len; index++) {
-    binary += String.fromCharCode(bytes[index])
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK_SIZE))
   }
   return btoa(binary)
 }
