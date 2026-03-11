@@ -98,12 +98,16 @@ class CacheSyncService {
       this.#state.clientId = data.client_id
     })
 
+    this.#client.on('ping', () => {
+      // Ping events keep the connection alive - no action needed
+      // The SSEClient handles inactivity timeout internally
+    })
+
     this.#client.on('activity', (event) => {
       this.#invalidator.invalidate(event)
     })
 
     this.#client.on('close', () => {
-      this.#state.isConnected = false
       this.#state.isConnected = false
       this.#scheduleReconnect()
     })
