@@ -70,6 +70,12 @@
     disabled: {
       type: Boolean,
       default: false
+    },
+
+    // Collapsed state - when true, only show title and preview
+    collapsed: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -165,7 +171,7 @@
   }
 
   const handleNext = () => {
-    emit('next')
+   emit('next')
   }
 
   // ============================================================================
@@ -196,7 +202,10 @@
 </script>
 
 <template>
-  <BaseDeployCard title="Start from Template">
+  <BaseDeployCard
+    title="Start from Template"
+    :hide-footer="props.collapsed"
+  >
     <template #content>
       <div
         class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
@@ -267,7 +276,7 @@
             >
               {{ props.templateDescription }}
             </p>
-
+            qqweqwe
             <div class="flex flex-col gap-1.5">
               <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
               <div class="flex items-center gap-1">
@@ -281,11 +290,15 @@
         </div>
       </div>
 
-      <div class="text-xs text-color-secondary leading-4">
+      <div
+        v-if="!props.collapsed"
+        class="text-xs text-color-secondary leading-4"
+      >
         {{ gitDescription }}
       </div>
 
       <slot
+        v-if="!props.collapsed"
         name="github-connection"
         :has-integrations-list="hasIntegrationsList"
         :list-of-integrations="listOfIntegrations"
@@ -297,7 +310,7 @@
       />
 
       <div
-        v-if="$slots.inputs"
+        v-if="!props.collapsed && $slots.inputs"
         class="flex flex-col gap-4"
       >
         <slot
@@ -310,6 +323,7 @@
       </div>
 
       <slot
+        v-if="!props.collapsed"
         name="form-content"
         :schema="props.schema"
         :is-drawer="props.isDrawer"
@@ -326,7 +340,7 @@
           :loading="props.loading"
           :disabled="props.disabled"
           severity="primary"
-          @click="handleNext"
+          @click.stop="handleNext"
         />
       </slot>
     </template>

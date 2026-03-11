@@ -20,16 +20,21 @@
    * - content: Required main content area
    * - footer: Required action button area
    */
-  defineProps({
+ defineProps({
     title: {
       type: String,
       required: true
+    },
+    hideFooter: {
+      type: Boolean,
+      default: false
     }
   })
+
 </script>
 
 <template>
-  <div class="flex flex-col max-w-2xl border surface-border rounded-md min-h-[400px]">
+  <div class="flex flex-col max-w-2xl border surface-border rounded-md">
     <div class="h-14 px-6 border-b surface-border flex items-center">
       <div class="flex-1 text-color text-xl font-semibold leading-5">
         {{ title }}
@@ -48,7 +53,7 @@
     </div>
 
     <div
-      v-if="$slots.footer"
+      v-if="$slots.footer && !hideFooter"
       class="h-14 px-6 border-t surface-border flex flex-col justify-center"
     >
       <slot name="footer" />

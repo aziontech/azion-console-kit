@@ -104,7 +104,8 @@
     schema: props.schema,
     isDrawer: props.isDrawer,
     loading: props.loadingNext,
-    disabled: props.disabledNext
+    disabled: props.disabledNext,
+    collapsed: currentStep.value === 'settings'
   }))
 
   /**
@@ -129,6 +130,7 @@
    */
   const goToSettings = () => {
     currentStep.value = 'settings'
+  
 
     nextTick(() => {
       // Scroll to step 2 but keep step 1 visible (center alignment)
@@ -206,7 +208,10 @@
         />
       </template>
 
-      <template #footer-actions>
+      <template
+        v-if="$slots['repository-footer-actions']"
+        #footer-actions
+      >
         <slot name="repository-footer-actions" />
       </template>
     </DeployRepositoryCard>

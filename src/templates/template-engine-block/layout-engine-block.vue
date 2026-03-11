@@ -373,19 +373,16 @@
 </script>
 
 <template>
-  <div class="layout-engine-block flex flex-col gap-6">
-    <!-- Step 1: Repository Card - Always visible -->
+  <div class="layout-engine-block flex flex-col gap-6 min-w-[672px]">
     <BaseDeployCard
       :title="props.title || 'Start from Template'"
       :step-index="0"
+      :hide-footer="currentStep === 'settings'"
     >
-      <!-- Content Slot -->
       <template #content>
-        <!-- Preview + Info Block -->
         <div
           class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >
-          <!-- Preview Image -->
           <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
             <slot
               name="preview"
@@ -405,7 +402,6 @@
             </slot>
           </div>
 
-          <!-- Info Block -->
           <div class="flex-1 py-4 pr-4 flex flex-col gap-3">
             <slot
               name="info"
@@ -415,7 +411,6 @@
               :template-description="props.templateDescription"
               :github-url="props.githubUrl"
             >
-              <!-- Template Title with Icon -->
               <div
                 v-if="props.templateTitle"
                 class="flex items-center gap-2.5"
@@ -455,12 +450,10 @@
                 </div>
               </div>
 
-              <!-- Description -->
               <p class="text-xs text-color-secondary leading-4">
                 {{ props.templateDescription }}
               </p>
 
-              <!-- GitHub Source -->
               <div class="flex flex-col gap-1.5">
                 <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
                 <div class="flex items-center gap-1">
@@ -474,13 +467,15 @@
           </div>
         </div>
 
-        <!-- Git Description -->
-        <div class="text-xs text-color-secondary leading-4">
+        <div
+          v-if="currentStep === 'repository'"
+          class="text-xs text-color-secondary leading-4"
+        >
           {{ gitDescription }}
         </div>
 
-        <!-- GitHub Connection Slot -->
         <slot
+          v-if="currentStep === 'repository'"
           name="github-connection"
           :has-integrations-list="hasIntegrationsList"
           :list-of-integrations="listOfIntegrations"
@@ -491,9 +486,8 @@
           :vcs-integration-field-name="vcsIntegrationFieldName"
         />
 
-        <!-- Inputs Slot -->
         <div
-          v-if="$slots.inputs"
+          v-if="currentStep === 'repository' && $slots.inputs"
           class="flex flex-col gap-4"
         >
           <slot
@@ -512,8 +506,8 @@
           />
         </div>
 
-        <!-- Form Content Slot -->
         <slot
+          v-if="currentStep === 'repository'"
           name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
@@ -522,7 +516,6 @@
         />
       </template>
 
-      <!-- Footer Slot -->
       <template
         v-if="props.showNextButton || $slots['footer-actions']"
         #footer
@@ -540,7 +533,6 @@
       </template>
     </BaseDeployCard>
 
-    <!-- Step 2: Template Settings Card - Hidden until Next is clicked -->
     <div
       ref="step2Ref"
       v-show="currentStep === 'settings'"
@@ -557,15 +549,14 @@
         :deploy-label="props.deployLabel"
         @deploy="handleDeploy"
       >
-        <!-- Pass through settings content slot -->
         <template #content>
           <slot name="settings-content" />
         </template>
       </TemplateSettingsCard>
     </div>
 
-    <!-- Browse Templates Link -->
     <div
+      v-if="currentStep === 'repository'"
       class="mt-8 justify-start text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
       <span class="cursor-pointer flex justify-center"> Browse Templates → </span>
