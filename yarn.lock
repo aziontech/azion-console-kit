@@ -80,10 +80,10 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.0.4.tgz#673e37e1dfce63d17f35a2567303bbb17a290704"
   integrity sha512-nR5aAkqSnQMpjXIaELqljW6o0jK9pPDhVK1TTH+rrpuTSekyJMoK6xqyX/DrhCz8DhGpfIYKD30yb6qE6aywhg==
 
-"@aziontech/webkit@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-0.0.1.tgz#213a92610b0d05df63bb2b19eca0525cf7428c2b"
-  integrity sha512-wsiK6UJTsKwCZ3nsHNSvQmWUigqHIJbTWZ4u2TcsEOxA+RCKP4wQWW3PDR2wfR/jfGPFbGiv7RGzBtrY5rwhsA==
+"@aziontech/webkit@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-0.0.3.tgz#69183662b5333c8e59de70e36df994d62d4c61da"
+  integrity sha512-SaqYIJb0n5RtYKoI1QpEw100DsPKX/rzA/Paiu8jmuTcnwPPUS6LZLnUXRULHgvd7MPpR2ld/vl/5xW6saFwhQ==
   dependencies:
     vee-validate "^4.15.1"
     vue-tsc "^3.2.5"
