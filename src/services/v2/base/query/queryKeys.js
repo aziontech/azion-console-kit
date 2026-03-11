@@ -5,7 +5,8 @@ export const queryKeys = {
   },
   user: {
     all: ['user'],
-    info: () => [...queryKeys.user.all, 'info']
+    info: () => [...queryKeys.user.all, 'info'],
+    settings: () => [...queryKeys.user.all, 'settings']
   },
   contract: {
     all: ['contract'],

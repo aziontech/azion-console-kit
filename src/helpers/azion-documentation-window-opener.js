@@ -16,7 +16,8 @@ export const AZION_X = 'https://x.com/aziontech'
 export const AZION_PLAN = 'https://www.azion.com/en/professional-services&id=#plans'
 export const AZION_INTEGRATIONS =
   'https://www.azion.com/en/documentation/products/marketplace/integrations/'
-export const AZION_FORMJSON_DOCUMENTATION = 'https://jsonforms.io/docs/integrations/react/#schema'
+export const AZION_FORMJSON_DOCUMENTATION =
+  'https://www.azion.com/en/documentation/devtools/form-builder/'
 
 export const openAzionSite = () => {
   window.open(AZION_SITE, '_blank')

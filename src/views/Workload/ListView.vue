@@ -99,7 +99,6 @@
         filterPath: 'domains',
         disableSort: true,
         type: 'component',
-        style: 'max-width: 300px',
         component: (columnData) => {
           return columnBuilder({
             data: Array.isArray(columnData) ? columnData : columnData?.content,
@@ -116,7 +115,6 @@
         filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
-        style: 'max-width: 150px',
         component: (columnData) => {
           return columnBuilder({
             data: columnData.content,

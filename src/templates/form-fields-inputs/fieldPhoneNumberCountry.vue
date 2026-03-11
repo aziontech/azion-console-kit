@@ -16,7 +16,7 @@
 
   const loading = computed(() => !options.value.length)
 
-  const { value: countryCallCode } = useField('countryCallCode')
+  const { value: countryCallCode, resetField } = useField('countryCallCode')
 
   const normalizeCountryCode = (countries) => {
     const currentValue = countryCallCode.value
@@ -27,7 +27,7 @@
 
     const partialMatch = countries.find((country) => country.value.endsWith(` - ${currentValue}`))
     if (partialMatch) {
-      countryCallCode.value = partialMatch.value
+      resetField({ value: partialMatch.value })
     }
   }
 
@@ -38,7 +38,7 @@
     if (!hasMatch) {
       const partialMatch = options.value.find((country) => country.value.endsWith(` - ${newValue}`))
       if (partialMatch) {
-        countryCallCode.value = partialMatch.value
+        resetField({ value: partialMatch.value })
       }
     }
   })
