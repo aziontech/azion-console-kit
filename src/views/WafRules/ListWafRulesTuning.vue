@@ -4,7 +4,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'

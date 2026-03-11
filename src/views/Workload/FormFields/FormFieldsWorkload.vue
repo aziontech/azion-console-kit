@@ -1,5 +1,5 @@
 <script setup>
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { useField } from 'vee-validate'
   import { INFORMATION_TEXTS } from '@/helpers'
