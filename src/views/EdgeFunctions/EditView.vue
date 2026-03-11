@@ -9,6 +9,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
 
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
@@ -29,7 +30,9 @@
 
   const cachedFunction = edgeFunctionService.getEdgeFunctionFromCache(route.params?.id) ?? {}
   const isLoading = ref(false)
+  const isFormLoading = ref(true)
   const additionalErrors = ref([])
+  const updateObject = ref({})
   const runtime = ref(null)
   const name = ref(cachedFunction.name || '')
 
@@ -82,6 +85,7 @@
 
   const setFunctionData = (edgeFunction) => {
     name.value = edgeFunction.name
+    isFormLoading.value = false
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, edgeFunction.name)
   }
 
@@ -117,14 +121,20 @@
         @on-edit-fail="handleTrackFailEdit"
         :schema="validationSchema"
       >
-        <template #form>
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading" />
           <FormFieldsEditEdgeFunctions
+            v-else
+            v-model:preview-data="updateObject"
             v-model:run="runtime"
             v-model:name="name"
             @additionalErrors="handleAdditionalErrors"
           />
         </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
+        <template
+          v-if="!isFormLoading"
+          #action-bar="{ onSubmit, onCancel, loading }"
+        >
           <ActionBarBlockWithTeleport
             @onSubmit="formSubmit(onSubmit)"
             @onCancel="onCancel"

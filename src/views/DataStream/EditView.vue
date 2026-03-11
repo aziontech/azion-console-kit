@@ -4,6 +4,7 @@
 
   // Import the components
   import FormFieldsDataStream from '@/views/DataStream/FormFields/FormFieldsDataStream'
+  import FormSkeleton from '@/views/DataStream/components/FormSkeleton.vue'
   import SamplingDialog from '@/views/DataStream/Dialog/SamplingDialog'
   import { validationSchema } from '@/views/DataStream/FormFields/composables/validation'
   import EditFormBlock from '@/templates/edit-form-block'
@@ -27,6 +28,7 @@
   const store = useAccountStore()
 
   const displaySamplingDialog = ref(false)
+  const isFormLoading = ref(true)
   const streamName = computed(() => cachedDataStream.value?.name || 'Edit Stream')
   const cachedDataStream = computed(() =>
     dataStreamService.getDataStreamFromCache(route.params?.id)
@@ -35,6 +37,7 @@
   const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const setStreamName = (dataStream) => {
+    isFormLoading.value = false
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, dataStream.name)
   }
 
@@ -75,11 +78,15 @@
         :schema="validation"
         @loaded-service-object="setStreamName"
       >
-        <template #form>
-          <FormFieldsDataStream isEdit />
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading" />
+          <FormFieldsDataStream
+            v-else
+            isEdit
+          />
         </template>
         <template
-          v-if="hasNoPermissionToEditDataStream"
+          v-if="hasNoPermissionToEditDataStream && !isFormLoading"
           #action-bar="{ onSubmit, onCancel, loading, values, formValid }"
         >
           <ActionBarBlockWithTeleport

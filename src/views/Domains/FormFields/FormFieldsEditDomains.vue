@@ -181,10 +181,17 @@
   }
   const moreOptions = ['authority', 'status', 'subjectName']
   const selectCertificate = ({ authority, value, subjectName }) => {
-    authorityCertificate.value = authority
+    const normalizedAuthority = authority ?? null
+    const normalizedSubjectName = subjectName ?? null
+
+    if (authorityCertificate.value !== normalizedAuthority) {
+      authorityCertificate.value = normalizedAuthority
+    }
     isLetEncrypt.value =
       value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
-    subjectNameCertificate.value = subjectName
+    if (subjectNameCertificate.value !== normalizedSubjectName) {
+      subjectNameCertificate.value = normalizedSubjectName
+    }
   }
 </script>
 
