@@ -153,7 +153,6 @@
   import { useDeploy } from '@/stores/deploy'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
-
   const props = defineProps({
     getLogsService: {
       type: Function,
@@ -328,7 +327,7 @@
   }
 
   const goToDomainEditView = () => {
-    const routerName = hasFlagBlockApiV4() ? 'domains': 'workloads'
+    const routerName = hasFlagBlockApiV4() ? 'domains' : 'workloads'
     router.push(`/${routerName}/edit/${results.value.domain.id}`)
   }
 
