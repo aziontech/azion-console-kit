@@ -38,7 +38,7 @@
   "dependencies": {
     "@analytics/segment": "^2.1.0",
     "@aziontech/icons": "^1.0.4",
-    "@aziontech/webkit": "^0.0.1",
+    "@aziontech/webkit": "^0.0.2",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.7.0",
     "@jsonforms/vue": "3.7.0",
