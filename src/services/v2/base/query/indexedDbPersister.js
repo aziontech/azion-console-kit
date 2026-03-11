@@ -68,6 +68,12 @@ async function decryptQuery(query) {
       return null
     }
 
+    // Legacy format: data is a base64 string from the old PBKDF2-based encryption.
+    // The old key is not available anymore, so discard and let the cache rebuild.
+    if (typeof query.state.data === 'string') {
+      return null
+    }
+
     try {
       const decryptedData = await decryptSensitiveData(query.state.data)
       return {
@@ -82,40 +88,6 @@ async function decryptQuery(query) {
         }
       }
     } catch {
-      // Fallback: check if data is already decrypted
-      if (typeof query.state.data === 'string') {
-        try {
-          const parsed = JSON.parse(query.state.data)
-          return {
-            ...query,
-            state: {
-              ...query.state,
-              data: parsed
-            },
-            meta: {
-              ...query.meta,
-              encrypted: false
-            }
-          }
-        } catch {
-          return null
-        }
-      }
-
-      if (typeof query.state.data === 'object') {
-        return {
-          ...query,
-          state: {
-            ...query.state,
-            data: query.state.data
-          },
-          meta: {
-            ...query.meta,
-            encrypted: false
-          }
-        }
-      }
-
       return null
     }
   }
@@ -266,6 +238,11 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 function filterNullValues(data) {
   if (data === null || data === undefined) {
     return undefined
+  }
+
+  // ArrayBuffer and typed arrays are valid binary payloads — pass through unchanged
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return data
   }
 
   if (Array.isArray(data)) {
