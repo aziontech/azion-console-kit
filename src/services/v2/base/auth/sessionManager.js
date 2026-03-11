@@ -58,32 +58,30 @@ const prefetchInBackground = () => {
 
   const pageSize = getPageSize()
 
-  schedulePrefetch(
-    [
-      () => solutionService.prefetchList(hasFlagBlockApiV4()),
-      () => edgeAppService.prefetchList(pageSize),
-      () => workloadService.prefetchList(pageSize),
-      () => edgeFirewallService.prefetchList(pageSize),
-      () => variablesService.prefetchList(),
-      () => marketplaceService.prefetchMarketplace(),
-      () => edgeStorageService.prefetchList(pageSize),
-      () => edgeDNSService.prefetchList(pageSize),
-      () => edgeFunctionService.prefetchList(pageSize),
-      () => edgeConnectorsService.prefetchList(pageSize),
-      () => dataStreamService.prefetchList(pageSize),
-      () => wafService.prefetchList(pageSize),
-      () => edgeSQLService.prefetchList(pageSize),
-      () => teamPermissionService.prefetchList(pageSize),
-      () => networkListsService.prefetchList(pageSize),
-      () => digitalCertificatesService.prefetchList(pageSize),
-      () => digitalCertificatesCRLService.prefetchList(pageSize),
-      () => customPageService.prefetchList(pageSize),
-      () => usersService.prefetchList(pageSize),
-      () => personalTokenService.prefetchList(pageSize),
-      () => edgeServiceService.prefetchList(pageSize),
-      () => edgeNodeService.prefetchList(pageSize)
-    ]
-  )
+  schedulePrefetch([
+    () => solutionService.prefetchList(hasFlagBlockApiV4()),
+    () => edgeAppService.prefetchList(pageSize),
+    () => workloadService.prefetchList(pageSize),
+    () => edgeFirewallService.prefetchList(pageSize),
+    () => variablesService.prefetchList(),
+    () => marketplaceService.prefetchMarketplace(),
+    () => edgeStorageService.prefetchList(pageSize),
+    () => edgeDNSService.prefetchList(pageSize),
+    () => edgeFunctionService.prefetchList(pageSize),
+    () => edgeConnectorsService.prefetchList(pageSize),
+    () => dataStreamService.prefetchList(pageSize),
+    () => wafService.prefetchList(pageSize),
+    () => edgeSQLService.prefetchList(pageSize),
+    () => teamPermissionService.prefetchList(pageSize),
+    () => networkListsService.prefetchList(pageSize),
+    () => digitalCertificatesService.prefetchList(pageSize),
+    () => digitalCertificatesCRLService.prefetchList(pageSize),
+    () => customPageService.prefetchList(pageSize),
+    () => usersService.prefetchList(pageSize),
+    () => personalTokenService.prefetchList(pageSize),
+    () => edgeServiceService.prefetchList(pageSize),
+    () => edgeNodeService.prefetchList(pageSize)
+  ])
 }
 
 let hasPrefetched = false
