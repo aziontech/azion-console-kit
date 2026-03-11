@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
 

@@ -112,11 +112,11 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+  import FieldNumber from '@aziontech/webkit/field-number'
+  import FieldTextIcon from '@aziontech/webkit/field-text-icon'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextarea from '@aziontech/webkit/field-text-area'
   import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
   import PrimeButton from 'primevue/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'

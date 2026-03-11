@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'

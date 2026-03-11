@@ -4,11 +4,11 @@
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldPhoneNumberCountry from '@/templates/form-fields-inputs/fieldPhoneNumberCountry'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldPhoneNumberCountry from '@aziontech/webkit/field-phone-number-country'
   import InputPassword from 'primevue/password'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import LabelBlock from '@/templates/label-block'
 
   defineProps({

@@ -52,7 +52,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import LabelBlock from '@/templates/label-block'
   import InputNumber from 'primevue/inputnumber'
   import { useField } from 'vee-validate'

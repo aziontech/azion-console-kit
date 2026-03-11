@@ -48,7 +48,7 @@
 <script setup>
   import { computed, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'CopyKeyDialog' })

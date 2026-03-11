@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'

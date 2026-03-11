@@ -1,8 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField } from 'vee-validate'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
 
   const { value: name } = useField('name')
   const { value: userAgent } = useField('userAgent')

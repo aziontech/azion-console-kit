@@ -1,9 +1,9 @@
 <script setup>
   import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextIcon from '@aziontech/webkit/field-text-icon'
   import { handleCopyDNSSEC } from '../Config/dnssec'
 
   import { useField } from 'vee-validate'

@@ -106,9 +106,9 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { useField } from 'vee-validate'
   import { ref, onMounted } from 'vue'
 

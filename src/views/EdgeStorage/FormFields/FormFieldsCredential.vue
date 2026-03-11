@@ -1,8 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import Calendar from 'primevue/calendar'
-  import FieldMultiSelect from '@/templates/form-fields-inputs/fieldMultiSelect'
+  import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
   import LabelBlock from '@/templates/label-block'
   import { useField } from 'vee-validate'
 

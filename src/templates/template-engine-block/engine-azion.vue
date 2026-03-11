@@ -5,7 +5,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
