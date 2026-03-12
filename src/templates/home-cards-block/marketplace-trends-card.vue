@@ -4,7 +4,7 @@
     title="Marketplace Trends"
   >
     <template #content>
-      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
+      <div class="bg-[var(--card-content-bg)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
         <div class="flex-1 flex flex-col gap-3 animate-pulse">
           <div class="flex gap-2.5 items-center">
             <div class="rounded-md size-6 bg-[var(--surface-200)]"></div>
@@ -62,7 +62,7 @@
     title="Marketplace Trends"
   >
     <template #content>
-      <div class="bg-[var(--surface-100)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
+      <div class="bg-[var(--card-content-bg)] flex gap-2.5 items-center px-4 py-3 h-[138px]">
         <div class="flex-1 flex flex-col gap-3">
           <div class="flex flex-col gap-2 w-full">
             <div class="flex gap-2.5 items-center w-full">
