@@ -23,8 +23,12 @@
     return {
       background: isSuccess ? 'bg-[rgba(22,163,74,0.2)]' : 'bg-[rgba(245,61,61,0.2)]',
       icon: isPositive ? 'pi pi-arrow-circle-up' : 'pi pi-arrow-circle-down',
-      iconColor: isSuccess ? 'text-[#39e478]' : 'text-[#f53d3d]',
-      textColor: isSuccess ? 'text-[#39e478]' : 'text-[#f53d3d]',
+      iconColor: isSuccess
+        ? 'text-[var(--p-tag-success-color)]'
+        : 'text-[var(--p-tag-danger-color)]',
+      textColor: isSuccess
+        ? 'text-[var(--p-tag-success-color)]'
+        : 'text-[var(--p-tag-danger-color)]',
       percentage: `${Math.abs(value).toFixed(2)}%`
     }
   })
@@ -42,15 +46,15 @@
     <div class="flex items-center justify-between w-full">
       <div class="flex flex-1 gap-2 items-center">
         <span
-          class="text-[10px] font-mono uppercase tracking-[1px] text-[var(--text-color-secondary)] font-medium"
+          class="text-[10px] font-mono uppercase tracking-[1px] var(--text-color-secondary) font-medium"
         >
           {{ metric.label }}
         </span>
         <div
           v-tooltip.top="metric.tooltip"
-          class="bg-[#262626] p-[5px] rounded-full flex items-center"
+          class="bg-[var(--surface-400)] p-[5px] rounded-full flex items-center"
         >
-          <i class="pi pi-info-circle text-[10px]"></i>
+          <i class="pi pi-info-circle text-[var(--text-color-primary)] text-[10px]"></i>
         </div>
       </div>
     </div>
@@ -69,10 +73,10 @@
         v-else
         class="flex gap-1 items-center"
       >
-        <span class="text-[28px] font-semibold tracking-[-1.4px] text-[#ededed]">
+        <span class="text-[28px] font-semibold tracking-[-1.4px] var(--text-color-primary)">
           {{ metric.value }}
         </span>
-        <span class="text-xs text-[#ededed]">{{ metric.unit }}</span>
+        <span class="text-xs text-[var(--text-color-secondary)]">{{ metric.unit }}</span>
       </div>
 
       <i

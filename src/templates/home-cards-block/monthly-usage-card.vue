@@ -19,7 +19,7 @@
         >
           <div class="px-3 py-2 bg-neutral-900 rounded-md flex items-center justify-between">
             <span
-              class="text-[10px] font-mono uppercase tracking-wider text-[var(--text-color-secondary)] font-medium"
+              class="text-[10px] font-mono uppercase tracking-wider var(--text-color-secondary) font-medium"
             >
               Show by usage
             </span>
