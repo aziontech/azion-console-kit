@@ -116,12 +116,12 @@ export const validationSchema = yup.object({
     })
     .when('tls', {
       is: (value) => {
-        return value.certificate === '1'
+        return value.certificate === '1' || value.certificate === '2'
       },
       then: (schema) =>
         schema.test(
           'has-filled-domain',
-          'When Let Encrypt is enabled at least one domain is required.',
+          'A domain is required to generate a Let\'s Encrypt certificate. Please add at least one domain.',
           (value) => value?.some((domain) => domain.domain)
         )
     }),
