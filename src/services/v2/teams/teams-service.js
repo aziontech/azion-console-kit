@@ -1,5 +1,4 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
-import { makeTeamsBaseUrl } from './make-teams-base-url'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const adapt = (results) => {
@@ -7,6 +6,15 @@ const adapt = (results) => {
 }
 
 class TeamsService extends BaseService {
+  constructor() {
+    super()
+    this.baseURL = 'v4/iam/teams'
+  }
+
+  #makeBaseUrl = () => {
+    return this.baseURL
+  }
+
   listTeams = async ({
     fields = '',
     ordering = 'name',
@@ -16,7 +24,7 @@ class TeamsService extends BaseService {
   } = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: makeTeamsBaseUrl(),
+      url: this.#makeBaseUrl(),
       params: {
         ordering,
         page,
@@ -52,8 +60,3 @@ class TeamsService extends BaseService {
 }
 
 export const teamsService = new TeamsService()
-
-/** @deprecated Use teamsService.listTeams() or teamsService.useListTeams() instead */
-export const listTeamsService = async () => {
-  return teamsService.useListTeams()
-}

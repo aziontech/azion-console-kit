@@ -2,8 +2,8 @@
   import { inject, onMounted, onUnmounted, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeButton from 'primevue/button'
-  import { inviteYourTeamService } from '@/services/users-services'
-  import { teamsService } from '@/services/users-services/list-teams-service'
+  import { usersService } from '@/services/v2/users/users-service'
+  import { teamsService } from '@/services/v2/teams/teams-service'
   import { useAccountStore } from '@/stores/account'
   import InviteSession from '@/helpers/invite-session'
   import ContentBlock from '@/templates/content-block'
@@ -119,7 +119,7 @@
   <InviteUserDialog
     v-model:visible="showInviteDialog"
     :listTeamsService="teamsService.listTeams"
-    :inviteYourTeamService="inviteYourTeamService"
+    :inviteYourTeamService="usersService.inviteTeamMember"
     @invite-success="handleInviteSuccess"
   />
 </template>

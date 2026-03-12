@@ -3,7 +3,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import { onMounted, ref } from 'vue'
-  import { teamsService } from '@/services/users-services/list-teams-service'
+  import { teamsService } from '@/services/v2/teams/teams-service'
 
   const teams = ref([])
   const loading = ref(true)
