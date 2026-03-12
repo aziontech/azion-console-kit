@@ -36,7 +36,7 @@
         </span>
 
         <h3
-          class="text-xl font-semibold text-white leading-tight px-6 py-4 surface-border border-b"
+          class="text-xl font-semibold var(--text-color) leading-tight px-6 py-4 surface-border border-b"
         >
           {{ communication.message }}
         </h3>

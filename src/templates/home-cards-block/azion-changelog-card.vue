@@ -29,10 +29,10 @@
 
               <div class="flex-1 flex flex-col px-3.5">
                 <div class="flex flex-col gap-1 rounded-md w-full">
-                  <p class="text-[10px] text-[var(--text-color-secondary)] leading-normal">
+                  <p class="text-[10px] var(--text-color-secondary) leading-normal">
                     {{ item.time }}
                   </p>
-                  <p class="text-xs text-white leading-[1.5]">
+                  <p class="text-xs var(--text-color-primary)) leading-[1.5]">
                     {{ item.description }}
                   </p>
                 </div>
