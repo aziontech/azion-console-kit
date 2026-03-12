@@ -5,8 +5,8 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
 
   defineOptions({ name: 'invite-user-dialog' })
 
