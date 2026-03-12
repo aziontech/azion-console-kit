@@ -9,8 +9,7 @@
   import OperationTag from './OperationTag.vue'
   import { createStartOfDay } from '@utils/date.js'
   import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
-  import { listTimezonesService } from '@/services/users-services'
-
+  import { listTimezonesService } from '@/services/v2/listTimezones'
   const props = defineProps({
     listService: {
       type: Function,
@@ -289,7 +288,7 @@
               <DataTimeRange
                 v-model="dateRange"
                 :maxDays="183"
-                :listTimezonesService="listTimezonesService"
+                :listTimezonesService="listTimezonesService.listTimezones"
                 @select="handleDateRangeChange"
               />
               <DataTable.ColumnSelector

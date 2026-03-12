@@ -286,5 +286,9 @@ export const queryKeys = {
         params
       ]
     }
+  },
+  timezones: {
+    all: ['timezones'],
+    list: () => [...queryKeys.timezones.all, 'list']
   }
 }
