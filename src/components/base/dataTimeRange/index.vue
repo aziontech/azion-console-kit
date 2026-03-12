@@ -67,7 +67,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -79,7 +79,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -200,6 +200,20 @@
     }
   })
 
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
+    if (!start || !end) return false
+
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
   const maxDate = computed(() => {
     if (!props.maxDays || props.maxDays <= 0) return null
     return new Date()
@@ -247,6 +261,7 @@
   }
 
   const handleSelect = () => {
+    if (isInvalidRange.value) return
     clampModelRangeInPlace()
     emit('select', model.value)
   }
@@ -320,7 +335,7 @@
     model.value.startDate = result.startDate
     model.value.endDate = result.endDate
 
-    emit('select', model.value)
+    handleSelect()
   }
 
   const setNow = () => {
@@ -328,14 +343,14 @@
     model.value.label = ''
 
     if (editingField.value === 'start') {
-      model.value.startDate = now
+      model.value.startDate = clampToBounds(now)
       model.value.labelStart = 'now'
     } else {
-      model.value.endDate = now
+      model.value.endDate = clampToBounds(now)
       model.value.labelEnd = 'now'
     }
 
-    emit('select', model.value)
+    handleSelect()
     closeOverlay()
   }
 
