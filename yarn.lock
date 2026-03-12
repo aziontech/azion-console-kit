@@ -80,11 +80,12 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.0.4.tgz#673e37e1dfce63d17f35a2567303bbb17a290704"
   integrity sha512-nR5aAkqSnQMpjXIaELqljW6o0jK9pPDhVK1TTH+rrpuTSekyJMoK6xqyX/DrhCz8DhGpfIYKD30yb6qE6aywhg==
 
-"@aziontech/webkit@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-0.0.3.tgz#69183662b5333c8e59de70e36df994d62d4c61da"
-  integrity sha512-SaqYIJb0n5RtYKoI1QpEw100DsPKX/rzA/Paiu8jmuTcnwPPUS6LZLnUXRULHgvd7MPpR2ld/vl/5xW6saFwhQ==
+"@aziontech/webkit@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.2.0.tgz#a3b7012d93c00b43dd4ef65f6747513d4929895d"
+  integrity sha512-Xp/rgDJj7D/MfRZY8vcYWoKs1sitXSQbUwajMiEtQoLYl9wlbSSLh1cIfyQiANqgHZ8ZSRr4HgIRE1NnjLcXMA==
   dependencies:
+    primevue "3.35.0"
     vee-validate "^4.15.1"
     vue-tsc "^3.2.5"
 

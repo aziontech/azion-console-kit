@@ -77,7 +77,7 @@
       <template #end>
         <div class="w-full flex flex-wrap gap-2 items-center justify-center">
           <!-- System Status -->
-          <SystemStatusBarBlock
+          <AzionSystemStatus
             v-tooltip.top="{ value: 'System status', showDelay: 200 }"
             v-if="!route.meta.hideLinksFooter"
           />
@@ -132,7 +132,7 @@
   import Toolbar from 'primevue/toolbar'
   import { useThemeStore } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
-  import SystemStatusBarBlock from '@templates/system-status-bar-block'
+  import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import { useRoute } from 'vue-router'
