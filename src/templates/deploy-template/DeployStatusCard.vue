@@ -12,7 +12,6 @@
    * This component manages its own timer state but receives results from parent.
    */
   import { computed, onUnmounted, ref, watch } from 'vue'
-  import Divider from 'primevue/divider'
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from './BaseDeployCard.vue'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
@@ -55,29 +54,6 @@
     deployStartTime: {
       type: Number,
       default: null
-    },
-
-    // Next steps configuration
-    nextSteps: {
-      type: Array,
-      default: () => [
-        {
-          title: 'Customize Domain',
-          description: 'Associate a custom domain and subdomains to Azion to handle user access.',
-          handle: () => {}
-        },
-        {
-          title: 'Point Traffic',
-          description:
-            'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
-          handle: () => {}
-        },
-        {
-          title: 'View Analytics',
-          description: 'Gain powerful insights into your performance, availability, and security.',
-          handle: () => {}
-        }
-      ]
     },
 
     // Labels
@@ -195,11 +171,6 @@
     emit('manage', { type: 'domain', id: domainId.value })
   }
 
-  const handleNextStep = (step, index) => {
-    emit('next-step', { step, index })
-    step.handle?.()
-  }
-
   const startTimer = () => {
     const timerInitialValue =
       props.deployStartTime !== null
@@ -312,38 +283,5 @@
         </div>
       </template>
     </BaseDeployCard>
-
-    <div
-      class="w-full flex flex-col gap-5"
-      v-if="isSuccessfullyFinished"
-    >
-      <Divider
-        align="left"
-        type="dashed"
-      >
-        <b>Next Steps</b>
-      </Divider>
-      <div class="ml-0 mt-0 w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <PrimeButton
-          v-for="(step, index) in nextSteps"
-          :key="index"
-          class="p-6 lg:h-36 w-full text-left h-auto items-start justify-start border-solid border surface-border hover:border-primary transition-all"
-          link
-          type="button"
-          @click="handleNextStep(step, index)"
-        >
-          <div class="flex flex-col justify-between gap-2 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div class="flex gap-1 flex-col">
-                <span class="text-color text-base font-medium"> {{ step.title }} </span>
-                <span class="text-sm font-normal text-color-secondary line-clamp-2">
-                  {{ step.description }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </PrimeButton>
-      </div>
-    </div>
   </div>
 </template>

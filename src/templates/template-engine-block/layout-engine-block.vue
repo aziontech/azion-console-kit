@@ -25,6 +25,7 @@
   import BaseDeployCard from '../deploy-template/BaseDeployCard.vue'
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
+  import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
 
   // ============================================================================
   // Props - Common props shared between all engine implementations
@@ -229,6 +230,32 @@
           handle: () => {}
         }
       ]
+    },
+
+    // Deploy Success Card props (Step 4)
+    /**
+     * Application URL displayed after successful deploy
+     */
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    /**
+     * Next steps configuration for success card
+     */
+    successNextSteps: {
+      type: Array,
+      default: () => []
+    },
+
+    // Simulation mode
+    /**
+     * Simulates deploy success after specified milliseconds
+     * Set to true for default 5 seconds, or pass a number for custom delay
+     */
+    simulateDeploy: {
+      type: [Boolean, Number],
+      default: false
     }
   })
 
@@ -243,11 +270,13 @@
   const toast = useToast()
 
   // Step Navigation State
-  const currentStep = ref('repository')
+  const currentStep = ref('success')
   const isTransitioning = ref(false)
   const step2Ref = ref(null)
   const step3Ref = ref(null)
+  const step4Ref = ref(null)
   const showNextButton = ref(props.showNextButton)
+  const simulationTimerRef = ref(null)
 
   // VCS Integration State
   const callbackUrl = ref('')
@@ -385,7 +414,6 @@
     emit('next')
 
     nextTick(() => {
-      // Scroll to step 2 but keep step 1 visible (center alignment)
       step2Ref.value?.scrollIntoView({
         behavior: 'smooth',
         block: 'center'
@@ -411,6 +439,16 @@
   }
 
   /**
+   * Clear deploy simulation timer
+   */
+  const clearDeploySimulation = () => {
+    if (simulationTimerRef.value) {
+      clearTimeout(simulationTimerRef.value)
+      simulationTimerRef.value = null
+    }
+  }
+
+  /**
    * Handle deploy action from settings step
    */
   const handleDeploy = () => {
@@ -419,9 +457,26 @@
   }
 
   /**
+   * Navigate to success step (step 4)
+   * Called after deploy finishes successfully
+   */
+  const goToSuccess = () => {
+    currentStep.value = 'success'
+
+    nextTick(() => {
+      step4Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  /**
    * Handle deploy finish
+   * Called when DeployStatusCard emits 'finish' (deploy completed)
    */
   const handleFinish = () => {
+    goToSuccess()
     emit('finish')
   }
 
@@ -460,13 +515,12 @@
   const reset = () => {
     currentStep.value = 'repository'
     isTransitioning.value = false
+    clearDeploySimulation()
   }
 
-  // ============================================================================
-  // Lifecycle Hooks
-  // ============================================================================
   onBeforeUnmount(() => {
     removeEventListenerToGithubIntegration()
+    clearDeploySimulation()
   })
 
   // ============================================================================
@@ -493,15 +547,38 @@
     currentStep,
     step2Ref,
     step3Ref,
+    step4Ref,
     reset,
     goToSettings,
-    goToDeploying
+    goToDeploying,
+    goToSuccess
   })
 </script>
 
 <template>
   <div class="layout-engine-block flex flex-col gap-6 min-w-[672px]">
+    <div
+      ref="step4Ref"
+      v-show="currentStep === 'success'"
+    >
+      <DeploySuccessCard
+        :app-url="props.appUrl"
+        :preview-src="props.previewSrc"
+        :preview-alt="props.previewAlt"
+        :template-title="props.templateTitle"
+        :template-url="props.templateUrl"
+        :template-description="props.templateDescription"
+        :github-url="props.githubUrl"
+        :next-steps="props.successNextSteps"
+      >
+        <template #customize-domain>
+          <slot name="customize-domain" />
+        </template>
+      </DeploySuccessCard>
+    </div>
+
     <BaseDeployCard
+      v-if="currentStep !== 'success'"
       :title="props.title || 'Start from Template'"
       :step-index="0"
       :hide-footer="currentStep === 'settings'"
@@ -648,7 +725,6 @@
         #footer
       >
         <slot name="footer-actions">
-          {{ showNextButton }}
           <PrimeButton
             class="w-full flex-row-reverse"
             :label="props.nextLabel"
@@ -686,12 +762,12 @@
 
     <div
       ref="step3Ref"
-      v-show="currentStep === 'deploying' || currentStep === 'settings'"
+      v-show="currentStep === 'deploying' || currentStep === 'success'"
     >
       <DeployStatusCard
         :execution-id="props.executionId"
         :get-logs-service="props.getLogsService"
-        :results="props.results"
+        :results="currentStep === 'success' ? { domain: { url: props.appUrl } } : props.results"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"

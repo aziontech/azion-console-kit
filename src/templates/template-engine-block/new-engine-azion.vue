@@ -108,7 +108,11 @@
     templateDescription: inputSchema.value.description || '',
     githubUrl: inputSchema.value.githubUrl || inputSchema.value.repository || '',
     schema: props.schema,
-    isDrawer: props.isDrawer
+    isDrawer: props.isDrawer,
+    // Deploy simulation props
+    simulateDeploy: inputSchema.value.simulateDeploy ?? false,
+    appUrl: inputSchema.value.appUrl || '',
+    successNextSteps: inputSchema.value.successNextSteps || []
   }))
 
   // ============================================================================
@@ -317,6 +321,30 @@
     emit('next')
   }
 
+  const handleDeploy = () => {
+    emit('deploy')
+  }
+
+  const handleFinish = () => {
+    emit('finish')
+  }
+
+  const handleRetry = () => {
+    emit('retry')
+  }
+
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
+  const handleOpenUrl = (url) => {
+    emit('open-url', url)
+  }
+
+  const handleNextStep = (data) => {
+    emit('next-step', data)
+  }
+
   // ============================================================================
   // Watchers
   // ============================================================================
@@ -380,6 +408,12 @@
       ref="layoutRef"
       v-bind="layoutProps"
       @next="handleNext"
+      @deploy="handleDeploy"
+      @finish="handleFinish"
+      @retry="handleRetry"
+      @manage="handleManage"
+      @open-url="handleOpenUrl"
+      @next-step="handleNextStep"
     >
       <!-- GitHub Connection Slot -->
       <template #github-connection="slotProps">
