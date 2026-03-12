@@ -10,7 +10,7 @@
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { useField } from 'vee-validate'
   import { computed, inject, ref } from 'vue'

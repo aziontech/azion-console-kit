@@ -10,7 +10,7 @@
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT, TTL_DEFAULT_ANAME } from '@/utils/constants'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')

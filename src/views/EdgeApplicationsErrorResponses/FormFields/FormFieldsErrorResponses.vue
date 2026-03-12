@@ -3,7 +3,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputText from 'primevue/inputtext'

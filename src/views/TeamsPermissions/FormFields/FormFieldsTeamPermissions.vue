@@ -4,7 +4,7 @@
   import PickList from 'primevue/picklist'
   import Skeleton from 'primevue/skeleton'
   import { useField } from 'vee-validate'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'

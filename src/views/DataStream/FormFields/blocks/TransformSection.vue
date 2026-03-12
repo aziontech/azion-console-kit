@@ -92,7 +92,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldPickList from '@aziontech/webkit/field-pick-list'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 

@@ -8,7 +8,7 @@
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { handleTypeNetwork } from '../Config/typeNetwork'
 

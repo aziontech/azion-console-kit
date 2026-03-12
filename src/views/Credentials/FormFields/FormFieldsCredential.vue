@@ -4,7 +4,7 @@
   import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
   import Calendar from 'primevue/calendar'
   import MultiSelect from 'primevue/multiselect'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   import { ref, onMounted, watch } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'

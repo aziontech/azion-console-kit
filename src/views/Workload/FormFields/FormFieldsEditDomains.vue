@@ -4,7 +4,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import MultiSelect from 'primevue/multiselect'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'

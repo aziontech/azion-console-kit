@@ -3,7 +3,7 @@
   import MultiSelect from 'primevue/multiselect'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import { networkGrouRadio } from '../Config/typeNetwork'
 

@@ -4,7 +4,7 @@
   import Dropdown from 'primevue/dropdown'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { useField } from 'vee-validate'
   import { computed } from 'vue'

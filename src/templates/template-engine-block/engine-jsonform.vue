@@ -4,7 +4,7 @@
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from 'primevue/dropdown'
   import { useToast } from 'primevue/usetoast'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
   import { InputTextControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlTester'

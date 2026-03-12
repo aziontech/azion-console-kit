@@ -277,7 +277,7 @@
   import Password from 'primevue/password'
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   const emit = defineEmits(['update:idpTypeSelection'])
   defineOptions({ name: 'identity-providers-create' })
