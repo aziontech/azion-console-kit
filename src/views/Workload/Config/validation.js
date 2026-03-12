@@ -121,7 +121,7 @@ export const validationSchema = yup.object({
       then: (schema) =>
         schema.test(
           'has-filled-domain',
-          'A domain is required to generate a Let\'s Encrypt certificate. Please add at least one domain.',
+          "Domain is required when using a Let's Encrypt certificate.",
           (value) => value?.some((domain) => domain.domain)
         )
     }),
