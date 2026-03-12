@@ -10,9 +10,9 @@
     <InputDateRange
       v-model="model"
       :maxDays="maxDays"
+      @select="handleSelect"
       :editingField="editingField"
       :isOverlayOpen="isOverlayOpen"
-      @select="emit('select', $event)"
       @open="openOverlay($event, 1)"
     />
 
@@ -55,7 +55,7 @@
               panelOnly
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @autoRefresh="emit('autoRefresh', $event)"
               @close="closeOverlay"
             />
@@ -67,7 +67,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -79,7 +79,7 @@
               :editingField="editingField"
               v-model="model"
               :maxDays="maxDays"
-              @select="emit('select', $event)"
+              @select="handleSelect"
               @close="closeOverlay"
             />
           </TabPanel>
@@ -200,6 +200,31 @@
     }
   })
 
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
+    if (!start || !end) return false
+
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
+  const maxDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    return new Date()
+  })
+
+  const minDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    const now = new Date()
+    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
+
   const utcOffsetOptions = computed(() => {
     const accountOption = {
       label: `Account (${formatUtcOffsetLabel(props.defaultUtcOffset)})`,
@@ -217,6 +242,36 @@
 
     return [accountOption, ...apiOptions]
   })
+
+  const clampToBounds = (date) => {
+    if (!date) return date
+    const parsed = new Date(date)
+    if (!props.maxDays || props.maxDays <= 0) return parsed
+    const min = minDate.value
+    const max = maxDate.value
+    if (min && parsed < min) return new Date(min)
+    if (max && parsed > max) return new Date(max)
+    return parsed
+  }
+
+  const clampModelRangeInPlace = () => {
+    if (!model.value) return
+    if (model.value.startDate) model.value.startDate = clampToBounds(model.value.startDate)
+    if (model.value.endDate) model.value.endDate = clampToBounds(model.value.endDate)
+  }
+
+  const handleSelect = () => {
+    if (isInvalidRange.value) return
+    clampModelRangeInPlace()
+    emit('select', model.value)
+  }
+
+  const formatUtcOffsetLabel = (offset) => {
+    const normalized = typeof offset === 'string' ? offset.trim() : ''
+    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
+    if (!match) return 'UTC'
+    return `UTC${match[1]}${match[2]}:${match[3]}`
+  }
 
   const syncSelectedUtcOption = () => {
     if (model.value?.utcOffset) {
@@ -242,17 +297,11 @@
     emit('select', model.value)
   }
 
-  const formatUtcOffsetLabel = (offset) => {
-    const normalized = typeof offset === 'string' ? offset.trim() : ''
-    const match = normalized.match(/^([+-])(\d{2})(\d{2})$/)
-    if (!match) return 'UTC'
-    return `UTC${match[1]}${match[2]}:${match[3]}`
-  }
+  const openOverlay = async (payload, tabIndex) => {
+    activeTab.value = tabIndex
+    const event = tabIndex === 0 ? payload : payload?.event
+    const field = tabIndex === 0 ? undefined : payload?.field
 
-  const openOverlay = async (payload) => {
-    activeTab.value = 0
-    const event = payload?.event ?? payload
-    const field = payload?.field
     if (field === 'start' || field === 'end') editingField.value = field
 
     if (!event) return
@@ -286,7 +335,7 @@
     model.value.startDate = result.startDate
     model.value.endDate = result.endDate
 
-    emit('select', model.value)
+    handleSelect()
   }
 
   const setNow = () => {
@@ -294,14 +343,14 @@
     model.value.label = ''
 
     if (editingField.value === 'start') {
-      model.value.startDate = now
+      model.value.startDate = clampToBounds(now)
       model.value.labelStart = 'now'
     } else {
-      model.value.endDate = now
+      model.value.endDate = clampToBounds(now)
       model.value.labelEnd = 'now'
     }
 
-    emit('select', model.value)
+    handleSelect()
     closeOverlay()
   }
 
