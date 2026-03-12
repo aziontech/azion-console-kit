@@ -127,6 +127,7 @@
         :createPagePath="emptyBlock.createPagePath"
         :onClickCreate="emptyBlock.onClickCreate"
         :documentationService="emptyBlock.documentationService"
+        :pt="pt.emptyState"
         data-testid="edge-applications-empty-results-block"
         @click-to-create="emit('click-to-create')"
       >

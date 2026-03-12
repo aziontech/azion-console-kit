@@ -83,7 +83,7 @@
       const inputStyles = {
         style: {
           base: {
-            fontFamily: "'Roboto', sans-serif",
+            fontFamily: "'Sora', sans-serif",
             color: theme === 'dark' ? '#ffffff' : '#000000'
           },
           '::placeholder': {

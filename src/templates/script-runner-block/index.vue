@@ -25,7 +25,7 @@
         ref="runner"
       >
         <p
-          class="w-full text-color text-base font-robotomono"
+          class="w-full text-color text-base font-mono"
           v-for="(log, index) in this.currentLogs"
           :key="index"
         >
