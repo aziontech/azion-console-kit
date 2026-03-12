@@ -105,6 +105,7 @@
             size="small"
             label="Variable"
             @click="handleTrackEvent"
+            helpCenterPath="VARIABLES"
             createPagePath="variables/create"
             data-testid="create_Variable_button"
           />

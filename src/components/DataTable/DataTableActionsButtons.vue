@@ -53,7 +53,9 @@
   import PrimeButton from 'primevue/button'
   import { useRouter } from 'vue-router'
   import { useLayout } from '@/composables/use-layout'
+  import { useHelperCenter } from '@/composables/use-helper-center'
   const { OpenSidebarComponent } = useLayout()
+  const { actions } = useHelperCenter()
   const router = useRouter()
   const props = defineProps({
     label: {
@@ -84,6 +86,10 @@
       type: String,
       default: null
     },
+    helpCenterPath: {
+      type: String,
+      default: null
+    },
     otherActions: {
       type: Boolean,
       default: false
@@ -109,7 +115,11 @@
     if (props.getHelpLink) {
       router.push({ path: props.getHelpLink })
     } else {
-      OpenSidebarComponent('copilot')
+      if (props.helpCenterPath) {
+        actions.setForcedPath(props.helpCenterPath)
+      }
+
+      OpenSidebarComponent('helper')
     }
   }
 </script>
