@@ -64,7 +64,7 @@
       </div>
     </template>
     <template #content>
-      <div class="p-4 flex flex-col gap-2.5 surface-100">
+      <div class="p-4 flex flex-col gap-2.5 bg-[var(--card-content-bg)]]">
         <template v-if="isLoading">
           <div
             v-for="index in 4"

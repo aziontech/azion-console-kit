@@ -4,7 +4,7 @@
     title="Azion Changelog"
   >
     <template #content>
-      <div class="p-4 surface-100">
+      <div class="p-4 bg-[var(--card-content-bg)]">
         <div class="flex items-center w-[273px]">
           <div class="flex flex-col items-start w-full">
             <div

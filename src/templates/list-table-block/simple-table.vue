@@ -163,7 +163,7 @@
     <template #footer>
       <div
         v-if="viewAllLink"
-        class="flex justify-center items-center py-3 cursor-pointer bg-[var(--surface-section)] border-t border-[var(--surface-border)]"
+        class="flex justify-center items-center py-3 cursor-pointer bg-[var(--surface-section)] border-[var(--surface-border)]"
         @click="handleViewAllClick"
         data-testid="resources-table-view-all"
         @mouseover="isHoverFooter = true"
