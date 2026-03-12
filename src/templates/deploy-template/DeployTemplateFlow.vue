@@ -14,11 +14,13 @@
    * 1. DeployRepositoryCard - template selection and git configuration
    * 2. TemplateSettingsCard - template settings form
    * 3. DeployStatusCard - deploy progress, logs, and results
+   * 4. DeploySuccessCard - success confirmation with app URL and next steps
    */
   import { ref, computed, nextTick } from 'vue'
   import DeployRepositoryCard from './DeployRepositoryCard.vue'
   import TemplateSettingsCard from './TemplateSettingsCard.vue'
   import DeployStatusCard from './DeployStatusCard.vue'
+  import DeploySuccessCard from './DeploySuccessCard.vue'
 
   // ============================================================================
   // Props
@@ -123,6 +125,16 @@
           handle: () => {}
         }
       ]
+    },
+
+    // Deploy Success Card props
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    successNextSteps: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -137,6 +149,7 @@
   const currentStep = ref('repository')
   const step2Ref = ref(null)
   const step3Ref = ref(null)
+  const step4Ref = ref(null)
 
   // ============================================================================
   // Computed
@@ -155,7 +168,10 @@
     isDrawer: props.isDrawer,
     loading: props.loadingNext,
     disabled: props.disabledNext,
-    collapsed: currentStep.value === 'settings' || currentStep.value === 'deploying'
+    collapsed:
+      currentStep.value === 'settings' ||
+      currentStep.value === 'deploying' ||
+      currentStep.value === 'success'
   }))
 
   /**
@@ -182,6 +198,20 @@
     applicationName: props.applicationName,
     deployStartTime: props.deployStartTime,
     nextSteps: props.nextSteps
+  }))
+
+  /**
+   * Props to pass to DeploySuccessCard
+   */
+  const successCardProps = computed(() => ({
+    appUrl: props.appUrl,
+    previewSrc: props.previewSrc,
+    previewAlt: props.previewAlt,
+    templateTitle: props.templateTitle,
+    templateUrl: props.templateUrl,
+    templateDescription: props.templateDescription,
+    githubUrl: props.githubUrl,
+    nextSteps: props.successNextSteps
   }))
 
   // ============================================================================
@@ -229,10 +259,36 @@
   }
 
   /**
-   * Handle deploy finish
+   * Navigate to success step (step 4)
+   * Called after deploy finishes successfully
+   */
+  const goToSuccess = () => {
+    currentStep.value = 'success'
+
+    nextTick(() => {
+      step4Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  /**
+   * Handle deploy finish - navigate to success card
+   * Called when deploy completes successfully
    */
   const handleFinish = () => {
+    goToSuccess()
     emit('finish')
+  }
+
+  /**
+   * Handle deploy success with app URL
+   * Alternative entry point when appUrl is available
+   */
+  const onDeploySuccess = (url) => {
+    goToSuccess()
+    emit('finish', { appUrl: url })
   }
 
   /**
@@ -279,6 +335,8 @@
     reset,
     goToSettings,
     goToDeploying,
+    goToSuccess,
+    onDeploySuccess,
     currentStep
   })
 </script>
@@ -367,6 +425,17 @@
         @open-url="handleOpenUrl"
         @next-step="handleNextStep"
       />
+    </div>
+
+    <div
+      ref="step4Ref"
+      v-show="currentStep === 'success'"
+    >
+      <DeploySuccessCard v-bind="successCardProps">
+        <template #customize-domain>
+          <slot name="customize-domain" />
+        </template>
+      </DeploySuccessCard>
     </div>
   </div>
 </template>

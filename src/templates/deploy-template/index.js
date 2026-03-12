@@ -14,6 +14,8 @@
  * - DeployRepositoryCard: Step 1 - Template selection and git configuration
  * - TemplateSettingsCard: Step 2 - Template settings form
  * - DeployStatusCard: Step 3 - Deploy progress, logs, and results
+ * - DeploySuccessCard: Step 4 - Success confirmation with app URL and next steps
+ * - TemplateInfoBlock: Reusable preview + info block component
  *
  * Animation sequence on Next click:
  * 1. Step 1 remains visible at the top (does NOT disappear or slide horizontally)
@@ -36,3 +38,5 @@ export { default as BaseDeployCard } from './BaseDeployCard.vue'
 export { default as DeployRepositoryCard } from './DeployRepositoryCard.vue'
 export { default as TemplateSettingsCard } from './TemplateSettingsCard.vue'
 export { default as DeployStatusCard } from './DeployStatusCard.vue'
+export { default as DeploySuccessCard } from './DeploySuccessCard.vue'
+export { default as TemplateInfoBlock } from './TemplateInfoBlock.vue'
