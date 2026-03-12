@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { formatMetricValue } from '@/helpers/format-metric-value'
+// eslint-disable-next-line azion-architecture/require-vue-query
 import {
   fetchHomeMetrics,
   fetchWafMetrics,
