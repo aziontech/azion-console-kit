@@ -35,8 +35,8 @@
 <script setup>
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   const TIERED_CACHE_REGION = [
     {

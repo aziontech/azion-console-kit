@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import fieldNumber from '@aziontech/webkit/field-number'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())

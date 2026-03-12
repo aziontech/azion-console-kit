@@ -2,8 +2,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import LabelBlock from '@/templates/label-block'
 
   import { useField } from 'vee-validate'

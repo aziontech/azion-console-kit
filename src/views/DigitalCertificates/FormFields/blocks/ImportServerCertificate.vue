@@ -36,7 +36,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
   import { useDigitalCertificate } from '../composables/certificate'

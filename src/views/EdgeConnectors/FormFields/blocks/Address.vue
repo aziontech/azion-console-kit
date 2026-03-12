@@ -234,10 +234,10 @@
   import Card from 'primevue/card'
   import Accordion from 'primevue/accordion'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldNumber from '@aziontech/webkit/field-number'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsAddress' })
 

@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from 'primevue/skeleton'
   import { computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'

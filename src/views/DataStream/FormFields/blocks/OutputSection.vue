@@ -815,16 +815,16 @@
   import { useField } from 'vee-validate'
   import { useThemeStore } from '@/stores/theme'
   import { useAccountStore } from '@/stores/account'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import Button from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
+  import FieldNumber from '@aziontech/webkit/field-number'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
 
   const themeStore = useThemeStore()
   const accountStore = useAccountStore()

@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import LabelBlock from '@/templates/label-block'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import { networkGrouRadio } from '../Config/typeNetwork'
 
   import { useField } from 'vee-validate'

@@ -87,11 +87,11 @@
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldNumber from '@aziontech/webkit/field-number'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldPickList from '@/templates/form-fields-inputs/fieldPickList.vue'
+  import FieldPickList from '@aziontech/webkit/field-pick-list'
   import LabelBlock from '@/templates/label-block'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
