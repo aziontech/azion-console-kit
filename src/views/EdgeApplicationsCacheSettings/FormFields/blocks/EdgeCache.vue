@@ -139,7 +139,7 @@
   } from '@/utils/constants'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import InputNumber from 'primevue/inputnumber'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'

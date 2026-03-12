@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'

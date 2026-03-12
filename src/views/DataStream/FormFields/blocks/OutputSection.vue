@@ -821,7 +821,7 @@
   import Button from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'

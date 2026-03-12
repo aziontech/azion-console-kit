@@ -9,7 +9,7 @@
   import FieldPhoneNumberCountry from '@aziontech/webkit/field-phone-number-country'
   import InputPassword from 'primevue/password'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   defineProps({
     timezoneOptions: {

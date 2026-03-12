@@ -5,7 +5,7 @@
   import { ref, computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 

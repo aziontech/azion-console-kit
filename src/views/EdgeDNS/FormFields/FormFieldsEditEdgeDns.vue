@@ -5,7 +5,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextIcon from '@aziontech/webkit/field-text-icon'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import copyBlock from '@/templates/copy-block/copy-block.vue'
   import { useField } from 'vee-validate'
   import { watch, ref } from 'vue'

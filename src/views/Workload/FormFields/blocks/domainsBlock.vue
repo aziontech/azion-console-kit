@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import InputText from 'primevue/inputtext'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldInputGroup from '@aziontech/webkit/field-input-group'

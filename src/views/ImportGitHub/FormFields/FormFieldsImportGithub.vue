@@ -10,7 +10,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { windowOpen } from '@/helpers'
 

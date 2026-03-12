@@ -7,7 +7,7 @@
   import * as yup from 'yup'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import OAuthGithub from './oauth-github.vue'
 

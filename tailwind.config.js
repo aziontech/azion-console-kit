@@ -3,7 +3,11 @@ import typography from '@tailwindcss/typography'
 /** @type {import('tailwindcss').Config} */
 export default {
   important: true,
-  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}' 
+  ],
   darkMode: 'class',
   theme: {
     fontFamily: {

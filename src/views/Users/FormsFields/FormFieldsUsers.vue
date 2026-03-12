@@ -6,7 +6,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldPhoneNumber from '@aziontech/webkit/field-phone-number'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'

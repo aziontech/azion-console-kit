@@ -10,7 +10,7 @@
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'

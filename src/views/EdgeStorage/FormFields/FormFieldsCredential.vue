@@ -3,7 +3,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import Calendar from 'primevue/calendar'
   import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
 
   const capabilitiesOptions = [
