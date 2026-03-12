@@ -51,6 +51,12 @@
     deployLabel: {
       type: String,
       default: 'Deploy'
+    },
+
+    // Hide footer when deploying
+    hideFooter: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -68,7 +74,10 @@
 </script>
 
 <template>
-  <BaseDeployCard title="Template Settings">
+  <BaseDeployCard
+    title="Template Settings"
+    :hide-footer="props.hideFooter"
+  >
     <template #header-meta>
       <div class="flex items-center gap-3">
         <div class="hidden sm:flex w-12 h-12 shrink-0 rounded overflow-hidden bg-surface-section">
@@ -127,6 +136,7 @@
     <template #footer>
       <slot name="footer-actions">
         <PrimeButton
+          type="button"
           class="w-full flex-row-reverse"
           :label="props.deployLabel"
           :loading="props.loadingDeploy"

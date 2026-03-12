@@ -24,6 +24,7 @@
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from '../deploy-template/BaseDeployCard.vue'
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
+  import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
 
   // ============================================================================
   // Props - Common props shared between all engine implementations
@@ -160,13 +161,81 @@
     disabledDeploy: {
       type: Boolean,
       default: false
+    },
+
+    // Deploy Status Card props (Step 3)
+    /**
+     * Execution ID for the script runner
+     */
+    executionId: {
+      type: String,
+      default: ''
+    },
+    /**
+     * Service function to get deploy logs
+     */
+    getLogsService: {
+      type: Function,
+      default: null
+    },
+    /**
+     * Results from deploy (populated after finish)
+     */
+    results: {
+      type: Object,
+      default: null
+    },
+    /**
+     * Deploy failed state
+     */
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Application name for heading
+     */
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    /**
+     * Deploy start time (timestamp)
+     */
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    /**
+     * Next steps configuration
+     */
+    nextSteps: {
+      type: Array,
+      default: () => [
+        {
+          title: 'Customize Domain',
+          description: 'Associate a custom domain and subdomains to Azion to handle user access.',
+          handle: () => {}
+        },
+        {
+          title: 'Point Traffic',
+          description:
+            'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
+          handle: () => {}
+        },
+        {
+          title: 'View Analytics',
+          description: 'Gain powerful insights into your performance, availability, and security.',
+          handle: () => {}
+        }
+      ]
     }
   })
 
   // ============================================================================
   // Emits
   // ============================================================================
-  const emit = defineEmits(['next', 'deploy'])
+  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
   // ============================================================================
   // Common State
@@ -177,6 +246,8 @@
   const currentStep = ref('repository')
   const isTransitioning = ref(false)
   const step2Ref = ref(null)
+  const step3Ref = ref(null)
+  const showNextButton = ref(props.showNextButton)
 
   // VCS Integration State
   const callbackUrl = ref('')
@@ -323,10 +394,64 @@
   }
 
   /**
+   * Navigate to deploying step (step 3)
+   * Called when user clicks Deploy on TemplateSettingsCard
+   */
+  const goToDeploying = () => {
+    currentStep.value = 'deploying'
+    showNextButton.value = false
+
+    nextTick(() => {
+      // Scroll to step 3
+      step3Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  /**
    * Handle deploy action from settings step
    */
   const handleDeploy = () => {
+    goToDeploying()
     emit('deploy')
+  }
+
+  /**
+   * Handle deploy finish
+   */
+  const handleFinish = () => {
+    emit('finish')
+  }
+
+  /**
+   * Handle retry action
+   */
+  const handleRetry = () => {
+    currentStep.value = 'settings'
+    emit('retry')
+  }
+
+  /**
+   * Handle manage action
+   */
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
+  /**
+   * Handle open URL action
+   */
+  const handleOpenUrl = (url) => {
+    emit('open-url', url)
+  }
+
+  /**
+   * Handle next step action
+   */
+  const handleNextStep = (data) => {
+    emit('next-step', data)
   }
 
   /**
@@ -367,8 +492,10 @@
     // Step Navigation
     currentStep,
     step2Ref,
+    step3Ref,
     reset,
-    goToSettings
+    goToSettings,
+    goToDeploying
   })
 </script>
 
@@ -517,10 +644,11 @@
       </template>
 
       <template
-        v-if="props.showNextButton || $slots['footer-actions']"
+        v-if="showNextButton || $slots['footer-actions']"
         #footer
       >
         <slot name="footer-actions">
+          {{ showNextButton }}
           <PrimeButton
             class="w-full flex-row-reverse"
             :label="props.nextLabel"
@@ -535,7 +663,7 @@
 
     <div
       ref="step2Ref"
-      v-show="currentStep === 'settings'"
+      v-show="currentStep === 'settings' || currentStep === 'deploying'"
     >
       <TemplateSettingsCard
         :title="'Template Settings'"
@@ -547,12 +675,34 @@
         :loading-deploy="props.loadingDeploy"
         :disabled="props.disabledDeploy"
         :deploy-label="props.deployLabel"
+        :hide-footer="currentStep === 'deploying'"
         @deploy="handleDeploy"
       >
         <template #content>
           <slot name="settings-content" />
         </template>
       </TemplateSettingsCard>
+    </div>
+
+    <div
+      ref="step3Ref"
+      v-show="currentStep === 'deploying' || currentStep === 'settings'"
+    >
+      <DeployStatusCard
+        :execution-id="props.executionId"
+        :get-logs-service="props.getLogsService"
+        :results="props.results"
+        :deploy-failed="props.deployFailed"
+        :application-name="props.applicationName"
+        :deploy-start-time="props.deployStartTime"
+        :next-steps="props.nextSteps"
+        :deploy-started="currentStep === 'deploying'"
+        @finish="handleFinish"
+        @retry="handleRetry"
+        @manage="handleManage"
+        @open-url="handleOpenUrl"
+        @next-step="handleNextStep"
+      />
     </div>
 
     <div

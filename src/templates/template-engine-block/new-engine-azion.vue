@@ -43,7 +43,7 @@
   // ============================================================================
   // Emits
   // ============================================================================
-  const emit = defineEmits(['next'])
+  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
   // ============================================================================
   // Template Refs
@@ -366,7 +366,11 @@
     getFormData,
     formTools,
     inputSchema,
-    layoutRef
+    layoutRef,
+    // Expose goToDeploying from LayoutEngineBlock
+    goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose currentStep from LayoutEngineBlock
+    currentStep: computed(() => layoutRef.value?.currentStep)
   })
 </script>
 

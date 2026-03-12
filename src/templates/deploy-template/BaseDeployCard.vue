@@ -34,9 +34,15 @@
 
 <template>
   <div class="flex flex-col max-w-2xl border surface-border rounded-md">
-    <div class="h-14 px-6 border-b surface-border flex items-center">
-      <div class="flex-1 text-color text-xl font-semibold leading-5">
+    <div class="h-14 px-6 border-b surface-border flex items-center justify-between">
+      <div class="text-color text-xl font-semibold leading-5">
         {{ title }}
+      </div>
+      <div
+        v-if="$slots['header-right']"
+        class="text-sm font-normal text-color-secondary"
+      >
+        <slot name="header-right" />
       </div>
     </div>
 

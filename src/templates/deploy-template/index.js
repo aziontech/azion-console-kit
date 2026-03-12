@@ -13,6 +13,7 @@
  * - BaseDeployCard: Base presentational card with slots (100% stateless)
  * - DeployRepositoryCard: Step 1 - Template selection and git configuration
  * - TemplateSettingsCard: Step 2 - Template settings form
+ * - DeployStatusCard: Step 3 - Deploy progress, logs, and results
  *
  * Animation sequence on Next click:
  * 1. Step 1 remains visible at the top (does NOT disappear or slide horizontally)
@@ -34,3 +35,4 @@ export { default as DeployTemplateFlow } from './DeployTemplateFlow.vue'
 export { default as BaseDeployCard } from './BaseDeployCard.vue'
 export { default as DeployRepositoryCard } from './DeployRepositoryCard.vue'
 export { default as TemplateSettingsCard } from './TemplateSettingsCard.vue'
+export { default as DeployStatusCard } from './DeployStatusCard.vue'

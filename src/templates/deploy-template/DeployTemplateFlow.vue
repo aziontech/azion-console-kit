@@ -6,17 +6,19 @@
    * Manages state for the current step and coordinates scroll-based transitions.
    *
    * Uses simple vertical scroll:
-   * - Both cards exist in the DOM simultaneously (stacked vertically)
-   * - On "Next" click, smooth scrolls to reveal step 2 below step 1
-   * - First card remains visible during and after scroll
+   * - Cards exist in the DOM simultaneously (stacked vertically)
+   * - On "Next" click, smooth scrolls to reveal next step
+   * - Previous cards remain visible during and after scroll
    *
    * Steps:
    * 1. DeployRepositoryCard - template selection and git configuration
    * 2. TemplateSettingsCard - template settings form
+   * 3. DeployStatusCard - deploy progress, logs, and results
    */
   import { ref, computed, nextTick } from 'vue'
   import DeployRepositoryCard from './DeployRepositoryCard.vue'
   import TemplateSettingsCard from './TemplateSettingsCard.vue'
+  import DeployStatusCard from './DeployStatusCard.vue'
 
   // ============================================================================
   // Props
@@ -74,19 +76,67 @@
     disabledDeploy: {
       type: Boolean,
       default: false
+    },
+
+    // Deploy Status Card props
+    executionId: {
+      type: String,
+      default: ''
+    },
+    getLogsService: {
+      type: Function,
+      default: null
+    },
+    results: {
+      type: Object,
+      default: null
+    },
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    nextSteps: {
+      type: Array,
+      default: () => [
+        {
+          title: 'Customize Domain',
+          description: 'Associate a custom domain and subdomains to Azion to handle user access.',
+          handle: () => {}
+        },
+        {
+          title: 'Point Traffic',
+          description:
+            'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
+          handle: () => {}
+        },
+        {
+          title: 'View Analytics',
+          description: 'Gain powerful insights into your performance, availability, and security.',
+          handle: () => {}
+        }
+      ]
     }
   })
 
   // ============================================================================
   // Emits
   // ============================================================================
-  const emit = defineEmits(['deploy'])
+  const emit = defineEmits(['deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
   // ============================================================================
   // State
   // ============================================================================
   const currentStep = ref('repository')
   const step2Ref = ref(null)
+  const step3Ref = ref(null)
 
   // ============================================================================
   // Computed
@@ -105,7 +155,7 @@
     isDrawer: props.isDrawer,
     loading: props.loadingNext,
     disabled: props.disabledNext,
-    collapsed: currentStep.value === 'settings'
+    collapsed: currentStep.value === 'settings' || currentStep.value === 'deploying'
   }))
 
   /**
@@ -119,6 +169,19 @@
     githubUrl: props.githubUrl,
     loadingDeploy: props.loadingDeploy,
     disabledDeploy: props.disabledDeploy
+  }))
+
+  /**
+   * Props to pass to DeployStatusCard
+   */
+  const statusCardProps = computed(() => ({
+    executionId: props.executionId,
+    getLogsService: props.getLogsService,
+    results: props.results,
+    deployFailed: props.deployFailed,
+    applicationName: props.applicationName,
+    deployStartTime: props.deployStartTime,
+    nextSteps: props.nextSteps
   }))
 
   // ============================================================================
@@ -141,11 +204,64 @@
   }
 
   /**
+   * Navigate to deploying step (step 3)
+   * Called when user clicks Deploy on TemplateSettingsCard
+   */
+  const goToDeploying = () => {
+    currentStep.value = 'deploying'
+
+    nextTick(() => {
+      // Scroll to step 3
+      step3Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  /**
    * Handle deploy action
    * Called when user clicks Deploy on TemplateSettingsCard
    */
   const handleDeploy = () => {
+    goToDeploying()
     emit('deploy')
+  }
+
+  /**
+   * Handle deploy finish
+   */
+  const handleFinish = () => {
+    emit('finish')
+  }
+
+  /**
+   * Handle retry action
+   */
+  const handleRetry = () => {
+    currentStep.value = 'settings'
+    emit('retry')
+  }
+
+  /**
+   * Handle manage action
+   */
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
+  /**
+   * Handle open URL action
+   */
+  const handleOpenUrl = (url) => {
+    emit('open-url', url)
+  }
+
+  /**
+   * Handle next step action
+   */
+  const handleNextStep = (data) => {
+    emit('next-step', data)
   }
 
   /**
@@ -162,6 +278,7 @@
   defineExpose({
     reset,
     goToSettings,
+    goToDeploying,
     currentStep
   })
 </script>
@@ -217,10 +334,11 @@
 
     <div
       ref="step2Ref"
-      v-show="currentStep === 'settings'"
+      v-show="currentStep === 'settings' || currentStep === 'deploying'"
     >
       <TemplateSettingsCard
         v-bind="settingsCardProps"
+        :hide-footer="currentStep === 'deploying'"
         @deploy="handleDeploy"
       >
         <!-- Pass through form slot -->
@@ -228,10 +346,27 @@
           <slot name="settings-form" />
         </template>
 
-        <template #footer-actions>
+        <template
+          v-if="$slots['settings-footer-actions']"
+          #footer-actions
+        >
           <slot name="settings-footer-actions" />
         </template>
       </TemplateSettingsCard>
+    </div>
+
+    <div
+      ref="step3Ref"
+      v-show="currentStep === 'deploying'"
+    >
+      <DeployStatusCard
+        v-bind="statusCardProps"
+        @finish="handleFinish"
+        @retry="handleRetry"
+        @manage="handleManage"
+        @open-url="handleOpenUrl"
+        @next-step="handleNextStep"
+      />
     </div>
   </div>
 </template>

@@ -2,10 +2,9 @@
   <Accordion :activeIndex="active">
     <AccordionTab
       :header="title"
-      :disabled="disableAccordion"
       ref="accordion"
       :pt="{
-        content: { class: 'p-0 pl-5' },
+        content: { class: 'p-4' },
         headerTitle: { class: 'w-full' }
       }"
     >
@@ -13,29 +12,62 @@
         <div class="w-full flex">
           <div class="ml-auto flex justify-center items-center">
             <ProgressSpinner
-              v-if="!pollEnded"
+              v-if="start && !pollEnded"
               class="w-6 h-6 text-color"
               strokeWidth="6"
             />
           </div>
         </div>
       </template>
-      <div
-        class="bg-transparent flex w-full h-60 flex-col overflow-auto pt-1 pb-3"
-        ref="runner"
-      >
-        <p
-          class="w-full text-color text-base font-robotomono"
-          v-for="(log, index) in this.currentLogs"
-          :key="index"
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-1/2">
+            <InputText
+              v-model="searchTerm"
+              placeholder="Search logs..."
+              class="w-full"
+              size="small"
+            />
+          </div>
+          <div class="w-1/2 flex gap-2 justify-end">
+            <Tag
+              v-if="errorCount === 0"
+              icon="pi pi-times-circle"
+              iconPos="right"
+              :value="errorCount"
+              severity="danger"
+            />
+            <Tag
+              v-if="warningCount === 0"
+              icon="pi pi-exclamation-triangle"
+              iconPos="right"
+              :value="warningCount"
+              severity="warning"
+            />
+            <CopyBlock
+              v-if="currentLogs.length === 0"
+              :value="logsAsString"
+              :is-copy-visible="true"
+            />
+          </div>
+        </div>
+        <div
+          class="bg-transparent flex w-full h-60 flex-col overflow-auto pt-1 pb-3"
+          ref="runner"
         >
-          <span> [{{ log.timeStamp }}] </span>
-          ›
-          <span
-            class="w-full"
-            v-html="log.content"
-          ></span>
-        </p>
+          <p
+            class="w-full text-color text-base font-robotomono"
+            v-for="(log, index) in filteredLogs"
+            :key="index"
+          >
+            <span> [{{ log.timeStamp }}] </span>
+            ›
+            <span
+              class="w-full"
+              v-html="log.content"
+            ></span>
+          </p>
+        </div>
       </div>
     </AccordionTab>
   </Accordion>
@@ -44,16 +76,19 @@
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import ProgressSpinner from 'primevue/progressspinner'
+  import InputText from 'primevue/inputtext'
+  import Tag from 'primevue/tag'
+  import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   export default {
     name: 'script-runner-block',
     components: {
       Accordion,
       AccordionTab,
-      ProgressSpinner
-    },
-    async created() {
-      await this.startPolling()
+      ProgressSpinner,
+      InputText,
+      Tag,
+      CopyBlock
     },
     data: () => ({
       active: null,
@@ -63,7 +98,8 @@
       isLogsPolling: false,
       status: undefined,
       emptyLogs: false,
-      pollEnded: false
+      pollEnded: false,
+      searchTerm: ''
     }),
     props: {
       title: {
@@ -77,11 +113,51 @@
       getLogsService: {
         type: Function,
         required: true
+      },
+      start: {
+        type: Boolean,
+        default: false
+      }
+    },
+    watch: {
+      start: {
+        immediate: true,
+        handler(newVal) {
+          if (newVal && !this.polling) {
+            this.startPolling()
+          }
+        }
       }
     },
     computed: {
       disableAccordion() {
         return !this.isPolling || this.currentLogs.length === 0
+      },
+      filteredLogs() {
+        if (!this.searchTerm) {
+          return this.currentLogs
+        }
+        const term = this.searchTerm.toLowerCase()
+        return this.currentLogs.filter((log) => {
+          const content = log.content?.toLowerCase() || ''
+          const timestamp = log.timeStamp?.toLowerCase() || ''
+          return content.includes(term) || timestamp.includes(term)
+        })
+      },
+      errorCount() {
+        return this.currentLogs.filter((log) => {
+          const content = log.content?.toLowerCase() || ''
+          return content.includes('error') || content.includes('err')
+        }).length
+      },
+      warningCount() {
+        return this.currentLogs.filter((log) => {
+          const content = log.content?.toLowerCase() || ''
+          return content.includes('warn') || content.includes('warning')
+        }).length
+      },
+      logsAsString() {
+        return this.currentLogs.map((log) => `[${log.timeStamp}] › ${log.content}`).join('\n')
       }
     },
     methods: {

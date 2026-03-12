@@ -276,7 +276,6 @@
             >
               {{ props.templateDescription }}
             </p>
-            qqweqwe
             <div class="flex flex-col gap-1.5">
               <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
               <div class="flex items-center gap-1">
@@ -333,8 +332,12 @@
     </template>
 
     <template #footer>
-      <slot name="footer-actions">
+      <slot
+        name="footer-actions"
+        v-if="!props.collapsed"
+      >
         <PrimeButton
+          type="button"
           class="w-full flex-row-reverse"
           :label="props.nextLabel"
           :loading="props.loading"
