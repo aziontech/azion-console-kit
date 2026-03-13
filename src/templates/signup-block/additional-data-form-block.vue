@@ -161,8 +161,8 @@
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

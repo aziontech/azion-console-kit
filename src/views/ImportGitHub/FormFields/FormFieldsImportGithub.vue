@@ -7,10 +7,10 @@
   import Divider from 'primevue/divider'
   import { useToast } from 'primevue/usetoast'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { windowOpen } from '@/helpers'
 

@@ -60,7 +60,7 @@
 
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
 
   defineOptions({ name: 'CloneBlock' })
 

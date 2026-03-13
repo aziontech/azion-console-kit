@@ -15,6 +15,7 @@
       :class="{ 'mr-[32rem]': showSidebar }"
       :style="{ transition: 'margin-right 0.2s' }"
     >
+      <InfoBanner />
       <router-view class="flex flex-1 flex-col" />
       <AppFooter v-show="!showLoading" />
     </main>
@@ -27,6 +28,7 @@
   import AppNavbar from './app-navbar.vue'
   import ToastBlock from '@/templates/toast-block'
   import AppSidebar from './app-sidebar.vue'
+  import InfoBanner from '@/templates/info-banner'
 
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'

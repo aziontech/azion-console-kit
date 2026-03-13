@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <strong>A modern, customizable front-end development kit for building edge computing interfaces</strong>
+  <strong>A modern, customizable front-end development kit for building web interfaces</strong>
 </p>
 
 <p align="center">
@@ -26,7 +26,7 @@
 
 **Azion Console Kit** is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) interface.
 
-This project was developed by [Azion](https://www.azion.com/), an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
+This project was developed by [Azion](https://www.azion.com/), a web platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
 
 ## Tech Stack 🛠️
 
@@ -112,7 +112,7 @@ src/
 | Directory | Description |
 |-----------|-------------|
 | `services/` | API integration layer. Each feature has its own service folder with CRUD operations |
-| `views/` | Page components organized by module (e.g., `EdgeApplications/`, `Variables/`) |
+| `views/` | Page components organized by module (e.g., `Applications/`, `Variables/`) |
 | `templates/` | Pre-built blocks for common UI patterns (list tables, forms, etc.) |
 | `stores/` | Shared state between components using Pinia |
 | `router/` | Centralized routing with `index.js` and feature-specific route files |
@@ -225,9 +225,9 @@ yarn format
 yarn security-check
 ```
 
-## Running on the Edge 🚀
+## Running on Azion's distributed infrastructure 🚀
 
-Deploy to Azion's edge platform using the Azion CLI:
+Deploy to Azion's web platform using the Azion CLI:
 
 1. **Install and configure Azion CLI:**
 
@@ -270,7 +270,7 @@ Deploy to Azion's edge platform using the Azion CLI:
 - **Multi-tenancy:** Build your Azion Console by consuming endpoints from the [Azion Public API](https://api.azion.com/)
 - **Customizable UI:** Configure theme tokens or generate them automatically via the Builder
 - **Simple structure:** Layered separation of blocks, components, and services for easy route building
-- **Edge-ready:** Deploy directly to Azion's edge network
+- **Edge-ready:** Deploy directly to Azion's distributed network
 
 ## Troubleshooting 🔧
 

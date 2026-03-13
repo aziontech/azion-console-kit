@@ -17,19 +17,28 @@
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
-        <template #form>
-          <FormFieldsEditDomains
-            :digitalCertificates="digitalCertificates"
-            :listEdgeApplicationsService="listEdgeApplicationsService"
-            :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
-            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            hasDomainName
-            @copyDomainName="copyDomainName"
-          />
+        <template #form="{ loading }">
+          <div class="relative flex flex-col gap-8 max-md:gap-6">
+            <FormFieldsEditDomains
+              :digitalCertificates="digitalCertificates"
+              :listEdgeApplicationsService="listEdgeApplicationsService"
+              :loadEdgeApplicationsService="loadEdgeApplicationsService"
+              :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+              :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
+              hasDomainName
+              @copyDomainName="copyDomainName"
+            />
+            <div
+              v-if="loading"
+              class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
+            >
+              <FormSkeleton />
+            </div>
+          </div>
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
+            v-if="!isFormLoading"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
@@ -46,6 +55,7 @@
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
@@ -130,7 +140,10 @@
     props.clipboardWrite(name)
   }
 
+  const isFormLoading = ref(true)
+
   const setDomainName = async (domain) => {
+    isFormLoading.value = false
     domainName.value = domain.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, domain.name)
   }

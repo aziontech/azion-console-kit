@@ -1,9 +1,9 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
-  defineOptions({ name: 'empty-results-block' })
-  import PrimeButton from 'primevue/button'
-
   import { useRouter } from 'vue-router'
+  import PrimeButton from 'primevue/button'
+  import Illustration from '@/assets/svg/illustration-layers'
+
+  defineOptions({ name: 'empty-results-block' })
 
   const emit = defineEmits('click-to-create')
 
@@ -20,7 +20,8 @@
     inTabs: { type: Boolean, required: false },
     noBorder: { type: Boolean, required: false },
     noShowBorderTop: { type: Boolean, required: false, default: false },
-    showLearnMoreButton: { type: Boolean, required: false, default: true }
+    showLearnMoreButton: { type: Boolean, required: false, default: true },
+    pt: { type: Object, required: false }
   })
   function openDocumentation() {
     props.documentationService()
@@ -46,6 +47,7 @@
   >
     <div
       class="min-h-[300px] flex flex-col justify-center gap-5 items-center rounded-md p-8 max-md:p-3"
+      :class="pt"
     >
       <slot name="illustration">
         <Illustration />

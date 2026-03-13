@@ -20,7 +20,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import blockCustomPageBlock from '@/views/CustomPages/Blocks/customPageBlock'
   import blockPagesCodeBlock from '@/views/CustomPages/Blocks/pagesCodeBlock'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import { useField } from 'vee-validate'
 
   const { value: active } = useField('active')

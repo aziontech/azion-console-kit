@@ -86,6 +86,50 @@ export class SolutionService extends BaseService {
 
     return parsedSolutions
   }
+  async listTrendingSolutions({ ids = [], limit = 3 } = {}) {
+    const allTrending = await this.useEnsureQueryData(
+      queryKeys.solutions.trending(),
+      () => this.#fetchTrendingSolutions(),
+      { cacheType: this.cacheType.STATIC }
+    )
+
+    if (ids.length > 0) {
+      const filtered = ids
+        .map((id) => allTrending.find((solution) => solution.id === `${id}`))
+        .filter(Boolean)
+      return filtered
+    }
+
+    return allTrending.slice(0, limit)
+  }
+
+  async #fetchTrendingSolutions() {
+    const response = await this.http.request({
+      method: 'GET',
+      url: this.baseUrl,
+      config: { baseURL: '/api' }
+    })
+    return this.adaptTrendingResponse(response)
+  }
+
+  adaptTrendingResponse(response) {
+    const isArray = Array.isArray(response.data)
+    if (!isArray || !response.data.length) return []
+
+    const trendingSolutions = response.data
+      .filter((element) => element.featured)
+      .map((element) => ({
+        id: `${element.id}`,
+        name: element.name,
+        slug: element.slug,
+        description: element.headline,
+        author: element.vendor?.name || 'Unknown',
+        vendorIcon: element.vendor?.icon || null,
+        version: element.version || element.latest_version
+      }))
+
+    return trendingSolutions
+  }
 }
 
 export const solutionService = new SolutionService()

@@ -9,7 +9,7 @@
   import advancedFilter from '@/templates/advanced-filter'
   import Dropdown from 'primevue/dropdown'
   import PrimeTag from 'primevue/tag'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'

@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
+  import fieldTextArea from '@aziontech/webkit/field-text-area'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())

@@ -1,9 +1,9 @@
 <script setup>
   import { useField } from 'vee-validate'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { onMounted, ref } from 'vue'
-  import { teamsService } from '@/services/users-services/list-teams-service'
+  import { teamsService } from '@/services/v2/teams/teams-service'
 
   const teams = ref([])
   const loading = ref(true)

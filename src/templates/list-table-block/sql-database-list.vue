@@ -167,6 +167,7 @@
             <DataTable.AppliedFilters
               :applied-filters="appliedFilters"
               @remove="handleRemoveFilter"
+              @edit="handleEditFilter"
             />
           </template>
         </DataTable.Header>
@@ -529,6 +530,10 @@
     if (filters.value?.[field]) {
       delete filters.value[field]
     }
+  }
+
+  const handleEditFilter = ({ filter, event }) => {
+    filterPanel.value?.openForFilter?.(filter, event)
   }
 
   watch(

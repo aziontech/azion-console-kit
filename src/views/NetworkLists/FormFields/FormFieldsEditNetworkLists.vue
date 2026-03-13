@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import PrimeTag from 'primevue/tag'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { handleTypeNetwork } from '../Config/typeNetwork'
 
@@ -16,6 +16,10 @@
     listCountriesService: {
       type: Function,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -99,13 +103,14 @@
           name="itemsValues"
           rows="2"
           :value="itemsValues"
+          :loading="props.loading"
           data-testid="network-list-form__asn-list"
           description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="isIpCidrNetworkType"
+        v-else-if="isIpCidrNetworkType"
       >
         <FieldTextArea
           label="List"
@@ -114,6 +119,7 @@
           name="itemsValues"
           rows="16"
           :value="itemsValues"
+          :loading="props.loading"
           data-testid="network-list-form__ipcidr-list"
         >
           <template #description>

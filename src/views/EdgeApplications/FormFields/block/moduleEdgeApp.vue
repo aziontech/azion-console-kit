@@ -49,7 +49,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
