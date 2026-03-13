@@ -16,6 +16,11 @@ export const EDGE_STORAGE_OPERATION_TYPE = {
   MOVE: 'move'
 }
 
+export const EDGE_STORAGE_DELETE_STEP = {
+  LISTING: 'listing',
+  DELETING: 'deleting'
+}
+
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
@@ -294,6 +299,9 @@ export const useEdgeStorage = () => {
     }
   }
 
+  const buildObjectKey = (fileName) =>
+    folderPath.value ? `${folderPath.value}${fileName}` : fileName
+
   const deleteMultipleFiles = async (items) => {
     if (!selectedBucket.value || !items.length) return
 
@@ -308,7 +316,7 @@ export const useEdgeStorage = () => {
     failedItems.value = []
     currentProcessingItem.value = null
     currentItemProgress.value = 0
-    currentProcessStep.value = 'deleting'
+    currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
     discoveredItemsCount.value = 0
     totalDeleteItems.value = files.length
 
@@ -316,16 +324,13 @@ export const useEdgeStorage = () => {
       const allResults = []
 
       if (files.length) {
-        const fileNames = files.map((file) =>
-          folderPath.value ? folderPath.value + file.name : file.name
-        )
+        const fileNames = files.map((file) => buildObjectKey(file.name))
 
         const onFileProgress = (progress) => {
           currentProcessingItem.value = { name: progress.fileName }
-          currentProcessStep.value = 'deleting'
+          currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
           currentItemProgress.value = progress.percentage
           processCount.value = progress.completed
-          totalDeleteItems.value = files.length
         }
 
         const fileResults = await edgeStorageService.deleteMultipleEdgeStorageBucketFiles(
@@ -338,21 +343,21 @@ export const useEdgeStorage = () => {
       }
 
       for (const folder of folders) {
-        const prefix = folderPath.value ? `${folderPath.value}${folder.name}/` : `${folder.name}/`
+        const prefix = buildObjectKey(`${folder.name}/`)
         const processedBaseline = allResults.length
         discoveredItemsCount.value = 0
 
         const onFolderProgress = (progress) => {
-          if (progress.step === 'listing') {
+          if (progress.step === EDGE_STORAGE_DELETE_STEP.LISTING) {
             currentProcessingItem.value = { name: folder.name }
-            currentProcessStep.value = 'listing'
+            currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.LISTING
             currentItemProgress.value = -1
             discoveredItemsCount.value = progress.completed
             return
           }
 
           currentProcessingItem.value = { name: progress.fileName }
-          currentProcessStep.value = 'deleting'
+          currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
           currentItemProgress.value = progress.percentage
           processCount.value = processedBaseline + progress.completed
           totalDeleteItems.value = processedBaseline + progress.total
@@ -372,12 +377,6 @@ export const useEdgeStorage = () => {
 
       processedItems.value = successResults
       failedItems.value = failureResults
-      currentProcessingItem.value = null
-      currentItemProgress.value = 0
-      currentProcessStep.value = ''
-      discoveredItemsCount.value = 0
-      totalDeleteItems.value = 0
-      isProcessing.value = false
 
       const successCount = successResults.length
       const failureCount = failureResults.length
@@ -404,18 +403,18 @@ export const useEdgeStorage = () => {
         )
       }
     } catch (error) {
+      handleToast(
+        'error',
+        'Deletion Failed',
+        'An unexpected error occurred during deletion. Please try again.'
+      )
+    } finally {
       currentProcessingItem.value = null
       currentItemProgress.value = 0
       currentProcessStep.value = ''
       discoveredItemsCount.value = 0
       totalDeleteItems.value = 0
       isProcessing.value = false
-
-      handleToast(
-        'error',
-        'Deletion Failed',
-        'An unexpected error occurred during deletion. Please try again.'
-      )
     }
   }
 

@@ -60,7 +60,7 @@
   import ProgressBar from 'primevue/progressbar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE } from '@/composables/useEdgeStorage'
+  import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE, EDGE_STORAGE_DELETE_STEP } from '@/composables/useEdgeStorage'
 
   const { isProcessing, operationType, processStatus, cancelRequest } = useEdgeStorage()
 
@@ -75,7 +75,7 @@
   const isDeleteListing = computed(() => {
     return (
       operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE &&
-      currentStatus.value.step === 'listing'
+      currentStatus.value.step === EDGE_STORAGE_DELETE_STEP.LISTING
     )
   })
 

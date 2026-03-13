@@ -1,6 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { EDGE_STORAGE_DELETE_STEP } from '@/composables/useEdgeStorage'
 
 const DEFAULT_CREDENTIALS_PARAMS = {
   page: 1,
@@ -197,7 +198,7 @@ export class EdgeStorageService extends BaseService {
             completed: idx,
             total: totalFiles,
             percentage: Math.round(((idx * 2 + 1) / totalSteps) * 100),
-            step: 'deleting'
+            step: EDGE_STORAGE_DELETE_STEP.DELETING
           })
         }
 
@@ -334,7 +335,7 @@ export class EdgeStorageService extends BaseService {
           fileName: prefix,
           completed: keysToDelete.length,
           percentage: -1,
-          step: 'listing'
+          step: EDGE_STORAGE_DELETE_STEP.LISTING
         })
       }
     } while (continuationToken)
@@ -351,7 +352,7 @@ export class EdgeStorageService extends BaseService {
           completed: index + 1,
           total: totalObjects,
           percentage: Math.round(((index + 1) / totalObjects) * 100),
-          step: 'deleting'
+          step: EDGE_STORAGE_DELETE_STEP.DELETING
         })
       }
 

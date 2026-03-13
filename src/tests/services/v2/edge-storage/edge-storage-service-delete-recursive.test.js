@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { EdgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
+import { EDGE_STORAGE_DELETE_STEP } from '@/composables/useEdgeStorage'
 
 describe('EdgeStorageService.deleteRecursiveBucketFolder', () => {
   let service
@@ -80,14 +81,14 @@ describe('EdgeStorageService.deleteRecursiveBucketFolder', () => {
       fileName: 'folder/',
       completed: 1,
       percentage: -1,
-      step: 'listing'
+      step: EDGE_STORAGE_DELETE_STEP.LISTING
     })
 
     expect(onProgress).toHaveBeenNthCalledWith(2, {
       fileName: 'folder/',
       completed: 2,
       percentage: -1,
-      step: 'listing'
+      step: EDGE_STORAGE_DELETE_STEP.LISTING
     })
 
     expect(onProgress).toHaveBeenNthCalledWith(3, {
@@ -95,7 +96,7 @@ describe('EdgeStorageService.deleteRecursiveBucketFolder', () => {
       completed: 1,
       total: 2,
       percentage: 50,
-      step: 'deleting'
+      step: EDGE_STORAGE_DELETE_STEP.DELETING
     })
 
     expect(onProgress).toHaveBeenNthCalledWith(4, {
@@ -103,7 +104,7 @@ describe('EdgeStorageService.deleteRecursiveBucketFolder', () => {
       completed: 2,
       total: 2,
       percentage: 100,
-      step: 'deleting'
+      step: EDGE_STORAGE_DELETE_STEP.DELETING
     })
   })
 
