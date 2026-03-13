@@ -4,6 +4,7 @@
 
     <AppNavbar
       :showNavItems="showNavItems"
+      :isLoading="showLoading"
       :listTypeAccountService="listTypeAccountService"
       :accountHandler="accountHandler"
     />
@@ -47,6 +48,6 @@
   const { isSidebarActive, isVisibleMobileSidebar } = useLayout()
   const { showLoading } = storeToRefs(useLoadingStore())
 
-  const showNavItems = computed(() => props.isLogged && !showLoading.value)
+  const showNavItems = computed(() => props.isLogged)
   const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
 </script>

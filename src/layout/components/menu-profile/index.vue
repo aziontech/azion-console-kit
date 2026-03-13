@@ -57,6 +57,7 @@
           v-if="item.to"
           v-bind="props.action"
           :to="item.to"
+          @click="closeMobileMenu"
         >
           {{ item.label }}
         </router-link>
@@ -99,6 +100,7 @@
             <router-link
               v-bind="props.action"
               :to="item.to"
+              @click="closeMobileMenu"
             >
               {{ item.label }}
             </router-link>
@@ -219,6 +221,7 @@
         v-if="item.to"
         v-bind="props.action"
         :to="item.to"
+        @click="closeDesktopMenu"
       >
         {{ item.label }}
       </router-link>
@@ -253,6 +256,7 @@
         <router-link
           :to="item.to"
           class="text-sm leading-none block px-2 py-[12px] hover:bg-[var(--surface-hover)] rounded text-color transition-[background-color,border-color,box-shadow] duration-200"
+          @click="closeDesktopMenu"
         >
           {{ item.label }}
         </router-link>
