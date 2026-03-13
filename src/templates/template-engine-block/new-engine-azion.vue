@@ -37,6 +37,43 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    hasSettings: {
+      type: Boolean,
+      default: true
+    },
+    loadingDeploy: {
+      type: Boolean,
+      default: false
+    },
+    disabledDeploy: {
+      type: Boolean,
+      default: false
+    },
+    // Deploy Status Card props
+    executionId: {
+      type: String,
+      default: ''
+    },
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    successNextSteps: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -109,10 +146,21 @@
     githubUrl: inputSchema.value.githubUrl || inputSchema.value.repository || '',
     schema: props.schema,
     isDrawer: props.isDrawer,
+    // Flow control props
+    hasSettings: props.hasSettings,
+    loadingDeploy: props.loadingDeploy,
+    disabledDeploy: props.disabledDeploy,
+    // Validation prop
+    onValidate: validateForm,
     // Deploy simulation props
     simulateDeploy: inputSchema.value.simulateDeploy ?? false,
-    appUrl: inputSchema.value.appUrl || '',
-    successNextSteps: inputSchema.value.successNextSteps || []
+    appUrl: props.appUrl || inputSchema.value.appUrl || '',
+    successNextSteps: props.successNextSteps || inputSchema.value.successNextSteps || [],
+    // Deploy Status Card props
+    executionId: props.executionId,
+    deployFailed: props.deployFailed,
+    applicationName: props.applicationName,
+    deployStartTime: props.deployStartTime
   }))
 
   // ============================================================================
@@ -164,28 +212,30 @@
    */
   const initializeForm = async () => {
     const schema = await createSchemaObject()
-    const { errors, defineField, handleSubmit, setFieldValue } = useForm({
+    const { errors, defineInputBinds, setFieldValue, validate } = useForm({
       validationSchema: schema
     })
 
-    formTools.value = {
-      errors: errors,
-      defineField: defineField,
-      handleSubmit: handleSubmit,
-      setFieldValue: setFieldValue
+    formTools.value = { errors, setFieldValue, validate }
+
+    // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
+    const registerFieldWithValueAndValidation = (field) => {
+      if (field.value) {
+        setFieldValue(field.name, field.value)
+      }
+      field.input = defineInputBinds(field.name, { validateOnInput: true })
     }
 
-    // Initialize fields with defineField
     inputSchema.value.fields?.forEach((field) => {
       if (!field.hidden) {
-        field.input = defineField(field.name)
+        registerFieldWithValueAndValidation(field)
       }
     })
 
     inputSchema.value.groups?.forEach((group) => {
       group.fields.forEach((field) => {
         if (!field.hidden) {
-          field.input = defineField(field.name)
+          registerFieldWithValueAndValidation(field)
         }
       })
     })
@@ -202,13 +252,9 @@
    * @returns {Promise<boolean>} Whether the form is valid
    */
   const validateForm = async () => {
-    if (!formTools.value.handleSubmit) return false
-
-    let isValid = false
-    await formTools.value.handleSubmit(() => {
-      isValid = true
-    })()
-    return isValid
+    if (!formTools.value.validate) return false
+    await formTools.value.validate()
+    return Object.keys(formTools.value.errors).length === 0
   }
 
   /**

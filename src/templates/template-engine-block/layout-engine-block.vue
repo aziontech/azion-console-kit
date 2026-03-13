@@ -21,6 +21,7 @@
   import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from '../deploy-template/BaseDeployCard.vue'
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
@@ -173,13 +174,6 @@
       default: ''
     },
     /**
-     * Service function to get deploy logs
-     */
-    getLogsService: {
-      type: Function,
-      default: null
-    },
-    /**
      * Results from deploy (populated after finish)
      */
     results: {
@@ -231,6 +225,25 @@
     simulateDeploy: {
       type: [Boolean, Number],
       default: false
+    },
+
+    // Flow control
+    /**
+     * Whether the template has settings step
+     * When true: footer shows "Next" button → scroll to settings
+     * When false: footer shows "Deploy" button → emit deploy directly
+     */
+    hasSettings: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Validation function to call before proceeding
+     * Should return a Promise<boolean> or boolean
+     */
+    onValidate: {
+      type: Function,
+      default: null
     }
   })
 
@@ -381,10 +394,25 @@
   // Step Navigation Methods
   // ============================================================================
   /**
-   * Navigate to settings step (step 2)
-   * Smooth scrolls to step 2, keeping step 1 visible
+   * Validate form before proceeding
+   * @returns {Promise<boolean>} Whether the form is valid
    */
-  const goToSettings = () => {
+  const validateBeforeProceed = async () => {
+    if (props.onValidate) {
+      const isValid = await props.onValidate()
+      return isValid
+    }
+    return true
+  }
+
+  /**
+   * Navigate to settings step (step 2)
+   * Validates form first, then proceeds if valid
+   */
+  const goToSettings = async () => {
+    const isValid = await validateBeforeProceed()
+    if (!isValid) return
+
     currentStep.value = 'settings'
     emit('next')
 
@@ -424,9 +452,12 @@
   }
 
   /**
-   * Handle deploy action from settings step
+   * Handle deploy action - validates and navigates to deploying step
    */
-  const handleDeploy = () => {
+  const handleDeploy = async () => {
+    const isValid = await validateBeforeProceed()
+    if (!isValid) return
+
     goToDeploying()
     emit('deploy')
   }
@@ -559,6 +590,7 @@
       :hide-footer="currentStep === 'settings'"
     >
       <template #content>
+        {{ currentStep }}
         <div
           class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >
@@ -700,7 +732,9 @@
         #footer
       >
         <slot name="footer-actions">
+          <!-- Next button: shown when hasSettings is true -->
           <PrimeButton
+            v-if="props.hasSettings"
             class="w-full flex-row-reverse"
             :label="props.nextLabel"
             :loading="props.loading"
@@ -708,11 +742,24 @@
             severity="primary"
             @click="goToSettings"
           />
+          <!-- Deploy button: shown when hasSettings is false -->
+          <PrimeButton
+            v-else
+            class="w-full flex-row-reverse"
+            :label="props.deployLabel"
+            :loading="props.loadingDeploy"
+            :disabled="props.disabledDeploy"
+            severity="primary"
+            icon="pi pi-cloud-upload"
+            @click="handleDeploy"
+          />
         </slot>
       </template>
     </BaseDeployCard>
 
+    <!-- Only render TemplateSettingsCard when hasSettings is true -->
     <div
+      v-if="props.hasSettings"
       ref="step2Ref"
       v-show="currentStep === 'settings' || currentStep === 'deploying'"
     >
@@ -741,7 +788,7 @@
     >
       <DeployStatusCard
         :execution-id="props.executionId"
-        :get-logs-service="props.getLogsService"
+        :get-logs-service="getScriptRunnerLogsService"
         :results="currentStep === 'success' ? { domain: { url: props.appUrl } } : props.results"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"

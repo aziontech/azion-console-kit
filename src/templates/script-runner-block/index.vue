@@ -79,6 +79,7 @@
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import { scriptRunnerService } from '@/services/v2/script-runner'
 
   export default {
     name: 'script-runner-block',
@@ -112,7 +113,7 @@
       },
       getLogsService: {
         type: Function,
-        required: true
+        default: null
       },
       start: {
         type: Boolean,
@@ -130,6 +131,9 @@
       }
     },
     computed: {
+      logsService() {
+        return this.getLogsService || ((id) => scriptRunnerService.getLogsService(id))
+      },
       disableAccordion() {
         return !this.isPolling || this.currentLogs.length === 0
       },
@@ -172,7 +176,7 @@
       },
       async getlogs() {
         try {
-          const data = await this.getLogsService(this.executionId)
+          const data = await this.logsService(this.executionId)
           const stopStatusList = ['succeeded', 'failed', 'pending finish']
           this.currentLogs = data.logs
           if (this.currentLogs.length > 0) {

@@ -12,7 +12,7 @@
 
   defineOptions({ name: 'templateEngineBlock' })
 
-  // const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])
+  const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])
 
   const props = defineProps({
     getTemplateService: {
@@ -37,6 +37,39 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    loadingDeploy: {
+      type: Boolean,
+      default: false
+    },
+    disabledDeploy: {
+      type: Boolean,
+      default: false
+    },
+    // Deploy Status Card props
+    executionId: {
+      type: String,
+      default: ''
+    },
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    successNextSteps: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -46,6 +79,7 @@
   const submitLoading = ref(false)
   const azionEngineRef = ref(null)
   const jsonFormEngineRef = ref(null)
+  const hasSettings = ref(null)
 
   onMounted(async () => {
     await loadTemplate(props.templateId)
@@ -63,6 +97,7 @@
       const templateData = await props.getTemplateService(props.templateId)
       inputSchema.value = templateData.inputSchema
       isLoading.value = false
+      hasSettings.value = templateData.hasSettings
     } catch (error) {
       toast.add({
         closable: true,
@@ -72,58 +107,58 @@
     }
   }
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     const activeEngine = isJsonForm.value ? jsonFormEngineRef.value : azionEngineRef.value
+  const handleSubmit = async () => {
+    try {
+      const activeEngine = isJsonForm.value ? jsonFormEngineRef.value : azionEngineRef.value
 
-  //     if (!activeEngine) {
-  //       toast.add({
-  //         closable: true,
-  //         severity: 'error',
-  //         summary: 'Engine not initialized'
-  //       })
+      if (!activeEngine) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Engine not initialized'
+        })
 
-  //       return
-  //     }
+        return
+      }
 
-  //     const isValid = await activeEngine.validateForm()
-  //     if (!isValid) return
+      const isValid = await activeEngine.validateForm()
+      if (!isValid) return
 
-  //     submitLoading.value = true
-  //     emit('submitClick')
+      submitLoading.value = true
+      emit('submitClick')
 
-  //     const parsedInputSchema = activeEngine.getFormData()
-  //     const instantiateParsedPayload = parsedInputSchema.map((field) => {
-  //       return {
-  //         field: field.name,
-  //         instantiation_data_path: field.instantiation_data_path,
-  //         value: field.input?.value ?? field.value ?? ''
-  //       }
-  //     })
+      const parsedInputSchema = activeEngine.getFormData()
+      const instantiateParsedPayload = parsedInputSchema.map((field) => {
+        return {
+          field: field.name,
+          instantiation_data_path: field.instantiation_data_path,
+          value: field.input?.value ?? field.value ?? ''
+        }
+      })
 
-  //     const response = await props.instantiateTemplateService(
-  //       props.templateId,
-  //       instantiateParsedPayload
-  //     )
-  //     submitLoading.value = props.freezeLoading
+      const response = await props.instantiateTemplateService(
+        props.templateId,
+        instantiateParsedPayload
+      )
+      submitLoading.value = props.freezeLoading
 
-  //     emit('instantiate', response)
-  //   } catch (error) {
-  //     toast.add({
-  //       closable: true,
-  //       severity: 'error',
-  //       summary: error
-  //     })
-  //   } finally {
-  //     if (!props.freezeLoading) {
-  //       submitLoading.value = false
-  //     }
-  //   }
-  // }
+      emit('instantiate', response)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      if (!props.freezeLoading) {
+        submitLoading.value = false
+      }
+    }
+  }
 
-  // const handleCancel = () => {
-  //   emit('cancel')
-  // }
+  const handleCancel = () => {
+    emit('cancel')
+  }
 
   watch(
     () => props.freezeLoading,
@@ -131,6 +166,14 @@
       submitLoading.value = false
     }
   )
+
+  // ============================================================================
+  // Expose - Methods needed by parent components
+  // ============================================================================
+  defineExpose({
+    handleSubmit,
+    handleCancel
+  })
 </script>
 
 <template>
@@ -140,14 +183,32 @@
       <NewEngineJsonForm
         ref="jsonFormEngineRef"
         :schema="inputSchema"
-        :isDrawer="isDrawer"
+        :has-settings="hasSettings"
+        :is-drawer="props.isDrawer"
+        :loading-deploy="props.loadingDeploy"
+        :disabled-deploy="props.disabledDeploy"
+        :execution-id="props.executionId"
+        :deploy-failed="props.deployFailed"
+        :application-name="props.applicationName"
+        :deploy-start-time="props.deployStartTime"
+        :app-url="props.appUrl"
+        :success-next-steps="props.successNextSteps"
       />
     </div>
     <div v-else>
       <NewEngineAzion
         ref="azionEngineRef"
         :schema="inputSchema"
-        :isDrawer="isDrawer"
+        :has-settings="hasSettings"
+        :is-drawer="props.isDrawer"
+        :loading-deploy="props.loadingDeploy"
+        :disabled-deploy="props.disabledDeploy"
+        :execution-id="props.executionId"
+        :deploy-failed="props.deployFailed"
+        :application-name="props.applicationName"
+        :deploy-start-time="props.deployStartTime"
+        :app-url="props.appUrl"
+        :success-next-steps="props.successNextSteps"
       />
     </div>
   </div>
