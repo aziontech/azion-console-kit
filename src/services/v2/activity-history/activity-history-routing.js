@@ -89,7 +89,7 @@ const CHILD_TO_TAB_MAP = {
     'Workload Deployment': null // Workload Deployment redirects to parent Workload
   },
   'Dns Zone': {
-    '': ''
+    'Dns Zone Record': 'records'
   }
 }
 
