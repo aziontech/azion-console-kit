@@ -16,6 +16,11 @@ export const EDGE_STORAGE_OPERATION_TYPE = {
   MOVE: 'move'
 }
 
+export const EDGE_STORAGE_DELETE_STEP = {
+  LISTING: 'listing',
+  DELETING: 'deleting'
+}
+
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
@@ -39,6 +44,9 @@ const isDownloading = ref(false)
 const showDragAndDrop = ref(false)
 const folderPath = ref('')
 const abortController = ref(null)
+const currentProcessStep = ref('')
+const discoveredItemsCount = ref(0)
+const totalDeleteItems = ref(0)
 
 const processProgress = computed(() => {
   if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD) {
@@ -61,7 +69,10 @@ const processProgress = computed(() => {
 
 const processStatus = computed(() => {
   return {
-    total: itemsToProcess.value.length,
+    total:
+      operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE && totalDeleteItems.value > 0
+        ? totalDeleteItems.value
+        : itemsToProcess.value.length,
     uploaded: operationType.value === EDGE_STORAGE_OPERATION_TYPE.UPLOAD ? processCount.value : 0,
     deleted: operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE ? processCount.value : 0,
     completed: processCount.value,
@@ -69,6 +80,8 @@ const processStatus = computed(() => {
     current: currentProcessingItem.value,
     progress: processProgress.value,
     currentFileProgress: currentItemProgress.value,
+    step: currentProcessStep.value,
+    discovered: discoveredItemsCount.value,
     totalBytesUploaded: totalBytesProcessed.value,
     totalBytesToUpload: totalBytesToProcess.value,
     bytesRemaining: totalBytesToProcess.value - totalBytesProcessed.value
@@ -286,10 +299,16 @@ export const useEdgeStorage = () => {
     }
   }
 
-  const deleteMultipleFiles = async (fileNames) => {
-    if (!selectedBucket.value || !fileNames.length) return
+  const buildObjectKey = (fileName) =>
+    folderPath.value ? `${folderPath.value}${fileName}` : fileName
 
-    itemsToProcess.value = fileNames
+  const deleteMultipleFiles = async (items) => {
+    if (!selectedBucket.value || !items.length) return
+
+    const files = items.filter((item) => !item.isFolder)
+    const folders = items.filter((item) => item.isFolder)
+
+    itemsToProcess.value = items
     operationType.value = EDGE_STORAGE_OPERATION_TYPE.DELETE
     isProcessing.value = true
     processCount.value = 0
@@ -297,30 +316,67 @@ export const useEdgeStorage = () => {
     failedItems.value = []
     currentProcessingItem.value = null
     currentItemProgress.value = 0
+    currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
+    discoveredItemsCount.value = 0
+    totalDeleteItems.value = files.length
 
     try {
-      const onProgress = (progress) => {
-        currentProcessingItem.value = {
-          name: progress.fileName
+      const allResults = []
+
+      if (files.length) {
+        const fileNames = files.map((file) => buildObjectKey(file.name))
+
+        const onFileProgress = (progress) => {
+          currentProcessingItem.value = { name: progress.fileName }
+          currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
+          currentItemProgress.value = progress.percentage
+          processCount.value = progress.completed
         }
-        currentItemProgress.value = progress.percentage
-        processCount.value = progress.completed
+
+        const fileResults = await edgeStorageService.deleteMultipleEdgeStorageBucketFiles(
+          selectedBucket.value.name,
+          fileNames,
+          onFileProgress
+        )
+
+        allResults.push(...fileResults)
       }
 
-      const results = await edgeStorageService.deleteMultipleEdgeStorageBucketFiles(
-        selectedBucket.value.name,
-        fileNames.map((file) => (folderPath.value ? folderPath.value + file : file)),
-        onProgress
-      )
+      for (const folder of folders) {
+        const prefix = buildObjectKey(`${folder.name}/`)
+        const processedBaseline = allResults.length
+        discoveredItemsCount.value = 0
 
-      const successResults = results.filter((result) => result.success)
-      const failureResults = results.filter((result) => !result.success)
+        const onFolderProgress = (progress) => {
+          if (progress.step === EDGE_STORAGE_DELETE_STEP.LISTING) {
+            currentProcessingItem.value = { name: folder.name }
+            currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.LISTING
+            currentItemProgress.value = -1
+            discoveredItemsCount.value = progress.completed
+            return
+          }
+
+          currentProcessingItem.value = { name: progress.fileName }
+          currentProcessStep.value = EDGE_STORAGE_DELETE_STEP.DELETING
+          currentItemProgress.value = progress.percentage
+          processCount.value = processedBaseline + progress.completed
+          totalDeleteItems.value = processedBaseline + progress.total
+        }
+
+        const folderResults = await edgeStorageService.deleteRecursiveBucketFolder(
+          selectedBucket.value.name,
+          prefix,
+          onFolderProgress
+        )
+
+        allResults.push(...folderResults)
+      }
+
+      const successResults = allResults.filter((result) => result.success)
+      const failureResults = allResults.filter((result) => !result.success)
 
       processedItems.value = successResults
       failedItems.value = failureResults
-
-      currentProcessingItem.value = null
-      isProcessing.value = false
 
       const successCount = successResults.length
       const failureCount = failureResults.length
@@ -331,7 +387,7 @@ export const useEdgeStorage = () => {
         const hasFailures = failureCount > 0
         const toastType = hasFailures ? 'warn' : 'success'
         const toastTitle = hasFailures ? 'Deletion Partially Completed' : 'Deletion Successful'
-        const successText = `${successCount} file${
+        const successText = `${successCount} item${
           successCount > 1 ? 's' : ''
         } deleted successfully`
         const toastMessage = hasFailures ? `${successText}, ${failureCount} failed` : successText
@@ -343,18 +399,22 @@ export const useEdgeStorage = () => {
         handleToast(
           'error',
           'Deletion Failed',
-          `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to delete`
+          `All ${failureCount} item${failureCount > 1 ? 's' : ''} failed to delete`
         )
       }
     } catch (error) {
-      currentProcessingItem.value = null
-      isProcessing.value = false
-
       handleToast(
         'error',
         'Deletion Failed',
         'An unexpected error occurred during deletion. Please try again.'
       )
+    } finally {
+      currentProcessingItem.value = null
+      currentItemProgress.value = 0
+      currentProcessStep.value = ''
+      discoveredItemsCount.value = 0
+      totalDeleteItems.value = 0
+      isProcessing.value = false
     }
   }
 

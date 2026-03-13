@@ -20,12 +20,34 @@
 
     <div class="flex justify-between items-center text-sm">
       <span class="text-color-secondary">
-        {{ actionText }} {{ currentStatus.completed || currentStatus.uploaded || 0 }} of
-        {{ currentStatus.total }} {{ itemText }}
+        <template v-if="isDeleteListing">
+          Preparing delete list{{
+            currentStatus.discovered ? `: ${currentStatus.discovered} object(s) found` : '...'
+          }}
+        </template>
+        <template v-else>
+          {{ actionText }} {{ currentStatus.completed || currentStatus.uploaded || 0 }} of
+          {{ currentStatus.total }} {{ itemText }}
+        </template>
       </span>
-      <span class="font-medium">{{ currentStatus.progress }}%</span>
+      <span
+        v-if="!isDeleteListing"
+        class="font-medium"
+      >
+        {{ currentStatus.progress }}%
+      </span>
     </div>
+
     <ProgressBar
+      v-if="isDeleteListing"
+      mode="indeterminate"
+      style="height: 0.5em"
+      :pt="{
+        value: { style: 'background-color: var(--primary-color) !important' }
+      }"
+    />
+    <ProgressBar
+      v-else
       :value="currentStatus.progress"
       style="height: 0.5em"
       :showValue="false"
@@ -40,7 +62,11 @@
   import ProgressBar from 'primevue/progressbar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE } from '@/composables/useEdgeStorage'
+  import {
+    useEdgeStorage,
+    EDGE_STORAGE_OPERATION_TYPE,
+    EDGE_STORAGE_DELETE_STEP
+  } from '@/composables/useEdgeStorage'
 
   const { isProcessing, operationType, processStatus, cancelRequest } = useEdgeStorage()
 
@@ -50,6 +76,13 @@
 
   const currentStatus = computed(() => {
     return processStatus.value
+  })
+
+  const isDeleteListing = computed(() => {
+    return (
+      operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE &&
+      currentStatus.value.step === EDGE_STORAGE_DELETE_STEP.LISTING
+    )
   })
 
   const iconClass = computed(() => {
@@ -66,6 +99,7 @@
   })
 
   const itemText = computed(() => {
+    if (operationType.value === EDGE_STORAGE_OPERATION_TYPE.DELETE) return 'items'
     return 'files'
   })
 

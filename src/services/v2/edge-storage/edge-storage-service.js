@@ -1,6 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeStorageAdapter } from './edge-storage-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { EDGE_STORAGE_DELETE_STEP } from '@/composables/useEdgeStorage'
 
 const DEFAULT_CREDENTIALS_PARAMS = {
   page: 1,
@@ -197,7 +198,7 @@ export class EdgeStorageService extends BaseService {
             completed: idx,
             total: totalFiles,
             percentage: Math.round(((idx * 2 + 1) / totalSteps) * 100),
-            step: 'deleting'
+            step: EDGE_STORAGE_DELETE_STEP.DELETING
           })
         }
 
@@ -298,6 +299,80 @@ export class EdgeStorageService extends BaseService {
           success: false,
           error: error,
           message: `Failed to delete file "${fileName}"`
+        })
+      }
+    }
+
+    return results
+  }
+
+  deleteRecursiveBucketFolder = async (bucketName = '', prefix = '', onProgress = null) => {
+    const keysToDelete = []
+    let continuationToken = ''
+
+    do {
+      const { data } = await this.http.request({
+        method: 'GET',
+        url: `${this.baseURL}/buckets/${bucketName}/objects`,
+        params: {
+          all_levels: true,
+          prefix,
+          max_object_count: 110,
+          continuation_token: continuationToken
+        }
+      })
+
+      const objects = data.results || []
+      continuationToken = data.continuation_token || ''
+
+      for (const object of objects) {
+        if (!object?.key) continue
+        keysToDelete.push(object.key)
+      }
+
+      if (objects.length && onProgress && typeof onProgress === 'function') {
+        onProgress({
+          fileName: prefix,
+          completed: keysToDelete.length,
+          percentage: -1,
+          step: EDGE_STORAGE_DELETE_STEP.LISTING
+        })
+      }
+    } while (continuationToken)
+
+    const results = []
+    const totalObjects = keysToDelete.length
+
+    for (let index = 0; index < totalObjects; index++) {
+      const key = keysToDelete[index]
+
+      if (onProgress && typeof onProgress === 'function') {
+        onProgress({
+          fileName: key,
+          completed: index + 1,
+          total: totalObjects,
+          percentage: Math.round(((index + 1) / totalObjects) * 100),
+          step: EDGE_STORAGE_DELETE_STEP.DELETING
+        })
+      }
+
+      try {
+        await this.http.request({
+          method: 'DELETE',
+          url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(key)}`
+        })
+
+        results.push({
+          fileName: key,
+          success: true,
+          message: `File "${key}" has been deleted successfully`
+        })
+      } catch (error) {
+        results.push({
+          fileName: key,
+          success: false,
+          error,
+          message: `Failed to delete file "${key}"`
         })
       }
     }

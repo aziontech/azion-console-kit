@@ -348,8 +348,7 @@
   }
 
   const toggleRowSelection = (rowData) => {
-    if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav || rowData.isNewFolder)
-      return
+    if (rowData.isSkeletonRow || rowData.isParentNav || rowData.isNewFolder) return
 
     const isSelected = selectedItems.value.includes(rowData)
     if (isSelected) {
@@ -361,7 +360,7 @@
 
   const toggleSelectAll = () => {
     const selectableRows = filterData.value.filter(
-      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
+      (row) => !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
     )
     if (isAllSelected.value) {
       selectedItems.value = []
@@ -372,11 +371,15 @@
 
   const isAllSelected = computed(() => {
     const selectableRows = filterData.value.filter(
-      (row) => !row.isFolder && !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
+      (row) => !row.isParentNav && !row.isNewFolder && !row.isSkeletonRow
     )
     return (
       selectableRows.length > 0 && selectableRows.every((row) => selectedItems.value.includes(row))
     )
+  })
+
+  const hasFolderSelection = computed(() => {
+    return selectedItems.value.some((item) => item.isFolder)
   })
 
   const stateClassRules = (row) => {
@@ -423,7 +426,6 @@
 
   const showActions = (rowData) => {
     return (
-      !rowData.isFolder &&
       !rowData.isParentNav &&
       !rowData.isNewFolder &&
       !rowData.isSkeletonRow &&
@@ -760,9 +762,10 @@
           v-if="selectedItems.length > 0 && index === 0"
         >
           <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
-            <span class="text-sm">{{ selectedItems.length }} files selected</span>
+            <span class="text-sm">{{ selectedItems.length }} items selected</span>
             <div class="flex gap-2">
               <PrimeButton
+                v-if="!hasFolderSelection"
                 size="small"
                 outlined
                 :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
@@ -772,6 +775,7 @@
                 @click="emit('download-selected-items')"
               />
               <PrimeButton
+                v-if="!hasFolderSelection"
                 size="small"
                 outlined
                 icon="pi pi-arrow-right-arrow-left"

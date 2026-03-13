@@ -216,26 +216,38 @@
       label: 'Download',
       icon: 'pi pi-download',
       type: 'action',
-      commandAction: (item) => handleDownload(item)
+      commandAction: (item) => handleDownload(item),
+      visibleAction: (item) => !item.isFolder
     },
     {
       label: 'Rename',
       icon: 'pi pi-pencil',
       type: 'action',
-      commandAction: (item) => startRenaming(item)
+      commandAction: (item) => startRenaming(item),
+      visibleAction: (item) => !item.isFolder
     },
     {
       label: 'Move',
       icon: 'pi pi-arrow-right-arrow-left',
       type: 'action',
-      commandAction: (item) => handleOpenMoveDialog([item])
+      commandAction: (item) => handleOpenMoveDialog([item]),
+      visibleAction: (item) => !item.isFolder
     },
     {
       title: 'File',
       label: 'Delete',
       icon: 'pi pi-trash',
       type: 'delete',
-      service: (item) => handleDeleteFile(item)
+      service: (item) => handleDeleteFile(item),
+      visibleAction: (item) => !item.isFolder
+    },
+    {
+      title: 'Folder',
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      type: 'action',
+      commandAction: (item) => handleDeleteFolder(item),
+      visibleAction: (item) => item.isFolder
     }
   ]
 
@@ -361,21 +373,47 @@
     const newPath = pathSegments.length > 0 ? pathSegments.join('/') + '/' : ''
     router.replace({ query: newPath ? { folderPath: newPath } : {} })
   }
-  const handleMultipleDelete = () => {
-    Promise.resolve().then(async () => {
-      await deleteMultipleFiles(selectedFiles.value.map((file) => file.name))
-      filesTableNeedRefresh.value = true
-      await listServiceFilesRef.value?.reload()
-      currentPage.value = 1
-    })
+  const handleMultipleDelete = async () => {
+    await deleteMultipleFiles(
+      selectedFiles.value.map((file) => ({
+        name: file.name,
+        isFolder: file.isFolder
+      }))
+    )
+    filesTableNeedRefresh.value = true
+    await listServiceFilesRef.value?.reload()
+    currentPage.value = 1
   }
   const handleDeleteSelectedItems = () => {
+    const files = selectedFiles.value.filter((item) => !item.isFolder)
+    const folders = selectedFiles.value.filter((item) => item.isFolder)
+    const fileCount = files.length
+    const folderCount = folders.length
+    const totalCount = fileCount + folderCount
+    const requiresGenericConfirmation = folderCount > 0 || totalCount > 1
+
+    let title = 'File'
+    let description = 'Are you sure you want to delete the selected files?'
+
+    if (folderCount > 0 && fileCount === 0) {
+      title = folderCount > 1 ? `${folderCount} folders` : 'Folder'
+      description =
+        folderCount === 1
+          ? `You are about to delete the folder "${folders[0].name}" and all its contents. This action is permanent and cannot be undone.`
+          : `You are about to delete ${folderCount} folders and all their contents. This action is permanent and cannot be undone.`
+    } else if (folderCount > 0) {
+      title = `${fileCount} file${fileCount > 1 ? 's' : ''} and ${folderCount} folder${folderCount > 1 ? 's' : ''}`
+      description = `You are about to delete ${fileCount} file${fileCount > 1 ? 's' : ''} and ${folderCount} folder${folderCount > 1 ? 's' : ''}. All contents inside the selected folders will be permanently removed.`
+    } else if (totalCount > 1) {
+      title = `${totalCount} files`
+      description = 'Are you sure you want to delete the selected files?'
+    }
+
     openDeleteDialog({
-      title: selectedFiles.value.length > 1 ? `${selectedFiles.value.length} files` : 'File',
-      message: 'Are you sure you want to delete the selected files?',
+      title,
+      description,
       data: {
-        deleteConfirmationText:
-          selectedFiles.value.length > 1 ? 'delete' : selectedFiles.value[0].name
+        deleteConfirmationText: requiresGenericConfirmation ? 'delete' : selectedFiles.value[0].name
       },
       showToast: false,
       deleteService: () => handleMultipleDelete(),
@@ -502,6 +540,26 @@
     await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, item)
     filesTableNeedRefresh.value = true
     listServiceFilesRef.value?.reload()
+  }
+
+  const handleDeleteFolder = (item) => {
+    openDeleteDialog({
+      title: 'Folder',
+      description: `You are about to delete the folder "${item.name}" and all its contents. This action is permanent and cannot be undone.`,
+      data: {
+        deleteConfirmationText: 'delete'
+      },
+      showToast: false,
+      deleteService: async () => {
+        await deleteMultipleFiles([{ name: item.name, isFolder: true }])
+        filesTableNeedRefresh.value = true
+        await listServiceFilesRef.value?.reload()
+        currentPage.value = 1
+      },
+      closeCallback: () => {
+        selectedFiles.value = []
+      }
+    })
   }
   //  comment handleNewFolder for hide new folder button
   // const handleNewFolder = () => {
