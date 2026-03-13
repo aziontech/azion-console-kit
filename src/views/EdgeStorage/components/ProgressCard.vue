@@ -21,7 +21,9 @@
     <div class="flex justify-between items-center text-sm">
       <span class="text-color-secondary">
         <template v-if="isDeleteListing">
-          Preparing delete list{{ currentStatus.discovered ? `: ${currentStatus.discovered} object(s) found` : '...' }}
+          Preparing delete list{{
+            currentStatus.discovered ? `: ${currentStatus.discovered} object(s) found` : '...'
+          }}
         </template>
         <template v-else>
           {{ actionText }} {{ currentStatus.completed || currentStatus.uploaded || 0 }} of
@@ -60,7 +62,11 @@
   import ProgressBar from 'primevue/progressbar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE, EDGE_STORAGE_DELETE_STEP } from '@/composables/useEdgeStorage'
+  import {
+    useEdgeStorage,
+    EDGE_STORAGE_OPERATION_TYPE,
+    EDGE_STORAGE_DELETE_STEP
+  } from '@/composables/useEdgeStorage'
 
   const { isProcessing, operationType, processStatus, cancelRequest } = useEdgeStorage()
 

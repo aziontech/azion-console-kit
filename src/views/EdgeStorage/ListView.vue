@@ -413,9 +413,7 @@
       title,
       description,
       data: {
-        deleteConfirmationText: requiresGenericConfirmation
-          ? 'delete'
-          : selectedFiles.value[0].name
+        deleteConfirmationText: requiresGenericConfirmation ? 'delete' : selectedFiles.value[0].name
       },
       showToast: false,
       deleteService: () => handleMultipleDelete(),

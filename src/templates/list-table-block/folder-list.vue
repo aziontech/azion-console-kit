@@ -348,8 +348,7 @@
   }
 
   const toggleRowSelection = (rowData) => {
-    if (rowData.isSkeletonRow || rowData.isParentNav || rowData.isNewFolder)
-      return
+    if (rowData.isSkeletonRow || rowData.isParentNav || rowData.isNewFolder) return
 
     const isSelected = selectedItems.value.includes(rowData)
     if (isSelected) {
