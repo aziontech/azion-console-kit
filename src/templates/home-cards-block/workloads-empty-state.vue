@@ -4,6 +4,9 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import { useCreateModalStore } from '@/stores/create-modal'
+  import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
+
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   const router = useRouter()
   const createModalStore = useCreateModalStore()
@@ -23,7 +26,7 @@
     },
     {
       title: 'Start from a Scratch',
-      description: 'Start from a blank Workload.',
+      description: `Start from a blank ${handleTextDomainWorkload.singularTitle}.`,
       buttonLabel: 'Create',
       action: handleCreateFromScratch
     }
@@ -40,7 +43,9 @@
   >
     <div class="flex flex-col gap-8 items-center justify-center max-w-[465px] px-4">
       <div class="flex flex-col gap-2 text-center">
-        <p class="text-lg font-semibold text-[var(--text-color)]">No Workloads created yet</p>
+        <p class="text-lg font-semibold text-[var(--text-color)]">
+          No {{ handleTextDomainWorkload.pluralTitle }} created yet
+        </p>
         <p class="text-sm text-[var(--text-color-secondary)]">
           Create your first deploy starting from scratch, a template or importing your code.
         </p>
