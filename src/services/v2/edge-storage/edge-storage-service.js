@@ -305,6 +305,80 @@ export class EdgeStorageService extends BaseService {
     return results
   }
 
+  deleteRecursiveBucketFolder = async (bucketName = '', prefix = '', onProgress = null) => {
+    const keysToDelete = []
+    let continuationToken = ''
+
+    do {
+      const { data } = await this.http.request({
+        method: 'GET',
+        url: `${this.baseURL}/buckets/${bucketName}/objects`,
+        params: {
+          all_levels: true,
+          prefix,
+          max_object_count: 110,
+          continuation_token: continuationToken
+        }
+      })
+
+      const objects = data.results || []
+      continuationToken = data.continuation_token || ''
+
+      for (const object of objects) {
+        if (!object?.key) continue
+        keysToDelete.push(object.key)
+      }
+
+      if (objects.length && onProgress && typeof onProgress === 'function') {
+        onProgress({
+          fileName: prefix,
+          completed: keysToDelete.length,
+          percentage: -1,
+          step: 'listing'
+        })
+      }
+    } while (continuationToken)
+
+    const results = []
+    const totalObjects = keysToDelete.length
+
+    for (let index = 0; index < totalObjects; index++) {
+      const key = keysToDelete[index]
+
+      if (onProgress && typeof onProgress === 'function') {
+        onProgress({
+          fileName: key,
+          completed: index + 1,
+          total: totalObjects,
+          percentage: Math.round(((index + 1) / totalObjects) * 100),
+          step: 'deleting'
+        })
+      }
+
+      try {
+        await this.http.request({
+          method: 'DELETE',
+          url: `${this.baseURL}/buckets/${bucketName}/objects/${encodeURIComponent(key)}`
+        })
+
+        results.push({
+          fileName: key,
+          success: true,
+          message: `File "${key}" has been deleted successfully`
+        })
+      } catch (error) {
+        results.push({
+          fileName: key,
+          success: false,
+          error,
+          message: `Failed to delete file "${key}"`
+        })
+      }
+    }
+
+    return results
+  }
+
   downloadEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
     const response = await this.http.request({
       method: 'GET',
