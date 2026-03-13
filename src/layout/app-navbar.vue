@@ -44,6 +44,95 @@
     </div>
 
     <div
+      v-else-if="props.isLoading"
+      class="flex w-full items-center"
+    >
+      <div class="flex items-center gap-3">
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+        />
+        <Skeleton
+          width="5.5rem"
+          height="1.75rem"
+          borderRadius="4px"
+          class="max-md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+      </div>
+      <div class="flex gap-2 items-center ml-auto">
+        <!-- Desktop: 3 wide + 2 small -->
+        <Skeleton
+          width="6.5rem"
+          height="2rem"
+          borderRadius="6px"
+          class="max-md:hidden"
+        />
+        <Skeleton
+          width="6.5rem"
+          height="2rem"
+          borderRadius="6px"
+          class="max-md:hidden"
+        />
+        <Skeleton
+          width="6.5rem"
+          height="2rem"
+          borderRadius="6px"
+          class="max-md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="max-md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="max-md:hidden"
+        />
+        <!-- Mobile: all buttons same small size -->
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+        <Skeleton
+          width="2rem"
+          height="2rem"
+          borderRadius="6px"
+          class="md:hidden"
+        />
+      </div>
+    </div>
+
+    <div
       v-else
       class="flex w-full flex-row justify-between items-center"
     >
@@ -74,6 +163,7 @@
   import ButtonCopilot from '@/layout/components/navbar/button-copilot.vue'
 
   import { ref, provide, watch } from 'vue'
+  import Skeleton from 'primevue/skeleton'
   import PrimeButton from 'primevue/button'
   import { useRouter, useRoute } from 'vue-router'
   import { useWindowSize } from '@vueuse/core'
@@ -102,6 +192,10 @@
   const props = defineProps({
     showNavItems: {
       type: Boolean
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     },
     listTypeAccountService: {
       type: Function,
