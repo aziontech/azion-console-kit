@@ -207,31 +207,6 @@
       type: Number,
       default: null
     },
-    /**
-     * Next steps configuration
-     */
-    nextSteps: {
-      type: Array,
-      default: () => [
-        {
-          title: 'Customize Domain',
-          description: 'Associate a custom domain and subdomains to Azion to handle user access.',
-          handle: () => {}
-        },
-        {
-          title: 'Point Traffic',
-          description:
-            'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
-          handle: () => {}
-        },
-        {
-          title: 'View Analytics',
-          description: 'Gain powerful insights into your performance, availability, and security.',
-          handle: () => {}
-        }
-      ]
-    },
-
     // Deploy Success Card props (Step 4)
     /**
      * Application URL displayed after successful deploy
@@ -270,7 +245,7 @@
   const toast = useToast()
 
   // Step Navigation State
-  const currentStep = ref('success')
+  const currentStep = ref('repository')
   const isTransitioning = ref(false)
   const step2Ref = ref(null)
   const step3Ref = ref(null)
