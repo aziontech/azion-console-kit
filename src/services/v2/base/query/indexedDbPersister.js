@@ -41,39 +41,16 @@ async function encryptQuery(query) {
  * @returns {Promise<any>} Processed cache data with sensitive data encrypted
  */
 async function encryptAllQueries(data) {
-  if (!data || typeof data !== 'object') {
+  if (!data || !Array.isArray(data.queries)) {
     return data
   }
 
-  // Handle TanStack Query dehydrated cache structure
-  // The cache has a structure like: { queries: [...], mutations: [...] }
-  if (data.queries && Array.isArray(data.queries)) {
-    const encryptedQueries = await Promise.all(data.queries.map((query) => encryptQuery(query)))
+  const encryptedQueries = await Promise.all(data.queries.map((query) => encryptQuery(query)))
 
-    // Filter out null values (failed encryptions)
-    const validQueries = encryptedQueries.filter((query) => query !== null)
-
-    return {
-      ...data,
-      queries: validQueries
-    }
+  return {
+    ...data,
+    queries: encryptedQueries.filter((query) => query !== null)
   }
-
-  // Handle array of queries
-  if (Array.isArray(data)) {
-    const encrypted = await Promise.all(data.map((item) => encryptAllQueries(item)))
-    return encrypted.filter((item) => item !== null)
-  }
-
-  // Recursively process nested objects
-  const processed = { ...data }
-  for (const key in processed) {
-    if (processed[key] && typeof processed[key] === 'object') {
-      processed[key] = await encryptAllQueries(processed[key])
-    }
-  }
-
-  return processed
 }
 
 /**
@@ -91,6 +68,12 @@ async function decryptQuery(query) {
       return null
     }
 
+    // Legacy format: data is a base64 string from the old PBKDF2-based encryption.
+    // The old key is not available anymore, so discard and let the cache rebuild.
+    if (typeof query.state.data === 'string') {
+      return null
+    }
+
     try {
       const decryptedData = await decryptSensitiveData(query.state.data)
       return {
@@ -105,40 +88,6 @@ async function decryptQuery(query) {
         }
       }
     } catch {
-      // Fallback: check if data is already decrypted
-      if (typeof query.state.data === 'string') {
-        try {
-          const parsed = JSON.parse(query.state.data)
-          return {
-            ...query,
-            state: {
-              ...query.state,
-              data: parsed
-            },
-            meta: {
-              ...query.meta,
-              encrypted: false
-            }
-          }
-        } catch {
-          return null
-        }
-      }
-
-      if (typeof query.state.data === 'object') {
-        return {
-          ...query,
-          state: {
-            ...query.state,
-            data: query.state.data
-          },
-          meta: {
-            ...query.meta,
-            encrypted: false
-          }
-        }
-      }
-
       return null
     }
   }
@@ -154,41 +103,44 @@ async function decryptQuery(query) {
  * @returns {Promise<any>} Decrypted cache data
  */
 async function decryptAllQueries(data, options = {}) {
-  if (!data || typeof data !== 'object') {
+  if (!data || !Array.isArray(data.queries)) {
     return data
   }
 
-  if (data.queries && Array.isArray(data.queries)) {
-    const decryptedQueries = await Promise.all(data.queries.map((query) => decryptQuery(query)))
-    const validQueries = decryptedQueries.filter((query) => query !== null)
-    const failedCount = decryptedQueries.length - validQueries.length
+  const decryptedQueries = await Promise.all(data.queries.map((query) => decryptQuery(query)))
+  const validQueries = decryptedQueries.filter((query) => query !== null)
+  const failedCount = decryptedQueries.length - validQueries.length
 
-    if (failedCount > 0) {
-      const failureRate = failedCount / decryptedQueries.length
-      if (failureRate > 0.5 && options.onCorruption) {
-        options.onCorruption()
-      }
-    }
-
-    return {
-      ...data,
-      queries: validQueries
+  if (failedCount > 0) {
+    const failureRate = failedCount / decryptedQueries.length
+    if (failureRate > 0.5 && options.onCorruption) {
+      options.onCorruption()
     }
   }
 
-  if (Array.isArray(data)) {
-    const decrypted = await Promise.all(data.map((item) => decryptAllQueries(item, options)))
-    return decrypted.filter((item) => item !== null)
+  return {
+    ...data,
+    queries: validQueries
   }
+}
 
-  const processed = { ...data }
-  for (const key in processed) {
-    if (processed[key] && typeof processed[key] === 'object') {
-      processed[key] = await decryptAllQueries(processed[key], options)
-    }
+const PERSIST_THROTTLE_MS = 2000
+
+function createThrottledPersist(fn) {
+  let timer = null
+  let pendingClient = null
+
+  return (client) => {
+    pendingClient = client
+    if (timer) return
+
+    timer = setTimeout(async () => {
+      timer = null
+      const snapshot = pendingClient
+      pendingClient = null
+      await fn(snapshot)
+    }, PERSIST_THROTTLE_MS)
   }
-
-  return processed
 }
 
 export function createIDBPersister(config, onRestoreComplete = null) {
@@ -212,15 +164,21 @@ export function createIDBPersister(config, onRestoreComplete = null) {
     return noopPersister
   }
 
+  const doWrite = async (client) => {
+    try {
+      const encryptedClient = await encryptAllQueries(client)
+      const filteredClient = filterNullValues(encryptedClient)
+      await set(cacheKey, filteredClient, customStore)
+    } catch {
+      // Encryption failed, persist unencrypted as fallback
+    }
+  }
+
+  const throttledPersist = createThrottledPersist(doWrite)
+
   return {
-    persistClient: async (client) => {
-      try {
-        const encryptedClient = await encryptAllQueries(client)
-        const filteredClient = filterNullValues(encryptedClient)
-        await set(cacheKey, filteredClient, customStore)
-      } catch {
-        // Encryption failed, persist unencrypted as fallback
-      }
+    persistClient: (client) => {
+      throttledPersist(client)
     },
     restoreClient: async () => {
       try {
@@ -280,6 +238,11 @@ export function createIDBPersister(config, onRestoreComplete = null) {
 function filterNullValues(data) {
   if (data === null || data === undefined) {
     return undefined
+  }
+
+  // ArrayBuffer and typed arrays are valid binary payloads — pass through unchanged
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return data
   }
 
   if (Array.isArray(data)) {
