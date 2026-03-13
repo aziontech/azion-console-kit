@@ -5,6 +5,7 @@
   import PrimeButton from 'primevue/button'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
   import { workloadService } from '@/services/v2/workload/workload-service'
+  import { deleteDomainService } from '@/services/domains-services'
   import { clipboardWrite } from '@/helpers/clipboard'
   import { set, get } from '@/helpers/local-storage-manager'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
@@ -14,10 +15,12 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import WorkloadsEmptyState from './workloads-empty-state.vue'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
 
   const tableDefinitionsStore = useTableDefinitionsStore()
   const router = useRouter()
   const isLoading = ref(false)
+  const { openDeleteDialog } = useDeleteDialog()
 
   const STORAGE_KEY = 'azion-home-resources-filter'
   const DEFAULT_RESOURCE = 'workloads'
@@ -239,8 +242,8 @@
     const linksMap = {
       workloads: `/${handleTextDomainWorkload.pluralLabel}`,
       'edge-dns': '/edge-dns',
-      'object-storage': '/object-storage/buckets',
-      functions: '/edge-functions'
+      'object-storage': '/object-storage',
+      functions: '/functions'
     }
     return linksMap[selectedResource.value] || '/'
   })
@@ -290,57 +293,110 @@
     return emptyBlockMap[selectedResource.value] || emptyBlockMap.workloads
   })
 
-  const currentActions = computed(() => {
+  const currentActions = (rowData) => {
     const actionsMap = {
       workloads: [
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
-          command: (rowData) =>
+          command: () =>
             router.push({ name: editWorkloadRouteName.value, params: { id: rowData.id } })
         },
         {
           label: 'Delete',
-          icon: 'pi pi-trash'
+          icon: 'pi pi-trash',
+          command: () => {
+            openDeleteDialog({
+              title: handleTextDomainWorkload.singularTitle,
+              id: rowData.id,
+              data: rowData,
+              deleteService: isWorkload.value
+                ? workloadService.deleteWorkload
+                : deleteDomainService,
+              closeCallback: (opt) => {
+                if (opt?.data?.updated) {
+                  loadDataForResource(selectedResource.value)
+                }
+              }
+            })
+          }
         }
       ],
       'edge-dns': [
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
-          command: (rowData) => router.push({ name: 'edit-edge-dns', params: { id: rowData.id } })
+          command: () => router.push({ name: 'edit-edge-dns', params: { id: rowData.id } })
         },
         {
           label: 'Delete',
-          icon: 'pi pi-trash'
+          icon: 'pi pi-trash',
+          command: () => {
+            openDeleteDialog({
+              title: 'zone',
+              id: rowData.id,
+              data: rowData,
+              deleteService: edgeDNSService.deleteEdgeDNSService,
+              closeCallback: (opt) => {
+                if (opt?.data?.updated) {
+                  loadDataForResource(selectedResource.value)
+                }
+              }
+            })
+          }
         }
       ],
       'object-storage': [
         {
           label: 'View',
           icon: 'pi pi-eye',
-          command: (rowData) =>
-            router.push({ name: 'object-storage-view', params: { id: rowData.name } })
+          command: () => router.push({ name: 'object-storage-view', params: { id: rowData.name } })
         },
         {
           label: 'Delete',
-          icon: 'pi pi-trash'
+          icon: 'pi pi-trash',
+          command: () => {
+            openDeleteDialog({
+              title: 'bucket',
+              id: rowData.id,
+              data: rowData,
+              deleteService: edgeStorageService.deleteEdgeStorageBucket,
+              closeCallback: (opt) => {
+                if (opt?.data?.updated) {
+                  loadDataForResource(selectedResource.value)
+                }
+              }
+            })
+          }
         }
       ],
       functions: [
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
-          command: (rowData) => router.push({ name: 'edit-functions', params: { id: rowData.id } })
+          command: () => router.push({ name: 'edit-functions', params: { id: rowData.id } })
         },
         {
           label: 'Delete',
-          icon: 'pi pi-trash'
+          icon: 'pi pi-trash',
+          command: () => {
+            openDeleteDialog({
+              title: 'Function',
+              id: rowData.id,
+              data: rowData,
+              deleteService: edgeFunctionService.deleteEdgeFunctionService,
+              closeCallback: (opt) => {
+                if (opt?.data?.updated) {
+                  loadDataForResource(selectedResource.value)
+                }
+              }
+            })
+          }
         }
       ]
     }
     return actionsMap[selectedResource.value] || []
-  })
+  }
 
   const toggleFilterMenu = (event) => {
     filterMenu.value.toggle(event)
