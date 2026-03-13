@@ -25,7 +25,6 @@
   defineOptions({ name: 'home-view' })
 
   const user = accountData
-  const teams = ref([])
   const showInviteDialog = ref(false)
 
   const homeSection = ref(null)
@@ -57,7 +56,6 @@
   }
 
   onMounted(async () => {
-    teams.value = await teamsService.listTeams()
     if (InviteSession.sessionIsExpired()) {
       InviteSession.turnInviteBlockVisable()
     }
