@@ -79,7 +79,7 @@ const CHILD_TO_TAB_MAP = {
     Editor: 'editor',
     Settings: 'settings'
   },
-  CustomPages: {},
+  'Custom Page': {},
   'Purge:cachekey': {},
   Credential: {
     ObjectStorageCredential: 'object-storage',
@@ -111,7 +111,7 @@ const PARENT_ROUTE_MAP = {
     edit: 'database-sql-database',
     list: 'list-sql-databases'
   },
-  CustomPages: {
+  'Custom Page': {
     edit: 'edit-custom-pages',
     list: 'list-custom-pages'
   },
@@ -184,7 +184,7 @@ const ROUTE_MAP = {
   Connector: { edit: 'edit-connectors', list: 'list-connectors' },
   Schema: { edit: 'database-sql-database', list: 'list-sql-databases' },
   'Sql Database': { edit: 'database-sql-database', list: 'list-sql-databases' },
-  CustomPages: { edit: 'edit-custom-pages', list: 'list-custom-pages' },
+  'Custom Page': { edit: 'edit-custom-pages', list: 'list-custom-pages' },
   'Purge Cache Key': routePurge,
   'Purge Cache Key L2': routePurge,
   'Purge URL': routePurge,

@@ -3,8 +3,6 @@
     v-if="isVisible"
     class="border surface-border rounded-md surface-section flex flex-col relative"
   >
-    <!-- 
-    Botão de fechar aguardando resolução do changelog
     <PrimeButton
       v-if="communication.dismissible"
       icon="pi pi-times"
@@ -13,8 +11,7 @@
       rounded
       class="absolute top-3 right-3 z-1"
       @click="handleDismiss"
-    /> -->
-
+    />
     <div class="flex flex-col">
       <div
         v-if="communication.image"
@@ -123,15 +120,23 @@
     return !!dismissedAt
   }
 
-  // const persistDismiss = (id) => {
-  //   if (!id) return
-  //   localStorage.setItem(`${STORAGE_KEY_PREFIX}${id}`, new Date().toISOString())
-  // }
+  const persistDismiss = (id) => {
+    if (!id) return
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}${id}`, new Date().toISOString())
+  }
 
   const handleCtaClick = () => {
     if (communication.value?.ctaHref) {
       window.open(communication.value.ctaHref, '_blank', 'noopener,noreferrer')
     }
+  }
+
+  const handleDismiss = () => {
+    if (communication.value?.id) {
+      persistDismiss(communication.value.id)
+    }
+
+    isDismissed.value = true
   }
 
   const validateBanner = (banner) => {

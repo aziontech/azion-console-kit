@@ -69,14 +69,16 @@
           <div
             v-for="index in 4"
             :key="index"
-            class="flex items-start justify-between text-xs"
+            class="flex items-start justify-between gap-2 text-xs"
           >
             <SkeletonBlock
               width="17rem"
+              height="1rem"
               :isLoaded="false"
             />
             <SkeletonBlock
               width="4rem"
+              height="1rem"
               :isLoaded="false"
             />
           </div>
