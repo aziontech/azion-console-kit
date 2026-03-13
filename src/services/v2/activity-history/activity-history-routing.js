@@ -87,6 +87,9 @@ const CHILD_TO_TAB_MAP = {
   },
   Workload: {
     'Workload Deployment': null // Workload Deployment redirects to parent Workload
+  },
+  'Dns Zone': {
+    'Dns Zone Record': 'records'
   }
 }
 
@@ -131,6 +134,10 @@ const PARENT_ROUTE_MAP = {
   Waf: {
     edit: 'edit-waf-rules',
     list: 'list-waf-rules'
+  },
+  'Dns Zone': {
+    edit: 'edit-edge-dns',
+    list: 'list-edge-dns'
   }
 }
 
@@ -173,6 +180,7 @@ const ROUTE_MAP = {
     parentType: 'DNS Zone',
     tab: 'records'
   },
+  'Dns Zone Dnssec': { edit: 'edit-edge-dns', list: 'list-edge-dns' },
   WAF: { edit: 'edit-waf-rules', list: 'list-waf-rules', tab: 'allowed' },
 
   Workload: { edit: 'edit-workload', list: 'list-workloads' },
@@ -189,6 +197,10 @@ const ROUTE_MAP = {
   'Purge Cache Key L2': routePurge,
   'Purge URL': routePurge,
   'Purge Wildcard': routePurge,
+  'Purge:cachekey': routePurge,
+  'Purge:l2cachekey': routePurge,
+  'Purge:url': routePurge,
+  'Purge:wildcard': routePurge,
   'Account Credential': {
     edit: 'credentials-tabs',
     list: 'credentials-tabs',

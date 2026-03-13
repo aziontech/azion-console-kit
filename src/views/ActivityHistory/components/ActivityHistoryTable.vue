@@ -35,17 +35,19 @@
   const totalRecords = ref(0)
   const searchValue = ref('')
   const now = new Date()
-  const startDate = createStartOfDay(now)
+  const thirtyDaysAgo = new Date(now)
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  const startDate = createStartOfDay(thirtyDaysAgo)
   const endDate = now
   const dateRange = ref({
     startDate,
     endDate,
-    label: 'Today',
-    labelStart: 'Today',
+    label: 'Last 30 days',
+    labelStart: 'Last 30 days',
     labelEnd: 'Today',
     relative: {
       direction: 'last',
-      value: 0,
+      value: 30,
       unit: 'days'
     }
   })
@@ -205,7 +207,8 @@
       toast.add({
         closable: true,
         severity: 'warn',
-        summary: 'No route available for this activity'
+        summary: 'Warning',
+        detail: 'No route found for the selected activity'
       })
       return
     }
