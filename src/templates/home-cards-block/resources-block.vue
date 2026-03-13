@@ -30,7 +30,7 @@
   const edgeDnsColumns = [
     {
       field: 'name',
-      header: 'Name',
+      header: 'Zone Name',
       enableClick: true,
       type: 'component',
       component: (columnData) => {
@@ -71,7 +71,7 @@
   const objectStorageColumns = [
     {
       field: 'name',
-      header: 'Name',
+      header: 'Bucket Name',
       enableClick: true,
       type: 'component',
       component: (columnData) => {
@@ -89,7 +89,7 @@
   const functionsColumns = [
     {
       field: 'name',
-      header: 'Name',
+      header: 'Function Name',
       enableClick: true,
       type: 'component',
       component: (columnData) => {
@@ -136,7 +136,10 @@
 
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const resourceTypes = computed(() => [
-    { label: handleTextDomainWorkload.pluralTitle, value: 'workloads' },
+    {
+      label: handleTextDomainWorkload.pluralTitle,
+      value: handleTextDomainWorkload.pluralLabel.toLowerCase()
+    },
     { label: 'Edge DNS', value: 'edge-dns' },
     { label: 'Object Storage', value: 'object-storage' },
     { label: 'Functions', value: 'functions' }
