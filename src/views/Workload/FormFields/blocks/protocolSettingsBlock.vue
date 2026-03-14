@@ -61,7 +61,7 @@
   }
 
   const showTlsAndCipherDropdown = computed(
-    () => protocols.value.http.useHttps || protocols.value.http.useHttp3
+    () => protocols.value?.http?.useHttps || protocols.value?.http?.useHttp3
   )
 
   const onDigitalCertificateSuccess = ({ id, authority }) => {
@@ -191,7 +191,7 @@
           name="protocols.http.useHttps"
           auto
           @onSwitchChange="handleHttps"
-          :value="protocols.http.useHttps"
+          :value="protocols?.http?.useHttps"
           :isCard="false"
           title="HTTPS support"
           subtitle="Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports."
@@ -199,7 +199,7 @@
       </div>
       <div
         class="flex gap-6 flex-col md:pl-12"
-        v-if="protocols.http.useHttps"
+        v-if="protocols?.http?.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
@@ -249,12 +249,12 @@
             for="port-https"
             data-testid="form-horizontal-delivery-settings-https-ports-label"
             label="HTTPS Ports"
-            :isRequired="protocols.http.useHttps"
+            :isRequired="protocols?.http?.useHttps"
           />
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
-              v-if="!protocols.http.useHttps"
+              v-if="!protocols?.http?.useHttps"
               data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
             />
             <MultiSelect
@@ -268,7 +268,7 @@
               :class="{ 'p-invalid': httpsPortError }"
               placeholder="Select an HTTPS port"
               class="w-full"
-              :disabled="!protocols.http.useHttps"
+              :disabled="!protocols?.http?.useHttps"
               data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
             />
             <small
@@ -330,7 +330,7 @@
       </div>
       <div
         class="flex gap-6 max-sm:flex-col md:pl-12"
-        v-if="protocols.http.useHttp3"
+        v-if="protocols?.http?.useHttp3"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
