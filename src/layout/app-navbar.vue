@@ -44,7 +44,7 @@
     </div>
 
     <div
-      v-else-if="props.isLoading"
+      v-else-if="props.isBootstrapping"
       class="flex w-full items-center"
     >
       <div class="flex items-center gap-3">
@@ -193,7 +193,7 @@
     showNavItems: {
       type: Boolean
     },
-    isLoading: {
+    isBootstrapping: {
       type: Boolean,
       default: false
     },
