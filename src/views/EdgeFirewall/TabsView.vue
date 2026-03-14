@@ -17,6 +17,7 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   const breadcrumbs = useBreadcrumbs()
   const tableDefinitionsStore = useTableDefinitionsStore()
@@ -184,6 +185,11 @@
     return edgeFirewall.value?.name || ''
   })
 
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeFirewall.value) return true
+    return false
+  })
+
   const updatedFirewall = (firewall) => {
     edgeFirewall.value = { ...edgeFirewall.value, ...firewall }
     verifyTab(edgeFirewall.value)
@@ -224,7 +230,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -238,10 +245,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeFirewall"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"
