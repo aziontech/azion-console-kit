@@ -4,8 +4,14 @@ import { sessionManager } from '@/services/v2/base/auth'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function logoutGuard({ to, accountStore, tracker }) {
+  const loadingStore = useLoadingStore()
+  loadingStore.startLoading()
+
+  if (to.meta?.hideLoading) {
+    loadingStore.finishLoading()
+  }
+
   if (to.path === '/logout' || to.query.ref === 'logout') {
-    const loadingStore = useLoadingStore()
     loadingStore.startLoading()
     tracker.reset()
     await sessionManager.logout()

@@ -13,6 +13,7 @@
   import PrimeButton from 'primevue/button'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -41,6 +42,12 @@
   }
 
   const title = ref(cachedService.name || '')
+  const isServiceLoaded = ref(!!cachedService.name)
+
+  const shouldShowSkeleton = computed(() => {
+    if (!isServiceLoaded.value) return true
+    return false
+  })
 
   const tabs = ref([
     {
@@ -90,6 +97,7 @@
 
   const updateEdgeServiceValue = (value) => {
     title.value = value.name
+    isServiceLoaded.value = true
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, value.name)
   }
 
@@ -139,7 +147,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
