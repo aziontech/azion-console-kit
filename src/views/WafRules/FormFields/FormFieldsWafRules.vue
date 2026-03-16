@@ -114,17 +114,15 @@
     description="Create a WAF rule set to protect servers and applications against threat families. Configure a behavior on Rules Engine for Firewall to apply and run this rule set."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give a unique and descriptive name to identify the WAF rule set."
-          name="name"
-          data-testid="waf-rules-form__name-field"
-          :value="name"
-          placeholder="My WAF rule"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give a unique and descriptive name to identify the WAF rule set."
+        name="name"
+        data-testid="waf-rules-form__name-field"
+        :value="name"
+        placeholder="My WAF rule"
+      />
     </template>
   </FormHorizontal>
   <FormHorizontal

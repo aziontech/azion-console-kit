@@ -82,17 +82,15 @@
         </div>
       </template>
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            disabled
-            required
-            :value="name"
-            placeholder="My digital certificate"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          disabled
+          required
+          :value="name"
+          placeholder="My digital certificate"
+          data-testid="digital-certificate__name-field"
+        />
       </template>
     </FormHorizontal>
   </template>
@@ -104,16 +102,14 @@
       description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field."
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            required
-            placeholder="My digital certificate"
-            :value="name"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          required
+          placeholder="My digital certificate"
+          :value="name"
+          data-testid="digital-certificate__name-field"
+        />
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"
@@ -159,16 +155,14 @@
       description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            required
-            :value="name"
-            placeholder="My digital certificate"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          required
+          :value="name"
+          placeholder="My digital certificate"
+          data-testid="digital-certificate__name-field"
+        />
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"
@@ -197,16 +191,14 @@
       description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            required
-            placeholder="My digital certificate"
-            :value="name"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          required
+          placeholder="My digital certificate"
+          :value="name"
+          data-testid="digital-certificate__name-field"
+        />
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"
@@ -228,16 +220,14 @@
       description="Paste the PEM-encoded CRL in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            required
-            :value="name"
-            placeholder="My digital certificate"
-            data-testid="digital-certificate__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          required
+          :value="name"
+          placeholder="My digital certificate"
+          data-testid="digital-certificate__name-field"
+        />
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"

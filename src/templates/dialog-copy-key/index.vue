@@ -8,17 +8,15 @@
     :header="`${params.title} has been created`"
   >
     <div class="flex flex-col sm:flex-row sm:items-end gap-6">
-      <div class="flex flex-col w-full gap-2">
-        <FieldText
-          id="key"
-          :name="params.title"
-          :label="params.title"
-          :value="keyValue"
-          disabled
-          ref="keyInput"
-          icon="pi pi-lock"
-        />
-      </div>
+      <FieldText
+        id="key"
+        :name="params.title"
+        :label="params.title"
+        :value="keyValue"
+        disabled
+        ref="keyInput"
+        icon="pi pi-lock"
+      />
       <div>
         <PrimeButton
           icon="pi pi-clone"

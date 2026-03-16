@@ -61,16 +61,14 @@
     description="Create zones to host your domains on Azion's distributed infrastructure."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My zone"
-          data-testid="edge-dns-form__name"
-          description="Give a unique and descriptive name to identify your zone."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My zone"
+        data-testid="edge-dns-form__name"
+        description="Give a unique and descriptive name to identify your zone."
+      />
     </template>
   </FormHorizontal>
   <FormHorizontal

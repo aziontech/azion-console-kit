@@ -118,17 +118,15 @@
     data-testid="personal-token-form__section__general"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          :value="name"
-          :disabled="disabledFields"
-          description="Give a unique and descriptive name to identify the personal token."
-          data-testid="personal-token-form__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        :value="name"
+        :disabled="disabledFields"
+        description="Give a unique and descriptive name to identify the personal token."
+        data-testid="personal-token-form__name-field"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"

@@ -166,17 +166,15 @@
     description="Create a origin server configuration for the Application. Use Rules Engine to activate origins."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          placeholder="My origin"
-          name="name"
-          :value="name"
-          data-testid="form-horizontal-general-name"
-          description="Give a unique and descriptive name to identify the origin."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        placeholder="My origin"
+        name="name"
+        :value="name"
+        data-testid="form-horizontal-general-name"
+        description="Give a unique and descriptive name to identify the origin."
+      />
     </template>
   </FormHorizontal>
 

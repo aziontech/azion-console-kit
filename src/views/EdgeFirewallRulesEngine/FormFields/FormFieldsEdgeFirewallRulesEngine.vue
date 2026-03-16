@@ -524,26 +524,22 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          data-testid="edge-firewall-rule-form__name"
-          :value="name"
-          placeholder="My rule"
-          description="Give a unique and descriptive name to identify the rule."
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Description"
-          name="description"
-          data-testid="edge-firewall-rule-form__description"
-          :value="description"
-          description="Add a short description or comment to the rule."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        data-testid="edge-firewall-rule-form__name"
+        :value="name"
+        placeholder="My rule"
+        description="Give a unique and descriptive name to identify the rule."
+      />
+      <FieldText
+        label="Description"
+        name="description"
+        data-testid="edge-firewall-rule-form__description"
+        :value="description"
+        description="Add a short description or comment to the rule."
+      />
     </template>
   </FormHorizontal>
 

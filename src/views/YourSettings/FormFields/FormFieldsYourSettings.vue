@@ -61,26 +61,22 @@
     description="Modify the personal information of the account."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="your-settings-form__first-name"
-          label="First Name"
-          required
-          name="firstName"
-          :value="firstName"
-          description="The first name of the user."
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="your-settings-form__last-name"
-          label="Last Name"
-          required
-          name="lastName"
-          :value="lastName"
-          description="The last name of the user."
-        />
-      </div>
+      <FieldText
+        data-testid="your-settings-form__first-name"
+        label="First Name"
+        required
+        name="firstName"
+        :value="firstName"
+        description="The first name of the user."
+      />
+      <FieldText
+        data-testid="your-settings-form__last-name"
+        label="Last Name"
+        required
+        name="lastName"
+        :value="lastName"
+        description="The last name of the user."
+      />
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
@@ -139,20 +135,17 @@
     description="Modify the contact information for the account."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="your-settings-form__email"
-          label="Email"
-          required
-          name="email"
-          :value="email"
-          type="email"
-          autocomplete="off"
-          placeholder="example@email.com"
-          description="Email of the user."
-        />
-      </div>
-
+      <FieldText
+        data-testid="your-settings-form__email"
+        label="Email"
+        required
+        name="email"
+        :value="email"
+        type="email"
+        autocomplete="off"
+        placeholder="example@email.com"
+        description="Email of the user."
+      />
       <FieldPhoneNumberCountry
         :listCountriesPhoneService="listCountriesPhoneService"
         label="Phone Number"
