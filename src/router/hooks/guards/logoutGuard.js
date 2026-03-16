@@ -3,9 +3,15 @@ import { useLoadingStore } from '@/stores/loading'
 import { sessionManager } from '@/services/v2/base/auth'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function logoutGuard({ to, accountStore, tracker }) {
+export async function logoutGuard({ to, from, accountStore, tracker }) {
   const loadingStore = useLoadingStore()
-  loadingStore.startLoading()
+  const isComingFromAuthRoute = from.meta?.hideNavigation
+  const shouldShowLoading =
+    accountStore.hasSession && !to.meta?.hideNavigation && !isComingFromAuthRoute
+
+  if (shouldShowLoading) {
+    loadingStore.startLoading()
+  }
 
   if (to.meta?.hideLoading) {
     loadingStore.finishLoading()
