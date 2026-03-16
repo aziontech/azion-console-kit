@@ -6,6 +6,8 @@
 
   import DataTable from '@/components/DataTable'
   import DataTimeRange from '@/components/base/dataTimeRange'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useDataTable } from '@/composables/useDataTable'
   import OperationTag from './OperationTag.vue'
   import { createStartOfDay } from '@utils/date.js'
   import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
@@ -26,7 +28,7 @@
   })
 
   const emit = defineEmits(['on-load-data'])
-
+  const { extractFieldValue, handleMouseEnter, handleMouseLeave } = useDataTable(props, emit)
   const router = useRouter()
   const toast = useToast()
   const filterRef = ref(null)
@@ -84,9 +86,30 @@
     { field: 'date', header: 'Date', visible: true, sortable: true },
     { field: 'operation', header: 'Operation', visible: true, sortable: true },
     { field: 'resourceType', header: 'Resource Type', visible: true },
-    { field: 'resourceName', header: 'Resource Name', visible: true },
+    {
+      field: 'resourceName',
+      header: 'Resource Name',
+      visible: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+    },
     { field: 'parentResourceType', header: 'Parent Resource Type', visible: true, sortable: true },
-    { field: 'parentResourceName', header: 'Parent Resource Name', visible: true, sortable: true },
+    {
+      field: 'parentResourceName',
+      header: 'Parent Resource Name',
+      visible: true,
+      sortable: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-format-with-popup'
+        })
+    },
     { field: 'authorEmail', header: 'Author Email', visible: true, sortable: true },
     { field: 'authorIp', header: 'Author IP', visible: false },
     { field: 'authorName', header: 'Author Name', visible: false },
@@ -229,7 +252,8 @@
       date: { width: '189px' },
       operation: { width: '94px' },
       resource: { width: '152px' },
-      resourceName: { minWidth: '260px' },
+      resourceName: { minWidth: '260px', maxWidth: '320px' },
+      parentResourceName: { maxWidth: '320px' },
       resourceItem: { width: '152px' },
       resourceItemName: { minWidth: '260px' },
       authorEmail: { width: '333px' },
@@ -323,20 +347,21 @@
         <template v-if="col.field === 'operation'">
           <OperationTag :operation="rowData.operation" />
         </template>
-        <template v-else-if="col.field === 'resourceName' || col.field === 'parentResourceName'">
-          <span
-            v-if="rowData[col.field]"
-            @click="handleRowClick({ data: rowData })"
-            class="text-color cursor-pointer hover:underline"
-          >
-            {{ rowData[col.field] }}
-          </span>
-          <span
-            v-else
-            class="text-color-secondary"
-            >-</span
-          >
-        </template>
+        <span
+          v-else-if="col.type === 'component'"
+          @click="handleRowClick({ data: rowData })"
+          class="text-color cursor-pointer hover:underline"
+        >
+          <component
+            :is="
+              col.component(extractFieldValue(rowData, col.field), rowData, {
+                handleMouseEnter,
+                handleMouseLeave
+              })
+            "
+            class="overflow-hidden whitespace-nowrap text-ellipsis"
+          />
+        </span>
         <template v-else>
           {{ rowData[col.field] || '-' }}
         </template>

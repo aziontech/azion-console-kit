@@ -26,26 +26,27 @@
       :isCopyVisible="isCellHovered"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
-    <Teleport to="body">
-      <div
-        v-if="showPopup"
-        ref="popupElement"
-        class="absolute z-[9999] w-fit rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)] overflow-y-auto"
-        :style="popupStyle"
-        @mouseenter="handlePopupMouseEnter"
-        @mouseleave="handlePopupMouseLeave"
-      >
-        <ul class="text-xs space-y-1">
-          <li
-            v-for="(item, index) in remainingItems"
-            :key="index"
-            class="break-words"
-          >
-            {{ item }}
-          </li>
-        </ul>
-      </div>
-    </Teleport>
+    <template v-if="showPopup">
+      <Teleport to="body">
+        <div
+          ref="popupElement"
+          class="absolute z-[9999] w-fit rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)] overflow-y-auto"
+          :style="popupStyle"
+          @mouseenter="handlePopupMouseEnter"
+          @mouseleave="handlePopupMouseLeave"
+        >
+          <ul class="text-xs space-y-1">
+            <li
+              v-for="(item, index) in remainingItems"
+              :key="index"
+              class="break-words"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+      </Teleport>
+    </template>
   </div>
 </template>
 
