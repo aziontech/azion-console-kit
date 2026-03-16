@@ -18,17 +18,18 @@
       :isCopyVisible="isCellHovered"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
-    <Teleport to="body">
-      <div
-        v-if="showPopup"
-        class="absolute z-[9999] max-w-80 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)]"
-        :style="popupStyle"
-        @mouseenter="handlePopupMouseEnter"
-        @mouseleave="handlePopupMouseLeave"
-      >
-        <p class="text-xs break-words">{{ text }}</p>
-      </div>
-    </Teleport>
+    <template v-if="showPopup">
+      <Teleport to="body">
+        <div
+          class="absolute z-[9999] max-w-80 rounded-md py-2 px-3 bg-[var(--surface-100)] border border-[var(--surface-border)]"
+          :style="popupStyle"
+          @mouseenter="handlePopupMouseEnter"
+          @mouseleave="handlePopupMouseLeave"
+        >
+          <p class="text-xs break-words">{{ text }}</p>
+        </div>
+      </Teleport>
+    </template>
   </div>
 </template>
 
