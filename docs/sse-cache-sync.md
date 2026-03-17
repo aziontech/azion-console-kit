@@ -33,20 +33,22 @@ Server-Sent Events (SSE) is a technology that allows the server to send updates 
 │           ▼                                             │           │
 │  ┌─────────────────────────────────────────────────────────────┐    │
 │  │                    CacheSyncService                         │    │
-│  │  (Singleton - orchestrates SSE + invalidation)              │    │
+│  │  (Singleton - orchestrates SSE + invalidation + broadcast)  │    │
 │  └────────┬───────────────────────────────────────┬────────────┘    │
 │           │                                       │                 │
 │           ▼                                       ▼                 │
 │  ┌───────────────────┐                   ┌──────────────────────┐   │
 │  │   TabCoordinator  │◄──────────────────│   BroadcastManager   │   │
 │  │ (Primary election)│                   │ (Cross-tab messaging)│   │
-│  └────────┬──────────┘                   └──────────────────────┘   │
-│           │                                                         │
-│           ▼                                                         │
+│  └────────┬──────────┘                   │ - PRIMARY_HEARTBEAT  │   │
+│           │                              │ - CACHE_INVALIDATION │   │
+│           ▼                              └──────────────────────┘   │
 │  ┌─────────────────┐                   ┌──────────────────────┐     │
 │  │    SSEClient    │───────────────────│   CacheInvalidator   │     │
 │  │ (EventSource)   │                   │ (Query invalidation) │     │
-│  └────────┬────────┘                   └──────────────────────┘     │
+│  └────────┬────────┘                   │ Returns invalidated  │     │
+│           │                            │ keys for broadcast   │     │
+│           │                            └──────────────────────┘     │
 │           │                                       │                 │
 └───────────┼───────────────────────────────────────┼─────────────────┘
             │                                       ▲
@@ -58,6 +60,8 @@ Server-Sent Events (SSE) is a technology that allows the server to send updates 
 │   Events: connected, activity, ping, close                          │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+
+> **Note:** The `CACHE_INVALIDATION` message is broadcast via `BroadcastManager` to ensure all tabs invalidate their cache when the primary tab receives an SSE activity event.
 
 ---
 
@@ -137,15 +141,15 @@ client.getState()
 
 #### Events
 
-| Event                  | Payload                    | Description                   |
-| ---------------------- | -------------------------- | ----------------------------- |
-| `open`                 | `{}`                       | Connection established (HTTP) |
-| `connected`            | `{ client_id, timestamp }` | Server confirmed connection   |
-| `activity`             | `{ type, data }`           | Activity in the system        |
-| `ping`                 | `{}`                       | Keep-alive from server        |
-| `close`                | `{}`                       | Connection closed             |
-| `error`                | `Error`                    | Connection error              |
-| `maxReconnectAttempts` | `{ attempts }`             | Exhausted attempts            |
+| Event                  | Payload                    | Description                              |
+| ---------------------- | -------------------------- | ---------------------------------------- |
+| `open`                 | `{}`                       | Connection established (HTTP)            |
+| `connected`            | `{ client_id, timestamp }` | Server confirmed connection              |
+| `activity`             | `{ type, data }`           | Activity in the system                   |
+| `ping`                 | `{ type: 'ping' }`         | Keep-alive from server (named SSE event) |
+| `close`                | `{}`                       | Connection closed                        |
+| `error`                | `Error`                    | Connection error                         |
+| `maxReconnectAttempts` | `{ attempts }`             | Exhausted attempts                       |
 
 #### Exponential Backoff
 
@@ -172,6 +176,8 @@ Singleton that orchestrates all SSE + Cache synchronization.
 - Manage SSE lifecycle
 - Coordinate primary tab election
 - Delegate cache invalidation
+- **Broadcast invalidation events to other tabs**
+- **Handle remote invalidation broadcasts from other tabs**
 - Provide connection state to the application
 
 #### Dependency Diagram
@@ -181,7 +187,9 @@ CacheSyncService
 ├── TabCoordinator (primary tab election)
 │   └── BroadcastManager (cross-tab messaging)
 ├── SSEClient (SSE connection - primary tab only)
-└── CacheInvalidator (converts events to invalidations)
+├── CacheInvalidator (converts events to invalidations)
+├── BroadcastManager (CACHE_INVALIDATION broadcast)
+└── queryClient (direct invalidation for remote events)
 ```
 
 #### Public API
@@ -261,13 +269,14 @@ When the server sends a `close` event, the service schedules a reconnection:
 
 **File:** `src/services/v2/base/cache-sync/cache-invalidator.js`
 
-Single responsibility: convert activity events into query invalidations.
+Single responsibility: convert activity events into query invalidations and return the invalidated keys for cross-tab propagation.
 
 #### Responsibilities
 
 - Parse activity events
 - Resolve affected query keys
 - Invalidate TanStack Query cache
+- **Return invalidated keys for cross-tab broadcast**
 
 #### Invalidation Flow
 
@@ -290,8 +299,10 @@ Single responsibility: convert activity events into query invalidations.
   }
 }
 
-// Resulting invalidation
-await queryClient.invalidateQueries({ queryKey: ['application', 'detail', '1772656941'] })
+// Resulting invalidation + return value
+const invalidatedKeys = await invalidator.invalidate(event)
+// Returns: [['application', 'detail', '1772656941']]
+// These keys are then broadcast to other tabs
 ```
 
 #### Invalidation Priority
@@ -336,12 +347,19 @@ async invalidate(event) {
     keysToInvalidate = getKeysForEvents([description])
   }
 
+  if (keysToInvalidate.length === 0) return []
+
   // Invalidate all found queries
   await Promise.allSettled(
     keysToInvalidate.map(key => queryClient.invalidateQueries({ queryKey: key }))
   )
+
+  // Return keys for cross-tab broadcast
+  return keysToInvalidate
 }
 ```
+
+> **Note:** The return value is used by `CacheSyncService` to broadcast invalidation events to other tabs via `BroadcastChannel`.
 
 ---
 
@@ -442,16 +460,16 @@ Vue 3 composable for accessing SSE state in components.
 
 #### API
 
-```typescript
-interface UseSSEReturn {
-  isConnected: Ref<boolean>
-  clientId: Ref<string | null>
-  connectionState: ComputedRef<'connected' | 'connecting' | 'disconnected' | 'error'>
-  lastEvent: Ref<SSEActivityEvent | null>
-  error: Ref<Error | null>
-  subscribe: (event: string, callback: Function) => Function
-}
-```
+Returns an object with:
+
+| Property          | Type                  | Description                                             |
+| ----------------- | --------------------- | ------------------------------------------------------- |
+| `isConnected`     | `Ref<boolean>`        | Whether SSE is connected                                |
+| `clientId`        | `Ref<string\|null>`   | Server-assigned client ID                               |
+| `connectionState` | `ComputedRef<string>` | `'connected'`, `'disconnected'`, or `'error'`           |
+| `lastEvent`       | `Ref<Object\|null>`   | Last activity event received                            |
+| `error`           | `Ref<Error\|null>`    | Last error encountered                                  |
+| `subscribe`       | `Function`            | Subscribe to events: `(event, callback) => unsubscribe` |
 
 #### Basic Usage
 
@@ -561,13 +579,7 @@ interface UseSSEReturn {
 
 ### 4.1 Connected
 
-```typescript
-interface SSEConnectedEvent {
-  type: 'connected'
-  client_id: string // Unique client ID on the server
-  timestamp: string // ISO 8601
-}
-```
+Emitted when the SSE connection is established.
 
 **Example:**
 
@@ -581,33 +593,7 @@ interface SSEConnectedEvent {
 
 ### 4.2 Activity
 
-```typescript
-interface SSEActivityEvent {
-  type: 'activity'
-  data: {
-    user: {
-      email: string
-      name: string
-    }
-    activity_type: 'created' | 'updated' | 'deleted' | 'edited' | string
-    resource: {
-      type: string // snake_case: 'application', 'firewall', etc.
-      name: string // Human-readable resource name
-      id: string | null // Resource ID (can be null)
-      parent?: {
-        type: string // PascalCase: 'Application', 'Firewall', etc.
-        id: string | number
-      }
-    }
-    timestamp: string // ISO 8601
-    description: string // Readable description: "Application my-app was updated"
-    metadata?: {
-      id?: number | string
-      [key: string]: unknown
-    }
-  }
-}
-```
+Emitted when an activity occurs in the system (resource created, updated, deleted, etc.).
 
 **Example:**
 
@@ -640,24 +626,27 @@ interface SSEActivityEvent {
 
 ### 4.3 Ping
 
-```typescript
-interface SSEPingEvent {
-  type: 'ping'
-}
+Keep-alive event sent as a **named SSE event**:
+
+```
+event: ping
+data: {}
 ```
 
-Keep-alive event. No action required, just confirms the connection is active.
+The client handles this via `addEventListener('ping', ...)` and emits `{ type: 'ping' }` to subscribers. No action required.
 
 ### 4.4 Close
 
-```typescript
-interface SSECloseEvent {
-  type: 'close'
-  reason?: string
+Server requests connection closure. Client reconnects after a 1-second delay.
+
+**Example:**
+
+```json
+{
+  "type": "close",
+  "reason": "timeout"
 }
 ```
-
-The server requests connection closure. The client should reconnect after a delay.
 
 ---
 
@@ -750,9 +739,16 @@ broadcast.close()
 
 ## 6. Cache Synchronization
 
-### 6.1 broadcastQueryClient
+### 6.1 Overview
 
-Besides SSE, the project uses `broadcastQueryClient` from TanStack Query to synchronize cache between tabs:
+The project uses a **dual-layer approach** for cache synchronization across tabs:
+
+1. **`broadcastQueryClient`** - TanStack Query's experimental cross-tab sync (backup mechanism)
+2. **Manual `CACHE_INVALIDATION` broadcast** - Explicit invalidation propagation via BroadcastChannel
+
+### 6.2 broadcastQueryClient (Backup)
+
+The `broadcastQueryClient` from TanStack Query provides baseline cross-tab synchronization:
 
 ```javascript
 // In queryClient.js
@@ -763,23 +759,107 @@ broadcastQueryClient(queryClient, {
 })
 ```
 
-This ensures that when one tab invalidates a query, all other tabs also invalidate.
+### 6.3 Manual Cross-Tab Invalidation (Primary)
 
-### 6.2 Complete Flow
+Due to limitations in `broadcastQueryClient` (it doesn't reliably propagate invalidation events when tabs don't have active query observers), the system implements **manual broadcasting** via `BroadcastManager`:
+
+```
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                              BROWSER                                          │
+├───────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌────────────────────┐                     ┌────────────────────┐            │
+│  │   Tab A (PRIMARY)  │                     │   Tab B (SECONDARY)│            │
+│  ├────────────────────┤                     ├────────────────────┤            │
+│  │                    │                     │                    │            │
+│  │  SSEClient         │                     │                    │            │
+│  │      ↓             │                     │                    │            │
+│  │  Activity Event    │                     │                    │            │
+│  │      ↓             │                     │                    │            │
+│  │  CacheInvalidator  │                     │                    │            │
+│  │      ↓             │   CACHE_INVALID-    │  BroadcastManager  │            │
+│  │  queryClient       │───ATION broadcast──►│  .on('CACHE_INVALI-│            │
+│  │  .invalidateQueries│                     │  DATION')          │            │
+│  │      ↓             │                     │      ↓             │            │
+│  │  BroadcastManager  │                     │  queryClient       │            │
+│  │  .send('CACHE_INVAL│                     │  .invalidateQueries│            │
+│  │  IDATION', {keys}) │                     │                    │            │
+│  └────────────────────┘                     └────────────────────┘            │
+│                                                                               │
+│                        BroadcastChannel: 'cache-sync'                         │
+└───────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 6.4 Implementation Details
+
+#### In `CacheSyncService`
+
+```javascript
+// Listen for cache invalidation broadcasts from other tabs
+this.#broadcast.on('CACHE_INVALIDATION', ({ keys }) => ──{
+  this.#handleRemoteInvalidation(keys)
+})
+
+// Handle activity event - invalidate locally AND broadcast
+this.#client.on('activity', async (event) => {
+  // 1. Invalidate local cache and get the keys that were invalidated
+  const invalidatedKeys = await this.#invalidator.invalidate(event)
+
+  // 2. Broadcast to other tabs (they will also invalidate)
+  if (invalidatedKeys && invalidatedKeys.length > 0) {
+    this.#broadcast.send('CACHE_INVALIDATION', { keys: invalidatedKeys })
+  }
+})
+```
+
+#### Remote Invalidation Handler
+
+```javascript
+#handleRemoteInvalidation(keys) {
+  if (!keys || keys.length === 0) return
+
+  keys.forEach((key) => {
+    queryClient.invalidateQueries({ queryKey: key })
+  })
+}
+```
+
+### 6.5 Why Manual Broadcast?
+
+| Issue with `broadcastQueryClient`                  | Manual Broadcast Solution                    |
+| -------------------------------------------------- | -------------------------------------------- |
+| Doesn't propagate when tab has no active observers | Works regardless of query subscription state |
+| Only syncs state changes, not invalidation markers | Explicitly broadcasts invalidation keys      |
+| Timing issues when tab is backgrounded             | Immediate broadcast via BroadcastChannel     |
+
+### 6.6 Complete Flow
 
 ```
 1. Server sends 'activity' event
    ↓
 2. SSEClient (primary tab) receives it
    ↓
-3. CacheInvalidator processes it
+3. CacheInvalidator processes it and returns invalidated keys
    ↓
-4. queryClient.invalidateQueries()
+4. queryClient.invalidateQueries() (local)
    ↓
-5. broadcastQueryClient propagates to other tabs
+5. BroadcastManager.send('CACHE_INVALIDATION', { keys })
    ↓
-6. All tabs refetch stale data
+6. Other tabs receive broadcast via BroadcastChannel
+   ↓
+7. Each tab calls queryClient.invalidateQueries() for each key
+   ↓
+8. All tabs refetch stale data
 ```
+
+### 6.7 Edge Cases
+
+| Scenario                                         | Behavior                                                                    |
+| ------------------------------------------------ | --------------------------------------------------------------------------- |
+| Tab becomes primary after receiving invalidation | New primary establishes SSE connection and starts receiving events directly |
+| Primary tab closes                               | Secondary tabs detect timeout (20s) and one becomes primary                 |
+| Multiple rapid activity events                   | Each event broadcasts separately; Vue Query handles deduplication           |
+| Keys are `null` or empty                         | No broadcast sent (check in handler)                                        |
 
 ---
 
@@ -850,6 +930,53 @@ import { resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service
 // Before logout
 resetCacheSync()
 ```
+
+### 8.3 Authentication Integration
+
+SSE lifecycle is tied to authentication. The connection only exists for authenticated users:
+
+```javascript
+// sessionManager.js
+import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync'
+
+export const sessionManager = {
+  afterLogin() {
+    const accountStore = useAccountStore()
+    if (accountStore.isClientAccount) {
+      startCacheSync() // SSE starts after login
+    }
+  },
+
+  async logout() {
+    resetCacheSync() // SSE stops on logout
+    await clearAllData()
+  }
+}
+```
+
+This ensures:
+
+- SSE only runs for authenticated users
+- No orphaned connections after logout
+- Clean reconnection on re-login
+
+### 8.4 SSE Event Formats
+
+The server can send events in two formats:
+
+1. **Named SSE events** - Captured via `addEventListener`:
+
+   ```
+   event: ping
+   data: {}
+   ```
+
+2. **JSON messages** - Captured via `onmessage`:
+   ```
+   data: {"type":"connected","client_id":"..."}
+   ```
+
+The SSEClient handles both formats transparently. The `ping` event uses the named format, while `connected` and `activity` use JSON messages.
 
 ---
 
@@ -955,7 +1082,7 @@ describe('CacheInvalidator', () => {
   it('invalidates based on parent type', async () => {
     const invalidator = new CacheInvalidator()
 
-    await invalidator.invalidate({
+    const keys = await invalidator.invalidate({
       type: 'activity',
       data: {
         resource: {
@@ -969,6 +1096,82 @@ describe('CacheInvalidator', () => {
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
       queryKey: ['application', 'detail', '123']
     })
+
+    // Should return invalidated keys for broadcast
+    expect(keys).toContainEqual(['application', 'detail', '123'])
+  })
+})
+```
+
+### 9.4 Testing Cross-Tab Cache Invalidation
+
+```javascript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { startCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+describe('Cross-tab cache invalidation', () => {
+  it('should broadcast CACHE_INVALIDATION after receiving activity event', async () => {
+    const mockSend = vi.fn()
+    // ... setup mock broadcast with send spy ...
+
+    startCacheSync()
+    onBecomePrimaryCallback?.()
+
+    const activityEvent = {
+      data: {
+        resource: { type: 'application' },
+        activity_type: 'updated',
+        metadata: { id: '123' }
+      }
+    }
+
+    mockSSEClient._emit('activity', activityEvent)
+    await flushPromises()
+
+    expect(mockSend).toHaveBeenCalledWith('CACHE_INVALIDATION', {
+      keys: expect.arrayContaining([
+        ['application', 'all'],
+        ['application', 'detail', '123']
+      ])
+    })
+  })
+
+  it('should invalidate local cache when receiving CACHE_INVALIDATION broadcast', () => {
+    const mockInvalidate = vi.spyOn(queryClient, 'invalidateQueries')
+
+    startCacheSync()
+
+    // Simulate receiving broadcast from another tab
+    const broadcastListener = mockBroadcast.on.mock.calls.find(
+      (call) => call[0] === 'CACHE_INVALIDATION'
+    )?.[1]
+
+    broadcastListener({ keys: [['application', 'all']] })
+
+    expect(mockInvalidate).toHaveBeenCalledWith({
+      queryKey: ['application', 'all']
+    })
+  })
+
+  it('should not broadcast when invalidation returns empty array', async () => {
+    mockInvalidate.mockResolvedValueOnce([])
+
+    startCacheSync()
+
+    const activityEvent = {
+      data: {
+        resource: { type: 'unknown' },
+        activity_type: 'updated'
+      }
+    }
+
+    mockSSEClient._emit('activity', activityEvent)
+    await flushPromises()
+
+    expect(mockBroadcastInstance.send).not.toHaveBeenCalled()
   })
 })
 ```
@@ -1013,11 +1216,15 @@ es.onopen = () => console.log('SSE connected')
 **Diagnosis:**
 
 ```javascript
-// Add log in CacheInvalidator
-console.log('[CacheSync]', {
-  resourceType,
-  keysToInvalidate
-})
+// Check queryClient cache state
+import { queryClient } from '@/services/v2/base/query/queryClient'
+
+console.log(
+  queryClient
+    .getQueryCache()
+    .getAll()
+    .map((q) => q.queryKey)
+)
 ```
 
 ### 10.3 Multiple SSE connections

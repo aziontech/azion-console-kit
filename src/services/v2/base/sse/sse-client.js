@@ -74,6 +74,7 @@ export class SSEClient {
   #listeners = new Map()
   #reconnectTimeoutId = null
   #isIntentionallyClosed = false
+  #pingHandler = null
 
   /**
    * Creates a new SSE client instance
@@ -168,6 +169,10 @@ export class SSEClient {
     this.#eventSource.onmessage = (event) => {
       this.#handleMessage(event)
     }
+
+    // Handle named SSE events (event: ping)
+    this.#pingHandler = () => this.#emit('ping', { type: 'ping' })
+    this.#eventSource.addEventListener('ping', this.#pingHandler)
   }
 
   /**
@@ -257,9 +262,15 @@ export class SSEClient {
 
   #cleanupEventSource() {
     if (this.#eventSource) {
+      // Remove named event listeners
+      if (this.#pingHandler) {
+        this.#eventSource.removeEventListener('ping', this.#pingHandler)
+      }
+      // Clear standard handlers
       this.#eventSource.onopen = null
       this.#eventSource.onerror = null
       this.#eventSource.onmessage = null
+      // Close connection
       this.#eventSource.close()
       this.#eventSource = null
     }

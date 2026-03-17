@@ -1,6 +1,7 @@
 import { SSEClient } from '../sse/sse-client'
 import { CacheInvalidator } from './cache-invalidator'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
+import { queryClient } from '../query/queryClient'
 
 const SSE_ENDPOINT = '/events/stream'
 
@@ -42,6 +43,11 @@ class CacheSyncService {
     this.#broadcast = new BroadcastManager('cache-sync')
     this.#broadcast.start()
 
+    // Listen for cache invalidation broadcasts from other tabs
+    this.#broadcast.on('CACHE_INVALIDATION', ({ keys }) => {
+      this.#handleRemoteInvalidation(keys)
+    })
+
     this.#tabCoordinator = new TabCoordinator(this.#broadcast, {
       onBecomePrimary: () => this.#connectSSE(),
       onLosePrimary: () => this.#disconnectSSE()
@@ -81,6 +87,18 @@ class CacheSyncService {
     this.#client?.off(event, callback)
   }
 
+  /**
+   * Handles cache invalidation broadcasts from other tabs.
+   * @param {Array} keys - Array of query keys to invalidate
+   */
+  #handleRemoteInvalidation(keys) {
+    if (!keys || keys.length === 0) return
+
+    keys.forEach((key) => {
+      queryClient.invalidateQueries({ queryKey: key })
+    })
+  }
+
   #connectSSE() {
     if (this.#client) return
 
@@ -103,8 +121,14 @@ class CacheSyncService {
       // The SSEClient handles inactivity timeout internally
     })
 
-    this.#client.on('activity', (event) => {
-      this.#invalidator.invalidate(event)
+    this.#client.on('activity', async (event) => {
+      // Invalidate local cache and get the keys that were invalidated
+      const invalidatedKeys = await this.#invalidator.invalidate(event)
+
+      // Broadcast to other tabs (they will also invalidate)
+      if (invalidatedKeys && invalidatedKeys.length > 0) {
+        this.#broadcast.send('CACHE_INVALIDATION', { keys: invalidatedKeys })
+      }
     })
 
     this.#client.on('close', () => {

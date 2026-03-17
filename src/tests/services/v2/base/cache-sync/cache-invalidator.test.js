@@ -126,93 +126,54 @@ describe('CacheInvalidator', () => {
     })
   })
 
-  describe('error logging for invalid payload', () => {
-    it('should log error when resource.type is missing', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-
-      await sut.invalidate({
+  describe('invalid payload handling', () => {
+    it('should return empty array when resource.type is missing', async () => {
+      const result = await sut.invalidate({
         data: {
           activity_type: 'created',
           metadata: { id: 123 }
         }
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[CacheSync]',
-        expect.objectContaining({
-          resourceType: undefined,
-          activityType: 'created'
-        })
-      )
-
+      expect(result).toEqual([])
       expect(getParentKeys).not.toHaveBeenCalled()
       expect(mockInvalidateQueries).not.toHaveBeenCalled()
-
-      consoleSpy.mockRestore()
     })
 
-    it('should log error when activity_type is missing', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    it('should return empty array when activity_type is missing and no description', async () => {
       getKeysForResource.mockReturnValue([])
 
-      await sut.invalidate({
+      const result = await sut.invalidate({
         data: {
           resource: { type: 'edge_application' },
           metadata: { id: 123 }
         }
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[CacheSync]',
-        expect.objectContaining({
-          resourceType: 'edge_application',
-          activityType: undefined
-        })
-      )
-
+      expect(result).toEqual([])
       expect(getParentKeys).not.toHaveBeenCalled()
-
-      consoleSpy.mockRestore()
     })
 
-    it('should log error when both resource.type and activity_type are missing', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-
-      await sut.invalidate({
+    it('should return empty array when both resource.type and activity_type are missing', async () => {
+      const result = await sut.invalidate({
         data: {
           metadata: { id: 123 }
         }
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[CacheSync]',
-        expect.objectContaining({
-          resourceType: undefined,
-          activityType: undefined
-        })
-      )
-
-      consoleSpy.mockRestore()
+      expect(result).toEqual([])
     })
 
-    it('should log error when event data is null', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    it('should return empty array when event data is null', async () => {
+      const result = await sut.invalidate({ data: null })
 
-      await sut.invalidate({ data: null })
-
-      expect(consoleSpy).toHaveBeenCalled()
-
-      consoleSpy.mockRestore()
+      expect(result).toEqual([])
     })
 
-    it('should log error when event is null', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    it('should return empty array when event is null', async () => {
+      const result = await sut.invalidate(null)
 
-      await sut.invalidate(null)
-
-      expect(consoleSpy).toHaveBeenCalled()
-
-      consoleSpy.mockRestore()
+      expect(result).toEqual([])
     })
   })
 
@@ -435,6 +396,56 @@ describe('CacheInvalidator', () => {
 
       expect(getParentKeys).toHaveBeenCalledWith('application', '123')
       expect(getKeysForEvents).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('return value', () => {
+    it('should return the array of invalidated keys', async () => {
+      const expectedKeys = [
+        ['application', '123'],
+        ['application', 'detail', '123']
+      ]
+      getParentKeys.mockReturnValue(expectedKeys)
+
+      const result = await sut.invalidate({
+        data: {
+          resource: {
+            type: 'application request rule',
+            parent: { type: 'application', id: '123' }
+          },
+          activity_type: 'edited',
+          metadata: { id: '456' }
+        }
+      })
+
+      expect(result).toEqual(expectedKeys)
+    })
+
+    it('should return empty array when no keys to invalidate', async () => {
+      getParentKeys.mockReturnValue([])
+
+      const result = await sut.invalidate({
+        data: {
+          resource: {
+            type: 'unknown_type',
+            parent: { type: 'unknown parent', id: '123' }
+          },
+          activity_type: 'created',
+          description: 'Unknown resource'
+        }
+      })
+
+      expect(result).toEqual([])
+    })
+
+    it('should return empty array when required fields are missing', async () => {
+      const result = await sut.invalidate({
+        data: {
+          metadata: { id: 123 }
+        }
+      })
+
+      expect(result).toEqual([])
     })
   })
 })

@@ -42,6 +42,7 @@ class MockEventSource {
     this.onopen = null
     this.onerror = null
     this.onmessage = null
+    this._namedListeners = new Map()
     lastEventSource = this
 
     setTimeout(() => {
@@ -56,6 +57,17 @@ class MockEventSource {
     this.readyState = MockEventSource.CLOSED
   }
 
+  addEventListener(eventName, handler) {
+    if (!this._namedListeners.has(eventName)) {
+      this._namedListeners.set(eventName, new Set())
+    }
+    this._namedListeners.get(eventName).add(handler)
+  }
+
+  removeEventListener(eventName, handler) {
+    this._namedListeners.get(eventName)?.delete(handler)
+  }
+
   simulateMessage(data) {
     const event = { data: JSON.stringify(data) }
     if (this.onmessage) this.onmessage(event)
@@ -64,6 +76,13 @@ class MockEventSource {
   simulateRawMessage(rawData) {
     const event = { data: rawData }
     if (this.onmessage) this.onmessage(event)
+  }
+
+  simulateNamedEvent(eventName, data = {}) {
+    const handlers = this._namedListeners.get(eventName)
+    if (handlers) {
+      handlers.forEach((handler) => handler({ data: JSON.stringify(data) }))
+    }
   }
 
   simulateError() {
@@ -242,7 +261,7 @@ describe('SSEClient', () => {
   })
 
   describe('ping event', () => {
-    it('should emit ping event to listeners', () => {
+    it('should emit ping event to listeners (via onmessage)', () => {
       const { sut, getEventSource } = makeSut()
       const pingHandler = vi.fn()
 
@@ -253,6 +272,21 @@ describe('SSEClient', () => {
       getEventSource().simulateMessage(fixtures.pingEvent)
 
       expect(pingHandler).toHaveBeenCalledWith(fixtures.pingEvent)
+      expect(sut.getState().isConnected).toBe(true)
+    })
+
+    it('should emit ping event via named SSE event (event: ping)', () => {
+      const { sut, getEventSource } = makeSut()
+      const pingHandler = vi.fn()
+
+      sut.on('ping', pingHandler)
+      sut.connect()
+      vi.advanceTimersByTime(1)
+
+      // Simulate named SSE event: "event: ping\ndata: {}"
+      getEventSource().simulateNamedEvent('ping')
+
+      expect(pingHandler).toHaveBeenCalledWith({ type: 'ping' })
       expect(sut.getState().isConnected).toBe(true)
     })
   })

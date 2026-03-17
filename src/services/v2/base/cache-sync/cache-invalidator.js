@@ -26,7 +26,7 @@ export class CacheInvalidator {
    * @param {Object} [event.data.metadata] - Additional metadata
    * @param {number|string} [event.data.metadata.id] - Resource ID
    * @param {string} [event.data.description] - Human-readable description (fallback)
-   * @returns {Promise<void>}
+   * @returns {Promise<Array>} Array of invalidated query keys
    */
   async invalidate(event) {
     // Extract structured fields from activity event
@@ -36,15 +36,7 @@ export class CacheInvalidator {
     const description = event?.data?.description
     const parentType = event?.data?.resource?.parent?.type?.toLowerCase()
     const parentId = event?.data?.resource?.parent?.id
-    // eslint-disable-next-line no-console
-    console.log('[CacheSync]', {
-      resourceType,
-      resourceId,
-      activityType,
-      parentType,
-      parentId,
-      description
-    })
+
     // Validate payload - log error if required fields are missing
     if (!resourceType || !activityType) {
       const missingFields = []
@@ -61,10 +53,12 @@ export class CacheInvalidator {
       keysToInvalidate = getKeysForEvents([description])
     }
 
-    if (keysToInvalidate.length === 0) return
+    if (keysToInvalidate.length === 0) return []
 
     await Promise.allSettled(
       keysToInvalidate.map((key) => queryClient.invalidateQueries({ queryKey: key }))
     )
+
+    return keysToInvalidate
   }
 }
