@@ -130,20 +130,76 @@ function formatPercentageDataUnit(data) {
   }).format(data / 100)
 }
 
+// Unit abbreviations for data volume display
+const UNIT_ABBREVIATIONS = {
+  byte: {
+    yotta: 'YB',
+    zetta: 'ZB',
+    exa: 'EB',
+    peta: 'PB',
+    tera: 'TB',
+    giga: 'GB',
+    mega: 'MB',
+    kilo: 'KB'
+  },
+  'bit-per-second': {
+    yotta: 'Yb/s',
+    zetta: 'Zb/s',
+    exa: 'Eb/s',
+    peta: 'Pb/s',
+    tera: 'Tb/s',
+    giga: 'Gb/s',
+    mega: 'Mb/s',
+    kilo: 'kb/s'
+  }
+}
+
+/**
+ * Calculate the appropriate value and unit for data volume display
+ * Returns both the Intl-compatible unit name and the unit abbreviation for manual formatting
+ */
 function calculateValueAndUnit(data, unit) {
+  if (data > CHART_RULES.DATA_VOLUME.yotta) {
+    return {
+      value: data / CHART_RULES.DATA_VOLUME.yotta,
+      intlUnit: null,
+      unitAbbr: UNIT_ABBREVIATIONS[unit]?.yotta || 'YB'
+    }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.zetta) {
+    return {
+      value: data / CHART_RULES.DATA_VOLUME.zetta,
+      intlUnit: null,
+      unitAbbr: UNIT_ABBREVIATIONS[unit]?.zetta || 'ZB'
+    }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.exa) {
+    return {
+      value: data / CHART_RULES.DATA_VOLUME.exa,
+      intlUnit: null,
+      unitAbbr: UNIT_ABBREVIATIONS[unit]?.exa || 'EB'
+    }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.peta) {
+    return {
+      value: data / CHART_RULES.DATA_VOLUME.peta,
+      intlUnit: null,
+      unitAbbr: UNIT_ABBREVIATIONS[unit]?.peta || 'PB'
+    }
+  }
   if (data > CHART_RULES.DATA_VOLUME.tera) {
-    return { value: data / CHART_RULES.DATA_VOLUME.tera, formattedUnit: `tera${unit}` }
+    return { value: data / CHART_RULES.DATA_VOLUME.tera, intlUnit: `tera${unit}`, unitAbbr: null }
   }
   if (data > CHART_RULES.DATA_VOLUME.giga) {
-    return { value: data / CHART_RULES.DATA_VOLUME.giga, formattedUnit: `giga${unit}` }
+    return { value: data / CHART_RULES.DATA_VOLUME.giga, intlUnit: `giga${unit}`, unitAbbr: null }
   }
   if (data > CHART_RULES.DATA_VOLUME.mega) {
-    return { value: data / CHART_RULES.DATA_VOLUME.mega, formattedUnit: `mega${unit}` }
+    return { value: data / CHART_RULES.DATA_VOLUME.mega, intlUnit: `mega${unit}`, unitAbbr: null }
   }
   if (data > CHART_RULES.DATA_VOLUME.kilo) {
-    return { value: data / CHART_RULES.DATA_VOLUME.kilo, formattedUnit: `kilo${unit}` }
+    return { value: data / CHART_RULES.DATA_VOLUME.kilo, intlUnit: `kilo${unit}`, unitAbbr: null }
   }
-  return { value: data, formattedUnit: unit }
+  return { value: data, intlUnit: unit, unitAbbr: null }
 }
 
 /**
@@ -155,16 +211,23 @@ function calculateValueAndUnit(data, unit) {
 function formatBytesDataUnit(data, chartData) {
   const unit = chartData.dataUnit === 'bitsPerSecond' ? 'bit-per-second' : 'byte'
 
-  const { value, formattedUnit } = calculateValueAndUnit(Math.abs(data), unit)
+  const { value, intlUnit, unitAbbr } = calculateValueAndUnit(Math.abs(data), unit)
 
-  const formattedData = Intl.NumberFormat('en', {
-    notation: 'compact',
-    style: 'unit',
-    unit: formattedUnit,
-    unitDisplay: 'narrow',
-    minimumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME,
-    maximumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME
-  }).format(value)
+  let formattedData
+  if (unitAbbr) {
+    // Manual formatting for units beyond TB (PB, EB, ZB, YB)
+    formattedData = `${value.toFixed(CHART_RULES.TO_FIXED_DATA_VOLUME)}${unitAbbr}`
+  } else {
+    // Use Intl.NumberFormat for supported units (TB and below)
+    formattedData = Intl.NumberFormat('en', {
+      notation: 'compact',
+      style: 'unit',
+      unit: intlUnit,
+      unitDisplay: 'narrow',
+      minimumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME,
+      maximumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME
+    }).format(value)
+  }
 
   const isNegativeData = data < 0
 
