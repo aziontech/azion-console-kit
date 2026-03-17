@@ -14,7 +14,7 @@
    * - fields: Array of top-level field definitions
    * - groups: Array of field groups, each containing fields
    */
-  import { ref, computed, watch, onBeforeUnmount, defineOptions } from 'vue'
+  import { ref, computed, watch, onBeforeUnmount, defineOptions, unref } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
@@ -176,15 +176,73 @@
   }
 
   /**
+   * Escapes template literals in error messages
+   * @param {string} errorMessage - Error message to escape
+   * @returns {string} Escaped message
+   */
+  const escapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('${', '#$')
+  }
+
+  /**
+   * Unescapes template literals in error messages
+   * @param {string} errorMessage - Error message to unescape
+   * @returns {string} Unescaped message
+   */
+  const unescapeErrorMessage = (errorMessage) => {
+    if (!errorMessage) return ''
+    return errorMessage.replaceAll('#$', '${')
+  }
+
+  /**
    * Creates a yup schema string for a field
-   * @param {Object} field - Field definition
+   * @param {Object} element - Field definition
    * @returns {yup.StringSchema} Yup schema for the field
    */
-  const createSchemaString = (field) => {
-    if (field.attrs?.required) {
-      return yup.string().required(field.label + ' is required')
+  const createSchemaString = (element) => {
+    let schema = yup.string()
+
+    if (element.hidden) return schema
+
+    if (element.attrs?.required) {
+      schema = schema.required(`${element.label} is required`)
     }
-    return yup.string().nullable().notRequired()
+
+    if (element.attrs?.maxLength) {
+      schema = schema.max(
+        element.attrs.maxLength,
+        `This field cannot exceed ${element.attrs.maxLength} characters`
+      )
+    }
+
+    if (element.attrs?.minLength) {
+      schema = schema.min(
+        element.attrs.minLength,
+        `This field must have at least ${element.attrs.minLength} characters`
+      )
+    }
+
+    if (element.validators) {
+      element.validators.forEach((validator) => {
+        schema = schema.test(
+          `valid-${element.name}`,
+          escapeErrorMessage(validator.errorMessage),
+          function (value) {
+            const domainRegex = new RegExp(validator.regex)
+            const shouldEscapeEmptyAndNotRequiredFields =
+              value === undefined && !element.attrs?.required
+            if (shouldEscapeEmptyAndNotRequiredFields) return true
+            return domainRegex.test(value)
+          }
+        )
+      })
+    }
+
+    if (element.value?.length > 0) {
+      schema = schema.default(element.value)
+    }
+
+    return schema
   }
 
   /**
@@ -254,7 +312,8 @@
   const validateForm = async () => {
     if (!formTools.value.validate) return false
     await formTools.value.validate()
-    return Object.keys(formTools.value.errors).length === 0
+    // errors is a ComputedRef, use unref to get the actual value
+    return Object.keys(unref(formTools.value.errors)).length === 0
   }
 
   /**
@@ -313,16 +372,6 @@
    */
   const renderInvalidClass = (error) => {
     return error ? 'p-invalid' : ''
-  }
-
-  /**
-   * Unescapes HTML entities from error messages
-   * @param {string} message - Error message
-   * @returns {string} Unescaped message
-   */
-  const unescapeErrorMessage = (message) => {
-    if (!message) return ''
-    return message.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   }
 
   // ============================================================================

@@ -21,7 +21,8 @@ const adapt = (httpResponse) => {
       templateType: httpResponse.body.template_type,
       updatedAt: httpResponse.body.updated_at,
       uuid: httpResponse.body.uuid,
-      hasSettings: httpResponse.body.hasSettings
+      hasSettings: httpResponse.body.hasSettings,
+      imagePreview: httpResponse.body.imagePreview
     },
     statusCode: httpResponse.statusCode
   }

@@ -22,7 +22,7 @@
   // ============================================================================
   const props = defineProps({
     // Preview block
-    previewSrc: {
+    imagePreview: {
       type: String,
       default: ''
     },
@@ -208,8 +208,9 @@
     :hide-footer="props.collapsed"
   >
     <template #content>
+      sss: {{ props }}
       <TemplateInfoBlock
-        :preview-src="props.previewSrc"
+        :preview-src="props.imagePreview"
         :preview-alt="props.previewAlt"
         :template-title="props.templateTitle"
         :template-url="props.templateUrl"

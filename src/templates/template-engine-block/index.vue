@@ -82,20 +82,23 @@
   const hasSettings = ref(null)
 
   onMounted(async () => {
+    if (!props.templateId) return
     await loadTemplate(props.templateId)
   })
 
   const isJsonForm = computed(() => {
+    if (!inputSchema.value) return false
     const typeIsObject = inputSchema.value.type === 'object'
     const hasPropertiesProp = inputSchema.value.properties
 
     return typeIsObject && hasPropertiesProp
   })
 
-  const loadTemplate = async () => {
+  const loadTemplate = async (templateId) => {
     try {
-      const templateData = await props.getTemplateService(props.templateId)
-      inputSchema.value = templateData.inputSchema
+      if (!props.templateId) return
+      const templateData = await props.getTemplateService(templateId)
+      inputSchema.value = templateData.inputSchema ?? {}
       isLoading.value = false
       hasSettings.value = templateData.hasSettings
     } catch (error) {
