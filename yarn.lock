@@ -80,6 +80,11 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.0.4.tgz#673e37e1dfce63d17f35a2567303bbb17a290704"
   integrity sha512-nR5aAkqSnQMpjXIaELqljW6o0jK9pPDhVK1TTH+rrpuTSekyJMoK6xqyX/DrhCz8DhGpfIYKD30yb6qE6aywhg==
 
+"@aziontech/theme@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.4.tgz#c81151eb16fd10e1dc10f060ad7c4226e2e0143b"
+  integrity sha512-K6or5V3Cs9OyXEif906x8Y/7xvxeb+OcEsRmI8Tlci3YnD5ZRIaznWeDDOxLZ/zn0VP28OShj9WggkVM0gsSmg==
+
 "@aziontech/webkit@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.2.0.tgz#a3b7012d93c00b43dd4ef65f6747513d4929895d"
@@ -3465,11 +3470,6 @@ axios@^0.27.2, axios@^1.13.2, axios@^1.13.6:
     follow-redirects "^1.15.11"
     form-data "^4.0.5"
     proxy-from-env "^1.1.0"
-
-azion-theme@^1.20.0:
-  version "1.20.0"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.20.0.tgz#5e9b86b7cd625859ac403e4a5add468c48f29512"
-  integrity sha512-zMclDcMv3bM8910Ownb97kZ9Iixcv2mqD3Nh8Gp3ODx+eq+ZTbuc1WjIi8bSBtt31LTtub7D2lHuEsttZkqexg==
 
 azion@^1.20.10:
   version "1.20.11"

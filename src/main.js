@@ -3,7 +3,7 @@ import '@assets/main.css'
 import '@assets/c3.scss'
 import '@assets/flags.css'
 import '@mdi/font/css/materialdesignicons.css'
-import 'azion-theme'
+import '@aziontech/theme'
 import '@aziontech/icons'
 
 import { createApp } from 'vue'
