@@ -1,24 +1,9 @@
 <script setup>
-  /**
-   * DeployStatusCard.vue
-   *
-   * Step 3 of the deploy template flow.
-   * Displays deploy progress, logs, and results.
-   *
-   * Uses BaseDeployCard for layout structure.
-   * Emits @finish when deploy completes (success or failure).
-   * Emits @retry when user clicks Back after failure.
-   *
-   * This component manages its own timer state but receives results from parent.
-   */
   import { computed, onUnmounted, ref, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from './BaseDeployCard.vue'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
 
-  // ============================================================================
-  // Props
-  // ============================================================================
   const props = defineProps({
     // Execution ID for the script runner
     executionId: {
@@ -87,26 +72,14 @@
     }
   })
 
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['finish', 'retry', 'manage', 'open-url', 'next-step'])
 
-  // ============================================================================
-  // State
-  // ============================================================================
   const timer = ref(0)
   const intervalRef = ref(null)
 
-  // ============================================================================
-  // Constants
-  // ============================================================================
   const MINUTE_IN_SEC = 60
   const MILISEC_IN_SEC = 1000
 
-  // ============================================================================
-  // Computed
-  // ============================================================================
   const isUnfinished = computed(() => {
     return !props.results && !props.deployFailed
   })
@@ -148,9 +121,6 @@
     return props.results?.domain?.id || null
   })
 
-  // ============================================================================
-  // Methods
-  // ============================================================================
   const handleFinish = async () => {
     emit('finish')
   }
@@ -190,9 +160,6 @@
     }
   }
 
-  // ============================================================================
-  // Lifecycle Hooks
-  // ============================================================================
   watch(
     () => props.deployStarted,
     (newVal) => {
@@ -207,9 +174,6 @@
     stopTimer()
   })
 
-  // ============================================================================
-  // Expose
-  // ============================================================================
   defineExpose({
     timer,
     startTimer,

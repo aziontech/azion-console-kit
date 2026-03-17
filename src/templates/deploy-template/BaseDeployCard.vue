@@ -1,25 +1,4 @@
 <script setup>
-  /**
-   * BaseDeployCard.vue
-   *
-   * Base presentational component for deploy template cards.
-   * Provides a consistent structure with slots for customization.
-   *
-   * Structure:
-   * - Header: title + header-meta slot
-   * - Content: main content slot
-   * - Footer: footer slot for actions
-   *
-   * This component is 100% presentational - no state, no business logic.
-   *
-   * Props:
-   * - title: Card header title (required)
-   *
-   * Slots:
-   * - header-meta: Optional area below title for step-specific content
-   * - content: Required main content area
-   * - footer: Required action button area
-   */
   defineProps({
     title: {
       type: String,

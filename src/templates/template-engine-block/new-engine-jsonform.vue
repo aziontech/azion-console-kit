@@ -1,19 +1,5 @@
 <script setup>
-  /**
-   * new-engine-jsonform.vue
-   *
-   * Consumer component for JSON Forms-based form rendering.
-   * Uses layout-engine-block.vue as the base layout component.
-   *
-   * This component will replace engine-jsonform.vue in a future refactoring step.
-   *
-   * Features:
-   * - @jsonforms/vue integration for JSON Schema-based forms
-   * - Custom PrimeVue renderers for input types
-   * - VCS integration support via slots
-   * - GitHub OAuth integration
-   */
-  import { computed, ref, markRaw, watch, onMounted, onBeforeUnmount, defineOptions } from 'vue'
+  import { computed, ref, markRaw, watch, onMounted, defineOptions } from 'vue'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from 'primevue/dropdown'
@@ -88,29 +74,17 @@
     }
   })
 
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
-  // ============================================================================
-  // Template Refs
-  // ============================================================================
   const layoutRef = ref(null)
   const oauthGithubRef = ref(null)
 
-  // ============================================================================
-  // Local State - Specific to JSON Forms engine
-  // ============================================================================
   const selectedIntegration = ref('')
   const vcsIntegrationError = ref('')
   const formData = ref({})
   const errors = ref([])
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
-  // ============================================================================
-  // JSON Forms Custom Renderers Configuration
-  // ============================================================================
   const customRenderers = [
     {
       tester: InputTextControlTester,
@@ -140,41 +114,24 @@
 
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
 
-  // ============================================================================
-  // Local Computed - Specific to JSON Forms engine
-  // ============================================================================
-
-  /**
-   * Check if the schema includes VCS integration fields
-   */
   const hasIntegrations = computed(() => {
     const githubIntegration = props.schema?.properties?.platform_feature__vcs_integration__uuid
     const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
     return hasGithubIntegration
   })
 
-  /**
-   * Compute the form schema, removing VCS integration fields
-   * (they are handled separately in the github-connection slot)
-   */
   const formSchema = computed(() => {
     const schema = { ...props.schema }
     schema.properties = parsePropertiesSchema(schema.properties || {})
     return schema
   })
 
-  /**
-   * Check if VCS integration field is required
-   */
   const isVcsRequired = computed(() => {
     if (!hasIntegrations.value) return false
     const requiredFields = props.schema?.required || []
     return requiredFields.includes(vcsIntegrationFieldName.value)
   })
 
-  /**
-   * Computes props to pass to LayoutEngineBlock
-   */
   const layoutProps = computed(() => ({
     title: props.schema?.title || 'Start from Template',
     previewSrc: props.schema?.previewSrc || '',
@@ -203,10 +160,6 @@
     deployStartTime: props.deployStartTime
   }))
 
-  // ============================================================================
-  // Form Event Handlers - Specific to JSON Forms engine
-  // ============================================================================
-
   /**
    * Handles JSON Forms change events
    * Updates formData and errors refs
@@ -216,11 +169,6 @@
     formData.value = event.data
     errors.value = event.errors
   }
-
-  // ============================================================================
-  // Validation Functions - Required by parent components
-  // ============================================================================
-
   /**
    * Validates the entire form including VCS integration
    * @returns {boolean} Whether the form is valid
@@ -237,10 +185,6 @@
 
     return !hasJsonFormErrors && !hasVcsError
   }
-
-  // ============================================================================
-  // Form Data Functions - Required by parent components
-  // ============================================================================
 
   /**
    * Gets all form data as an array of field objects
@@ -289,10 +233,6 @@
     }
   }
 
-  // ============================================================================
-  // Schema Processing Functions - Specific to JSON Forms engine
-  // ============================================================================
-
   /**
    * Parses properties schema, removing VCS integration fields
    * @param {Object} properties - The schema properties
@@ -310,10 +250,6 @@
 
     return data
   }
-
-  // ============================================================================
-  // VCS Integration Handlers - Specific to JSON Forms engine
-  // ============================================================================
 
   /**
    * Updates the selected integration value
@@ -339,10 +275,6 @@
   const setCallbackUrl = (uri) => {
     layoutRef.value?.setCallbackUrl(uri)
   }
-
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
   /**
    * Handles the next button click
    */
@@ -374,22 +306,12 @@
     emit('next-step', data)
   }
 
-  // ============================================================================
-  // Lifecycle Hooks
-  // ============================================================================
   onMounted(async () => {
     if (hasIntegrations.value) {
       await layoutRef.value?.loadIntegrationOnShowButton()
     }
   })
 
-  onBeforeUnmount(() => {
-    // Cleanup is handled by LayoutEngineBlock
-  })
-
-  // ============================================================================
-  // Watchers
-  // ============================================================================
   watch(
     () => props.schema,
     async (newValue) => {
@@ -403,20 +325,16 @@
     { deep: true }
   )
 
-  // Watch for integrations list changes to set default
   watch(
     () => layoutRef.value?.listOfIntegrations,
     (newList) => {
-      if (newList?.value && newList.value.length > 0) {
+      if (newList?.value && newList.value.length) {
         selectedIntegration.value = newList.value[0].value
       }
     },
     { deep: true }
   )
 
-  // ============================================================================
-  // Expose - Methods needed by parent components
-  // ============================================================================
   defineExpose({
     validateForm,
     getFormData,

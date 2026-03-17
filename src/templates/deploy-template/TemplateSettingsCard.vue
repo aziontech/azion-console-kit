@@ -1,21 +1,7 @@
 <script setup>
-  /**
-   * TemplateSettingsCard.vue
-   *
-   * Step 2 of the deploy template flow.
-   * Displays template settings form with compact preview in header-meta.
-   *
-   * Uses BaseDeployCard for layout structure.
-   * Emits @deploy when user clicks the Deploy button.
-   *
-   * This component is stateless - all state lives in the orchestrator.
-   */
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from './BaseDeployCard.vue'
 
-  // ============================================================================
-  // Props
-  // ============================================================================
   const props = defineProps({
     // Preview for header-meta (compact summary from step 1)
     previewSrc: {
@@ -59,15 +45,7 @@
       default: false
     }
   })
-
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['deploy'])
-
-  // ============================================================================
-  // Methods
-  // ============================================================================
   const handleDeploy = () => {
     emit('deploy')
   }

@@ -1,23 +1,4 @@
 <script setup>
-  /**
-   * layout-engine-block.vue
-   *
-   * Base layout component for template engine blocks.
-   * Provides common props, state, functions, and slots for form rendering engines.
-   *
-   * This component centralizes shared functionality between engine-azion.vue and
-   * engine-jsonform.vue, including VCS integration handling and common lifecycle hooks.
-   *
-   * Uses BaseDeployCard for layout structure.
-   *
-   * Slots:
-   * - #preview: Preview image or custom preview (e.g., iframe)
-   * - #info: Template info block (title, description, links)
-   * - #github-connection: Area for GitHub/VCS integration UI
-   * - #inputs: Form inputs rendered in grid (max 2 cols)
-   * - #form-content: Additional form content
-   * - #footer-actions: Custom footer actions (optional)
-   */
   import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
@@ -28,200 +9,104 @@
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
 
-  // ============================================================================
-  // Props - Common props shared between all engine implementations
-  // ============================================================================
   const props = defineProps({
-    // Header
-    /**
-     * Title displayed in the card header
-     */
     title: {
       type: String,
       default: ''
     },
-
-    // Preview block
-    /**
-     * URL of the template preview image
-     */
     previewSrc: {
       type: String,
       default: ''
     },
-    /**
-     * Alt text for the preview image
-     */
     previewAlt: {
       type: String,
       default: ''
     },
-
-    // Info block
-    /**
-     * Title of the template (displayed as a link)
-     */
     templateTitle: {
       type: String,
       default: ''
     },
-    /**
-     * External URL for the template title link (opens in new tab)
-     */
     templateUrl: {
       type: String,
       default: ''
     },
-    /**
-     * URL of the template icon/image (displayed next to title)
-     */
     templateIcon: {
       type: String,
       default: ''
     },
-    /**
-     * Description text for the template
-     */
     templateDescription: {
       type: String,
       default: ''
     },
-    /**
-     * URL of the GitHub repository (displayed as "Cloning from" source)
-     */
     githubUrl: {
       type: String,
       default: ''
     },
-
-    // Form props
-    /**
-     * Schema object for the form
-     * Structure varies by engine type (Azion format vs JSON Schema)
-     */
     schema: {
       type: Object,
       default: () => ({})
     },
-    /**
-     * Whether the form is rendered inside a drawer component
-     * Affects layout and styling
-     */
     isDrawer: {
       type: Boolean,
       default: false
     },
-
-    // Footer action - Step 1 (Next button)
-    /**
-     * Label for the Next button
-     */
     nextLabel: {
       type: String,
       default: 'Next'
     },
-    /**
-     * Loading state for the Next button
-     */
     loading: {
       type: Boolean,
       default: false
     },
-    /**
-     * Disabled state for the Next button
-     */
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether to show the Next button
-     */
     showNextButton: {
       type: Boolean,
       default: true
     },
-
-    // Footer action - Step 2 (Deploy button)
-    /**
-     * Label for the Deploy button
-     */
     deployLabel: {
       type: String,
       default: 'Deploy'
     },
-    /**
-     * Loading state for the Deploy button
-     */
     loadingDeploy: {
       type: Boolean,
       default: false
     },
-    /**
-     * Disabled state for the Deploy button
-     */
     disabledDeploy: {
       type: Boolean,
       default: false
     },
-
-    // Deploy Status Card props (Step 3)
-    /**
-     * Execution ID for the script runner
-     */
     executionId: {
       type: String,
       default: ''
     },
-    /**
-     * Results from deploy (populated after finish)
-     */
     results: {
       type: Object,
       default: null
     },
-    /**
-     * Deploy failed state
-     */
     deployFailed: {
       type: Boolean,
       default: false
     },
-    /**
-     * Application name for heading
-     */
     applicationName: {
       type: String,
       default: ''
     },
-    /**
-     * Deploy start time (timestamp)
-     */
     deployStartTime: {
       type: Number,
       default: null
     },
-    // Deploy Success Card props (Step 4)
-    /**
-     * Application URL displayed after successful deploy
-     */
     appUrl: {
       type: String,
       default: ''
     },
-    /**
-     * Next steps configuration for success card
-     */
     successNextSteps: {
       type: Array,
       default: () => []
     },
 
-    // Simulation mode
-    /**
-     * Simulates deploy success after specified milliseconds
-     * Set to true for default 5 seconds, or pass a number for custom delay
-     */
     simulateDeploy: {
       type: [Boolean, Number],
       default: false
@@ -247,14 +132,8 @@
     }
   })
 
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
-  // ============================================================================
-  // Common State
-  // ============================================================================
   const toast = useToast()
 
   // Step Navigation State
@@ -277,9 +156,6 @@
   const formData = ref({})
   const formErrors = ref([])
 
-  // ============================================================================
-  // Common Computed
-  // ============================================================================
   /**
    * Check if there are VCS integrations available
    * Used by both implementations to toggle UI states
@@ -293,17 +169,12 @@
    */
   const gitDescription = `Configure your Git repository to integrate your codebase and automate deployments directly from your version control system.`
 
-  // ============================================================================
-  // VCS Integration Functions
-  // ============================================================================
-
   /**
    * Triggers the GitHub OAuth flow
    * Called when user clicks "Connect with GitHub" or "Add GitHub Account"
    */
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
-      // Handle both single ref and array ref scenarios
       const ref = Array.isArray(oauthGithubRef.value)
         ? oauthGithubRef.value[0]
         : oauthGithubRef.value
@@ -390,9 +261,6 @@
     addEventListenerToGithubIntegration()
   }
 
-  // ============================================================================
-  // Step Navigation Methods
-  // ============================================================================
   /**
    * Validate form before proceeding
    * @returns {Promise<boolean>} Whether the form is valid
@@ -529,9 +397,6 @@
     clearDeploySimulation()
   })
 
-  // ============================================================================
-  // Expose - Methods and state that consumers might need access to
-  // ============================================================================
   defineExpose({
     // VCS Integration
     listIntegrations,

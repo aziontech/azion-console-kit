@@ -1,24 +1,4 @@
 <script setup>
-  /**
-   * TemplateInfoBlock.vue
-   *
-   * Reusable presentational component for displaying template preview and info.
-   * Used by DeployRepositoryCard and DeploySuccessCard to maintain visual consistency.
-   *
-   * Structure:
-   * - Left: Preview image (w-72, h-48)
-   * - Right: Template title, description, and GitHub URL
-   *
-   * This component is 100% presentational - no state, no business logic.
-   *
-   * Props:
-   * - previewSrc: Image source for preview
-   * - previewAlt: Alt text for preview image
-   * - templateTitle: Template title (required)
-   * - templateUrl: Template URL - makes title clickable
-   * - templateDescription: Template description text
-   * - githubUrl: GitHub repository URL
-   */
   const props = defineProps({
     previewSrc: {
       type: String,

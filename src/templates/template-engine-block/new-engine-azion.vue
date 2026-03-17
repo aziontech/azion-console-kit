@@ -1,20 +1,5 @@
 <script setup>
-  /**
-   * new-engine-azion.vue
-   *
-   * Consumer component for Azion-specific form rendering.
-   * Uses layout-engine-block.vue as the base layout component.
-   *
-   * This component handles:
-   * - vee-validate/yup schema-based validation
-   * - Dynamic field rendering based on Azion schema format
-   * - VCS integration via LayoutEngineBlock slots
-   *
-   * Schema format (Azion):
-   * - fields: Array of top-level field definitions
-   * - groups: Array of field groups, each containing fields
-   */
-  import { ref, computed, watch, onBeforeUnmount, defineOptions, unref } from 'vue'
+  import { ref, computed, watch, defineOptions, unref } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
@@ -26,9 +11,6 @@
 
   defineOptions({ name: 'engineAzion' })
 
-  // ============================================================================
-  // Props
-  // ============================================================================
   const props = defineProps({
     schema: {
       type: Object,
@@ -77,32 +59,16 @@
     }
   })
 
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
 
-  // ============================================================================
-  // Template Refs
-  // ============================================================================
   const layoutRef = ref(null)
 
-  // ============================================================================
-  // State - Azion-specific form state
-  // ============================================================================
   const inputSchema = ref(props.schema)
   const formTools = ref({})
   const isFormReady = ref(false)
   const setIntegration = ref('')
   const isInitialized = ref(false)
 
-  // ============================================================================
-  // Computed - Schema processing
-  // ============================================================================
-  /**
-   * Groups fields into rows for layout.
-   * Single-field groups are paired side-by-side when possible.
-   */
   const groupedRows = computed(() => {
     const rows = []
     const singleFieldGroups = []
@@ -163,9 +129,6 @@
     deployStartTime: props.deployStartTime
   }))
 
-  // ============================================================================
-  // Schema Creation Functions - Azion-specific
-  // ============================================================================
   /**
    * Extracts field names from groups
    * @param {Array} groups - Schema groups
@@ -302,9 +265,6 @@
     isInitialized.value = true
   }
 
-  // ============================================================================
-  // Form Validation Functions
-  // ============================================================================
   /**
    * Validates the entire form
    * @returns {Promise<boolean>} Whether the form is valid
@@ -344,9 +304,6 @@
     return data
   }
 
-  // ============================================================================
-  // Field Rendering Helpers
-  // ============================================================================
   /**
    * Checks if a field should be handled (not hidden and not VCS integration)
    * @param {string} fieldName - Name of the field
@@ -374,9 +331,6 @@
     return error ? 'p-invalid' : ''
   }
 
-  // ============================================================================
-  // Value Change Handlers
-  // ============================================================================
   /**
    * Updates a field value
    * @param {string} fieldName - Name of the field
@@ -388,9 +342,6 @@
     }
   }
 
-  // ============================================================================
-  // VCS Integration Helpers - Use LayoutEngineBlock methods
-  // ============================================================================
   /**
    * Triggers GitHub connection via LayoutEngineBlock
    */
@@ -406,9 +357,6 @@
     layoutRef.value?.setCallbackUrl(uri)
   }
 
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
   /**
    * Handles the next button click
    */
@@ -440,9 +388,6 @@
     emit('next-step', data)
   }
 
-  // ============================================================================
-  // Watchers
-  // ============================================================================
   watch(
     () => props.schema,
     async (newValue) => {
@@ -463,27 +408,16 @@
     { immediate: true }
   )
 
-  // Watch for integrations list changes to set default
   watch(
     () => layoutRef.value?.listOfIntegrations,
     (newList) => {
-      if (newList?.value && newList.value.length > 0) {
+      if (newList?.value && newList.value.length) {
         setIntegration.value = newList.value[0].value
       }
     },
     { deep: true }
   )
 
-  // ============================================================================
-  // Lifecycle Cleanup
-  // ============================================================================
-  onBeforeUnmount(() => {
-    // Cleanup is handled by LayoutEngineBlock
-  })
-
-  // ============================================================================
-  // Expose - Methods needed by parent components
-  // ============================================================================
   defineExpose({
     validateForm,
     getFormData,

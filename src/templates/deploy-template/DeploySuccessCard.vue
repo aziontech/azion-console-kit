@@ -1,18 +1,6 @@
 <script setup>
-  /**
-   * DeploySuccessCard.vue
-   *
-   * Step 3 of the deploy template flow (success state).
-   * Displays deployment success confirmation with app URL, template info, and next steps.
-   *
-   * Uses BaseDeployCard for layout structure.
-   * Uses TemplateInfoBlock for preview + info block consistency.
-   *
-   * This component is stateless - all state lives in the orchestrator.
-   */
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
-  // import * as yup from 'yup'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import PrimeButton from 'primevue/button'
@@ -22,9 +10,6 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
 
-  // ============================================================================
-  // Props
-  // ============================================================================
   const props = defineProps({
     // Status message
     appUrl: {
@@ -61,9 +46,6 @@
     }
   })
 
-  // ============================================================================
-  // Domain Form State & Validation
-  // ============================================================================
   /**
    * Dynamic domain list state
    * Each domain has a unique id and value
@@ -123,9 +105,6 @@
     initialValue: false
   })
 
-  // ============================================================================
-  // Computed
-  // ============================================================================
   /**
    * Extract domain from appUrl for display
    */
@@ -138,9 +117,6 @@
     }
   })
 
-  // ============================================================================
-  // Methods
-  // ============================================================================
   /**
    * Handle click on next step item
    */

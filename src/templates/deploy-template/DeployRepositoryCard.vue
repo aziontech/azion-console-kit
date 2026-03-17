@@ -1,15 +1,4 @@
 <script setup>
-  /**
-   * DeployRepositoryCard.vue
-   *
-   * Step 1 of the deploy template flow.
-   * Displays template preview, info, and git configuration.
-   *
-   * Uses BaseDeployCard for layout structure.
-   * Emits @next when user clicks the Next button.
-   *
-   * This component is stateless - all state lives in the orchestrator.
-   */
   import { ref, computed, onBeforeUnmount } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
@@ -17,9 +6,6 @@
   import BaseDeployCard from './BaseDeployCard.vue'
   import TemplateInfoBlock from './TemplateInfoBlock.vue'
 
-  // ============================================================================
-  // Props
-  // ============================================================================
   const props = defineProps({
     // Preview block
     imagePreview: {
@@ -80,14 +66,8 @@
     }
   })
 
-  // ============================================================================
-  // Emits
-  // ============================================================================
   const emit = defineEmits(['next'])
 
-  // ============================================================================
-  // VCS Integration State
-  // ============================================================================
   const toast = useToast()
   const callbackUrl = ref('')
   const listOfIntegrations = ref([])
@@ -99,18 +79,12 @@
   const formData = ref({})
   const formErrors = ref([])
 
-  // ============================================================================
-  // Computed
-  // ============================================================================
   const hasIntegrationsList = computed(() => {
     return listOfIntegrations.value?.length > 0
   })
 
   const gitDescription = `Configure your Git repository to integrate your codebase and automate deployments directly from your version control system.`
 
-  // ============================================================================
-  // VCS Integration Functions
-  // ============================================================================
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
       const ref = Array.isArray(oauthGithubRef.value)
@@ -175,16 +149,10 @@
     emit('next')
   }
 
-  // ============================================================================
-  // Lifecycle Hooks
-  // ============================================================================
   onBeforeUnmount(() => {
     removeEventListenerToGithubIntegration()
   })
 
-  // ============================================================================
-  // Expose
-  // ============================================================================
   defineExpose({
     listIntegrations,
     loadIntegrationOnShowButton,
@@ -208,7 +176,6 @@
     :hide-footer="props.collapsed"
   >
     <template #content>
-      sss: {{ props }}
       <TemplateInfoBlock
         :preview-src="props.imagePreview"
         :preview-alt="props.previewAlt"
