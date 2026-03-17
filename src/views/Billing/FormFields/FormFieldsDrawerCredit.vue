@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputNumber from 'primevue/inputnumber'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   import InlineMessage from 'primevue/inlinemessage'
   import InputText from 'primevue/inputtext'

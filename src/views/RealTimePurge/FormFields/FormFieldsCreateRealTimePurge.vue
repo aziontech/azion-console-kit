@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
 
   const { value: layer } = useField('layer')
   const { value: purgeType } = useField('purgeType')

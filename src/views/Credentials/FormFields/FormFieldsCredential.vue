@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldMultiSelect from '@/templates/form-fields-inputs/fieldMultiSelect'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
   import Calendar from 'primevue/calendar'
   import MultiSelect from 'primevue/multiselect'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   import { ref, onMounted, watch } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'

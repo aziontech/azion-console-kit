@@ -1,0 +1,62 @@
+import { BaseService } from '@/services/v2/base/query/baseService'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
+
+const adapt = (results) => {
+  return results.map((item) => ({ label: item.name, value: item.id }))
+}
+
+class TeamsService extends BaseService {
+  constructor() {
+    super()
+    this.baseURL = 'v4/iam/teams'
+  }
+
+  #makeBaseUrl = () => {
+    return this.baseURL
+  }
+
+  listTeams = async ({
+    fields = '',
+    ordering = 'name',
+    page = 1,
+    pageSize = 100,
+    search = ''
+  } = {}) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#makeBaseUrl(),
+      params: {
+        ordering,
+        page,
+        page_size: pageSize,
+        ...(search && { search }),
+        ...(fields && { fields })
+      }
+    })
+
+    if (!data || !Array.isArray(data.results)) {
+      throw new Error('Invalid data structure: expected results array')
+    }
+
+    return adapt(data.results)
+  }
+
+  useListTeams = async () => {
+    const queryKey = queryKeys.teams.all
+
+    return this.useEnsureQueryData(queryKey, () => this.listTeams())
+  }
+
+  useListTeamsQuery() {
+    return this.useQuery(queryKeys.teams.all, () => this.listTeams(), {
+      cacheType: this.cacheType.STATIC,
+      enabled: true
+    })
+  }
+
+  invalidateTeamsCache = async () => {
+    await this.queryClient.removeQueries({ queryKey: queryKeys.teams.all })
+  }
+}
+
+export const teamsService = new TeamsService()

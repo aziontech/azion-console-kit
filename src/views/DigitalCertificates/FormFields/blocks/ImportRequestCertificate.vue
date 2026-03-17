@@ -21,7 +21,7 @@
   import { useField } from 'vee-validate'
   import { watch, computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import { useDigitalCertificate } from '../composables/certificate'
 
   defineOptions({ name: 'ImportOrRequestCertificate' })

@@ -3,15 +3,15 @@
   import { storeToRefs } from 'pinia'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldPhoneNumber from '@/templates/form-fields-inputs/fieldPhoneNumber'
-  import LabelBlock from '@/templates/label-block'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldPhoneNumber from '@aziontech/webkit/field-phone-number'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import MultiSelect from 'primevue/multiselect'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
 
   const props = defineProps({
     loadAccountDetailsService: {

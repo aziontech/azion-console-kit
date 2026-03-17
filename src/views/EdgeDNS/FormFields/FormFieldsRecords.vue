@@ -1,16 +1,16 @@
 <script setup>
   import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
+  import FieldNumber from '@aziontech/webkit/field-number'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT, TTL_DEFAULT_ANAME } from '@/utils/constants'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')

@@ -4,6 +4,7 @@
 
     <AppNavbar
       :showNavItems="showNavItems"
+      :isBootstrapping="isBootstrapping"
       :listTypeAccountService="listTypeAccountService"
       :accountHandler="accountHandler"
     />
@@ -15,24 +16,29 @@
       :class="{ 'mr-[32rem]': showSidebar }"
       :style="{ transition: 'margin-right 0.2s' }"
     >
-      <router-view class="flex flex-1 flex-col" />
-      <AppFooter v-show="!showLoading" />
+      <InfoBanner />
+      <div class="flex flex-1 flex-col">
+        <router-view class="flex flex-1 flex-col" />
+      </div>
+      <AppFooter v-show="!isBootstrapping" />
     </main>
   </div>
 </template>
 
 <script setup>
   import { computed } from 'vue'
+  import { useRoute } from 'vue-router'
   import AppFooter from '@/layout/app-footer'
   import AppNavbar from './app-navbar.vue'
   import ToastBlock from '@/templates/toast-block'
   import AppSidebar from './app-sidebar.vue'
+  import InfoBanner from '@/templates/info-banner'
 
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
   import { useLayout } from '@/composables/use-layout'
-  import { useLoadingStore } from '@/stores/loading'
+  import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
   defineOptions({ name: 'app-layout' })
@@ -41,10 +47,14 @@
     isLogged: Boolean
   })
 
+  const route = useRoute()
   const accountHandler = new AccountHandler(switchAccountService, listTypeAccountService)
   const { isSidebarActive, isVisibleMobileSidebar } = useLayout()
-  const { showLoading } = storeToRefs(useLoadingStore())
+  const { hasSession } = storeToRefs(useAccountStore())
 
-  const showNavItems = computed(() => props.isLogged && !showLoading.value)
+  const showNavItems = computed(() => props.isLogged)
+  const isBootstrapping = computed(
+    () => hasSession.value && route.meta?.hideNavigation !== true && !props.isLogged
+  )
   const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
 </script>

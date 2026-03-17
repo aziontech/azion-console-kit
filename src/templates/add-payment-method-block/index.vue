@@ -7,7 +7,7 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useScrollToError } from '@/composables/useScrollToError'
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
@@ -83,7 +83,7 @@
       const inputStyles = {
         style: {
           base: {
-            fontFamily: "'Roboto', sans-serif",
+            fontFamily: "'Sora', sans-serif",
             color: theme === 'dark' ? '#ffffff' : '#000000'
           },
           '::placeholder': {

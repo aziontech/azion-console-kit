@@ -1,11 +1,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldText from '@aziontech/webkit/field-text'
   import { ref, computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import LabelBlock from '@/templates/label-block'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 

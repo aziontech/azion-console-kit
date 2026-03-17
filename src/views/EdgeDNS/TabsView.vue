@@ -2,6 +2,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import EditView from '@/views/EdgeDNS/EditView.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
@@ -153,6 +154,11 @@
 
   const title = computed(() => {
     return edgeDNS.value?.name || ''
+  })
+
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeDNS.value) return true
+    return false
   })
 
   const showMainSettings = computed(() => {
@@ -382,7 +388,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -396,10 +403,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeDNS"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"

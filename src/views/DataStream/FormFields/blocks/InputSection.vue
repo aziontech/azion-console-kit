@@ -30,7 +30,7 @@
   import { ref } from 'vue'
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
 
   defineProps({
     disabled: {

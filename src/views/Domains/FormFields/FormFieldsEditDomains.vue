@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
@@ -181,10 +181,17 @@
   }
   const moreOptions = ['authority', 'status', 'subjectName']
   const selectCertificate = ({ authority, value, subjectName }) => {
-    authorityCertificate.value = authority
+    const normalizedAuthority = authority ?? null
+    const normalizedSubjectName = subjectName ?? null
+
+    if (authorityCertificate.value !== normalizedAuthority) {
+      authorityCertificate.value = normalizedAuthority
+    }
     isLetEncrypt.value =
       value === 'lets_encrypt' || value === 'lets_encrypt_http' || authority === 'lets_encrypt'
-    subjectNameCertificate.value = subjectName
+    if (subjectNameCertificate.value !== normalizedSubjectName) {
+      subjectNameCertificate.value = normalizedSubjectName
+    }
   }
 </script>
 

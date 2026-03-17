@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import { useField } from 'vee-validate'
 
   const { value: name } = useField('name')

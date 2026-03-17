@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import PrimeTag from 'primevue/tag'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { handleTypeNetwork } from '../Config/typeNetwork'
 

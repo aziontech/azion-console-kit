@@ -30,7 +30,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
 
   // Form blocks
   import BrowserCache from './blocks/BrowserCache.vue'

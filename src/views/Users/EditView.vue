@@ -4,6 +4,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useToast } from 'primevue/usetoast'
   import { ref, inject } from 'vue'
@@ -36,6 +37,7 @@
 
     userName.value = name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, name)
+    isFormLoading.value = false
   }
 
   const props = defineProps({
@@ -85,6 +87,7 @@
     twoFactorEnabled: yup.boolean()
   })
 
+  const isFormLoading = ref(true)
   const currentEmail = ref()
 
   const handleTrackFailedEdit = (error) => {
@@ -152,8 +155,10 @@
         @on-edit-fail="handleTrackFailedEdit"
         :initialValues="cachedUser"
       >
-        <template #form>
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading || isFormLoading" />
           <FormFieldsUsers
+            v-else
             :loadAccountDetailsService="loadAccountDetailsService"
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
@@ -163,6 +168,7 @@
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarTemplate
+            v-if="!isFormLoading"
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"

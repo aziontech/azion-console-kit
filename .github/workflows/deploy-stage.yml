@@ -43,3 +43,4 @@ jobs:
           VITE_SSO_IDP_SCIM_E2E: ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.STAGE_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
+          VITE_APPCUES_ACCOUNT_ID: ${{ secrets.APPCUES_ACCOUNT_ID }}
