@@ -132,8 +132,8 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
+      sortField: 'active',
+      filterPath: 'active',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
