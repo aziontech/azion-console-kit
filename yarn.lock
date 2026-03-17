@@ -80,10 +80,10 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.0.4.tgz#673e37e1dfce63d17f35a2567303bbb17a290704"
   integrity sha512-nR5aAkqSnQMpjXIaELqljW6o0jK9pPDhVK1TTH+rrpuTSekyJMoK6xqyX/DrhCz8DhGpfIYKD30yb6qE6aywhg==
 
-"@aziontech/theme@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.3.tgz#4db4dd9b825cfcde548f79a492843cb8773d52c5"
-  integrity sha512-r4NSL8ziryLfRNffRpGBkhf3GJMOtOx3rK9BIYSZQMq3eU9F2zaH3rKkV67/n0P94pkEuPoktk+ZRuRwact48Q==
+"@aziontech/theme@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.4.tgz#c81151eb16fd10e1dc10f060ad7c4226e2e0143b"
+  integrity sha512-K6or5V3Cs9OyXEif906x8Y/7xvxeb+OcEsRmI8Tlci3YnD5ZRIaznWeDDOxLZ/zn0VP28OShj9WggkVM0gsSmg==
 
 "@aziontech/webkit@^1.2.0":
   version "1.2.0"
