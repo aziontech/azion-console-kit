@@ -20,7 +20,9 @@ const adapt = (httpResponse) => {
       name: httpResponse.body.name,
       templateType: httpResponse.body.template_type,
       updatedAt: httpResponse.body.updated_at,
-      uuid: httpResponse.body.uuid
+      uuid: httpResponse.body.uuid,
+      hasSettings: httpResponse.body.input_schema.groups.length > 1 ? true : false,
+      imagePreview: httpResponse.body.imagePreview
     },
     statusCode: httpResponse.statusCode
   }

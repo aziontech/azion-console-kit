@@ -5,11 +5,10 @@
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
-  import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
 
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  // import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import FormLoading from '@/templates/template-engine-block/form-loading.vue'
 
@@ -95,12 +94,6 @@
     showDetails.value = true
   }
 
-  const handleInstantiate = ({ result }) => {
-    router.push({
-      path: `/create/deploy/${result.uuid}`
-    })
-  }
-
   const handleSubmitClick = () => {
     tracker.create
       .eventClickedToDeploy({
@@ -129,34 +122,8 @@
   <ContentBlock>
     <template #heading>
       <div
-        class="flex flex-col gap-4"
-        v-if="isLoading"
-      >
-        <div class="flex gap-3">
-          <Skeleton class="h-4 w-10" />
-          <Skeleton class="h-4 w-24" />
-        </div>
-        <Skeleton class="h-9 w-64" />
-        <div class="flex gap-4">
-          <Skeleton class="hidden sm:flex w-10 h-10" />
-          <div class="flex flex-col gap-4 sm:flex-row w-full">
-            <div class="flex items-center gap-3">
-              <Skeleton class="h-4 w-20" />
-              <Skeleton class="h-4 w-20" />
-              <Skeleton class="h-4 w-36" />
-            </div>
-            <Skeleton class="sm:ml-auto h-9 sm:w-28" />
-          </div>
-        </div>
-      </div>
-      <PageHeadingBlock
-        :pageTitle="solution.name"
-        :description="solution.headline"
-        v-if="!isLoading"
-      />
-      <div
-        class="flex flex-col sm:flex-row gap-4 lg:items-center"
-        v-if="!isLoading"
+        class="flex flex-col sm:flex-row gap-4 lg:items-center none"
+        v-if="false"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div
@@ -216,7 +183,6 @@
         <TemplateEngineBlock
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
-          @instantiate="handleInstantiate"
           :getTemplateService="props.getTemplateService"
           :instantiateTemplateService="props.instantiateTemplateService"
           :templateId="solution.referenceId"

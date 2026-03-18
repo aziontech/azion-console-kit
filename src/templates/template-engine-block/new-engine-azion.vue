@@ -1,0 +1,805 @@
+<script setup>
+  import { ref, computed, watch, defineOptions, unref, onMounted } from 'vue'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
+  import InputText from 'primevue/inputtext'
+  import Password from 'primevue/password'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import LabelBlock from '@/templates/label-block'
+  import OAuthGithub from './oauth-github.vue'
+  import LayoutEngineBlock from './layout-engine-block.vue'
+
+  defineOptions({ name: 'engineAzion' })
+
+  const props = defineProps({
+    schema: {
+      type: Object,
+      required: true
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    hasSettings: {
+      type: Boolean,
+      default: true
+    },
+    loadingDeploy: {
+      type: Boolean,
+      default: false
+    },
+    disabledDeploy: {
+      type: Boolean,
+      default: false
+    },
+    // Deploy Status Card props
+    executionId: {
+      type: String,
+      default: ''
+    },
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    successNextSteps: {
+      type: Array,
+      default: () => []
+    }
+  })
+
+  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
+
+  const layoutRef = ref(null)
+
+  const inputSchema = ref(props.schema)
+  const formTools = ref({})
+  const isFormReady = ref(false)
+  const setIntegration = ref('')
+  const isInitialized = ref(false)
+
+  const groupedRows = computed(() => {
+    const rows = []
+    const singleFieldGroups = []
+
+    for (const group of inputSchema.value.groups || []) {
+      const visibleFields = (group.fields || []).filter((field) => !field.hidden)
+      if (visibleFields.length === 1) {
+        singleFieldGroups.push(group)
+        if (singleFieldGroups.length === 2) {
+          rows.push({ type: 'pair', groups: [...singleFieldGroups] })
+          singleFieldGroups.length = 0
+        }
+      } else {
+        // Flush any pending single-field group before inserting a multi-field
+        if (singleFieldGroups.length) {
+          rows.push({ type: 'single', groups: [singleFieldGroups.shift()] })
+        }
+        rows.push({ type: 'single', groups: [group] })
+      }
+    }
+
+    // Flush remaining odd group
+    if (singleFieldGroups.length) {
+      rows.push({ type: 'single', groups: [singleFieldGroups.shift()] })
+    }
+
+    return rows
+  })
+
+  /**
+   * Computes props to pass to LayoutEngineBlock
+   */
+  const layoutProps = computed(() => ({
+    title: inputSchema.value.title || 'Start from Template',
+    previewSrc: inputSchema.value.previewSrc || '',
+    previewAlt: inputSchema.value.previewAlt || '',
+    templateTitle: inputSchema.value.templateTitle || inputSchema.value.name || '',
+    templateUrl: inputSchema.value.templateUrl || '',
+    templateIcon: inputSchema.value.templateIcon || '',
+    templateDescription: inputSchema.value.description || '',
+    githubUrl: inputSchema.value.githubUrl || inputSchema.value.repository || '',
+    schema: props.schema,
+    isDrawer: props.isDrawer,
+    // Flow control props
+    hasSettings: props.hasSettings,
+    loadingDeploy: props.loadingDeploy,
+    disabledDeploy: props.disabledDeploy,
+    // Validation prop
+    onValidate: validateForm,
+    // Deploy simulation props
+    simulateDeploy: inputSchema.value.simulateDeploy ?? false,
+    appUrl: props.appUrl || inputSchema.value.appUrl || '',
+    successNextSteps: props.successNextSteps || inputSchema.value.successNextSteps || [],
+    // Deploy Status Card props
+    executionId: props.executionId,
+    deployFailed: props.deployFailed,
+    applicationName: props.applicationName,
+    deployStartTime: props.deployStartTime
+  }))
+
+  /**
+   * Extracts field names from groups
+   * @param {Array} groups - Schema groups
+   * @returns {Array} Array of field names
+   */
+  const extractFieldNames = (groups) => {
+    return groups.flatMap((group) => group.fields.map((field) => field.name))
+  }
+
+  /**
+   * Escapes template literals in error messages
+   * @param {string} errorMessage - Error message to escape
+   * @returns {string} Escaped message
+   */
+  const escapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('${', '#$')
+  }
+
+  /**
+   * Unescapes template literals in error messages
+   * @param {string} errorMessage - Error message to unescape
+   * @returns {string} Unescaped message
+   */
+  const unescapeErrorMessage = (errorMessage) => {
+    if (!errorMessage) return ''
+    return errorMessage.replaceAll('#$', '${')
+  }
+
+  /**
+   * Creates a yup schema string for a field
+   * @param {Object} element - Field definition
+   * @returns {yup.StringSchema} Yup schema for the field
+   */
+  const createSchemaString = (element) => {
+    let schema = yup.string()
+
+    if (element.hidden) return schema
+
+    if (element.attrs?.required) {
+      schema = schema.required(`${element.label} is required`)
+    }
+
+    if (element.attrs?.maxLength) {
+      schema = schema.max(
+        element.attrs.maxLength,
+        `This field cannot exceed ${element.attrs.maxLength} characters`
+      )
+    }
+
+    if (element.attrs?.minLength) {
+      schema = schema.min(
+        element.attrs.minLength,
+        `This field must have at least ${element.attrs.minLength} characters`
+      )
+    }
+
+    if (element.validators) {
+      element.validators.forEach((validator) => {
+        schema = schema.test(
+          `valid-${element.name}`,
+          escapeErrorMessage(validator.errorMessage),
+          function (value) {
+            const domainRegex = new RegExp(validator.regex)
+            const shouldEscapeEmptyAndNotRequiredFields =
+              value === undefined && !element.attrs?.required
+            if (shouldEscapeEmptyAndNotRequiredFields) return true
+            return domainRegex.test(value)
+          }
+        )
+      })
+    }
+
+    if (element.value?.length > 0) {
+      schema = schema.default(element.value)
+    }
+
+    return schema
+  }
+
+  /**
+   * Creates the yup validation schema for the form
+   * @returns {Promise<yup.ObjectSchema>} Yup object schema
+   */
+  const createSchemaObject = async () => {
+    const templateSchema = {}
+
+    inputSchema.value.fields?.forEach((field) => {
+      templateSchema[field.name] = createSchemaString(field)
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        templateSchema[field.name] = createSchemaString(field)
+      })
+    })
+
+    return yup.object(templateSchema)
+  }
+
+  /**
+   * Initializes the vee-validate form with the schema
+   */
+  const initializeForm = async () => {
+    const schema = await createSchemaObject()
+    const { errors, defineInputBinds, setFieldValue, validate } = useForm({
+      validationSchema: schema
+    })
+
+    formTools.value = { errors, setFieldValue, validate }
+
+    // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
+    const registerFieldWithValueAndValidation = (field) => {
+      if (field.value) {
+        setFieldValue(field.name, field.value)
+      }
+      field.input = defineInputBinds(field.name, { validateOnInput: true })
+    }
+
+    inputSchema.value.fields?.forEach((field) => {
+      if (!field.hidden) {
+        registerFieldWithValueAndValidation(field)
+      }
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        if (!field.hidden) {
+          registerFieldWithValueAndValidation(field)
+        }
+      })
+    })
+
+    isFormReady.value = true
+    isInitialized.value = true
+  }
+
+  /**
+   * Validates the entire form
+   * @returns {Promise<boolean>} Whether the form is valid
+   */
+  const validateForm = async () => {
+    if (!formTools.value.validate) return false
+    await formTools.value.validate()
+    // errors is a ComputedRef, use unref to get the actual value
+    return Object.keys(unref(formTools.value.errors)).length === 0
+  }
+
+  /**
+   * Gets all form data as an array of field objects
+   * @returns {Array} Array of field objects with name, value, and instantiation_data_path
+   */
+  const getFormData = () => {
+    const data = []
+
+    inputSchema.value.fields?.forEach((field) => {
+      data.push({
+        name: field.name,
+        value: field.input?.value ?? field.value ?? '',
+        instantiation_data_path: field.instantiation_data_path
+      })
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        data.push({
+          name: field.name,
+          value: field.input?.value ?? field.value ?? '',
+          instantiation_data_path: field.instantiation_data_path
+        })
+      })
+    })
+
+    return data
+  }
+
+  /**
+   * Checks if a field should be handled (not hidden and not VCS integration)
+   * @param {string} fieldName - Name of the field
+   * @returns {boolean} Whether the field should be rendered
+   */
+  const isHandleField = (fieldName) => {
+    return fieldName !== 'platform_feature__vcs_integration__uuid'
+  }
+
+  /**
+   * Removes hidden fields from an array
+   * @param {Array} fields - Array of field definitions
+   * @returns {Array} Filtered array without hidden fields
+   */
+  const removeHiddenFields = (fields) => {
+    return (fields || []).filter((field) => !field.hidden)
+  }
+
+  /**
+   * Renders the invalid class based on error state
+   * @param {string} error - Error message
+   * @returns {string} CSS class
+   */
+  const renderInvalidClass = (error) => {
+    return error ? 'p-invalid' : ''
+  }
+
+  /**
+   * Updates a field value
+   * @param {string} fieldName - Name of the field
+   * @param {*} value - New value
+   */
+  const updateValueOnChange = (fieldName, value) => {
+    if (formTools.value.setFieldValue) {
+      formTools.value.setFieldValue(fieldName, value)
+    }
+  }
+
+  /**
+   * Triggers GitHub connection via LayoutEngineBlock
+   */
+  const triggerConnectWithGithub = () => {
+    layoutRef.value?.triggerConnectWithGithub()
+  }
+
+  /**
+   * Sets callback URL via LayoutEngineBlock
+   * @param {string} uri - The callback URI
+   */
+  const setCallbackUrl = (uri) => {
+    layoutRef.value?.setCallbackUrl(uri)
+  }
+
+  /**
+   * Handles the next button click
+   */
+  const handleNext = () => {
+    emit('next')
+  }
+
+  const handleDeploy = () => {
+    emit('deploy')
+  }
+
+  const handleFinish = () => {
+    emit('finish')
+  }
+
+  const handleRetry = () => {
+    emit('retry')
+  }
+
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
+  const handleOpenUrl = (url) => {
+    emit('open-url', url)
+  }
+
+  const handleNextStep = (data) => {
+    emit('next-step', data)
+  }
+
+  /**
+   * Initializes the component when schema is available
+   */
+  const initializeComponent = async () => {
+    if (!props.schema || isInitialized.value) return
+
+    inputSchema.value = props.schema
+    const groupsToCheck = props.schema.groups || []
+    const fieldNames = extractFieldNames(groupsToCheck)
+
+    // Check if VCS integration is needed and load integrations
+    if (fieldNames.includes('platform_feature__vcs_integration__uuid')) {
+      await layoutRef.value?.loadIntegrationOnShowButton()
+    }
+
+    await initializeForm()
+  }
+
+  // Watch for schema changes (not immediate - onMounted handles initial load)
+  watch(
+    () => props.schema,
+    async (newValue) => {
+      if (!newValue) return
+      if (isInitialized.value) return
+
+      inputSchema.value = newValue
+      const groupsToCheck = newValue.groups || []
+      const fieldNames = extractFieldNames(groupsToCheck)
+
+      // Check if VCS integration is needed and load integrations
+      if (fieldNames.includes('platform_feature__vcs_integration__uuid')) {
+        await layoutRef.value?.loadIntegrationOnShowButton()
+      }
+
+      await initializeForm()
+    }
+  )
+
+  onMounted(() => {
+    initializeComponent()
+  })
+
+  watch(
+    () => layoutRef.value?.listOfIntegrations,
+    (newList) => {
+      if (newList?.value && newList.value.length) {
+        setIntegration.value = newList.value[0].value
+      }
+    },
+    { deep: true }
+  )
+
+  defineExpose({
+    validateForm,
+    getFormData,
+    formTools,
+    inputSchema,
+    layoutRef,
+    // Expose goToDeploying from LayoutEngineBlock
+    goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose currentStep from LayoutEngineBlock
+    currentStep: computed(() => layoutRef.value?.currentStep)
+  })
+</script>
+
+<template>
+  <div class="flex justify-center">
+    <LayoutEngineBlock
+      ref="layoutRef"
+      v-bind="layoutProps"
+      @next="handleNext"
+      @deploy="handleDeploy"
+      @finish="handleFinish"
+      @retry="handleRetry"
+      @manage="handleManage"
+      @open-url="handleOpenUrl"
+      @next-step="handleNextStep"
+    >
+      <!-- GitHub Connection Slot -->
+      <template #github-connection="slotProps">
+        <template v-if="isFormReady">
+          <!-- Top-level VCS Integration Field -->
+          <template v-if="inputSchema.fields">
+            <template
+              v-for="field in removeHiddenFields(inputSchema.fields)"
+              :key="field.name"
+            >
+              <div
+                v-if="field.name === 'platform_feature__vcs_integration__uuid'"
+                class="flex flex-col gap-2"
+              >
+                <OAuthGithub
+                  v-show="!slotProps.hasIntegrationsList"
+                  ref="oauthGithubRef"
+                  @onCallbackUrl="setCallbackUrl"
+                  :loading="slotProps.isIntegrationsLoading"
+                />
+                <div
+                  v-if="slotProps.hasIntegrationsList"
+                  class="flex flex-col gap-2"
+                >
+                  <FieldDropdown
+                    :options="slotProps.listOfIntegrations"
+                    :name="field.name"
+                    :required="field.attrs?.required"
+                    :label="field.label"
+                    :value="setIntegration"
+                    placeholder="Select a scope"
+                    :description="field.description"
+                    :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                    optionLabel="label"
+                    optionValue="value"
+                    @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
+                  >
+                    <template #footer>
+                      <div class="p-dropdown-items-wrapper">
+                        <ul class="p-dropdown-items">
+                          <li
+                            class="p-dropdown-item flex items-center"
+                            @click="triggerConnectWithGithub"
+                          >
+                            <i class="pi pi-plus-circle mr-2" />
+                            <div>Add GitHub Account</div>
+                          </li>
+                        </ul>
+                      </div>
+                    </template>
+                  </FieldDropdown>
+                </div>
+              </div>
+            </template>
+          </template>
+        </template>
+      </template>
+
+      <!-- Inputs Slot - Azion-specific field rendering -->
+      <template #inputs="slotProps">
+        <template v-if="isFormReady">
+          <!-- Top-level Fields -->
+          <div
+            v-if="inputSchema.fields"
+            class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 w-full"
+          >
+            <template
+              v-for="field in removeHiddenFields(inputSchema.fields)"
+              :key="field.name"
+            >
+              <!-- Skip VCS integration field - handled in github-connection slot -->
+              <div
+                v-if="isHandleField(field.name)"
+                class="flex flex-col gap-2"
+              >
+                <LabelBlock
+                  :for="field.name"
+                  :label="field.label"
+                  :isRequired="field.attrs?.required"
+                />
+                <Password
+                  v-if="field.type === 'password'"
+                  autocomplete="off"
+                  toggleMask
+                  v-bind="field.input"
+                  v-model="field.input.value"
+                  :id="field.name"
+                  class="w-full"
+                  :class="renderInvalidClass(formTools.errors[field.name])"
+                  :feedback="false"
+                  :pt="{ input: { name: field.name } }"
+                />
+                <InputText
+                  v-else
+                  autocomplete="off"
+                  :id="field.name"
+                  type="text"
+                  v-bind="field.input"
+                  :name="field.name"
+                  :class="renderInvalidClass(formTools.errors[field.name])"
+                />
+                <small class="text-xs font-normal text-color-secondary">{{
+                  field.description
+                }}</small>
+                <small
+                  v-if="formTools.errors[field.name]"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                </small>
+              </div>
+            </template>
+          </div>
+
+          <!-- Grouped Fields -->
+          <div
+            v-if="inputSchema.groups"
+            class="flex flex-col gap-8 w-full"
+          >
+            <template
+              v-for="row in groupedRows"
+              :key="row.groups[0].name"
+            >
+              <!-- Pair: 2 single-field groups side by side -->
+              <div
+                v-if="row.type === 'pair'"
+                class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
+              >
+                <template
+                  v-for="group in row.groups"
+                  :key="group.name"
+                >
+                  <div class="flex flex-col gap-2">
+                    <template
+                      v-for="field in removeHiddenFields(group.fields)"
+                      :key="field.name"
+                    >
+                      <!-- VCS integration field in group -->
+                      <div
+                        v-if="field.name === 'platform_feature__vcs_integration__uuid'"
+                        class="flex flex-col gap-2"
+                      >
+                        <OAuthGithub
+                          v-show="!slotProps.hasIntegrationsList"
+                          ref="oauthGithubRef"
+                          @onCallbackUrl="setCallbackUrl"
+                          :loading="slotProps.isIntegrationsLoading"
+                        />
+                        <div
+                          v-if="slotProps.hasIntegrationsList"
+                          class="flex flex-col gap-2"
+                        >
+                          <FieldDropdown
+                            :options="slotProps.listOfIntegrations"
+                            :name="field.name"
+                            :required="field.attrs?.required"
+                            :label="field.label"
+                            :value="setIntegration"
+                            placeholder="Select a scope"
+                            :description="field.description"
+                            :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                            optionLabel="label"
+                            optionValue="value"
+                            @onChange="
+                              (installationId) => updateValueOnChange(field.name, installationId)
+                            "
+                          >
+                            <template #footer>
+                              <div class="p-dropdown-items-wrapper">
+                                <ul class="p-dropdown-items">
+                                  <li
+                                    class="p-dropdown-item flex items-center"
+                                    @click="triggerConnectWithGithub"
+                                  >
+                                    <i class="pi pi-plus-circle mr-2" />
+                                    <div>Add GitHub Account</div>
+                                  </li>
+                                </ul>
+                              </div>
+                            </template>
+                          </FieldDropdown>
+                        </div>
+                      </div>
+
+                      <!-- Regular field in group -->
+                      <div
+                        v-else-if="isHandleField(field.name)"
+                        class="flex flex-col gap-2"
+                      >
+                        <LabelBlock
+                          :for="field.name"
+                          :label="field.label"
+                          :isRequired="field.attrs?.required"
+                        />
+                        <Password
+                          v-if="field.type === 'password'"
+                          autocomplete="off"
+                          toggleMask
+                          v-bind="field.input"
+                          v-model="field.input.value"
+                          :id="field.name"
+                          class="w-full"
+                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :feedback="false"
+                          :pt="{ input: { name: field.name } }"
+                        />
+                        <InputText
+                          v-else
+                          autocomplete="off"
+                          :id="field.name"
+                          type="text"
+                          v-bind="field.input"
+                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :name="field.name"
+                        />
+                        <small class="text-xs font-normal text-color-secondary">{{
+                          field.description
+                        }}</small>
+                        <small
+                          v-if="formTools.errors[field.name]"
+                          class="p-error text-xs font-normal leading-tight"
+                        >
+                          {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                        </small>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Single: 1 group in full width -->
+              <div
+                v-else
+                class="flex flex-col gap-4"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <template
+                    v-for="field in removeHiddenFields(row.groups[0].fields)"
+                    :key="field.name"
+                  >
+                    <!-- VCS integration field in single group -->
+                    <div
+                      v-if="field.name === 'platform_feature__vcs_integration__uuid'"
+                      class="flex flex-col gap-2"
+                    >
+                      <OAuthGithub
+                        v-show="!slotProps.hasIntegrationsList"
+                        ref="oauthGithubRef"
+                        @onCallbackUrl="setCallbackUrl"
+                        :loading="slotProps.isIntegrationsLoading"
+                      />
+                      <div
+                        v-if="slotProps.hasIntegrationsList"
+                        class="flex flex-col gap-2"
+                      >
+                        <FieldDropdown
+                          :options="slotProps.listOfIntegrations"
+                          :name="field.name"
+                          :required="field.attrs?.required"
+                          :label="field.label"
+                          :value="setIntegration"
+                          placeholder="Select a scope"
+                          :description="field.description"
+                          :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                          optionLabel="label"
+                          optionValue="value"
+                          @onChange="
+                            (installationId) => updateValueOnChange(field.name, installationId)
+                          "
+                        >
+                          <template #footer>
+                            <div class="p-dropdown-items-wrapper">
+                              <ul class="p-dropdown-items">
+                                <li
+                                  class="p-dropdown-item flex items-center"
+                                  @click="triggerConnectWithGithub"
+                                >
+                                  <i class="pi pi-plus-circle mr-2" />
+                                  <div>Add GitHub Account</div>
+                                </li>
+                              </ul>
+                            </div>
+                          </template>
+                        </FieldDropdown>
+                      </div>
+                    </div>
+
+                    <!-- Regular field in single group -->
+                    <div
+                      v-else-if="isHandleField(field.name)"
+                      class="flex flex-col gap-2"
+                    >
+                      <LabelBlock
+                        :for="field.name"
+                        :label="field.label"
+                        :isRequired="field.attrs?.required"
+                      />
+                      <Password
+                        v-if="field.type === 'password'"
+                        autocomplete="off"
+                        toggleMask
+                        v-bind="field.input"
+                        v-model="field.input.value"
+                        :id="field.name"
+                        class="w-full"
+                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :feedback="false"
+                        :pt="{ input: { name: field.name } }"
+                      />
+                      <InputText
+                        v-else
+                        autocomplete="off"
+                        :id="field.name"
+                        type="text"
+                        v-bind="field.input"
+                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :name="field.name"
+                      />
+                      <small class="text-xs font-normal text-color-secondary">{{
+                        field.description
+                      }}</small>
+                      <small
+                        v-if="formTools.errors[field.name]"
+                        class="p-error text-xs font-normal leading-tight"
+                      >
+                        {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                      </small>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </template>
+    </LayoutEngineBlock>
+  </div>
+</template>
