@@ -455,7 +455,6 @@
       :hide-footer="currentStep === 'settings'"
     >
       <template #content>
-        {{ currentStep }}
         <div
           class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >

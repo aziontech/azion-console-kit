@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch, defineOptions, unref } from 'vue'
+  import { ref, computed, watch, defineOptions, unref, onMounted } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
@@ -388,6 +388,25 @@
     emit('next-step', data)
   }
 
+  /**
+   * Initializes the component when schema is available
+   */
+  const initializeComponent = async () => {
+    if (!props.schema || isInitialized.value) return
+
+    inputSchema.value = props.schema
+    const groupsToCheck = props.schema.groups || []
+    const fieldNames = extractFieldNames(groupsToCheck)
+
+    // Check if VCS integration is needed and load integrations
+    if (fieldNames.includes('platform_feature__vcs_integration__uuid')) {
+      await layoutRef.value?.loadIntegrationOnShowButton()
+    }
+
+    await initializeForm()
+  }
+
+  // Watch for schema changes (not immediate - onMounted handles initial load)
   watch(
     () => props.schema,
     async (newValue) => {
@@ -404,9 +423,12 @@
       }
 
       await initializeForm()
-    },
-    { immediate: true }
+    }
   )
+
+  onMounted(() => {
+    initializeComponent()
+  })
 
   watch(
     () => layoutRef.value?.listOfIntegrations,
