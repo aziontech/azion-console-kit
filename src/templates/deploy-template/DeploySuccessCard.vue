@@ -1,14 +1,19 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  import { useField } from 'vee-validate'
+  import { computed, ref, onMounted } from 'vue'
+  import { useForm, useField, useFieldArray } from 'vee-validate'
+  import * as yup from 'yup'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import PrimeButton from 'primevue/button'
+  import { useRouter } from 'vue-router'
 
   import BaseDeployCard from './BaseDeployCard.vue'
   import TemplateInfoBlock from './TemplateInfoBlock.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup.vue'
+  import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
 
   const props = defineProps({
     // Status message
@@ -46,64 +51,101 @@
     }
   })
 
+  const emit = defineEmits(['onSave'])
+  const router = useRouter()
   /**
-   * Dynamic domain list state
-   * Each domain has a unique id and value
+   * Validation schema for the form
+   * When useCustomDomain is true:
+   * - customDomain is required
+   * - domains must have at least one item with a value
    */
-  const domains = ref([{ id: crypto.randomUUID(), value: '' }])
+  const validationSchema = yup.object({
+    domains: yup
+      .array()
+      .min(1, 'At least one domain is required')
+      .test(
+        'has-valid-domain',
+        'At least one domain must be filled',
+        (value) => value && value.some((item) => item.domain && item.domain.trim() !== '')
+      ),
+    useCustomDomain: yup.boolean(),
+    customDomain: yup.string().when('useCustomDomain', {
+      is: true,
+      then: (schema) => schema.required('Custom domain is required when using custom domain')
+    }),
+    workloadHostnameAllowAccess: yup.boolean()
+  })
+
+  /**
+   * vee-validate form setup with validation schema and initial values
+   */
+  const { handleSubmit } = useForm({
+    validationSchema,
+    initialValues: {
+      domains: [{ domain: '' }],
+      useCustomDomain: false,
+      customDomain: '',
+      workloadHostnameAllowAccess: false
+    }
+  })
+
+  /**
+   * vee-validate form fields setup
+   */
+  const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
+  const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
+  const { value: useCustomDomain } = useField('useCustomDomain')
+  const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
+
+  const domainsOptions = ref([])
 
   /**
    * Add a new domain field to the list
    */
-  const addDomain = () => {
-    domains.value.push({ id: crypto.randomUUID(), value: '' })
+  const addNewDomain = () => {
+    pushDomain({ domain: '' })
   }
 
   /**
    * Remove a domain field from the list
    * Minimum 1 field is always kept
    */
-  const removeDomain = (id) => {
-    if (domains.value.length === 1) return
-    domains.value = domains.value.filter((domain) => domain.id !== id)
+  const removeDomain = (domainId) => {
+    if (domainsList.value.length > 1) {
+      remove(domainId)
+    }
   }
 
   /**
-   * Build dynamic validation schema based on current domains
+   * Load Edge DNS domains for dropdown suggestions
    */
-  // const buildValidationSchema = () => {
-  //   const schema = {}
-
-  //   // Add validation for each domain field
-  //   // eslint-disable-next-line id-length
-  //   domains.value.forEach((_, index) => {
-  //     schema[`domain_${index}`] = yup.string()
-  //   })
-
-  //   // Add validation for other fields
-  //   schema.use_azion_domain = yup.boolean().default(false)
-  //   schema.custom_domain = yup.string().when('use_azion_domain', {
-  //     is: true,
-  //     then: (schema) => schema.required('Custom domain is required when using Azion domain')
-  //   })
-  //   schema.workload_domain_allow_access = yup.boolean().default(false)
-
-  //   return schema
-  // }
+  const sugestionDomains = async () => {
+    const domains = await edgeDNSService.listEdgeDNSService({
+      fields: ['id', 'domain'],
+      active: 'True'
+    })
+    domainsOptions.value = domains.body.map((domain) => {
+      return {
+        label: domain.domain.content,
+        value: domain.id
+      }
+    })
+  }
 
   /**
-   * vee-validate form setup
+   * Update domain value
    */
-  // const { handleSubmit, values } = useForm({
-  //   validationSchema: buildValidationSchema()
-  // })
+  const updateDomainValue = (index, value) => {
+    const domain = domainsList.value[index]
+    if (domain) {
+      domain.domain = value
+    }
+  }
 
   /**
-   * Track use_azion_domain switch state for conditional rendering
+   * Check if there are multiple domains
    */
-  const { value: useAzionDomain } = useField('use_azion_domain', undefined, {
-    initialValue: false
-  })
+  const hasMultipleDomains = computed(() => domainsList.value.length !== 1)
 
   /**
    * Extract domain from appUrl for display
@@ -128,6 +170,10 @@
     }
   }
 
+  const openMarketplace = () => {
+    router.push('/marketplace')
+  }
+
   const nextSteps = [
     {
       action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
@@ -135,11 +181,24 @@
       label: 'View Real-Time Metrics'
     },
     {
-      action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
+      action: () => openMarketplace(),
       icon: 'pi-shopping-cart',
       label: 'Explore Functions from Marketplace'
     }
   ]
+
+  /**
+   * Handle form submission
+   * Called when validation passes
+   */
+  const onSubmit = handleSubmit((values) => {
+    emit('onSave', values)
+  })
+
+  // Load domain suggestions on mount
+  onMounted(() => {
+    sugestionDomains()
+  })
 </script>
 
 <template>
@@ -188,70 +247,114 @@
             </template>
             <div class="flex flex-col gap-4 p-4">
               <div class="flex flex-col gap-2">
+                <LabelBlock label="Domain" />
                 <div
                   v-for="(domain, index) in domains"
-                  :key="domain.id"
-                  class="flex w-full gap-2 justify-between"
+                  :key="index"
+                  class="flex gap-2 items-start w-full"
                 >
-                  <div class="flex flex-col gap-2 w-full">
-                    <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                      <FieldText
-                        label="Domain"
-                        name="domain"
-                        :value="domain"
-                        placeholder="example.com"
-                        description="Type your domain or select from Edge DNS."
-                      />
-                    </div>
+                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                    <FieldDropdown
+                      editable
+                      :focusOnHover="false"
+                      :name="`domains[${index}].domain`"
+                      :options="domainsOptions"
+                      optionLabel="label"
+                      optionValue="label"
+                      placeholder="example.com"
+                      emptyMessage="No domains available"
+                      :value="domain.domain"
+                      :class="{ 'p-invalid': domainsErrorMessage }"
+                      @change="updateDomainValue(index, $event.value)"
+                      data-testid="domains-form__domain-dropdown"
+                    />
+                    <small
+                      class="text-xs text-color-secondary font-normal leading-5 -mt-1"
+                      v-if="!index"
+                    >
+                      Type your domain or select from Edge DNS.
+                    </small>
                   </div>
-                  <button
-                    v-if="index"
-                    type="button"
-                    @click="removeDomain(domain.id)"
-                    class="mt-7 p-2 text-color-secondary rounded-md"
-                    aria-label="Remove domain"
-                  >
-                    <i class="pi pi-trash" />
-                  </button>
+
+                  <PrimeButton
+                    v-if="hasMultipleDomains"
+                    @click="removeDomain(index)"
+                    icon="pi pi-trash"
+                    class="p-button-outlined p-button-sm p-button-danger"
+                    data-testid="domains-form__remove-domain-button"
+                    title="Remove domain"
+                  />
                 </div>
 
+                <small
+                  v-if="domainsErrorMessage"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ domainsErrorMessage }}
+                </small>
+              </div>
+
+              <div class="flex mt-1">
                 <PrimeButton
-                  label="Add Domain"
-                  icon="pi pi-plus"
-                  severity="secondary"
-                  class="w-1/3"
-                  @click="addDomain"
+                  @click="addNewDomain"
+                  label="Add Another"
+                  icon="pi pi-plus-circle"
+                  outlined
+                  size="small"
+                  data-testid="domains-form__add-domain-button"
+                  title="Add Another"
                 />
               </div>
 
               <FieldSwitchBlock
-                name="use_azion_domain"
-                nameField="use_azion_domain"
+                nameField="useCustomDomain"
+                name="useCustomDomain"
+                auto
                 title="Custom Domain"
-                subtitle="You can use a free azion.app domain."
+                subtitle="You can use an free azion.app domain."
                 :isCard="false"
               />
 
-              <FieldText
-                v-if="useAzionDomain"
-                name="custom_domain"
-                label="Custom Domain"
-              />
+              <div
+                v-if="useCustomDomain"
+                class="flex sm:max-w-lg w-full gap-2 flex-col sm:flex-row"
+                :class="{ 'items-center': customDomainErrorMessage }"
+              >
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <FieldInputGroup
+                    placeholder="my-custom-name"
+                    label="Azion Custom Domain"
+                    required
+                    :value="customDomain"
+                    name="customDomain"
+                    data-testid="workload-custom-domain-field"
+                  >
+                    <template #button>
+                      <PrimeButton
+                        label=".azion.app"
+                        size="small"
+                        class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
+                        outlined
+                      />
+                    </template>
+                  </FieldInputGroup>
+                </div>
+              </div>
 
-              <!-- Workload Domain Allow Access Switch -->
               <FieldSwitchBlock
-                nameField="workload_domain_allow_access"
-                name="workload_domain_allow_access"
+                nameField="workloadHostnameAllowAccess"
+                name="workloadHostnameAllowAccess"
+                auto
                 title="Workload Domain Allow Access"
-                subtitle="Allow direct access to the default workload domain generated after workload creation (*.map.azionedge.net)."
+                subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
                 :isCard="false"
               />
             </div>
-            <div class="bg-neutral-950 h-16 p-4 flex justify-end">
+            <div class="bg-neutral-950 h-16 p-4 flex justify-end rounded-b-md">
               <PrimeButton
                 severity="primary"
                 label="Save"
-                @click="handleSubmit"
+                @click="onSubmit"
                 icon-pos="right"
                 class="max-md:w-full md:min-w-[5rem]"
               />
