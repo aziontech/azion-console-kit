@@ -223,16 +223,14 @@
         description="Edit a Function that runs closer to users to use with Application or Firewall."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldText
-              label="Name"
-              required
-              name="name"
-              placeholder="My function"
-              :value="name"
-              description="Give a unique and descriptive name to identify the Function."
-            />
-          </div>
+          <FieldText
+            label="Name"
+            required
+            name="name"
+            placeholder="My function"
+            :value="name"
+            description="Give a unique and descriptive name to identify the Function."
+          />
         </template>
       </FormHorizontal>
 

@@ -211,17 +211,15 @@
     description="Instantiate a function within your Firewall. Use Rules Engine to activate the function."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          v-model="name"
-          description="Give a unique and descriptive name to identify the Firewall function instance."
-          placeholder="My Firewall function instance"
-          data-testid="edge-firewall-functions-form__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        v-model="name"
+        description="Give a unique and descriptive name to identify the Firewall function instance."
+        placeholder="My Firewall function instance"
+        data-testid="edge-firewall-functions-form__name-field"
+      />
     </template>
   </FormHorizontal>
 

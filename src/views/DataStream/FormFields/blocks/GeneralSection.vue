@@ -5,18 +5,16 @@
     data-testid="data-stream-form__section__general"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give a unique and descriptive name to identify the data stream."
-          name="name"
-          placeholder="My data stream"
-          data-testid="data-stream-form__general__name-field"
-          :disabled="disabled"
-          :value="name"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give a unique and descriptive name to identify the data stream."
+        name="name"
+        placeholder="My data stream"
+        data-testid="data-stream-form__general__name-field"
+        :disabled="disabled"
+        :value="name"
+      />
     </template>
   </FormHorizontal>
 </template>

@@ -201,16 +201,14 @@
     description="Check the details of the Azion domain, including the domain address to access the Application, and modify digital certificate options."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My domain"
-          :value="name"
-          description="Give a unique and descriptive name to identify the domain."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My domain"
+        :value="name"
+        description="Give a unique and descriptive name to identify the domain."
+      />
     </template>
   </form-horizontal>
 

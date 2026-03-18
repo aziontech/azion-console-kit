@@ -76,18 +76,16 @@
     description="Configure the resources needed to install, uninstall, and reload your services."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Path"
-          required
-          name="name"
-          placeholder="/tmp/myresource"
-          :disabled="isFieldDisabled"
-          :value="name"
-          description="The path where the resource will be saved on the edge node."
-          data-testid="edge-service-drawer-form__path-field"
-        />
-      </div>
+      <FieldText
+        label="Path"
+        required
+        name="name"
+        placeholder="/tmp/myresource"
+        :disabled="isFieldDisabled"
+        :value="name"
+        description="The path where the resource will be saved on the edge node."
+        data-testid="edge-service-drawer-form__path-field"
+      />
       <div class="flex flex-col sm:w-2/5 gap-2">
         <FieldDropdown
           label="Type"
