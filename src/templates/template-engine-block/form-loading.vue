@@ -2,7 +2,7 @@
   <div class="flex justify-center items-center w-full">
     <div
       class="surface-section rounded-md border surface-border p-6"
-      style="width: 672px; height: 600px"
+      style="width: 672px; height: 536px"
     >
       <div class="flex flex-col gap-2 mb-6">
         <Skeleton class="h-7 w-44" />

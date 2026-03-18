@@ -12,7 +12,7 @@
 
   defineOptions({ name: 'templateEngineBlock' })
 
-  const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])
+  const emit = defineEmits(['instantiate', 'cancel', 'submitClick', 'executionId'])
 
   const props = defineProps({
     getTemplateService: {
@@ -80,6 +80,12 @@
   const azionEngineRef = ref(null)
   const jsonFormEngineRef = ref(null)
   const hasSettings = ref(null)
+  const localExecutionId = ref('')
+
+  // Computed that prefers local executionId over prop
+  const currentExecutionId = computed(() => {
+    return localExecutionId.value || props.executionId
+  })
 
   onMounted(async () => {
     if (!props.templateId) return
@@ -128,7 +134,7 @@
       if (!isValid) return
 
       submitLoading.value = true
-      emit('submitClick')
+      // emit('submitClick')
 
       const parsedInputSchema = activeEngine.getFormData()
       const instantiateParsedPayload = parsedInputSchema.map((field) => {
@@ -144,8 +150,8 @@
         instantiateParsedPayload
       )
       submitLoading.value = props.freezeLoading
-
-      emit('instantiate', response)
+      localExecutionId.value = response.result.uuid
+      emit('executionId', localExecutionId.value)
     } catch (error) {
       toast.add({
         closable: true,
@@ -190,12 +196,13 @@
         :is-drawer="props.isDrawer"
         :loading-deploy="props.loadingDeploy"
         :disabled-deploy="props.disabledDeploy"
-        :execution-id="props.executionId"
+        :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"
         :app-url="props.appUrl"
         :success-next-steps="props.successNextSteps"
+        @deploy="handleSubmit"
       />
     </div>
     <div v-else>
@@ -206,12 +213,13 @@
         :is-drawer="props.isDrawer"
         :loading-deploy="props.loadingDeploy"
         :disabled-deploy="props.disabledDeploy"
-        :execution-id="props.executionId"
+        :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"
         :app-url="props.appUrl"
         :success-next-steps="props.successNextSteps"
+        @deploy="handleSubmit"
       />
     </div>
   </div>

@@ -94,12 +94,6 @@
     showDetails.value = true
   }
 
-  const handleInstantiate = ({ result }) => {
-    router.push({
-      path: `/create/deploy/${result.uuid}`
-    })
-  }
-
   const handleSubmitClick = () => {
     tracker.create
       .eventClickedToDeploy({
@@ -189,7 +183,6 @@
         <TemplateEngineBlock
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
-          @instantiate="handleInstantiate"
           :getTemplateService="props.getTemplateService"
           :instantiateTemplateService="props.instantiateTemplateService"
           :templateId="solution.referenceId"

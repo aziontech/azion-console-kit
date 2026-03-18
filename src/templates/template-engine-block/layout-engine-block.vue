@@ -651,6 +651,7 @@
       v-show="currentStep === 'deploying' || currentStep === 'success'"
     >
       <DeployStatusCard
+        v-if="props.executionId"
         :execution-id="props.executionId"
         :get-logs-service="getScriptRunnerLogsService"
         :results="currentStep === 'success' ? { domain: { url: props.appUrl } } : props.results"
