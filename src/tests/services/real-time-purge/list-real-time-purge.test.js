@@ -65,7 +65,9 @@ describe('ListRealTimePurgeService', () => {
     )
     const payload = {
       operatioName: 'ActivityHistory',
-      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard", "Purge:l2cachekey"] }, orderBy: [ts_DESC] ) { resourceType
+      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"}
+    resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard", "Purge:l2cachekey" ,"Purge Cache Key",
+    "Purge Cache Key L2","Purge Url", "Purge Wildcard" ] }, orderBy: [ts_DESC] ) { resourceType
       ts
       title
       comment
