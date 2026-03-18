@@ -13,7 +13,9 @@ export const listRealTimePurgeService = async (
 
   const payload = {
     operatioName: 'ActivityHistory',
-    query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard", "Purge:l2cachekey"] }, orderBy: [ts_DESC] ) { resourceType
+    query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"}
+    resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard", "Purge:l2cachekey" ,"Purge Cache Key",
+    "Purge Cache Key L2","Purge Url", "Purge Wildcard" ] }, orderBy: [ts_DESC] ) { resourceType
       ts
       title
       comment
@@ -82,8 +84,11 @@ const adapt = (httpResponse) => {
 
   const requestData = httpResponse.body.data?.activityHistoryEvents.map((item, index) => {
     const id = `${item.ts}-${index}`
-    const [, type] = item.resourceType.split(':')
+    let [, type] = item.resourceType.split(':')
 
+    if (!type) {
+      type = item.resourceType.split(' ')[1]
+    }
     const data = (() => {
       if (item?.requestData && item?.requestData !== DEFAULT_VALUE) {
         return parseEscapedJSON(item.requestData)
@@ -93,7 +98,7 @@ const adapt = (httpResponse) => {
 
     return {
       id,
-      type: MAPTYPE[type],
+      type: MAPTYPE[type] || type,
       arguments: data?.items ? data.items : DEFAULT_VALUE,
       layer: data?.layer ? MAPLAYER[data.layer] : DEFAULT_VALUE,
       user: item.authorEmail,
