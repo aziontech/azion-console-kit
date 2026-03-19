@@ -87,6 +87,22 @@
     return localExecutionId.value || props.executionId
   })
 
+  /**
+   * Computed for combined loading state
+   * Combines local submitLoading with prop loadingDeploy
+   */
+  const isLoadingDeploy = computed(() => {
+    return submitLoading.value || props.loadingDeploy
+  })
+
+  /**
+   * Computed for combined disabled state
+   * Disables when loading or when explicitly disabled
+   */
+  const isDisabledDeploy = computed(() => {
+    return isLoadingDeploy.value || props.disabledDeploy
+  })
+
   onMounted(async () => {
     if (!props.templateId) return
     await loadTemplate(props.templateId)
@@ -194,8 +210,8 @@
         :schema="inputSchema"
         :has-settings="hasSettings"
         :is-drawer="props.isDrawer"
-        :loading-deploy="props.loadingDeploy"
-        :disabled-deploy="props.disabledDeploy"
+        :loading-deploy="isLoadingDeploy"
+        :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"
@@ -211,8 +227,8 @@
         :schema="inputSchema"
         :has-settings="hasSettings"
         :is-drawer="props.isDrawer"
-        :loading-deploy="props.loadingDeploy"
-        :disabled-deploy="props.disabledDeploy"
+        :loading-deploy="isLoadingDeploy"
+        :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"

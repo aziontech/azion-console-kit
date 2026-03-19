@@ -658,9 +658,9 @@
         :template-url="props.templateUrl"
         :github-url="props.githubUrl"
         :loading-deploy="props.loadingDeploy"
-        :disabled="props.disabledDeploy"
+        :disabled-deploy="props.disabledDeploy || props.loadingDeploy"
         :deploy-label="props.deployLabel"
-        :hide-footer="currentStep === 'deploying'"
+        :hide-footer="!!props.executionId"
         @deploy="handleDeploy"
       >
         <template #form>

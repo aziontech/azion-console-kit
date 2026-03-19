@@ -72,6 +72,15 @@
   const isEdgeAppNamePublic = ref(false)
 
   /**
+   * Computed property to determine if inputs should be disabled
+   * True when loadingDeploy is true OR when currentStep is 'deploying'
+   */
+  const isDeploying = computed(() => {
+    const step = layoutRef.value?.currentStep
+    return props.loadingDeploy || step === 'deploying'
+  })
+
+  /**
    * Computed property for repository groups (group[0])
    * Returns the first group from the schema groups array
    */
@@ -613,6 +622,7 @@
                     class="h-8"
                     :description="field.description"
                     :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                    :disabled="isDeploying"
                     optionLabel="label"
                     optionValue="value"
                     @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
@@ -662,6 +672,7 @@
                 :description="field.description"
                 :data-testid="`field-${field.name}`"
                 :required="field.attrs?.required"
+                :disabled="isDeploying"
                 :aditionalError="
                   formTools.errors[field.name]
                     ? unescapeErrorMessage(formTools.errors[field.name])
@@ -687,6 +698,7 @@
                   class="w-full"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                   :feedback="false"
+                  :disabled="isDeploying"
                   :pt="{ input: { name: field.name } }"
                 />
                 <InputText
@@ -696,6 +708,7 @@
                   type="text"
                   v-bind="field.input"
                   :name="field.name"
+                  :disabled="isDeploying"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                 />
                 <small class="text-xs font-normal text-color-secondary">{{
@@ -757,9 +770,9 @@
                             :value="setIntegration"
                             placeholder="Select a scope"
                             class="h-8"
-
                             :description="field.description"
                             :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                            :disabled="isDeploying"
                             optionLabel="label"
                             optionValue="value"
                             enableWorkaroundLabelToDisabledOptions
@@ -804,6 +817,7 @@
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
+                        :disabled="isDeploying"
                         :aditionalError="
                           formTools.errors[field.name]
                             ? unescapeErrorMessage(formTools.errors[field.name])
@@ -829,6 +843,7 @@
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :feedback="false"
+                          :disabled="isDeploying"
                           :pt="{ input: { name: field.name } }"
                         />
                         <InputText
@@ -837,6 +852,7 @@
                           :id="field.name"
                           type="text"
                           v-bind="field.input"
+                          :disabled="isDeploying"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :name="field.name"
                         />
@@ -889,6 +905,7 @@
                           placeholder="Select a scope"
                           :description="field.description"
                           :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                          :disabled="isDeploying"
                           optionLabel="label"
                           optionValue="value"
                           enableWorkaroundLabelToDisabledOptions
@@ -933,6 +950,7 @@
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
+                      :disabled="isDeploying"
                       :aditionalError="
                         formTools.errors[field.name]
                           ? unescapeErrorMessage(formTools.errors[field.name])
@@ -958,6 +976,7 @@
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :feedback="false"
+                        :disabled="isDeploying"
                         :pt="{ input: { name: field.name } }"
                       />
                       <InputText
@@ -966,6 +985,7 @@
                         :id="field.name"
                         type="text"
                         v-bind="field.input"
+                        :disabled="isDeploying"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :name="field.name"
                       />
@@ -1022,6 +1042,7 @@
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
+                        :disabled="isDeploying"
                         :aditionalError="
                           formTools.errors[field.name]
                             ? unescapeErrorMessage(formTools.errors[field.name])
@@ -1047,6 +1068,7 @@
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :feedback="false"
+                          :disabled="isDeploying"
                           :pt="{ input: { name: field.name } }"
                         />
                         <InputText
@@ -1055,6 +1077,7 @@
                           :id="field.name"
                           type="text"
                           v-bind="field.input"
+                          :disabled="isDeploying"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :name="field.name"
                         />
@@ -1095,6 +1118,7 @@
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
+                      :disabled="isDeploying"
                       :aditionalError="
                         formTools.errors[field.name]
                           ? unescapeErrorMessage(formTools.errors[field.name])
@@ -1120,6 +1144,7 @@
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :feedback="false"
+                        :disabled="isDeploying"
                         :pt="{ input: { name: field.name } }"
                       />
                       <InputText
@@ -1128,6 +1153,7 @@
                         :id="field.name"
                         type="text"
                         v-bind="field.input"
+                        :disabled="isDeploying"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :name="field.name"
                       />
