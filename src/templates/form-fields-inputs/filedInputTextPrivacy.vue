@@ -140,6 +140,7 @@
 
 <template>
   <div
+    class="flex flex-col gap-2"
     @mouseenter="onGroupMouseEnter"
     @mouseleave="onGroupMouseLeave"
   >
@@ -152,7 +153,7 @@
     />
 
     <div
-      class="p-inputgroup rounded transition-shadow duration-150 mt-2"
+      class="p-inputgroup rounded transition-shadow duration-150"
       :class="[groupShadowClass, disabled ? 'opacity-50 pointer-events-none' : '']"
       @focusin="onGroupFocusIn"
       @focusout="onGroupFocusOut"
@@ -268,25 +269,25 @@
         </span>
       </span>
     </div>
+
+    <small
+      v-if="aditionalError || veeValidateErrorMessage"
+      class="p-error text-xs font-normal leading-tight"
+      :data-testid="customTestId.error"
+    >
+      {{ aditionalError || veeValidateErrorMessage }}
+    </small>
+
+    <small
+      v-if="props.description || hasDescriptionSlot"
+      class="text-xs text-color-secondary font-normal leading-5"
+      :data-testid="customTestId.description"
+    >
+      <slot name="description">
+        {{ props.description }}
+      </slot>
+    </small>
   </div>
-
-  <small
-    v-if="aditionalError || veeValidateErrorMessage"
-    class="p-error text-xs font-normal leading-tight"
-    :data-testid="customTestId.error"
-  >
-    {{ aditionalError || veeValidateErrorMessage }}
-  </small>
-
-  <small
-    v-if="props.description || hasDescriptionSlot"
-    class="text-xs text-color-secondary font-normal leading-5"
-    :data-testid="customTestId.description"
-  >
-    <slot name="description">
-      {{ props.description }}
-    </slot>
-  </small>
 </template>
 
 <style scoped>

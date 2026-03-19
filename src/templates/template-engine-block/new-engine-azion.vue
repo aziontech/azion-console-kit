@@ -76,7 +76,9 @@
     const singleFieldGroups = []
 
     for (const group of inputSchema.value.groups || []) {
-      const visibleFields = (group.fields || []).filter((field) => !field.hidden)
+      const visibleFields = (group.fields || []).filter(
+        (field) => !field.hidden && field.info !== 'Private Repository'
+      )
       if (visibleFields.length === 1) {
         singleFieldGroups.push(group)
         if (singleFieldGroups.length === 2) {
@@ -249,6 +251,24 @@
       field.input = defineInputBinds(field.name, { validateOnInput: true })
     }
 
+    // Helper function to find a field by name across schema
+    const findFieldByName = (fieldName) => {
+      let foundField = inputSchema.value.fields?.find((field) => field.name === fieldName)
+      if (!foundField) {
+        for (const group of inputSchema.value.groups || []) {
+          foundField = group.fields?.find((field) => field.name === fieldName)
+          if (foundField) break
+        }
+      }
+      return foundField
+    }
+
+    // Initialize isEdgeAppNamePublic from az_repo field value
+    const azRepoField = findFieldByName('az_repo')
+    if (azRepoField?.value !== undefined) {
+      isEdgeAppNamePublic.value = Boolean(azRepoField.value)
+    }
+
     inputSchema.value.fields?.forEach((field) => {
       if (!field.hidden) {
         registerFieldWithValueAndValidation(field)
@@ -321,7 +341,7 @@
    * @returns {Array} Filtered array without hidden fields
    */
   const removeHiddenFields = (fields) => {
-    return (fields || []).filter((field) => !field.hidden)
+    return (fields || []).filter((field) => !field.hidden && field.info !== 'Private Repository')
   }
 
   /**
@@ -331,6 +351,17 @@
    */
   const renderInvalidClass = (error) => {
     return error ? 'p-invalid' : ''
+  }
+
+  /**
+   * Handles the privacy toggle change - updates both isEdgeAppNamePublic and az_repo field
+   * @param {boolean} isPublic - Whether the field is public
+   */
+  const handlePrivacyToggle = (isPublic) => {
+    isEdgeAppNamePublic.value = isPublic
+    if (formTools.value.setFieldValue) {
+      formTools.value.setFieldValue('az_repo', isPublic)
+    }
   }
 
   /**
@@ -538,64 +569,62 @@
               :key="field.name"
             >
               <!-- Skip VCS integration field - handled in github-connection slot -->
+              <FieldInputTextPrivacy
+                v-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
+                :name="field.name"
+                :label="field.label"
+                :value="field.value"
+                :isPublic="isEdgeAppNamePublic"
+                @update:isPublic="handlePrivacyToggle"
+                @input="(val) => updateValueOnChange(field.name, val)"
+                :description="field.description"
+                :data-testid="`field-${field.name}`"
+                :required="field.attrs?.required"
+                :aditionalError="
+                  formTools.errors[field.name]
+                    ? unescapeErrorMessage(formTools.errors[field.name])
+                    : ''
+                "
+              />
               <div
-                v-if="isHandleField(field.name)"
+                v-else-if="isHandleField(field.name)"
                 class="flex flex-col gap-2"
               >
-                <FieldInputTextPrivacy
-                  v-if="field.info === 'Edge Application Name'"
-                  :name="field.name"
+                <LabelBlock
+                  :for="field.name"
                   :label="field.label"
-                  :value="field.value"
-                  :isPublic="isEdgeAppNamePublic"
-                  @update:isPublic="isEdgeAppNamePublic = $event"
-                  @input="(val) => updateValueOnChange(field.name, val)"
-                  :description="field.description"
-                  :data-testid="`field-${field.name}`"
-                  :required="field.attrs?.required"
-                  :aditionalError="
-                    formTools.errors[field.name]
-                      ? unescapeErrorMessage(formTools.errors[field.name])
-                      : ''
-                  "
+                  :isRequired="field.attrs?.required"
                 />
-                <template v-else>
-                  <LabelBlock
-                    :for="field.name"
-                    :label="field.label"
-                    :isRequired="field.attrs?.required"
-                  />
-                  <Password
-                    v-if="field.type === 'password'"
-                    autocomplete="off"
-                    toggleMask
-                    v-bind="field.input"
-                    v-model="field.input.value"
-                    :id="field.name"
-                    class="w-full"
-                    :class="renderInvalidClass(formTools.errors[field.name])"
-                    :feedback="false"
-                    :pt="{ input: { name: field.name } }"
-                  />
-                  <InputText
-                    v-else
-                    autocomplete="off"
-                    :id="field.name"
-                    type="text"
-                    v-bind="field.input"
-                    :name="field.name"
-                    :class="renderInvalidClass(formTools.errors[field.name])"
-                  />
-                  <small class="text-xs font-normal text-color-secondary">{{
-                    field.description
-                  }}</small>
-                  <small
-                    v-if="formTools.errors[field.name]"
-                    class="p-error text-xs font-normal leading-tight"
-                  >
-                    {{ unescapeErrorMessage(formTools.errors[field.name]) }}
-                  </small>
-                </template>
+                <Password
+                  v-if="field.type === 'password'"
+                  autocomplete="off"
+                  toggleMask
+                  v-bind="field.input"
+                  v-model="field.input.value"
+                  :id="field.name"
+                  class="w-full"
+                  :class="renderInvalidClass(formTools.errors[field.name])"
+                  :feedback="false"
+                  :pt="{ input: { name: field.name } }"
+                />
+                <InputText
+                  v-else
+                  autocomplete="off"
+                  :id="field.name"
+                  type="text"
+                  v-bind="field.input"
+                  :name="field.name"
+                  :class="renderInvalidClass(formTools.errors[field.name])"
+                />
+                <small class="text-xs font-normal text-color-secondary">{{
+                  field.description
+                }}</small>
+                <small
+                  v-if="formTools.errors[field.name]"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                </small>
               </div>
             </template>
           </div>
@@ -684,7 +713,7 @@
                         :label="field.label"
                         :value="field.value"
                         :isPublic="isEdgeAppNamePublic"
-                        @update:isPublic="isEdgeAppNamePublic = $event"
+                        @update:isPublic="handlePrivacyToggle"
                         @input="(val) => updateValueOnChange(field.name, val)"
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
@@ -784,7 +813,7 @@
                           <template #value="slotProps">
                             <div class="flex items-center gap-2">
                               <i class="pi pi-github" />
-                              <div>ddsds GitHub: {{ slotProps.value.label }}</div>
+                              <div>{{ slotProps.value?.label }}</div>
                             </div>
                           </template>
                           <template #footer>
@@ -811,7 +840,7 @@
                       :label="field.label"
                       :value="field.value"
                       :isPublic="isEdgeAppNamePublic"
-                      @update:isPublic="isEdgeAppNamePublic = $event"
+                      @update:isPublic="handlePrivacyToggle"
                       @input="(val) => updateValueOnChange(field.name, val)"
                       :description="field.description"
                       :data-testid="`field-${field.name}`"

@@ -621,7 +621,6 @@
             :loading="props.loadingDeploy"
             :disabled="props.disabledDeploy"
             severity="primary"
-            icon="pi pi-cloud-upload"
             @click="handleDeploy"
           />
         </slot>
