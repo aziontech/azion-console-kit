@@ -85,11 +85,12 @@
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.4.tgz#c81151eb16fd10e1dc10f060ad7c4226e2e0143b"
   integrity sha512-K6or5V3Cs9OyXEif906x8Y/7xvxeb+OcEsRmI8Tlci3YnD5ZRIaznWeDDOxLZ/zn0VP28OShj9WggkVM0gsSmg==
 
-"@aziontech/webkit@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.2.0.tgz#a3b7012d93c00b43dd4ef65f6747513d4929895d"
-  integrity sha512-Xp/rgDJj7D/MfRZY8vcYWoKs1sitXSQbUwajMiEtQoLYl9wlbSSLh1cIfyQiANqgHZ8ZSRr4HgIRE1NnjLcXMA==
+"@aziontech/webkit@^1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.5.3.tgz#9dc8b4df53c7fb90ad8c143f52de63cc2d824517"
+  integrity sha512-2jrCNrZQfj1sHyl1CVHKBEsz8u0DSUz0znPq3KAqZ9EKd3ocFZNva6ovk3Ao3uWsq5sigKxD0QyU4kHPtqb/Cg==
   dependencies:
+    "@vueuse/core" "^10.11.1"
     primevue "3.35.0"
     vee-validate "^4.15.1"
     vue-tsc "^3.2.5"
