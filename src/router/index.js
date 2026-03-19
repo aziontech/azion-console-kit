@@ -5,7 +5,6 @@ import { azionAiRoutes } from '@routes/azion-ai-routes'
 
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
-import { compareWithAzionRoutes } from '@routes/compare-with-azion'
 import { dataStreamRoutes } from '@/router/routes/data-stream-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
 import { workloadRoutes } from '@/router/routes/workload-routes'
@@ -96,7 +95,6 @@ const router = createRouter({
     billingRoutes,
     importGithubRoutes,
     azionAiRoutes,
-    compareWithAzionRoutes,
     resellerManagementRoutes,
     groupsManagementRoutes,
     clientManagementRoutes,
