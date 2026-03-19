@@ -27,7 +27,6 @@ import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
 import { personalTokensRoutes } from '@routes/personal-tokens-routes'
-import { playgroundRoutes } from '@routes/playground-routes'
 import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
 import { switchAccountRoutes } from '@routes/switch-account-routes'
@@ -78,7 +77,6 @@ const router = createRouter({
     edgeNodeRoutes,
     usersListsRoutes,
     passwordRoutes,
-    playgroundRoutes,
     createNewRoutes,
     mfaRoutes,
     activityHistoryRoutes,
