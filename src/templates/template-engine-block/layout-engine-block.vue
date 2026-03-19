@@ -49,6 +49,22 @@
       type: Object,
       default: () => ({})
     },
+    /**
+     * Groups to display in repository step (usually group[0])
+     * Provided by parent component
+     */
+    repositoryGroups: {
+      type: Array,
+      default: () => []
+    },
+    /**
+     * Groups to display in settings step (usually group[1+])
+     * Provided by parent component
+     */
+    settingsGroups: {
+      type: Array,
+      default: () => []
+    },
     isDrawer: {
       type: Boolean,
       default: false
@@ -270,7 +286,7 @@
    */
   const validateBeforeProceed = async () => {
     if (props.onValidate) {
-      const isValid = await props.onValidate()
+      const isValid = await props.onValidate(currentStep.value)
       return isValid
     }
     return true
@@ -554,6 +570,7 @@
           class="text-xs text-color-secondary leading-4"
         >
           {{ gitDescription }}
+          {{ errors }}
         </div>
 
         <slot
@@ -646,7 +663,15 @@
         :hide-footer="currentStep === 'deploying'"
         @deploy="handleDeploy"
       >
-        <template #content>
+        <template #form>
+          <slot
+            name="settings-inputs"
+            :schema="props.schema"
+            :is-drawer="props.isDrawer"
+            :form-data="formData"
+            :form-errors="formErrors"
+            :settings-groups="props.settingsGroups"
+          />
           <slot name="settings-content" />
         </template>
       </TemplateSettingsCard>
