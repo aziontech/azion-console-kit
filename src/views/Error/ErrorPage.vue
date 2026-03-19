@@ -29,10 +29,6 @@
   import ErrorPageBlock from '@/templates/error-page-block'
 
   const props = defineProps({
-    documentationService: {
-      type: Function,
-      required: true
-    },
     statusCode: {
       type: Number,
       required: true
@@ -43,6 +39,17 @@
     },
     description: {
       type: String,
+      required: true
+    },
+    buttons: {
+      type: Object,
+      default: () => ({
+        backToHome: 'Back to Home',
+        documentation: 'Documentation'
+      })
+    },
+    documentationService: {
+      type: Function,
       required: true
     }
   })
