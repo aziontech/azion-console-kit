@@ -26,56 +26,14 @@
       >
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label
-        for="password"
-        class="font-semibold text-sm"
-      >
-        Password
-      </label>
-      <Password
-        class="col-span-1 min-w-full"
-        :class="{ 'p-invalid': errors.password }"
-        toggleMask
-        v-model="password"
-        promptLabel="Choose a password"
-        weakLabel="Weak"
-        autocomplete="off"
-        mediumLabel="Medium"
-        strongLabel="Strong"
-        :strongRegex="strongPasswordRegex"
-        required
-        :pt="{
-          meter: 'rounded-md',
-          meterLabel: 'text-sm'
-        }"
-      >
-        <template #header> </template>
-        <template #footer>
-          <div class="mt-4 text-sm space-y-4">
-            <PrimeDivider />
-            <p class="font-medium">Must have at least:</p>
-          </div>
-
-          <div class="text-sm p-4 py-0 mt-2">
-            <ul class="list-square font-normal space-y-2 text-color-secondary">
-              <li
-                v-for="requirement in passwordRequirementsList"
-                :key="requirement.text"
-              >
-                <span>{{ requirement.text }}</span>
-              </li>
-            </ul>
-          </div>
-        </template>
-      </Password>
-
-      <small
-        v-if="errors.password"
-        class="p-error text-xs font-normal leading-tight"
-        >{{ errors.password }}</small
-      >
-    </div>
+    <FieldPasswordStrength
+      name="password"
+      label="Password"
+      :strongRegex="strongPasswordRegex"
+      :requirements="passwordRequirementsList"
+      :additionalError="errors.password"
+      required
+    />
   </div>
 
   <PrimeButton
@@ -88,9 +46,8 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import Password from 'primevue/password'
   import InputText from 'primevue/inputtext'
-  import PrimeDivider from 'primevue/divider'
+  import FieldPasswordStrength from '@aziontech/webkit/field-password-strength'
 
   import { useToast } from 'primevue/usetoast'
   import { getInstance, load } from 'recaptcha-v3'
@@ -166,7 +123,6 @@
 
   const { errors, handleSubmit } = useForm({ validationSchema })
 
-  const { value: password } = useField('password')
   const { value: email } = useField('email')
 
   const toast = useToast()

@@ -59,7 +59,7 @@
       :disabled="disabled"
       :filter="filter"
       :loading="loading"
-      :aditionalError="errorMessage"
+      :additionalError="errorMessage"
       @onChange="onChange"
       @onBlur="onBlur"
     />
