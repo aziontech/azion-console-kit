@@ -100,7 +100,7 @@ describe('CacheSyncService', () => {
     startCacheSync()
 
     expect(SSEClient).toHaveBeenCalledWith({
-      url: '/events/stream',
+      url: '/v4/sse',
       withCredentials: true
     })
     expect(mockSSEClient.connect).toHaveBeenCalled()

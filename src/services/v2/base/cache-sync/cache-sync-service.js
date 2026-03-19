@@ -3,7 +3,7 @@ import { CacheInvalidator } from './cache-invalidator'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
 import { queryClient } from '../query/queryClient'
 
-const SSE_ENDPOINT = '/events/stream'
+const SSE_ENDPOINT = '/v4/sse'
 
 /**
  * CacheSyncService - Orchestrates SSE connection and cache invalidation.

@@ -7,6 +7,8 @@ import { defineConfig, loadEnv } from 'vite'
 import istanbul from 'vite-plugin-istanbul'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
+import { sseHttp2ProxyPlugin } from './src/plugins/sse-http2-proxy'
+
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const IS_SENTRY_UPLOAD = env.VITE_SENTRY_UPLOAD === 'true'
@@ -34,6 +36,8 @@ const getConfig = () => {
     })
   })
 
+  const apiTarget = `${URLStartPrefix}api.azion.com`
+
   return {
     build: {
       sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
@@ -44,6 +48,7 @@ const getConfig = () => {
     plugins: [
       vue(),
       vueJsx(),
+      sseHttp2ProxyPlugin({ target: apiTarget }),
       istanbul({
         nycrcPath: '.nycrc'
       }),
@@ -133,9 +138,6 @@ const getConfig = () => {
         '/appcues': createProxyConfig({
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
-        }),
-        '/events/stream': createProxyConfig({
-          target: `${URLStartPrefix}beholder.azion.net`
         })
       }
     }

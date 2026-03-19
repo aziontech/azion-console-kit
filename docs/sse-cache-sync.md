@@ -1251,7 +1251,112 @@ console.log('Is primary:', cacheSyncService.state.isPrimary)
 
 ---
 
-## 11. Integration Checklist
+## 11. HTTP/2 Proxy Requirement
+
+### The Problem
+
+SSE connections do not work correctly in the local development environment with Vite's default proxy.
+
+#### Symptoms
+
+- `EventSource` connection hangs/pending
+- No headers received from the SSE stream
+- Works in production but not locally
+
+#### Root Cause Analysis
+
+The issue is NOT related to:
+
+- `withCredentials` configuration
+- Cookie handling
+- CORS settings
+
+The actual cause is a **protocol mismatch**:
+
+| Test Case                                                | Result         |
+| -------------------------------------------------------- | -------------- |
+| `curl https://stage-api.azion.com/v4/sse`                | Works (HTTP/2) |
+| `curl --http1.1 https://stage-api.azion.com/v4/sse`      | Hangs/pending  |
+| `curl http://localhost:5173/v4/sse` (Vite default proxy) | Hangs/pending  |
+
+**Conclusion:**
+
+- The `/v4/sse` endpoint requires HTTP/2 to function correctly
+- Vite's default proxy uses `http-proxy`, which makes upstream connections in HTTP/1.1
+- Therefore, SSE streams never open in local development with the standard proxy
+
+### Why Vite's Native Solution Doesn't Work
+
+#### Vite 7.2+ and HTTP/2 Support
+
+Vite 7.2 introduced HTTP/2 support even when proxy is enabled ([PR #20869](https://github.com/vitejs/vite/pull/20869)). This was possible because `http-proxy-3` (the library used by Vite for proxying) added support for "incoming HTTP/2" ([PR #33](https://github.com/sagemathinc/http-proxy-3/pull/33)).
+
+#### Limitation of http-proxy-3
+
+The support added is **only for incoming connections** (browser → dev server). The proxy still makes upstream requests (dev server → backend) in HTTP/1.1:
+
+| Direction                       | Vite < 7.2                  | Vite 7.2+            |
+| ------------------------------- | --------------------------- | -------------------- |
+| Browser → Dev Server (incoming) | HTTP/1.1 when proxy enabled | HTTP/2               |
+| Dev Server → Backend (upstream) | HTTP/1.1                    | HTTP/1.1 (no change) |
+
+As described in the `http-proxy-3` PR:
+
+> _"For full http2 support, the proxy server should forward the request as http2, if possible, but this will require a much larger effort, because the https client currently used can't make h2 requests and the http2 client can't make http1 requests."_
+
+#### Conclusion
+
+A custom middleware using `node:http2` **remains necessary** even after updating to Vite 7.2+. There is no native Vite parameter that allows configuring the upstream proxy to use HTTP/2.
+
+### The Solution: Custom HTTP/2 Proxy Plugin
+
+A dedicated Vite plugin was created in `src/plugins/sse-http2-proxy/` to proxy SSE using HTTP/2.
+
+#### What It Does
+
+- Intercepts requests to `/v4/sse`
+- Uses native `node:http2` for the upstream connection
+- Forwards relevant headers:
+  - `accept: text/event-stream`
+  - `cookie`
+  - `last-event-id` (when present)
+- Returns the upstream response as an SSE stream with:
+  - `content-type: text/event-stream`
+  - `cache-control: no-cache`
+
+#### Configuration in vite.config.js
+
+```javascript
+import { sseHttp2ProxyPlugin } from './src/plugins/sse-http2-proxy'
+
+// ...
+plugins: [
+  vue(),
+  vueJsx(),
+  sseHttp2ProxyPlugin({ target: 'https://api.azion.com' })
+  // ...
+]
+```
+
+#### Plugin Parameters
+
+| Parameter | Type     | Default    | Description                                 |
+| --------- | -------- | ---------- | ------------------------------------------- |
+| `target`  | `string` | (required) | Backend URL (e.g., `https://api.azion.com`) |
+| `path`    | `string` | `/v4/sse`  | Path prefix to intercept                    |
+
+### Compatibility Matrix
+
+| Component                            | Protocol                           | Notes                              |
+| ------------------------------------ | ---------------------------------- | ---------------------------------- |
+| Browser → Dev Server                 | HTTP/1.1 or HTTP/2                 | Vite 7.2+ supports HTTP/2 incoming |
+| Dev Server → Proxy Handler           | HTTP/1.1                           | Vite default proxy                 |
+| Proxy Handler → Backend `/v4/sse`    | **HTTP/2** (via custom middleware) | Required for SSE to work           |
+| Proxy Handler → Backend other routes | HTTP/1.1                           | Default proxy is sufficient        |
+
+---
+
+## 12. Integration Checklist
 
 When adding a new resource to the system:
 
@@ -1290,7 +1395,7 @@ INVALIDATION_MAP.push(
 
 ---
 
-## 12. References
+## 13. References
 
 - [MDN: Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 - [TanStack Query: Invalidations](https://tanstack.com/query/latest/docs/vue/guides/invalidations-from-mutations)
