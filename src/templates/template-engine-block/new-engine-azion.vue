@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch, defineOptions, unref, onMounted } from 'vue'
+  import { ref, computed, watch, defineOptions, onMounted } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
@@ -278,11 +278,11 @@
    */
   const initializeForm = async () => {
     const schema = await createSchemaObject()
-    const { errors, defineInputBinds, setFieldValue, validate } = useForm({
+    const { errors, defineInputBinds, setFieldValue, validate, validateField } = useForm({
       validationSchema: schema
     })
 
-    formTools.value = { errors, setFieldValue, validate }
+    formTools.value = { errors, setFieldValue, validate, validateField }
 
     // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
     const registerFieldWithValueAndValidation = (field) => {
@@ -343,7 +343,7 @@
    * @returns {Promise<boolean>} Whether the form is valid for the step
    */
   const validateForm = async (step = 'repository') => {
-    if (!formTools.value.validate) return false
+    if (!formTools.value.validateField) return false
 
     // Determine which field names to validate based on the current step
     let fieldNamesToValidate = []
@@ -367,16 +367,16 @@
       })
     }
 
-    // Validate only the relevant fields
-    await formTools.value.validate()
+    // Validate only the relevant fields using validateField
+    let isValid = true
+    for (const fieldName of fieldNamesToValidate) {
+      const result = await formTools.value.validateField(fieldName)
+      if (!result.valid) {
+        isValid = false
+      }
+    }
 
-    // Check errors only for the relevant fields for this step
-    const allErrors = unref(formTools.value.errors)
-    const relevantErrors = Object.keys(allErrors).filter((fieldName) =>
-      fieldNamesToValidate.includes(fieldName)
-    )
-
-    return relevantErrors.length === 0
+    return isValid
   }
 
   /**
@@ -610,6 +610,7 @@
                     :label="field.label"
                     :value="setIntegration"
                     placeholder="Select a scope"
+                    class="h-8"
                     :description="field.description"
                     :inputClass="renderInvalidClass(formTools.errors[field.name])"
                     optionLabel="label"
@@ -755,6 +756,8 @@
                             :label="field.label"
                             :value="setIntegration"
                             placeholder="Select a scope"
+                            class="h-8"
+
                             :description="field.description"
                             :inputClass="renderInvalidClass(formTools.errors[field.name])"
                             optionLabel="label"
@@ -765,9 +768,11 @@
                             "
                           >
                             <template #value="slotProps">
-                              <div class="flex items-center gap-2">
-                                <i class="pi pi-github" />
-                                <div>{{ slotProps.value?.label }}</div>
+                              <div class="flex flex-col justify-center h-full">
+                                <div class="flex items-center gap-2">
+                                  <i class="pi pi-github" />
+                                  <div>{{ slotProps.value?.label }}</div>
+                                </div>
                               </div>
                             </template>
                             <template #footer>
@@ -892,9 +897,11 @@
                           "
                         >
                           <template #value="slotProps">
-                            <div class="flex items-center gap-2">
-                              <i class="pi pi-github" />
-                              <div>{{ slotProps.value?.label }}</div>
+                            <div class="flex flex-col justify-center h-full">
+                              <div class="flex items-center gap-2">
+                                <i class="pi pi-github" />
+                                <div>{{ slotProps.value?.label }}</div>
+                              </div>
                             </div>
                           </template>
                           <template #footer>

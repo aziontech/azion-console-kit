@@ -212,7 +212,7 @@
     :class="{ 'p-invalid': aditionalError || errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
-    class="w-full"
+    class="w-full h-[34px]"
     :pt="passThrough"
     :data-testid="customTestId.dropdown"
   >
