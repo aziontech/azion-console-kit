@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
@@ -8,6 +9,8 @@
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
+
+  const router = useRouter()
 
   const props = defineProps({
     title: {
@@ -369,6 +372,10 @@
     emit('manage', data)
   }
 
+  const navigateToMarkketplace = () => {
+    router.push('/marketplace')
+  }
+
   /**
    * Handle open URL action
    */
@@ -672,7 +679,12 @@
       v-if="currentStep === 'repository'"
       class="mt-8 justify-start text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
-      <span class="cursor-pointer flex justify-center"> Browse Templates → </span>
+      <span
+        class="cursor-pointer flex justify-center px-3 py-1 rounded hover:surface-hover dark:hover:bg-gray-800 transition-colors duration-150 w-auto"
+        @click="navigateToMarkketplace"
+      >
+        Browse Templates →
+      </span>
     </div>
   </div>
 </template>

@@ -5,6 +5,7 @@
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
@@ -68,6 +69,7 @@
   const isFormReady = ref(false)
   const setIntegration = ref('')
   const isInitialized = ref(false)
+  const isEdgeAppNamePublic = ref(false)
 
   const groupedRows = computed(() => {
     const rows = []
@@ -540,41 +542,60 @@
                 v-if="isHandleField(field.name)"
                 class="flex flex-col gap-2"
               >
-                <LabelBlock
-                  :for="field.name"
-                  :label="field.label"
-                  :isRequired="field.attrs?.required"
-                />
-                <Password
-                  v-if="field.type === 'password'"
-                  autocomplete="off"
-                  toggleMask
-                  v-bind="field.input"
-                  v-model="field.input.value"
-                  :id="field.name"
-                  class="w-full"
-                  :class="renderInvalidClass(formTools.errors[field.name])"
-                  :feedback="false"
-                  :pt="{ input: { name: field.name } }"
-                />
-                <InputText
-                  v-else
-                  autocomplete="off"
-                  :id="field.name"
-                  type="text"
-                  v-bind="field.input"
+                <FieldInputTextPrivacy
+                  v-if="field.info === 'Edge Application Name'"
                   :name="field.name"
-                  :class="renderInvalidClass(formTools.errors[field.name])"
+                  :label="field.label"
+                  :value="field.value"
+                  :isPublic="isEdgeAppNamePublic"
+                  @update:isPublic="isEdgeAppNamePublic = $event"
+                  @input="(val) => updateValueOnChange(field.name, val)"
+                  :description="field.description"
+                  :data-testid="`field-${field.name}`"
+                  :required="field.attrs?.required"
+                  :aditionalError="
+                    formTools.errors[field.name]
+                      ? unescapeErrorMessage(formTools.errors[field.name])
+                      : ''
+                  "
                 />
-                <small class="text-xs font-normal text-color-secondary">{{
-                  field.description
-                }}</small>
-                <small
-                  v-if="formTools.errors[field.name]"
-                  class="p-error text-xs font-normal leading-tight"
-                >
-                  {{ unescapeErrorMessage(formTools.errors[field.name]) }}
-                </small>
+                <template v-else>
+                  <LabelBlock
+                    :for="field.name"
+                    :label="field.label"
+                    :isRequired="field.attrs?.required"
+                  />
+                  <Password
+                    v-if="field.type === 'password'"
+                    autocomplete="off"
+                    toggleMask
+                    v-bind="field.input"
+                    v-model="field.input.value"
+                    :id="field.name"
+                    class="w-full"
+                    :class="renderInvalidClass(formTools.errors[field.name])"
+                    :feedback="false"
+                    :pt="{ input: { name: field.name } }"
+                  />
+                  <InputText
+                    v-else
+                    autocomplete="off"
+                    :id="field.name"
+                    type="text"
+                    v-bind="field.input"
+                    :name="field.name"
+                    :class="renderInvalidClass(formTools.errors[field.name])"
+                  />
+                  <small class="text-xs font-normal text-color-secondary">{{
+                    field.description
+                  }}</small>
+                  <small
+                    v-if="formTools.errors[field.name]"
+                    class="p-error text-xs font-normal leading-tight"
+                  >
+                    {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                  </small>
+                </template>
               </div>
             </template>
           </div>
@@ -628,10 +649,17 @@
                             :inputClass="renderInvalidClass(formTools.errors[field.name])"
                             optionLabel="label"
                             optionValue="value"
+                            enableWorkaroundLabelToDisabledOptions
                             @onChange="
                               (installationId) => updateValueOnChange(field.name, installationId)
                             "
                           >
+                            <template #value="slotProps">
+                              <div class="flex items-center gap-2">
+                                <i class="pi pi-github" />
+                                <div>{{ slotProps.value?.label }}</div>
+                              </div>
+                            </template>
                             <template #footer>
                               <div class="p-dropdown-items-wrapper">
                                 <ul class="p-dropdown-items">
@@ -650,6 +678,23 @@
                       </div>
 
                       <!-- Regular field in group -->
+                      <FieldInputTextPrivacy
+                        v-if="field.info === 'Edge Application Name'"
+                        :name="field.name"
+                        :label="field.label"
+                        :value="field.value"
+                        :isPublic="isEdgeAppNamePublic"
+                        @update:isPublic="isEdgeAppNamePublic = $event"
+                        @input="(val) => updateValueOnChange(field.name, val)"
+                        :description="field.description"
+                        :data-testid="`field-${field.name}`"
+                        :required="field.attrs?.required"
+                        :aditionalError="
+                          formTools.errors[field.name]
+                            ? unescapeErrorMessage(formTools.errors[field.name])
+                            : ''
+                        "
+                      />
                       <div
                         v-else-if="isHandleField(field.name)"
                         class="flex flex-col gap-2"
@@ -731,10 +776,17 @@
                           :inputClass="renderInvalidClass(formTools.errors[field.name])"
                           optionLabel="label"
                           optionValue="value"
+                          enableWorkaroundLabelToDisabledOptions
                           @onChange="
                             (installationId) => updateValueOnChange(field.name, installationId)
                           "
                         >
+                          <template #value="slotProps">
+                            <div class="flex items-center gap-2">
+                              <i class="pi pi-github" />
+                              <div>ddsds GitHub: {{ slotProps.value.label }}</div>
+                            </div>
+                          </template>
                           <template #footer>
                             <div class="p-dropdown-items-wrapper">
                               <ul class="p-dropdown-items">
@@ -753,6 +805,23 @@
                     </div>
 
                     <!-- Regular field in single group -->
+                    <FieldInputTextPrivacy
+                      v-if="field.info === 'Edge Application Name'"
+                      :name="field.name"
+                      :label="field.label"
+                      :value="field.value"
+                      :isPublic="isEdgeAppNamePublic"
+                      @update:isPublic="isEdgeAppNamePublic = $event"
+                      @input="(val) => updateValueOnChange(field.name, val)"
+                      :description="field.description"
+                      :data-testid="`field-${field.name}`"
+                      :required="field.attrs?.required"
+                      :aditionalError="
+                        formTools.errors[field.name]
+                          ? unescapeErrorMessage(formTools.errors[field.name])
+                          : ''
+                      "
+                    />
                     <div
                       v-else-if="isHandleField(field.name)"
                       class="flex flex-col gap-2"
