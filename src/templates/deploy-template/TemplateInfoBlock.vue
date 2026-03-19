@@ -80,12 +80,10 @@
                 >
                   {{ props.templateTitle }}
                 </span>
-                <div
+                <i
                   v-if="props.templateUrl"
-                  class="w-3 h-3 relative overflow-hidden"
-                >
-                  <i class="pi pi-external-link text-[10px] text-color-secondary" />
-                </div>
+                  class="pi pi-external-link text-color-secondary"
+                />
               </div>
             </div>
           </div>

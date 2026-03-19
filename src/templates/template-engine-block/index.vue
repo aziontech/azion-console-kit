@@ -120,7 +120,18 @@
     try {
       if (!props.templateId) return
       const templateData = await props.getTemplateService(templateId)
-      inputSchema.value = templateData.inputSchema ?? {}
+
+      // Merge template info fields from GitHub template into inputSchema
+      // These are displayed in DeployRepositoryCard preview
+      inputSchema.value = {
+        ...(templateData.inputSchema ?? {}),
+        templateTitle: templateData.templateTitle ?? '',
+        templateDescription: templateData.templateDescription ?? '',
+        templatePath: templateData.templatePath ?? '',
+        templateUrl: templateData.templateUrl ?? '',
+        imagePreview: templateData.imagePreview ?? ''
+      }
+
       isLoading.value = false
       hasSettings.value = templateData.hasSettings
     } catch (error) {

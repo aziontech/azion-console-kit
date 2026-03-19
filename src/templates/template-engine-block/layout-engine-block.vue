@@ -182,12 +182,6 @@
   const hasIntegrationsList = computed(() => {
     return listOfIntegrations.value?.length > 0
   })
-
-  /**
-   * Fixed description text for Git configuration section
-   */
-  const gitDescription = `Configure your Git repository to integrate your codebase and automate deployments directly from your version control system.`
-
   /**
    * Triggers the GitHub OAuth flow
    * Called when user clicks "Connect with GitHub" or "Add GitHub Account"
@@ -537,11 +531,10 @@
                       >
                         {{ props.templateTitle }}
                       </span>
-                      <div
-                        v-if="props.templateUrl"
-                        class="w-3 h-3 relative overflow-hidden"
-                      >
-                        <i class="pi pi-external-link text-[10px] text-color-secondary" />
+                      <div v-if="props.templateUrl">
+                        <i
+                          class="pi pi-external-link text-sm cursor-pointer text-color-secondary"
+                        />
                       </div>
                     </div>
                   </div>
@@ -568,10 +561,7 @@
         <div
           v-if="currentStep === 'repository'"
           class="text-xs text-color-secondary leading-4"
-        >
-          {{ gitDescription }}
-          {{ errors }}
-        </div>
+        ></div>
 
         <slot
           v-if="currentStep === 'repository'"

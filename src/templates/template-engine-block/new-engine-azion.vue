@@ -154,13 +154,18 @@
    */
   const layoutProps = computed(() => ({
     title: inputSchema.value.title || 'Start from Template',
-    previewSrc: inputSchema.value.previewSrc || '',
+    previewSrc: inputSchema.value.imagePreview || inputSchema.value.previewSrc || '',
     previewAlt: inputSchema.value.previewAlt || '',
     templateTitle: inputSchema.value.templateTitle || inputSchema.value.name || '',
     templateUrl: inputSchema.value.templateUrl || '',
     templateIcon: inputSchema.value.templateIcon || '',
-    templateDescription: inputSchema.value.description || '',
-    githubUrl: inputSchema.value.githubUrl || inputSchema.value.repository || '',
+    templateDescription:
+      inputSchema.value.templateDescription || inputSchema.value.description || '',
+    githubUrl:
+      inputSchema.value.templatePath ||
+      inputSchema.value.githubUrl ||
+      inputSchema.value.repository ||
+      '',
     schema: props.schema,
     isDrawer: props.isDrawer,
     // Groups for each step
