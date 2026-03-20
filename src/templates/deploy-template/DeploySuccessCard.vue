@@ -8,7 +8,7 @@
   import { useRouter } from 'vue-router'
 
   import BaseDeployCard from './BaseDeployCard.vue'
-  import TemplateInfoBlock from './TemplateInfoBlock.vue'
+  import ResourcesCreatedBlock from './ResourcesCreatedBlock.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
@@ -22,7 +22,7 @@
       required: true
     },
 
-    // Preview block — same pattern as DeployRepositoryCard
+    // Preview block for resources created
     previewSrc: {
       type: String,
       default: ''
@@ -32,22 +32,11 @@
       default: ''
     },
 
-    // Info block
-    templateTitle: {
-      type: String,
-      required: true
-    },
-    templateUrl: {
-      type: String,
-      required: true
-    },
-    templateDescription: {
-      type: String,
-      default: ''
-    },
-    githubUrl: {
-      type: String,
-      default: ''
+    // Resources created block
+    resources: {
+      type: Array,
+      default: () => []
+      // Expected format: [{ type: 'workload' | 'application' | 'function' | 'firewall', name: 'string' }]
     }
   })
 
@@ -174,9 +163,13 @@
     router.push('/marketplace')
   }
 
+  const openMetrics = () => {
+    router.push('/real-time-metrics')
+  }
+
   const nextSteps = [
     {
-      action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
+      action: () => openMetrics(),
       icon: 'pi-chart-line',
       label: 'View Real-Time Metrics'
     },
@@ -220,13 +213,10 @@
         >.
       </p>
 
-      <TemplateInfoBlock
+      <ResourcesCreatedBlock
         :preview-src="props.previewSrc"
         :preview-alt="props.previewAlt"
-        :template-title="props.templateTitle"
-        :template-url="props.templateUrl"
-        :template-description="props.templateDescription"
-        :github-url="props.githubUrl"
+        :resources="props.resources"
       />
 
       <div class="flex flex-col gap-3">
