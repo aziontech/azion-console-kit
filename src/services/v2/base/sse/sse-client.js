@@ -1,9 +1,13 @@
 /**
- * SSE Client - Wrapper for EventSource with automatic reconnection
+ * SSE Client - Fetch-based SSE client with automatic reconnection
+ *
+ * Uses fetch + ReadableStream instead of EventSource to support custom headers.
+ * This allows sending cookies from localhost to external domains.
  *
  * @typedef {Object} SSEClientOptions
  * @property {string} url - SSE endpoint URL
- * @property {boolean} [withCredentials=true] - Send session cookies
+ * @property {boolean} [withCredentials=true] - Send credentials (cookies) in CORS requests
+ * @property {Object} [headers={}] - Custom headers to send with the request
  * @property {number} [reconnectMaxAttempts=10] - Maximum reconnection attempts
  * @property {number} [reconnectBaseDelay=1000] - Initial delay in ms
  * @property {number} [reconnectMaxDelay=30000] - Maximum delay in ms
@@ -57,13 +61,15 @@
 
 const DEFAULT_OPTIONS = {
   withCredentials: true,
+  headers: {},
   reconnectMaxAttempts: 10,
   reconnectBaseDelay: 1000,
   reconnectMaxDelay: 30000
 }
 
 export class SSEClient {
-  #eventSource = null
+  #abortController = null
+  #reader = null
   #options = null
   #state = {
     isConnected: false,
@@ -74,7 +80,7 @@ export class SSEClient {
   #listeners = new Map()
   #reconnectTimeoutId = null
   #isIntentionallyClosed = false
-  #pingHandler = null
+  #buffer = ''
 
   /**
    * Creates a new SSE client instance
@@ -101,10 +107,11 @@ export class SSEClient {
    * @returns {void}
    */
   connect() {
-    this.#cleanupEventSource()
+    this.#cleanup()
     this.#clearReconnectTimeout()
     this.#isIntentionallyClosed = false
-    this.#createEventSource()
+    this.#buffer = ''
+    this.#createConnection()
   }
 
   /**
@@ -114,6 +121,9 @@ export class SSEClient {
   disconnect() {
     this.#isIntentionallyClosed = true
     this.#cleanup()
+    this.#state.isConnected = false
+    this.#state.clientId = null
+    this.#emit('close', {})
   }
 
   /**
@@ -144,58 +154,122 @@ export class SSEClient {
     }
   }
 
-  #createEventSource() {
-    this.#eventSource = new EventSource(this.#options.url, {
-      withCredentials: this.#options.withCredentials
-    })
-    this.#setupEventHandlers()
-  }
+  async #createConnection() {
+    this.#abortController = new AbortController()
 
-  #setupEventHandlers() {
-    if (!this.#eventSource) return
+    try {
+      const response = await fetch(this.#options.url, {
+        method: 'GET',
+        headers: {
+          Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          ...this.#options.headers
+        },
+        credentials: this.#options.withCredentials ? 'include' : 'same-origin',
+        mode: 'cors',
+        signal: this.#abortController.signal
+      })
 
-    this.#eventSource.onopen = () => {
+      if (!response.ok) {
+        throw new Error(`SSE connection failed: ${response.status} ${response.statusText}`)
+      }
+
       this.#state.isConnected = true
       this.#state.reconnectAttempts = 0
       this.#state.lastError = null
       this.#emit('open', {})
-    }
 
-    this.#eventSource.onerror = () => {
-      const error = new Error('SSE connection error')
+      this.#reader = response.body.getReader()
+      await this.#readStream()
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // Intentionally cancelled, don't treat as error
+        return
+      }
       this.#handleError(error)
     }
-
-    this.#eventSource.onmessage = (event) => {
-      this.#handleMessage(event)
-    }
-
-    // Handle named SSE events (event: ping)
-    this.#pingHandler = () => this.#emit('ping', { type: 'ping' })
-    this.#eventSource.addEventListener('ping', this.#pingHandler)
   }
 
-  /**
-   * @param {MessageEvent} event
-   */
-  #handleMessage(event) {
+  async #readStream() {
+    const decoder = new TextDecoder()
+
     try {
-      const data = JSON.parse(event.data)
+      while (!this.#isIntentionallyClosed) {
+        const { done, value } = await this.#reader.read()
 
-      // Emit to 'message' listeners
-      this.#emit('message', data)
+        if (done) {
+          // Stream ended normally
+          if (!this.#isIntentionallyClosed) {
+            this.#handleError(new Error('SSE stream ended unexpectedly'))
+          }
+          return
+        }
 
-      // Emit to specific event type listeners
-      if (data.type) {
-        this.#emit(data.type, data)
+        this.#buffer += decoder.decode(value, { stream: true })
+        this.#processBuffer()
       }
-
-      // Handle 'connected' event specifically
-      if (data.type === 'connected') {
-        this.#state.clientId = data.client_id
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        return
       }
-    } catch {
-      // parse errors are expected for non-JSON messages
+      this.#handleError(error)
+    }
+  }
+
+  #processBuffer() {
+    // SSE messages are separated by double newlines
+    const messages = this.#buffer.split('\n\n')
+
+    // Keep the last incomplete message in the buffer
+    this.#buffer = messages.pop() || ''
+
+    for (const message of messages) {
+      if (message.trim()) {
+        this.#processMessage(message)
+      }
+    }
+  }
+
+  #processMessage(message) {
+    const lines = message.split('\n')
+    let eventType = 'message'
+    let data = ''
+
+    for (const line of lines) {
+      if (line.startsWith('event:')) {
+        eventType = line.slice(6).trim()
+      } else if (line.startsWith('data:')) {
+        data += line.slice(5)
+      }
+    }
+
+    // Handle named events like 'ping'
+    if (eventType === 'ping') {
+      this.#emit('ping', { type: 'ping' })
+      return
+    }
+
+    // Parse JSON data for default events
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data)
+
+        // Emit to 'message' listeners
+        this.#emit('message', parsedData)
+
+        // Emit to specific event type listeners
+        if (parsedData.type) {
+          this.#emit(parsedData.type, parsedData)
+        }
+
+        // Handle 'connected' event specifically
+        if (parsedData.type === 'connected') {
+          this.#state.clientId = parsedData.client_id
+        }
+      } catch {
+        // Non-JSON data, emit as raw
+        this.#emit('message', { raw: data })
+      }
     }
   }
 
@@ -213,15 +287,8 @@ export class SSEClient {
       return
     }
 
-    // Check if EventSource is in CLOSED state (failed to connect)
-    if (this.#eventSource?.readyState === EventSource.CLOSED) {
-      this.#eventSource = null
-      this.#attemptReconnect()
-    } else {
-      // Connection lost, will attempt to reconnect
-      this.#cleanupEventSource()
-      this.#attemptReconnect()
-    }
+    this.#cleanup()
+    this.#attemptReconnect()
   }
 
   #attemptReconnect() {
@@ -242,7 +309,7 @@ export class SSEClient {
 
     this.#reconnectTimeoutId = setTimeout(() => {
       if (!this.#isIntentionallyClosed) {
-        this.#createEventSource()
+        this.#createConnection()
       }
     }, delay)
   }
@@ -260,30 +327,18 @@ export class SSEClient {
     }
   }
 
-  #cleanupEventSource() {
-    if (this.#eventSource) {
-      // Remove named event listeners
-      if (this.#pingHandler) {
-        this.#eventSource.removeEventListener('ping', this.#pingHandler)
-      }
-      // Clear standard handlers
-      this.#eventSource.onopen = null
-      this.#eventSource.onerror = null
-      this.#eventSource.onmessage = null
-      // Close connection
-      this.#eventSource.close()
-      this.#eventSource = null
-    }
-  }
-
   #cleanup() {
-    this.#clearReconnectTimeout()
-    this.#cleanupEventSource()
+    if (this.#reader) {
+      this.#reader.cancel().catch(() => {})
+      this.#reader = null
+    }
 
-    this.#state.isConnected = false
-    this.#state.clientId = null
+    if (this.#abortController) {
+      this.#abortController.abort()
+      this.#abortController = null
+    }
 
-    this.#emit('close', {})
+    this.#buffer = ''
   }
 
   #clearReconnectTimeout() {

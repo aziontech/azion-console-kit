@@ -3,7 +3,25 @@ import { CacheInvalidator } from './cache-invalidator'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
 import { queryClient } from '../query/queryClient'
 
-const SSE_ENDPOINT = '/v4/sse'
+const SSE_ENDPOINT = 'https://stage-beholder.azion.net/sse'
+
+/**
+ * Gets cookies from the current document that should be forwarded
+ * This allows sending localhost cookies to external domains
+ * @returns {Object} Headers object with Cookie header
+ */
+function getCookieHeaders() {
+  if (typeof document === 'undefined') {
+    return {}
+  }
+
+  const cookies = document.cookie
+  if (!cookies) {
+    return {}
+  }
+
+  return { Cookie: cookies }
+}
 
 /**
  * CacheSyncService - Orchestrates SSE connection and cache invalidation.
@@ -104,7 +122,8 @@ class CacheSyncService {
 
     this.#client = new SSEClient({
       url: SSE_ENDPOINT,
-      withCredentials: true
+      withCredentials: true,
+      headers: getCookieHeaders()
     })
 
     this.#client.on('open', () => {

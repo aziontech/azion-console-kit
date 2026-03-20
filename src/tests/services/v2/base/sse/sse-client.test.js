@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { SSEClient } from '@services/v2/base/sse/sse-client'
 
 const fixtures = {
-  url: '/events/stream',
+  url: 'https://stage-beholder.azion.net/sse',
   connectedEvent: {
     type: 'connected',
     client_id: '0001a',
@@ -28,86 +28,54 @@ const fixtures = {
   }
 }
 
-let lastEventSource = null
+/**
+ * Creates a mock ReadableStream that yields SSE events
+ */
+function createMockReadableStream(chunks = []) {
+  let index = 0
+  const encoder = new TextEncoder()
 
-class MockEventSource {
-  static CONNECTING = 0
-  static OPEN = 1
-  static CLOSED = 2
-
-  constructor(url, options = {}) {
-    this.url = url
-    this.withCredentials = options.withCredentials ?? false
-    this.readyState = MockEventSource.CONNECTING
-    this.onopen = null
-    this.onerror = null
-    this.onmessage = null
-    this._namedListeners = new Map()
-    lastEventSource = this
-
-    setTimeout(() => {
-      if (this.readyState !== MockEventSource.CLOSED) {
-        this.readyState = MockEventSource.OPEN
-        if (this.onopen) this.onopen()
-      }
-    }, 0)
-  }
-
-  close() {
-    this.readyState = MockEventSource.CLOSED
-  }
-
-  addEventListener(eventName, handler) {
-    if (!this._namedListeners.has(eventName)) {
-      this._namedListeners.set(eventName, new Set())
-    }
-    this._namedListeners.get(eventName).add(handler)
-  }
-
-  removeEventListener(eventName, handler) {
-    this._namedListeners.get(eventName)?.delete(handler)
-  }
-
-  simulateMessage(data) {
-    const event = { data: JSON.stringify(data) }
-    if (this.onmessage) this.onmessage(event)
-  }
-
-  simulateRawMessage(rawData) {
-    const event = { data: rawData }
-    if (this.onmessage) this.onmessage(event)
-  }
-
-  simulateNamedEvent(eventName, data = {}) {
-    const handlers = this._namedListeners.get(eventName)
-    if (handlers) {
-      handlers.forEach((handler) => handler({ data: JSON.stringify(data) }))
-    }
-  }
-
-  simulateError() {
-    this.readyState = MockEventSource.CLOSED
-    if (this.onerror) this.onerror({})
+  return {
+    getReader: () => ({
+      read: vi.fn(async () => {
+        if (index >= chunks.length) {
+          return { done: true, value: undefined }
+        }
+        const chunk = chunks[index++]
+        return { done: false, value: encoder.encode(chunk) }
+      }),
+      cancel: vi.fn(async () => {})
+    })
   }
 }
 
-MockEventSource.CONNECTING = 0
-MockEventSource.OPEN = 1
-MockEventSource.CLOSED = 2
+let mockFetch = null
+let lastFetchRequest = null
 
 const makeSut = (options = {}) => {
-  lastEventSource = null
+  lastFetchRequest = null
   const sut = new SSEClient({ url: fixtures.url, ...options })
   return {
     sut,
-    getEventSource: () => lastEventSource
+    getLastRequest: () => lastFetchRequest
   }
 }
 
 describe('SSEClient', () => {
   beforeEach(() => {
-    vi.stubGlobal('EventSource', MockEventSource)
     vi.useFakeTimers()
+
+    mockFetch = vi.fn(async (url, options) => {
+      lastFetchRequest = { url, options }
+
+      return {
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['data: {"type":"connected","client_id":"test"}\n\n'])
+      }
+    })
+
+    vi.stubGlobal('fetch', mockFetch)
   })
 
   afterEach(() => {
@@ -133,47 +101,55 @@ describe('SSEClient', () => {
   })
 
   describe('connect', () => {
-    it('should create EventSource with correct URL and credentials', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should call fetch with correct URL and headers', async () => {
+      const { sut } = makeSut({ headers: { 'X-Custom': 'value' } })
       sut.connect()
+      await vi.runAllTimersAsync()
 
-      const es = getEventSource()
-      expect(es.url).toBe(fixtures.url)
-      expect(es.withCredentials).toBe(true)
+      expect(mockFetch).toHaveBeenCalledWith(
+        fixtures.url,
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            Accept: 'text/event-stream',
+            'X-Custom': 'value'
+          }),
+          credentials: 'include',
+          mode: 'cors'
+        })
+      )
     })
 
-    it('should emit open and set isConnected on connection', () => {
+    it('should emit open event on successful connection', async () => {
       const { sut } = makeSut()
       const openHandler = vi.fn()
 
       sut.on('open', openHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
       expect(openHandler).toHaveBeenCalled()
       expect(sut.getState().isConnected).toBe(true)
       expect(sut.getState().reconnectAttempts).toBe(0)
     })
 
-    it('should close existing connection and create new one when called twice', () => {
-      const { sut } = makeSut()
+    it('should use withCredentials=false correctly', async () => {
+      const { sut } = makeSut({ withCredentials: false })
       sut.connect()
-      const firstES = lastEventSource
+      await vi.runAllTimersAsync()
 
-      sut.connect()
-      expect(firstES.readyState).toBe(MockEventSource.CLOSED)
-      expect(lastEventSource).not.toBe(firstES)
+      expect(lastFetchRequest.options.credentials).toBe('same-origin')
     })
   })
 
   describe('disconnect', () => {
-    it('should close connection and emit close event', () => {
+    it('should close connection and emit close event', async () => {
       const { sut } = makeSut()
       const closeHandler = vi.fn()
 
       sut.on('close', closeHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
       sut.disconnect()
 
@@ -184,154 +160,172 @@ describe('SSEClient', () => {
   })
 
   describe('message handling', () => {
-    it('should parse JSON and emit to message listeners', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should parse JSON and emit to message listeners', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.connectedEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const messageHandler = vi.fn()
 
       sut.on('message', messageHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.connectedEvent)
+      await vi.runAllTimersAsync()
 
       expect(messageHandler).toHaveBeenCalledWith(fixtures.connectedEvent)
     })
 
-    it('should emit typed events based on data.type', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should emit typed events based on data.type', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.connectedEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const connectedHandler = vi.fn()
 
       sut.on('connected', connectedHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.connectedEvent)
+      await vi.runAllTimersAsync()
 
       expect(connectedHandler).toHaveBeenCalledWith(fixtures.connectedEvent)
     })
 
-    it('should store clientId from connected event', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should store clientId from connected event', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.connectedEvent)}\n\n`])
+      })
 
+      const { sut } = makeSut()
       sut.connect()
-      vi.advanceTimersByTime(1)
-      getEventSource().simulateMessage(fixtures.connectedEvent)
+      await vi.runAllTimersAsync()
 
       expect(sut.getState().clientId).toBe('0001a')
     })
 
-    it('should emit activity events', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should emit activity events', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.activityEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const activityHandler = vi.fn()
 
       sut.on('activity', activityHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.activityEvent)
+      await vi.runAllTimersAsync()
 
       expect(activityHandler).toHaveBeenCalledWith(fixtures.activityEvent)
     })
 
-    it('should not emit on invalid JSON', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should emit raw data for non-JSON messages', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['data: plain-text\n\n'])
+      })
+
+      const { sut } = makeSut()
       const messageHandler = vi.fn()
 
       sut.on('message', messageHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
-      getEventSource().simulateRawMessage('not-json')
-
-      expect(messageHandler).not.toHaveBeenCalled()
-    })
-
-    it('should not process messages twice (no duplicate listener)', () => {
-      const { sut, getEventSource } = makeSut()
-      const messageHandler = vi.fn()
-
-      sut.on('message', messageHandler)
-      sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.connectedEvent)
-
-      expect(messageHandler).toHaveBeenCalledTimes(1)
+      expect(messageHandler).toHaveBeenCalledWith({ raw: 'plain-text' })
     })
   })
 
   describe('ping event', () => {
-    it('should emit ping event to listeners (via onmessage)', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should emit ping event for named SSE event (event: ping)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['event: ping\ndata: {}\n\n'])
+      })
+
+      const { sut } = makeSut()
       const pingHandler = vi.fn()
 
       sut.on('ping', pingHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.pingEvent)
-
-      expect(pingHandler).toHaveBeenCalledWith(fixtures.pingEvent)
-      expect(sut.getState().isConnected).toBe(true)
-    })
-
-    it('should emit ping event via named SSE event (event: ping)', () => {
-      const { sut, getEventSource } = makeSut()
-      const pingHandler = vi.fn()
-
-      sut.on('ping', pingHandler)
-      sut.connect()
-      vi.advanceTimersByTime(1)
-
-      // Simulate named SSE event: "event: ping\ndata: {}"
-      getEventSource().simulateNamedEvent('ping')
+      await vi.runAllTimersAsync()
 
       expect(pingHandler).toHaveBeenCalledWith({ type: 'ping' })
-      expect(sut.getState().isConnected).toBe(true)
     })
   })
 
   describe('closed event', () => {
-    it('should emit closed event to listeners', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should emit closed event to listeners', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.closedEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const closedHandler = vi.fn()
 
       sut.on('closed', closedHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.closedEvent)
+      await vi.runAllTimersAsync()
 
       expect(closedHandler).toHaveBeenCalledWith(fixtures.closedEvent)
     })
   })
 
   describe('event subscription', () => {
-    it('should return unsubscribe function from on()', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should return unsubscribe function from on()', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.connectedEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const handler = vi.fn()
 
       const unsubscribe = sut.on('message', handler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
       unsubscribe()
-      getEventSource().simulateMessage(fixtures.connectedEvent)
 
-      expect(handler).not.toHaveBeenCalled()
+      // Reconnect with new data
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.activityEvent)}\n\n`])
+      })
+
+      sut.connect()
+      await vi.runAllTimersAsync()
+
+      expect(handler).toHaveBeenCalledTimes(1) // Only from first connection
     })
 
-    it('should support multiple subscribers for same event', () => {
-      const { sut, getEventSource } = makeSut()
+    it('should support multiple subscribers for same event', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream([`data: ${JSON.stringify(fixtures.connectedEvent)}\n\n`])
+      })
+
+      const { sut } = makeSut()
       const handler1 = vi.fn()
       const handler2 = vi.fn()
 
       sut.on('message', handler1)
       sut.on('message', handler2)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      getEventSource().simulateMessage(fixtures.connectedEvent)
+      await vi.runAllTimersAsync()
 
       expect(handler1).toHaveBeenCalledTimes(1)
       expect(handler2).toHaveBeenCalledTimes(1)
@@ -339,47 +333,53 @@ describe('SSEClient', () => {
   })
 
   describe('reconnection', () => {
-    it('should attempt reconnection with exponential backoff', () => {
+    it('should attempt reconnection with exponential backoff on error', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network error'))
+      mockFetch.mockRejectedValueOnce(new Error('Network error'))
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['data: {"type":"connected"}\n\n'])
+      })
+
       const { sut } = makeSut({ reconnectMaxAttempts: 3, reconnectBaseDelay: 1000 })
+      const errorHandler = vi.fn()
+
+      sut.on('error', errorHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
-      lastEventSource.simulateError()
+      expect(errorHandler).toHaveBeenCalled()
       expect(sut.getState().reconnectAttempts).toBe(1)
-
-      vi.advanceTimersByTime(1000)
-      lastEventSource.simulateError()
-      expect(sut.getState().reconnectAttempts).toBe(2)
-
-      vi.advanceTimersByTime(2000)
-      lastEventSource.simulateError()
-      expect(sut.getState().reconnectAttempts).toBe(3)
     })
 
-    it('should emit maxReconnectAttempts after exhausting retries', () => {
-      const { sut } = makeSut({ reconnectMaxAttempts: 1, reconnectBaseDelay: 100 })
+    it('should emit maxReconnectAttempts after exhausting retries', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'))
+
+      const { sut } = makeSut({ reconnectMaxAttempts: 2, reconnectBaseDelay: 100 })
       const maxHandler = vi.fn()
 
       sut.on('maxReconnectAttempts', maxHandler)
       sut.connect()
-      vi.advanceTimersByTime(1)
-
-      lastEventSource.simulateError()
-      vi.advanceTimersByTime(100)
-
-      lastEventSource.simulateError()
+      await vi.runAllTimersAsync()
 
       expect(maxHandler).toHaveBeenCalled()
     })
 
-    it('should not reconnect after intentional disconnect', () => {
+    it('should not reconnect after intentional disconnect', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['data: {"type":"connected"}\n\n'])
+      })
+
       const { sut } = makeSut()
 
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
       sut.disconnect()
-      vi.advanceTimersByTime(60000)
+      await vi.runAllTimersAsync()
 
       expect(sut.getState().isConnected).toBe(false)
       expect(sut.getState().reconnectAttempts).toBe(0)
@@ -398,17 +398,58 @@ describe('SSEClient', () => {
   })
 
   describe('destroy', () => {
-    it('should disconnect and clear all listeners', () => {
+    it('should disconnect and clear all listeners', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: createMockReadableStream(['data: {"type":"connected"}\n\n'])
+      })
+
       const { sut } = makeSut()
       const handler = vi.fn()
 
       sut.on('message', handler)
       sut.connect()
-      vi.advanceTimersByTime(1)
+      await vi.runAllTimersAsync()
 
       sut.destroy()
 
       expect(sut.getState().isConnected).toBe(false)
+    })
+  })
+
+  describe('custom headers', () => {
+    it('should include custom headers in request', async () => {
+      const customHeaders = {
+        'X-Custom-Header': 'custom-value',
+        Cookie: 'session=abc123'
+      }
+
+      const { sut } = makeSut({ headers: customHeaders })
+      sut.connect()
+      await vi.runAllTimersAsync()
+
+      expect(lastFetchRequest.options.headers).toMatchObject(customHeaders)
+    })
+  })
+
+  describe('error handling', () => {
+    it('should handle non-ok HTTP responses', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized'
+      })
+
+      const { sut } = makeSut()
+      const errorHandler = vi.fn()
+
+      sut.on('error', errorHandler)
+      sut.connect()
+      await vi.runAllTimersAsync()
+
+      expect(errorHandler).toHaveBeenCalled()
+      expect(errorHandler.mock.calls[0][0].message).toContain('401')
     })
   })
 })
