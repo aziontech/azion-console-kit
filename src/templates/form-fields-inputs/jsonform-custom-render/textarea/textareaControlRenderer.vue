@@ -36,7 +36,7 @@
       :label="label"
       :description="description"
       :required="required"
-      :aditionalError="errorMessage"
+      :additionalError="errorMessage"
       :rows="options?.rows || 20"
       @blur="onBlur"
       @input="onChange"

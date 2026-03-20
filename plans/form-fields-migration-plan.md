@@ -33,7 +33,7 @@ This document outlines the migration plan for replacing local form-fields-inputs
 | `@aziontech/webkit/field-text` | `fieldText.vue` | ✅ Ready |
 | `@aziontech/webkit/field-text-area` | `fieldTextArea.vue` | ✅ Ready |
 | `@aziontech/webkit/field-text-icon` | `fieldTextIcon.vue` | ✅ Ready |
-| `@aziontech/webkit/field-text-password` | `fieldTextPassword.vue` | ✅ Ready |
+| `@aziontech/webkit/field-password` | `fieldPassword.vue` | ✅ Ready |
 
 ### Components NOT in Webkit (Internal Dependencies)
 
@@ -42,7 +42,7 @@ These files are internal renderers and should remain local:
 | Local Path | Notes |
 |------------|-------|
 | `jsonform-custom-render/input-text/inputTextControlRenderer.vue` | Uses local fieldText internally |
-| `jsonform-custom-render/input-password/inputPasswordControlRenderer.vue` | Uses local fieldTextPassword internally |
+| `jsonform-custom-render/input-password/inputPasswordControlRenderer.vue` | Uses local fieldPassword internally |
 | `jsonform-custom-render/input-number/inputNumberControlRenderer.vue` | Uses local fieldNumber internally |
 | `jsonform-custom-render/textarea/textareaControlRenderer.vue` | Uses local fieldTextArea internally |
 | `jsonform-custom-render/dropdown/dropdownControlRenderer.vue` | Uses local fieldDropdown internally |
@@ -66,7 +66,7 @@ import FieldText from '@aziontech/webkit/field-text'
 | `@/templates/form-fields-inputs/fieldText` | `@aziontech/webkit/field-text` |
 | `@/templates/form-fields-inputs/fieldTextArea` | `@aziontech/webkit/field-text-area` |
 | `@/templates/form-fields-inputs/fieldTextIcon` | `@aziontech/webkit/field-text-icon` |
-| `@/templates/form-fields-inputs/fieldTextPassword` | `@aziontech/webkit/field-text-password` |
+| `@/templates/form-fields-inputs/fieldPassword` | `@aziontech/webkit/field-password` |
 | `@/templates/form-fields-inputs/fieldDropdown` | `@aziontech/webkit/field-dropdown` |
 | `@/templates/form-fields-inputs/fieldDropdownIcon` | `@aziontech/webkit/field-dropdown-icon` |
 | `@/templates/form-fields-inputs/fieldDropdownLazyLoader` | `@aziontech/webkit/field-dropdown-lazy-loader` |

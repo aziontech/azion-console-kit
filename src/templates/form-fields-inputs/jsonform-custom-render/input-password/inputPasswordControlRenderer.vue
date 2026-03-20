@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldTextPassword from '@aziontech/webkit/field-text-password'
+  import fieldPassword from '@aziontech/webkit/field-password'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
@@ -30,12 +30,12 @@
 
 <template>
   <div class="flex flex-col gap-2">
-    <fieldTextPassword
+    <fieldPassword
       :name="path"
       :label="label"
       :description="description"
       :required="required"
-      :aditionalError="errorMessage"
+      :additionalError="errorMessage"
       @blur="onBlur"
       @input="onChange"
     />
