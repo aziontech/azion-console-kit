@@ -51,6 +51,9 @@
 
   const solutionStore = useSolutionStore()
 
+  // Get executionId from route params (available on success step)
+  const executionId = ref('')
+
   const loadSolutionByVendor = async () => {
     try {
       store.startLoading()
@@ -108,7 +111,21 @@
 
   onMounted(async () => {
     await loadSolutionByVendor()
+    // Set executionId from route params if available
+    if (route.params.executionId) {
+      executionId.value = route.params.executionId
+    }
   })
+
+  // Watch for executionId changes in route params
+  watch(
+    () => route.params.executionId,
+    (newExecutionId) => {
+      if (newExecutionId) {
+        executionId.value = newExecutionId
+      }
+    }
+  )
 
   // Watch only vendor and solution params, not step changes
   watch(
@@ -193,6 +210,7 @@
           :getTemplateService="props.getTemplateService"
           :instantiateTemplateService="props.instantiateTemplateService"
           :templateId="solution.referenceId"
+          :executionId="executionId"
         />
       </form>
 

@@ -197,7 +197,6 @@
 <template>
   <BaseDeployCard
     title="Deployment Successful"
-    :hide-footer="true"
   >
     <template #content>
       <p class="text-sm text-color-secondary leading-5">
@@ -395,7 +394,13 @@
     </template>
 
     <template #footer>
-      <slot name="footer"> </slot>
+      <PrimeButton
+        severity="secondary"
+        label="Continue to Home"
+        @click="router.push('/')"
+        icon-pos="right"
+        class="max-md:w-full md:min-w-[5rem]"
+      />
     </template>
   </BaseDeployCard>
 </template>

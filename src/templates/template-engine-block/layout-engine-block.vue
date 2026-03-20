@@ -207,15 +207,29 @@
   }
 
   /**
+   * Get executionId from URL path parameter
+   * @returns {string} The executionId from URL or empty string
+   */
+  const getExecutionIdFromRoute = () => {
+    return route.params.executionId || ''
+  }
+
+  /**
    * Update URL with current step as path segment
    * @param {string} step - The step to set in URL path
+   * @param {string} [executionId] - Optional executionId to include in URL (for deploying/success steps)
    */
-  const updateRouteStep = (step) => {
+  const updateRouteStep = (step, executionId = null) => {
     const currentPath = route.path
     const pathSegments = currentPath.split('/').filter(Boolean)
 
-    // Remove the last segment if it's a valid step
+    // Remove the last segments if they're valid step/executionId
     const validSteps = ['repository', 'settings', 'deploying', 'success']
+    // Remove executionId if present (it comes after step)
+    if (validSteps.includes(pathSegments[pathSegments.length - 2])) {
+      pathSegments.pop()
+    }
+    // Remove step if present
     if (validSteps.includes(pathSegments[pathSegments.length - 1])) {
       pathSegments.pop()
     }
@@ -223,6 +237,10 @@
     // Add the new step (always use 'repository' as default, but don't add it to URL)
     if (step !== 'repository') {
       pathSegments.push(step)
+      // Add executionId for deploying or success step if provided
+      if ((step === 'deploying' || step === 'success') && executionId) {
+        pathSegments.push(executionId)
+      }
     }
 
     const newPath = '/' + pathSegments.join('/')
@@ -246,6 +264,17 @@
         if (step !== currentStep.value) {
           deployTemplateFormStore.setCurrentStep(step)
         }
+      }
+    }
+  )
+
+  // Watch for executionId changes to update the route
+  watch(
+    () => props.executionId,
+    (newExecutionId) => {
+      // Only update route if we have executionId and we're in deploying or success step
+      if (newExecutionId && ['deploying', 'success'].includes(currentStep.value)) {
+        updateRouteStep(currentStep.value, newExecutionId)
       }
     }
   )
@@ -426,7 +455,7 @@
    */
   const goToSuccess = () => {
     deployTemplateFormStore.setCurrentStep('success')
-    updateRouteStep('success')
+    updateRouteStep('success', props.executionId)
 
     nextTick(() => {
       step4Ref.value?.scrollIntoView({
@@ -530,6 +559,7 @@
     goToSettings,
     goToDeploying,
     goToSuccess,
+    getExecutionIdFromRoute,
     // Store
     deployTemplateFormStore
   })
@@ -772,7 +802,7 @@
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"
         :next-steps="props.nextSteps"
-        :deploy-started="currentStep === 'deploying'"
+        :deploy-started="currentStep === 'deploying' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
         @manage="handleManage"
