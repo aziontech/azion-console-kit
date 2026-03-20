@@ -17,7 +17,7 @@ export const marketplaceRoutes = {
       }
     },
     {
-      path: 'solution/:vendor/:solution',
+      path: 'solution/:vendor/:solution/:step?',
       name: 'marketplace-solution',
       component: () => import('@views/Marketplace/SolutionView.vue'),
       props: {

@@ -1,5 +1,5 @@
 <script setup>
-  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { inject, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   import PrimeButton from 'primevue/button'
@@ -110,12 +110,19 @@
     await loadSolutionByVendor()
   })
 
-  watchEffect(() => {
-    if (!route.params.vendor || !route.params.solution) {
-      return
+  // Watch only vendor and solution params, not step changes
+  watch(
+    () => ({ vendor: route.params.vendor, solution: route.params.solution }),
+    (newParams, oldParams) => {
+      if (!newParams.vendor || !newParams.solution) {
+        return
+      }
+      // Only reload if vendor or solution actually changed
+      if (newParams.vendor !== oldParams?.vendor || newParams.solution !== oldParams?.solution) {
+        loadSolutionByVendor()
+      }
     }
-    loadSolutionByVendor()
-  })
+  )
 </script>
 
 <template>

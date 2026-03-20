@@ -6,6 +6,7 @@
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
+  import { useDeployTemplateFormStore } from '@/stores/deploy-template-form'
 
   // JSON Forms Custom Renderers
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
@@ -22,6 +23,8 @@
   import { InputTextPrivacyControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text-privacy/inputTextPrivacyControlTester'
 
   defineOptions({ name: 'engineJsonForm' })
+
+  const deployTemplateFormStore = useDeployTemplateFormStore()
 
   // ============================================================================
   // Props
@@ -79,9 +82,18 @@
   const layoutRef = ref(null)
   const oauthGithubRef = ref(null)
 
-  const selectedIntegration = ref('')
+  const selectedIntegration = computed({
+    get: () => deployTemplateFormStore.getSelectedIntegration,
+    set: (value) => deployTemplateFormStore.setSelectedIntegration(value)
+  })
   const vcsIntegrationError = ref('')
-  const formData = ref({})
+
+  // Form data synced with store for persistence
+  const formData = computed({
+    get: () => deployTemplateFormStore.getFormData,
+    set: (value) => deployTemplateFormStore.setFormData(value)
+  })
+
   const errors = ref([])
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 

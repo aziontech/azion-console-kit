@@ -1,6 +1,6 @@
 <script setup>
-  import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref, computed, onBeforeUnmount, nextTick, watch, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
@@ -9,8 +9,11 @@
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
+  import { useDeployTemplateFormStore } from '@/stores/deploy-template-form'
 
   const router = useRouter()
+  const route = useRoute()
+  const deployTemplateFormStore = useDeployTemplateFormStore()
 
   const props = defineProps({
     title: {
@@ -155,8 +158,12 @@
 
   const toast = useToast()
 
-  // Step Navigation State
-  const currentStep = ref('repository')
+  // Step Navigation State - synced with store and URL
+  const currentStep = computed({
+    get: () => deployTemplateFormStore.getCurrentStep,
+    set: (value) => deployTemplateFormStore.setCurrentStep(value)
+  })
+
   const isTransitioning = ref(false)
   const step2Ref = ref(null)
   const step3Ref = ref(null)
@@ -164,16 +171,84 @@
   const showNextButton = ref(props.showNextButton)
   const simulationTimerRef = ref(null)
 
-  // VCS Integration State
-  const callbackUrl = ref('')
-  const listOfIntegrations = ref([])
+  // VCS Integration State - synced with store
+  const callbackUrl = computed({
+    get: () => deployTemplateFormStore.getCallbackUrl,
+    set: (value) => deployTemplateFormStore.setCallbackUrl(value)
+  })
+
+  const listOfIntegrations = computed({
+    get: () => deployTemplateFormStore.getListOfIntegrations,
+    set: (value) => deployTemplateFormStore.setListOfIntegrations(value)
+  })
+
   const isIntegrationsLoading = ref(false)
   const oauthGithubRef = ref(null)
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
-  // Form State (to be managed by consumer components)
-  const formData = ref({})
+  // Form State - synced with store
+  const formData = computed({
+    get: () => deployTemplateFormStore.getFormData,
+    set: (value) => deployTemplateFormStore.setFormData(value)
+  })
+
   const formErrors = ref([])
+
+  /**
+   * Get current step from URL path parameter
+   * @returns {string} The current step from URL or 'repository' as default
+   */
+  const getStepFromRoute = () => {
+    const step = route.params.step
+    if (step && ['repository', 'settings', 'deploying', 'success'].includes(step)) {
+      return step
+    }
+    return 'repository'
+  }
+
+  /**
+   * Update URL with current step as path segment
+   * @param {string} step - The step to set in URL path
+   */
+  const updateRouteStep = (step) => {
+    const currentPath = route.path
+    const pathSegments = currentPath.split('/').filter(Boolean)
+
+    // Remove the last segment if it's a valid step
+    const validSteps = ['repository', 'settings', 'deploying', 'success']
+    if (validSteps.includes(pathSegments[pathSegments.length - 1])) {
+      pathSegments.pop()
+    }
+
+    // Add the new step (always use 'repository' as default, but don't add it to URL)
+    if (step !== 'repository') {
+      pathSegments.push(step)
+    }
+
+    const newPath = '/' + pathSegments.join('/')
+    router.push(newPath)
+  }
+
+  // Initialize step from route on mount
+  onMounted(() => {
+    const routeStep = getStepFromRoute()
+    if (routeStep !== currentStep.value) {
+      deployTemplateFormStore.setCurrentStep(routeStep)
+    }
+  })
+
+  // Watch for route changes to sync step
+  watch(
+    () => route.params.step,
+    (newStep) => {
+      const step = newStep || 'repository'
+      if (['repository', 'settings', 'deploying', 'success'].includes(step)) {
+        if (step !== currentStep.value) {
+          deployTemplateFormStore.setCurrentStep(step)
+        }
+      }
+    }
+  )
 
   /**
    * Check if there are VCS integrations available
@@ -294,7 +369,8 @@
     const isValid = await validateBeforeProceed()
     if (!isValid) return
 
-    currentStep.value = 'settings'
+    deployTemplateFormStore.setCurrentStep('settings')
+    updateRouteStep('settings')
     emit('next')
 
     nextTick(() => {
@@ -310,7 +386,8 @@
    * Called when user clicks Deploy on TemplateSettingsCard
    */
   const goToDeploying = () => {
-    currentStep.value = 'deploying'
+    deployTemplateFormStore.setCurrentStep('deploying')
+    updateRouteStep('deploying')
     showNextButton.value = false
 
     nextTick(() => {
@@ -348,7 +425,8 @@
    * Called after deploy finishes successfully
    */
   const goToSuccess = () => {
-    currentStep.value = 'success'
+    deployTemplateFormStore.setCurrentStep('success')
+    updateRouteStep('success')
 
     nextTick(() => {
       step4Ref.value?.scrollIntoView({
@@ -371,7 +449,8 @@
    * Handle retry action
    */
   const handleRetry = () => {
-    currentStep.value = 'settings'
+    deployTemplateFormStore.setCurrentStep('settings')
+    updateRouteStep('settings')
     emit('retry')
   }
 
@@ -404,9 +483,19 @@
    * Reset flow to first step
    */
   const reset = () => {
-    currentStep.value = 'repository'
+    deployTemplateFormStore.setCurrentStep('repository')
+    updateRouteStep('repository')
     isTransitioning.value = false
     clearDeploySimulation()
+  }
+
+  /**
+   * Go back to repository step
+   * Used when navigating back from settings
+   */
+  const goToRepository = () => {
+    deployTemplateFormStore.setCurrentStep('repository')
+    updateRouteStep('repository')
   }
 
   onBeforeUnmount(() => {
@@ -437,9 +526,12 @@
     step3Ref,
     step4Ref,
     reset,
+    goToRepository,
     goToSettings,
     goToDeploying,
-    goToSuccess
+    goToSuccess,
+    // Store
+    deployTemplateFormStore
   })
 </script>
 

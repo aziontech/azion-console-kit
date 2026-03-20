@@ -9,8 +9,11 @@
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
+  import { useDeployTemplateFormStore } from '@/stores/deploy-template-form'
 
   defineOptions({ name: 'engineAzion' })
+
+  const deployTemplateFormStore = useDeployTemplateFormStore()
 
   const props = defineProps({
     schema: {
@@ -70,6 +73,18 @@
   const setIntegration = ref('')
   const isInitialized = ref(false)
   const isEdgeAppNamePublic = ref(false)
+
+  // Persisted form data from store
+  const persistedFormData = computed({
+    get: () => deployTemplateFormStore.getFormData,
+    set: (value) => deployTemplateFormStore.setFormData(value)
+  })
+
+  // Persisted VCS integration from store
+  const selectedIntegration = computed({
+    get: () => deployTemplateFormStore.getSelectedIntegration,
+    set: (value) => deployTemplateFormStore.setSelectedIntegration(value)
+  })
 
   /**
    * Computed property to determine if inputs should be disabled
@@ -300,8 +315,12 @@
 
     // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
     const registerFieldWithValueAndValidation = (field) => {
-      if (field.value) {
-        setFieldValue(field.name, field.value)
+      // Check for persisted value first, then fall back to schema default
+      const persistedValue = persistedFormData.value[field.name]
+      const valueToSet = persistedValue !== undefined ? persistedValue : field.value
+
+      if (valueToSet !== undefined && valueToSet !== '') {
+        setFieldValue(field.name, valueToSet)
       }
       field.input = defineInputBinds(field.name, { validateOnInput: true })
     }
@@ -318,10 +337,15 @@
       return foundField
     }
 
-    // Initialize isEdgeAppNamePublic from az_repo field value
-    const azRepoField = findFieldByName('az_repo')
-    if (azRepoField?.value !== undefined) {
-      isEdgeAppNamePublic.value = Boolean(azRepoField.value)
+    // Initialize isEdgeAppNamePublic from az_repo field value (prefer persisted)
+    const persistedAzRepo = persistedFormData.value.az_repo
+    if (persistedAzRepo !== undefined) {
+      isEdgeAppNamePublic.value = Boolean(persistedAzRepo)
+    } else {
+      const azRepoField = findFieldByName('az_repo')
+      if (azRepoField?.value !== undefined) {
+        isEdgeAppNamePublic.value = Boolean(azRepoField.value)
+      }
     }
 
     inputSchema.value.fields?.forEach((field) => {
@@ -338,8 +362,32 @@
       })
     })
 
+    // Restore persisted VCS integration if available
+    if (selectedIntegration.value) {
+      setIntegration.value = selectedIntegration.value
+    }
+
     isFormReady.value = true
     isInitialized.value = true
+  }
+
+  /**
+   * Sync current form data to store for persistence
+   */
+  const syncFormDataToStore = () => {
+    const data = {}
+
+    inputSchema.value.fields?.forEach((field) => {
+      data[field.name] = field.input?.value ?? field.value ?? ''
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        data[field.name] = field.input?.value ?? field.value ?? ''
+      })
+    })
+
+    persistedFormData.value = data
   }
 
   /**
@@ -457,6 +505,8 @@
     if (formTools.value.setFieldValue) {
       formTools.value.setFieldValue('az_repo', isPublic)
     }
+    // Sync to store for persistence
+    syncFormDataToStore()
   }
 
   /**
@@ -468,6 +518,8 @@
     if (formTools.value.setFieldValue) {
       formTools.value.setFieldValue(fieldName, value)
     }
+    // Sync to store for persistence
+    syncFormDataToStore()
   }
 
   /**
@@ -486,13 +538,18 @@
   }
 
   /**
-   * Handles the next button click
+   * Handles the next button click - syncs data before navigating
    */
   const handleNext = () => {
+    syncFormDataToStore()
     emit('next')
   }
 
+  /**
+   * Handles the deploy button click - syncs data before deploying
+   */
   const handleDeploy = () => {
+    syncFormDataToStore()
     emit('deploy')
   }
 
@@ -562,11 +619,21 @@
     () => layoutRef.value?.listOfIntegrations,
     (newList) => {
       if (newList?.value && newList.value.length) {
-        setIntegration.value = newList.value[0].value
+        const integrationValue = newList.value[0].value
+        setIntegration.value = integrationValue
+        // Sync to store for persistence
+        selectedIntegration.value = integrationValue
       }
     },
     { deep: true }
   )
+
+  // Watch for setIntegration changes and sync to store
+  watch(setIntegration, (newValue) => {
+    if (newValue) {
+      selectedIntegration.value = newValue
+    }
+  })
 
   defineExpose({
     validateForm,

@@ -9,7 +9,7 @@ export const createNewRoutes = {
   name: 'create',
   children: [
     {
-      path: ':vendor/:solution',
+      path: ':vendor/:solution/:step?',
       name: 'create-something-new',
       component: () => import('@views/CreateNew/CreateView.vue'),
       props: {
