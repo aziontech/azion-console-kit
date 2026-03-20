@@ -195,9 +195,7 @@
 </script>
 
 <template>
-  <BaseDeployCard
-    title="Deployment Successful"
-  >
+  <BaseDeployCard title="Deployment Successful">
     <template #content>
       <p class="text-sm text-color-secondary leading-5">
         Your application is being distributed, in few minutes, the application will be available on
