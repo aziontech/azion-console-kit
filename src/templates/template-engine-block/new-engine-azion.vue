@@ -1,10 +1,11 @@
 <script setup>
-  import { ref, computed, watch, defineOptions, unref, onMounted } from 'vue'
+  import { ref, computed, watch, defineOptions, onMounted } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
@@ -68,13 +69,49 @@
   const isFormReady = ref(false)
   const setIntegration = ref('')
   const isInitialized = ref(false)
+  const isEdgeAppNamePublic = ref(false)
 
-  const groupedRows = computed(() => {
+  /**
+   * Computed property to determine if inputs should be disabled
+   * True when loadingDeploy is true OR when currentStep is 'deploying'
+   */
+  const isDeploying = computed(() => {
+    const step = layoutRef.value?.currentStep
+    return props.loadingDeploy || step === 'deploying'
+  })
+
+  /**
+   * Computed property for repository groups (group[0])
+   * Returns the first group from the schema groups array
+   */
+  const repositoryGroups = computed(() => {
+    const groups = inputSchema.value.groups || []
+    return groups.length > 0 ? [groups[0]] : []
+  })
+
+  /**
+   * Computed property for settings groups (group[1+])
+   * Returns all groups except the first one
+   */
+  const settingsGroups = computed(() => {
+    const groups = inputSchema.value.groups || []
+    return groups.slice(1)
+  })
+
+  /**
+   * Builds grouped rows for rendering fields in a grid layout
+   * Handles both single-field groups (paired side-by-side) and multi-field groups
+   * @param {Array} groups - Array of groups to build rows from
+   * @returns {Array} Array of row objects with type and groups
+   */
+  const buildGroupedRows = (groups) => {
     const rows = []
     const singleFieldGroups = []
 
-    for (const group of inputSchema.value.groups || []) {
-      const visibleFields = (group.fields || []).filter((field) => !field.hidden)
+    for (const group of groups) {
+      const visibleFields = (group.fields || []).filter(
+        (field) => !field.hidden && field.info !== 'Private Repository'
+      )
       if (visibleFields.length === 1) {
         singleFieldGroups.push(group)
         if (singleFieldGroups.length === 2) {
@@ -96,6 +133,20 @@
     }
 
     return rows
+  }
+
+  /**
+   * Grouped rows for repository step (group[0])
+   */
+  const repositoryGroupedRows = computed(() => {
+    return buildGroupedRows(repositoryGroups.value)
+  })
+
+  /**
+   * Grouped rows for settings step (group[1+])
+   */
+  const settingsGroupedRows = computed(() => {
+    return buildGroupedRows(settingsGroups.value)
   })
 
   /**
@@ -103,15 +154,23 @@
    */
   const layoutProps = computed(() => ({
     title: inputSchema.value.title || 'Start from Template',
-    previewSrc: inputSchema.value.previewSrc || '',
+    previewSrc: inputSchema.value.imagePreview || inputSchema.value.previewSrc || '',
     previewAlt: inputSchema.value.previewAlt || '',
     templateTitle: inputSchema.value.templateTitle || inputSchema.value.name || '',
     templateUrl: inputSchema.value.templateUrl || '',
     templateIcon: inputSchema.value.templateIcon || '',
-    templateDescription: inputSchema.value.description || '',
-    githubUrl: inputSchema.value.githubUrl || inputSchema.value.repository || '',
+    templateDescription:
+      inputSchema.value.templateDescription || inputSchema.value.description || '',
+    githubUrl:
+      inputSchema.value.templatePath ||
+      inputSchema.value.githubUrl ||
+      inputSchema.value.repository ||
+      '',
     schema: props.schema,
     isDrawer: props.isDrawer,
+    // Groups for each step
+    repositoryGroups: repositoryGroups.value,
+    settingsGroups: settingsGroups.value,
     // Flow control props
     hasSettings: props.hasSettings,
     loadingDeploy: props.loadingDeploy,
@@ -233,11 +292,11 @@
    */
   const initializeForm = async () => {
     const schema = await createSchemaObject()
-    const { errors, defineInputBinds, setFieldValue, validate } = useForm({
+    const { errors, defineInputBinds, setFieldValue, validate, validateField } = useForm({
       validationSchema: schema
     })
 
-    formTools.value = { errors, setFieldValue, validate }
+    formTools.value = { errors, setFieldValue, validate, validateField }
 
     // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
     const registerFieldWithValueAndValidation = (field) => {
@@ -245,6 +304,24 @@
         setFieldValue(field.name, field.value)
       }
       field.input = defineInputBinds(field.name, { validateOnInput: true })
+    }
+
+    // Helper function to find a field by name across schema
+    const findFieldByName = (fieldName) => {
+      let foundField = inputSchema.value.fields?.find((field) => field.name === fieldName)
+      if (!foundField) {
+        for (const group of inputSchema.value.groups || []) {
+          foundField = group.fields?.find((field) => field.name === fieldName)
+          if (foundField) break
+        }
+      }
+      return foundField
+    }
+
+    // Initialize isEdgeAppNamePublic from az_repo field value
+    const azRepoField = findFieldByName('az_repo')
+    if (azRepoField?.value !== undefined) {
+      isEdgeAppNamePublic.value = Boolean(azRepoField.value)
     }
 
     inputSchema.value.fields?.forEach((field) => {
@@ -266,14 +343,54 @@
   }
 
   /**
-   * Validates the entire form
-   * @returns {Promise<boolean>} Whether the form is valid
+   * Gets field names from a specific group
+   * @param {Object} group - Group object containing fields
+   * @returns {Array<string>} Array of field names in the group
    */
-  const validateForm = async () => {
-    if (!formTools.value.validate) return false
-    await formTools.value.validate()
-    // errors is a ComputedRef, use unref to get the actual value
-    return Object.keys(unref(formTools.value.errors)).length === 0
+  const getFieldNamesFromGroup = (group) => {
+    return (group.fields || []).filter((field) => !field.hidden).map((field) => field.name)
+  }
+
+  /**
+   * Validates fields for a specific step
+   * @param {string} step - The current step ('repository' or 'settings')
+   * @returns {Promise<boolean>} Whether the form is valid for the step
+   */
+  const validateForm = async (step = 'repository') => {
+    if (!formTools.value.validateField) return false
+
+    // Determine which field names to validate based on the current step
+    let fieldNamesToValidate = []
+
+    if (step === 'repository') {
+      // Repository step: validate group[0] fields and top-level fields
+      const groups = inputSchema.value.groups || []
+      if (groups.length > 0) {
+        fieldNamesToValidate = getFieldNamesFromGroup(groups[0])
+      }
+      // Also include top-level fields (not in groups)
+      const topLevelFields = (inputSchema.value.fields || [])
+        .filter((field) => !field.hidden)
+        .map((field) => field.name)
+      fieldNamesToValidate = [...fieldNamesToValidate, ...topLevelFields]
+    } else if (step === 'settings') {
+      // Settings step: validate group[1+] fields
+      const groups = inputSchema.value.groups || []
+      groups.slice(1).forEach((group) => {
+        fieldNamesToValidate = [...fieldNamesToValidate, ...getFieldNamesFromGroup(group)]
+      })
+    }
+
+    // Validate only the relevant fields using validateField
+    let isValid = true
+    for (const fieldName of fieldNamesToValidate) {
+      const result = await formTools.value.validateField(fieldName)
+      if (!result.valid) {
+        isValid = false
+      }
+    }
+
+    return isValid
   }
 
   /**
@@ -319,7 +436,7 @@
    * @returns {Array} Filtered array without hidden fields
    */
   const removeHiddenFields = (fields) => {
-    return (fields || []).filter((field) => !field.hidden)
+    return (fields || []).filter((field) => !field.hidden && field.info !== 'Private Repository')
   }
 
   /**
@@ -329,6 +446,17 @@
    */
   const renderInvalidClass = (error) => {
     return error ? 'p-invalid' : ''
+  }
+
+  /**
+   * Handles the privacy toggle change - updates both isEdgeAppNamePublic and az_repo field
+   * @param {boolean} isPublic - Whether the field is public
+   */
+  const handlePrivacyToggle = (isPublic) => {
+    isEdgeAppNamePublic.value = isPublic
+    if (formTools.value.setFieldValue) {
+      formTools.value.setFieldValue('az_repo', isPublic)
+    }
   }
 
   /**
@@ -496,8 +624,10 @@
                     :label="field.label"
                     :value="setIntegration"
                     placeholder="Select a scope"
+                    class="h-8"
                     :description="field.description"
                     :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                    :disabled="isDeploying"
                     optionLabel="label"
                     optionValue="value"
                     @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
@@ -536,8 +666,26 @@
               :key="field.name"
             >
               <!-- Skip VCS integration field - handled in github-connection slot -->
+              <FieldInputTextPrivacy
+                v-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
+                :name="field.name"
+                :label="field.label"
+                :value="field.value"
+                :isPublic="isEdgeAppNamePublic"
+                @update:isPublic="handlePrivacyToggle"
+                @input="(val) => updateValueOnChange(field.name, val)"
+                :description="field.description"
+                :data-testid="`field-${field.name}`"
+                :required="field.attrs?.required"
+                :disabled="isDeploying"
+                :aditionalError="
+                  formTools.errors[field.name]
+                    ? unescapeErrorMessage(formTools.errors[field.name])
+                    : ''
+                "
+              />
               <div
-                v-if="isHandleField(field.name)"
+                v-else-if="isHandleField(field.name)"
                 class="flex flex-col gap-2"
               >
                 <LabelBlock
@@ -555,6 +703,7 @@
                   class="w-full"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                   :feedback="false"
+                  :disabled="isDeploying"
                   :pt="{ input: { name: field.name } }"
                 />
                 <InputText
@@ -564,6 +713,7 @@
                   type="text"
                   v-bind="field.input"
                   :name="field.name"
+                  :disabled="isDeploying"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                 />
                 <small class="text-xs font-normal text-color-secondary">{{
@@ -579,13 +729,13 @@
             </template>
           </div>
 
-          <!-- Grouped Fields -->
+          <!-- Grouped Fields for Repository Step (group[0]) -->
           <div
-            v-if="inputSchema.groups"
+            v-if="repositoryGroups.length > 0"
             class="flex flex-col gap-8 w-full"
           >
             <template
-              v-for="row in groupedRows"
+              v-for="row in repositoryGroupedRows"
               :key="row.groups[0].name"
             >
               <!-- Pair: 2 single-field groups side by side -->
@@ -624,14 +774,25 @@
                             :label="field.label"
                             :value="setIntegration"
                             placeholder="Select a scope"
+                            class="h-8"
                             :description="field.description"
                             :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                            :disabled="isDeploying"
                             optionLabel="label"
                             optionValue="value"
+                            enableWorkaroundLabelToDisabledOptions
                             @onChange="
                               (installationId) => updateValueOnChange(field.name, installationId)
                             "
                           >
+                            <template #value="slotProps">
+                              <div class="flex flex-col justify-center h-full">
+                                <div class="flex items-center gap-2">
+                                  <i class="pi pi-github" />
+                                  <div>{{ slotProps.value?.label }}</div>
+                                </div>
+                              </div>
+                            </template>
                             <template #footer>
                               <div class="p-dropdown-items-wrapper">
                                 <ul class="p-dropdown-items">
@@ -650,6 +811,24 @@
                       </div>
 
                       <!-- Regular field in group -->
+                      <FieldInputTextPrivacy
+                        v-if="field.info === 'Edge Application Name'"
+                        :name="field.name"
+                        :label="field.label"
+                        :value="field.value"
+                        :isPublic="isEdgeAppNamePublic"
+                        @update:isPublic="handlePrivacyToggle"
+                        @input="(val) => updateValueOnChange(field.name, val)"
+                        :description="field.description"
+                        :data-testid="`field-${field.name}`"
+                        :required="field.attrs?.required"
+                        :disabled="isDeploying"
+                        :aditionalError="
+                          formTools.errors[field.name]
+                            ? unescapeErrorMessage(formTools.errors[field.name])
+                            : ''
+                        "
+                      />
                       <div
                         v-else-if="isHandleField(field.name)"
                         class="flex flex-col gap-2"
@@ -669,6 +848,7 @@
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :feedback="false"
+                          :disabled="isDeploying"
                           :pt="{ input: { name: field.name } }"
                         />
                         <InputText
@@ -677,6 +857,7 @@
                           :id="field.name"
                           type="text"
                           v-bind="field.input"
+                          :disabled="isDeploying"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :name="field.name"
                         />
@@ -729,12 +910,22 @@
                           placeholder="Select a scope"
                           :description="field.description"
                           :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                          :disabled="isDeploying"
                           optionLabel="label"
                           optionValue="value"
+                          enableWorkaroundLabelToDisabledOptions
                           @onChange="
                             (installationId) => updateValueOnChange(field.name, installationId)
                           "
                         >
+                          <template #value="slotProps">
+                            <div class="flex flex-col justify-center h-full">
+                              <div class="flex items-center gap-2">
+                                <i class="pi pi-github" />
+                                <div>{{ slotProps.value?.label }}</div>
+                              </div>
+                            </div>
+                          </template>
                           <template #footer>
                             <div class="p-dropdown-items-wrapper">
                               <ul class="p-dropdown-items">
@@ -753,6 +944,24 @@
                     </div>
 
                     <!-- Regular field in single group -->
+                    <FieldInputTextPrivacy
+                      v-if="field.info === 'Edge Application Name'"
+                      :name="field.name"
+                      :label="field.label"
+                      :value="field.value"
+                      :isPublic="isEdgeAppNamePublic"
+                      @update:isPublic="handlePrivacyToggle"
+                      @input="(val) => updateValueOnChange(field.name, val)"
+                      :description="field.description"
+                      :data-testid="`field-${field.name}`"
+                      :required="field.attrs?.required"
+                      :disabled="isDeploying"
+                      :aditionalError="
+                        formTools.errors[field.name]
+                          ? unescapeErrorMessage(formTools.errors[field.name])
+                          : ''
+                      "
+                    />
                     <div
                       v-else-if="isHandleField(field.name)"
                       class="flex flex-col gap-2"
@@ -772,6 +981,7 @@
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :feedback="false"
+                        :disabled="isDeploying"
                         :pt="{ input: { name: field.name } }"
                       />
                       <InputText
@@ -780,6 +990,175 @@
                         :id="field.name"
                         type="text"
                         v-bind="field.input"
+                        :disabled="isDeploying"
+                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :name="field.name"
+                      />
+                      <small class="text-xs font-normal text-color-secondary">{{
+                        field.description
+                      }}</small>
+                      <small
+                        v-if="formTools.errors[field.name]"
+                        class="p-error text-xs font-normal leading-tight"
+                      >
+                        {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                      </small>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </template>
+
+      <!-- Settings Inputs Slot - Groups[1+] for TemplateSettingsCard -->
+      <template #settings-inputs>
+        <template v-if="isFormReady && settingsGroupedRows.length > 0">
+          <!-- Grouped Fields for Settings Step (group[1+]) -->
+          <div class="flex flex-col gap-8 w-full">
+            <template
+              v-for="row in settingsGroupedRows"
+              :key="row.groups[0].name"
+            >
+              <!-- Pair: 2 single-field groups side by side -->
+              <div
+                v-if="row.type === 'pair'"
+                class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
+              >
+                <template
+                  v-for="group in row.groups"
+                  :key="group.name"
+                >
+                  <div class="flex flex-col gap-2">
+                    <template
+                      v-for="field in removeHiddenFields(group.fields)"
+                      :key="field.name"
+                    >
+                      <!-- Regular field in group -->
+                      <FieldInputTextPrivacy
+                        v-if="field.info === 'Edge Application Name'"
+                        :name="field.name"
+                        :label="field.label"
+                        :value="field.value"
+                        :isPublic="isEdgeAppNamePublic"
+                        @update:isPublic="handlePrivacyToggle"
+                        @input="(val) => updateValueOnChange(field.name, val)"
+                        :description="field.description"
+                        :data-testid="`field-${field.name}`"
+                        :required="field.attrs?.required"
+                        :disabled="isDeploying"
+                        :aditionalError="
+                          formTools.errors[field.name]
+                            ? unescapeErrorMessage(formTools.errors[field.name])
+                            : ''
+                        "
+                      />
+                      <div
+                        v-else-if="isHandleField(field.name)"
+                        class="flex flex-col gap-2"
+                      >
+                        <LabelBlock
+                          :for="field.name"
+                          :label="field.label"
+                          :isRequired="field.attrs?.required"
+                        />
+                        <Password
+                          v-if="field.type === 'password'"
+                          autocomplete="off"
+                          toggleMask
+                          v-bind="field.input"
+                          v-model="field.input.value"
+                          :id="field.name"
+                          class="w-full"
+                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :feedback="false"
+                          :disabled="isDeploying"
+                          :pt="{ input: { name: field.name } }"
+                        />
+                        <InputText
+                          v-else
+                          autocomplete="off"
+                          :id="field.name"
+                          type="text"
+                          v-bind="field.input"
+                          :disabled="isDeploying"
+                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :name="field.name"
+                        />
+                        <small class="text-xs font-normal text-color-secondary">{{
+                          field.description
+                        }}</small>
+                        <small
+                          v-if="formTools.errors[field.name]"
+                          class="p-error text-xs font-normal leading-tight"
+                        >
+                          {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                        </small>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Single: 1 group in full width -->
+              <div
+                v-else
+                class="flex flex-col gap-4"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <template
+                    v-for="field in removeHiddenFields(row.groups[0].fields)"
+                    :key="field.name"
+                  >
+                    <!-- Regular field in single group -->
+                    <FieldInputTextPrivacy
+                      v-if="field.info === 'Edge Application Name'"
+                      :name="field.name"
+                      :label="field.label"
+                      :value="field.value"
+                      :isPublic="isEdgeAppNamePublic"
+                      @update:isPublic="handlePrivacyToggle"
+                      @input="(val) => updateValueOnChange(field.name, val)"
+                      :description="field.description"
+                      :data-testid="`field-${field.name}`"
+                      :required="field.attrs?.required"
+                      :disabled="isDeploying"
+                      :aditionalError="
+                        formTools.errors[field.name]
+                          ? unescapeErrorMessage(formTools.errors[field.name])
+                          : ''
+                      "
+                    />
+                    <div
+                      v-else-if="isHandleField(field.name)"
+                      class="flex flex-col gap-2"
+                    >
+                      <LabelBlock
+                        :for="field.name"
+                        :label="field.label"
+                        :isRequired="field.attrs?.required"
+                      />
+                      <Password
+                        v-if="field.type === 'password'"
+                        autocomplete="off"
+                        toggleMask
+                        v-bind="field.input"
+                        v-model="field.input.value"
+                        :id="field.name"
+                        class="w-full"
+                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :feedback="false"
+                        :disabled="isDeploying"
+                        :pt="{ input: { name: field.name } }"
+                      />
+                      <InputText
+                        v-else
+                        autocomplete="off"
+                        :id="field.name"
+                        type="text"
+                        v-bind="field.input"
+                        :disabled="isDeploying"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :name="field.name"
                       />

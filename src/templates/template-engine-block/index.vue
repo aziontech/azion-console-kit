@@ -87,6 +87,22 @@
     return localExecutionId.value || props.executionId
   })
 
+  /**
+   * Computed for combined loading state
+   * Combines local submitLoading with prop loadingDeploy
+   */
+  const isLoadingDeploy = computed(() => {
+    return submitLoading.value || props.loadingDeploy
+  })
+
+  /**
+   * Computed for combined disabled state
+   * Disables when loading or when explicitly disabled
+   */
+  const isDisabledDeploy = computed(() => {
+    return isLoadingDeploy.value || props.disabledDeploy
+  })
+
   onMounted(async () => {
     if (!props.templateId) return
     await loadTemplate(props.templateId)
@@ -104,7 +120,18 @@
     try {
       if (!props.templateId) return
       const templateData = await props.getTemplateService(templateId)
-      inputSchema.value = templateData.inputSchema ?? {}
+
+      // Merge template info fields from GitHub template into inputSchema
+      // These are displayed in DeployRepositoryCard preview
+      inputSchema.value = {
+        ...(templateData.inputSchema ?? {}),
+        templateTitle: templateData.templateTitle ?? '',
+        templateDescription: templateData.templateDescription ?? '',
+        templatePath: templateData.templatePath ?? '',
+        templateUrl: templateData.templateUrl ?? '',
+        imagePreview: templateData.imagePreview ?? ''
+      }
+
       isLoading.value = false
       hasSettings.value = templateData.hasSettings
     } catch (error) {
@@ -194,8 +221,8 @@
         :schema="inputSchema"
         :has-settings="hasSettings"
         :is-drawer="props.isDrawer"
-        :loading-deploy="props.loadingDeploy"
-        :disabled-deploy="props.disabledDeploy"
+        :loading-deploy="isLoadingDeploy"
+        :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"
@@ -211,8 +238,8 @@
         :schema="inputSchema"
         :has-settings="hasSettings"
         :is-drawer="props.isDrawer"
-        :loading-deploy="props.loadingDeploy"
-        :disabled-deploy="props.disabledDeploy"
+        :loading-deploy="isLoadingDeploy"
+        :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
         :deploy-failed="props.deployFailed"
         :application-name="props.applicationName"

@@ -132,6 +132,15 @@
    * end of primevue workaround
    */
 
+  /**
+   * Computed to get the full selected option object for the value slot
+   * This allows parent components to access all properties of the selected option
+   */
+  const selectedOption = computed(() => {
+    if (!inputValue.value) return null
+    return props.options.find((option) => option[props.optionValue] === inputValue.value)
+  })
+
   const attrs = useAttrs()
 
   const customTestId = computed(() => {
@@ -203,16 +212,27 @@
     :class="{ 'p-invalid': aditionalError || errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
-    class="w-full"
+    class="w-full h-[34px]"
     :pt="passThrough"
     :data-testid="customTestId.dropdown"
   >
     <template
-      v-if="enableCustomLabel"
+      v-if="$slots.value || enableCustomLabel"
       #value="slotProps"
     >
       <span :data-testid="customTestId.value">
-        {{ getLabelBySelectedValue(slotProps.value) }}
+        <slot
+          v-if="$slots.value"
+          name="value"
+          v-bind="{
+            ...slotProps,
+            value: selectedOption,
+            rawValue: slotProps.value
+          }"
+        />
+        <template v-else-if="enableCustomLabel">
+          {{ getLabelBySelectedValue(slotProps.value) }}
+        </template>
       </span>
     </template>
 

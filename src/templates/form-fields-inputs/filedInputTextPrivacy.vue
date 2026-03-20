@@ -4,7 +4,7 @@
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
 
-  const emit = defineEmits(['blur', 'input', 'update:isPublic'])
+  const emit = defineEmits(['blur', 'input', 'update:props.isPublic'])
 
   const props = defineProps({
     value: {
@@ -47,6 +47,10 @@
       default: ''
     },
     isPublic: {
+      type: Boolean,
+      default: false
+    },
+    required: {
       type: Boolean,
       default: false
     }
@@ -95,6 +99,10 @@
     initialValue: props.value
   })
 
+  const labelInput = computed(() =>
+    props.isPublic ? `Public ${props.label} ` : `Private ${props.label}`
+  )
+
   const aditionalError = computed(() => props.aditionalError)
 
   const onBlur = (event) => {
@@ -132,6 +140,7 @@
 
 <template>
   <div
+    class="flex flex-col gap-2"
     @mouseenter="onGroupMouseEnter"
     @mouseleave="onGroupMouseLeave"
   >
@@ -139,12 +148,12 @@
       v-if="props.label"
       :for="props.name"
       :data-testid="customTestId.label"
-      :label="props.label"
-      :isRequired="attrs.required"
+      :label="labelInput"
+      :isRequired="props.required || attrs.required"
     />
 
     <div
-      class="p-inputgroup rounded transition-shadow duration-150 mt-2"
+      class="p-inputgroup rounded transition-shadow duration-150"
       :class="[groupShadowClass, disabled ? 'opacity-50 pointer-events-none' : '']"
       @focusin="onGroupFocusIn"
       @focusout="onGroupFocusOut"
@@ -173,13 +182,15 @@
 
       <span
         :data-testid="customTestId.privacySwitch"
-        :title="isPublic ? 'Public – click to make private' : 'Private – click to make public'"
+        :title="
+          props.isPublic ? 'Public – click to make private' : 'Private – click to make public'
+        "
         :aria-label="
-          isPublic
+          props.isPublic
             ? 'Field is public. Click to make private.'
             : 'Field is private. Click to make public.'
         "
-        :aria-pressed="isPublic"
+        :aria-pressed="props.isPublic"
         role="switch"
         tabindex="0"
         class="p-inputgroup-addon !bg-[var(--input-bg,var(--surface-0))] !border-l-0 cursor-pointer outline-none transition-colors duration-150 select-none"
@@ -194,14 +205,14 @@
         <span
           class="relative w-9 h-5 rounded-full transition-colors duration-200"
           :class="
-            isPublic
+            props.isPublic
               ? 'bg-[#f3652b] hover:bg-[#d95522]'
               : 'bg-[var(--input-switch-slider-off-bg)] hover:bg-[var(--input-switch-slider-off-hover-bg)]'
           "
         >
           <span
             class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-sm transition-transform duration-200"
-            :class="isPublic ? 'translate-x-4' : 'translate-x-0'"
+            :class="props.isPublic ? 'translate-x-4' : 'translate-x-0'"
           >
             <span class="relative w-3 h-3">
               <svg
@@ -216,7 +227,7 @@
                 stroke-linejoin="round"
                 aria-hidden="true"
                 class="absolute inset-0 transition-all duration-200 text-gray-500"
-                :class="isPublic ? 'opacity-0 scale-75' : 'opacity-100 scale-100'"
+                :class="props.isPublic ? 'opacity-0 scale-75' : 'opacity-100 scale-100'"
               >
                 <rect
                   x="3"
@@ -241,7 +252,7 @@
                 stroke-linejoin="round"
                 aria-hidden="true"
                 class="absolute inset-0 transition-all duration-200 text-orange-700"
-                :class="isPublic ? 'opacity-100 scale-100' : 'opacity-0 scale-75'"
+                :class="props.isPublic ? 'opacity-100 scale-100' : 'opacity-0 scale-75'"
               >
                 <rect
                   x="3"
@@ -258,25 +269,25 @@
         </span>
       </span>
     </div>
+
+    <small
+      v-if="aditionalError || veeValidateErrorMessage"
+      class="p-error text-xs font-normal leading-tight"
+      :data-testid="customTestId.error"
+    >
+      {{ aditionalError || veeValidateErrorMessage }}
+    </small>
+
+    <small
+      v-if="props.description || hasDescriptionSlot"
+      class="text-xs text-color-secondary font-normal leading-5"
+      :data-testid="customTestId.description"
+    >
+      <slot name="description">
+        {{ props.description }}
+      </slot>
+    </small>
   </div>
-
-  <small
-    v-if="aditionalError || veeValidateErrorMessage"
-    class="p-error text-xs font-normal leading-tight"
-    :data-testid="customTestId.error"
-  >
-    {{ aditionalError || veeValidateErrorMessage }}
-  </small>
-
-  <small
-    v-if="props.description || hasDescriptionSlot"
-    class="text-xs text-color-secondary font-normal leading-5"
-    :data-testid="customTestId.description"
-  >
-    <slot name="description">
-      {{ props.description }}
-    </slot>
-  </small>
 </template>
 
 <style scoped>

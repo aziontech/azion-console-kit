@@ -134,13 +134,14 @@
 
   const layoutProps = computed(() => ({
     title: props.schema?.title || 'Start from Template',
-    previewSrc: props.schema?.previewSrc || '',
+    previewSrc: props.schema?.imagePreview || props.schema?.previewSrc || '',
     previewAlt: props.schema?.previewAlt || '',
     templateTitle: props.schema?.templateTitle || props.schema?.name || '',
     templateUrl: props.schema?.templateUrl || '',
     templateIcon: props.schema?.templateIcon || '',
-    templateDescription: props.schema?.description || '',
-    githubUrl: props.schema?.githubUrl || props.schema?.repository || '',
+    templateDescription: props.schema?.templateDescription || props.schema?.description || '',
+    githubUrl:
+      props.schema?.templatePath || props.schema?.githubUrl || props.schema?.repository || '',
     schema: props.schema,
     isDrawer: props.isDrawer,
     // Flow control props

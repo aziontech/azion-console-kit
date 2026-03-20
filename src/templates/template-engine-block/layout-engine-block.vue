@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
@@ -8,6 +9,8 @@
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
+
+  const router = useRouter()
 
   const props = defineProps({
     title: {
@@ -45,6 +48,22 @@
     schema: {
       type: Object,
       default: () => ({})
+    },
+    /**
+     * Groups to display in repository step (usually group[0])
+     * Provided by parent component
+     */
+    repositoryGroups: {
+      type: Array,
+      default: () => []
+    },
+    /**
+     * Groups to display in settings step (usually group[1+])
+     * Provided by parent component
+     */
+    settingsGroups: {
+      type: Array,
+      default: () => []
     },
     isDrawer: {
       type: Boolean,
@@ -163,12 +182,6 @@
   const hasIntegrationsList = computed(() => {
     return listOfIntegrations.value?.length > 0
   })
-
-  /**
-   * Fixed description text for Git configuration section
-   */
-  const gitDescription = `Configure your Git repository to integrate your codebase and automate deployments directly from your version control system.`
-
   /**
    * Triggers the GitHub OAuth flow
    * Called when user clicks "Connect with GitHub" or "Add GitHub Account"
@@ -267,7 +280,7 @@
    */
   const validateBeforeProceed = async () => {
     if (props.onValidate) {
-      const isValid = await props.onValidate()
+      const isValid = await props.onValidate(currentStep.value)
       return isValid
     }
     return true
@@ -367,6 +380,10 @@
    */
   const handleManage = (data) => {
     emit('manage', data)
+  }
+
+  const navigateToMarkketplace = () => {
+    router.push('/marketplace')
   }
 
   /**
@@ -514,11 +531,10 @@
                       >
                         {{ props.templateTitle }}
                       </span>
-                      <div
-                        v-if="props.templateUrl"
-                        class="w-3 h-3 relative overflow-hidden"
-                      >
-                        <i class="pi pi-external-link text-[10px] text-color-secondary" />
+                      <div v-if="props.templateUrl">
+                        <i
+                          class="pi pi-external-link text-sm cursor-pointer text-color-secondary"
+                        />
                       </div>
                     </div>
                   </div>
@@ -545,9 +561,7 @@
         <div
           v-if="currentStep === 'repository'"
           class="text-xs text-color-secondary leading-4"
-        >
-          {{ gitDescription }}
-        </div>
+        ></div>
 
         <slot
           v-if="currentStep === 'repository'"
@@ -614,7 +628,6 @@
             :loading="props.loadingDeploy"
             :disabled="props.disabledDeploy"
             severity="primary"
-            icon="pi pi-cloud-upload"
             @click="handleDeploy"
           />
         </slot>
@@ -635,12 +648,20 @@
         :template-url="props.templateUrl"
         :github-url="props.githubUrl"
         :loading-deploy="props.loadingDeploy"
-        :disabled="props.disabledDeploy"
+        :disabled-deploy="props.disabledDeploy || props.loadingDeploy"
         :deploy-label="props.deployLabel"
-        :hide-footer="currentStep === 'deploying'"
+        :hide-footer="!!props.executionId"
         @deploy="handleDeploy"
       >
-        <template #content>
+        <template #form>
+          <slot
+            name="settings-inputs"
+            :schema="props.schema"
+            :is-drawer="props.isDrawer"
+            :form-data="formData"
+            :form-errors="formErrors"
+            :settings-groups="props.settingsGroups"
+          />
           <slot name="settings-content" />
         </template>
       </TemplateSettingsCard>
@@ -672,7 +693,12 @@
       v-if="currentStep === 'repository'"
       class="mt-8 justify-start text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
-      <span class="cursor-pointer flex justify-center"> Browse Templates → </span>
+      <span
+        class="cursor-pointer flex justify-center px-3 py-1 rounded hover:surface-hover dark:hover:bg-gray-800 transition-colors duration-150 w-auto"
+        @click="navigateToMarkketplace"
+      >
+        Browse Templates →
+      </span>
     </div>
   </div>
 </template>
