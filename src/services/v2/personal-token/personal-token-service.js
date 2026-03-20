@@ -10,7 +10,7 @@ export class PersonalTokenService extends BaseService {
     this.baseURL = 'v4/iam/personal_tokens'
   }
 
-  #fetchList = async ({ page = 1, pageSize = 200, search = '' } = {}) => {
+  #fetchList = async ({ page = 1, pageSize = 100, search = '' } = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -29,7 +29,7 @@ export class PersonalTokenService extends BaseService {
     }
   }
 
-  prefetchList = (pageSize = 200) => {
+  prefetchList = (pageSize = 100) => {
     const params = { page: 1, pageSize }
 
     return this.usePrefetchQuery(queryKeys.personalToken.list(params), () =>

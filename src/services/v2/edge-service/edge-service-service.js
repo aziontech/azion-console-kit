@@ -24,7 +24,7 @@ export class EdgeServiceService extends BaseService {
     }
   }
 
-  #fetchList = async (params = { page: 1, pageSize: 200, ordering: '-last_modified' }) => {
+  #fetchList = async (params = { page: 1, pageSize: 100, ordering: '-last_modified' }) => {
     const { order_by, sort } = this.#parseOrdering(params.ordering)
 
     const { data } = await this.http.request({
@@ -50,7 +50,7 @@ export class EdgeServiceService extends BaseService {
     }
   }
 
-  prefetchList = (pageSize = 200) => {
+  prefetchList = (pageSize = 100) => {
     const defaultParams = {
       page: 1,
       pageSize,
@@ -65,7 +65,7 @@ export class EdgeServiceService extends BaseService {
   listEdgeServiceService = async (
     params = {
       page: 1,
-      pageSize: 200,
+      pageSize: 100,
       ordering: '-last_modified'
     }
   ) => {
@@ -168,7 +168,7 @@ export class EdgeServiceService extends BaseService {
         order_by,
         sort,
         page: params.page || 1,
-        page_size: params.pageSize || 200
+        page_size: params.pageSize || 100
       },
       config: { baseURL: '/api' }
     })
