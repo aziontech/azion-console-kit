@@ -85,10 +85,10 @@
   const allColumns = ref([
     { field: 'date', header: 'Date', visible: true, sortable: true },
     { field: 'operation', header: 'Operation', visible: true, sortable: true },
-    { field: 'resourceType', header: 'Resource Type', visible: true },
+    { field: 'resourceType', header: 'Type', visible: true },
     {
       field: 'resourceName',
-      header: 'Resource Name',
+      header: 'Resource',
       visible: true,
       type: 'component',
       component: (columnData) =>
@@ -97,10 +97,10 @@
           columnAppearance: 'text-format-with-popup'
         })
     },
-    { field: 'parentResourceType', header: 'Parent Resource Type', visible: true, sortable: true },
+    { field: 'parentResourceType', header: 'Parent Type', visible: true, sortable: true },
     {
       field: 'parentResourceName',
-      header: 'Parent Resource Name',
+      header: 'Parent Resource',
       visible: true,
       sortable: true,
       type: 'component',
