@@ -25,7 +25,7 @@
         <AdvancedFilterSystem
           v-model:filterData="advancedFilterModel"
           :fieldsInFilter="filterFields"
-          :filterDateRangeMaxDays="365"
+          :filterDateRangeMaxDays="730"
           :isLoadingFilters="isLoadingFilters"
           @updatedFilter="applyAdvancedFilter"
         />
