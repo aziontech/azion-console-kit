@@ -15,7 +15,7 @@ export class EdgeNodeService extends BaseService {
   }
 
   #buildListUrl(params = {}) {
-    const { page = 1, pageSize = 200, ordering, search } = params
+    const { page = 1, pageSize = 100, ordering, search } = params
     const { orderBy, sort } = this.#parseOrdering(ordering)
 
     const searchParams = new URLSearchParams()
@@ -61,7 +61,7 @@ export class EdgeNodeService extends BaseService {
     }
   }
 
-  prefetchList = (pageSize = 200) => {
+  prefetchList = (pageSize = 100) => {
     const params = {
       page: 1,
       pageSize,

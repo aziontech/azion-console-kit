@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { searchEdgeDnsService } from '@/services/real-time-metrics-services'
-import { describe, expect, it, vi } from 'vitest'
+import { searchEdgeDnsService, resetEdgeDnsCache } from '@/services/real-time-metrics-services'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as Errors from '@services/axios/errors'
 
 const makeSut = () => {
@@ -25,6 +25,10 @@ const fixtures = {
 }
 
 describe('RealTimeMetricsServices', () => {
+  beforeEach(() => {
+    resetEdgeDnsCache()
+  })
+
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -36,7 +40,7 @@ describe('RealTimeMetricsServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/intelligent_dns?order_by=name&sort=asc&page=1&page_size=200`,
+      url: `${version}/intelligent_dns?order_by=name&sort=asc&page=1&page_size=100`,
       method: 'GET'
     })
   })
@@ -90,7 +94,7 @@ describe('RealTimeMetricsServices', () => {
         orderBy: 'name',
         sort: 'asc',
         page: 1,
-        pageSize: 200
+        pageSize: 100
       },
       expectedError: new Errors.InternalServerError().message
     },
