@@ -12,7 +12,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col max-w-2xl border surface-border rounded-md">
+  <div class="flex flex-col w-[700px] border surface-border rounded-md">
     <div class="h-14 px-6 border-b surface-border flex items-center justify-between">
       <div class="text-color text-xl font-semibold leading-5">
         {{ title }}
@@ -32,7 +32,7 @@
       <slot name="header-meta" />
     </div>
 
-    <div class="p-6 bg-[var(--surface-50)] flex flex-col gap-6 flex-1">
+    <div class="p-6 bg-[var(--surface-50)] flex flex-col gap-6">
       <slot name="content" />
     </div>
 
