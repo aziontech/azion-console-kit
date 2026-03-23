@@ -11,7 +11,7 @@ export class PaymentService extends BaseService {
     }
   }
 
-  listCreditCards = async (params = { pageSize: 200 }) => {
+  listCreditCards = async (params = { pageSize: 100 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL.creditCards}`,
@@ -75,7 +75,7 @@ export class PaymentService extends BaseService {
     return { feedback: 'Credit added successfully.' }
   }
 
-  listPaymentsHistory = async (params = { pageSize: 200 }) => {
+  listPaymentsHistory = async (params = { pageSize: 100 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL.history}`,

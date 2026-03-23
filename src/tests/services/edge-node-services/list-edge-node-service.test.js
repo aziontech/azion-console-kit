@@ -39,7 +39,7 @@ describe('EdgeNodeServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_nodes?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_nodes?order_by=id&sort=asc&page=1&page_size=100`,
       method: 'GET'
     })
   })

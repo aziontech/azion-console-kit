@@ -1,5 +1,8 @@
-import { searchEdgeDnsService } from './search-edge-dns-service'
-import { searchEdgeFunctionsService } from './search-edge-functions'
+import { searchEdgeDnsService, resetCache as resetEdgeDnsCache } from './search-edge-dns-service'
+import {
+  searchEdgeFunctionsService,
+  resetCache as resetEdgeFunctionsCache
+} from './search-edge-functions'
 import { loadRealTimeMetricsData } from './load-real-time-metrics-data'
 import { searchBotCategoryService } from './search-bot-category-service'
 import { searchChallengeSolvedService } from './search-challenge-solved-service'
@@ -15,5 +18,7 @@ export {
   searchChallengeSolvedService,
   searchClassifiedService,
   searchActionService,
-  searchWorkloadsService
+  searchWorkloadsService,
+  resetEdgeDnsCache,
+  resetEdgeFunctionsCache
 }

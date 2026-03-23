@@ -85,10 +85,10 @@
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.4.tgz#c81151eb16fd10e1dc10f060ad7c4226e2e0143b"
   integrity sha512-K6or5V3Cs9OyXEif906x8Y/7xvxeb+OcEsRmI8Tlci3YnD5ZRIaznWeDDOxLZ/zn0VP28OShj9WggkVM0gsSmg==
 
-"@aziontech/webkit@^1.5.4":
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.5.4.tgz#f37c73810111634dbc42a0cde23e6cc20389a910"
-  integrity sha512-zM46TCB3a/ebvyWrJeNiOQTj+KGNLdPESHaSm5xTG6gmDNXVuh1dAXKWFtQW3MHvmVapMObKgUhea7hNb6NzfQ==
+"@aziontech/webkit@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.7.1.tgz#b9d9059e393a2ab5e2299c9f1fdeeea3a2f9176e"
+  integrity sha512-1aDDdoGgcakYQIuA5BImVmelxiBoIcuNHNRjDpQxt34/X+EvQDXf/gAe+mpWZkXXjC6acIskmG0DCPO+IBH/8Q==
   dependencies:
     "@vueuse/core" "^10.11.1"
     primevue "3.35.0"
@@ -5567,9 +5567,9 @@ flat-cache@^3.0.4:
     rimraf "^3.0.2"
 
 flatted@^3.2.7, flatted@^3.2.9:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.3.3.tgz#67c8fad95454a7c7abebf74bb78ee74a44023358"
-  integrity sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.4.2.tgz#f5c23c107f0f37de8dbdf24f13722b3b98d52726"
+  integrity sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==
 
 follow-redirects@^1.15.11:
   version "1.15.11"

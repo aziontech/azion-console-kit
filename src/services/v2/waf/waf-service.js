@@ -272,7 +272,7 @@ export class WafService extends BaseService {
     const { data } = await this.http.request({
       url: `/api/v3/waf/${wafId}/domains`,
       method: 'GET',
-      params: { page_size: 200 }
+      params: { page_size: 100 }
     })
 
     const results = Array.isArray(data.results) ? data.results : []

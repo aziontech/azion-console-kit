@@ -89,7 +89,7 @@
   const listCreditCards = async (params) => {
     const { body } = await paymentService.listCreditCards({
       ...params,
-      pageSize: 200
+      pageSize: 100
     })
     return body
   }
