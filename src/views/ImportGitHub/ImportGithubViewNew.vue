@@ -12,6 +12,7 @@
   import AccordionTab from 'primevue/accordiontab'
   import Button from 'primevue/button'
   import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
   import { useLoadingStore } from '@/stores/loading'
   import { useDeploy } from '@/stores/deploy'
   import { variablesService } from '@/services/v2/variables'
@@ -325,15 +326,24 @@
     title="Import from Git"
     class="self-center my-8"
   >
-    <template #header-meta>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-normal text-text-color-muted">Importing from</span>
-      </div>
-      <div class="flex items-center gap-1.5 mt-1">
-        <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted"></i>
-        <span class="text-sm font-normal text-text-color-muted">
-          {{ repositoryOwner }}/{{ repositoryName }}
-        </span>
+    <template
+      #header-meta
+      v-if="gitScope"
+    >
+      <div class="w-full px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
+        <div class="py-4 flex flex-col gap-3">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[10px] font-normal text-text-color-muted leading-3"
+              >Importing from</span
+            >
+            <div class="flex items-center gap-1">
+              <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
+              <span class="text-[10px] font-normal text-text-color-muted leading-3">
+                {{ repositoryOwner }}/{{ repositoryName }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
 
@@ -636,7 +646,6 @@
     <template #footer>
       <Button
         label="Deploy"
-        icon="pi pi-cloud-upload"
         icon-pos="right"
         class="w-full"
         :loading="loading"
