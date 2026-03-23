@@ -129,7 +129,7 @@
           optionLabel="name"
           optionValue="value"
           keyToFilter="status"
-          :valuesToFilter="['active', 'challenge_verification']"
+          :valuesToFilter="['active', 'challenge_verification', 'inactive']"
           :value="mtls.certificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate."
