@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.55.2",
+  "version": "1.55.3",
   "private": false,
   "type": "module",
   "repository": {
@@ -39,7 +39,7 @@
     "@analytics/segment": "^2.1.0",
     "@aziontech/icons": "^1.0.4",
     "@aziontech/theme": "^1.0.4",
-    "@aziontech/webkit": "^1.7.1",
+    "@aziontech/webkit": "^1.9.0",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.7.0",
     "@jsonforms/vue": "3.7.0",
