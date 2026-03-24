@@ -142,7 +142,7 @@
     edgeApplication.value = id
   }
 
-  const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
+  const emit = defineEmits(['edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
 

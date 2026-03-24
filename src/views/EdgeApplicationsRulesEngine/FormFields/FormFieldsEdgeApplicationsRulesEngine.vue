@@ -207,10 +207,6 @@
     errors: {
       type: Object
     },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     loadingOrigins: {
       type: Boolean,
       default: false
@@ -588,7 +584,6 @@
         @onSuccess="handleSuccessOrigin"
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
-        :clipboardWrite="clipboardWrite"
       />
       <DrawerFunction
         ref="drawerFunctionRef"

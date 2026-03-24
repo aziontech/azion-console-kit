@@ -1,18 +1,15 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
 
   import { useField } from 'vee-validate'
-  import { ref, computed } from 'vue'
+  import { computed } from 'vue'
   import Divider from 'primevue/divider'
 
   const props = defineProps({
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       type: Function,
       required: true
@@ -29,18 +26,12 @@
     CRL: 'CRL'
   }
 
-  const csrCopied = ref(false)
   const { value: name } = useField('name')
   const { value: certificate } = useField('certificate')
   const { value: csr } = useField('csr')
   const { value: certificateType } = useField('type')
   const { value: managed } = useField('managed')
   const { value: privateKey } = useField('privateKey')
-
-  async function copyCSRToclipboard() {
-    await props.clipboardWrite(csr.value)
-    csrCopied.value = true
-  }
 
   const openDocumentation = async () => {
     props.documentationService()
@@ -132,19 +123,12 @@
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <PrimeButton
-            data-testid="digital-certificate__copy-csr__button"
-            class="max-sm:w-full"
-            type="button"
-            severity="secondary"
+          <CopyBlock
+            :value="csr"
             label="Copy"
-            @click="copyCSRToclipboard"
+            copiedLabel="Successfully copied!"
+            data-testid="digital-certificate__copy-csr__button"
           />
-          <small
-            data-testid="digital-certificate__copy-csr__message"
-            v-if="csrCopied"
-            >Successfully copied!</small
-          >
         </div>
       </template>
     </FormHorizontal>

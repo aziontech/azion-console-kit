@@ -4,7 +4,6 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  import * as Helpers from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
@@ -104,7 +103,7 @@
             data: Array.isArray(columnData) ? columnData : columnData?.content,
             columnAppearance: 'text-array-with-popup',
             dependencies: {
-              showCopy: !!Helpers.clipboardWrite
+              showCopy: true
             }
           })
         }
@@ -120,8 +119,7 @@
             data: columnData.content,
             columnAppearance: 'text-format-with-popup',
             dependencies: {
-              copyContentService: Helpers.clipboardWrite,
-              showCopy: !!Helpers.clipboardWrite
+              showCopy: true
             }
           })
         }

@@ -58,11 +58,9 @@
                   v-else
                   >{{ invoiceData?.billId }}</span
                 >
-                <PrimeButton
-                  icon="pi pi-copy"
-                  outlined
+                <CopyBlock
+                  :value="invoiceData?.billDetailId"
                   v-if="invoiceData?.billDetailId"
-                  @click="clipboard(invoiceData.billDetailId)"
                 />
               </SkeletonBlock>
             </div>
@@ -165,12 +163,12 @@
 <script setup>
   import { onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import ContentBlock from '@/templates/content-block'
   import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
@@ -211,16 +209,11 @@
     loadCurrentInvoiceService: {
       type: Function,
       required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     }
   })
 
   const route = useRoute()
   const router = useRouter()
-  const toast = useToast()
   const accountStore = useAccountStore()
 
   const { accountIsNotRegular, showExportBilling } = storeToRefs(accountStore)
@@ -273,16 +266,6 @@
     } finally {
       isCardDefaultLoaded.value = true
     }
-  }
-
-  const clipboard = (content) => {
-    props.clipboardWrite(content)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Successfully copied!'
-    })
   }
 
   const invoiceDownload = () => {

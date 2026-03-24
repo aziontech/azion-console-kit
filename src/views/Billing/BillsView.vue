@@ -277,10 +277,6 @@
       type: Function,
       required: true
     },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     openPlans: {
       type: Function,
       required: true
@@ -485,10 +481,7 @@
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
-            columnAppearance: 'text-full-with-clipboard',
-            dependencies: {
-              copyContentService: props.clipboardWrite
-            }
+            columnAppearance: 'text-full-with-clipboard'
           })
         }
       }

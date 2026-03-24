@@ -38,7 +38,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
@@ -294,8 +293,7 @@
       addButtonLabel: 'Origin',
       props: () => ({
         ...props.originsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -307,8 +305,7 @@
       addButtonLabel: 'Device',
       props: () => ({
         ...props.deviceGroupsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -360,7 +357,6 @@
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription:
           edgeApplication.value[applicationAcceleratorEnabled.value],
         navigateToApplicationAccelerator: navigateToApplicationAccelerator

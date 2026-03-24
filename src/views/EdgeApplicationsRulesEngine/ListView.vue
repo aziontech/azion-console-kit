@@ -43,10 +43,6 @@
     isEdgeFunctionEnabled: {
       type: Boolean
     },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     navigateToApplicationAccelerator: {
       type: Function,
       required: false
@@ -235,7 +231,6 @@
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :isImageOptimizationEnabled="isImageOptimizationEnabled"
     :listOriginsService="listOriginsService"
-    :clipboardWrite="clipboardWrite"
     :edgeApplicationId="edgeApplicationId"
     :documentationService="documentationService"
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"

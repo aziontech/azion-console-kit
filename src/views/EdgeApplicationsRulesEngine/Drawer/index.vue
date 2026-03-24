@@ -46,10 +46,6 @@
     isEdgeFunctionEnabled: {
       type: Boolean
     },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     currentPhase: {
       type: String,
       required: false,
@@ -336,7 +332,6 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :originsOptions="originsOptions"
-        :clipboardWrite="clipboardWrite"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
@@ -375,7 +370,6 @@
         @refreshOrigins="handleRefreshOrigins"
         @refreshCacheSettings="handleRefreshCacheSettings"
         @navigate-to-main-settings="handleNavigateToMainSettings"
-        :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"

@@ -33,7 +33,6 @@
       <DashboardPanelBlock
         v-if="reportData"
         :key="groupData.currentDashboard?.id"
-        :clipboardWrite="clipboardWrite"
         :moduleActions="metricsModule.actions"
         :moduleGetters="metricsModule.getters"
         :reportData="reportData"
@@ -64,10 +63,6 @@
 
   defineProps({
     playgroundOpener: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
       type: Function,
       required: true
     }

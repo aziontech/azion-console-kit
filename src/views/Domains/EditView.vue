@@ -26,7 +26,6 @@
               :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
               :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
               hasDomainName
-              @copyDomainName="copyDomainName"
             />
             <div
               v-if="loading"
@@ -68,7 +67,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
+  defineProps({
     editDomainService: {
       type: Function,
       required: true
@@ -95,10 +94,6 @@
     },
     updatedRedirect: {
       type: String,
-      required: true
-    },
-    clipboardWrite: {
-      type: Function,
       required: true
     },
     updateDigitalCertificates: {
@@ -134,10 +129,6 @@
 
   if (cachedDomain?.name) {
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedDomain.name)
-  }
-
-  const copyDomainName = ({ name }) => {
-    props.clipboardWrite(name)
   }
 
   const isFormLoading = ref(true)

@@ -28,7 +28,6 @@ export const personalTokensRoutes = {
       name: 'create-personal-token',
       component: () => import('@views/PersonalTokens/CreateView.vue'),
       props: {
-        clipboardWrite: Helpers.clipboardWrite,
         convertDateToLocalTimezone: Helpers.convertDateToLocalTimezone
       },
       meta: {

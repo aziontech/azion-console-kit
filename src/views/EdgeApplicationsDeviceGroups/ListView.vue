@@ -18,10 +18,6 @@
     documentationService: {
       required: true,
       type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
     }
   })
 

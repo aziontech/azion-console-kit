@@ -11,13 +11,6 @@
   import { watch, ref } from 'vue'
   import { handleCopyDNSSEC } from '../Config/dnssec.js'
 
-  defineProps({
-    handleCopy: {
-      type: Function,
-      required: true
-    }
-  })
-
   const edgeDNSStore = useEdgeDNSStore()
 
   const { value: id } = useField('id')
