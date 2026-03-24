@@ -15,8 +15,7 @@ export const domainsRoutes = {
       props: {
         listDomainsService: WorkloadServices.listWorkloadsService,
         deleteDomainService: WorkloadServices.deleteWorkloadService,
-        documentationService: Helpers.documentationCatalog.domains,
-        clipboardWrite: Helpers.clipboardWrite
+        documentationService: Helpers.documentationCatalog.domains
       },
       meta: {
         title: 'Domains',
@@ -36,8 +35,7 @@ export const domainsRoutes = {
       props: {
         createDomainService: DomainServices.createDomainService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
-        clipboardWrite: Helpers.clipboardWrite
+        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService
       },
       meta: {
         title: 'Create Domain',
@@ -63,8 +61,7 @@ export const domainsRoutes = {
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
-        updatedRedirect: 'list-domains',
-        clipboardWrite: Helpers.clipboardWrite
+        updatedRedirect: 'list-domains'
       },
       meta: {
         title: 'Edit Domain',

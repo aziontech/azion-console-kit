@@ -32,7 +32,6 @@
     loadCurrentInvoiceService: { type: Function, required: true },
     loadInvoiceDataService: { type: Function, required: true },
     listServiceAndProductsChangesService: { type: Function, required: true },
-    clipboardWrite: { type: Function, required: true },
     documentPaymentMethodService: { type: Function, required: true },
     listPaymentHistoryService: { type: Function, required: true },
     documentPaymentHistoryService: { type: Function, required: true },

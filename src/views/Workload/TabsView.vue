@@ -133,7 +133,6 @@
             :updatedRedirect="props.domainServices.updatedRedirect"
             :editDomainService="props.domainServices.editDomainService"
             :loadDigitalCertificatesService="props.domainServices.loadDigitalCertificatesService"
-            :clipboardWrite="props.domainServices.clipboardWrite"
             :domain="domain"
             :showActionBar="activeTab === mapTabs.mainSettings"
           />

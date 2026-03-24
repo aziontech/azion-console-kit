@@ -42,16 +42,10 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { validationSchema } from './Config/validation'
+  import { clipboardWrite } from '@/helpers/clipboard'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    clipboardWrite: {
-      type: Function,
-      required: true
-    }
-  })
 
   const route = useRoute()
 
@@ -80,7 +74,7 @@
             icon: 'pi pi-check',
             label: 'Copied'
           },
-          callback: () => props.clipboardWrite(response.domainName)
+          callback: () => clipboardWrite(response.domainName)
         }
       }
     }

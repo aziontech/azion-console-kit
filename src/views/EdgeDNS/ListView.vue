@@ -13,7 +13,7 @@
 
   defineOptions({ name: 'edge-dns-view' })
 
-  const props = defineProps({
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -85,7 +85,7 @@
             data: columnData.content,
             columnAppearance: 'text-format-with-popup',
             dependencies: {
-              showCopy: () => props.clipboardWrite(columnData.content)
+              showCopy: true
             }
           })
         }

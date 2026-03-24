@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
@@ -17,10 +18,6 @@
     disabledFields: {
       type: Boolean,
       default: false
-    },
-    copyToClipboard: {
-      type: Function,
-      required: true
     },
     listOrigins: {
       required: true,
@@ -198,15 +195,12 @@
             icon="pi pi-lock"
           />
         </div>
-        <PrimeButton
-          class="h-8 max-sm:w-full"
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          aria-label="Copy Origin Key"
+        <CopyBlock
+          :value="originKey"
           label="Copy"
+          copiedLabel="Copied"
           :disabled="!originKey"
-          @click="props.copyToClipboard(originKey)"
+          aria-label="Copy Origin Key"
         />
       </div>
     </template>

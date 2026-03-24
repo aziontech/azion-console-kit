@@ -72,7 +72,6 @@ export const digitalCertificatesRoutes = {
       name: 'edit-digital-certificates',
       component: () => import('@views/DigitalCertificates/EditView.vue'),
       props: {
-        clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
       },
       meta: {

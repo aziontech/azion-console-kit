@@ -18,14 +18,11 @@
         icon="pi pi-lock"
       />
       <div>
-        <PrimeButton
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          :aria-label="`Copy ${params.title}`"
+        <CopyBlock
+          :value="keyValue"
           label="Copy"
-          size="small"
-          @click="params.copy(keyValue)"
+          copiedLabel="Copied"
+          :aria-label="`Copy ${params.title}`"
           :data-testid="`copy-key-dialog__token-field__copy-key-button`"
         />
       </div>
@@ -47,7 +44,7 @@
   import { computed, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from 'primevue/button'
+  import CopyBlock from '@aziontech/webkit/copy-block'
 
   defineOptions({ name: 'CopyKeyDialog' })
 

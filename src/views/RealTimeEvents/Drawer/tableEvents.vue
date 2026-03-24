@@ -40,13 +40,11 @@
             >
               {{ data.value.content }}
             </div>
-            <PrimeButton
-              outlined
-              icon="pi pi-copy"
-              class="max-md:w-full"
-              @click="handleCopy(data.value.content)"
+            <CopyBlock
+              :value="data.value.content"
               data-testid="data-table-copy-button"
               v-if="hasContent(data.value.content)"
+              @copy="handleCopyToast"
             />
           </div>
 
@@ -65,13 +63,12 @@
   </div>
 </template>
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from 'primevue/api'
   import InputText from 'primevue/inputtext'
   import { useToast } from 'primevue/usetoast'
-  import { clipboardWrite } from '@/helpers/clipboard'
 
   import { ref } from 'vue'
 
@@ -90,8 +87,7 @@
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
 
-  const handleCopy = (value) => {
-    clipboardWrite(value)
+  const handleCopyToast = () => {
     toast.add({
       closable: true,
       severity: 'success',
