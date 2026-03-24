@@ -110,10 +110,25 @@
       yup.object().shape({
         key: yup
           .string()
-          .required()
           .label('Key')
-          .matches(/^[A-Z0-9_]+$/, 'Only accepts upper-case letters, numbers, and underscore.'),
-        value: yup.string().required().label('Value'),
+          .matches(/^[A-Z0-9_]*$/, 'Only accepts upper-case letters, numbers, and underscore.')
+          .test('required-if-value', 'Key is required when value is provided', function (value) {
+            const siblingValue = this.parent.value
+            if (siblingValue && siblingValue.trim() !== '') {
+              return value && value.trim() !== ''
+            }
+            return true
+          }),
+        value: yup
+          .string()
+          .label('Value')
+          .test('required-if-key', 'Value is required when key is provided', function (value) {
+            const siblingKey = this.parent.key
+            if (siblingKey && siblingKey.trim() !== '') {
+              return value && value.trim() !== ''
+            }
+            return true
+          }),
         isPublic: yup.boolean().default(false)
       })
     )
@@ -383,77 +398,98 @@
     emit('manage', data)
   }
 
-  const onDeploy = handleSubmit(async (formValues) => {
-    try {
-      isDeploying.value = true
-      goToDeploying()
+  const onDeploy = handleSubmit(
+    async (formValues) => {
+      try {
+        isDeploying.value = true
+        goToDeploying()
 
-      if (formValues.newVariables && formValues.newVariables.length > 0) {
-        await Promise.all(
-          formValues.newVariables.map((variable) => variablesService.create(variable))
+        // Filter out empty variables (variables with no key/value)
+        const validVariables = (formValues.newVariables || []).filter(
+          (variable) =>
+            variable.key &&
+            variable.key.trim() !== '' &&
+            variable.value &&
+            variable.value.trim() !== ''
         )
-      }
 
-      const inputSchema = [
-        {
-          field: 'platform_feature__vcs_integration__uuid',
-          instantiation_data_path: '',
-          value: formValues.gitScope
-        },
-        {
-          field: 'az_name',
-          instantiation_data_path: 'envs.[0].value',
-          value: formValues.domain
-        },
-        {
-          field: 'git_url_external',
-          instantiation_data_path: 'envs.[1].value',
-          value: formValues.repository
-        },
-        {
-          field: 'vulcan_preset',
-          instantiation_data_path: 'envs.[2].value',
-          value: formValues.preset
-        },
-        {
-          field: 'az_command',
-          instantiation_data_path: 'envs.[4].value',
-          value: formValues.installCommand
-        },
-        {
-          field: 'az_root_directory',
-          instantiation_data_path: 'envs.[5].value',
-          value: formValues.rootDirectory
+        if (validVariables.length > 0) {
+          await Promise.all(validVariables.map((variable) => variablesService.create(variable)))
         }
-      ]
 
-      deployStore.addApplicationName(formValues.domain)
-      applicationName.value = formValues.domain
+        const inputSchema = [
+          {
+            field: 'platform_feature__vcs_integration__uuid',
+            instantiation_data_path: '',
+            value: formValues.gitScope
+          },
+          {
+            field: 'az_name',
+            instantiation_data_path: 'envs.[0].value',
+            value: formValues.domain
+          },
+          {
+            field: 'git_url_external',
+            instantiation_data_path: 'envs.[1].value',
+            value: formValues.repository
+          },
+          {
+            field: 'vulcan_preset',
+            instantiation_data_path: 'envs.[2].value',
+            value: formValues.preset
+          },
+          {
+            field: 'az_command',
+            instantiation_data_path: 'envs.[4].value',
+            value: formValues.installCommand
+          },
+          {
+            field: 'az_root_directory',
+            instantiation_data_path: 'envs.[5].value',
+            value: formValues.rootDirectory
+          }
+        ]
 
-      const response = await props.instantiateTemplateService(templateId.value, inputSchema)
+        deployStore.addApplicationName(formValues.domain)
+        applicationName.value = formValues.domain
 
-      // Set execution ID from response for DeployStatusCard
-      if (response?.executionId) {
-        executionId.value = response.executionId
+        const response = await props.instantiateTemplateService(templateId.value, inputSchema)
+
+        // Set execution ID from response for DeployStatusCard
+        if (response?.executionId) {
+          executionId.value = response.executionId
+        }
+
+        // Set app URL for success card
+        appUrl.value = `https://${formValues.domain}`
+        results.value = response
+
+        emit('deploy', formValues)
+      } catch (error) {
+        deployFailed.value = true
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Deploy failed',
+          detail: error.message || 'Failed to deploy'
+        })
+      } finally {
+        isDeploying.value = false
       }
-
-      // Set app URL for success card
-      appUrl.value = `https://${formValues.domain}`
-      results.value = response
-
-      emit('deploy', formValues)
-    } catch (error) {
-      deployFailed.value = true
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Deploy failed',
-        detail: error.message || 'Failed to deploy'
-      })
-    } finally {
-      isDeploying.value = false
+    },
+    ({ errors }) => {
+      // Handle validation errors - show first error to user
+      const firstError = Object.values(errors)[0]
+      if (firstError) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: firstError
+        })
+      }
     }
-  })
+  )
 
   const loadSolutionByVendor = async () => {
     try {
