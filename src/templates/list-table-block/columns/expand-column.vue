@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-  import copyBlock from '@/templates/copy-block/copy-block.vue'
+  import copyBlock from '@aziontech/webkit/copy-block'
   defineOptions({ name: 'expand-column' })
   import { ref, computed } from 'vue'
 
