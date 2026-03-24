@@ -1,10 +1,12 @@
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
+  import DeployStatusCard from '@/templates/deploy-template/DeployStatusCard.vue'
+  import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -17,6 +19,7 @@
   import { useDeploy } from '@/stores/deploy'
   import { variablesService } from '@/services/v2/variables'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
 
   const props = defineProps({
@@ -50,12 +53,26 @@
     }
   })
 
-  const emit = defineEmits(['deploy'])
+  const emit = defineEmits(['deploy', 'finish', 'retry', 'manage'])
 
   const loadingStore = useLoadingStore()
   const deployStore = useDeploy()
   const toast = useToast()
   const route = useRoute()
+
+  // Step Navigation State
+  const currentStep = ref('repository')
+  const step2Ref = ref(null)
+  const step3Ref = ref(null)
+
+  // Deploy State
+  const executionId = ref('')
+  const deployFailed = ref(false)
+  const deployStartTime = ref(null)
+  const appUrl = ref('')
+  const applicationName = ref('')
+  const results = ref(null)
+  const isDeploying = ref(false)
 
   // OAuth and integration state
   const callbackUrl = ref('')
@@ -250,12 +267,18 @@
     }
   }
 
+  const handleGithubMessage = (event) => {
+    if (event.data.event === 'integration-data') {
+      saveIntegration(event.data)
+    }
+  }
+
   const listenerOnMessage = () => {
-    window.addEventListener('message', (event) => {
-      if (event.data.event === 'integration-data') {
-        saveIntegration(event.data)
-      }
-    })
+    window.addEventListener('message', handleGithubMessage)
+  }
+
+  const removeMessageListener = () => {
+    window.removeEventListener('message', handleGithubMessage)
   }
 
   const loadListIntegrations = async () => {
@@ -320,8 +343,51 @@
     return `ai ai-${presetValue}`
   }
 
+  // Step Navigation Methods
+  const goToDeploying = () => {
+    currentStep.value = 'deploying'
+    deployStartTime.value = Date.now()
+
+    nextTick(() => {
+      step2Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  const goToSuccess = () => {
+    currentStep.value = 'success'
+
+    nextTick(() => {
+      step3Ref.value?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    })
+  }
+
+  const handleFinish = () => {
+    goToSuccess()
+    emit('finish')
+  }
+
+  const handleRetry = () => {
+    currentStep.value = 'repository'
+    deployFailed.value = false
+    executionId.value = ''
+    emit('retry')
+  }
+
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
   const onDeploy = handleSubmit(async (formValues) => {
     try {
+      isDeploying.value = true
+      goToDeploying()
+
       if (formValues.newVariables && formValues.newVariables.length > 0) {
         await Promise.all(
           formValues.newVariables.map((variable) => variablesService.create(variable))
@@ -362,15 +428,30 @@
       ]
 
       deployStore.addApplicationName(formValues.domain)
-      await props.instantiateTemplateService(templateId.value, inputSchema)
+      applicationName.value = formValues.domain
+
+      const response = await props.instantiateTemplateService(templateId.value, inputSchema)
+
+      // Set execution ID from response for DeployStatusCard
+      if (response?.executionId) {
+        executionId.value = response.executionId
+      }
+
+      // Set app URL for success card
+      appUrl.value = `https://${formValues.domain}`
+      results.value = response
+
       emit('deploy', formValues)
     } catch (error) {
+      deployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
         summary: 'Deploy failed',
         detail: error.message || 'Failed to deploy'
       })
+    } finally {
+      isDeploying.value = false
     }
   })
 
@@ -399,337 +480,383 @@
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
+
+  onBeforeUnmount(() => {
+    removeMessageListener()
+  })
 </script>
 
 <template>
-  <BaseDeployCard
-    title="Import from Git"
-    class="self-center my-8"
-    :loading="loadingStore.isLoading"
-  >
-    <template
-      #header-meta
-      v-if="gitScope"
+  <div class="flex flex-col gap-6 min-w-[672px]">
+    <!-- Success Card -->
+    <div
+      ref="step3Ref"
+      v-show="currentStep === 'success'"
     >
-      <div class="w-full px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
-        <div class="py-4 flex flex-col gap-3">
-          <div class="flex flex-col gap-1.5">
-            <span class="text-[10px] font-normal text-text-color-muted leading-3"
-              >Importing from</span
-            >
-            <div class="flex items-center gap-1">
-              <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
-              <span class="text-[10px] font-normal text-text-color-muted leading-3">
-                {{ repositoryOwner }}/{{ repositoryName }}
-              </span>
+      <DeploySuccessCard
+        :app-url="appUrl"
+        :template-title="'Application Deployed'"
+        :template-description="`Your application ${applicationName} has been successfully deployed.`"
+        :github-url="repository"
+      />
+    </div>
+
+    <!-- Main Deploy Card -->
+    <BaseDeployCard
+      v-if="currentStep !== 'success'"
+      title="Import from Git"
+      class="self-center my-8"
+      :loading="loadingStore.isLoading"
+      :hide-footer="currentStep === 'deploying'"
+    >
+      <template
+        #header-meta
+        v-if="gitScope"
+      >
+        <div class="w-full px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
+          <div class="py-4 flex flex-col gap-3">
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[10px] font-normal text-text-color-muted leading-3"
+                >Importing from</span
+              >
+              <div class="flex items-center gap-1">
+                <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
+                <span class="text-[10px] font-normal text-text-color-muted leading-3">
+                  {{ repositoryOwner }}/{{ repositoryName }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </template>
+      </template>
 
-    <template #content>
-      <div
-        v-if="!hasIntegrations"
-        class="flex flex-col gap-4"
-      >
-        <OAuthGithub
-          ref="oauthGithubRef"
-          @onCallbackUrl="(uri) => setCallbackUrl(uri)"
-          :loading="isGithubConnectLoading"
-        />
-      </div>
-
-      <template v-else>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="flex flex-col sm:w-1/2 gap-2">
-            <LabelBlock
-              for="gitScope"
-              label="Git Scope"
-              isRequired
+      <template #content>
+        <template v-if="currentStep === 'repository'">
+          <div
+            v-if="!hasIntegrations"
+            class="flex flex-col gap-4"
+          >
+            <OAuthGithub
+              ref="oauthGithubRef"
+              @onCallbackUrl="(uri) => setCallbackUrl(uri)"
+              :loading="isGithubConnectLoading"
             />
-            <Dropdown
-              name="gitScope"
-              v-model="gitScope"
-              :options="integrationsList"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select a scope"
-              class="w-full"
-              @change="setListRepositories"
-            >
-              <template #value="slotProps">
-                <div
-                  v-if="slotProps.value"
-                  class="flex items-center"
+          </div>
+
+          <template v-else>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex flex-col sm:w-1/2 gap-2">
+                <LabelBlock
+                  for="gitScope"
+                  label="Git Scope"
+                  isRequired
+                />
+                <Dropdown
+                  name="gitScope"
+                  v-model="gitScope"
+                  :options="integrationsList"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a scope"
+                  class="w-full"
+                  @change="setListRepositories"
                 >
-                  <i class="pi pi-github mr-2"></i>
-                  <div>
-                    {{
-                      getOptionNameByValue({
+                  <template #value="slotProps">
+                    <div
+                      v-if="slotProps.value"
+                      class="flex items-center"
+                    >
+                      <i class="pi pi-github mr-2"></i>
+                      <div>
+                        {{
+                          getOptionNameByValue({
+                            listOption: integrationsList,
+                            optionValue: slotProps.value,
+                            key: 'value'
+                          })
+                        }}
+                      </div>
+                    </div>
+                    <div
+                      class="flex items-center"
+                      v-else
+                    >
+                      <i class="pi pi-github mr-2"></i>
+                      {{ slotProps.placeholder }}
+                    </div>
+                  </template>
+                  <template #option="slotProps">
+                    <div class="flex items-center">
+                      <i class="pi pi-github mr-2"></i>
+                      <div>{{ slotProps.option.label }}</div>
+                    </div>
+                  </template>
+                  <template #footer>
+                    <div class="p-dropdown-items-wrapper">
+                      <ul class="p-dropdown-items">
+                        <li
+                          class="p-dropdown-item flex items-center"
+                          @click="triggerConnectWithGithub"
+                        >
+                          <i class="pi pi-plus-circle mr-2"></i>
+                          <div>Add GitHub Account</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </Dropdown>
+              </div>
+              <div class="flex flex-col sm:w-1/2 gap-2">
+                <FieldDropdown
+                  filter
+                  required
+                  name="repository"
+                  label="Repository"
+                  optionLabel="name"
+                  optionValue="url"
+                  placeholder="Select a repository"
+                  :options="repositoriesList"
+                  :disabled="!gitScope"
+                  :value="repository"
+                  :loading="loadingRepositories"
+                  @onSelectOption="
+                    (option) => {
+                      setRepositoryValue(option.url)
+                      const accountName = getOptionNameByValue({
                         listOption: integrationsList,
-                        optionValue: slotProps.value,
+                        optionValue: gitScope,
                         key: 'value'
                       })
-                    }}
-                  </div>
-                </div>
-                <div
-                  class="flex items-center"
-                  v-else
-                >
-                  <i class="pi pi-github mr-2"></i>
-                  {{ slotProps.placeholder }}
-                </div>
-              </template>
-              <template #option="slotProps">
-                <div class="flex items-center">
-                  <i class="pi pi-github mr-2"></i>
-                  <div>{{ slotProps.option.label }}</div>
-                </div>
-              </template>
-              <template #footer>
-                <div class="p-dropdown-items-wrapper">
-                  <ul class="p-dropdown-items">
-                    <li
-                      class="p-dropdown-item flex items-center"
-                      @click="triggerConnectWithGithub"
-                    >
-                      <i class="pi pi-plus-circle mr-2"></i>
-                      <div>Add GitHub Account</div>
-                    </li>
-                  </ul>
-                </div>
-              </template>
-            </Dropdown>
-          </div>
-          <div class="flex flex-col sm:w-1/2 gap-2">
-            <FieldDropdown
-              filter
-              required
-              name="repository"
-              label="Repository"
-              optionLabel="name"
-              optionValue="url"
-              placeholder="Select a repository"
-              :options="repositoriesList"
-              :disabled="!gitScope"
-              :value="repository"
-              :loading="loadingRepositories"
-              @onSelectOption="
-                (option) => {
-                  setRepositoryValue(option.url)
-                  const accountName = getOptionNameByValue({
-                    listOption: integrationsList,
-                    optionValue: gitScope,
-                    key: 'value'
-                  })
-                  detectAndSetFrameworkPreset(accountName, option.name)
-                }
-              "
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-col w-full gap-2">
-          <FieldText
-            label="Domain"
-            required
-            name="domain"
-            :placeholder="suggestedDomain"
-            :value="domain"
-            description="This domain can be changed later and replaced with a custom domain."
-          />
-        </div>
-
-        <div class="flex flex-col w-full gap-2">
-          <LabelBlock
-            for="preset"
-            label="Framework"
-            isRequired
-          />
-          <Dropdown
-            name="preset"
-            v-model="preset"
-            :options="presetsList"
-            filter
-            optionLabel="label"
-            optionValue="value"
-            autoFilterFocus
-            placeholder="Select a framework"
-            class="w-full"
-          >
-            <template #value="slotProps">
-              <div
-                v-if="slotProps.value"
-                class="flex items-center"
-              >
-                <i
-                  :class="getPresetIconClass(slotProps.value)"
-                  class="w-3.5 h-3.5 mr-2"
-                ></i>
-                <div>
-                  {{
-                    getOptionNameByValue({
-                      listOption: presetsList,
-                      optionValue: slotProps.value,
-                      key: 'value'
-                    })
-                  }}
-                </div>
-              </div>
-              <div v-else>
-                {{ slotProps.placeholder }}
-              </div>
-            </template>
-            <template #option="slotProps">
-              <div class="flex items-center">
-                <i
-                  :class="getPresetIconClass(slotProps.option.value)"
-                  class="w-3.5 h-3.5 mr-2"
-                ></i>
-                <div>{{ slotProps.option.label }}</div>
-              </div>
-            </template>
-          </Dropdown>
-        </div>
-
-        <div class="flex flex-col w-full gap-2">
-          <FieldText
-            label="Root Directory"
-            required
-            name="rootDirectory"
-            placeholder="./"
-            :value="rootDirectory"
-          />
-        </div>
-
-        <Accordion :active-index="null">
-          <AccordionTab
-            :pt="{
-              header: { class: 'bg-surface-overlay' },
-              headerAction: {
-                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
-              },
-              content: { class: '!p-0 bg-surface-overlay' }
-            }"
-          >
-            <template #header>
-              <div class="flex items-center gap-2">
-                <span>Build Settings</span>
-              </div>
-            </template>
-            <div class="p-4 flex flex-col gap-4">
-              <div class="flex flex-col w-full gap-2">
-                <FieldInputTextPrivacy
-                  label="Install Command"
-                  required
-                  name="installCommand"
-                  placeholder="npm install"
-                  :value="installCommand"
-                  :isPublic="isInstallCommandEditable"
-                  @update:isPublic="isInstallCommandEditable = $event"
-                  :showPrivacyIcon="false"
+                      detectAndSetFrameworkPreset(accountName, option.name)
+                    }
+                  "
                 />
               </div>
             </div>
-          </AccordionTab>
 
-          <AccordionTab
-            :pt="{
-              header: { class: 'bg-surface-overlay' },
-              headerAction: {
-                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
-              },
-              content: { class: '!p-0 bg-surface-overlay' }
-            }"
-          >
-            <template #header>
-              <div class="flex items-center gap-2">
-                <span>Environment Variables</span>
-              </div>
-            </template>
-            <div class="p-4 flex flex-col gap-4">
-              <template v-if="newVariables?.length">
-                <div
-                  v-for="(variable, index) in newVariables"
-                  class="flex flex-col gap-2"
-                  :key="index"
-                >
-                  <div class="flex gap-4 items-top">
-                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
-                      <FieldText
-                        :label="index === 0 ? 'Key' : ''"
-                        required
-                        autocapitalize="characters"
-                        :name="`newVariables[${index}].key`"
-                        :value="newVariables[index].key"
-                        placeholder="VARIABLE_KEY_NAME"
-                        @paste="handlePasteVariables($event, index)"
-                      />
-                      <small
-                        v-if="index === newVariables.length - 1"
-                        class="text-xs text-color-secondary font-normal leading-5"
-                      >
-                        Give a name or identifier for the variable. Accepts upper-case letters,
-                        numbers, and underscore.
-                      </small>
+            <div class="flex flex-col w-full gap-2">
+              <FieldText
+                label="Domain"
+                required
+                name="domain"
+                :placeholder="suggestedDomain"
+                :value="domain"
+                description="This domain can be changed later and replaced with a custom domain."
+              />
+            </div>
+
+            <div class="flex flex-col w-full gap-2">
+              <LabelBlock
+                for="preset"
+                label="Framework"
+                isRequired
+              />
+              <Dropdown
+                name="preset"
+                v-model="preset"
+                :options="presetsList"
+                filter
+                optionLabel="label"
+                optionValue="value"
+                autoFilterFocus
+                placeholder="Select a framework"
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <div
+                    v-if="slotProps.value"
+                    class="flex items-center"
+                  >
+                    <i
+                      :class="getPresetIconClass(slotProps.value)"
+                      class="w-3.5 h-3.5 mr-2"
+                    ></i>
+                    <div>
+                      {{
+                        getOptionNameByValue({
+                          listOption: presetsList,
+                          optionValue: slotProps.value,
+                          key: 'value'
+                        })
+                      }}
                     </div>
-                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
-                      <FieldInputTextPrivacy
-                        :label="index === 0 ? 'Value' : ''"
-                        required
-                        labelPublic=""
-                        labelPrivate="Secret"
-                        :name="`newVariables[${index}].value`"
-                        :value="newVariables[index].value"
-                        placeholder="VARIABLE_VALUE"
-                        :isPublic="newVariables[index].isPublic"
-                        @update:isPublic="newVariables[index].isPublic = $event"
-                      />
-                      <small
-                        v-if="index === newVariables.length - 1"
-                        class="text-xs text-color-secondary font-normal leading-5"
-                      >
-                        Enter the data associated with the variable key.
-                      </small>
-                    </div>
-                    <Button
-                      :class="[
-                        'h-8 max-sm:w-full position-absolute right-0',
-                        index === 0 ? 'top-[30px]' : 'top-0.5'
-                      ]"
-                      icon="pi pi-minus-circle"
-                      outlined
-                      type="button"
-                      @click="removeVariable(index)"
+                  </div>
+                  <div v-else>
+                    {{ slotProps.placeholder }}
+                  </div>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex items-center">
+                    <i
+                      :class="getPresetIconClass(slotProps.option.value)"
+                      class="w-3.5 h-3.5 mr-2"
+                    ></i>
+                    <div>{{ slotProps.option.label }}</div>
+                  </div>
+                </template>
+              </Dropdown>
+            </div>
+
+            <div class="flex flex-col w-full gap-2">
+              <FieldText
+                label="Root Directory"
+                required
+                name="rootDirectory"
+                placeholder="./"
+                :value="rootDirectory"
+              />
+            </div>
+
+            <Accordion :active-index="null">
+              <AccordionTab
+                :pt="{
+                  header: { class: 'bg-surface-overlay' },
+                  headerAction: {
+                    class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+                  },
+                  content: { class: '!p-0 bg-surface-overlay' }
+                }"
+              >
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <span>Build Settings</span>
+                  </div>
+                </template>
+                <div class="p-4 flex flex-col gap-4">
+                  <div class="flex flex-col w-full gap-2">
+                    <FieldInputTextPrivacy
+                      label="Install Command"
+                      required
+                      name="installCommand"
+                      placeholder="npm install"
+                      :value="installCommand"
+                      :isPublic="isInstallCommandEditable"
+                      @update:isPublic="isInstallCommandEditable = $event"
+                      :showPrivacyIcon="false"
                     />
                   </div>
                 </div>
-              </template>
+              </AccordionTab>
 
-              <div class="flex flex-col sm:flex-row gap-4">
-                <Button
-                  icon="pi pi-plus-circle"
-                  outlined
-                  :label="addVariableLabel"
-                  @click="addVariable"
-                />
-              </div>
-            </div>
-          </AccordionTab>
-        </Accordion>
+              <AccordionTab
+                :pt="{
+                  header: { class: 'bg-surface-overlay' },
+                  headerAction: {
+                    class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+                  },
+                  content: { class: '!p-0 bg-surface-overlay' }
+                }"
+              >
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <span>Environment Variables</span>
+                  </div>
+                </template>
+                <div class="p-4 flex flex-col gap-4">
+                  <template v-if="newVariables?.length">
+                    <div
+                      v-for="(variable, index) in newVariables"
+                      class="flex flex-col gap-2"
+                      :key="index"
+                    >
+                      <div class="flex gap-4 items-top">
+                        <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                          <FieldText
+                            :label="index === 0 ? 'Key' : ''"
+                            required
+                            autocapitalize="characters"
+                            :name="`newVariables[${index}].key`"
+                            :value="newVariables[index].key"
+                            placeholder="VARIABLE_KEY_NAME"
+                            @paste="handlePasteVariables($event, index)"
+                          />
+                          <small
+                            v-if="index === newVariables.length - 1"
+                            class="text-xs text-color-secondary font-normal leading-5"
+                          >
+                            Give a name or identifier for the variable. Accepts upper-case letters,
+                            numbers, and underscore.
+                          </small>
+                        </div>
+                        <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                          <FieldInputTextPrivacy
+                            :label="index === 0 ? 'Value' : ''"
+                            required
+                            labelPublic=""
+                            labelPrivate="Secret"
+                            :name="`newVariables[${index}].value`"
+                            :value="newVariables[index].value"
+                            placeholder="VARIABLE_VALUE"
+                            :isPublic="newVariables[index].isPublic"
+                            @update:isPublic="newVariables[index].isPublic = $event"
+                          />
+                          <small
+                            v-if="index === newVariables.length - 1"
+                            class="text-xs text-color-secondary font-normal leading-5"
+                          >
+                            Enter the data associated with the variable key.
+                          </small>
+                        </div>
+                        <Button
+                          :class="[
+                            'h-8 max-sm:w-full position-absolute right-0',
+                            index === 0 ? 'top-[30px]' : 'top-0.5'
+                          ]"
+                          icon="pi pi-minus-circle"
+                          outlined
+                          type="button"
+                          @click="removeVariable(index)"
+                        />
+                      </div>
+                    </div>
+                  </template>
+
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <Button
+                      icon="pi pi-plus-circle"
+                      outlined
+                      :label="addVariableLabel"
+                      @click="addVariable"
+                    />
+                  </div>
+                </div>
+              </AccordionTab>
+            </Accordion>
+          </template>
+        </template>
       </template>
-    </template>
 
-    <template #footer>
-      <Button
-        label="Deploy"
-        icon-pos="right"
-        class="w-full"
-        :loading="loading"
-        @click="onDeploy"
+      <template
+        v-if="currentStep === 'repository'"
+        #footer
+      >
+        <Button
+          label="Deploy"
+          icon-pos="right"
+          class="w-full"
+          :loading="isDeploying"
+          @click="onDeploy"
+        />
+      </template>
+    </BaseDeployCard>
+
+    <!-- Deploy Status Card -->
+    <div
+      ref="step2Ref"
+      v-show="currentStep === 'deploying' || currentStep === 'success'"
+    >
+      <DeployStatusCard
+        :execution-id="executionId"
+        :get-logs-service="getScriptRunnerLogsService"
+        :results="currentStep === 'success' ? { domain: { url: appUrl } } : results"
+        :deploy-failed="deployFailed"
+        :application-name="applicationName"
+        :deploy-start-time="deployStartTime"
+        :deploy-started="currentStep === 'deploying'"
+        @finish="handleFinish"
+        @retry="handleRetry"
+        @manage="handleManage"
       />
-    </template>
-  </BaseDeployCard>
+    </div>
+  </div>
 </template>

@@ -128,6 +128,13 @@
             this.startPolling()
           }
         }
+      },
+      executionId: {
+        handler(newVal) {
+          if (newVal && this.start && this.polling && !this.isLogsPolling) {
+            this.handlePoll()
+          }
+        }
       }
     },
     computed: {
@@ -167,7 +174,7 @@
     methods: {
       startPolling() {
         this.polling = setInterval(async () => {
-          if (!this.isLogsPolling) {
+          if (!this.isLogsPolling && this.executionId) {
             this.isLogsPolling = true
             await this.handlePoll()
             this.isLogsPolling = false
