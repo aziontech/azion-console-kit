@@ -6,7 +6,7 @@
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldInputGroup from '@aziontech/webkit/field-input-group'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/copy-block'
 
   import PrimeButton from 'primevue/button'
   import { useFieldArray, useField } from 'vee-validate'

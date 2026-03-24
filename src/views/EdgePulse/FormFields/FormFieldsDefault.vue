@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
-  import copyBlock from '@/templates/copy-block/copy-block.vue'
+  import copyBlock from '@aziontech/webkit/copy-block'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   const defaultTagCode = ref(`<script>

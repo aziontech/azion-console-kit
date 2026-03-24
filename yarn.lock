@@ -85,12 +85,13 @@
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.0.4.tgz#c81151eb16fd10e1dc10f060ad7c4226e2e0143b"
   integrity sha512-K6or5V3Cs9OyXEif906x8Y/7xvxeb+OcEsRmI8Tlci3YnD5ZRIaznWeDDOxLZ/zn0VP28OShj9WggkVM0gsSmg==
 
-"@aziontech/webkit@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.7.1.tgz#b9d9059e393a2ab5e2299c9f1fdeeea3a2f9176e"
-  integrity sha512-1aDDdoGgcakYQIuA5BImVmelxiBoIcuNHNRjDpQxt34/X+EvQDXf/gAe+mpWZkXXjC6acIskmG0DCPO+IBH/8Q==
+"@aziontech/webkit@^1.8.5":
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.8.5.tgz#54c95214d628dadf98f05c61911ec4ca24865aa5"
+  integrity sha512-Rlk3Y1nfQfLOYPMa5RfzW8KvIQ9opW3e20R0CWZLWkFCDq3lxUz7UmDg+wYlZhIjtj8wLAVELM84UjC0BQGhjg==
   dependencies:
     "@vueuse/core" "^10.11.1"
+    motion-v "^2.1.0"
     primevue "3.35.0"
     vee-validate "^4.15.1"
     vue-tsc "^3.2.5"
@@ -5634,6 +5635,15 @@ framer-motion@^12.25.0:
     motion-utils "^12.29.2"
     tslib "^2.4.0"
 
+framer-motion@^12.38.0:
+  version "12.38.0"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.38.0.tgz#cf28e072a95942881ca4e33fd33be41192fd146b"
+  integrity sha512-rFYkY/pigbcswl1XQSb7q424kSTQ8q6eAC+YUsSKooHQYuLdzdHjrt6uxUC+PRAO++q5IS7+TamgIw1AphxR+g==
+  dependencies:
+    motion-dom "^12.38.0"
+    motion-utils "^12.36.0"
+    tslib "^2.4.0"
+
 from@~0:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
@@ -7200,10 +7210,22 @@ motion-dom@^12.23.23, motion-dom@^12.29.2:
   dependencies:
     motion-utils "^12.29.2"
 
+motion-dom@^12.38.0:
+  version "12.38.0"
+  resolved "https://registry.yarnpkg.com/motion-dom/-/motion-dom-12.38.0.tgz#9ef3253ea0fb28b6757588327073848d940e9aab"
+  integrity sha512-pdkHLD8QYRp8VfiNLb8xIBJis1byQ9gPT3Jnh2jqfFtAsWUA3dEepDlsWe/xMpO8McV+VdpKVcp+E+TGJEtOoA==
+  dependencies:
+    motion-utils "^12.36.0"
+
 motion-utils@^12.29.2:
   version "12.29.2"
   resolved "https://registry.yarnpkg.com/motion-utils/-/motion-utils-12.29.2.tgz#8fdd28babe042c2456b078ab33b32daa3bf5938b"
   integrity sha512-G3kc34H2cX2gI63RqU+cZq+zWRRPSsNIOjpdl9TN4AQwC4sgwYPl/Q/Obf/d53nOm569T0fYK+tcoSV50BWx8A==
+
+motion-utils@^12.36.0:
+  version "12.36.0"
+  resolved "https://registry.yarnpkg.com/motion-utils/-/motion-utils-12.36.0.tgz#cff2df2a28c3fe53a3de7e0103ba7f73ff7d77a7"
+  integrity sha512-eHWisygbiwVvf6PZ1vhaHCLamvkSbPIeAYxWUuL3a2PD/TROgE7FvfHWTIH4vMl798QLfMw15nRqIaRDXTlYRg==
 
 motion-v@^1.10.2:
   version "1.10.2"
@@ -7213,6 +7235,16 @@ motion-v@^1.10.2:
     framer-motion "^12.25.0"
     hey-listen "^1.0.8"
     motion-dom "^12.23.23"
+
+motion-v@^2.1.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/motion-v/-/motion-v-2.2.0.tgz#ea7e1b9a92440754bca0a615f23edbe5658089fb"
+  integrity sha512-8rrUBt9UMwy45MfLMwHer9J7xBY/rL31S+0U3ZUAouqjH3AOVHvS0NGuXwF4mfWfvb22rfZEv59ZsBc2f1epxQ==
+  dependencies:
+    framer-motion "^12.38.0"
+    hey-listen "^1.0.8"
+    motion-dom "^12.38.0"
+    motion-utils "^12.36.0"
 
 mrmime@^2.0.0:
   version "2.0.1"
