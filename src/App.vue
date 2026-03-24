@@ -53,7 +53,7 @@
 
   watch(currentTheme, (theme) => {
     themeApply(theme)
-  })
+  }, { immediate: true })
 
   watch(account, () => {
     updateTrackingTraits()
