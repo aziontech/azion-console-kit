@@ -7,9 +7,11 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldPhoneNumberCountry from '@aziontech/webkit/field-phone-number-country'
-  import InputPassword from 'primevue/password'
+  import FieldPassword from '@aziontech/webkit/field-password'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import LabelBlock from '@aziontech/webkit/label'
+
+  const emit = defineEmits(['password-strength'])
 
   defineProps({
     timezoneOptions: {
@@ -30,27 +32,22 @@
   const { value: timezone } = useField('timezone')
   const { value: language } = useField('language')
   const { value: email } = useField('email')
-  const { value: password, errorMessage: errorPassword } = useField('password')
-  const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
-  const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
 
   const passwordRequirementsList = ref([
-    { label: '8 characters', valid: false },
-    { label: '1 uppercase letter', valid: false },
-    { label: '1 lowercase letter', valid: false },
-    { label: '1 special character (example: !?<>@#$%)', valid: false }
+    { label: '8 characters', key: 'minLength', valid: false },
+    { label: '1 uppercase letter', key: 'uppercase', valid: false },
+    { label: '1 lowercase letter', key: 'lowercase', valid: false },
+    { label: '1 number', key: 'number', valid: false },
+    { label: '1 special character (example: !?<>@#$%)', key: 'specialChar', valid: false }
   ])
 
-  const validation = () => {
-    const hasUpperCase = password.value && /[A-Z]/.test(password.value)
-    const hasLowerCase = password.value && /[a-z]/.test(password.value)
-    const hasSpecialChar = password.value && /[!@#$%^&*(),.?":{}|<>]/.test(password.value)
-    const hasMinLength = password.value?.length > 7
-    passwordRequirementsList.value[0].valid = hasMinLength
-    passwordRequirementsList.value[1].valid = hasUpperCase
-    passwordRequirementsList.value[2].valid = hasLowerCase
-    passwordRequirementsList.value[3].valid = hasSpecialChar
-    return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+  const onPasswordStrength = (strength) => {
+    passwordRequirementsList.value[0].valid = strength.minLength
+    passwordRequirementsList.value[1].valid = strength.uppercase
+    passwordRequirementsList.value[2].valid = strength.lowercase
+    passwordRequirementsList.value[3].valid = strength.number
+    passwordRequirementsList.value[4].valid = strength.specialChar
+    emit('password-strength', strength)
   }
 </script>
 
@@ -161,71 +158,25 @@
     data-testid="your-settings-form__section__security"
   >
     <template #inputs>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__old-password"
-      >
-        <LabelBlock
-          data-testid="your-settings-form__old-password__label"
-          for="oldPassword"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldPassword
+          data-testid="your-settings-form__old-password"
+          name="oldPassword"
           label="Old Password"
-          isRequired
+          required
         />
-        <InputPassword
-          data-testid="your-settings-form__old-password__input"
-          toggleMask
-          v-model="oldPassword"
-          id="oldPassword"
-          class="w-full"
-          autocomplete="new-password"
-          :inputProps="{ autocomplete: 'new-password' }"
-          :feedback="false"
-          :pt="{
-            input: {
-              name: 'oldPassword'
-            }
-          }"
-        />
-        <small
-          data-testid="your-settings-form__old-password__error-message"
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorOldPassword }}
-        </small>
       </div>
       <div
         class="flex flex-col sm:max-w-lg gap-2"
         data-testid="your-settings-form__new-password"
       >
-        <LabelBlock
-          data-testid="your-settings-form__new-password__label"
-          for="password"
-          label="New Password"
-          isRequired
-        />
-        <InputPassword
+        <FieldPassword
           data-testid="your-settings-form__new-password__input"
-          toggleMask
-          v-model="password"
-          id="password"
-          autocomplete="new-password"
-          class="w-full"
-          :pt="{
-            input: {
-              name: 'password'
-            }
-          }"
-          :class="{ 'p-invalid': errorPassword }"
-          @input="validation()"
-          :feedback="false"
+          name="password"
+          label="New Password"
+          required
+          @strength="onPasswordStrength"
         />
-        <small
-          class="p-error text-xs font-normal leading-tight"
-          data-testid="your-settings-form__new-password__error-message"
-        >
-          {{ errorPassword }}
-        </small>
 
         <label
           class="font-semibold text-sm my-2"
@@ -255,38 +206,13 @@
           </li>
         </ul>
       </div>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__confirm-password"
-      >
-        <LabelBlock
-          data-testid="your-settings-form__confirm-password__label"
-          for="confirmPassword"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldPassword
+          data-testid="your-settings-form__confirm-password"
+          name="confirmPassword"
           label="Confirm Password"
-          isRequired
+          required
         />
-        <InputPassword
-          data-testid="your-settings-form__confirm-password__input"
-          toggleMask
-          v-model="confirmPassword"
-          id="confirmPassword"
-          class="w-full"
-          autocomplete="off"
-          :class="{ 'p-invalid': errorConfirmPassword }"
-          :feedback="false"
-          :pt="{
-            input: {
-              name: 'confirmPassword'
-            }
-          }"
-        />
-        <small
-          data-testid="your-settings-form__confirm-password__error-message"
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorConfirmPassword }}
-        </small>
       </div>
       <FieldSwitchBlock
         data-testid="your-settings-form__enforce-mfa"
