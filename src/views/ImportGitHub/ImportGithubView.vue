@@ -592,8 +592,12 @@
                         :value="newVariables[index].key"
                         placeholder="VARIABLE_KEY_NAME"
                       />
-                      <small v-if="index === newVariables.length - 1" class="text-xs text-color-secondary font-normal leading-5">
-                        Give a name or identifier for the variable. Accepts upper-case letters, numbers, and underscore.
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
+                      >
+                        Give a name or identifier for the variable. Accepts upper-case letters,
+                        numbers, and underscore.
                       </small>
                     </div>
                     <div class="flex flex-col sm:w-1/2 w-full gap-2">
@@ -607,12 +611,18 @@
                         @update:isPublic="newVariables[index].isPublic = $event"
                         :showPrivacyIcon="false"
                       />
-                      <small v-if="index === newVariables.length - 1" class="text-xs text-color-secondary font-normal leading-5">
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
+                      >
                         Enter the data associated with the variable key.
                       </small>
                     </div>
                     <Button
-                      :class="['h-8 max-sm:w-full position-absolute right-0', index === 0 ? 'top-[30px]' : 'top-0.5']"
+                      :class="[
+                        'h-8 max-sm:w-full position-absolute right-0',
+                        index === 0 ? 'top-[30px]' : 'top-0.5'
+                      ]"
                       icon="pi pi-trash"
                       outlined
                       type="button"
@@ -620,7 +630,6 @@
                     />
                   </div>
                 </div>
-               
               </template>
 
               <div class="flex flex-col sm:flex-row gap-4">
