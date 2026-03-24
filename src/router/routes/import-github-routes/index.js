@@ -11,7 +11,7 @@ export const importGithubRoutes = {
     {
       path: ':vendor/:solution',
       name: 'github-repository-import',
-      component: () => import('@/views/ImportGitHub/ImportGithubViewNew.vue'),
+      component: () => import('@/views/ImportGitHub/ImportGithubView.vue'),
       props: {
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,

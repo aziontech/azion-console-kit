@@ -53,6 +53,10 @@
     required: {
       type: Boolean,
       default: false
+    },
+    showPrivacyIcon: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -99,9 +103,10 @@
     initialValue: props.value
   })
 
-  const labelInput = computed(() =>
-    props.isPublic ? `Public ${props.label} ` : `Private ${props.label}`
-  )
+  const labelInput = computed(() => {
+    if (!props.showPrivacyIcon) return props.label
+    return props.isPublic ? `Public ${props.label} ` : `Private ${props.label}`
+  })
 
   const aditionalError = computed(() => props.aditionalError)
 
@@ -214,7 +219,10 @@
             class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-sm transition-transform duration-200"
             :class="props.isPublic ? 'translate-x-4' : 'translate-x-0'"
           >
-            <span class="relative w-3 h-3">
+            <span
+              v-if="props.showPrivacyIcon"
+              class="relative w-3 h-3"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="12"

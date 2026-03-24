@@ -1,4 +1,6 @@
 <script setup>
+  import Skeleton from 'primevue/skeleton'
+
   defineProps({
     title: {
       type: String,
@@ -7,37 +9,66 @@
     hideFooter: {
       type: Boolean,
       default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   })
 </script>
 
 <template>
   <div class="flex flex-col w-[700px] border surface-border rounded-md">
+    <!-- Header -->
     <div class="h-14 px-6 border-b surface-border flex items-center justify-between">
       <div class="text-color text-xl font-semibold leading-5">
-        {{ title }}
+        <Skeleton
+          v-if="loading"
+          class="h-6 w-48"
+        />
+        <template v-else>
+          {{ title }}
+        </template>
       </div>
       <div
-        v-if="$slots['header-right']"
+        v-if="$slots['header-right'] && !loading"
         class="text-sm font-normal text-color-secondary"
       >
         <slot name="header-right" />
       </div>
     </div>
 
+    <!-- Header Meta -->
     <div
-      v-if="$slots['header-meta']"
+      v-if="$slots['header-meta'] && !loading"
       class="px-6 py-4 border-b surface-border bg-[var(--surface-50)]"
     >
       <slot name="header-meta" />
     </div>
 
+    <!-- Content -->
     <div class="p-6 bg-[var(--surface-50)] flex flex-col gap-6">
-      <slot name="content" />
+      <template v-if="loading">
+        <!-- Skeleton content placeholder -->
+        <div class="flex flex-col gap-4">
+          <Skeleton class="h-4 w-full" />
+          <Skeleton class="h-4 w-3/4" />
+          <Skeleton class="h-4 w-5/6" />
+        </div>
+        <div class="flex flex-col gap-4">
+          <Skeleton class="h-10 w-full" />
+          <Skeleton class="h-10 w-2/3" />
+        </div>
+      </template>
+      <slot
+        v-else
+        name="content"
+      />
     </div>
 
+    <!-- Footer -->
     <div
-      v-if="$slots.footer && !hideFooter"
+      v-if="$slots.footer && !hideFooter && !loading"
       class="h-14 px-6 border-t surface-border flex flex-col justify-center"
     >
       <slot name="footer" />
