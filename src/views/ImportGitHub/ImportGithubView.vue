@@ -1,24 +1,37 @@
 <script setup>
-  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
-  import ContentBlock from '@/templates/content-block'
-  import CreateFormBlock from '@/templates/create-form-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { ref, computed, onMounted } from 'vue'
+  import { useForm, useField } from 'vee-validate'
+  import { useRoute } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  import * as yup from 'yup'
+  import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import LabelBlock from '@/templates/label-block'
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
+  import Button from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
   import { useLoadingStore } from '@/stores/loading'
   import { useDeploy } from '@/stores/deploy'
-  import { ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
-  import { onMounted } from 'vue'
-  import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
   import { variablesService } from '@/services/v2/variables'
-
-  const loadingStore = useLoadingStore()
-  const deployStore = useDeploy()
-  const toast = useToast()
-  const route = useRoute()
+  import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
 
   const props = defineProps({
+    repositoryOwner: {
+      type: String,
+      required: true
+    },
+    repositoryName: {
+      type: String,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
     listVulcanPresetsService: {
       type: Function,
       required: true
@@ -37,8 +50,28 @@
     }
   })
 
+  const emit = defineEmits(['deploy'])
+
+  const loadingStore = useLoadingStore()
+  const deployStore = useDeploy()
+  const toast = useToast()
+  const route = useRoute()
+
+  // OAuth and integration state
+  const callbackUrl = ref('')
+  const oauthGithubRef = ref(null)
+  const isGithubConnectLoading = ref(false)
+  const integrationsList = ref([])
+  const repositoriesList = ref([])
+  const loadingRepositories = ref(false)
+  const presetsList = ref([])
+  const templateId = ref(null)
+  const installCommandIsPublic = ref(false)
+
+  // Validation schema
   const validationSchema = yup.object({
-    applicationName: yup.string().required().label('Application Name'),
+    domain: yup.string().required().label('Domain'),
+    preset: yup.string().required().label('Framework'),
     rootDirectory: yup
       .string()
       .required()
@@ -46,10 +79,9 @@
       .matches(/^(?!.*\.\.).*$/, 'Root Directory cannot contain (..)')
       .matches(/^\S*$/, 'Root Directory cannot contain spaces')
       .label('Root Directory'),
-    preset: yup.string().required().label('Preset'),
-    repository: yup.string().required().label('Repository'),
     installCommand: yup.string().required().label('Install Command'),
     gitScope: yup.string().required().label('Git Scope'),
+    repository: yup.string().required().label('Repository'),
     newVariables: yup.array().of(
       yup.object().shape({
         key: yup
@@ -57,74 +89,222 @@
           .required()
           .label('Key')
           .matches(/^[A-Z0-9_]+$/, 'Only accepts upper-case letters, numbers, and underscore.'),
-        value: yup.string().required().label('Value')
+        value: yup.string().required().label('Value'),
+        isPublic: yup.boolean().default(false)
       })
     )
   })
 
-  const initialValues = {
-    applicationName: '',
-    rootDirectory: '/',
-    preset: '',
-    newVariables: [],
-    repository: '',
-    installCommand: '',
-    gitScope: ''
-  }
+  // Computed domain suggestion
+  const suggestedDomain = computed(() => {
+    if (!props.repositoryName) return ''
+    return `${props.repositoryName.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+  })
 
-  const templateId = ref(null)
-  const createServiceWithVariablesDecorator = async (formValues) => {
-    if (formValues.newVariables) {
-      await Promise.all(
-        formValues.newVariables.map((variable) => variablesService.create(variable))
-      )
+  const addVariableLabel = computed(() => {
+    if (newVariables.value.length === 0) {
+      return 'Add Variable'
     }
+    return 'Add Another'
+  })
 
-    const inputSchema = [
-      {
-        field: 'platform_feature__vcs_integration__uuid',
-        instantiation_data_path: '',
-        value: formValues.gitScope
-      },
-      {
-        field: 'az_name',
-        instantiation_data_path: 'envs.[0].value',
-        value: formValues.applicationName
-      },
-      {
-        field: 'git_url_external',
-        instantiation_data_path: 'envs.[1].value',
-        value: formValues.repository
-      },
-      {
-        field: 'vulcan_preset',
-        instantiation_data_path: 'envs.[2].value',
-        value: formValues.preset
-      },
-      {
-        field: 'az_command',
-        instantiation_data_path: 'envs.[4].value',
-        value: formValues.installCommand
-      },
-      {
-        field: 'az_root_directory',
-        instantiation_data_path: 'envs.[5].value',
-        value: formValues.rootDirectory
-      }
-    ]
-    deployStore.addApplicationName(formValues.applicationName)
-    return props.instantiateTemplateService(templateId.value, inputSchema)
+  // Initial form values
+  const initialValues = {
+    domain: suggestedDomain.value,
+    preset: '',
+    rootDirectory: '/',
+    installCommand: 'npm install',
+    newVariables: [],
+    gitScope: '',
+    repository: ''
   }
+
+  // Setup form with vee-validate
+  const { handleSubmit } = useForm({
+    validationSchema,
+    initialValues
+  })
+
+  // UseField for individual fields
+  const { value: domain } = useField('domain')
+  const { value: preset } = useField('preset')
+  const { value: rootDirectory } = useField('rootDirectory')
+  const { value: installCommand } = useField('installCommand')
+  const { value: gitScope } = useField('gitScope')
+  const { value: repository } = useField('repository')
+  const { value: newVariables } = useField('newVariables')
+
+  // Computed for integration check
+  const hasIntegrations = computed(() => {
+    return integrationsList?.value?.length > 0
+  })
+
+  // Methods
+  const addVariable = () => {
+    if (!Array.isArray(newVariables.value)) {
+      newVariables.value = []
+    }
+    newVariables.value.push({
+      key: '',
+      value: '',
+      isPublic: false
+    })
+  }
+
+  const removeVariable = (index) => {
+    newVariables.value.splice(index, 1)
+  }
+
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
+  }
+
+  const saveIntegration = async (integration) => {
+    try {
+      isGithubConnectLoading.value = true
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
+      await loadListIntegrations()
+    } catch (error) {
+      error.showWithOptions(toast, (error) => ({
+        summary: `GitHub integration failed: ${error.detail}`,
+        severity: 'error'
+      }))
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
+      }
+    })
+  }
+
+  const loadListIntegrations = async () => {
+    try {
+      isGithubConnectLoading.value = true
+      const data = await vcsService.listIntegrations()
+      integrationsList.value = data
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Listing failed' })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const setListRepositories = async () => {
+    repositoriesList.value = []
+    loadingRepositories.value = true
+
+    try {
+      const data = await vcsService.listRepositories(gitScope.value)
+      repositoriesList.value = data
+    } catch (error) {
+      error.showWithOptions(toast, { summary: 'Loading failed' })
+    } finally {
+      loadingRepositories.value = false
+    }
+  }
+
+  const detectAndSetFrameworkPreset = async (accountName, repoName) => {
+    try {
+      const framework = await props.frameworkDetectorService({
+        accountName,
+        repositoryName: repoName
+      })
+      preset.value = framework
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Setting failed',
+        detail: error
+      })
+    }
+  }
+
+  const setRepositoryValue = (repositoryUrl) => {
+    repository.value = repositoryUrl
+  }
+
+  const getOptionNameByValue = ({ listOption, optionValue, key }) => {
+    const selectedOption = listOption.find((integration) => integration[key] === optionValue)
+    return selectedOption ? selectedOption.label : ''
+  }
+
+  const triggerConnectWithGithub = () => {
+    if (oauthGithubRef.value) {
+      oauthGithubRef.value.connectWithGithub()
+    }
+  }
+
+  const getPresetIconClass = (presetValue) => {
+    return `ai ai-${presetValue}`
+  }
+
+  const onDeploy = handleSubmit(async (formValues) => {
+    try {
+      if (formValues.newVariables && formValues.newVariables.length > 0) {
+        await Promise.all(
+          formValues.newVariables.map((variable) => variablesService.create(variable))
+        )
+      }
+
+      const inputSchema = [
+        {
+          field: 'platform_feature__vcs_integration__uuid',
+          instantiation_data_path: '',
+          value: formValues.gitScope
+        },
+        {
+          field: 'az_name',
+          instantiation_data_path: 'envs.[0].value',
+          value: formValues.domain
+        },
+        {
+          field: 'git_url_external',
+          instantiation_data_path: 'envs.[1].value',
+          value: formValues.repository
+        },
+        {
+          field: 'vulcan_preset',
+          instantiation_data_path: 'envs.[2].value',
+          value: formValues.preset
+        },
+        {
+          field: 'az_command',
+          instantiation_data_path: 'envs.[4].value',
+          value: formValues.installCommand
+        },
+        {
+          field: 'az_root_directory',
+          instantiation_data_path: 'envs.[5].value',
+          value: formValues.rootDirectory
+        }
+      ]
+
+      deployStore.addApplicationName(formValues.domain)
+      await props.instantiateTemplateService(templateId.value, inputSchema)
+      emit('deploy', formValues)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Deploy failed',
+        detail: error.message || 'Failed to deploy'
+      })
+    }
+  })
 
   const loadSolutionByVendor = async () => {
     try {
       loadingStore.startLoading()
-
       const solution = await props.loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
       })
-
       templateId.value = solution.referenceId
     } catch (error) {
       toast.add({
@@ -139,41 +319,341 @@
   }
 
   onMounted(async () => {
-    await loadSolutionByVendor()
+    await Promise.all([loadSolutionByVendor(), loadListIntegrations()])
+    listenerOnMessage()
+    presetsList.value = await props.listVulcanPresetsService()
   })
 </script>
 
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Import from GitHub"
-        description="Import repositories and configurations from GitHub to your account."
+  <BaseDeployCard
+    title="Import from Git"
+    class="self-center my-8"
+    :loading="loadingStore.isLoading"
+  >
+    <template
+      #header-meta
+      v-if="gitScope"
+    >
+      <div class="w-full px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
+        <div class="py-4 flex flex-col gap-3">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[10px] font-normal text-text-color-muted leading-3"
+              >Importing from</span
+            >
+            <div class="flex items-center gap-1">
+              <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
+              <span class="text-[10px] font-normal text-text-color-muted leading-3">
+                {{ repositoryOwner }}/{{ repositoryName }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template #content>
+      <div
+        v-if="!hasIntegrations"
+        class="flex flex-col gap-4"
+      >
+        <OAuthGithub
+          ref="oauthGithubRef"
+          @onCallbackUrl="(uri) => setCallbackUrl(uri)"
+          :loading="isGithubConnectLoading"
+        />
+      </div>
+
+      <template v-else>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex flex-col sm:w-1/2 gap-2">
+            <LabelBlock
+              for="gitScope"
+              label="Git Scope"
+              isRequired
+            />
+            <Dropdown
+              name="gitScope"
+              v-model="gitScope"
+              :options="integrationsList"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select a scope"
+              class="w-full"
+              @change="setListRepositories"
+            >
+              <template #value="slotProps">
+                <div
+                  v-if="slotProps.value"
+                  class="flex items-center"
+                >
+                  <i class="pi pi-github mr-2"></i>
+                  <div>
+                    {{
+                      getOptionNameByValue({
+                        listOption: integrationsList,
+                        optionValue: slotProps.value,
+                        key: 'value'
+                      })
+                    }}
+                  </div>
+                </div>
+                <div
+                  class="flex items-center"
+                  v-else
+                >
+                  <i class="pi pi-github mr-2"></i>
+                  {{ slotProps.placeholder }}
+                </div>
+              </template>
+              <template #option="slotProps">
+                <div class="flex items-center">
+                  <i class="pi pi-github mr-2"></i>
+                  <div>{{ slotProps.option.label }}</div>
+                </div>
+              </template>
+              <template #footer>
+                <div class="p-dropdown-items-wrapper">
+                  <ul class="p-dropdown-items">
+                    <li
+                      class="p-dropdown-item flex items-center"
+                      @click="triggerConnectWithGithub"
+                    >
+                      <i class="pi pi-plus-circle mr-2"></i>
+                      <div>Add GitHub Account</div>
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
+          <div class="flex flex-col sm:w-1/2 gap-2">
+            <FieldDropdown
+              filter
+              required
+              name="repository"
+              label="Repository"
+              optionLabel="name"
+              optionValue="url"
+              placeholder="Select a repository"
+              :options="repositoriesList"
+              :disabled="!gitScope"
+              :value="repository"
+              :loading="loadingRepositories"
+              @onSelectOption="
+                (option) => {
+                  setRepositoryValue(option.url)
+                  const accountName = getOptionNameByValue({
+                    listOption: integrationsList,
+                    optionValue: gitScope,
+                    key: 'value'
+                  })
+                  detectAndSetFrameworkPreset(accountName, option.name)
+                }
+              "
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col w-full gap-2">
+          <FieldText
+            label="Domain"
+            required
+            name="domain"
+            :placeholder="suggestedDomain"
+            :value="domain"
+            description="This domain can be changed later and replaced with a custom domain."
+          />
+        </div>
+
+        <div class="flex flex-col w-full gap-2">
+          <LabelBlock
+            for="preset"
+            label="Framework"
+            isRequired
+          />
+          <Dropdown
+            name="preset"
+            v-model="preset"
+            :options="presetsList"
+            filter
+            optionLabel="label"
+            optionValue="value"
+            autoFilterFocus
+            placeholder="Select a framework"
+            class="w-full"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center"
+              >
+                <i
+                  :class="getPresetIconClass(slotProps.value)"
+                  class="w-3.5 h-3.5 mr-2"
+                ></i>
+                <div>
+                  {{
+                    getOptionNameByValue({
+                      listOption: presetsList,
+                      optionValue: slotProps.value,
+                      key: 'value'
+                    })
+                  }}
+                </div>
+              </div>
+              <div v-else>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center">
+                <i
+                  :class="getPresetIconClass(slotProps.option.value)"
+                  class="w-3.5 h-3.5 mr-2"
+                ></i>
+                <div>{{ slotProps.option.label }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+
+        <div class="flex flex-col w-full gap-2">
+          <FieldText
+            label="Root Directory"
+            required
+            name="rootDirectory"
+            placeholder="./"
+            :value="rootDirectory"
+          />
+        </div>
+
+        <Accordion :active-index="null">
+          <AccordionTab
+            :pt="{
+              header: { class: 'bg-surface-overlay' },
+              headerAction: {
+                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+              },
+              content: { class: '!p-0 bg-surface-overlay' }
+            }"
+          >
+            <template #header>
+              <div class="flex items-center gap-2">
+                <i class="pi pi-cog"></i>
+                <span>Build Settings</span>
+              </div>
+            </template>
+            <div class="p-4 flex flex-col gap-4">
+              <div class="flex flex-col w-full gap-2">
+                <FieldInputTextPrivacy
+                  label="Install Command"
+                  required
+                  name="installCommand"
+                  placeholder="npm install"
+                  :value="installCommand"
+                  :isPublic="installCommandIsPublic"
+                  @update:isPublic="installCommandIsPublic = $event"
+                  :showPrivacyIcon="false"
+                />
+              </div>
+            </div>
+          </AccordionTab>
+
+          <AccordionTab
+            :pt="{
+              header: { class: 'bg-surface-overlay' },
+              headerAction: {
+                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+              },
+              content: { class: '!p-0 bg-surface-overlay' }
+            }"
+          >
+            <template #header>
+              <div class="flex items-center gap-2">
+                <i class="pi pi-sliders-h"></i>
+                <span>Environment Variables</span>
+              </div>
+            </template>
+            <div class="p-4 flex flex-col gap-4">
+              <template v-if="newVariables?.length">
+                <div
+                  v-for="(variable, index) in newVariables"
+                  class="flex flex-col gap-2"
+                  :key="index"
+                >
+                  <div class="flex gap-4 items-top">
+                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                      <FieldText
+                        :label="index === 0 ? 'Key' : ''"
+                        required
+                        autocapitalize="characters"
+                        :name="`newVariables[${index}].key`"
+                        :value="newVariables[index].key"
+                        placeholder="VARIABLE_KEY_NAME"
+                      />
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
+                      >
+                        Give a name or identifier for the variable. Accepts upper-case letters,
+                        numbers, and underscore.
+                      </small>
+                    </div>
+                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                      <FieldInputTextPrivacy
+                        :label="index === 0 ? 'Value' : ''"
+                        required
+                        :name="`newVariables[${index}].value`"
+                        :value="newVariables[index].value"
+                        placeholder="VARIABLE_VALUE"
+                        :isPublic="newVariables[index].isPublic"
+                        @update:isPublic="newVariables[index].isPublic = $event"
+                        :showPrivacyIcon="false"
+                      />
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
+                      >
+                        Enter the data associated with the variable key.
+                      </small>
+                    </div>
+                    <Button
+                      :class="[
+                        'h-8 max-sm:w-full position-absolute right-0',
+                        index === 0 ? 'top-[30px]' : 'top-0.5'
+                      ]"
+                      icon="pi pi-trash"
+                      outlined
+                      type="button"
+                      @click="removeVariable(index)"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <div class="flex flex-col sm:flex-row gap-4">
+                <Button
+                  icon="pi pi-plus-circle"
+                  outlined
+                  :label="addVariableLabel"
+                  @click="addVariable"
+                />
+              </div>
+            </div>
+          </AccordionTab>
+        </Accordion>
+      </template>
+    </template>
+
+    <template #footer>
+      <Button
+        label="Deploy"
+        icon-pos="right"
+        class="w-full"
+        :loading="loading"
+        @click="onDeploy"
       />
     </template>
-    <template #content>
-      <CreateFormBlock
-        :disableAfterCreateToastFeedback="true"
-        :createService="createServiceWithVariablesDecorator"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormFieldsImportGithub
-            :listVulcanPresetsService="listVulcanPresetsService"
-            :frameworkDetectorService="frameworkDetectorService"
-          />
-        </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-            :submitDisabled="!formValid"
-            primaryActionLabel="Deploy"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
+  </BaseDeployCard>
 </template>
