@@ -4,7 +4,7 @@
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
 
-  const emit = defineEmits(['blur', 'input'])
+  const emit = defineEmits(['blur', 'input', 'paste'])
   const props = defineProps({
     value: {
       type: String,
@@ -82,6 +82,10 @@
     emit('input', event.target.value)
   }
 
+  const onPaste = (event) => {
+    emit('paste', event)
+  }
+
   defineExpose({ inputRef })
 </script>
 
@@ -108,6 +112,7 @@
     @input="onChange"
     @keypress.enter.prevent
     @blur="onBlur"
+    @paste="onPaste"
   />
   <small
     v-if="aditionalError || veeValidateErrorMessage"

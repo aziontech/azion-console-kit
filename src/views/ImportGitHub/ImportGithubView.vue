@@ -66,11 +66,18 @@
   const loadingRepositories = ref(false)
   const presetsList = ref([])
   const templateId = ref(null)
-  const installCommandIsPublic = ref(false)
+  const isInstallCommandEditable = ref(false)
 
   // Validation schema
   const validationSchema = yup.object({
-    domain: yup.string().required().label('Domain'),
+    domain: yup
+      .string()
+      .required()
+      .matches(
+        /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.azion\.app$/,
+        'Domain must end with .azion.app (e.g., mydomain.azion.app)'
+      )
+      .label('Domain'),
     preset: yup.string().required().label('Framework'),
     rootDirectory: yup
       .string()
@@ -102,7 +109,7 @@
   })
 
   const addVariableLabel = computed(() => {
-    if (newVariables.value.length === 0) {
+    if (!newVariables.value || newVariables.value.length === 0) {
       return 'Add Variable'
     }
     return 'Add Another'
@@ -114,7 +121,13 @@
     preset: '',
     rootDirectory: '/',
     installCommand: 'npm install',
-    newVariables: [],
+    newVariables: [
+      {
+        key: '',
+        value: '',
+        isPublic: false
+      }
+    ],
     gitScope: '',
     repository: ''
   }
@@ -149,6 +162,69 @@
       value: '',
       isPublic: false
     })
+  }
+
+  const parseEnvVariables = (text) => {
+    const lines = text.split('\n').filter((line) => line.trim())
+
+    const variables = []
+    const seenKeys = new Set()
+
+    for (const line of lines) {
+      const trimmedLine = line.trim()
+      if (!trimmedLine || trimmedLine.startsWith('#')) {
+        continue
+      }
+
+      // Match patterns like: KEY="value", KEY='value', KEY=value
+      // Regex captures the key and value, handling quoted values properly
+      const doubleQuotedMatch = trimmedLine.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"([^"]*)"\s*$/)
+      const singleQuotedMatch = trimmedLine.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*'([^']*)'\s*$/)
+      const unquotedMatch = trimmedLine.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\s]+)\s*$/)
+
+      const match = doubleQuotedMatch || singleQuotedMatch || unquotedMatch
+      if (match) {
+        const key = match[1].toUpperCase()
+        const value = match[2]
+
+        // Only add if key hasn't been seen before (deduplicate, keep first occurrence)
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key)
+          variables.push({
+            key,
+            value,
+            isPublic: false
+          })
+        }
+      }
+    }
+    return variables
+  }
+
+  const handlePasteVariables = (event, index) => {
+    const pastedText = event.clipboardData?.getData('text')
+    if (!pastedText) {
+      return
+    }
+
+    const parsedVariables = parseEnvVariables(pastedText)
+
+    // Only process if multiple lines were pasted (likely env vars format)
+    if (parsedVariables.length > 1 || (parsedVariables.length === 1 && pastedText.includes('\n'))) {
+      event.preventDefault()
+
+      // Replace the current variable at index with the first parsed one
+      // and add the rest as new variables
+      if (!parsedVariables.length) {
+        newVariables.value[index] = parsedVariables[0]
+
+        // Add remaining variables
+        for (let idx = 1; idx < parsedVariables.length; idx++) {
+          newVariables.value.push(parsedVariables[idx])
+        }
+      }
+    }
+    // If it's a single line without newline, let the default paste behavior happen
   }
 
   const removeVariable = (index) => {
@@ -540,7 +616,6 @@
           >
             <template #header>
               <div class="flex items-center gap-2">
-                <i class="pi pi-cog"></i>
                 <span>Build Settings</span>
               </div>
             </template>
@@ -552,8 +627,8 @@
                   name="installCommand"
                   placeholder="npm install"
                   :value="installCommand"
-                  :isPublic="installCommandIsPublic"
-                  @update:isPublic="installCommandIsPublic = $event"
+                  :isPublic="isInstallCommandEditable"
+                  @update:isPublic="isInstallCommandEditable = $event"
                   :showPrivacyIcon="false"
                 />
               </div>
@@ -571,7 +646,6 @@
           >
             <template #header>
               <div class="flex items-center gap-2">
-                <i class="pi pi-sliders-h"></i>
                 <span>Environment Variables</span>
               </div>
             </template>
@@ -591,6 +665,7 @@
                         :name="`newVariables[${index}].key`"
                         :value="newVariables[index].key"
                         placeholder="VARIABLE_KEY_NAME"
+                        @paste="handlePasteVariables($event, index)"
                       />
                       <small
                         v-if="index === newVariables.length - 1"
@@ -604,12 +679,13 @@
                       <FieldInputTextPrivacy
                         :label="index === 0 ? 'Value' : ''"
                         required
+                        labelPublic=""
+                        labelPrivate="Secret"
                         :name="`newVariables[${index}].value`"
                         :value="newVariables[index].value"
                         placeholder="VARIABLE_VALUE"
                         :isPublic="newVariables[index].isPublic"
                         @update:isPublic="newVariables[index].isPublic = $event"
-                        :showPrivacyIcon="false"
                       />
                       <small
                         v-if="index === newVariables.length - 1"
@@ -623,7 +699,7 @@
                         'h-8 max-sm:w-full position-absolute right-0',
                         index === 0 ? 'top-[30px]' : 'top-0.5'
                       ]"
-                      icon="pi pi-trash"
+                      icon="pi pi-minus-circle"
                       outlined
                       type="button"
                       @click="removeVariable(index)"

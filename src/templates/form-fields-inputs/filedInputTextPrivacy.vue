@@ -50,6 +50,11 @@
       type: Boolean,
       default: false
     },
+    labelPrivate: { type: String, default: 'Private' },
+    labelPublic: {
+      type: String,
+      default: 'Public'
+    },
     required: {
       type: Boolean,
       default: false
@@ -105,7 +110,9 @@
 
   const labelInput = computed(() => {
     if (!props.showPrivacyIcon) return props.label
-    return props.isPublic ? `Public ${props.label} ` : `Private ${props.label}`
+    return props.isPublic
+      ? `${props.labelPublic} ${props.label} `
+      : `${props.labelPrivate} ${props.label}`
   })
 
   const aditionalError = computed(() => props.aditionalError)
@@ -121,9 +128,15 @@
   }
 
   const togglePrivacy = () => {
-    if (props.disabled || props.readonly) return
+    if (!props.showPrivacyIcon && (props.disabled || props.readonly)) return
     emit('update:isPublic', !props.isPublic)
   }
+
+  const isInputDisabled = computed(() => {
+    if (props.disabled) return true
+    if (!props.showPrivacyIcon && !props.isPublic) return true
+    return false
+  })
 
   const onGroupFocusIn = () => {
     isFocused.value = true
@@ -159,7 +172,10 @@
 
     <div
       class="p-inputgroup rounded transition-shadow duration-150"
-      :class="[groupShadowClass, disabled ? 'opacity-50 pointer-events-none' : '']"
+      :class="[
+        groupShadowClass,
+        isInputDisabled && showPrivacyIcon ? 'opacity-50 pointer-events-none' : ''
+      ]"
       @focusin="onGroupFocusIn"
       @focusout="onGroupFocusOut"
     >
@@ -172,7 +188,7 @@
         :id="name"
         :name="name"
         :readonly="readonly"
-        :disabled="disabled"
+        :disabled="isInputDisabled"
         :placeholder="props.placeholder"
         :class="[
           '!border-r-0 !outline-none !shadow-none transition-colors duration-150',
@@ -198,11 +214,18 @@
         :aria-pressed="props.isPublic"
         role="switch"
         tabindex="0"
-        class="p-inputgroup-addon !bg-[var(--input-bg,var(--surface-0))] !border-l-0 cursor-pointer outline-none transition-colors duration-150 select-none"
+        class="p-inputgroup-addon !border-l-0 cursor-pointer outline-none transition-colors duration-150 select-none"
         :class="[
           groupBorderClass,
-          { 'opacity-50 cursor-not-allowed pointer-events-none': disabled || readonly }
+          {
+            'opacity-50 cursor-not-allowed pointer-events-none':
+              (disabled || readonly) && showPrivacyIcon
+          }
         ]"
+        :style="{
+          backgroundColor: 'var(--input-bg, var(--surface-0))',
+          ...(isInputDisabled && !showPrivacyIcon ? { opacity: 'var(--disabled-opacity)' } : {})
+        }"
         @click="togglePrivacy"
         @keydown.enter.prevent="togglePrivacy"
         @keydown.space.prevent="togglePrivacy"
