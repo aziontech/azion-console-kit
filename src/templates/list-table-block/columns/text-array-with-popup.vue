@@ -52,7 +52,7 @@
 
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/copy-block'
 
   const props = defineProps({
     items: {

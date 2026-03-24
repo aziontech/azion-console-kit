@@ -35,7 +35,7 @@
 
 <script setup>
   import { ref, computed } from 'vue'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/copy-block'
 
   const props = defineProps({
     text: String,
