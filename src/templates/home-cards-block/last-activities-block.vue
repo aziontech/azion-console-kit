@@ -26,20 +26,11 @@
     },
     {
       field: 'resourceType',
-      header: 'Resource Type'
+      header: 'Type'
     },
     {
       field: 'resourceName',
-      header: 'Resource Name',
-      enableClick: true
-    },
-    {
-      field: 'parentResourceType',
-      header: 'Parent Resource Type'
-    },
-    {
-      field: 'parentResourceName',
-      header: 'Parent Resource Name',
+      header: 'Resource',
       enableClick: true
     },
     {

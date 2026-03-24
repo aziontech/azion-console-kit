@@ -6,7 +6,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { DataTableActionsButtons } from '@/components/DataTable'
-  import copyBlock from '@/templates/copy-block/copy-block.vue'
+  import copyBlock from '@aziontech/webkit/copy-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

@@ -357,15 +357,16 @@ export const EdgeSQLAdapter = {
 
   buildTableInfoStatements(tableName, needSchema) {
     const options = arguments.length > 2 && arguments[2] ? arguments[2] : {}
-    const { paginate = false, page = 1, pageSize = 10 } = options
+    const { paginate = false, page = 1, pageSize = 10, orderBy = null } = options
 
     const safePage = Math.max(1, Number(page) || 1)
     const safePageSize = Math.max(1, Number(pageSize) || 10)
     const offset = (safePage - 1) * safePageSize
 
+    const orderClause = orderBy ? ` ORDER BY ${orderBy}` : ''
     const selectStmt = paginate
-      ? `SELECT * FROM ${tableName} LIMIT ${safePageSize} OFFSET ${offset}`
-      : `SELECT * FROM ${tableName}`
+      ? `SELECT * FROM ${tableName}${orderClause} LIMIT ${safePageSize} OFFSET ${offset}`
+      : `SELECT * FROM ${tableName}${orderClause}`
 
     const statements = []
     if (needSchema) {

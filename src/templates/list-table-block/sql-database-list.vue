@@ -458,7 +458,9 @@
     'other-actions',
     'row-edit-saved',
     'row-edit-cancel',
-    'click-to-create'
+    'click-to-create',
+    'reload-table',
+    'view-change'
   ])
 
   const tableProps = { ...toRefs(props), loadDisabled: true }
@@ -598,7 +600,22 @@
     editableData.value = editableData.value.filter((row) => row?._isNew !== true)
     editingRows.value = []
     backups.value.clear()
-    emit('sort', event)
+
+    // Build SQL ORDER BY clause from sort event
+    const { sortField, sortOrder } = event
+    let orderByClause = null
+
+    if (sortField) {
+      const direction = sortOrder === -1 ? 'DESC' : 'ASC'
+      orderByClause = `${sortField} ${direction}`
+    }
+
+    emit('sort', {
+      ...event,
+      orderBy: orderByClause,
+      sortField,
+      sortOrder
+    })
   }
 
   const onRowEditSave = (event) => {
@@ -868,5 +885,38 @@
   :deep(.p-datatable-emptymessage > td) {
     height: 600px !important;
     padding: 0 !important;
+  }
+
+  /* Remove gap between table header and column headers - fill with background color */
+  .sql-database-list {
+    background-color: var(--surface-100, #f3f4f6);
+  }
+
+  :deep(.p-datatable-header) {
+    padding: 0 !important;
+    border-bottom: none !important;
+    background-color: var(--surface-100, #f3f4f6);
+  }
+
+  :deep(.p-datatable-scrollable-header) {
+    background-color: var(--surface-100, #f3f4f6);
+    border-top: none !important;
+  }
+
+  :deep(.p-datatable-scrollable-header-box) {
+    background-color: var(--surface-100, #f3f4f6);
+  }
+
+  :deep(.p-datatable-thead) {
+    background-color: var(--surface-100, #f3f4f6);
+  }
+
+  :deep(.p-datatable-header-cell) {
+    background-color: var(--surface-100, #f3f4f6) !important;
+  }
+
+  /* Ensure header wrapper doesn't create gaps */
+  :deep(.p-datatable-wrapper) {
+    background-color: var(--surface-100, #f3f4f6);
   }
 </style>

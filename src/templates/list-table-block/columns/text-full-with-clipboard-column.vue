@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   defineOptions({ name: 'text-full-with-clipboard-column' })
 
   defineProps({
