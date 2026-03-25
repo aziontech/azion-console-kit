@@ -1,6 +1,7 @@
 <script setup>
   import { ref, computed, watch, defineOptions, onMounted } from 'vue'
   import { useForm } from 'vee-validate'
+  import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
@@ -9,6 +10,7 @@
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
+  import { workloadService } from '@/services/v2/workload/workload-service'
 
   defineOptions({ name: 'engineAzion' })
 
@@ -57,10 +59,26 @@
     successNextSteps: {
       type: Array,
       default: () => []
+    },
+    // Results from deployment (needed for patch domains)
+    results: {
+      type: Object,
+      default: null
     }
   })
 
-  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
+  const emit = defineEmits([
+    'next',
+    'deploy',
+    'finish',
+    'retry',
+    'manage',
+    'open-url',
+    'next-step',
+    'save-domains'
+  ])
+
+  const toast = useToast()
 
   const layoutRef = ref(null)
 
@@ -185,7 +203,9 @@
     executionId: props.executionId,
     deployFailed: props.deployFailed,
     applicationName: props.applicationName,
-    deployStartTime: props.deployStartTime
+    deployStartTime: props.deployStartTime,
+    // Results for DeploySuccessCard
+    results: props.results
   }))
 
   /**
@@ -517,6 +537,42 @@
   }
 
   /**
+   * Handles saving domain settings via patchWorkloadDomains
+   * Called when user saves domain settings from DeploySuccessCard
+   * @param {Object} values - The domain form values
+   */
+  const handleSaveDomains = async (values) => {
+    try {
+      const workloadId = props.results?.domain?.id
+      if (!workloadId) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Workload ID not found'
+        })
+        return
+      }
+
+      await workloadService.patchWorkloadDomains(workloadId, values)
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Domain settings updated successfully'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to update domain settings'
+      })
+    }
+  }
+
+  /**
    * Initializes the component when schema is available
    */
   const initializeComponent = async () => {
@@ -591,6 +647,7 @@
       @finish="handleFinish"
       @retry="handleRetry"
       @manage="handleManage"
+      @save-domains="handleSaveDomains"
       @open-url="handleOpenUrl"
       @next-step="handleNextStep"
     >
