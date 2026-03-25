@@ -5,15 +5,21 @@ import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 /*
   Cache strategy is used to prevent making multiple calls to the same endpoint under the same conditions.
 */
+
 let cache
 
 let prevParams = {}
+
+export const resetCache = () => {
+  cache = null
+  prevParams = {}
+}
 
 export const searchEdgeDnsService = async ({
   orderBy = 'name',
   sort = 'asc',
   page = 1,
-  pageSize = 200
+  pageSize = 100
 } = {}) => {
   const params = { orderBy, sort, page, pageSize }
   const isSameParams = JSON.stringify(params) === JSON.stringify(prevParams)
