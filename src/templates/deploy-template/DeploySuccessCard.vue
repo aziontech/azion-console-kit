@@ -23,6 +23,12 @@
       required: true
     },
 
+    // Execution ID for viewing logs
+    executionId: {
+      type: String,
+      default: ''
+    },
+
     // Preview block — same pattern as DeployRepositoryCard
     previewSrc: {
       type: String,
@@ -243,6 +249,15 @@
     router.push('/marketplace')
   }
 
+  const openRealTimeEvents = () => {
+    if (props.executionId) {
+      router.push({
+        name: 'real-time-events',
+        query: { executionId: props.executionId }
+      })
+    }
+  }
+
   const nextSteps = [
     {
       action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
@@ -255,6 +270,15 @@
       label: 'Explore Functions from Marketplace'
     }
   ]
+
+  // Add View Logs step if executionId is available
+  if (props.executionId) {
+    nextSteps.push({
+      action: () => openRealTimeEvents(),
+      icon: 'pi-list',
+      label: 'View Deploy Logs'
+    })
+  }
 
   /**
    * Handle form submission

@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
   import { useForm, useField } from 'vee-validate'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
@@ -63,6 +63,7 @@
   const deployStore = useDeploy()
   const toast = useToast()
   const route = useRoute()
+  const router = useRouter()
 
   // Step Navigation State
   const currentStep = ref('repository')
@@ -77,6 +78,7 @@
   const applicationName = ref('')
   const results = ref(null)
   const isDeploying = ref(false)
+  const isRestoringState = ref(false)
 
   // OAuth and integration state
   const callbackUrl = ref('')
@@ -363,6 +365,17 @@
   }
 
   // Step Navigation Methods
+  const updateRouteQuery = (step, id = null, domain = null) => {
+    const query = { step }
+    if (id) {
+      query.executionId = id
+    }
+    if (domain) {
+      query.domain = domain
+    }
+    router.replace({ query })
+  }
+
   const goToDeploying = () => {
     currentStep.value = 'deploying'
     deployStartTime.value = Date.now()
@@ -392,6 +405,11 @@
     'The Application is being propagated through the edge nodes. This process will take a few minutes.'
 
   const handleFinish = async () => {
+    // Skip if we're restoring state from route (results already populated)
+    if (isRestoringState.value) {
+      return
+    }
+
     try {
       const response = await props.getResultsService(executionId.value)
       results.value = response.result
@@ -401,6 +419,8 @@
         summary: 'Successfully created!',
         detail: successMessage
       })
+      // Update route query to success state with executionId and domain
+      updateRouteQuery('success', executionId.value, applicationName.value)
       goToSuccess()
     } catch (error) {
       deployFailed.value = true
@@ -488,6 +508,8 @@
         // Set execution ID from response for DeployStatusCard
         if (response?.result?.uuid) {
           executionId.value = response.result.uuid
+          // Update route query params to preserve state on reload
+          updateRouteQuery('deploying', executionId.value)
         }
 
         // Set app URL for success card
@@ -541,10 +563,52 @@
     }
   }
 
+  const restoreStateFromRoute = async () => {
+    const { step, executionId: routeExecutionId, domain } = route.query
+
+    if (step && routeExecutionId) {
+      executionId.value = routeExecutionId
+      isRestoringState.value = true
+
+      if (step === 'deploying') {
+        currentStep.value = 'deploying'
+        deployStartTime.value = Date.now()
+        isDeploying.value = true
+      } else if (step === 'success') {
+        // For success state, we need to fetch the results
+        try {
+          loadingStore.startLoading()
+          const response = await props.getResultsService(routeExecutionId)
+          results.value = response.result
+          // Use domain from query params if available, otherwise from results
+          applicationName.value = domain || response.result?.edgeApplication?.name || ''
+          appUrl.value = response.result?.domain?.url || (domain ? `https://${domain}` : '')
+          currentStep.value = 'success'
+        } catch (error) {
+          // If we can't restore success state, fall back to deploying
+          currentStep.value = 'deploying'
+          deployStartTime.value = Date.now()
+          isDeploying.value = true
+          toast.add({
+            closable: true,
+            severity: 'warn',
+            summary: 'Could not restore deployment state',
+            detail: 'Showing deployment status instead.'
+          })
+        } finally {
+          loadingStore.finishLoading()
+        }
+      }
+    }
+  }
+
   onMounted(async () => {
     await Promise.all([loadSolutionByVendor(), loadListIntegrations()])
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
+
+    // Restore state from route query params after loading required data
+    await restoreStateFromRoute()
   })
 
   onBeforeUnmount(() => {
@@ -553,8 +617,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 min-w-[672px]">
-    <!-- Success Card -->
+  <div class="flex flex-col gap-6 min-w-[672px] my-8">
     <div
       ref="step3Ref"
       class="self-center"
@@ -562,6 +625,7 @@
     >
       <DeploySuccessCard
         :app-url="appUrl"
+        :execution-id="executionId"
         :template-title="'Application Deployed'"
         :template-description="`Your application ${applicationName} has been successfully deployed.`"
         :github-url="repository"
@@ -569,7 +633,6 @@
       />
     </div>
 
-    <!-- Main Deploy Card -->
     <BaseDeployCard
       v-if="currentStep !== 'success'"
       title="Import from Git"
@@ -908,7 +971,6 @@
       </template>
     </BaseDeployCard>
 
-    <!-- Deploy Status Card -->
     <div
       ref="step2Ref"
       class="self-center"
@@ -921,7 +983,7 @@
         :deploy-failed="deployFailed"
         :application-name="applicationName"
         :deploy-start-time="deployStartTime"
-        :deploy-started="currentStep === 'deploying'"
+        :deploy-started="currentStep === 'deploying' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
         @manage="handleManage"
