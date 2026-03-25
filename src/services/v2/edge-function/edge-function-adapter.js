@@ -91,7 +91,9 @@ export const EdgeFunctionsAdapter = {
     }
   },
 
-  transformLoadEdgeFunction({ data }, fields) {
+  transformLoadEdgeFunction(data, fields) {
+    if (!data) return {}
+
     const adapt = adaptServiceDataResponseToLoad(data, fields, transformMap)
     adapt.runtimeFormat = LANGUAGE_WITH_ICON[adapt.runtime]
 
