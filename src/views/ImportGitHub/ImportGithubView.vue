@@ -19,6 +19,7 @@
   import { useDeploy } from '@/stores/deploy'
   import { variablesService } from '@/services/v2/variables'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
 
@@ -448,6 +449,37 @@
     emit('manage', data)
   }
 
+  const handleSaveDomains = async (values) => {
+    try {
+      const workloadId = results.value?.domain?.id
+      if (!workloadId) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Workload ID not found'
+        })
+        return
+      }
+
+      await workloadService.patchWorkloadDomains(workloadId, values)
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Domain settings updated successfully'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to update domain settings'
+      })
+    }
+  }
+
   const onDeploy = handleSubmit(
     async (formValues) => {
       try {
@@ -630,6 +662,7 @@
         :template-description="`Your application ${applicationName} has been successfully deployed.`"
         :github-url="repository"
         :results="results"
+        @on-save="handleSaveDomains"
       />
     </div>
 
