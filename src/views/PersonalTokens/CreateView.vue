@@ -1,7 +1,6 @@
 <script setup>
   import { ref, inject } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
-  import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import GoBack from '@/templates/action-bar-block/go-back'
   import ContentBlock from '@/templates/content-block'
@@ -22,10 +21,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     convertDateToLocalTimezone: {
       type: Function,
       required: true
@@ -67,7 +62,6 @@
     expiresAt: getTomorrowInUserTimezone()
   }
 
-  const toast = useToast()
   const router = useRouter()
   const dialog = useDialog()
 
@@ -78,8 +72,7 @@
     personalTokenKey.value = token
     dialog.open(CopyTokenDialog, {
       data: {
-        personalToken: personalTokenKey.value,
-        copy: copyPersonalToken
+        personalToken: personalTokenKey.value
       },
       onClose: () => {
         router.push({ name: 'list-personal-tokens' })
@@ -97,25 +90,6 @@
         errorMessage: message
       })
       .track()
-  }
-
-  const copyPersonalToken = async () => {
-    const toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    }
-
-    try {
-      props.clipboardWrite(personalTokenKey.value)
-      toast.add({ ...toastConfig })
-    } catch {
-      toast.add({
-        ...toastConfig,
-        severity: 'error',
-        detail: 'The personal token was not copied to the clipboard. Try copying it again.'
-      })
-    }
   }
 </script>
 
@@ -140,7 +114,6 @@
         <template #form>
           <FormFieldsPersonalToken
             :personalTokenKey="personalTokenKey"
-            :copyPersonalToken="copyPersonalToken"
             :userUtcOffset="account?.utc_offset"
             :convertDateToLocalTimezone="convertDateToLocalTimezone"
           />

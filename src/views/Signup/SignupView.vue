@@ -7,7 +7,7 @@
     </div>
     <div class="flex flex-col items-center justify-center">
       <div>
-        <client-testimonials-block />
+        <testimonials-carousel :testimonials="testimonials" />
       </div>
     </div>
   </section>
@@ -15,10 +15,22 @@
 
 <script setup>
   import FormSignupBlock from '@/templates/signup-block/form-signup-block.vue'
-  import ClientTestimonialsBlock from '@/templates/signup-block/client-testimonials-block'
+  import TestimonialsCarousel from '@aziontech/webkit/testimonials-carousel'
+  import Axur from '@/assets/svg/axur-logo.vue'
+  import { h } from 'vue'
 
   const props = defineProps({
     signupService: { required: true, type: Function },
     resendEmailService: { required: true, type: Function }
   })
+
+  const testimonials = [
+    {
+      name: 'Fabio Ramos',
+      position: 'CEO of Axur',
+      testimonial:
+        'With Azion, we can scale our proprietary AI models without worrying about infrastructure. Inspecting millions of websites daily, performing the fastest takedown in the market.',
+      logo: h(Axur)
+    }
+  ]
 </script>

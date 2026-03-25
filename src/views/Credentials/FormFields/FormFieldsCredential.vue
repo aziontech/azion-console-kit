@@ -162,16 +162,14 @@
     isDrawer
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          name="name"
-          placeholder="My credential"
-          data-testid="credential-form__name-field"
-          description="Give a unique and descriptive name to identify the credential."
-          required
-        />
-      </div>
+      <FieldText
+        label="Name"
+        name="name"
+        placeholder="My credential"
+        data-testid="credential-form__name-field"
+        description="Give a unique and descriptive name to identify the credential."
+        required
+      />
     </template>
   </FormHorizontal>
 

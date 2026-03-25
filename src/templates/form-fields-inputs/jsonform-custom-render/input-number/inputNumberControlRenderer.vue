@@ -40,7 +40,7 @@
       :label="label"
       :description="description"
       :required="required"
-      :aditionalError="errorMessage"
+      :additionalError="errorMessage"
       :min="min"
       :max="max"
       :step="step"

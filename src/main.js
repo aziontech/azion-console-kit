@@ -1,10 +1,10 @@
 import 'primeflex/primeflex.css'
 import '@assets/main.css'
 import '@assets/c3.scss'
-import '@assets/flags.css'
 import '@mdi/font/css/materialdesignicons.css'
-import 'azion-theme'
+import '@aziontech/theme'
 import '@aziontech/icons'
+import '@aziontech/webkit/styles/country-flags'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

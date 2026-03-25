@@ -15,7 +15,7 @@
 
 <script>
   import ExpandTextColumn from './expand-text-column.vue'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/copy-block'
   export default {
     name: 'text-with-clipboard-column',
     components: {

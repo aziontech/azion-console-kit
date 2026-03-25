@@ -7,7 +7,7 @@
   import { h, computed, ref, inject } from 'vue'
   import { DataTableActionsButtons } from '@/components/DataTable'
   import { variablesService } from '@/services/v2/variables'
-  import { clipboardWrite, documentationCatalog } from '@/helpers'
+  import { documentationCatalog } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -51,7 +51,7 @@
               data: columnData.content,
               columnAppearance: 'text-format-with-popup',
               dependencies: {
-                showCopy: clipboardWrite
+                showCopy: true
               }
             })
           }

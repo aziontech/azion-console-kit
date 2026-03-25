@@ -6,7 +6,7 @@ export class PaymentService extends BaseService {
     this.baseURL = 'v4/billing/invoices'
   }
 
-  listInvoices = async (params = { pageSize: 200 }) => {
+  listInvoices = async (params = { pageSize: 100 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}`,

@@ -116,15 +116,13 @@
     v-if="handleBlock('general')"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          placeholder="My Application"
-          :value="name"
-          description="Give a unique and descriptive name to identify the Application."
-        />
-      </div>
+      <FieldText
+        label="Name *"
+        name="name"
+        placeholder="My Application"
+        :value="name"
+        description="Give a unique and descriptive name to identify the Application."
+      />
     </template>
   </FormHorizontal>
 

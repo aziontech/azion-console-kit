@@ -1,5 +1,5 @@
 <template>
-  <div class="flex sm:flex-row flex-col gap-8 mt-4">
+  <div class="flex sm:flex-row flex-col gap-8 mt-4 h-full min-h-0">
     <ConfirmDialog />
     <TruncateTable
       v-model:visible="truncateTableVisible"
@@ -40,7 +40,7 @@
       @open-confirm-truncate="openConfirmTruncate"
       @open-confirm-delete="openConfirmDelete"
     />
-    <div class="w-full flex flex-col gap-4 overflow-hidden">
+    <div class="w-full flex flex-col gap-4 overflow-hidden h-full min-h-0">
       <InlineMessage
         v-if="isApplyingChanges"
         severity="info"
@@ -62,6 +62,7 @@
         @row-edit-cancel="onRowEditCancel"
         @reload-table="selectTable(selectedTable)"
         @page="handlePage"
+        @sort="handleSort"
         :disabled-action="isApplyingChanges"
         @view-change="handleViewChange"
         :title-delete-dialog="titleDeleteDialog"
@@ -93,6 +94,7 @@
   import SqlDatabaseList from '@/templates/list-table-block/sql-database-list.vue'
   import { SQLITE_QUERIES } from './constants/queries'
   import ListTables from './components/ListTables.vue'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import {
     createDeleteService,
     createInsertRowService,
@@ -118,6 +120,7 @@
   })
 
   const { currentDatabase, executeQuery } = useEdgeSQL()
+  const tableDefinitions = useTableDefinitionsStore()
   const isSelectionMode = ref(false)
   const selectedTableNames = ref([])
   const tableMenuRef = ref(null)
@@ -129,7 +132,8 @@
   const tableRows = ref([])
   const tableTotalRecords = ref(0)
   const currentPage = ref(1)
-  const currentPageSize = ref(10)
+  const currentPageSize = ref(tableDefinitions.getNumberOfLinesPerPage || 50)
+  const currentOrderBy = ref(null)
   const isLoadingQuery = ref(false)
   const notShowEmptyBlock = ref(false)
 
@@ -141,6 +145,7 @@
     isSelectionMode.value = false
     selectedTableNames.value = []
     notShowEmptyBlock.value = false
+    currentOrderBy.value = null
     tableMenuRef.value.hide()
   }
 
@@ -317,12 +322,14 @@
     isLoadingQuery.value = true
     selectedTable.value = table
     notShowEmptyBlock.value = true
+    currentOrderBy.value = null
     try {
       currentPage.value = 1
       const result = await edgeSQLService.getTableInfo(currentDatabase.value.id, table.name, {
         paginate: true,
         page: currentPage.value,
-        pageSize: currentPageSize.value
+        pageSize: currentPageSize.value,
+        orderBy: currentOrderBy.value
       })
       columns.value = result.body.tableSchema.map(({ name, type }) => ({
         field: name,
@@ -353,7 +360,33 @@
         {
           paginate: true,
           page: currentPage.value,
-          pageSize: currentPageSize.value
+          pageSize: currentPageSize.value,
+          orderBy: currentOrderBy.value
+        }
+      )
+      tableRows.value = result.body.rows
+      tableTotalRecords.value = result.count || 0
+    } finally {
+      isLoadingQuery.value = false
+    }
+  }
+
+  const handleSort = async (event) => {
+    if (!selectedTable.value || isColumnView.value) return
+
+    currentOrderBy.value = event.orderBy
+    currentPage.value = 1
+
+    isLoadingQuery.value = true
+    try {
+      const result = await edgeSQLService.getTableInfo(
+        currentDatabase.value.id,
+        selectedTable.value.name,
+        {
+          paginate: true,
+          page: currentPage.value,
+          pageSize: currentPageSize.value,
+          orderBy: currentOrderBy.value
         }
       )
       tableRows.value = result.body.rows

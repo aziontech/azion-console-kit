@@ -45,15 +45,13 @@
     description="Install and manage services and resources in real time."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give a unique and descriptive name to identify the edge node."
-          name="name"
-          placeholder="My edge node"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give a unique and descriptive name to identify the edge node."
+        name="name"
+        placeholder="My edge node"
+      />
     </template>
   </FormHorizontal>
   <FormHorizontal
@@ -62,17 +60,15 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-5 mb-6">
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Hash ID"
-            description="The hash ID used to authenticate the edge node."
-            name="hashId"
-            disabled
-            placeholder="Hash ID"
-            filled
-            icon="pi pi-lock"
-          />
-        </div>
+        <FieldText
+          label="Hash ID"
+          description="The hash ID used to authenticate the edge node."
+          name="hashId"
+          disabled
+          placeholder="Hash ID"
+          filled
+          icon="pi pi-lock"
+        />
         <div class="flex flex-col w-full sm:max-w-3xl gap-2">
           <label
             for="select-01"

@@ -67,16 +67,14 @@
     description="Use permissions to manage and oversee users by defining access levels of client accounts."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="teams-permissions-form__name__field-text"
-          label="Name"
-          required
-          name="name"
-          :value="name"
-          description="Give a unique and descriptive name to identify the team."
-        />
-      </div>
+      <FieldText
+        data-testid="teams-permissions-form__name__field-text"
+        label="Name"
+        required
+        name="name"
+        :value="name"
+        description="Give a unique and descriptive name to identify the team."
+      />
     </template>
   </FormHorizontal>
 

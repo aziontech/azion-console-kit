@@ -28,7 +28,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    clipboardWrite: { type: Function, required: true },
     updatedRedirect: { type: String, required: true },
     documentationService: { type: Function, required: true }
   })
@@ -114,7 +113,7 @@
           data: Array.isArray(columnData) ? columnData : columnData?.content,
           columnAppearance: 'text-array-with-popup',
           dependencies: {
-            showCopy: !!props.clipboardWrite
+            showCopy: true
           }
         })
       }
@@ -448,7 +447,6 @@
           <EditView
             v-if="showMainSettings"
             :edgeDNS="edgeDNS"
-            :clipboardWrite="clipboardWrite"
             :updatedRedirect="updatedRedirect"
           />
 

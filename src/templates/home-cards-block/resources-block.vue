@@ -6,7 +6,6 @@
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
-  import { clipboardWrite } from '@/helpers/clipboard'
   import { set, get } from '@/helpers/local-storage-manager'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
@@ -187,8 +186,7 @@
             data: columnData,
             columnAppearance: 'text-array-with-popup',
             dependencies: {
-              copyContentService: clipboardWrite,
-              showCopy: !!clipboardWrite
+              showCopy: true
             }
           })
         }
@@ -197,8 +195,7 @@
           data: columnData,
           columnAppearance: 'text-format-with-popup',
           dependencies: {
-            copyContentService: clipboardWrite,
-            showCopy: !!clipboardWrite
+            showCopy: true
           }
         })
       }

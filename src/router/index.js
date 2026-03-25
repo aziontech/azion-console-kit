@@ -5,7 +5,6 @@ import { azionAiRoutes } from '@routes/azion-ai-routes'
 
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
-import { compareWithAzionRoutes } from '@routes/compare-with-azion'
 import { dataStreamRoutes } from '@/router/routes/data-stream-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
 import { workloadRoutes } from '@/router/routes/workload-routes'
@@ -27,7 +26,6 @@ import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
 import { personalTokensRoutes } from '@routes/personal-tokens-routes'
-import { playgroundRoutes } from '@routes/playground-routes'
 import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
 import { switchAccountRoutes } from '@routes/switch-account-routes'
@@ -78,7 +76,6 @@ const router = createRouter({
     edgeNodeRoutes,
     usersListsRoutes,
     passwordRoutes,
-    playgroundRoutes,
     createNewRoutes,
     mfaRoutes,
     activityHistoryRoutes,
@@ -96,7 +93,6 @@ const router = createRouter({
     billingRoutes,
     importGithubRoutes,
     azionAiRoutes,
-    compareWithAzionRoutes,
     resellerManagementRoutes,
     groupsManagementRoutes,
     clientManagementRoutes,

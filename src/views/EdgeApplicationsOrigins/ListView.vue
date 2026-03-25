@@ -40,10 +40,6 @@
     documentationService: {
       type: Function,
       required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     }
   })
 
@@ -81,7 +77,7 @@
             data: columnData.content,
             columnAppearance: 'text-format-with-popup',
             dependencies: {
-              showCopy: !!props.clipboardWrite
+              showCopy: true
             }
           })
         }
@@ -144,7 +140,6 @@
       :editOriginService="props.editOriginService"
       :loadOriginService="props.loadOriginService"
       :documentationService="props.documentationService"
-      :clipboardWrite="props.clipboardWrite"
       :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
       @onSuccess="reloadList"
     />

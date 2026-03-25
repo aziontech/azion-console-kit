@@ -23,6 +23,7 @@
 <script setup>
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
+  import { clipboardWrite } from '@/helpers/clipboard'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import { computed, ref, toRef, inject } from 'vue'
@@ -35,7 +36,6 @@
 
   const props = defineProps({
     report: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
     groupData: { type: Object, required: true }
   })
 
@@ -132,7 +132,7 @@
     clickedToRealTimeMetrics('copyQuery')
     const { query, variables } = reportData.value.reportQuery
     const clipboardQuery = formatGQL(query, variables)
-    await props.clipboardWrite(clipboardQuery)
+    await clipboardWrite(clipboardQuery)
   }
 
   const formatGQL = (gql, variables) => {
