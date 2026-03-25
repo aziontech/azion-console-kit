@@ -31,7 +31,6 @@ describe('RealTimeMetricsServices', () => {
   beforeEach(() => {
     resetEdgeFunctionsCache()
   })
-
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

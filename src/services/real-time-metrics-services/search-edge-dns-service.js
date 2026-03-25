@@ -5,6 +5,7 @@ import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 /*
   Cache strategy is used to prevent making multiple calls to the same endpoint under the same conditions.
 */
+
 let cache
 
 let prevParams = {}
