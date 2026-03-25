@@ -456,8 +456,8 @@
         const response = await props.instantiateTemplateService(templateId.value, inputSchema)
 
         // Set execution ID from response for DeployStatusCard
-        if (response?.executionId) {
-          executionId.value = response.executionId
+        if (response?.result?.uuid) {
+          executionId.value = response.result.uuid
         }
 
         // Set app URL for success card

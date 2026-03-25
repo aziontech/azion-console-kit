@@ -31,21 +31,25 @@
           </div>
           <div class="w-1/2 flex gap-2 justify-end">
             <Tag
-              v-if="errorCount === 0"
+              v-if="errorCount > 0"
               icon="pi pi-times-circle"
               iconPos="right"
               :value="errorCount"
               severity="danger"
+              class="cursor-pointer"
+              @click="scrollToFirstError"
             />
             <Tag
-              v-if="warningCount === 0"
+              v-if="warningCount > 0"
               icon="pi pi-exclamation-triangle"
               iconPos="right"
               :value="warningCount"
               severity="warning"
+              class="cursor-pointer"
+              @click="scrollToFirstWarning"
             />
             <CopyBlock
-              v-if="currentLogs.length === 0"
+              v-if="currentLogs.length > 0"
               :value="logsAsString"
               :is-copy-visible="true"
             />
@@ -56,9 +60,11 @@
           ref="runner"
         >
           <p
-            class="w-full text-color text-base font-robotomono"
+            :id="log.id"
+            class="w-full text-base font-robotomono"
+            :class="getLogClass(log)"
             v-for="(log, index) in filteredLogs"
-            :key="index"
+            :key="log.id || index"
           >
             <span> [{{ log.timeStamp }}] </span>
             ›
@@ -156,22 +162,47 @@
         })
       },
       errorCount() {
-        return this.currentLogs.filter((log) => {
-          const content = log.content?.toLowerCase() || ''
-          return content.includes('error') || content.includes('err')
-        }).length
+        return this.currentLogs.filter((log) => log.type === 'error').length
       },
       warningCount() {
-        return this.currentLogs.filter((log) => {
-          const content = log.content?.toLowerCase() || ''
-          return content.includes('warn') || content.includes('warning')
-        }).length
+        return this.currentLogs.filter((log) => log.type === 'warning').length
       },
       logsAsString() {
         return this.currentLogs.map((log) => `[${log.timeStamp}] › ${log.content}`).join('\n')
       }
     },
     methods: {
+      getLogClass(log) {
+        if (log.type === 'error') {
+          return 'text-red-500'
+        }
+        if (log.type === 'warning') {
+          return 'text-yellow-500'
+        }
+        return 'text-color'
+      },
+      scrollToFirstError() {
+        const firstError = this.currentLogs.find((log) => log.type === 'error')
+        if (firstError?.id) {
+          this.scrollToLog(firstError.id)
+        }
+      },
+      scrollToFirstWarning() {
+        const firstWarning = this.currentLogs.find((log) => log.type === 'warning')
+        if (firstWarning?.id) {
+          this.scrollToLog(firstWarning.id)
+        }
+      },
+      scrollToLog(logId) {
+        const element = document.getElementById(logId)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          element.classList.add('highlight-log')
+          setTimeout(() => {
+            element.classList.remove('highlight-log')
+          }, 2000)
+        }
+      },
       startPolling() {
         this.polling = setInterval(async () => {
           if (!this.isLogsPolling && this.executionId) {
@@ -226,3 +257,10 @@
     }
   }
 </script>
+
+<style scoped>
+.highlight-log {
+  background-color: rgba(239, 68, 68, 0.2);
+  transition: background-color 0.3s ease;
+}
+</style>
