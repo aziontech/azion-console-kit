@@ -18,9 +18,9 @@
 </script>
 
 <template>
-  <div class="flex flex-col w-[700px] border surface-border rounded-md">
+  <div class="flex flex-col w-full max-w-[700px] border surface-border rounded-md">
     <!-- Header -->
-    <div class="h-14 px-6 border-b surface-border flex items-center justify-between">
+    <div class="h-14 px-4 sm:px-6 border-b surface-border flex items-center justify-between">
       <div class="text-color text-xl font-semibold leading-5">
         <Skeleton
           v-if="loading"
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Content -->
-    <div class="p-6 bg-[var(--surface-50)] flex flex-col gap-6">
+    <div class="p-4 sm:p-6 bg-[var(--surface-50)] flex flex-col gap-6">
       <template v-if="loading">
         <!-- Skeleton content placeholder -->
         <div class="flex flex-col gap-4">
@@ -69,7 +69,7 @@
     <!-- Footer -->
     <div
       v-if="$slots.footer && !hideFooter && !loading"
-      class="h-14 px-6 border-t surface-border flex flex-col justify-center"
+      class="h-14 px-4 sm:px-6 border-t surface-border flex flex-col justify-center"
     >
       <slot name="footer" />
     </div>

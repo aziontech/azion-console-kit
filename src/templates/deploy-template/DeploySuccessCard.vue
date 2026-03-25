@@ -170,7 +170,7 @@
   const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
   const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
   const { value: useCustomDomain } = useField('useCustomDomain')
-  const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
+  const { value: customDomain } = useField('customDomain')
 
   const domainsOptions = ref([])
 
@@ -342,9 +342,9 @@
                 <div
                   v-for="(domain, index) in domains"
                   :key="index"
-                  class="flex gap-2 items-start w-full"
+                  class="flex flex-col sm:flex-row gap-2 w-full"
                 >
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <div class="flex flex-col w-full gap-2">
                     <FieldDropdown
                       editable
                       :focusOnHover="false"
@@ -371,7 +371,7 @@
                     v-if="hasMultipleDomains"
                     @click="removeDomain(index)"
                     icon="pi pi-trash"
-                    class="p-button-outlined p-button-sm p-button-danger"
+                    class="p-button-outlined p-button-sm p-button-danger self-end"
                     data-testid="domains-form__remove-domain-button"
                     title="Remove domain"
                   />
@@ -408,10 +408,9 @@
 
               <div
                 v-if="useCustomDomain"
-                class="flex sm:max-w-lg w-full gap-2 flex-col sm:flex-row"
-                :class="{ 'items-center': customDomainErrorMessage }"
+                class="flex w-full gap-2 flex-col"
               >
-                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <div class="flex flex-col w-full gap-2">
                   <FieldInputGroup
                     placeholder="my-custom-name"
                     label="Azion Custom Domain"

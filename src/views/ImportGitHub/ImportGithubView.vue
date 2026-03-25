@@ -617,10 +617,10 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 min-w-[672px] my-8">
+  <div class="flex flex-col gap-6 w-full px-4 sm:px-0 my-8">
     <div
       ref="step3Ref"
-      class="self-center"
+      class="self-center w-full max-w-[700px]"
       v-show="currentStep === 'success'"
     >
       <DeploySuccessCard
@@ -636,7 +636,7 @@
     <BaseDeployCard
       v-if="currentStep !== 'success'"
       title="Import from Git"
-      class="self-center my-8"
+      class="self-center w-full max-w-[700px] my-8"
       :loading="loadingStore.isLoading"
       :hide-footer="currentStep === 'deploying'"
     >
@@ -644,7 +644,7 @@
         #header-meta
         v-if="gitScope"
       >
-        <div class="w-full px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
+        <div class="w-full px-4 sm:px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
           <div class="py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-1.5">
               <span class="text-[10px] font-normal text-text-color-muted leading-3"
@@ -890,7 +890,7 @@
                       class="flex flex-col gap-2"
                       :key="index"
                     >
-                      <div class="flex gap-4 items-top">
+                      <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
                         <div class="flex flex-col sm:w-1/2 w-full gap-2">
                           <FieldText
                             :label="index === 0 ? 'Key' : ''"
@@ -928,16 +928,15 @@
                             Enter the data associated with the variable key.
                           </small>
                         </div>
-                        <Button
-                          :class="[
-                            'h-8 max-sm:w-full position-absolute right-0',
-                            index === 0 ? 'top-[30px]' : 'top-0.5'
-                          ]"
-                          icon="pi pi-minus-circle"
-                          outlined
-                          type="button"
-                          @click="removeVariable(index)"
-                        />
+                        <div class="flex sm:self-end sm:pb-2">
+                          <Button
+                            class="h-8"
+                            icon="pi pi-minus-circle"
+                            outlined
+                            type="button"
+                            @click="removeVariable(index)"
+                          />
+                        </div>
                       </div>
                     </div>
                   </template>
@@ -973,7 +972,7 @@
 
     <div
       ref="step2Ref"
-      class="self-center"
+      class="self-center w-full max-w-[700px]"
       v-show="currentStep === 'deploying' || currentStep === 'success'"
     >
       <DeployStatusCard
