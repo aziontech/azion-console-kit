@@ -50,6 +50,10 @@
     loadSolutionService: {
       type: Function,
       required: true
+    },
+    getResultsService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -382,8 +386,34 @@
     })
   }
 
-  const handleFinish = () => {
-    goToSuccess()
+  const failMessage =
+    'There was an issue during the deployment. Check the Deploy Log for more details.'
+  const successMessage =
+    'The Application is being propagated through the edge nodes. This process will take a few minutes.'
+
+  const handleFinish = async () => {
+    try {
+      const response = await props.getResultsService(executionId.value)
+      results.value = response.result
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Successfully created!',
+        detail: successMessage
+      })
+      goToSuccess()
+    } catch (error) {
+      deployFailed.value = true
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Creation failed',
+        detail: failMessage
+      })
+    } finally {
+      deployStore.removeStartTime()
+    }
+
     emit('finish')
   }
 
@@ -535,6 +565,7 @@
         :template-title="'Application Deployed'"
         :template-description="`Your application ${applicationName} has been successfully deployed.`"
         :github-url="repository"
+        :results="results"
       />
     </div>
 
@@ -886,7 +917,7 @@
       <DeployStatusCard
         :execution-id="executionId"
         :get-logs-service="getScriptRunnerLogsService"
-        :results="currentStep === 'success' ? { domain: { url: appUrl } } : results"
+        :results="results"
         :deploy-failed="deployFailed"
         :application-name="applicationName"
         :deploy-start-time="deployStartTime"

@@ -14,6 +14,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup.vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   const props = defineProps({
     // Status message
@@ -39,7 +40,7 @@
     },
     templateUrl: {
       type: String,
-      required: true
+      default: ''
     },
     templateDescription: {
       type: String,
@@ -48,11 +49,79 @@
     githubUrl: {
       type: String,
       default: ''
+    },
+
+    // Deployment results
+    results: {
+      type: Object,
+      default: null
     }
   })
 
   const emit = defineEmits(['onSave'])
   const router = useRouter()
+
+  /**
+   * Build resources array from deployment results
+   */
+  const resourcesCreated = computed(() => {
+    if (!props.results) return []
+
+    const resources = []
+
+    // Add Workload (domain)
+    if (props.results.domain?.url) {
+      resources.push({
+        type: 'Workload',
+        redirect: () =>
+          router.push({
+            name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
+            params: { id: props.results.domain.id }
+          }),
+        name: props.results.edgeApplication?.name || 'Workload',
+        icon: 'ai ai-workloads'
+      })
+    }
+
+    // Add Edge Application
+    if (props.results.edgeApplication?.name) {
+      resources.push({
+        type: 'Application',
+        redirect: () =>
+          router.push({
+            name: 'edit-application',
+            params: { id: props.results.edgeApplication.id }
+          }),
+        name: props.results.edgeApplication.name,
+        icon: 'ai ai-edge-application'
+      })
+    }
+
+    // Add Function (if exists in extras)
+    if (props.results.extras?.functionName) {
+      resources.push({
+        type: 'Function',
+        redirect: () =>
+          router.push({ name: 'edit-functions', params: { id: props.results.extras.functionId } }),
+        name: props.results.extras.functionName,
+        icon: 'ai ai-edge-functions'
+      })
+    }
+
+    // Add Firewall (if exists in extras)
+    if (props.results.extras?.firewallName) {
+      resources.push({
+        type: 'Firewall',
+        redirect: () =>
+          router.push({ name: 'edit-firewall', params: { id: props.results.extras.firewallId } }),
+        name: props.results.extras.firewallName,
+        icon: 'ai ai-edge-functions'
+      })
+    }
+
+    return resources
+  })
+
   /**
    * Validation schema for the form
    * When useCustomDomain is true:
@@ -223,10 +292,8 @@
       <TemplateInfoBlock
         :preview-src="props.previewSrc"
         :preview-alt="props.previewAlt"
-        :template-title="props.templateTitle"
-        :template-url="props.templateUrl"
-        :template-description="props.templateDescription"
-        :github-url="props.githubUrl"
+        :resources="resourcesCreated"
+        resources-only
       />
 
       <div class="flex flex-col gap-3">
