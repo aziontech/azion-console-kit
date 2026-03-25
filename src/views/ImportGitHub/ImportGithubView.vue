@@ -527,6 +527,7 @@
     <!-- Success Card -->
     <div
       ref="step3Ref"
+      class="self-center"
       v-show="currentStep === 'success'"
     >
       <DeploySuccessCard
@@ -879,6 +880,7 @@
     <!-- Deploy Status Card -->
     <div
       ref="step2Ref"
+      class="self-center"
       v-show="currentStep === 'deploying' || currentStep === 'success'"
     >
       <DeployStatusCard
