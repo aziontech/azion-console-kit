@@ -259,8 +259,8 @@
 </script>
 
 <style scoped>
-.highlight-log {
-  background-color: rgba(239, 68, 68, 0.2);
-  transition: background-color 0.3s ease;
-}
+  .highlight-log {
+    background-color: rgba(239, 68, 68, 0.2);
+    transition: background-color 0.3s ease;
+  }
 </style>
