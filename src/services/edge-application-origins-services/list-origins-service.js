@@ -21,7 +21,7 @@ export const listOriginsService = async ({
   orderBy = 'origin_id',
   sort = 'asc',
   page = 1,
-  pageSize = 200
+  pageSize = 100
 }) => {
   const params = { id, orderBy, sort, page, pageSize }
 
@@ -33,7 +33,7 @@ export const listOriginsService = async ({
 }
 
 export const prefetchOriginsList = async (applicationId) => {
-  return await listOriginsService({ id: applicationId, page: 1, pageSize: 200 })
+  return await listOriginsService({ id: applicationId, page: 1, pageSize: 100 })
 }
 
 const adapt = (httpResponse) => {
