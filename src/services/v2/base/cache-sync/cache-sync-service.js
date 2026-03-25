@@ -2,6 +2,9 @@ import { SSEClient } from '../sse/sse-client'
 import { CacheInvalidator } from './cache-invalidator'
 import { BroadcastManager, TabCoordinator } from '../broadcast'
 import { queryClient } from '../query/queryClient'
+import { PrefetchScheduler } from './prefetch-scheduler'
+import { PrefetchExecutor } from './prefetch-executor'
+import { registerPrefetchQueryFns } from './prefetch-registrations'
 
 const SSE_ENDPOINT = '/sse'
 
@@ -21,6 +24,7 @@ class CacheSyncService {
   #broadcast = null
   #tabCoordinator = null
   #invalidator = new CacheInvalidator()
+  #prefetchScheduler = null
   #isInitialized = false
   #closedReconnectTimeoutId = null
   #state = {
@@ -39,6 +43,13 @@ class CacheSyncService {
   start() {
     if (this.#isInitialized) return
     this.#isInitialized = true
+
+    // Register prefetch query functions
+    registerPrefetchQueryFns()
+
+    // Initialize prefetch system
+    const executor = new PrefetchExecutor({ queryClient })
+    this.#prefetchScheduler = new PrefetchScheduler({ executor, queryClient })
 
     this.#broadcast = new BroadcastManager('cache-sync')
     this.#broadcast.start()
@@ -61,6 +72,8 @@ class CacheSyncService {
 
     this.#clearClosedReconnectTimeout()
     this.#disconnectSSE()
+    this.#prefetchScheduler?.destroy()
+    this.#prefetchScheduler = null
     this.#tabCoordinator?.stop()
     this.#broadcast?.close()
 
@@ -124,6 +137,11 @@ class CacheSyncService {
     this.#client.on('activity', async (event) => {
       // Invalidate local cache and get the keys that were invalidated
       const invalidatedKeys = await this.#invalidator.invalidate(event)
+
+      // Schedule prefetch for invalidated keys
+      if (invalidatedKeys && invalidatedKeys.length > 0) {
+        this.#prefetchScheduler.schedule(invalidatedKeys)
+      }
 
       // Broadcast to other tabs (they will also invalidate)
       if (invalidatedKeys && invalidatedKeys.length > 0) {

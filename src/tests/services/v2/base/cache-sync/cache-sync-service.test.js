@@ -69,7 +69,30 @@ vi.mock('@services/v2/base/broadcast', () => ({
   })
 }))
 
+// Mock PrefetchScheduler
+const mockPrefetchScheduler = {
+  schedule: vi.fn(),
+  destroy: vi.fn()
+}
+
+vi.mock('@services/v2/base/cache-sync/prefetch-scheduler', () => ({
+  PrefetchScheduler: vi.fn(() => mockPrefetchScheduler)
+}))
+
+// Mock PrefetchExecutor
+vi.mock('@services/v2/base/cache-sync/prefetch-executor', () => ({
+  PrefetchExecutor: vi.fn(() => ({
+    execute: vi.fn().mockResolvedValue(undefined)
+  }))
+}))
+
+// Mock registerPrefetchQueryFns
+vi.mock('@services/v2/base/cache-sync/prefetch-registrations', () => ({
+  registerPrefetchQueryFns: vi.fn()
+}))
+
 import { SSEClient } from '@services/v2/base/sse/sse-client'
+import { registerPrefetchQueryFns } from '@services/v2/base/cache-sync/prefetch-registrations'
 
 describe('CacheSyncService', () => {
   let cacheSyncService, startCacheSync, resetCacheSync
@@ -100,7 +123,7 @@ describe('CacheSyncService', () => {
     startCacheSync()
 
     expect(SSEClient).toHaveBeenCalledWith({
-      url: '/v4/sse',
+      url: '/sse',
       withCredentials: true
     })
     expect(mockSSEClient.connect).toHaveBeenCalled()
@@ -167,6 +190,19 @@ describe('CacheSyncService', () => {
     expect(SSEClient).toHaveBeenCalledTimes(2)
   })
 
+  it('should register prefetch query functions on start', () => {
+    startCacheSync()
+
+    expect(registerPrefetchQueryFns).toHaveBeenCalled()
+  })
+
+  it('should destroy prefetch scheduler on stop', () => {
+    startCacheSync()
+    resetCacheSync()
+
+    expect(mockPrefetchScheduler.destroy).toHaveBeenCalled()
+  })
+
   describe('Cross-tab cache invalidation', () => {
     it('should broadcast CACHE_INVALIDATION after receiving activity event with keys', async () => {
       const invalidatedKeys = [
@@ -191,6 +227,29 @@ describe('CacheSyncService', () => {
       expect(mockBroadcastInstance.send).toHaveBeenCalledWith('CACHE_INVALIDATION', {
         keys: invalidatedKeys
       })
+    })
+
+    it('should schedule prefetch for invalidated keys', async () => {
+      const invalidatedKeys = [
+        ['application', 'all'],
+        ['application', 'detail', '123']
+      ]
+      mockInvalidate.mockResolvedValueOnce(invalidatedKeys)
+
+      startCacheSync()
+
+      const activityEvent = {
+        data: {
+          resource: { type: 'application' },
+          activity_type: 'updated',
+          metadata: { id: '123' }
+        }
+      }
+
+      mockSSEClient._emit('activity', activityEvent)
+      await flushPromises()
+
+      expect(mockPrefetchScheduler.schedule).toHaveBeenCalledWith(invalidatedKeys)
     })
 
     it('should not broadcast when invalidation returns empty array', async () => {

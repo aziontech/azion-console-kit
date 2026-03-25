@@ -56,7 +56,9 @@ export class CacheInvalidator {
     if (keysToInvalidate.length === 0) return []
 
     await Promise.allSettled(
-      keysToInvalidate.map((key) => queryClient.invalidateQueries({ queryKey: key }))
+      keysToInvalidate.map((key) =>
+        queryClient.invalidateQueries({ queryKey: key, refetchType: 'none' })
+      )
     )
 
     return keysToInvalidate
