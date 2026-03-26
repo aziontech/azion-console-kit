@@ -36,7 +36,7 @@ describe('EdgeFunctionsServices', () => {
       body: { data: { edgeFunctions: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'edgeFunctionsEvents'
+    const datasetName = 'functionEvents'
     await sut(fixtures.filter)
 
     const query = [
@@ -85,7 +85,7 @@ describe('EdgeFunctionsServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctionsEvents: [fixtures.edgeFunction] } }
+      body: { data: { functionEvents: [fixtures.edgeFunction] } }
     })
 
     const { sut } = makeSut()

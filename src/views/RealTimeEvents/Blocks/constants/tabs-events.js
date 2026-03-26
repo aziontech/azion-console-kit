@@ -33,7 +33,7 @@ const TABS_EVENTS = {
     index: 1,
     title: 'Functions',
     description: 'Logs of events from requests made to your functions.',
-    dataset: 'edgeFunctionsEvents',
+    dataset: 'functionEvents',
     tabRouter: 'edge-functions',
     columns: [
       {
