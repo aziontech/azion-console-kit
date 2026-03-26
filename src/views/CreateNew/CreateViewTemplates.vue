@@ -1,35 +1,45 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
   import Menu from 'primevue/menu'
+  import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
   import ContentBlock from '@/templates/content-block'
   import PrimeButton from 'primevue/button'
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
   import { useAccountStore } from '@/stores/account'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import { useVcsOAuth } from '@/composables/useVcsOAuth'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
+
+  // VCS OAuth composable
+  const {
+    isLoading: isVcsLoading,
+    isRepositoriesLoading,
+    repositories,
+    connectedProviders,
+    integrationsByProvider,
+    selectedIntegration,
+    connect: connectProvider,
+    listIntegrations,
+    listPlatforms,
+    selectIntegration,
+    setupPostMessageListener
+  } = useVcsOAuth()
+
+  // Cleanup function for postMessage listener
+  let cleanupPostMessage = null
 
   // Navigation state
   const activeNav = ref('import')
 
-  const navItems = computed(() => [
-    {
-      label: 'Import from Git',
-      key: 'import',
-      command: () => setNavActive('import')
-    },
-    {
-      label: 'Start from Templates',
-      key: 'templates',
-      icon: 'pi pi-chevron-right',
-      command: () => setNavActive('templates')
-    },
-    {
-      label: 'Create Resources',
-      key: 'resources',
-      icon: 'pi pi-chevron-right',
-      command: () => setNavActive('resources')
-    }
-  ])
+  // Selected provider tab
+  const selectedProviderTab = ref(null)
+
+  // Search query
+  const searchQuery = ref('')
 
   // Git providers configuration
   const gitProviders = [
@@ -59,6 +69,120 @@
     }
   ]
 
+  const navItems = computed(() => [
+    {
+      label: 'Import from Git',
+      key: 'import',
+      command: () => setNavActive('import')
+    },
+    {
+      label: 'Start from Templates',
+      key: 'templates',
+      icon: 'pi pi-chevron-right',
+      command: () => setNavActive('templates')
+    },
+    {
+      label: 'Create Resources',
+      key: 'resources',
+      icon: 'pi pi-chevron-right',
+      command: () => setNavActive('resources')
+    }
+  ])
+
+  // Filtered repositories based on search
+  const filteredRepositories = computed(() => {
+    if (!searchQuery.value) {
+      return repositories.value
+    }
+    const query = searchQuery.value.toLowerCase()
+    return repositories.value.filter((repo) => repo.name?.toLowerCase().includes(query))
+  })
+
+  // Get provider info by key
+  const getProviderInfo = (providerKey) => {
+    return gitProviders.find((provider) => provider.key === providerKey)
+  }
+
+  // Get providers not yet connected
+  const unconnectedProviders = computed(() => {
+    return gitProviders.filter((provider) => !connectedProviders.value.includes(provider.key))
+  })
+
+  // Get integrations for selected provider tab
+  const integrationsForSelectedTab = computed(() => {
+    if (!selectedProviderTab.value) return []
+    return integrationsByProvider.value[selectedProviderTab.value] || []
+  })
+
+  // Check if any provider is connected
+  const hasConnectedProviders = computed(() => connectedProviders.value.length > 0)
+
+  /**
+   * Handles provider connection via OAuth
+   * @param {Object} provider - The provider object { name, key, bgColor, hoverBgColor }
+   */
+  const handleProviderConnect = async (provider) => {
+    try {
+      await connectProvider(provider.key)
+      toast.add({
+        severity: 'info',
+        summary: `${provider.name} connection initiated`,
+        detail: 'Complete the authorization in the popup window.',
+        life: 3000
+      })
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: `Failed to connect ${provider.name}`,
+        detail: error.message || 'An unexpected error occurred.',
+        life: 5000
+      })
+    }
+  }
+
+  /**
+   * Handles provider tab selection
+   * @param {string} providerKey - The provider key
+   */
+  const handleProviderTabSelect = async (providerKey) => {
+    selectedProviderTab.value = providerKey
+    const providerIntegrations = integrationsByProvider.value[providerKey] || []
+    if (providerIntegrations.length > 0) {
+      // Auto-select first integration
+      await selectIntegration(providerIntegrations[0])
+    }
+  }
+
+  /**
+   * Handles integration (account) selection
+   * @param {Object} integration - The selected integration
+   */
+  const handleIntegrationSelect = async (integration) => {
+    await selectIntegration(integration)
+  }
+
+  /**
+   * Handles repository import
+   * @param {Object} repository - The repository to import
+   */
+  // eslint-disable-next-line no-unused-vars
+  const handleRepositoryImport = (repository) => {
+    // TODO: Navigate to import flow with repository data
+  }
+
+  /**
+   * Callback when VCS integration is successful
+   */
+  const onVcsIntegrationSuccess = async () => {
+    toast.add({
+      severity: 'success',
+      summary: 'Provider connected successfully',
+      life: 3000
+    })
+    // Refresh integrations
+    await listIntegrations()
+  }
+
   // Get recommended solutions dynamically
   const accountStore = useAccountStore()
   const isFlagBlockApiV4 = hasFlagBlockApiV4()
@@ -81,11 +205,23 @@
   // Fetch solutions using the service (uses cached data from prefetchList)
   const { data: templates, isLoading } = solutionService.useListSolutions(queryParams)
 
-  // eslint-disable-next-line no-unused-vars
-  const handleProviderConnect = (provider) => {
-    // Integration logic for OAuth flow will be added here
-    // provider param contains: { name, key, bgColor, hoverBgColor }
-  }
+  // Watch for integrations changes to auto-select first provider
+  watch(connectedProviders, (providers) => {
+    if (providers.length > 0 && !selectedProviderTab.value) {
+      handleProviderTabSelect(providers[0])
+    }
+  })
+
+  // Initialize VCS OAuth on mount
+  onMounted(async () => {
+    cleanupPostMessage = setupPostMessageListener(onVcsIntegrationSuccess)
+    await Promise.all([listPlatforms(), listIntegrations()])
+  })
+
+  // Cleanup on unmount
+  onBeforeUnmount(() => {
+    cleanupPostMessage?.()
+  })
 
   // eslint-disable-next-line no-unused-vars
   const handleTemplateSelect = (template) => {
@@ -174,7 +310,205 @@
           <div
             class="w-full lg:w-[578px] bg-surface-section rounded-md border surface-border flex flex-col"
           >
-            <div class="flex-1 px-4 pt-3 pb-4 flex flex-col items-center justify-center gap-6">
+            <!-- Connected Providers View -->
+            <div
+              v-if="hasConnectedProviders"
+              class="flex-1 p-4 flex flex-col gap-4"
+            >
+              <!-- Provider Tabs -->
+              <div class="flex gap-2">
+                <button
+                  v-for="providerKey in connectedProviders"
+                  :key="providerKey"
+                  class="flex-1 h-9 px-4 rounded-md border flex items-center justify-center gap-2 transition-colors"
+                  :class="[
+                    selectedProviderTab === providerKey
+                      ? 'bg-button-contrast-background border-button-contrast-border-color text-button-contrast-color'
+                      : 'bg-surface-200 border-surface-border text-color-base hover:bg-surface-100'
+                  ]"
+                  @click="handleProviderTabSelect(providerKey)"
+                >
+                  <i
+                    :class="[
+                      'pi',
+                      providerKey === 'github'
+                        ? 'pi-github'
+                        : providerKey === 'gitlab'
+                          ? 'pi-gitlab'
+                          : providerKey === 'azure'
+                            ? 'pi-microsoft'
+                            : 'pi-bitbucket'
+                    ]"
+                    class="text-sm"
+                  ></i>
+                  <span class="text-xs font-mono font-semibold leading-3">
+                    {{ getProviderInfo(providerKey)?.name }}
+                  </span>
+                </button>
+              </div>
+
+              <!-- Account Dropdown and Search -->
+              <div class="flex gap-3">
+                <!-- Account/Organization Dropdown -->
+                <Dropdown
+                  :model-value="selectedIntegration"
+                  :options="integrationsForSelectedTab"
+                  option-label="label"
+                  placeholder="Select account"
+                  class="w-48"
+                  @change="handleIntegrationSelect"
+                  :pt="{
+                    root: { class: 'h-8 text-xs' },
+                    input: { class: 'text-xs' },
+                    item: { class: 'text-xs' }
+                  }"
+                >
+                  <template #value="slotProps">
+                    <div class="flex items-center gap-2">
+                      <i
+                        :class="[
+                          'pi',
+                          selectedProviderTab === 'github'
+                            ? 'pi-github'
+                            : selectedProviderTab === 'gitlab'
+                              ? 'pi-gitlab'
+                              : selectedProviderTab === 'azure'
+                                ? 'pi-microsoft'
+                                : 'pi-bitbucket'
+                        ]"
+                        class="text-xs"
+                      ></i>
+                      <span>{{ slotProps.value?.label || 'Select account' }}</span>
+                    </div>
+                  </template>
+                </Dropdown>
+
+                <!-- Search Input -->
+                <div class="flex-1 relative">
+                  <InputText
+                    v-model="searchQuery"
+                    placeholder="Search project or enter a Git URL"
+                    class="w-full h-8 text-xs"
+                    :pt="{
+                      root: { class: 'pl-4 pr-4' }
+                    }"
+                  />
+                </div>
+              </div>
+
+              <!-- Repository List -->
+              <div class="bg-surface-50 rounded-md border surface-border overflow-hidden">
+                <!-- Loading State -->
+                <div
+                  v-if="isRepositoriesLoading"
+                  class="p-8 text-center"
+                >
+                  <i class="pi pi-spinner pi-spin text-2xl text-color-secondary"></i>
+                  <p class="mt-2 text-xs text-color-secondary">Loading repositories...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div
+                  v-else-if="filteredRepositories.length === 0"
+                  class="p-8 text-center"
+                >
+                  <i class="pi pi-folder text-2xl text-color-secondary"></i>
+                  <p class="mt-2 text-xs text-color-secondary">
+                    {{
+                      searchQuery
+                        ? 'No repositories found matching your search'
+                        : 'No repositories found for this account'
+                    }}
+                  </p>
+                </div>
+
+                <!-- Repository List -->
+                <div
+                  v-else
+                  class="max-h-[400px] overflow-y-auto"
+                >
+                  <div
+                    v-for="repo in filteredRepositories"
+                    :key="repo.id || repo.name"
+                    class="px-5 py-3 border-b surface-border flex items-center justify-between gap-2.5 hover:bg-surface-100 transition-colors"
+                  >
+                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                      <!-- Provider Icon -->
+                      <i
+                        :class="[
+                          'pi',
+                          selectedProviderTab === 'github'
+                            ? 'pi-github'
+                            : selectedProviderTab === 'gitlab'
+                              ? 'pi-gitlab'
+                              : selectedProviderTab === 'azure'
+                                ? 'pi-microsoft'
+                                : 'pi-bitbucket'
+                        ]"
+                        class="text-sm"
+                      ></i>
+                      <!-- Repository Name -->
+                      <span class="text-xs text-color truncate">{{ repo.name }}</span>
+                      <!-- Last Updated -->
+                      <span
+                        v-if="repo.updated_at"
+                        class="text-[10px] text-color-secondary"
+                      >
+                        {{ repo.updated_at }}
+                      </span>
+                    </div>
+                    <!-- Import Button -->
+                    <PrimeButton
+                      label="Import"
+                      size="small"
+                      severity="contrast"
+                      outlined
+                      class="text-xs"
+                      :pt="{
+                        root: { class: 'px-2.5 py-1.5' }
+                      }"
+                      @click="handleRepositoryImport(repo)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add Another Provider -->
+              <div
+                v-if="unconnectedProviders.length > 0"
+                class="flex gap-2"
+              >
+                <button
+                  v-for="provider in unconnectedProviders"
+                  :key="provider.key"
+                  class="flex-1 h-9 px-4 rounded-md border surface-border bg-surface-200 flex items-center justify-center gap-2 transition-colors hover:bg-surface-100"
+                  @click="handleProviderConnect(provider)"
+                >
+                  <i
+                    :class="[
+                      'pi',
+                      provider.key === 'github'
+                        ? 'pi-github'
+                        : provider.key === 'gitlab'
+                          ? 'pi-gitlab'
+                          : provider.key === 'azure'
+                            ? 'pi-microsoft'
+                            : 'pi-bitbucket'
+                    ]"
+                    class="text-sm"
+                  ></i>
+                  <span class="text-xs font-mono font-semibold leading-3">
+                    Add {{ provider.name }}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- No Connected Providers - Initial View -->
+            <div
+              v-else
+              class="flex-1 px-4 pt-3 pb-4 flex flex-col items-center justify-center gap-6"
+            >
               <div class="w-full max-w-80 flex flex-col items-center gap-6">
                 <!-- Header -->
                 <div class="text-center">
@@ -194,58 +528,24 @@
                     :key="provider.key"
                     class="w-full h-11 px-4 rounded-md border surface-border flex items-center justify-center gap-2 transition-colors"
                     :class="[provider.bgColor, provider.hoverBgColor]"
+                    :disabled="isVcsLoading"
                     @click="handleProviderConnect(provider)"
                   >
                     <!-- Provider Icon -->
                     <span class="w-3.5 h-3.5 flex items-center justify-center">
-                      <svg
-                        v-if="provider.key === 'github'"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="text-white"
-                      >
-                        <path
-                          d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
-                        />
-                      </svg>
-                      <svg
-                        v-else-if="provider.key === 'gitlab'"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="text-white"
-                      >
-                        <path
-                          d="M22.65 14.75L20.7 8.45a.57.57 0 00-.03-.11l-2.1-6.45a.85.85 0 00-.8-.58.87.87 0 00-.79.58l-2 6.14H9l-2-6.14a.87.87 0 00-.79-.58.85.85 0 00-.8.58l-2.09 6.45a.57.57 0 00-.03.11l-1.94 6.3a1.26 1.26 0 00.46 1.4l10.3 7.49a.52.52 0 00.61 0l10.3-7.49a1.26 1.26 0 00.46-1.4z"
-                        />
-                      </svg>
-                      <svg
-                        v-else-if="provider.key === 'azure'"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="text-white"
-                      >
-                        <path
-                          d="M5.48 10.11L12 3.59l6.52 6.52H5.48zM3.59 12L12 3.59 3.59 12zm8.41 8.41L3.59 12h8.41v8.41zm1.18-8.41h8.41l-8.41 8.41V12zm8.41 0L12 3.59 20.41 12H12z"
-                        />
-                      </svg>
-                      <svg
-                        v-else-if="provider.key === 'bitbucket'"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="text-white"
-                      >
-                        <path
-                          d="M.778 1.211c-.43 0-.773.35-.778.78 0 .065 0 .131.016.195l2.896 17.924c.08.49.51.855 1.01.865h14.228c.43 0 .786-.33.86-.75l2.88-17.97a.778.778 0 00-.654-.89.778.778 0 00-.195-.015L.778 1.211zm13.578 12.298H9.744l-1.544-7.467h6.544l-1.388 7.467z"
-                        />
-                      </svg>
+                      <i
+                        :class="[
+                          'pi',
+                          provider.key === 'github'
+                            ? 'pi-github'
+                            : provider.key === 'gitlab'
+                              ? 'pi-gitlab'
+                              : provider.key === 'azure'
+                                ? 'pi-microsoft'
+                                : 'pi-bitbucket'
+                        ]"
+                        class="text-white text-sm"
+                      ></i>
                     </span>
                     <span class="text-xs font-mono font-semibold text-white leading-3">
                       Continue with {{ provider.name }}
