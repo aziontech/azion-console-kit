@@ -37,9 +37,9 @@
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
-    "@aziontech/icons": "^1.0.4",
-    "@aziontech/theme": "^1.0.4",
-    "@aziontech/webkit": "^1.9.0",
+    "@aziontech/icons": "^1.4.0",
+    "@aziontech/theme": "^1.4.0",
+    "@aziontech/webkit": "^1.12.3",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.7.0",
     "@jsonforms/vue": "3.7.0",
