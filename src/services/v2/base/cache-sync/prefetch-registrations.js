@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Prefetch QueryFn Registrations
  *
@@ -253,11 +252,4 @@ export function registerPrefetchQueryFns() {
     const id = queryKey[2]
     return edgeServiceService.loadEdgeServiceService({ id })
   })
-
-  console.info('[PrefetchRegistry] Registered', prefetchRegistry.size, 'queryFn patterns')
-
-  // Expose registry to window for debugging
-  if (typeof window !== 'undefined') {
-    window.__PREFETCH_REGISTRY__ = prefetchRegistry
-  }
 }

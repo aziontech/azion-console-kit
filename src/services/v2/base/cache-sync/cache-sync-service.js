@@ -29,7 +29,8 @@ class CacheSyncService {
   #closedReconnectTimeoutId = null
   #state = {
     isConnected: false,
-    clientId: null
+    clientId: null,
+    serverUnavailable: false
   }
 
   get state() {
@@ -38,6 +39,10 @@ class CacheSyncService {
 
   get isConnected() {
     return this.#state.isConnected
+  }
+
+  get serverUnavailable() {
+    return this.#state.serverUnavailable
   }
 
   start() {
@@ -101,6 +106,19 @@ class CacheSyncService {
   }
 
   /**
+   * Resets server error state and attempts to reconnect.
+   * Call this after detecting server_unavailable to retry connection.
+   * @returns {void}
+   */
+  retryAfterServerUnavailable() {
+    if (!this.#client) return
+
+    this.#client.resetServerErrorState()
+    this.#state.serverUnavailable = false
+    this.#client.connect()
+  }
+
+  /**
    * Handles cache invalidation broadcasts from other tabs.
    * @param {Array} keys - Array of query keys to invalidate
    */
@@ -122,11 +140,13 @@ class CacheSyncService {
 
     this.#client.on('open', () => {
       this.#state.isConnected = true
+      this.#state.serverUnavailable = false
     })
 
     this.#client.on('connected', (data) => {
       this.#state.isConnected = true
       this.#state.clientId = data.client_id
+      this.#state.serverUnavailable = false
     })
 
     this.#client.on('ping', () => {
@@ -158,6 +178,17 @@ class CacheSyncService {
       this.#state.isConnected = false
     })
 
+    this.#client.on('server_error', ({ attempts, maxAttempts }) => {
+      // Server error detected - SSE client handles reconnection
+      this.#state.serverUnavailable = attempts >= maxAttempts - 1
+    })
+
+    this.#client.on('server_unavailable', () => {
+      // SSE server is unavailable after max attempts - UI can show notification
+      this.#state.serverUnavailable = true
+      this.#state.isConnected = false
+    })
+
     this.#client.on('maxReconnectAttempts', () => {
       this.#state.isConnected = false
     })
@@ -172,6 +203,7 @@ class CacheSyncService {
     }
     this.#state.isConnected = false
     this.#state.clientId = null
+    this.#state.serverUnavailable = false
   }
 
   #scheduleReconnect() {

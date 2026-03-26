@@ -7,6 +7,9 @@
  * @property {number} [reconnectMaxAttempts=10] - Maximum reconnection attempts
  * @property {number} [reconnectBaseDelay=1000] - Initial delay in ms
  * @property {number} [reconnectMaxDelay=30000] - Maximum delay in ms
+ * @property {number} [serverErrorMaxAttempts=3] - Max attempts for server errors
+ * @property {number} [serverErrorMultiplier=2] - Backoff multiplier for server errors
+ * @property {number} [connectionStabilityThreshold=5000] - Ms to consider connection stable
  */
 
 /**
@@ -15,6 +18,8 @@
  * @property {string|null} clientId
  * @property {number} reconnectAttempts
  * @property {Error|null} lastError
+ * @property {number|null} connectionEstablishedAt - Timestamp when connection opened
+ * @property {number} serverErrorAttempts - Consecutive server error attempts
  */
 
 /**
@@ -59,7 +64,10 @@ const DEFAULT_OPTIONS = {
   withCredentials: true,
   reconnectMaxAttempts: 10,
   reconnectBaseDelay: 1000,
-  reconnectMaxDelay: 30000
+  reconnectMaxDelay: 30000,
+  serverErrorMaxAttempts: 3,
+  serverErrorMultiplier: 2,
+  connectionStabilityThreshold: 5000
 }
 
 export class SSEClient {
@@ -69,7 +77,9 @@ export class SSEClient {
     isConnected: false,
     clientId: null,
     reconnectAttempts: 0,
-    lastError: null
+    lastError: null,
+    connectionEstablishedAt: null,
+    serverErrorAttempts: 0
   }
   #listeners = new Map()
   #reconnectTimeoutId = null
@@ -113,7 +123,19 @@ export class SSEClient {
    */
   disconnect() {
     this.#isIntentionallyClosed = true
+    this.#state.connectionEstablishedAt = null
     this.#cleanup()
+  }
+
+  /**
+   * Resets server error state to allow manual reconnection attempts.
+   * Call this after receiving 'server_unavailable' event if you want to retry.
+   * @returns {void}
+   */
+  resetServerErrorState() {
+    this.#state.serverErrorAttempts = 0
+    this.#state.reconnectAttempts = 0
+    this.#state.connectionEstablishedAt = null
   }
 
   /**
@@ -157,6 +179,8 @@ export class SSEClient {
     this.#eventSource.onopen = () => {
       this.#state.isConnected = true
       this.#state.reconnectAttempts = 0
+      this.#state.serverErrorAttempts = 0
+      this.#state.connectionEstablishedAt = Date.now()
       this.#state.lastError = null
       this.#emit('open', {})
     }
@@ -206,39 +230,120 @@ export class SSEClient {
     this.#state.isConnected = false
     this.#state.lastError = error
 
+    const classification = this.#classifyError()
+
+    // Emitir erro genérico (mantém compatibilidade)
     this.#emit('error', error)
 
-    // Don't reconnect if intentionally closed
-    if (this.#isIntentionallyClosed) {
+    if (this.#isIntentionallyClosed) return
+
+    // Tratamento específico para erro de servidor
+    if (classification.type === 'SERVER') {
+      this.#handleServerError(error, classification)
       return
     }
 
-    // Check if EventSource is in CLOSED state (failed to connect)
-    if (this.#eventSource?.readyState === EventSource.CLOSED) {
-      this.#eventSource = null
-      this.#attemptReconnect()
-    } else {
-      // Connection lost, will attempt to reconnect
-      this.#cleanupEventSource()
-      this.#attemptReconnect()
-    }
+    // Tratamento normal para erro de rede
+    this.#handleNetworkError(error)
   }
 
-  #attemptReconnect() {
-    const { reconnectMaxAttempts, reconnectBaseDelay, reconnectMaxDelay } = this.#options
+  /**
+   * Determina se o erro é de servidor baseado em heurística temporal.
+   * Retorna true se:
+   * 1. Conexão nunca chegou a abrir (connectionEstablishedAt === null)
+   * 2. Conexão falhou < threshold ms após abrir (instável)
+   */
+  #isServerError() {
+    const { connectionStabilityThreshold } = this.#options
 
-    if (this.#state.reconnectAttempts >= reconnectMaxAttempts) {
+    // Nunca conectou = provável erro de servidor (500)
+    if (this.#state.connectionEstablishedAt === null) {
+      return true
+    }
+
+    // Conectou mas falhou muito rápido = provável erro de servidor
+    const stableTime = Date.now() - this.#state.connectionEstablishedAt
+    return stableTime < connectionStabilityThreshold
+  }
+
+  /**
+   * Classifica o tipo de erro para log e evento
+   * @returns {{ type: string, retryable: boolean }}
+   */
+  #classifyError() {
+    if (this.#isServerError()) {
+      return {
+        type: 'SERVER',
+        retryable: this.#state.serverErrorAttempts < this.#options.serverErrorMaxAttempts
+      }
+    }
+    return { type: 'NETWORK', retryable: true }
+  }
+
+  /**
+   * @param {Error} error
+   * @param {{ type: string, retryable: boolean }} classification
+   */
+  #handleServerError(error, classification) {
+    this.#state.serverErrorAttempts++
+
+    // Emitir evento específico
+    this.#emit('server_error', {
+      attempts: this.#state.serverErrorAttempts,
+      maxAttempts: this.#options.serverErrorMaxAttempts,
+      retryable: classification.retryable
+    })
+
+    // Verificar se excedeu tentativas de servidor
+    if (this.#state.serverErrorAttempts >= this.#options.serverErrorMaxAttempts) {
+      this.#emit('server_unavailable', {
+        attempts: this.#state.serverErrorAttempts
+      })
+      return // PARA de tentar
+    }
+
+    // Backoff agressivo para servidor
+    const delay = Math.min(
+      this.#options.reconnectMaxDelay,
+      this.#options.reconnectBaseDelay *
+        Math.pow(this.#options.serverErrorMultiplier, this.#state.serverErrorAttempts)
+    )
+
+    this.#scheduleReconnect(delay)
+  }
+
+  /**
+   * Handles network errors with normal exponential backoff.
+   */
+  #handleNetworkError() {
+    this.#state.serverErrorAttempts = 0 // Reset contador de servidor
+
+    // Verificar max tentativas normal
+    if (this.#state.reconnectAttempts >= this.#options.reconnectMaxAttempts) {
       this.#emit('maxReconnectAttempts', { attempts: this.#state.reconnectAttempts })
       return
     }
 
-    // Exponential backoff: delay = min(maxDelay, baseDelay * 2^attempts)
+    // Backoff normal (exponential)
     const delay = Math.min(
-      reconnectMaxDelay,
-      reconnectBaseDelay * Math.pow(2, this.#state.reconnectAttempts)
+      this.#options.reconnectMaxDelay,
+      this.#options.reconnectBaseDelay * Math.pow(2, this.#state.reconnectAttempts)
     )
 
     this.#state.reconnectAttempts++
+    this.#scheduleReconnect(delay)
+  }
+
+  /**
+   * @param {number} delay
+   */
+  #scheduleReconnect(delay) {
+    // Check if EventSource is in CLOSED state (failed to connect)
+    if (this.#eventSource?.readyState === EventSource.CLOSED) {
+      this.#eventSource = null
+    } else {
+      this.#cleanupEventSource()
+    }
 
     this.#reconnectTimeoutId = setTimeout(() => {
       if (!this.#isIntentionallyClosed) {
@@ -282,6 +387,7 @@ export class SSEClient {
 
     this.#state.isConnected = false
     this.#state.clientId = null
+    this.#state.connectionEstablishedAt = null
 
     this.#emit('close', {})
   }
