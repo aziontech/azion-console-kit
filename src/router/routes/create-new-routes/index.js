@@ -44,6 +44,25 @@ export const createNewRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'templates',
+      name: 'create-new-templates',
+      component: () => import('@/views/CreateNew/CreateViewTemplates.vue'),
+      props: {
+        getTemplatesService: MarketplaceService.getTemplatesService,
+        getTemplateService: TemplateEngineService.getTemplate,
+        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
+        windowOpen
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Create New',
+            to: '/'
+          }
+        ]
+      }
     }
   ]
 }

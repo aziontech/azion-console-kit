@@ -70,6 +70,7 @@ export class SolutionService extends BaseService {
             vendor: element.vendor,
             slug: element.slug,
             headline: element.headline,
+            icon: element.icon,
             featured: element.featured,
             released: element.new_release,
             instanceType: {
