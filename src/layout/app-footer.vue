@@ -76,41 +76,10 @@
 
       <template #end>
         <div class="w-full flex flex-wrap gap-2 items-center justify-center">
-          <!-- System Status -->
           <AzionSystemStatus
             v-tooltip.top="{ value: 'System status', showDelay: 200 }"
             v-if="!route.meta.hideLinksFooter"
           />
-          <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
-            <Dropdown
-              appendTo="self"
-              :modelValue="selectedTheme"
-              @update:modelValue="selectTheme"
-              optionValue="value"
-              optionLabel="name"
-              :loading="isThemeNotSelected"
-              :options="themeOptions"
-              :autoOptionFocus="false"
-              :pt="dropdownPt"
-              aria-label="Select theme mode"
-            >
-              <template #value="slotProps">
-                <div
-                  v-if="slotProps.value"
-                  class="flex gap-2 align-items-center"
-                >
-                  <i :class="slotProps.value.icon"></i>
-                  <div>{{ slotProps.value.name }}</div>
-                </div>
-              </template>
-              <template #option="slotProps">
-                <div class="flex gap-2 align-items-center">
-                  <i :class="slotProps.option.icon"></i>
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown>
-          </div>
         </div>
       </template>
     </Toolbar>
@@ -128,48 +97,19 @@
     openDocumentation
   } from '@/helpers'
 
-  import { ref, computed } from 'vue'
+  import { computed } from 'vue'
   import Toolbar from 'primevue/toolbar'
-  import { useThemeStore } from '@/stores/theme'
-  import { storeToRefs } from 'pinia'
   import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
   import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
   import { useRoute } from 'vue-router'
-  const themeStore = useThemeStore()
-  const { currentTheme } = storeToRefs(themeStore)
+
   const route = useRoute()
 
   defineOptions({
     name: 'footer-block'
   })
 
-  const themeOptions = ref([
-    { name: 'Light', value: 'light', icon: 'pi pi-sun' },
-    { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
-    { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-  ])
-
-  const selectedTheme = computed(() =>
-    themeOptions.value.find((option) => option.value === currentTheme.value)
-  )
-
-  const isThemeNotSelected = computed(() => !selectedTheme.value?.value)
-
-  const selectTheme = (theme) => {
-    themeStore.setTheme(theme)
-  }
-
   const toolbarClass = computed(() => ({
     '!gap-3': route.meta.hideLinksFooter
   }))
-
-  const dropdownPt = {
-    root: {
-      class: 'w-32',
-      style: 'background: var(--surface-section) !important'
-    },
-    item: { class: 'w-full text-sm' },
-    input: { class: 'w-auto text-sm' }
-  }
 </script>
