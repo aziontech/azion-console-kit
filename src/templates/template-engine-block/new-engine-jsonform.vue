@@ -1,11 +1,13 @@
 <script setup>
   import { computed, ref, markRaw, watch, onMounted, defineOptions } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from 'primevue/dropdown'
   import LabelBlock from '@/templates/label-block'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'
+  import { workloadService } from '@/services/v2/workload/workload-service'
 
   // JSON Forms Custom Renderers
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
@@ -71,10 +73,26 @@
     successNextSteps: {
       type: Array,
       default: () => []
+    },
+    // Results from deployment (needed for patch domains)
+    results: {
+      type: Object,
+      default: null
     }
   })
 
-  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
+  const emit = defineEmits([
+    'next',
+    'deploy',
+    'finish',
+    'retry',
+    'manage',
+    'open-url',
+    'next-step',
+    'save-domains'
+  ])
+
+  const toast = useToast()
 
   const layoutRef = ref(null)
   const oauthGithubRef = ref(null)
@@ -158,7 +176,9 @@
     executionId: props.executionId,
     deployFailed: props.deployFailed,
     applicationName: props.applicationName,
-    deployStartTime: props.deployStartTime
+    deployStartTime: props.deployStartTime,
+    // Results for DeploySuccessCard
+    results: props.results
   }))
 
   /**
@@ -307,6 +327,42 @@
     emit('next-step', data)
   }
 
+  /**
+   * Handles saving domain settings via patchWorkloadDomains
+   * Called when user saves domain settings from DeploySuccessCard
+   * @param {Object} values - The domain form values
+   */
+  const handleSaveDomains = async (values) => {
+    try {
+      const workloadId = props.results?.domain?.id
+      if (!workloadId) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Workload ID not found'
+        })
+        return
+      }
+
+      await workloadService.patchWorkloadDomains(workloadId, values)
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Domain settings updated successfully'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to update domain settings'
+      })
+    }
+  }
+
   onMounted(async () => {
     if (hasIntegrations.value) {
       await layoutRef.value?.loadIntegrationOnShowButton()
@@ -359,6 +415,7 @@
       @finish="handleFinish"
       @retry="handleRetry"
       @manage="handleManage"
+      @save-domains="handleSaveDomains"
       @open-url="handleOpenUrl"
       @next-step="handleNextStep"
     >

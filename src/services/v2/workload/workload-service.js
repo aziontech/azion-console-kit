@@ -320,6 +320,39 @@ export class WorkloadService extends BaseService {
     await this.workloadDeployment.updateWorkloadDeployment(payload.id, deployPayload)
   }
 
+  #transformPatchDomainsPayload = (payload) => {
+    let domains = payload.domains
+      .filter((item) => item.domain && item.domain.trim() !== '')
+      .map((item) => item.domain)
+
+    if (payload.useCustomDomain && payload.customDomain) {
+      const customDomain = payload.customDomain.trim()
+      const domainWithSuffix = customDomain.endsWith('.azion.app')
+        ? customDomain
+        : `${customDomain}.azion.app`
+      domains.unshift(domainWithSuffix)
+    }
+
+    return {
+      domains,
+      workload_hostname_allow_access: payload.workloadHostnameAllowAccess ?? false
+    }
+  }
+
+  patchWorkloadDomains = async (workloadId, payload) => {
+    const body = this.#transformPatchDomainsPayload(payload)
+
+    await this.http.request({
+      method: 'PATCH',
+      url: `${this.baseURL}/${workloadId}`,
+      body
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
+
+    return 'Your domain settings have been updated'
+  }
+
   deleteWorkload = async (id) => {
     await this.http.request({
       method: 'DELETE',

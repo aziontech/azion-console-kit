@@ -14,12 +14,19 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup.vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   const props = defineProps({
     // Status message
     appUrl: {
       type: String,
       required: true
+    },
+
+    // Execution ID for viewing logs
+    executionId: {
+      type: String,
+      default: ''
     },
 
     // Preview block — same pattern as DeployRepositoryCard
@@ -39,7 +46,7 @@
     },
     templateUrl: {
       type: String,
-      required: true
+      default: ''
     },
     templateDescription: {
       type: String,
@@ -48,11 +55,79 @@
     githubUrl: {
       type: String,
       default: ''
+    },
+
+    // Deployment results
+    results: {
+      type: Object,
+      default: null
     }
   })
 
   const emit = defineEmits(['onSave'])
   const router = useRouter()
+
+  /**
+   * Build resources array from deployment results
+   */
+  const resourcesCreated = computed(() => {
+    if (!props.results) return []
+
+    const resources = []
+
+    // Add Workload (domain)
+    if (props.results.domain?.url) {
+      resources.push({
+        type: 'Workload',
+        redirect: () =>
+          router.push({
+            name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
+            params: { id: props.results.domain.id }
+          }),
+        name: props.results.edgeApplication?.name || 'Workload',
+        icon: 'ai ai-workloads'
+      })
+    }
+
+    // Add Edge Application
+    if (props.results.edgeApplication?.name) {
+      resources.push({
+        type: 'Application',
+        redirect: () =>
+          router.push({
+            name: 'edit-application',
+            params: { id: props.results.edgeApplication.id }
+          }),
+        name: props.results.edgeApplication.name,
+        icon: 'ai ai-edge-application'
+      })
+    }
+
+    // Add Function (if exists in extras)
+    if (props.results.extras?.functionName) {
+      resources.push({
+        type: 'Function',
+        redirect: () =>
+          router.push({ name: 'edit-functions', params: { id: props.results.extras.functionId } }),
+        name: props.results.extras.functionName,
+        icon: 'ai ai-edge-functions'
+      })
+    }
+
+    // Add Firewall (if exists in extras)
+    if (props.results.extras?.firewallName) {
+      resources.push({
+        type: 'Firewall',
+        redirect: () =>
+          router.push({ name: 'edit-firewall', params: { id: props.results.extras.firewallId } }),
+        name: props.results.extras.firewallName,
+        icon: 'ai ai-edge-functions'
+      })
+    }
+
+    return resources
+  })
+
   /**
    * Validation schema for the form
    * When useCustomDomain is true:
@@ -95,7 +170,7 @@
   const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
   const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
   const { value: useCustomDomain } = useField('useCustomDomain')
-  const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
+  const { value: customDomain } = useField('customDomain')
 
   const domainsOptions = ref([])
 
@@ -174,9 +249,17 @@
     router.push('/marketplace')
   }
 
+  const openRealTimeEvents = () => {
+    if (props.executionId) {
+      router.push({
+        name: 'real-time-events'
+      })
+    }
+  }
+
   const nextSteps = [
     {
-      action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
+      action: () => openRealTimeEvents(),
       icon: 'pi-chart-line',
       label: 'View Real-Time Metrics'
     },
@@ -223,10 +306,8 @@
       <TemplateInfoBlock
         :preview-src="props.previewSrc"
         :preview-alt="props.previewAlt"
-        :template-title="props.templateTitle"
-        :template-url="props.templateUrl"
-        :template-description="props.templateDescription"
-        :github-url="props.githubUrl"
+        :resources="resourcesCreated"
+        resources-only
       />
 
       <div class="flex flex-col gap-3">
@@ -251,9 +332,9 @@
                 <div
                   v-for="(domain, index) in domains"
                   :key="index"
-                  class="flex gap-2 items-start w-full"
+                  class="flex flex-col sm:flex-row gap-2 w-full"
                 >
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <div class="flex flex-col w-full gap-2">
                     <FieldDropdown
                       editable
                       :focusOnHover="false"
@@ -280,7 +361,7 @@
                     v-if="hasMultipleDomains"
                     @click="removeDomain(index)"
                     icon="pi pi-trash"
-                    class="p-button-outlined p-button-sm p-button-danger"
+                    class="p-button-outlined p-button-sm p-button-danger self-end"
                     data-testid="domains-form__remove-domain-button"
                     title="Remove domain"
                   />
@@ -317,10 +398,9 @@
 
               <div
                 v-if="useCustomDomain"
-                class="flex sm:max-w-lg w-full gap-2 flex-col sm:flex-row"
-                :class="{ 'items-center': customDomainErrorMessage }"
+                class="flex w-full gap-2 flex-col"
               >
-                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <div class="flex flex-col w-full gap-2">
                   <FieldInputGroup
                     placeholder="my-custom-name"
                     label="Azion Custom Domain"

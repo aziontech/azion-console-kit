@@ -1,6 +1,5 @@
 <script setup>
   import { computed, onUnmounted, ref, watch } from 'vue'
-  import PrimeButton from 'primevue/button'
   import BaseDeployCard from './BaseDeployCard.vue'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
 
@@ -84,10 +83,6 @@
     return !props.results && !props.deployFailed
   })
 
-  const isSuccessfullyFinished = computed(() => {
-    return props.results && !props.deployFailed
-  })
-
   const elapsedTime = computed(() => {
     if (!timer.value) {
       return 'Start deploying to see the progress here'
@@ -109,32 +104,12 @@
     return 'Deployment'
   })
 
-  const domainUrl = computed(() => {
-    return props.results?.domain?.url || ''
-  })
-
-  const edgeApplicationId = computed(() => {
-    return props.results?.edgeApplication?.id || null
-  })
-
   const domainId = computed(() => {
     return props.results?.domain?.id || null
   })
 
   const handleFinish = async () => {
     emit('finish')
-  }
-
-  const retry = () => {
-    emit('retry')
-  }
-
-  const goToUrl = () => {
-    emit('open-url', domainUrl.value)
-  }
-
-  const goToEdgeApplicationEditView = () => {
-    emit('manage', { type: 'edgeApplication', id: edgeApplicationId.value })
   }
 
   const goToDomainEditView = () => {
@@ -200,51 +175,6 @@
           :start="props.deployStarted"
           @onFinish.once="handleFinish"
         />
-
-        <div class="flex w-full justify-end">
-          <div class="flex sm:flex-row flex-col gap-3 md:gap-4">
-            <PrimeButton
-              v-if="isSuccessfullyFinished && showUrlButton && domainUrl"
-              link
-              icon="pi pi-external-link"
-              iconPos="right"
-              size="small"
-              class="px-0 py-1"
-              :label="domainUrl"
-              :pt="{
-                root: { class: 'justify-center' },
-                label: { class: 'grow-0 truncate' }
-              }"
-              @click="goToUrl"
-            />
-            <div class="flex justify-end">
-              <PrimeButton
-                v-if="isSuccessfullyFinished && showManageButton && edgeApplicationId"
-                :label="manageLabel"
-                severity="secondary"
-                size="small"
-                @click="goToEdgeApplicationEditView"
-              />
-            </div>
-            <div
-              v-if="deployFailed"
-              class="md:ml-auto flex"
-            >
-              <PrimeButton
-                @click="retry"
-                severity="secondary"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-                class="md:ml-auto w-full"
-                :label="backLabel"
-                icon="pi pi-chevron-left"
-                iconPos="left"
-              />
-            </div>
-          </div>
-        </div>
       </template>
     </BaseDeployCard>
   </div>

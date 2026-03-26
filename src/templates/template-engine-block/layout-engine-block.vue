@@ -151,7 +151,16 @@
     }
   })
 
-  const emit = defineEmits(['next', 'deploy', 'finish', 'retry', 'manage', 'open-url', 'next-step'])
+  const emit = defineEmits([
+    'next',
+    'deploy',
+    'finish',
+    'retry',
+    'manage',
+    'open-url',
+    'next-step',
+    'save-domains'
+  ])
 
   const toast = useToast()
 
@@ -401,6 +410,14 @@
   }
 
   /**
+   * Handle save domains action
+   * Called when user saves domain settings from DeploySuccessCard
+   */
+  const handleSaveDomains = (values) => {
+    emit('save-domains', values)
+  }
+
+  /**
    * Reset flow to first step
    */
   const reset = () => {
@@ -458,6 +475,7 @@
         :template-description="props.templateDescription"
         :github-url="props.githubUrl"
         :next-steps="props.successNextSteps"
+        @on-save="handleSaveDomains"
       >
         <template #customize-domain>
           <slot name="customize-domain" />
