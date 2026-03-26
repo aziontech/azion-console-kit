@@ -98,16 +98,6 @@
     return repositories.value.filter((repo) => repo.name?.toLowerCase().includes(query))
   })
 
-  // Get provider info by key
-  const getProviderInfo = (providerKey) => {
-    return gitProviders.find((provider) => provider.key === providerKey)
-  }
-
-  // Get providers not yet connected
-  const unconnectedProviders = computed(() => {
-    return gitProviders.filter((provider) => !connectedProviders.value.includes(provider.key))
-  })
-
   // Get integrations for selected provider tab
   const integrationsForSelectedTab = computed(() => {
     if (!selectedProviderTab.value) return []
@@ -155,10 +145,10 @@
 
   /**
    * Handles integration (account) selection
-   * @param {Object} integration - The selected integration
+   * @param {Object} event - The PrimeVue Dropdown change event
    */
-  const handleIntegrationSelect = async (integration) => {
-    await selectIntegration(integration)
+  const handleIntegrationSelect = async (event) => {
+    await selectIntegration(event.value)
   }
 
   /**
@@ -308,7 +298,7 @@
         <div class="flex-1 flex flex-col lg:flex-row gap-5 min-w-0">
           <!-- Connect Repository Card -->
           <div
-            class="w-full lg:w-[578px] bg-surface-section rounded-md border surface-border flex flex-col"
+            class="w-full lg:w-[578px] bg-[var(--surface-50)] rounded-md border surface-border flex flex-col"
           >
             <!-- Connected Providers View -->
             <div
@@ -318,31 +308,36 @@
               <!-- Provider Tabs -->
               <div class="flex gap-2">
                 <button
-                  v-for="providerKey in connectedProviders"
-                  :key="providerKey"
+                  v-for="provider in gitProviders"
+                  :key="provider.key"
                   class="flex-1 h-9 px-4 rounded-md border flex items-center justify-center gap-2 transition-colors"
                   :class="[
-                    selectedProviderTab === providerKey
+                    connectedProviders.includes(provider.key) &&
+                    selectedProviderTab === provider.key
                       ? 'bg-button-contrast-background border-button-contrast-border-color text-button-contrast-color'
-                      : 'bg-surface-200 border-surface-border text-color-base hover:bg-surface-100'
+                      : 'bg-surface-200 surface-border text-color-base hover:bg-surface-100'
                   ]"
-                  @click="handleProviderTabSelect(providerKey)"
+                  @click="
+                    connectedProviders.includes(provider.key)
+                      ? handleProviderTabSelect(provider.key)
+                      : handleProviderConnect(provider)
+                  "
                 >
                   <i
                     :class="[
                       'pi',
-                      providerKey === 'github'
+                      provider.key === 'github'
                         ? 'pi-github'
-                        : providerKey === 'gitlab'
+                        : provider.key === 'gitlab'
                           ? 'pi-gitlab'
-                          : providerKey === 'azure'
+                          : provider.key === 'azure'
                             ? 'pi-microsoft'
                             : 'pi-bitbucket'
                     ]"
                     class="text-sm"
                   ></i>
                   <span class="text-xs font-mono font-semibold leading-3">
-                    {{ getProviderInfo(providerKey)?.name }}
+                    {{ provider.name }}
                   </span>
                 </button>
               </div>
@@ -425,7 +420,7 @@
                 <!-- Repository List -->
                 <div
                   v-else
-                  class="max-h-[400px] overflow-y-auto"
+                  class="max-h-[600px] overflow-y-auto"
                 >
                   <div
                     v-for="repo in filteredRepositories"
@@ -461,8 +456,7 @@
                     <PrimeButton
                       label="Import"
                       size="small"
-                      severity="contrast"
-                      outlined
+                      severity="secondary"
                       class="text-xs"
                       :pt="{
                         root: { class: 'px-2.5 py-1.5' }
@@ -471,36 +465,6 @@
                     />
                   </div>
                 </div>
-              </div>
-
-              <!-- Add Another Provider -->
-              <div
-                v-if="unconnectedProviders.length > 0"
-                class="flex gap-2"
-              >
-                <button
-                  v-for="provider in unconnectedProviders"
-                  :key="provider.key"
-                  class="flex-1 h-9 px-4 rounded-md border surface-border bg-surface-200 flex items-center justify-center gap-2 transition-colors hover:bg-surface-100"
-                  @click="handleProviderConnect(provider)"
-                >
-                  <i
-                    :class="[
-                      'pi',
-                      provider.key === 'github'
-                        ? 'pi-github'
-                        : provider.key === 'gitlab'
-                          ? 'pi-gitlab'
-                          : provider.key === 'azure'
-                            ? 'pi-microsoft'
-                            : 'pi-bitbucket'
-                    ]"
-                    class="text-sm"
-                  ></i>
-                  <span class="text-xs font-mono font-semibold leading-3">
-                    Add {{ provider.name }}
-                  </span>
-                </button>
               </div>
             </div>
 
