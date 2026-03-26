@@ -102,7 +102,7 @@
   import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
   import PrimeButton from 'primevue/button'
   import { useRoute } from 'vue-router'
-  
+
   const route = useRoute()
 
   defineOptions({
