@@ -252,15 +252,14 @@
   const openRealTimeEvents = () => {
     if (props.executionId) {
       router.push({
-        name: 'real-time-events',
-        query: { executionId: props.executionId }
+        name: 'real-time-events'
       })
     }
   }
 
   const nextSteps = [
     {
-      action: () => window.open(props.appUrl, '_blank', 'noopener,noreferrer'),
+      action: () => openRealTimeEvents(),
       icon: 'pi-chart-line',
       label: 'View Real-Time Metrics'
     },
@@ -270,15 +269,6 @@
       label: 'Explore Functions from Marketplace'
     }
   ]
-
-  // Add View Logs step if executionId is available
-  if (props.executionId) {
-    nextSteps.push({
-      action: () => openRealTimeEvents(),
-      icon: 'pi-list',
-      label: 'View Deploy Logs'
-    })
-  }
 
   /**
    * Handle form submission
