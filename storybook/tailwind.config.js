@@ -9,7 +9,8 @@ export default {
   important: true,
   content: [
     './src/**/*.{vue,js,ts,jsx,tsx}',
-    '../../src/**/*.{vue,js,ts,jsx,tsx}'
+    '../src/**/*.{vue,js,ts,jsx,tsx}',
+    '../node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}'
   ],
   // Dark mode configuration
   // Use `.dark` on an ancestor (Storybook uses `withThemeByClassName` to toggle it)
