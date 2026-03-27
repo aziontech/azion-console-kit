@@ -85,10 +85,10 @@
   resolved "https://registry.npmjs.org/@aziontech/theme/-/theme-1.4.0.tgz"
   integrity sha512-G82S4xYs+PTIf3PBeUoashN80cc4nzQE/W3FNacGxf7kd+Rz3SxbkHv1PodfGPvleap7CaTsN2sjAzfoo8iSlA==
 
-"@aziontech/webkit@^1.13.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.13.0.tgz#9332bfe2f3ec3ba761bfe530f0f1c14461af73e8"
-  integrity sha512-NCZ+9HVo2gX3UtVKLOuqOelkqIljZU+vSN+pCDglTq8YIfyLii/bahEktH4Cxdzp96CRBnQ3ClQKFp6Ol8SSFQ==
+"@aziontech/webkit@^1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.14.1.tgz#c8449bb7cf849e5cc891e60708313f13c9bcd1c2"
+  integrity sha512-j8ThX9fmNryj/v6+wARz/rIGueWUwCeX7Eqj8SHk+OEoqxV42DkxrTp6J+NnDjk8VFoFFhx+p90maG6J/lspTw==
   dependencies:
     "@vueuse/core" "^10.11.1"
     motion-v "^2.1.0"

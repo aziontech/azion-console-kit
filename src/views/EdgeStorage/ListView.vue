@@ -211,8 +211,11 @@
                           height="1.5rem"
                         />
                         <Checkbox
-                          v-else-if="selectedItems.some(i => i.name === rowData.name) && !rowData.isNewFolder"
-                          :model-value="selectedItems.some(i => i.name === rowData.name)"
+                          v-else-if="
+                            selectedItems.some((i) => i.name === rowData.name) &&
+                            !rowData.isNewFolder
+                          "
+                          :model-value="selectedItems.some((i) => i.name === rowData.name)"
                           binary
                           class="pointer-events-none"
                         />
@@ -673,9 +676,7 @@
     )
     return (
       selectableRows.length > 0 &&
-      selectableRows.every((row) =>
-        selectedItems.value.some((item) => item.name === row.name)
-      )
+      selectableRows.every((row) => selectedItems.value.some((item) => item.name === row.name))
     )
   })
 
