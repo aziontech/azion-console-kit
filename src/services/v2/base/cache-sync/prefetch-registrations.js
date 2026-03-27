@@ -252,4 +252,80 @@ export function registerPrefetchQueryFns() {
     const id = queryKey[2]
     return edgeServiceService.loadEdgeServiceService({ id })
   })
+
+  // =========================================================================
+  // Custom Pages - Structure: ['custom-pages', 'list', params] or ['custom-pages', 'detail', id]
+  // =========================================================================
+
+  prefetchRegistry.register(['custom-pages', 'list'], async () => {
+    const { customPageService } = await import('../../custom-page/custom-page-service')
+    return customPageService.prefetchList()
+  })
+
+  prefetchRegistry.register(['custom-pages', 'detail'], async (queryKey) => {
+    const { customPageService } = await import('../../custom-page/custom-page-service')
+    const id = queryKey[2]
+    return customPageService.loadCustomPagesService({ id })
+  })
+
+  // =========================================================================
+  // Digital Certificates CRL - Structure: ['digital-certificates-crl', 'list', params] or ['digital-certificates-crl', 'detail', id]
+  // =========================================================================
+
+  prefetchRegistry.register(['digital-certificates-crl', 'list'], async () => {
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
+    return digitalCertificatesCRLService.prefetchList()
+  })
+
+  prefetchRegistry.register(['digital-certificates-crl', 'detail'], async (queryKey) => {
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
+    const id = queryKey[2]
+    return digitalCertificatesCRLService.loadDigitalCertificateCRL({ id })
+  })
+
+  // =========================================================================
+  // Users - Structure: ['users', 'list', params]
+  // =========================================================================
+
+  prefetchRegistry.register(['users', 'list'], async () => {
+    const { usersService } = await import('../../users/users-service')
+    return usersService.prefetchList()
+  })
+
+  // =========================================================================
+  // Variables - Structure: ['variables', 'list']
+  // =========================================================================
+
+  prefetchRegistry.register(['variables', 'list'], async () => {
+    const { variablesService } = await import('../../variables/variables-service')
+    return variablesService.prefetchList()
+  })
+
+  // =========================================================================
+  // Personal Tokens - Structure: ['personal-tokens', 'list', params]
+  // =========================================================================
+
+  prefetchRegistry.register(['personal-tokens', 'list'], async () => {
+    const { personalTokenService } = await import('../../personal-token/personal-token-service')
+    return personalTokenService.prefetchList()
+  })
+
+  // =========================================================================
+  // Team Permissions - Structure: ['team-permissions', 'list', params] or ['team-permissions', 'detail', id]
+  // =========================================================================
+
+  prefetchRegistry.register(['team-permissions', 'list'], async () => {
+    const { teamPermissionService } = await import('../../team-permission/team-permission-service')
+    return teamPermissionService.prefetchList()
+  })
+
+  prefetchRegistry.register(['team-permissions', 'detail'], async (queryKey) => {
+    const { teamPermissionService } = await import('../../team-permission/team-permission-service')
+    const id = queryKey[2]
+    return teamPermissionService.load({ id })
+  })
 }

@@ -146,12 +146,6 @@ const config = {
         type: 'single_origin',
         hostHeader: `api.azion.com`,
         addresses: [`api.azion.com`]
-      },
-      {
-        name: 'origin-beholder',
-        type: 'single_origin',
-        hostHeader: `beholder.azion.net`,
-        addresses: [`beholder.azion.net`]
       }
     ]),
     {
@@ -513,20 +507,6 @@ const config = {
             subject: 'request_uri'
           },
           rewrite: `/iam/api/%{captured[1]}`
-        }
-      },
-      {
-        name: 'Route SSE Requests to Beholder Origin',
-        description:
-          'Routes SSE (Server-Sent Events) requests to the Beholder service for real-time event streaming with authentication.',
-        match: '^/sse',
-        behavior: {
-          setOrigin: {
-            name: 'origin-beholder',
-            type: 'single_origin'
-          },
-          forwardCookies: true,
-          bypassCache: true
         }
       }
     ],

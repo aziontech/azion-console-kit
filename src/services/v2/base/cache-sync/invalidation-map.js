@@ -50,14 +50,6 @@ const createDetailMapping = (queryKeyRef, group) => ({
  * @param {string|null} group - Optional group identifier
  * @returns {Object} Mapping object with group and getKeys
  */
-const createMultiKeyMapping = (queryKeyRefs, group = null) => ({
-  group,
-  getKeys: () =>
-    queryKeyRefs.map((ref) => {
-      // Handle both array and function for 'all' property
-      return typeof ref.all === 'function' ? ref.all() : ref.all
-    })
-})
 
 /**
  * Creates multiple aliased entries in an object using a factory function.
@@ -125,58 +117,58 @@ const GROUPS = {
  * SSE parent.type values → queryKeys property names
  */
 const PARENT_TYPE_TO_QUERY_KEY = {
-  Solution: 'solutions',
-  Marketplace: 'marketplace',
-  Domain: 'workload',
-  Workload: 'workload',
+  solution: 'solutions',
+  marketplace: 'marketplace',
+  domain: 'workload',
+  workload: 'workload',
 
   // Edge Application
-  Application: 'application',
-  'Edge Application': 'application',
+  application: 'application',
+  'edge application': 'application',
 
   // Edge Firewall
-  Firewall: 'firewall',
-  'Edge Firewall': 'firewall',
+  firewall: 'firewall',
+  'edge firewall': 'firewall',
 
   //Secure
-  Connector: 'edgeConnectors',
+  connector: 'edgeConnectors',
   'dns zone dnssec': 'edgeDNS',
   'dns zone': 'edgeDNS',
-  'Edge DNS': 'edgeDNS',
+  'edge dns': 'edgeDNS',
 
   //Store
-  'Edge Storage': 'edgeStorage',
+  'edge storage': 'edgeStorage',
   'account credential': 'edgeStorage.credentials',
-  'Sql Database': 'edgeSql',
+  'sql database': 'edgeSql',
 
   //Deploy
-  'Edge Node': 'edgeNode',
+  'edge node': 'edgeNode',
 
   //Observe
-  'Data Stream': 'dataStream',
+  'data stream': 'dataStream',
 
   //Edge Liberies
-  'Digital Certificate': 'digitalCertificates',
-  'Tls Certificate': 'digitalCertificates',
-  'Tls Certificate Revocation List': 'digitalCertificatesCRL',
-  'Custom Page': 'customPages',
-  'Edge Service': 'edgeService',
-  'Edge Function': 'edgeFunction',
-  'Network List': 'networkLists',
-  WAF: 'waf',
+  'digital certificate': 'digitalCertificates',
+  'tls certificate': 'digitalCertificates',
+  'tls certificate revocation list': 'digitalCertificatesCRL',
+  'custom page': 'customPages',
+  'edge service': 'edgeService',
+  'edge function': 'edgeFunction',
+  'network List': 'networkLists',
+  waf: 'waf',
 
   // User Menu
-  Team: 'teams', // ainda sem conseguir testar
-  'Team Permission': 'teamPermission', // ainda se conseguir testar
-  User: 'users',
-  'Personal Token': 'personalToken',
+  team: 'teams', // ainda sem conseguir testar
+  'team Permission': 'teamPermission', // ainda se conseguir testar
+  user: 'users',
+  'personal token': 'personalToken',
 
   // Account: 'account',
-  Client: 'account',
-  'Account Settings': 'accountSettings',
-  Billing: 'billing', // não lista em stage
+  client: 'account',
+  'account settings': 'accountSettings',
+  billing: 'billing', // não lista em stage
 
-  Contract: 'contract'
+  contract: 'contract'
 }
 
 /**
@@ -210,11 +202,7 @@ const RESOURCE_TYPE_MAP = {
   domain: createSimpleMapping(queryKeys.workload, GROUPS.WORKLOADS),
 
   // Function - affects multiple caches
-  function: createMultiKeyMapping([
-    queryKeys.edgeFunction,
-    queryKeys.application,
-    queryKeys.firewall
-  ]),
+  function: createDetailMapping(queryKeys.edgeFunction),
 
   // Edge DNS - shared config for 'dns zone' and 'dns zone dnssec'
   ...createAliasedMapping(['dns zone dnssec', 'dns zone'], () =>
@@ -223,10 +211,18 @@ const RESOURCE_TYPE_MAP = {
 
   // Edge Storage
   'storage bucket': createSimpleMapping(queryKeys.edgeStorage, GROUPS.EDGE_STORAGE),
+  'storage bucket object': {
+    group: GROUPS.EDGE_STORAGE,
+    getKeys: () => [queryKeys.edgeStorage.all, [...queryKeys.edgeStorage.all, 'files']]
+  },
   'account credential': createSimpleMapping(queryKeys.edgeStorage.credentials, GROUPS.EDGE_STORAGE),
+  'sql database': {
+    group: GROUPS.EDGE_SQL,
+    getKeys: () => [queryKeys.edgeSql.all]
+  },
 
   // Data Stream
-  data_stream: createDetailMapping(queryKeys.dataStream, GROUPS.DATA_STREAM),
+  stream: createDetailMapping(queryKeys.dataStream, GROUPS.DATA_STREAM),
 
   // Connectors
   connector: createDetailMapping(queryKeys.edgeConnectors, GROUPS.EDGE_CONNECTORS),
@@ -245,8 +241,9 @@ const RESOURCE_TYPE_MAP = {
   'network list': createDetailMapping(queryKeys.networkLists, GROUPS.NETWORK_LISTS),
 
   // Digital Certificates
-  ...createAliasedMapping(['tls certificate', 'tls certificate signing request'], () =>
-    createDetailMapping(queryKeys.digitalCertificates, GROUPS.DIGITAL_CERTIFICATES)
+  ...createAliasedMapping(
+    ['tls certificate', 'tls certificate signing request', 'tls certificate request'],
+    () => createDetailMapping(queryKeys.digitalCertificates, GROUPS.DIGITAL_CERTIFICATES)
   ),
   'tls certificate revocation list': createDetailMapping(
     queryKeys.digitalCertificatesCRL,
