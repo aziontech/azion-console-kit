@@ -43,6 +43,10 @@ const detectFrameworkByDependencies = (httpResponse) => {
   const allDetectedFrameworks = dependencies.filter((dependency) => allPresets.includes(dependency))
 
   const hasMatchCases = allDetectedFrameworks.length > 0
+  const detectedFramework = hasMatchCases ? allDetectedFrameworks[0] : null
 
-  return hasMatchCases ? allDetectedFrameworks[0] : null
+  return {
+    framework: detectedFramework,
+    packageJson: packageSchema
+  }
 }

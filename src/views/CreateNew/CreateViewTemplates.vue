@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+  import { useRouter } from 'vue-router'
   import Menu from 'primevue/menu'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
@@ -13,6 +14,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
+  const router = useRouter()
 
   // VCS OAuth composable
   const {
@@ -152,12 +154,24 @@
   }
 
   /**
-   * Handles repository import
-   * @param {Object} repository - The repository to import
+   * Handles repository import - navigates to ImportGithubView with repository data
+   * @param {Object} repository - The repository to import (contains name, url, etc.)
    */
-  // eslint-disable-next-line no-unused-vars
   const handleRepositoryImport = (repository) => {
-    // TODO: Navigate to import flow with repository data
+    router.push({
+      name: 'github-repository-import',
+      params: {
+        vendor: 'azion',
+        solution: 'import-from-github'
+      },
+      query: {
+        gitScope: selectedIntegration.value?.value,
+        repository: repository.url,
+        repositoryName: repository.name,
+        repositoryOwner: selectedIntegration.value?.label,
+        provider: selectedProviderTab.value
+      }
+    })
   }
 
   /**
