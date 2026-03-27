@@ -79,6 +79,7 @@
   const results = ref(null)
   const isDeploying = ref(false)
   const isRestoringState = ref(false)
+  const isSavingDomains = ref(false)
 
   // OAuth and integration state
   const callbackUrl = ref('')
@@ -424,6 +425,7 @@
   }
 
   const handleSaveDomains = async (values) => {
+    isSavingDomains.value = true
     try {
       const workloadId = results.value?.domain?.id
       if (!workloadId) {
@@ -451,6 +453,8 @@
         summary: 'Error',
         detail: error.message || 'Failed to update domain settings'
       })
+    } finally {
+      isSavingDomains.value = false
     }
   }
 
@@ -654,6 +658,8 @@
         :template-description="`Your application ${applicationName} has been successfully deployed.`"
         :github-url="route.query.repository"
         :results="results"
+        :workload-id="results?.domain?.id"
+        :is-saving="isSavingDomains"
         @on-save="handleSaveDomains"
       />
     </div>

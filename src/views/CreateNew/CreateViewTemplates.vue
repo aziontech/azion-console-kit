@@ -6,6 +6,7 @@
   import InputText from 'primevue/inputtext'
   import ContentBlock from '@/templates/content-block'
   import PrimeButton from 'primevue/button'
+  import Skeleton from 'primevue/skeleton'
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
   import { useAccountStore } from '@/stores/account'
@@ -49,27 +50,36 @@
       name: 'Github',
       key: 'github',
       bgColor: 'bg-[#24292f]',
-      hoverBgColor: 'hover:bg-[#1c2024]'
+      hoverBgColor: 'hover:bg-[#1c2024]',
+      show: true
     },
     {
       name: 'Gitlab',
       key: 'gitlab',
       bgColor: 'bg-violet-800',
-      hoverBgColor: 'hover:bg-violet-700'
+      hoverBgColor: 'hover:bg-violet-700',
+      show: false
     },
     {
       name: 'Azure',
       key: 'azure',
       bgColor: 'bg-sky-600',
-      hoverBgColor: 'hover:bg-sky-500'
+      hoverBgColor: 'hover:bg-sky-500',
+      show: false
     },
     {
       name: 'Bitbucket',
       key: 'bitbucket',
       bgColor: 'bg-blue-800',
-      hoverBgColor: 'hover:bg-blue-700'
+      hoverBgColor: 'hover:bg-blue-700',
+      show: false
     }
   ]
+
+  // Filter only visible providers
+  const visibleGitProviders = computed(() => {
+    return gitProviders.filter((provider) => provider.show)
+  })
 
   const navItems = computed(() => [
     {
@@ -94,10 +104,10 @@
   // Filtered repositories based on search
   const filteredRepositories = computed(() => {
     if (!searchQuery.value) {
-      return repositories.value
+      return repositories.value.slice(0, 9)
     }
     const query = searchQuery.value.toLowerCase()
-    return repositories.value.filter((repo) => repo.name?.toLowerCase().includes(query))
+    return repositories.value.filter((repo) => repo.name?.toLowerCase().includes(query)).slice(0, 9)
   })
 
   // Get integrations for selected provider tab
@@ -209,6 +219,11 @@
   // Fetch solutions using the service (uses cached data from prefetchList)
   const { data: templates, isLoading } = solutionService.useListSolutions(queryParams)
 
+  // Limit templates to 6 items for display
+  const limitedTemplates = computed(() => {
+    return templates.value?.slice(0, 6) || []
+  })
+
   // Watch for integrations changes to auto-select first provider
   watch(connectedProviders, (providers) => {
     if (providers.length > 0 && !selectedProviderTab.value) {
@@ -286,10 +301,10 @@
       </div>
     </template>
     <template #content>
-      <div class="w-full min-h-full flex flex-col lg:flex-row px-1 gap-4 lg:gap-8 mt-4 md:mt-8">
+      <div class="w-full min-h-full flex flex-col xl:flex-row px-1 gap-4 xl:gap-8 mt-4 md:mt-8">
         <!-- Sidebar Navigation -->
-        <nav class="w-full lg:w-64 flex-shrink-0">
-          <div class="flex flex-col gap-3 lg:gap-5">
+        <nav class="w-full xl:w-64 flex-shrink-0">
+          <div class="flex flex-col gap-3 xl:gap-5">
             <div class="text-xs font-mono text-color-secondary">How to start</div>
             <Menu
               :model="navItems"
@@ -313,62 +328,25 @@
         </nav>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col lg:flex-row gap-5 min-w-0">
+        <div class="flex-1 flex flex-col xl:flex-row gap-5 min-w-0">
           <!-- Connect Repository Card -->
           <div
-            class="w-full lg:w-[578px] bg-[var(--surface-50)] rounded-md border surface-border flex flex-col"
+            class="w-full xl:w-[578px] bg-[var(--surface-50)] rounded-md border surface-border flex flex-col"
           >
             <!-- Connected Providers View -->
             <div
               v-if="hasConnectedProviders"
-              class="flex-1 p-4 flex flex-col gap-4"
+              class="flex-1 p-3 sm:p-4 flex flex-col gap-3 sm:gap-4"
             >
-              <!-- Provider Tabs -->
-              <div class="flex gap-2">
-                <button
-                  v-for="provider in gitProviders"
-                  :key="provider.key"
-                  class="flex-1 h-9 px-4 rounded-md border flex items-center justify-center gap-2 transition-colors"
-                  :class="[
-                    connectedProviders.includes(provider.key) &&
-                    selectedProviderTab === provider.key
-                      ? 'bg-button-contrast-background border-button-contrast-border-color text-button-contrast-color'
-                      : 'bg-surface-200 surface-border text-color-base hover:bg-surface-100'
-                  ]"
-                  @click="
-                    connectedProviders.includes(provider.key)
-                      ? handleProviderTabSelect(provider.key)
-                      : handleProviderConnect(provider)
-                  "
-                >
-                  <i
-                    :class="[
-                      'pi',
-                      provider.key === 'github'
-                        ? 'pi-github'
-                        : provider.key === 'gitlab'
-                          ? 'pi-gitlab'
-                          : provider.key === 'azure'
-                            ? 'pi-microsoft'
-                            : 'pi-bitbucket'
-                    ]"
-                    class="text-sm"
-                  ></i>
-                  <span class="text-xs font-mono font-semibold leading-3">
-                    {{ provider.name }}
-                  </span>
-                </button>
-              </div>
-
               <!-- Account Dropdown and Search -->
-              <div class="flex gap-3">
+              <div class="flex flex-col sm:flex-row gap-3">
                 <!-- Account/Organization Dropdown -->
                 <Dropdown
                   :model-value="selectedIntegration"
                   :options="integrationsForSelectedTab"
                   option-label="label"
                   placeholder="Select account"
-                  class="w-48"
+                  class="w-full sm:w-48"
                   @change="handleIntegrationSelect"
                   :pt="{
                     root: { class: 'h-8 text-xs' },
@@ -391,7 +369,7 @@
                         ]"
                         class="text-xs"
                       ></i>
-                      <span>{{ slotProps.value?.label || 'Select account' }}</span>
+                      <span class="truncate">{{ slotProps.value?.label || 'Select account' }}</span>
                     </div>
                   </template>
                 </Dropdown>
@@ -422,7 +400,7 @@
 
                 <!-- Empty State -->
                 <div
-                  v-else-if="filteredRepositories.length === 0"
+                  v-else-if="!filteredRepositories.length"
                   class="p-8 text-center"
                 >
                   <i class="pi pi-folder text-2xl text-color-secondary"></i>
@@ -438,14 +416,14 @@
                 <!-- Repository List -->
                 <div
                   v-else
-                  class="max-h-[600px] overflow-y-auto"
+                  class="max-h-[400px] sm:max-h-[600px] overflow-y-auto"
                 >
                   <div
                     v-for="repo in filteredRepositories"
                     :key="repo.id || repo.name"
-                    class="px-5 py-3 border-b surface-border flex items-center justify-between gap-2.5 hover:bg-surface-100 transition-colors"
+                    class="px-3 sm:px-5 py-2.5 sm:py-3 border-b surface-border flex items-center justify-between gap-2 sm:gap-2.5 hover:bg-surface-100 transition-colors"
                   >
-                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div class="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
                       <!-- Provider Icon -->
                       <i
                         :class="[
@@ -458,26 +436,26 @@
                                 ? 'pi-microsoft'
                                 : 'pi-bitbucket'
                         ]"
-                        class="text-sm"
+                        class="text-sm flex-shrink-0"
                       ></i>
                       <!-- Repository Name -->
                       <span class="text-xs text-color truncate">{{ repo.name }}</span>
-                      <!-- Last Updated -->
+                      <!-- Last Updated - hidden on very small screens -->
                       <span
                         v-if="repo.updated_at"
-                        class="text-[10px] text-color-secondary"
+                        class="text-[10px] text-color-secondary hidden sm:inline"
                       >
                         {{ repo.updated_at }}
                       </span>
                     </div>
                     <!-- Import Button -->
                     <PrimeButton
-                      label="Import"
+                      label="IMPORT"
                       size="small"
                       severity="secondary"
-                      class="text-xs"
+                      class="text-xs flex-shrink-0"
                       :pt="{
-                        root: { class: 'px-2.5 py-1.5' }
+                        root: { class: 'px-2 sm:px-2.5 py-1.5' }
                       }"
                       @click="handleRepositoryImport(repo)"
                     />
@@ -486,29 +464,78 @@
               </div>
             </div>
 
+            <!-- Loading Skeleton -->
+            <div
+              v-else-if="isVcsLoading"
+              class="flex-1 px-3 sm:px-4 pt-3 pb-4 flex flex-col items-center justify-center gap-4 sm:gap-6"
+            >
+              <div class="w-full max-w-80 flex flex-col items-center gap-4 sm:gap-6">
+                <!-- Header Skeleton -->
+                <div class="text-center px-2 w-full">
+                  <Skeleton
+                    height="16px"
+                    width="180px"
+                    class="mx-auto mb-2"
+                  />
+                  <Skeleton
+                    height="12px"
+                    width="100%"
+                    class="mb-1"
+                  />
+                  <Skeleton
+                    height="12px"
+                    width="80%"
+                    class="mx-auto"
+                  />
+                </div>
+
+                <!-- Git Provider Buttons Skeleton -->
+                <div class="w-full grid grid-cols-2 sm:flex sm:flex-col gap-2 sm:gap-2.5">
+                  <div
+                    v-for="i in 4"
+                    :key="i"
+                    class="w-full h-10 sm:h-11 rounded-md"
+                  >
+                    <Skeleton
+                      height="100%"
+                      width="100%"
+                      class="rounded-md"
+                    />
+                  </div>
+                </div>
+
+                <!-- Manage Providers Link Skeleton -->
+                <Skeleton
+                  height="20px"
+                  width="180px"
+                  class="mx-auto"
+                />
+              </div>
+            </div>
+
             <!-- No Connected Providers - Initial View -->
             <div
               v-else
-              class="flex-1 px-4 pt-3 pb-4 flex flex-col items-center justify-center gap-6"
+              class="flex-1 px-3 sm:px-4 pt-3 pb-4 flex flex-col items-center justify-center gap-4 sm:gap-6"
             >
-              <div class="w-full max-w-80 flex flex-col items-center gap-6">
+              <div class="w-full max-w-80 flex flex-col items-center gap-4 sm:gap-6">
                 <!-- Header -->
-                <div class="text-center">
+                <div class="text-center px-2">
                   <h2 class="text-sm font-semibold text-color leading-4">
                     Connect your Repository
                   </h2>
                   <p class="mt-2 text-xs text-color-secondary leading-4">
-                    Choose a Git provider to connect your repository<br />
-                    and start the deployment process.
+                    Choose a Git provider to connect your repository<br class="hidden sm:inline" />
+                    <span class="sm:hidden"> </span>and start the deployment process.
                   </p>
                 </div>
 
                 <!-- Git Provider Buttons -->
-                <div class="w-full flex flex-col gap-2.5">
+                <div class="w-full grid grid-cols-2 sm:flex sm:flex-col gap-2 sm:gap-2.5">
                   <button
-                    v-for="provider in gitProviders"
+                    v-for="provider in visibleGitProviders"
                     :key="provider.key"
-                    class="w-full h-11 px-4 rounded-md border surface-border flex items-center justify-center gap-2 transition-colors"
+                    class="w-full h-10 sm:h-11 px-3 sm:px-4 rounded-md border surface-border flex items-center justify-center gap-2 transition-colors"
                     :class="[provider.bgColor, provider.hoverBgColor]"
                     :disabled="isVcsLoading"
                     @click="handleProviderConnect(provider)"
@@ -530,7 +557,7 @@
                       ></i>
                     </span>
                     <span class="text-xs font-mono font-semibold text-white leading-3">
-                      Continue with {{ provider.name }}
+                      <span class="hidden sm:inline">Continue with </span>{{ provider.name }}
                     </span>
                   </button>
                 </div>
@@ -561,27 +588,29 @@
             :loading="isLoading"
           >
             <template #content>
-              <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2.5">
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-2.5"
+              >
                 <article
-                  v-for="template in templates"
+                  v-for="template in limitedTemplates"
                   :key="template.id"
-                  class="p-4 bg-surface-50 rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:bg-surface-100 hover:shadow-md"
+                  class="p-3 sm:p-4 bg-surface-50 rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:bg-surface-100 hover:shadow-md"
                   @click="handleTemplateSelect(template)"
                 >
-                  <div class="flex flex-col gap-4">
+                  <div class="flex flex-col gap-3 sm:gap-4">
                     <img
-                      v-if="template.icon"
-                      :src="template.icon"
-                      :alt="template.name"
-                      class="w-9 h-9 rounded-sm object-cover"
+                      v-if="template.vendor.icon"
+                      :src="template.vendor.icon"
+                      :alt="template.vendor.name"
+                      class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm object-cover"
                     />
                     <div
                       v-else
-                      class="w-9 h-9 rounded-sm bg-surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
+                      class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm bg-surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
                     >
                       {{ template.name?.charAt(0)?.toUpperCase() || 'T' }}
                     </div>
-                    <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-1.5 sm:gap-2">
                       <h4 class="text-xs font-semibold text-color leading-3">
                         {{ template.name }}
                       </h4>

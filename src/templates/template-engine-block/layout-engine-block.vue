@@ -167,6 +167,7 @@
   // Step Navigation State
   const currentStep = ref('repository')
   const isTransitioning = ref(false)
+  const isSavingDomains = ref(false)
   const step2Ref = ref(null)
   const step3Ref = ref(null)
   const step4Ref = ref(null)
@@ -397,8 +398,13 @@
    * Handle save domains action
    * Called when user saves domain settings from DeploySuccessCard
    */
-  const handleSaveDomains = (values) => {
-    emit('save-domains', values)
+  const handleSaveDomains = async (values) => {
+    isSavingDomains.value = true
+    try {
+      emit('save-domains', values)
+    } finally {
+      isSavingDomains.value = false
+    }
   }
 
   /**
@@ -474,6 +480,8 @@
         :github-url="props.githubUrl"
         :results="props.results"
         :next-steps="props.successNextSteps"
+        :workload-id="props.results?.domain?.id"
+        :is-saving="isSavingDomains"
         @on-save="handleSaveDomains"
       >
         <template #customize-domain>
