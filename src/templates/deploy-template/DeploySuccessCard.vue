@@ -407,109 +407,109 @@
                 <i class="pi pi-spin pi-spinner text-2xl text-primary" />
               </div>
               <template v-else>
-              <div class="flex flex-col gap-2">
-                <LabelBlock label="Domain" />
-                <div
-                  v-for="(domain, index) in domains"
-                  :key="index"
-                  class="flex flex-col sm:flex-row gap-2 w-full"
-                >
-                  <div class="flex flex-col w-full gap-2">
-                    <FieldDropdown
-                      editable
-                      :focusOnHover="false"
-                      :name="`domains[${index}].domain`"
-                      :options="domainsOptions"
-                      optionLabel="label"
-                      optionValue="label"
-                      placeholder="example.com"
-                      emptyMessage="No domains available"
-                      :value="domain.domain"
-                      :class="{ 'p-invalid': domainsErrorMessage }"
-                      @change="updateDomainValue(index, $event.value)"
-                      data-testid="domains-form__domain-dropdown"
+                <div class="flex flex-col gap-2">
+                  <LabelBlock label="Domain" />
+                  <div
+                    v-for="(domain, index) in domains"
+                    :key="index"
+                    class="flex flex-col sm:flex-row gap-2 w-full"
+                  >
+                    <div class="flex flex-col w-full gap-2">
+                      <FieldDropdown
+                        editable
+                        :focusOnHover="false"
+                        :name="`domains[${index}].domain`"
+                        :options="domainsOptions"
+                        optionLabel="label"
+                        optionValue="label"
+                        placeholder="example.com"
+                        emptyMessage="No domains available"
+                        :value="domain.domain"
+                        :class="{ 'p-invalid': domainsErrorMessage }"
+                        @change="updateDomainValue(index, $event.value)"
+                        data-testid="domains-form__domain-dropdown"
+                      />
+                      <small
+                        class="text-xs text-color-secondary font-normal leading-5 -mt-1"
+                        v-if="!index"
+                      >
+                        Type your domain or select from Edge DNS.
+                      </small>
+                    </div>
+
+                    <PrimeButton
+                      v-if="hasMultipleDomains"
+                      :class="{ 'mb-6': !index }"
+                      @click="removeDomain(index)"
+                      icon="pi pi-trash"
+                      class="p-button-outlined p-button-sm p-button-danger self-end"
+                      data-testid="domains-form__remove-domain-button"
+                      title="Remove domain"
                     />
-                    <small
-                      class="text-xs text-color-secondary font-normal leading-5 -mt-1"
-                      v-if="!index"
-                    >
-                      Type your domain or select from Edge DNS.
-                    </small>
                   </div>
 
+                  <small
+                    v-if="domainsErrorMessage"
+                    class="p-error text-xs font-normal leading-tight"
+                  >
+                    {{ domainsErrorMessage }}
+                  </small>
+                </div>
+
+                <div class="flex mt-1">
                   <PrimeButton
-                    v-if="hasMultipleDomains"
-                    :class="{'mb-6': !index}"
-                    @click="removeDomain(index)"
-                    icon="pi pi-trash"
-                    class="p-button-outlined p-button-sm p-button-danger self-end"
-                    data-testid="domains-form__remove-domain-button"
-                    title="Remove domain"
+                    @click="addNewDomain"
+                    label="Add Another"
+                    icon="pi pi-plus-circle"
+                    outlined
+                    size="small"
+                    data-testid="domains-form__add-domain-button"
+                    title="Add Another"
                   />
                 </div>
 
-                <small
-                  v-if="domainsErrorMessage"
-                  class="p-error text-xs font-normal leading-tight"
-                >
-                  {{ domainsErrorMessage }}
-                </small>
-              </div>
-
-              <div class="flex mt-1">
-                <PrimeButton
-                  @click="addNewDomain"
-                  label="Add Another"
-                  icon="pi pi-plus-circle"
-                  outlined
-                  size="small"
-                  data-testid="domains-form__add-domain-button"
-                  title="Add Another"
+                <FieldSwitchBlock
+                  nameField="useCustomDomain"
+                  name="useCustomDomain"
+                  auto
+                  title="Custom Domain"
+                  subtitle="You can use an free azion.app domain."
+                  :isCard="false"
                 />
-              </div>
 
-              <FieldSwitchBlock
-                nameField="useCustomDomain"
-                name="useCustomDomain"
-                auto
-                title="Custom Domain"
-                subtitle="You can use an free azion.app domain."
-                :isCard="false"
-              />
-
-              <div
-                v-if="useCustomDomain"
-                class="flex w-full gap-2 flex-col"
-              >
-                <div class="flex flex-col w-full gap-2">
-                  <FieldInputGroup
-                    placeholder="my-custom-name"
-                    label="Azion Custom Domain"
-                    required
-                    :value="customDomain"
-                    name="customDomain"
-                    data-testid="workload-custom-domain-field"
-                  >
-                    <template #button>
-                      <PrimeButton
-                        label=".azion.app"
-                        size="small"
-                        class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
-                        outlined
-                      />
-                    </template>
-                  </FieldInputGroup>
+                <div
+                  v-if="useCustomDomain"
+                  class="flex w-full gap-2 flex-col"
+                >
+                  <div class="flex flex-col w-full gap-2">
+                    <FieldInputGroup
+                      placeholder="my-custom-name"
+                      label="Azion Custom Domain"
+                      required
+                      :value="customDomain"
+                      name="customDomain"
+                      data-testid="workload-custom-domain-field"
+                    >
+                      <template #button>
+                        <PrimeButton
+                          label=".azion.app"
+                          size="small"
+                          class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
+                          outlined
+                        />
+                      </template>
+                    </FieldInputGroup>
+                  </div>
                 </div>
-              </div>
 
-              <FieldSwitchBlock
-                nameField="workloadHostnameAllowAccess"
-                name="workloadHostnameAllowAccess"
-                auto
-                title="Workload Domain Allow Access"
-                subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
-                :isCard="false"
-              />
+                <FieldSwitchBlock
+                  nameField="workloadHostnameAllowAccess"
+                  name="workloadHostnameAllowAccess"
+                  auto
+                  title="Workload Domain Allow Access"
+                  subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
+                  :isCard="false"
+                />
               </template>
             </div>
             <div class="bg-neutral-950 h-16 p-4 flex justify-end rounded-b-md">
