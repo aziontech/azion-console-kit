@@ -91,7 +91,7 @@ const FILTERS_RULES = () => {
       'Invocations',
       'Edge Functions Instance Id List'
     ],
-    edgeFunctionsEvents: [
+    functionEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,
       'Edge Function Id',
       'Compute Time',

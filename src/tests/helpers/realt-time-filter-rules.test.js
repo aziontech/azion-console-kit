@@ -91,7 +91,7 @@ describe('RealTimeMetricsModule', () => {
             'Invocations',
             'Edge Functions Instance Id List'
           ],
-          edgeFunctionsEvents: [
+          functionEvents: [
             handleTextDomainWorkload.singularTitle,
             'Edge Function Id',
             'Compute Time',
