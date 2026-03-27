@@ -757,7 +757,7 @@
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
-          class="max-w-[150px]"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
         />
