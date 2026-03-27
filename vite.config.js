@@ -125,6 +125,9 @@ const getConfig = () => {
         '/appcues': createProxyConfig({
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
+        }),
+        '/sse': createProxyConfig({
+          target: `${URLStartPrefix}beholder.azion.net`
         })
       }
     }
