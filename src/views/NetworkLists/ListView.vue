@@ -1,16 +1,16 @@
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
+  import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+
+  defineOptions({ name: 'network-list-view' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  defineOptions({ name: 'network-list-view' })
 
   defineProps({
     documentationService: {
@@ -20,6 +20,8 @@
   })
 
   const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
+
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -103,6 +105,8 @@
       field: 'id'
     }
   ]
+
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-edit'])
 </script>
 
 <template>
@@ -124,19 +128,21 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
         :listService="networkListsService.listNetworkLists"
         :columns="getColumns"
-        editPagePath="/network-lists/edit"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No network lists found."
         :actions="actions"
+        editPagePath="/network-lists/edit"
+        createPagePath="network-lists/create"
         :apiFields="NETWORK_LIST_API_FIELDS"
-        :frozen-columns="['name']"
+        defaultOrderingFieldName="-last_modified"
+        :frozenColumns="['name']"
         exportFileName="Network Lists"
         :csvMapper="csvMapper"
+        :lazy="true"
+        emptyListMessage="No network lists found."
         :allowedFilters="allowedFilters"
-        defaultOrderingFieldName="-last_modified"
         :emptyBlock="{
           title: 'No Network Lists yet',
           description: 'Create your first network list to control traffic and security behavior.',
@@ -144,6 +150,8 @@
           createPagePath: 'network-lists/create',
           documentationService: documentationService
         }"
+        @on-load-data="emit('on-load-data', $event)"
+        @on-before-go-to-edit="handleTrackEditEvent"
       />
     </template>
   </ContentBlock>

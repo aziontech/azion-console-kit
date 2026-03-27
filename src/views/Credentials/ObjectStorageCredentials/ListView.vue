@@ -1,8 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { EdgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import CredentialDrawer from '../Drawer/index.vue'
 
@@ -15,10 +14,9 @@
     }
   })
 
-  const toast = useToast()
   const hasContentToList = ref(true)
-  const listTableBlockRef = ref('')
   const credentialDrawerRef = ref(null)
+  const listTableRef = ref(null)
   const edgeStorageService = new EdgeStorageService()
 
   const getColumns = computed(() => [
@@ -93,18 +91,9 @@
     hasContentToList.value = event
   }
 
-  const handleFailedToDelete = (error) => {
-    const { fieldName, message } = error
-    toast.add({
-      closable: true,
-      severity: 'error',
-      summary: `${fieldName}: ${message}`
-    })
-  }
-
   const reloadList = () => {
     if (hasContentToList.value) {
-      listTableBlockRef.value.reload()
+      listTableRef.value?.reload()
       return
     }
     hasContentToList.value = true
@@ -140,17 +129,14 @@
 
 <template>
   <div class="w-full">
-    <ListTableBlock
-      ref="listTableBlockRef"
+    <ListTable
+      ref="listTableRef"
       :listService="listCredentialsService"
       :columns="getColumns"
-      :enable-edit-click="false"
-      addButtonLabel="Credential"
-      @on-load-data="handleLoadData"
-      @on-before-go-to-add-page="handleCreateCredential"
       :actions="actions"
-      @on-failed-to-delete="handleFailedToDelete"
-      default-ordering-field-name="-last_modified"
+      :enableEditClick="false"
+      defaultOrderingFieldName="-last_modified"
+      exportFileName="Object Storage Credentials"
       emptyListMessage="No credentials found."
       isTabs
       :emptyBlock="{
@@ -161,7 +147,8 @@
         onClickCreate: () => handleCreateCredential(),
         documentationService: documentationService
       }"
-      exportFileName="Object Storage Credentials"
+      @on-load-data="handleLoadData"
+      @on-before-go-to-add-page="handleCreateCredential"
     />
     <CredentialDrawer
       ref="credentialDrawerRef"

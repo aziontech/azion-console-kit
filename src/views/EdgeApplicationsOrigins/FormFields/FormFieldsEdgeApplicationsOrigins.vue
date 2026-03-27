@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'

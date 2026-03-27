@@ -1,52 +1,10 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Personal Tokens"
-        description="Define and manage personal access tokens used for API authentication."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Personal Token"
-            createPagePath="personal-tokens/create"
-            @click="handleTrackEvent"
-            data-testid="create_PersonalToken_button"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <ListTableBlock
-        :listService="personalTokenService.listPersonalTokensService"
-        :columns="getColumns"
-        addButtonLabel="Personal Token"
-        createPagePath="personal-tokens/create"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        :enableEditClick="false"
-        :actions="actions"
-        exportFileName="Personal Tokens"
-        :emptyBlock="{
-          title: 'No Personal Tokens yet',
-          description: 'Create your first Personal Token to securely access your account via API.',
-          documentationService: props.documentationService,
-          emptyListMessage: 'No personal tokens found.',
-          createPagePath: 'personal-tokens/create',
-          createButtonLabel: 'Personal Token'
-        }"
-      />
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { ref, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import { computed, ref, inject } from 'vue'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -59,6 +17,8 @@
     }
   })
 
+  const listTableRef = ref()
+
   const actions = [
     {
       label: 'Delete',
@@ -69,7 +29,7 @@
     }
   ]
 
-  const getColumns = ref([
+  const getColumns = computed(() => [
     {
       field: 'name',
       header: 'Name'
@@ -105,3 +65,44 @@
     })
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Personal Tokens"
+        description="Define and manage personal access tokens used for API authentication."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Personal Token"
+            createPagePath="personal-tokens/create"
+            @click="handleTrackEvent"
+            data-testid="create_PersonalToken_button"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTable
+        ref="listTableRef"
+        :listService="personalTokenService.listPersonalTokensService"
+        :columns="getColumns"
+        :actions="actions"
+        :enableEditClick="false"
+        createPagePath="personal-tokens/create"
+        exportFileName="Personal Tokens"
+        emptyListMessage="No personal tokens found."
+        @on-before-go-to-add-page="handleTrackEvent"
+        :emptyBlock="{
+          title: 'No Personal Tokens yet',
+          description: 'Create your first Personal Token to securely access your account via API.',
+          documentationService: props.documentationService,
+          emptyListMessage: 'No personal tokens found.',
+          createPagePath: 'personal-tokens/create',
+          createButtonLabel: 'Personal Token'
+        }"
+      />
+    </template>
+  </ContentBlock>
+</template>

@@ -1,11 +1,11 @@
 <script setup>
   import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { h, computed, ref, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import { variablesService } from '@/services/v2/variables'
   import { documentationCatalog } from '@/helpers'
 
@@ -15,8 +15,8 @@
   defineOptions({ name: 'variables-view' })
 
   const enableRedirect = ref(true)
-  const refListTable = ref()
-  const hasContentToList = ref(true)
+  const listTableRef = ref()
+
   const actions = [
     {
       label: 'Delete',
@@ -27,15 +27,12 @@
     }
   ]
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const getColumns = computed(() => {
     return [
       {
         field: 'key',
-        header: 'Key'
+        header: 'Key',
+        headerStyle: ''
       },
       {
         field: 'value',
@@ -98,7 +95,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Variables"
-        description="Define and manage variables that store configuration values across Azion’s products."
+        description="Define and manage variables that store configuration values across Azion's products."
       >
         <template #default>
           <DataTableActionsButtons
@@ -112,24 +109,17 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
-        @on-before-go-to-edit="checkIfIsEditable"
-        @on-before-go-to-add-page="handleTrackEvent"
+      <ListTable
+        ref="listTableRef"
         :listService="variablesService.list"
         :columns="getColumns"
-        editPagePath="/variables/edit"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No variables found."
         :actions="actions"
-        :lazy="false"
-        :filters="[
-          {
-            field: 'key',
-            header: 'Key'
-          }
-        ]"
+        :frozenColumns="['key']"
+        editPagePath="/variables/edit"
+        createPagePath="variables/create"
         exportFileName="Variables"
+        :lazy="false"
+        emptyListMessage="No variables found."
         :empty-block="{
           title: 'No Variables yet',
           description:
@@ -138,6 +128,8 @@
           createPagePath: 'variables/create',
           documentationService: documentationCatalog.variables
         }"
+        @on-before-go-to-edit="checkIfIsEditable"
+        @on-before-go-to-add-page="handleTrackEvent"
       />
     </template>
   </ContentBlock>

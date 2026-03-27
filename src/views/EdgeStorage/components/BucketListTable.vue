@@ -1,42 +1,19 @@
-<template>
-  <ListTableBlock
-    ref="listServiceRef"
-    :listService="loadBuckets"
-    :columns="columns"
-    :actions="actions"
-    :apiFields="fields"
-    defaultOrderingFieldName="-last_modified"
-    enableEditClick
-    editPagePath="/object-storage"
-    exportFileName="Buckets"
-    class="w-full"
-    :isLoading="isLoading"
-    :emptyBlock="{
-      title: 'No Buckets yet',
-      description: 'Create your first bucket to store, organize, and access data.',
-      createButtonLabel: 'Bucket',
-      createPagePath: '/object-storage/create',
-      documentationService: documentationGuideProducts.edgeStorage
-    }"
-    @force-update="bucketTableNeedRefresh = true"
-  />
-</template>
-
 <script setup>
   import { ref } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
   import { useRouter, useRoute } from 'vue-router'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
 
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const router = useRouter()
   const route = useRoute()
   const { buckets, bucketTableNeedRefresh, selectedBucket } = useEdgeStorage()
   const fields = ['name', 'size', 'last_editor', 'last_modified', 'workloads_access']
-  const columns = [
+  const listTableRef = ref(null)
+
+  const bucketColumns = [
     {
       field: 'name',
       header: 'Name',
@@ -69,10 +46,6 @@
     }
   ]
 
-  const listServiceRef = ref(null)
-
-  const isLoading = ref(true)
-
   const handleEdit = (bucket) => {
     selectedBucket.value = bucket
     router.push(`/object-storage/${bucket.name}/edit/main-settings`)
@@ -81,8 +54,9 @@
   const handleDeleteBucket = async (data) => {
     bucketTableNeedRefresh.value = true
     await edgeStorageService.deleteEdgeStorageBucket(data)
-    listServiceRef.value.reload()
+    listTableRef.value?.reload()
   }
+
   const actions = [
     {
       type: 'action',
@@ -100,8 +74,6 @@
 
   const loadBuckets = async (params) => {
     try {
-      isLoading.value = true
-
       const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
 
       buckets.value = listBucketsResponse.body
@@ -136,8 +108,31 @@
         body: buckets.value,
         count: bucketCount
       }
-    } finally {
-      isLoading.value = false
+    } catch {
+      return { body: [], count: 0 }
     }
   }
 </script>
+
+<template>
+  <ListTable
+    ref="listTableRef"
+    :listService="loadBuckets"
+    :columns="bucketColumns"
+    :actions="actions"
+    :apiFields="fields"
+    :frozenColumns="['name']"
+    editPagePath="/object-storage"
+    defaultOrderingFieldName="-last_modified"
+    exportFileName="Buckets"
+    emptyListMessage="No buckets found."
+    :emptyBlock="{
+      title: 'No Buckets yet',
+      description: 'Create your first bucket to store, organize, and access data.',
+      createButtonLabel: 'Bucket',
+      createPagePath: '/object-storage/create',
+      documentationService: documentationGuideProducts.edgeStorage
+    }"
+    @force-update="bucketTableNeedRefresh = true"
+  />
+</template>

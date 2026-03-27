@@ -6,7 +6,7 @@
   import FieldTextIcon from '@aziontech/webkit/field-text-icon'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import LabelBlock from '@aziontech/webkit/label'
-  import copyBlock from '@aziontech/webkit/copy-block'
+  import copyBlock from '@aziontech/webkit/button-copy'
   import { useField } from 'vee-validate'
   import { watch, ref } from 'vue'
   import { handleCopyDNSSEC } from '../Config/dnssec.js'

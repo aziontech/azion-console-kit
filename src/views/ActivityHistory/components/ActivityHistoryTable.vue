@@ -4,9 +4,9 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
 
-  import DataTable from '@/components/DataTable'
+  import DataTable from '@aziontech/webkit/list-data-table'
   import DataTimeRange from '@/components/base/dataTimeRange'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useDataTable } from '@/composables/useDataTable'
   import OperationTag from './OperationTag.vue'
   import { createStartOfDay } from '@utils/date.js'

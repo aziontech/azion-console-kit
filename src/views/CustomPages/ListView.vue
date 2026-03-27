@@ -1,11 +1,11 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -18,7 +18,7 @@
     }
   })
 
-  const hasContentToList = ref(true)
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -29,10 +29,6 @@
       service: customPageService.deleteCustomPagesService
     }
   ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -94,6 +90,10 @@
       }
     ]
   })
+
+  const allowedFilters = computed(() => {
+    return getColumns.value.filter((col) => col.header && col.header !== 'Last Modified')
+  })
 </script>
 
 <template>
@@ -115,21 +115,17 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
-        ref="listTableBlockRef"
-        editPagePath="/custom-pages/edit"
+      <ListTable
+        ref="listTableRef"
         :listService="customPageService.listCustomPagesService"
         :columns="getColumns"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Custom Pages found."
-        data-testid="custom-pages-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
+        editPagePath="/custom-pages/edit"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Custom Pages"
-        :allowedFilters="getColumns"
+        :lazy="true"
+        :frozenColumns="['name']"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Custom Pages yet',
           description: 'Create your first custom page to control responses for defined conditions.',
@@ -137,6 +133,8 @@
           createButtonLabel: 'Custom Page',
           documentationService: props.documentationService
         }"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
       />
     </template>
   </ContentBlock>

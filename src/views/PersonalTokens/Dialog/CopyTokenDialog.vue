@@ -79,7 +79,7 @@
   import PrimeDialog from 'primevue/dialog'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimePassword from 'primevue/password'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyTokenDialog' })
 
