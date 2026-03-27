@@ -1,3 +1,6 @@
+import PrimeButton from 'primevue/button'
+import Illustration403 from '@aziontech/webkit/svg/error-403'
+import Illustration404 from '@aziontech/webkit/svg/error-404'
 import ErrorPageBlock from '@/templates/error-page-block/index.vue';
 
 export default {
@@ -5,41 +8,108 @@ export default {
   component: ErrorPageBlock,
   tags: ['autodocs'],
   argTypes: {
-    errorCode: {
-      control: 'text',
-      description: 'Error code to display'
-    },
     title: {
       control: 'text',
-      description: 'Error title'
+      description: 'Error title displayed on the page'
     },
-    message: {
+    description: {
       control: 'text',
-      description: 'Error message'
+      description: 'Error description text'
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        component: 'Error page template with customizable illustration and action slots. Use the illustration slot for error graphics and actions slot for navigation buttons.'
+      }
     }
   }
 };
 
-export const NotFound = {
+export const Forbidden403 = {
   args: {
-    errorCode: '404',
-    title: 'Page Not Found',
-    message: 'The page you are looking for does not exist'
-  }
-};
-
-export const ServerError = {
-  args: {
-    errorCode: '500',
-    title: 'Server Error',
-    message: 'An internal server error occurred'
-  }
-};
-
-export const Forbidden = {
-  args: {
-    errorCode: '403',
     title: 'Access Forbidden',
-    message: 'You do not have permission to access this resource'
-  }
+    description: 'You do not have permission to access this resource. Please contact your administrator if you believe this is an error.'
+  },
+  render: (args) => ({
+    components: {
+      ErrorPageBlock,
+      Illustration403,
+      PrimeButton
+    },
+    setup() {
+      const handleGoBackHome = () => {
+        alert('Back to home')
+      };
+
+      const handleContactSupport = () => {
+        alert('Contact Support')
+      };
+
+      return { args, handleGoBackHome, handleContactSupport };
+    },
+    template: `
+      <ErrorPageBlock v-bind="args">
+        <template #illustration>
+          <Illustration403 />
+        </template>
+
+        <template #actions>
+          <PrimeButton
+            label="Back to Home"
+            @click="handleGoBackHome"
+          />
+          <PrimeButton
+            outlined
+            label="Contact Support"
+            @click="handleContactSupport"
+          />
+        </template>
+      </ErrorPageBlock>
+    `
+  })
+};
+
+export const NotFound404 = {
+  args: {
+    title: 'Page Not Found',
+  description: 'The page you are looking for does not exist or has been moved.'
+  },
+  render: (args) => ({
+    components: {
+      ErrorPageBlock,
+      Illustration404,
+      PrimeButton
+    },
+    setup() {
+      const handleGoBackHome = () => {
+        alert('Back to home')
+      };
+
+      const handleContactSupport = () => {
+        alert('Contact Support')
+      };
+
+      return { args, handleGoBackHome, handleContactSupport };
+    },
+    template: `
+      <ErrorPageBlock v-bind="args">
+        <template #illustration>
+          <Illustration404 />
+        </template>
+
+        <template #actions>
+          <PrimeButton
+            label="Back to Home"
+            @click="handleGoBackHome"
+          />
+          <PrimeButton
+            outlined
+            label="Contact Support"
+            @click="handleContactSupport"
+          />
+        </template>
+      </ErrorPageBlock>
+    `
+  })
 };
