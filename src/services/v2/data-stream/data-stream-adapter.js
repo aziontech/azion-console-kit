@@ -3,19 +3,13 @@ import * as Errors from '@/services/axios/errors'
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const mapDataSourceName = {
-  http: 'Edge Applications',
+  http: 'Applications',
   activity: 'Activity History',
   functions: 'Functions',
   waf: 'WAF Events',
-  workloads: 'Edge Applications',
+  workloads: 'Applications',
   functions_console: 'Functions',
   activity_history: 'Activity History'
-}
-
-const mapDataSourceSlugToValue = {
-  workloads: 'http',
-  functions_console: 'functions',
-  activity_history: 'activity'
 }
 
 const mapDataSourceValueToSlug = {
@@ -36,10 +30,6 @@ const endpointTypeNameMap = {
   qradar: 'QRadar',
   azure_monitor: 'Azure Monitor',
   azure_blob_storage: 'Azure Blob Storage'
-}
-
-const getDataSource = (slug) => {
-  return mapDataSourceSlugToValue[slug] || slug
 }
 
 const getWorkloadIds = (workloads) => {
@@ -276,12 +266,11 @@ export const DataStreamAdapter = {
         const samplingTransform = dataStream.transform?.find((item) => item.type === 'sampling')
         const templateId = dataStream.transform?.find((item) => item.type === 'render_template')
         const endpointOutput = dataStream.outputs?.[0]
-
         return {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
-          dataSource: getDataSource(dataSourceInput?.attributes?.data_source),
+          dataSource: dataSourceInput?.attributes?.data_source,
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
