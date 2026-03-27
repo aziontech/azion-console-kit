@@ -1,7 +1,7 @@
 <script setup>
+  import { computed, ref, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
@@ -14,8 +14,8 @@
   } from '@/helpers/azion-documentation-catalog'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { DataTableActionsButtons } from '@/components/list-table'
+  import ListTable from '@/components/list-table/ListTable.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -156,6 +156,7 @@
       }
     ]
   })
+
   const allowedFilters = computed(() =>
     getColumns.value.filter((col) => col.field !== 'workloadHostname' && col.field !== 'domains')
   )
@@ -171,6 +172,22 @@
       ? "Deploy and manage workloads that bind domains, protocols, security, and application on Azion's global infrastructure."
       : "Deploy and manage domains that execute firewalls and applications on Azion's global infrastructure."
   })
+
+  const hasContentToList = ref(true)
+
+  const frozenColumns = ['name']
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const handleBeforeGoToAddPage = () => {
+    handleTrackEvent()
+  }
+
+  const handleBeforeGoToEdit = (item) => {
+    handleTrackEditEvent(item)
+  }
 </script>
 
 <template>
@@ -192,20 +209,19 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
-        :createPagePath="createDomainPath"
-        :editPagePath="`/${handleTextDomainWorkload.pluralLabel}/edit`"
+      <ListTable
         :listService="workloadService.listWorkloads"
         :columns="getColumns"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
+        :createPagePath="createDomainPath"
+        :editPagePath="`/${handleTextDomainWorkload.pluralLabel}/edit`"
+        defaultOrderingFieldName="-last_modified"
         :hiddenByDefault="columnsHiddenByDefault"
-        :frozenColumns="['name']"
         :exportFileName="handleTextDomainWorkload.singularTitle"
+        :lazy="true"
+        :frozenColumns="frozenColumns"
         :allowedFilters="allowedFilters"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularTitle} found.`"
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,
@@ -213,6 +229,9 @@
           createButtonLabel: handleTextDomainWorkload.singularTitle,
           documentationService: documentationHandler
         }"
+        @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleBeforeGoToAddPage"
+        @on-before-go-to-edit="handleBeforeGoToEdit"
       />
     </template>
   </ContentBlock>

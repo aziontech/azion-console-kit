@@ -195,20 +195,25 @@
 
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
-  <ListTableBlock
+  <div
     v-if="hasContentToList"
-    ref="listPaymentHistoryRef"
-    isTabs
-    :enableEditClick="false"
-    :allowedFilters="allowedFilters"
-    :columns="loaderPaymentHistoryColumns"
-    :listService="props.listPaymentHistoryService"
-    @on-load-data="handleLoadData"
-    @on-before-go-to-edit="goToEnvoiceDetails"
-    :actions="actionsRow"
-    emptyListMessage="No payment activity found."
-    exportFileName="Payment History"
-  />
+    class="max-w-full mt-4"
+    data-testid="data-table-container"
+  >
+    <ListTable
+      ref="listTableRef"
+      :listService="props.listPaymentHistoryService"
+      :columns="loaderPaymentHistoryColumns"
+      :actions="actionsRow"
+      :enableEditClick="false"
+      exportFileName="Payment History"
+      :lazy="true"
+      :allowedFilters="allowedFilters"
+      emptyListMessage="No payment activity found."
+      @on-load-data="handleLoadData"
+      @on-before-go-to-edit="goToEnvoiceDetails"
+    />
+  </div>
 
   <EmptyResultsBlock
     v-else
@@ -243,8 +248,8 @@
   import { useRouter } from 'vue-router'
   import SkeletonBlock from '@/templates/skeleton-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
@@ -259,6 +264,7 @@
   const servicePlan = ref(null)
   const emit = defineEmits(['changeTab'])
   const accountStore = useAccountStore()
+  const listTableRef = ref(null)
 
   const { accountData, accountIsNotRegular, showExportBilling } = storeToRefs(accountStore)
 
@@ -329,7 +335,6 @@
 
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
-  const listPaymentHistoryRef = ref('')
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -410,14 +415,6 @@
 
   const isTrail = computed(() => user.value.status === 'TRIAL')
 
-  const reloadList = async () => {
-    if (hasContentToList.value) {
-      await listPaymentHistoryRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
-  }
-
   const loaderPaymentHistoryColumns = computed(() => {
     if (accountIsNotRegular.value) {
       return [
@@ -487,6 +484,14 @@
       }
     ]
   })
+
+  const reloadList = async () => {
+    if (hasContentToList.value) {
+      await listTableRef.value?.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 
   onMounted(async () => {
     getAllInfos()

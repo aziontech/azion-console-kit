@@ -2,8 +2,8 @@
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from 'primevue/button'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import DrawerFunction from './Drawer'
 
@@ -34,7 +34,7 @@
     'last_editor'
   ]
   const drawerFunctionRef = ref('')
-  const listFunctionsEdgeApplicationsRef = ref('')
+  const listTableRef = ref(null)
 
   const getColumns = computed(() => {
     return [
@@ -113,10 +113,6 @@
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
-  const reloadList = () => {
-    listFunctionsEdgeApplicationsRef.value.reload()
-  }
-
   const actions = [
     {
       label: 'Delete',
@@ -142,6 +138,14 @@
       .track()
   }
 
+  const reloadList = () => {
+    listTableRef.value?.reload()
+  }
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackClickToEdit()
+  }
+
   defineExpose({
     openCreateDrawer: openCreateFunctionDrawer
   })
@@ -157,18 +161,17 @@
     :edgeApplicationId="edgeApplicationId"
     @onSuccess="reloadList"
   />
-  <FetchListTableBlock
-    ref="listFunctionsEdgeApplicationsRef"
+  <ListTable
+    ref="listTableRef"
     :listService="listEdgeApplicationFunctions"
     :columns="getColumns"
     :editInDrawer="openEditFunctionDrawer"
-    @on-load-data="handleLoadData"
-    @on-before-go-to-edit="handleTrackClickToEdit"
     :actions="actions"
-    isTabs
-    :defaultOrderingFieldName="'name'"
+    defaultOrderingFieldName="name"
     :apiFields="FUNCTIONS_API_FIELDS"
     exportFileName="Application Function Instances"
+    :lazy="true"
+    :isTabs="true"
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',
@@ -176,6 +179,7 @@
       createPagePath: '/edge-applications/functions/create',
       documentationService: props.documentationService
     }"
+    @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
       <PrimeButton
@@ -186,5 +190,5 @@
         @click="openCreateFunctionDrawer"
       />
     </template>
-  </FetchListTableBlock>
+  </ListTable>
 </template>

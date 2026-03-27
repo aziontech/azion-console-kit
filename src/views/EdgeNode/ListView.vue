@@ -1,12 +1,12 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
+  import ListTable from '@/components/list-table'
 
   defineOptions({ name: 'list-edge-node' })
 
@@ -17,7 +17,7 @@
     }
   })
 
-  let hasContentToList = ref(true)
+  const listTableRef = ref()
 
   const getColumns = computed(() => [
     {
@@ -64,10 +64,6 @@
     }
   ])
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const actions = [
     {
       type: 'delete',
@@ -93,6 +89,7 @@
       }
     }
   ]
+
   function downloadOrchestrator() {
     window.open(
       'https://www.azion.com/en/documentation/products/guides/deploy/install-orchestrator-agent/',
@@ -100,23 +97,25 @@
     )
   }
 </script>
+
 <template>
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge Nodes"
         description="Deploy and manage Edge Nodes on your infrastructure and orchestrate Edge Services to them."
-      ></PageHeadingBlock>
+      />
     </template>
     <template #content>
-      <ListTableBlock
+      <ListTable
+        ref="listTableRef"
+        emptyListMessage="No edge nodes found."
         :listService="edgeNodeService.listEdgeNodeService"
         :columns="getColumns"
-        editPagePath="/edge-node/edit"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No edge nodes found."
         :actions="actions"
+        editPagePath="/edge-node/edit"
         exportFileName="Edge Nodes"
+        :lazy="true"
         :emptyBlock="{
           title: 'No Edge Nodes yet',
           description:
@@ -133,7 +132,7 @@
             @click="downloadOrchestrator"
           />
         </template>
-      </ListTableBlock>
+      </ListTable>
     </template>
   </ContentBlock>
 </template>

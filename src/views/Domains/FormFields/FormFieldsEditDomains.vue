@@ -14,7 +14,7 @@
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   const isLetEncrypt = ref(false)
 
   const props = defineProps({

@@ -6,7 +6,8 @@
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
 
-  import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
+  // TODO: migrate import to @aziontech/webkit/list-data-table when published
+  import DataTable from '@aziontech/webkit/list-data-table'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import MultiSelect from 'primevue/multiselect'
@@ -20,6 +21,7 @@
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
@@ -80,8 +82,60 @@
   const tuningSelected = ref(null)
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
-  const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
+
+  // DataTable setup for WAF Tuning list (migrated from with-selection-behavior)
+  const tableDefinitions = useTableDefinitionsStore()
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
+  const tableData = ref([])
+  const tableIsLoading = ref(false)
+  const tableSelectedColumns = ref([])
+
+  const tableFilterBy = computed(() => {
+    const filtersPath = wafRulesAllowedColumns.value
+      .filter((el) => el.filterPath)
+      .map((el) => el.filterPath)
+    const columnFilters = wafRulesAllowedColumns.value.map((item) => item.field)
+    return [...columnFilters, ...filtersPath]
+  })
+
+  const loadTableData = async (params = {}) => {
+    try {
+      tableIsLoading.value = true
+      const response = await listService(params)
+      tableData.value = response
+    } catch (error) {
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error?.message || error
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage
+        })
+      }
+    } finally {
+      tableIsLoading.value = false
+    }
+  }
+
+  const reloadTable = (query = {}) => {
+    loadTableData({ page: 1, ...query })
+  }
+
+  const changeNumberOfLinesPerPage = (event) => {
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
+  }
+
+  const dataTableRef = ref(null)
+
+  const handleExportTableDataToCSV = () => {
+    dataTableRef.value?.exportCSV?.()
+  }
 
   const valueNetworkId = ref(null)
   const selectedDomainIds = ref([])
@@ -275,7 +329,7 @@
   }
 
   const downloadCSV = () => {
-    listServiceWafTunningRef.value?.handleExportTableDataToCSV()
+    handleExportTableDataToCSV()
   }
 
   const showToast = (detail, summary, severity) => {
@@ -392,7 +446,7 @@
       filter
     }
 
-    listServiceWafTunningRef.value.reload(queryFields)
+    reloadTable(queryFields)
   }
 
   const listDomainsOptions = async () => {
@@ -417,6 +471,7 @@
 
   onMounted(async () => {
     await listDomainsOptions()
+    tableSelectedColumns.value = wafRulesAllowedColumns.value
   })
 </script>
 
@@ -517,21 +572,89 @@
       />
     </div>
   </div>
-  <ListTableBlock
+  <div
     v-show="showListTable"
-    pageTitleDelete="WAF rules tuning"
-    :listService="listService"
-    ref="listServiceWafTunningRef"
-    :columns="wafRulesAllowedColumns"
-    :hasListService="true"
-    v-model:selectedItensData="selectedEvents"
-    :showSelectionMode="true"
-    :editInDrawer="openMoreDetails"
-    emptyListMessage="No requests found."
-    hiddenHeader
-    exportFileName="WAF Rules Tuning"
-    :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
-  />
+    class="max-w-full"
+    data-testid="data-table-container"
+  >
+    <DataTable
+      ref="dataTableRef"
+      :data="tableData"
+      :columns="wafRulesAllowedColumns"
+      :loading="tableIsLoading"
+      :paginator="true"
+      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rows="minimumOfItemsPerPage"
+      v-model:selection="selectedEvents"
+      @page="changeNumberOfLinesPerPage"
+      :globalFilterFields="tableFilterBy"
+      :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
+      emptyListMessage="No requests found."
+      dataKey="id"
+      exportFilename="WAF Rules Tuning"
+      :notShowEmptyBlock="true"
+      data-testid="data-table"
+    >
+      <DataTable.Column
+        selectionMode="multiple"
+        :pt="{
+          rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+        }"
+        headerStyle="width: 3rem"
+      />
+      <DataTable.Column
+        :sortable="!col.disableSort"
+        v-for="col of tableSelectedColumns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+        :sortField="col?.sortField"
+        headerClass="p-highlight"
+        data-testid="data-table-column"
+      >
+        <template #body="{ data: rowData }">
+          <template v-if="col.type !== 'component'">
+            <div
+              @click="openMoreDetails(rowData)"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            >
+              {{ rowData[col.field] }}
+            </div>
+          </template>
+          <template v-else>
+            <component
+              @click="openMoreDetails(rowData)"
+              :is="col.component(rowData[col.field])"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            />
+          </template>
+        </template>
+      </DataTable.Column>
+      <DataTable.Column
+        :frozen="true"
+        :alignFrozen="'right'"
+        headerStyle="width: 13rem"
+        data-testid="data-table-actions-column"
+      >
+        <template #header>
+          <DataTable.ColumnSelector
+            :columns="wafRulesAllowedColumns"
+            v-model:selectedColumns="tableSelectedColumns"
+          />
+        </template>
+      </DataTable.Column>
+      <template #empty>
+        <div class="my-4 flex flex-col gap-3 justify-center items-start">
+          <p
+            class="text-md font-normal text-secondary"
+            data-testid="list-table-block__empty-message__text"
+          >
+            No requests found.
+          </p>
+        </div>
+      </template>
+    </DataTable>
+  </div>
 
   <EmptyResultsBlock
     v-if="!showListTable"

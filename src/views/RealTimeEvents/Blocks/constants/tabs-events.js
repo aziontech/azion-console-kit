@@ -1,4 +1,4 @@
-import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+import { columnBuilder } from '@/components/list-table/columns/column-builder'
 
 const TABS_EVENTS = {
   httpRequests: {

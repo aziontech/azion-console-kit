@@ -1,6 +1,6 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
@@ -43,8 +43,8 @@
     }
   })
 
-  const listOriginsEdgeApplicationsRef = ref('')
   const drawerOriginsRef = ref('')
+  const listTableRef = ref(null)
 
   const getColumns = computed(() => {
     return [
@@ -112,10 +112,6 @@
     drawerOriginsRef.value.openDrawerEdit(item.id)
   }
 
-  const reloadList = () => {
-    listOriginsEdgeApplicationsRef.value.reload()
-  }
-
   defineExpose({
     openCreateDrawer: openCreateOriginDrawer
   })
@@ -129,6 +125,10 @@
       service: deleteOriginWithDecorator
     }
   ]
+
+  const reloadList = () => {
+    listTableRef.value?.reload()
+  }
 </script>
 
 <template>
@@ -143,16 +143,16 @@
       :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
       @onSuccess="reloadList"
     />
-    <ListTableBlock
-      ref="listOriginsEdgeApplicationsRef"
+    <ListTable
+      ref="listTableRef"
       :listService="listOriginsWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditOriginDrawer"
-      emptyListMessage="No origins found."
       :actions="actions"
       :lazy="false"
-      isTabs
       exportFileName="Application Origins"
+      emptyListMessage="No origins found."
+      :isTabs="true"
       :emptyBlock="{
         title: 'No origins yet',
         description: 'Create your first origin to define where your application retrieves content.'
@@ -168,7 +168,7 @@
           data-testid="origins__add-button"
         />
       </template>
-    </ListTableBlock>
+    </ListTable>
   </div>
   <div
     v-else

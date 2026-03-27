@@ -1,5 +1,5 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
@@ -38,8 +38,8 @@
   })
 
   const hasContentToList = ref(true)
-  const listResourcesEdgeServiceRef = ref('')
   const drawerResourceRef = ref('')
+  const listTableRef = ref(null)
 
   const getColumns = computed(() => [
     {
@@ -68,10 +68,6 @@
     }
   ])
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const openCreateServiceDrawer = () => {
     drawerResourceRef.value.openDrawerCreate()
   }
@@ -91,14 +87,6 @@
     })
   }
 
-  const reloadResourcesList = () => {
-    if (hasContentToList.value) {
-      listResourcesEdgeServiceRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
-  }
-
   const actions = [
     {
       type: 'delete',
@@ -108,6 +96,18 @@
       service: deleteResourcesServicesWithDecorator
     }
   ]
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const reloadResourcesList = () => {
+    if (hasContentToList.value) {
+      listTableRef.value?.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 
   defineExpose({
     openCreateDrawer: openCreateServiceDrawer
@@ -124,25 +124,25 @@
       :editResourcesServices="props.editResourcesServices"
       @onSuccess="reloadResourcesList"
     />
-    <ListTableBlock
-      ref="listResourcesEdgeServiceRef"
+    <ListTable
+      ref="listTableRef"
       :listService="listResourcesServicesWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditServiceDrawer"
-      @on-load-data="handleLoadData"
-      emptyListMessage="No resources found."
       :actions="actions"
-      isTabs
-      class="mt-0"
       exportFileName="Resources"
-      :empty-block="{
+      :lazy="true"
+      :isTabs="true"
+      emptyListMessage="No resources found."
+      :emptyBlock="{
         title: 'No resources yet',
         description: 'Create your first resource to enable your service to run at the edge.',
         createButtonLabel: 'Resource',
         documentationService: props.documentationServiceResource
       }"
+      @on-load-data="handleLoadData"
     >
-      <template #addButton>
+      <template #header-actions>
         <PrimeButton
           icon="pi pi-plus"
           label="Resource"
@@ -160,6 +160,6 @@
           data-testid="list-table-block__create-resource-button"
         />
       </template>
-    </ListTableBlock>
+    </ListTable>
   </div>
 </template>

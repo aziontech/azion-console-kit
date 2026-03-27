@@ -1,12 +1,12 @@
 <script setup>
   import { ref, computed, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
-  import copyBlock from '@aziontech/webkit/copy-block'
+  import copyBlock from '@aziontech/webkit/button-copy'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -50,10 +50,6 @@
       active: rowData.data?.content || rowData.active
     }
   }
-
-  const getFilters = computed(() => {
-    return getColumns.value.filter((column) => column.field !== 'active')
-  })
 
   const getColumns = computed(() => {
     return [
@@ -103,6 +99,20 @@
       }
     ]
   })
+
+  const frozenColumns = ['name']
+
+  const getFilters = computed(() => {
+    return getColumns.value.filter((column) => column.field !== 'active')
+  })
+
+  const handleBeforeGoToAddPage = () => {
+    handleTrackEvent()
+  }
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackEditEvent()
+  }
 </script>
 
 <template>
@@ -130,22 +140,20 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
-        createPagePath="edge-dns/create"
-        editPagePath="/edge-dns/edit"
+      <ListTable
         :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No zone found."
-        data-testid="edge-dns-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
+        createPagePath="edge-dns/create"
+        editPagePath="/edge-dns/edit"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Edge DNS"
-        hideLastModifiedColumn
         :csvMapper="csvMapper"
+        :lazy="true"
+        :frozenColumns="frozenColumns"
+        :hideLastModifiedColumn="true"
         :allowedFilters="getFilters"
+        emptyListMessage="No zone found."
         :emptyBlock="{
           title: 'No DNS Zones yet',
           description:
@@ -154,6 +162,8 @@
           createPagePath: 'edge-dns/create',
           documentationService: documentationService
         }"
+        @on-before-go-to-add-page="handleBeforeGoToAddPage"
+        @on-before-go-to-edit="handleBeforeGoToEdit"
       />
     </template>
   </ContentBlock>

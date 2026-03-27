@@ -1,18 +1,18 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import PrimeButton from 'primevue/button'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
   import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -22,7 +22,7 @@
   const selectedWafRulesAllowedToEdit = ref(0)
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
-  const listAllowedRef = ref('')
+  const listTableRef = ref(null)
 
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
@@ -104,7 +104,7 @@
       .track()
   }
 
-  const wafRulesAllowedColumns = ref([
+  const wafRulesAllowedColumns = [
     {
       field: 'ruleId',
       header: 'Rule ID'
@@ -121,7 +121,6 @@
         })
       }
     },
-
     {
       field: 'path',
       header: 'Path'
@@ -157,32 +156,21 @@
       sortField: 'lastModified',
       filterPath: 'lastModified'
     }
-  ])
+  ]
 
   const reloadWafRulesAllowedList = () => {
     hasContentToList.value = true
-    listAllowedRef.value.reload()
+    listTableRef.value?.reload()
   }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
 
-  const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'Allowed Rules'
-    })
-  }
-
-  const handleCreateTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Allowed Rules'
-    })
-  }
-
   const goToWafRulesTuning = () => {
     emit('handle-go-to-tuning', { index: 1 })
   }
+
   const handleListWafRulesAllowedService = async (query) => {
     return await wafService.listWafRulesAllowed({ wafId: wafRuleId.value, ...query })
   }
@@ -213,7 +201,9 @@
   const openEditDrawerWafRulesAllowed = (event) => {
     selectedWafRulesAllowedToEdit.value = parseInt(event.id)
     showEditWafRulesAllowedDrawer.value = true
-    handleTrackEditEvent()
+    tracker.product.clickToEdit({
+      productName: 'Allowed Rules'
+    })
   }
 
   const openCreateDrawerWafAllowed = () => {
@@ -223,7 +213,6 @@
       })
       .track()
     showCreateWafRulesAllowedDrawer.value = true
-    handleCreateTrackEvent()
   }
 
   const actions = [
@@ -235,24 +224,23 @@
       service: handleDeleteWafRulesAllowedService
     }
   ]
+
   defineExpose({
     openCreateDrawer: openCreateDrawerWafAllowed
   })
 </script>
 
 <template>
-  <FetchListTableBlock
-    ref="listAllowedRef"
-    addButtonLabel="Allowed Rule"
-    :editInDrawer="openEditDrawerWafRulesAllowed"
-    :columns="wafRulesAllowedColumns"
+  <ListTable
+    ref="listTableRef"
     :listService="handleListWafRulesAllowedService"
-    @on-load-data="handleLoadData"
+    :columns="wafRulesAllowedColumns"
+    :actions="actions"
+    :editInDrawer="openEditDrawerWafRulesAllowed"
+    defaultOrderingFieldName="id"
+    exportFileName="WAF Rules Allowed"
     emptyListMessage="No allowed rules found."
     isTabs
-    :actions="actions"
-    :default-ordering-field-name="'id'"
-    exportFileName="WAF Rules Allowed"
     :emptyBlock="{
       title: 'No allowed rules yet',
       description:
@@ -260,25 +248,8 @@
       createButtonLabel: 'Allowed Rule',
       documentationService: props.documentationServiceAllowed
     }"
+    @on-load-data="handleLoadData"
   >
-    <template #addButton>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        label="Create from Tuning"
-        outlined
-        @click="goToWafRulesTuning"
-      >
-      </PrimeButton>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Allowed Rule"
-        @click="openCreateDrawerWafAllowed"
-        data-testid="create_Allowed Rule_button"
-      />
-    </template>
     <template #emptyBlock>
       <EmptyResultsBlock
         title="No allowed rule has been created."
@@ -310,7 +281,7 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </FetchListTableBlock>
+  </ListTable>
 
   <CreateDrawerBlock
     v-if="showCreateWafRulesAllowedDrawer"
