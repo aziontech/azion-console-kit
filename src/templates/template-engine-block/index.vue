@@ -1,5 +1,6 @@
 <script setup>
-  import { ref, defineOptions, watch, onMounted, computed } from 'vue'
+  import { ref, defineOptions, watch, onMounted, computed, nextTick } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   // import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from '@templates/template-engine-block/form-loading'
@@ -12,7 +13,10 @@
 
   defineOptions({ name: 'templateEngineBlock' })
 
-  const emit = defineEmits(['instantiate', 'cancel', 'submitClick', 'executionId'])
+  const route = useRoute()
+  const router = useRouter()
+
+  const emit = defineEmits(['instantiate', 'cancel', 'submitClick', 'executionId', 'finish'])
 
   const props = defineProps({
     getTemplateService: {
@@ -70,6 +74,11 @@
     successNextSteps: {
       type: Array,
       default: () => []
+    },
+    // Service to fetch results after deployment finishes
+    getResultsService: {
+      type: Function,
+      default: null
     }
   })
 
@@ -81,10 +90,30 @@
   const jsonFormEngineRef = ref(null)
   const hasSettings = ref(null)
   const localExecutionId = ref('')
+  const results = ref(null)
+  const localApplicationName = ref('')
+  const localDeployStartTime = ref(null)
+  const localDeployFailed = ref(false)
+  const isRestoringState = ref(false)
 
   // Computed that prefers local executionId over prop
   const currentExecutionId = computed(() => {
     return localExecutionId.value || props.executionId
+  })
+
+  // Computed for application name
+  const currentApplicationName = computed(() => {
+    return localApplicationName.value || props.applicationName
+  })
+
+  // Computed for deploy start time
+  const currentDeployStartTime = computed(() => {
+    return localDeployStartTime.value || props.deployStartTime
+  })
+
+  // Computed for deploy failed state
+  const currentDeployFailed = computed(() => {
+    return localDeployFailed.value || props.deployFailed
   })
 
   /**
@@ -103,9 +132,12 @@
     return isLoadingDeploy.value || props.disabledDeploy
   })
 
-  onMounted(async () => {
-    if (!props.templateId) return
-    await loadTemplate(props.templateId)
+  /**
+   * Computed for app URL
+   * Prefers prop appUrl, falls back to results.domain.url
+   */
+  const computedAppUrl = computed(() => {
+    return props.appUrl || results.value?.domain?.url || ''
   })
 
   const isJsonForm = computed(() => {
@@ -178,7 +210,10 @@
       )
       submitLoading.value = props.freezeLoading
       localExecutionId.value = response.result.uuid
+      localDeployStartTime.value = Date.now()
       emit('executionId', localExecutionId.value)
+      // Update route query to preserve state on reload
+      updateRouteQuery('deploying', localExecutionId.value)
     } catch (error) {
       toast.add({
         closable: true,
@@ -196,6 +231,39 @@
     emit('cancel')
   }
 
+  /**
+   * Handles the finish event from child components
+   * Fetches deployment results and emits finish event
+   */
+  const handleFinish = async () => {
+    if (!props.getResultsService || !currentExecutionId.value) {
+      emit('finish')
+      return
+    }
+
+    try {
+      const response = await props.getResultsService(currentExecutionId.value)
+      results.value = response.result
+      // Update route query to success step with domain info
+      const domain = response.result?.domain?.cname || response.result?.domain?.url || ''
+      updateRouteQuery('success', currentExecutionId.value, domain)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Successfully created!'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Failed to fetch deployment results',
+        detail: error?.message || 'An unexpected error occurred'
+      })
+    }
+
+    emit('finish')
+  }
+
   watch(
     () => props.freezeLoading,
     () => {
@@ -203,12 +271,82 @@
     }
   )
 
+  /**
+   * Update route query params to preserve deploy state on page reload
+   * @param {string} step - Current step (repository, settings, deploying, success)
+   * @param {string} id - Execution ID (optional)
+   * @param {string} domain - Application domain (optional)
+   */
+  const updateRouteQuery = (step, id = null, domain = null) => {
+    const query = { ...route.query, step }
+    if (id) {
+      query.executionId = id
+    }
+    if (domain) {
+      query.domain = domain
+    }
+    router.replace({ query })
+  }
+
+  /**
+   * Restore state from route query params on page reload
+   * Called in onMounted to recover deploy state
+   */
+  const restoreStateFromRoute = async () => {
+    const { step, executionId: routeExecutionId, domain } = route.query
+
+    if (step && routeExecutionId) {
+      localExecutionId.value = routeExecutionId
+      isRestoringState.value = true
+
+      if (step === 'deploying') {
+        localDeployStartTime.value = Date.now()
+        // Set step in engine - methods are exposed directly on engine component
+        await nextTick()
+        const activeEngine = isJsonForm.value ? jsonFormEngineRef.value : azionEngineRef.value
+        if (activeEngine?.goToDeploying) {
+          activeEngine.goToDeploying()
+        }
+      } else if (step === 'success') {
+        // For success state, we need to fetch the results
+        if (props.getResultsService) {
+          try {
+            const response = await props.getResultsService(routeExecutionId)
+            results.value = response.result
+            localApplicationName.value = domain || response.result?.domain?.cname || ''
+            await nextTick()
+            const activeEngine = isJsonForm.value ? jsonFormEngineRef.value : azionEngineRef.value
+            if (activeEngine?.goToSuccess) {
+              activeEngine.goToSuccess()
+            }
+          } catch (error) {
+            // Fall back to deploying state
+            localDeployStartTime.value = Date.now()
+            await nextTick()
+            const activeEngine = isJsonForm.value ? jsonFormEngineRef.value : azionEngineRef.value
+            if (activeEngine?.goToDeploying) {
+              activeEngine.goToDeploying()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  onMounted(async () => {
+    if (!props.templateId) return
+    await loadTemplate(props.templateId)
+    // Restore state from route after template is loaded
+    await restoreStateFromRoute()
+  })
+
   // ============================================================================
   // Expose - Methods needed by parent components
   // ============================================================================
   defineExpose({
     handleSubmit,
-    handleCancel
+    handleCancel,
+    updateRouteQuery
   })
 </script>
 
@@ -224,12 +362,14 @@
         :loading-deploy="isLoadingDeploy"
         :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
-        :deploy-failed="props.deployFailed"
-        :application-name="props.applicationName"
-        :deploy-start-time="props.deployStartTime"
-        :app-url="props.appUrl"
+        :deploy-failed="currentDeployFailed"
+        :application-name="currentApplicationName"
+        :deploy-start-time="currentDeployStartTime"
+        :app-url="computedAppUrl"
         :success-next-steps="props.successNextSteps"
+        :results="results"
         @deploy="handleSubmit"
+        @finish="handleFinish"
       />
     </div>
     <div v-else>
@@ -241,12 +381,14 @@
         :loading-deploy="isLoadingDeploy"
         :disabled-deploy="isDisabledDeploy"
         :execution-id="currentExecutionId"
-        :deploy-failed="props.deployFailed"
-        :application-name="props.applicationName"
-        :deploy-start-time="props.deployStartTime"
-        :app-url="props.appUrl"
+        :deploy-failed="currentDeployFailed"
+        :application-name="currentApplicationName"
+        :deploy-start-time="currentDeployStartTime"
+        :app-url="computedAppUrl"
         :success-next-steps="props.successNextSteps"
+        :results="results"
         @deploy="handleSubmit"
+        @finish="handleFinish"
       />
     </div>
   </div>

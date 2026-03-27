@@ -227,10 +227,14 @@
     cleanupPostMessage?.()
   })
 
-  // eslint-disable-next-line no-unused-vars
   const handleTemplateSelect = (template) => {
-    // Template selection logic for navigation
-    // template param contains: { id, name, headline, vendor, slug, ... }
+    router.push({
+      name: 'create-something-new',
+      params: {
+        vendor: template.vendor?.slug,
+        solution: template.slug
+      }
+    })
   }
 
   const handleViewAllTemplates = () => {
