@@ -6,7 +6,22 @@ const mapDataSourceName = {
   http: 'Edge Applications',
   activity: 'Activity History',
   functions: 'Functions',
-  waf: 'WAF Events'
+  waf: 'WAF Events',
+  workloads: 'Edge Applications',
+  functions_console: 'Functions',
+  activity_history: 'Activity History'
+}
+
+const mapDataSourceSlugToValue = {
+  workloads: 'http',
+  functions_console: 'functions',
+  activity_history: 'activity'
+}
+
+const mapDataSourceValueToSlug = {
+  http: 'workloads',
+  functions: 'functions_console',
+  activity: 'activity_history'
 }
 
 const endpointTypeNameMap = {
@@ -21,6 +36,10 @@ const endpointTypeNameMap = {
   qradar: 'QRadar',
   azure_monitor: 'Azure Monitor',
   azure_blob_storage: 'Azure Blob Storage'
+}
+
+const getDataSource = (slug) => {
+  return mapDataSourceSlugToValue[slug] || slug
 }
 
 const getWorkloadIds = (workloads) => {
@@ -262,9 +281,7 @@ export const DataStreamAdapter = {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
-          dataSource:
-            dataSourceInput?.attributes?.data_source ||
-            mapDataSourceName[dataSourceInput?.attributes?.data_source],
+          dataSource: getDataSource(dataSourceInput?.attributes?.data_source),
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
@@ -305,7 +322,7 @@ export const DataStreamAdapter = {
         {
           type: 'raw_logs',
           attributes: {
-            data_source: payload.dataSource
+            data_source: mapDataSourceValueToSlug[payload.dataSource] || payload.dataSource
           }
         }
       ],
@@ -386,5 +403,12 @@ export const DataStreamAdapter = {
       name: payload.name,
       dataSet: payload?.data_set
     }
+  },
+  transformListDataSources(data) {
+    return data.map((dataSource) => ({
+      slug: dataSource.slug,
+      name: dataSource.name,
+      active: dataSource.active
+    }))
   }
 }

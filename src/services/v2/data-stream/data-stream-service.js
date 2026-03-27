@@ -10,6 +10,7 @@ export class DataStreamService extends BaseService {
     this.baseURL = 'v4/workspace/stream/streams'
     this.dataSetsEndpoint = 'v4/workspace/stream/templates'
     this.workloadEndpoint = 'v4/workspace/workloads'
+    this.dataSources = 'v4/workspace/stream/data_sources'
   }
 
   #getTransformed = (method, data) => {
@@ -77,6 +78,19 @@ export class DataStreamService extends BaseService {
         skipCache
       }
     )
+  }
+
+  listDataSourcesService = async (params = { pageSize: 10 }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.dataSources,
+      params
+    })
+
+    return {
+      count: data.count,
+      body: this.#getTransformed('transformListDataSources', data.results)
+    }
   }
 
   getDataStreamFromCache = (id) => {
