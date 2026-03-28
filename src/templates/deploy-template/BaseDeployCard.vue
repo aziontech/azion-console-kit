@@ -13,6 +13,10 @@
     loading: {
       type: Boolean,
       default: false
+    },
+    withoutBorder: {
+      type: Boolean,
+      default: false
     }
   })
 </script>
@@ -41,7 +45,8 @@
     <!-- Header Meta -->
     <div
       v-if="$slots['header-meta'] && !loading"
-      class="px-6 py-4 border-b surface-border bg-[var(--surface-50)]"
+      class="px-6 bg-[var(--surface-50)]"
+      :class="{ 'border-b surface-border py-4': !withoutBorder, 'pt-4': withoutBorder }"
     >
       <slot name="header-meta" />
     </div>

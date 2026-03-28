@@ -632,6 +632,8 @@
     layoutRef,
     // Expose goToDeploying from LayoutEngineBlock
     goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose goToSuccess from LayoutEngineBlock
+    goToSuccess: () => layoutRef.value?.goToSuccess?.(),
     // Expose currentStep from LayoutEngineBlock
     currentStep: computed(() => layoutRef.value?.currentStep)
   })

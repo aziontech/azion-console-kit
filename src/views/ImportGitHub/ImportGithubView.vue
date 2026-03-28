@@ -9,7 +9,6 @@
   import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import LabelBlock from '@/templates/label-block'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
@@ -26,11 +25,11 @@
   const props = defineProps({
     repositoryOwner: {
       type: String,
-      required: true
+      default: ''
     },
     repositoryName: {
       type: String,
-      required: true
+      default: ''
     },
     loading: {
       type: Boolean,
@@ -80,14 +79,13 @@
   const results = ref(null)
   const isDeploying = ref(false)
   const isRestoringState = ref(false)
+  const isSavingDomains = ref(false)
 
   // OAuth and integration state
   const callbackUrl = ref('')
   const oauthGithubRef = ref(null)
   const isGithubConnectLoading = ref(false)
   const integrationsList = ref([])
-  const repositoriesList = ref([])
-  const loadingRepositories = ref(false)
   const presetsList = ref([])
   const templateId = ref(null)
   const isInstallCommandEditable = ref(false)
@@ -111,8 +109,6 @@
       .matches(/^\S*$/, 'Root Directory cannot contain spaces')
       .label('Root Directory'),
     installCommand: yup.string().required().label('Install Command'),
-    gitScope: yup.string().required().label('Git Scope'),
-    repository: yup.string().required().label('Repository'),
     newVariables: yup.array().of(
       yup.object().shape({
         key: yup
@@ -143,8 +139,9 @@
 
   // Computed domain suggestion
   const suggestedDomain = computed(() => {
-    if (!props.repositoryName) return ''
-    return `${props.repositoryName.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+    const repoName = route.query.repositoryName || props.repositoryName
+    if (!repoName) return ''
+    return `${repoName.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
   })
 
   const addVariableLabel = computed(() => {
@@ -166,9 +163,7 @@
         value: '',
         isPublic: false
       }
-    ],
-    gitScope: '',
-    repository: ''
+    ]
   }
 
   // Setup form with vee-validate
@@ -182,8 +177,6 @@
   const { value: preset } = useField('preset')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: installCommand } = useField('installCommand')
-  const { value: gitScope } = useField('gitScope')
-  const { value: repository } = useField('repository')
   const { value: newVariables } = useField('newVariables')
 
   // Computed for integration check
@@ -315,27 +308,19 @@
     }
   }
 
-  const setListRepositories = async () => {
-    repositoriesList.value = []
-    loadingRepositories.value = true
-
-    try {
-      const data = await vcsService.listRepositories(gitScope.value)
-      repositoriesList.value = data
-    } catch (error) {
-      error.showWithOptions(toast, { summary: 'Loading failed' })
-    } finally {
-      loadingRepositories.value = false
-    }
-  }
+  // Repository package.json data
+  const packageJsonData = ref(null)
 
   const detectAndSetFrameworkPreset = async (accountName, repoName) => {
     try {
-      const framework = await props.frameworkDetectorService({
+      const result = await props.frameworkDetectorService({
         accountName,
         repositoryName: repoName
       })
-      preset.value = framework
+      if (result) {
+        preset.value = result.framework
+        packageJsonData.value = result.packageJson
+      }
     } catch (error) {
       toast.add({
         closable: true,
@@ -346,19 +331,9 @@
     }
   }
 
-  const setRepositoryValue = (repositoryUrl) => {
-    repository.value = repositoryUrl
-  }
-
   const getOptionNameByValue = ({ listOption, optionValue, key }) => {
     const selectedOption = listOption.find((integration) => integration[key] === optionValue)
     return selectedOption ? selectedOption.label : ''
-  }
-
-  const triggerConnectWithGithub = () => {
-    if (oauthGithubRef.value) {
-      oauthGithubRef.value.connectWithGithub()
-    }
   }
 
   const getPresetIconClass = (presetValue) => {
@@ -450,6 +425,7 @@
   }
 
   const handleSaveDomains = async (values) => {
+    isSavingDomains.value = true
     try {
       const workloadId = results.value?.domain?.id
       if (!workloadId) {
@@ -477,6 +453,8 @@
         summary: 'Error',
         detail: error.message || 'Failed to update domain settings'
       })
+    } finally {
+      isSavingDomains.value = false
     }
   }
 
@@ -503,7 +481,7 @@
           {
             field: 'platform_feature__vcs_integration__uuid',
             instantiation_data_path: '',
-            value: formValues.gitScope
+            value: route.query.gitScope
           },
           {
             field: 'az_name',
@@ -513,7 +491,7 @@
           {
             field: 'git_url_external',
             instantiation_data_path: 'envs.[1].value',
-            value: formValues.repository
+            value: route.query.repository
           },
           {
             field: 'vulcan_preset',
@@ -634,10 +612,28 @@
     }
   }
 
+  // Repository owner and name from query params (with fallback to props)
+  const repositoryOwnerRef = route.query.repositoryOwner || props.repositoryOwner
+  const repositoryNameRef = route.query.repositoryName || props.repositoryName
+
+  /**
+   * Initialize form data from route query params
+   * Called when navigating from CreateViewTemplates with pre-selected repository
+   */
+  const initializeFromQueryParams = async () => {
+    const { gitScope: queryGitScope, repositoryName: queryRepoName } = route.query
+    if (queryGitScope && queryRepoName) {
+      await detectAndSetFrameworkPreset(repositoryOwnerRef, queryRepoName)
+    }
+  }
+
   onMounted(async () => {
     await Promise.all([loadSolutionByVendor(), loadListIntegrations()])
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
+
+    // Initialize from query params if available
+    await initializeFromQueryParams()
 
     // Restore state from route query params after loading required data
     await restoreStateFromRoute()
@@ -660,8 +656,10 @@
         :execution-id="executionId"
         :template-title="'Application Deployed'"
         :template-description="`Your application ${applicationName} has been successfully deployed.`"
-        :github-url="repository"
+        :github-url="route.query.repository"
         :results="results"
+        :workload-id="results?.domain?.id"
+        :is-saving="isSavingDomains"
         @on-save="handleSaveDomains"
       />
     </div>
@@ -672,11 +670,9 @@
       class="self-center w-full max-w-[700px] my-8"
       :loading="loadingStore.isLoading"
       :hide-footer="currentStep === 'deploying'"
+      withoutBorder
     >
-      <template
-        #header-meta
-        v-if="gitScope"
-      >
+      <template #header-meta>
         <div class="w-full px-4 sm:px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
           <div class="py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-1.5">
@@ -686,7 +682,7 @@
               <div class="flex items-center gap-1">
                 <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
                 <span class="text-[10px] font-normal text-text-color-muted leading-3">
-                  {{ repositoryOwner }}/{{ repositoryName }}
+                  {{ repositoryOwnerRef }}/{{ repositoryNameRef }}
                 </span>
               </div>
             </div>
@@ -708,96 +704,6 @@
           </div>
 
           <template v-else>
-            <div class="flex flex-col sm:flex-row gap-4">
-              <div class="flex flex-col sm:w-1/2 gap-2">
-                <LabelBlock
-                  for="gitScope"
-                  label="Git Scope"
-                  isRequired
-                />
-                <Dropdown
-                  name="gitScope"
-                  v-model="gitScope"
-                  :options="integrationsList"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a scope"
-                  class="w-full"
-                  @change="setListRepositories"
-                >
-                  <template #value="slotProps">
-                    <div
-                      v-if="slotProps.value"
-                      class="flex items-center"
-                    >
-                      <i class="pi pi-github mr-2"></i>
-                      <div>
-                        {{
-                          getOptionNameByValue({
-                            listOption: integrationsList,
-                            optionValue: slotProps.value,
-                            key: 'value'
-                          })
-                        }}
-                      </div>
-                    </div>
-                    <div
-                      class="flex items-center"
-                      v-else
-                    >
-                      <i class="pi pi-github mr-2"></i>
-                      {{ slotProps.placeholder }}
-                    </div>
-                  </template>
-                  <template #option="slotProps">
-                    <div class="flex items-center">
-                      <i class="pi pi-github mr-2"></i>
-                      <div>{{ slotProps.option.label }}</div>
-                    </div>
-                  </template>
-                  <template #footer>
-                    <div class="p-dropdown-items-wrapper">
-                      <ul class="p-dropdown-items">
-                        <li
-                          class="p-dropdown-item flex items-center"
-                          @click="triggerConnectWithGithub"
-                        >
-                          <i class="pi pi-plus-circle mr-2"></i>
-                          <div>Add GitHub Account</div>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </Dropdown>
-              </div>
-              <div class="flex flex-col sm:w-1/2 gap-2">
-                <FieldDropdown
-                  filter
-                  required
-                  name="repository"
-                  label="Repository"
-                  optionLabel="name"
-                  optionValue="url"
-                  placeholder="Select a repository"
-                  :options="repositoriesList"
-                  :disabled="!gitScope"
-                  :value="repository"
-                  :loading="loadingRepositories"
-                  @onSelectOption="
-                    (option) => {
-                      setRepositoryValue(option.url)
-                      const accountName = getOptionNameByValue({
-                        listOption: integrationsList,
-                        optionValue: gitScope,
-                        key: 'value'
-                      })
-                      detectAndSetFrameworkPreset(accountName, option.name)
-                    }
-                  "
-                />
-              </div>
-            </div>
-
             <div class="flex flex-col w-full gap-2">
               <FieldText
                 label="Domain"
@@ -961,7 +867,10 @@
                             Enter the data associated with the variable key.
                           </small>
                         </div>
-                        <div class="flex sm:self-end sm:pb-2">
+                        <div
+                          class="flex"
+                          :class="{ 'mt-[30px]': !index }"
+                        >
                           <Button
                             class="h-8"
                             icon="pi pi-minus-circle"
