@@ -47,7 +47,6 @@ export const createNewRoutes = {
     },
     {
       path: 'templates',
-      name: 'create-new-templates',
       component: () => import('@/views/CreateNew/CreateViewTemplates.vue'),
       props: {
         getTemplatesService: MarketplaceService.getTemplatesService,
@@ -62,7 +61,29 @@ export const createNewRoutes = {
             to: '/'
           }
         ]
-      }
+      },
+      children: [
+        {
+          path: '',
+          name: 'create-new-templates',
+          redirect: { name: 'create-import-from-git' }
+        },
+        {
+          path: 'import-from-git',
+          name: 'create-import-from-git',
+          component: () => import('@/views/CreateNew/sections/ImportFromGitSection.vue')
+        },
+        {
+          path: 'start-from-template',
+          name: 'create-start-from-template',
+          component: () => import('@/views/CreateNew/sections/StartFromTemplateSection.vue')
+        },
+        {
+          path: 'create-resource',
+          name: 'create-create-resource',
+          component: () => import('@/views/CreateNew/sections/CreateResourceSection.vue')
+        }
+      ]
     }
   ]
 }
