@@ -1,7 +1,8 @@
 <script setup>
-  import { computed, onMounted, onBeforeUnmount } from 'vue'
+  import { computed, onMounted, onBeforeUnmount, ref, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Menu from 'primevue/menu'
+  import Checkbox from 'primevue/checkbox'
   import ContentBlock from '@/templates/content-block'
   import { useVcsOAuth } from '@/composables/useVcsOAuth'
   import { useToast } from 'primevue/usetoast'
@@ -15,6 +16,82 @@
 
   // Cleanup function for postMessage listener
   let cleanupPostMessage = null
+
+  // Category filters for Resources section
+  const selectedCategories = ref([])
+  provide('selectedCategories', selectedCategories)
+
+  const categoryOptions = [
+    { label: 'Build', value: 'build' },
+    { label: 'Store', value: 'store' },
+    { label: 'Secure', value: 'secure' },
+    { label: 'Observe', value: 'observe' }
+  ]
+
+  // Template filters for Templates section
+  const selectedTemplateFilters = ref({})
+  provide('selectedTemplateFilters', selectedTemplateFilters)
+
+  // Track which filter groups are expanded
+  const expandedFilterGroups = ref({
+    useCases: false,
+    databases: false,
+    frameworks: true
+  })
+
+  // Template filter groups with their options
+  const templateFilterGroups = [
+    {
+      key: 'useCases',
+      label: 'Use Cases',
+      options: [
+        { label: 'Blog', value: 'blog' },
+        { label: 'Documentation', value: 'documentation' },
+        { label: 'E-commerce', value: 'ecommerce' },
+        { label: 'Portfolio', value: 'portfolio' },
+        { label: 'Landing Page', value: 'landing-page' }
+      ]
+    },
+    {
+      key: 'databases',
+      label: 'Databases',
+      options: [
+        { label: 'MySQL', value: 'mysql' },
+        { label: 'PostgreSQL', value: 'postgresql' },
+        { label: 'MongoDB', value: 'mongodb' },
+        { label: 'Redis', value: 'redis' },
+        { label: 'SQLite', value: 'sqlite' }
+      ]
+    },
+    {
+      key: 'frameworks',
+      label: 'Frameworks',
+      options: [
+        { label: 'Angular', value: 'angular' },
+        { label: 'Astro', value: 'astro' },
+        { label: 'Docusaurus', value: 'docusaurus' },
+        { label: 'Eleventy (11ty)', value: 'eleventy' },
+        { label: 'Emscripten', value: 'emscripten' },
+        { label: 'Gatsby', value: 'gatsby' },
+        { label: 'Hexo', value: 'hexo' },
+        { label: 'Hono', value: 'hono' },
+        { label: 'Hugo', value: 'hugo' },
+        { label: 'Jekyll', value: 'jekyll' },
+        { label: 'Next.js', value: 'nextjs' },
+        { label: 'Nuxt', value: 'nuxt' },
+        { label: 'Preact', value: 'preact' },
+        { label: 'Qwik', value: 'qwik' },
+        { label: 'React', value: 'react' },
+        { label: 'Rust WASM', value: 'rust-wasm' },
+        { label: 'Stencil', value: 'stencil' },
+        { label: 'SvelteKit', value: 'sveltekit' },
+        { label: 'Vanilla JS', value: 'vanilla-js' },
+        { label: 'Vitepress', value: 'vitepress' },
+        { label: 'Vue', value: 'vue' },
+        { label: 'Vuepress', value: 'vuepress' }
+      ]
+    }
+  ]
 
   // Get the current active navigation from route
   const activeNav = computed(() => {
@@ -48,6 +125,44 @@
   // Navigation helper
   const navigateTo = (routeName) => {
     router.push({ name: routeName })
+  }
+
+  // Go back to main menu from Resources or Templates
+  const goBackToMenu = () => {
+    router.push({ name: 'create-import-from-git' })
+  }
+
+  // Toggle category selection
+  const toggleCategory = (categoryValue) => {
+    const index = selectedCategories.value.indexOf(categoryValue)
+    if (index === -1) {
+      selectedCategories.value.push(categoryValue)
+    } else {
+      selectedCategories.value.splice(index, 1)
+    }
+  }
+
+  // Toggle filter group expansion
+  const toggleFilterGroup = (groupKey) => {
+    expandedFilterGroups.value[groupKey] = !expandedFilterGroups.value[groupKey]
+  }
+
+  // Toggle template filter selection
+  const toggleTemplateFilter = (groupKey, filterValue) => {
+    if (!selectedTemplateFilters.value[groupKey]) {
+      selectedTemplateFilters.value[groupKey] = []
+    }
+    const index = selectedTemplateFilters.value[groupKey].indexOf(filterValue)
+    if (index === -1) {
+      selectedTemplateFilters.value[groupKey].push(filterValue)
+    } else {
+      selectedTemplateFilters.value[groupKey].splice(index, 1)
+    }
+  }
+
+  // Check if a filter is selected
+  const isFilterSelected = (groupKey, filterValue) => {
+    return selectedTemplateFilters.value[groupKey]?.includes(filterValue) || false
   }
 
   /**
@@ -114,7 +229,11 @@
       <div class="w-full min-h-full flex flex-col xl:flex-row px-1 gap-4 xl:gap-8 mt-4 md:mt-8">
         <!-- Sidebar Navigation -->
         <nav class="w-full xl:w-64 flex-shrink-0">
-          <div class="flex flex-col gap-3 xl:gap-5">
+          <!-- Default Menu for Import section -->
+          <div
+            v-if="activeNav === 'import'"
+            class="flex flex-col gap-3 xl:gap-5"
+          >
             <div class="text-xs font-mono text-color-secondary">How to start</div>
             <Menu
               :model="navItems"
@@ -134,6 +253,142 @@
                 icon: { class: 'text-xs order-2' }
               }"
             />
+          </div>
+
+          <!-- Templates Section Menu with Filters -->
+          <div
+            v-else-if="activeNav === 'templates'"
+            class="flex flex-col gap-5"
+          >
+            <!-- Back to Templates Button -->
+            <button
+              class="w-64 h-8 px-2.5 py-1.5 rounded outline outline-1 outline-offset-[-1px] outline-Root-surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              @click="goBackToMenu"
+            >
+              <i class="pi pi-arrow-left text-xs" />
+              <span
+                class="flex-1 text-left text-listbox-option-focus-color text-xs font-normal font-['Sora']"
+                >Templates</span
+              >
+            </button>
+
+            <!-- Filter Groups -->
+            <div class="flex flex-col gap-5">
+              <div
+                v-for="group in templateFilterGroups"
+                :key="group.key"
+                class="flex flex-col gap-4"
+              >
+                <!-- Group Header (collapsible) -->
+                <button
+                  class="self-stretch h-5 inline-flex justify-between items-center cursor-pointer"
+                  @click="toggleFilterGroup(group.key)"
+                >
+                  <span class="text-Text-text-color-muted text-xs font-normal font-['Proto_Mono']">
+                    {{ group.label }}
+                  </span>
+                  <div
+                    class="w-5 h-5 flex justify-center items-center gap-2.5 transition-transform"
+                  >
+                    <i
+                      :class="[
+                        'pi pi-chevron-right text-xs text-color-secondary transition-transform',
+                        expandedFilterGroups[group.key] ? 'rotate-90' : ''
+                      ]"
+                    />
+                  </div>
+                </button>
+
+                <!-- Group Options (shown when expanded) -->
+                <div
+                  v-if="expandedFilterGroups[group.key]"
+                  class="flex flex-col gap-1"
+                >
+                  <div
+                    v-for="option in group.options"
+                    :key="option.value"
+                    class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:bg-surface-100 transition-colors cursor-pointer"
+                    @click="toggleTemplateFilter(group.key, option.value)"
+                  >
+                    <Checkbox
+                      :model-value="isFilterSelected(group.key, option.value)"
+                      :binary="true"
+                      :pt="{
+                        box: {
+                          class: [
+                            'w-4 h-4 rounded border border-checkbox-border-color bg-checkbox-background',
+                            isFilterSelected(group.key, option.value) ? 'border-primary' : ''
+                          ]
+                        },
+                        icon: { class: 'text-xs' }
+                      }"
+                      @click.stop
+                      @change="toggleTemplateFilter(group.key, option.value)"
+                    />
+                    <span
+                      class="flex-1 text-listbox-option-color text-xs font-normal font-['Sora']"
+                    >
+                      {{ option.label }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resources Section Menu with Filters -->
+          <div
+            v-else-if="activeNav === 'resources'"
+            class="flex flex-col gap-5"
+          >
+            <!-- Back to Resources Button -->
+            <button
+              class="w-64 h-8 px-2.5 py-1.5 rounded outline outline-1 outline-offset-[-1px] outline-Root-surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              @click="goBackToMenu"
+            >
+              <i class="pi pi-arrow-left text-xs" />
+              <span
+                class="flex-1 text-left text-listbox-option-focus-color text-xs font-normal font-['Sora']"
+                >Resources</span
+              >
+            </button>
+
+            <!-- Categories Filter -->
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between items-center h-5">
+                <span class="text-Text-text-color-muted text-xs font-normal font-['Proto_Mono']"
+                  >Categories</span
+                >
+              </div>
+              <div class="flex flex-col gap-1">
+                <div
+                  v-for="category in categoryOptions"
+                  :key="category.value"
+                  class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:bg-surface-100 transition-colors cursor-pointer"
+                  @click="toggleCategory(category.value)"
+                >
+                  <Checkbox
+                    :model-value="selectedCategories.includes(category.value)"
+                    :binary="true"
+                    :pt="{
+                      box: {
+                        class: [
+                          'w-4 h-4 rounded border border-checkbox-border-color bg-checkbox-background',
+                          selectedCategories.includes(category.value) ? 'border-primary' : ''
+                        ]
+                      },
+                      icon: { class: 'text-xs' }
+                    }"
+                    @click.stop
+                    @change="toggleCategory(category.value)"
+                  />
+                  <span
+                    class="flex-1 text-listbox-option-color text-xs font-normal font-['Sora']"
+                    >{{ category.label }}</span
+                  >
+                </div>
+              </div>
+            </div>
           </div>
         </nav>
 

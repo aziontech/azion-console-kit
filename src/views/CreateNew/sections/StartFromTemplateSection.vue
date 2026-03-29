@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
@@ -9,6 +9,9 @@
 
   const router = useRouter()
   const searchQuery = ref('')
+
+  // Inject selected template filters from parent component
+  const selectedTemplateFilters = inject('selectedTemplateFilters', ref({}))
 
   // Get account store and feature flag
   const accountStore = useAccountStore()
@@ -79,14 +82,87 @@
     return categories
   })
 
-  // Filter templates based on search query
+  // Helper to check if any filters are selected
+  const hasActiveFilters = computed(() => {
+    if (!selectedTemplateFilters.value) return false
+    return Object.values(selectedTemplateFilters.value).some(
+      (filters) => filters && filters.length > 0
+    )
+  })
+
+  // Filter templates based on search query and selected filters
   const filteredCategories = computed(() => {
+    let categories = templateCategories.value
+
+    // Filter by selected template filters if any are selected
+    if (hasActiveFilters.value) {
+      categories = categories.map((category) => ({
+        ...category,
+        items: category.items.filter((item) => {
+          // Check if template matches any of the selected filters
+          // Template metadata fields that could match filters
+          const templateMeta = item.meta || {}
+          const templateFramework = item.framework || templateMeta.framework
+          const templateUseCase = item.useCase || templateMeta.useCase
+          const templateDatabase = item.database || templateMeta.database
+
+          // Check frameworks filter
+          const frameworksFilters = selectedTemplateFilters.value.frameworks || []
+          const matchesFrameworks =
+            frameworksFilters.length === 0 ||
+            frameworksFilters.some((filterVal) => {
+              const templateFrameworkLower = templateFramework?.toLowerCase() || ''
+              return (
+                templateFrameworkLower.includes(filterVal) ||
+                filterVal.includes(templateFrameworkLower) ||
+                item.name?.toLowerCase().includes(filterVal)
+              )
+            })
+
+          // Check use cases filter
+          const useCasesFilters = selectedTemplateFilters.value.useCases || []
+          const matchesUseCases =
+            useCasesFilters.length === 0 ||
+            useCasesFilters.some((filterVal) => {
+              const templateUseCaseLower = templateUseCase?.toLowerCase() || ''
+              return (
+                templateUseCaseLower.includes(filterVal) ||
+                item.name?.toLowerCase().includes(filterVal) ||
+                item.description?.toLowerCase().includes(filterVal)
+              )
+            })
+
+          // Check databases filter
+          const databasesFilters = selectedTemplateFilters.value.databases || []
+          const matchesDatabases =
+            databasesFilters.length === 0 ||
+            databasesFilters.some((filterVal) => {
+              const templateDatabaseLower = templateDatabase?.toLowerCase() || ''
+              return (
+                templateDatabaseLower.includes(filterVal) ||
+                item.name?.toLowerCase().includes(filterVal) ||
+                item.description?.toLowerCase().includes(filterVal)
+              )
+            })
+
+          // If no filters are selected in a group, it passes
+          // Template must match all non-empty filter groups
+          const frameworkPass = frameworksFilters.length === 0 || matchesFrameworks
+          const useCasePass = useCasesFilters.length === 0 || matchesUseCases
+          const databasePass = databasesFilters.length === 0 || matchesDatabases
+
+          return frameworkPass && useCasePass && databasePass
+        })
+      }))
+    }
+
+    // Filter by search query
     if (!searchQuery.value) {
-      return templateCategories.value
+      return categories.filter((category) => category.items.length > 0)
     }
 
     const query = searchQuery.value.toLowerCase()
-    return templateCategories.value
+    return categories
       .map((category) => ({
         ...category,
         items: category.items.filter(

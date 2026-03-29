@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
@@ -7,6 +7,9 @@
 
   const router = useRouter()
   const searchQuery = ref('')
+
+  // Inject selected categories from parent component
+  const selectedCategories = inject('selectedCategories', ref([]))
 
   // Get the workload/domain text based on v4 flag
   const domainWorkloadText = TEXT_DOMAIN_WORKLOAD()
@@ -144,14 +147,29 @@
     }
   ]
 
-  // Filter resources based on search query
+  // Helper function to normalize category title to match filter value
+  const getCategoryFilterValue = (title) => {
+    return title.toLowerCase()
+  }
+
+  // Filter resources based on search query and selected categories
   const filteredCategories = computed(() => {
+    let categories = resourceCategories
+
+    // Filter by selected categories if any are selected
+    if (selectedCategories.value && selectedCategories.value.length > 0) {
+      categories = categories.filter((category) =>
+        selectedCategories.value.includes(getCategoryFilterValue(category.title))
+      )
+    }
+
+    // Filter by search query
     if (!searchQuery.value) {
-      return resourceCategories
+      return categories
     }
 
     const query = searchQuery.value.toLowerCase()
-    return resourceCategories
+    return categories
       .map((category) => ({
         ...category,
         items: category.items.filter(
