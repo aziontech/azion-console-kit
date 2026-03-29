@@ -2,6 +2,7 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+// eslint-disable-next-line azion-architecture/services-http-only
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
@@ -10,7 +11,48 @@ import { getCurrentTimezone } from '@/helpers'
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
+// ── DEV MOCK ────────────────────────────────────────────────────────────
+// Use VITE_ENVIRONMENT (not MODE) so that production-targeted local dev
+// sessions hit the real GraphQL API instead of the mock JSON.
+const USE_MOCK =
+  import.meta.env.MODE === 'development' && import.meta.env.VITE_ENVIRONMENT !== 'production'
+
+const spreadTimestamps = (events) => {
+  const now = Date.now()
+  const fiveMinutesAgo = now - 5 * 60 * 1000
+  return events.map((event, index) => {
+    const fraction = index / (events.length - 1 || 1)
+    const ts = new Date(fiveMinutesAgo + fraction * (now - fiveMinutesAgo)).toISOString()
+    return { ...event, ts }
+  })
+}
+
+const loadMockData = async () => {
+  const mod = await import('./__mocks__/events.json')
+  const raw = mod.default || mod
+  const events = spreadTimestamps(raw.data.httpEvents)
+  return { data: { httpEvents: events } }
+}
+
+const adaptMockResponse = (httpResponse) => {
+  let counter = 0
+  const data = httpResponse.data.httpEvents?.map((httpEventItem) => ({
+    id: `mock_${Date.now()}_${counter++}`,
+    requestId: httpEventItem.requestId,
+    summary: buildSummary(httpEventItem, shouldLimitRequestUri, shouldShowTsColumn),
+    ts: httpEventItem.ts,
+    tsFormat: getCurrentTimezone(httpEventItem.ts)
+  }))
+  return { data }
+}
+// ── END DEV MOCK ────────────────────────────────────────────────────────
+
 export const listHttpRequest = async (filter) => {
+  if (USE_MOCK) {
+    const body = await loadMockData()
+    return adaptMockResponse(body)
+  }
+
   const payload = adapt(filter)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)

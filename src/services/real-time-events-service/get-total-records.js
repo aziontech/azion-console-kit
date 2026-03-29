@@ -3,7 +3,18 @@ import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDe
 import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
 import * as Errors from '@/services/axios/errors'
 
+// ── DEV MOCK ────────────────────────────────────────────────────────────
+// Use VITE_ENVIRONMENT (not MODE) so that production-targeted local dev
+// sessions hit the real GraphQL API instead of the mock JSON.
+const USE_MOCK =
+  import.meta.env.MODE === 'development' && import.meta.env.VITE_ENVIRONMENT !== 'production'
+// ── END DEV MOCK ────────────────────────────────────────────────────────
+
 export const getTotalRecords = async ({ filter, dataset }) => {
+  if (USE_MOCK && dataset === 'httpEvents') {
+    return '1.000'
+  }
+
   const payload = adapt(filter, dataset)
 
   const decorator = new AxiosHttpClientSignalDecorator()
