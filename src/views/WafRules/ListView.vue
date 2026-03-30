@@ -1,12 +1,12 @@
 <script setup>
-  import { computed, inject } from 'vue'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { computed, inject, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import CloneBlock from '@/templates/clone-block'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -17,6 +17,8 @@
       type: Function
     }
   })
+
+  const listTableRef = ref(null)
 
   const actions = [
     {
@@ -137,6 +139,12 @@
       }
     ]
   })
+
+  const hasContentToList = ref(true)
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
 </script>
 
 <template>
@@ -158,18 +166,18 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
         :listService="wafService.listWafRules"
         :columns="getColumns"
-        @on-before-go-to-edit="handleTrackClickToEdit"
-        @on-before-go-to-add-page="handleTrackClickToCreate"
-        editPagePath="/waf/edit"
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozenColumns="['name']"
+        editPagePath="/waf/edit"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="WAF Rules"
         :csvMapper="csvMapper"
+        :frozenColumns="['name']"
         :allowedFilters="allowedFilters"
+        emptyListMessage="No WAF rules found."
         :emptyBlock="{
           title: 'No WAF Rules yet',
           description: 'Create your first WAF rule to inspect and control incoming requests.',
@@ -177,6 +185,9 @@
           createPagePath: 'waf/create',
           documentationService: documentationService
         }"
+        @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackClickToCreate"
+        @on-before-go-to-edit="handleTrackClickToEdit"
       />
     </template>
   </ContentBlock>

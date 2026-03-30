@@ -81,7 +81,7 @@
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeInputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyDomainDialog' })
 
