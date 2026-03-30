@@ -13,6 +13,7 @@ const getConfig = () => {
   const IS_PROD = env.VITE_ENVIRONMENT === 'production'
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
+  const BEHOLDER_URL = env.VITE_BEHOLDER_URL
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
@@ -127,7 +128,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/appcues/, '')
         }),
         '/sse': createProxyConfig({
-          target: `${URLStartPrefix}beholder.azion.net`
+          target: BEHOLDER_URL
         })
       }
     }
