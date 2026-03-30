@@ -98,7 +98,7 @@
     if (!props.resetForm) return
     const initialValues = {
       name: name.value,
-      dataSource: 'http',
+      dataSource: 'workloads',
       template: templateId,
       dataSet: '',
       domainOption: '1',

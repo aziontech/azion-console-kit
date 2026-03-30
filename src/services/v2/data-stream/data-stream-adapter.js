@@ -396,7 +396,7 @@ export const DataStreamAdapter = {
   transformListDataSources(data) {
     return data.map((dataSource) => ({
       slug: dataSource.slug,
-      name: dataSource.name,
+      name: mapDataSourceName[dataSource.slug] || dataSource.name,
       active: dataSource.active
     }))
   }
