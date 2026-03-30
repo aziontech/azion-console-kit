@@ -211,11 +211,19 @@
     </div>
 
     <!-- Resource Categories Grid - Responsive -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-3">
+    <div
+      class="grid gap-4 sm:gap-3"
+      :class="
+        filteredCategories.length === 1
+          ? 'grid-cols-1'
+          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+      "
+    >
       <div
         v-for="category in filteredCategories"
         :key="category.title"
         class="flex flex-col justify-start items-start gap-1.5 bg-surface-50 rounded-md"
+        :class="{ 'col-span-full': category.items.length === 1 }"
       >
         <!-- Category Header -->
         <div class="self-stretch px-3 sm:px-4 pt-3 sm:pt-4 pb-2 border-b surface-border">
@@ -225,11 +233,15 @@
         </div>
 
         <!-- Category Items -->
-        <div class="self-stretch flex flex-col justify-start items-start pb-2">
+        <div
+          class="flex justify-start items-start pb-2 w-full"
+          :class="filteredCategories.length === 1 ? 'flex-row' : 'flex-col'"
+        >
           <button
             v-for="item in category.items"
             :key="item.id"
             class="self-stretch px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-surface-100 transition-colors inline-flex justify-start items-start gap-2.5 overflow-hidden cursor-pointer text-left w-full"
+            :class="{ 'max-w-[236px]': filteredCategories.length === 1 }"
             @click="handleResourceClick(item)"
           >
             <div class="flex-1 inline-flex flex-col justify-start items-start gap-1.5 sm:gap-2">

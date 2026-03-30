@@ -31,19 +31,19 @@
         type: isFlagBlockApiV4 ? 'onboarding' : 'onboarding-v4'
       }
 
-  // Build query params for partners solutions
-  const partnersQueryParams = {
-    group: 'partners',
-    type: isFlagBlockApiV4 ? 'partners' : 'partners-v4'
+  // Build query params for all templates solutions
+  const allTemplatesQueryParams = {
+    group: 'templates',
+    type: isFlagBlockApiV4 ? 'onboarding' : 'onboarding-v4'
   }
 
   // Fetch recommended solutions
   const { data: recommendedTemplates, isLoading: isRecommendedLoading } =
     solutionService.useListSolutions(recommendedQueryParams)
 
-  // Fetch partners solutions
-  const { data: partnersTemplates, isLoading: isPartnersLoading } =
-    solutionService.useListSolutions(partnersQueryParams)
+  // Fetch all templates solutions
+  const { data: allTemplates, isLoading: isAllTemplatesLoading } =
+    solutionService.useListSolutions(allTemplatesQueryParams)
 
   // Build template categories from fetched data
   const templateCategories = computed(() => {
@@ -64,11 +64,11 @@
       })
     }
 
-    // Add partners templates category
-    if (partnersTemplates.value?.length) {
+    // Add all templates category
+    if (allTemplates.value?.length) {
       categories.push({
-        title: 'Partners Templates',
-        items: partnersTemplates.value.map((template) => ({
+        title: 'All Templates',
+        items: allTemplates.value.map((template) => ({
           id: template.id,
           name: template.name,
           description: template.headline,
@@ -99,59 +99,38 @@
       categories = categories.map((category) => ({
         ...category,
         items: category.items.filter((item) => {
-          // Check if template matches any of the selected filters
+          // Check if template matches any of the selected filters (OR logic)
           // Template metadata fields that could match filters
           const templateMeta = item.meta || {}
           const templateFramework = item.framework || templateMeta.framework
           const templateUseCase = item.useCase || templateMeta.useCase
           const templateDatabase = item.database || templateMeta.database
 
-          // Check frameworks filter
-          const frameworksFilters = selectedTemplateFilters.value.frameworks || []
-          const matchesFrameworks =
-            frameworksFilters.length === 0 ||
-            frameworksFilters.some((filterVal) => {
-              const templateFrameworkLower = templateFramework?.toLowerCase() || ''
-              return (
-                templateFrameworkLower.includes(filterVal) ||
-                filterVal.includes(templateFrameworkLower) ||
-                item.name?.toLowerCase().includes(filterVal)
-              )
-            })
+          // Collect all selected filters from all groups
+          const allSelectedFilters = [
+            ...(selectedTemplateFilters.value.frameworks || []),
+            ...(selectedTemplateFilters.value.useCases || []),
+            ...(selectedTemplateFilters.value.databases || [])
+          ]
 
-          // Check use cases filter
-          const useCasesFilters = selectedTemplateFilters.value.useCases || []
-          const matchesUseCases =
-            useCasesFilters.length === 0 ||
-            useCasesFilters.some((filterVal) => {
-              const templateUseCaseLower = templateUseCase?.toLowerCase() || ''
-              return (
-                templateUseCaseLower.includes(filterVal) ||
-                item.name?.toLowerCase().includes(filterVal) ||
-                item.description?.toLowerCase().includes(filterVal)
-              )
-            })
+          // Check if template matches ANY of the selected filters (OR logic)
+          return allSelectedFilters.some((filterVal) => {
+            const filterLower = filterVal.toLowerCase()
+            const templateFrameworkLower = templateFramework?.toLowerCase() || ''
+            const templateUseCaseLower = templateUseCase?.toLowerCase() || ''
+            const templateDatabaseLower = templateDatabase?.toLowerCase() || ''
 
-          // Check databases filter
-          const databasesFilters = selectedTemplateFilters.value.databases || []
-          const matchesDatabases =
-            databasesFilters.length === 0 ||
-            databasesFilters.some((filterVal) => {
-              const templateDatabaseLower = templateDatabase?.toLowerCase() || ''
-              return (
-                templateDatabaseLower.includes(filterVal) ||
-                item.name?.toLowerCase().includes(filterVal) ||
-                item.description?.toLowerCase().includes(filterVal)
-              )
-            })
-
-          // If no filters are selected in a group, it passes
-          // Template must match all non-empty filter groups
-          const frameworkPass = frameworksFilters.length === 0 || matchesFrameworks
-          const useCasePass = useCasesFilters.length === 0 || matchesUseCases
-          const databasePass = databasesFilters.length === 0 || matchesDatabases
-
-          return frameworkPass && useCasePass && databasePass
+            return (
+              templateFrameworkLower.includes(filterLower) ||
+              filterLower.includes(templateFrameworkLower) ||
+              templateUseCaseLower.includes(filterLower) ||
+              filterLower.includes(templateUseCaseLower) ||
+              templateDatabaseLower.includes(filterLower) ||
+              filterLower.includes(templateDatabaseLower) ||
+              item.name?.toLowerCase().includes(filterLower) ||
+              item.description?.toLowerCase().includes(filterLower)
+            )
+          })
         })
       }))
     }
@@ -186,7 +165,7 @@
   }
 
   // Check if any data is loading
-  const isLoading = computed(() => isRecommendedLoading.value || isPartnersLoading.value)
+  const isLoading = computed(() => isRecommendedLoading.value || isAllTemplatesLoading.value)
 </script>
 
 <template>
@@ -255,7 +234,8 @@
           <div
             v-for="template in category.items"
             :key="template.id"
-            class="group w-full sm:w-64 h-36 p-4 bg-surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
+            class="group h-36 p-4 bg-surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
+            :class="filteredCategories.length === 1 ? 'w-full max-w-[236px]' : 'w-full sm:w-64'"
             @click="handleTemplateClick(template)"
             data-testid="template-card"
           >

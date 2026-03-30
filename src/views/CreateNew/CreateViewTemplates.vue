@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, onBeforeUnmount, ref, provide } from 'vue'
+  import { computed, onMounted, onBeforeUnmount, ref, provide, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Menu from 'primevue/menu'
   import Checkbox from 'primevue/checkbox'
@@ -16,6 +16,9 @@
 
   // Cleanup function for postMessage listener
   let cleanupPostMessage = null
+
+  // Track if we should show the main menu (overriding the sub-menu view)
+  const showMainMenu = ref(true)
 
   // Category filters for Resources section
   const selectedCategories = ref([])
@@ -102,23 +105,47 @@
     return 'import' // default
   })
 
+  // Watch route changes - only set initial state, subsequent changes handled by navigation
+  watch(
+    () => route.name,
+    (newRouteName) => {
+      // Only auto-switch on initial load or when navigating to import
+      if (newRouteName === 'create-import-from-git') {
+        showMainMenu.value = true
+      }
+    },
+    { immediate: true }
+  )
+
   const navItems = computed(() => [
     {
       label: 'Import from Git',
       key: 'import',
-      command: () => navigateTo('create-import-from-git')
+      active: activeNav.value === 'import',
+      command: () => {
+        showMainMenu.value = true
+        navigateTo('create-import-from-git')
+      }
     },
     {
       label: 'Start from Templates',
       key: 'templates',
       icon: 'pi pi-chevron-right',
-      command: () => navigateTo('create-start-from-template')
+      active: activeNav.value === 'templates',
+      command: () => {
+        showMainMenu.value = false
+        navigateTo('create-start-from-template')
+      }
     },
     {
       label: 'Create Resources',
       key: 'resources',
       icon: 'pi pi-chevron-right',
-      command: () => navigateTo('create-create-resource')
+      active: activeNav.value === 'resources',
+      command: () => {
+        showMainMenu.value = false
+        navigateTo('create-create-resource')
+      }
     }
   ])
 
@@ -127,9 +154,9 @@
     router.push({ name: routeName })
   }
 
-  // Go back to main menu from Resources or Templates
+  // Go back to main menu from Resources or Templates (without changing route)
   const goBackToMenu = () => {
-    router.push({ name: 'create-import-from-git' })
+    showMainMenu.value = true
   }
 
   // Toggle category selection
@@ -228,23 +255,25 @@
     <template #content>
       <div class="w-full min-h-full flex flex-col xl:flex-row px-1 gap-4 xl:gap-8 mt-4 md:mt-8">
         <!-- Sidebar Navigation -->
-        <nav class="w-full xl:w-64 flex-shrink-0">
-          <!-- Default Menu for Import section -->
+        <nav
+          class="w-full xl:w-64 flex-shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto"
+        >
+          <!-- Default Menu for Import section (or when showMainMenu is true) -->
           <div
-            v-if="activeNav === 'import'"
+            v-if="showMainMenu || activeNav === 'import'"
             class="flex flex-col gap-3 xl:gap-5"
           >
-            <div class="text-xs font-mono text-color-secondary">How to start</div>
+            <div class="text-xs font-mono text-color-secondary">HOW TO START</div>
             <Menu
               :model="navItems"
-              class="w-full border-none bg-transparent p-0"
+              class="w-full border-none bg-transparent p-0 create-menu"
               :pt="{
                 menuitem: ({ context }) => ({
                   class: [
                     'h-8 rounded cursor-pointer transition-colors mb-2',
-                    activeNav === context.item?.key
+                    context.item?.active
                       ? 'bg-listbox-option-focus-background text-listbox-option-focus-color'
-                      : 'text-color-secondary hover:bg-surface-100'
+                      : 'text-color-secondary bg-surface-100'
                   ]
                 }),
                 content: { class: 'w-full' },
@@ -338,7 +367,7 @@
 
           <!-- Resources Section Menu with Filters -->
           <div
-            v-else-if="activeNav === 'resources'"
+            v-else-if="activeNav === 'resources' && !showMainMenu"
             class="flex flex-col gap-5"
           >
             <!-- Back to Resources Button -->
@@ -417,5 +446,20 @@
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
+  }
+
+  /* Test styles for menu focus - yellow color */
+  .create-menu :deep(.p-menuitem:focus-within),
+  .create-menu :deep(.p-menuitem-content:focus),
+  .create-menu :deep(.p-menuitem-action:focus) {
+    background-color: yellow !important;
+    outline: 2px solid orange !important;
+    outline-offset: 2px;
+  }
+
+  .create-menu :deep(li:focus),
+  .create-menu :deep(li:focus-within) {
+    background-color: yellow !important;
+    outline: 2px solid orange !important;
   }
 </style>
