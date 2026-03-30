@@ -27,8 +27,7 @@
             ? 'Configure domains for your applications.'
             : 'Implement serverless functions and scalable applications.',
           route: isFlagBlockApiV4 ? '/domains/create' : '/workloads/create',
-          icon: domainWorkloadText.icon,
-          tag: domainWorkloadText.tag
+          icon: domainWorkloadText.icon
         },
         {
           id: 'application',
@@ -239,12 +238,6 @@
                 <span class="text-xs font-semibold text-color leading-3">
                   {{ item.name }}
                 </span>
-                <span
-                  v-if="item.tag"
-                  class="text-[10px] font-normal px-1.5 py-0.5 rounded bg-color-primary text-white"
-                >
-                  {{ item.tag }}
-                </span>
               </div>
               <span
                 class="self-stretch text-xs font-normal text-color-secondary leading-4 line-clamp-2"
@@ -258,7 +251,7 @@
 
       <!-- Empty State -->
       <div
-        v-if="filteredCategories.length === 0"
+        v-if="!filteredCategories.length"
         class="col-span-full flex flex-col items-center justify-center py-12 text-center"
       >
         <i class="pi pi-search text-4xl text-color-secondary mb-4"></i>

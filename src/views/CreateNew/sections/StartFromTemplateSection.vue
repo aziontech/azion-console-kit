@@ -255,7 +255,7 @@
           <div
             v-for="template in category.items"
             :key="template.id"
-            class="group w-64 h-36 p-4 bg-surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
+            class="group w-full sm:w-64 h-36 p-4 bg-surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
             @click="handleTemplateClick(template)"
             data-testid="template-card"
           >

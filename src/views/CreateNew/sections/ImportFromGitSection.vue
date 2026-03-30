@@ -439,12 +439,15 @@
 
           <!-- Git Provider Buttons -->
           <div class="w-full grid grid-cols-2 sm:flex sm:flex-col gap-2 sm:gap-2.5">
-            <button
+            <div
               v-for="provider in visibleGitProviders"
               :key="provider.key"
-              class="w-full h-10 sm:h-11 px-3 sm:px-4 rounded-md border surface-border flex items-center justify-center gap-2 transition-colors"
-              :class="[provider.bgColor, provider.hoverBgColor]"
-              :disabled="isVcsLoading"
+              class="w-full h-10 sm:h-11 px-3 sm:px-4 rounded-md border surface-border flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              :class="[
+                provider.bgColor,
+                provider.hoverBgColor,
+                { 'opacity-50 pointer-events-none': isVcsLoading }
+              ]"
               @click="handleProviderConnect(provider)"
             >
               <!-- Provider Icon -->
@@ -466,7 +469,7 @@
               <span class="text-xs font-mono font-semibold text-white leading-3">
                 <span class="hidden sm:inline">Continue with </span>{{ provider.name }}
               </span>
-            </button>
+            </div>
           </div>
 
           <!-- Manage Providers Link -->
