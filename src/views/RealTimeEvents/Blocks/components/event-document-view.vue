@@ -25,6 +25,10 @@
     isLoading: {
       type: Boolean,
       default: false
+    },
+    compact: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -136,7 +140,60 @@
       v-model:activeIndex="activeTab"
     >
       <TabPanel header="Table">
-        <div class="doc-list">
+        <!-- Compact mode: dense horizontal rows for inline expansion -->
+        <div
+          v-if="compact"
+          class="doc-compact"
+        >
+          <div
+            v-for="(entry, index) in summaryEntries"
+            :key="index"
+            class="doc-compact__row group"
+            data-testid="event-document-row"
+          >
+            <span class="doc-compact__key">{{ entry.key }}</span>
+            <span
+              class="doc-compact__value"
+              :title="String(entry.value).length > 60 ? String(entry.value) : undefined"
+              >{{ formatDisplayValue(entry.value) }}</span
+            >
+            <span class="doc-compact__actions">
+              <PrimeButton
+                v-if="onAddFilter && entry.value !== '-'"
+                icon="pi pi-plus-circle"
+                text
+                size="small"
+                class="!w-5 !h-5 !p-0"
+                v-tooltip.top="{ value: 'Filter for value', showDelay: 300 }"
+                @click.stop="handleAddFilter(entry.key, entry.value)"
+              />
+              <PrimeButton
+                v-if="onExcludeFilter && entry.value !== '-'"
+                icon="pi pi-minus-circle"
+                text
+                size="small"
+                class="!w-5 !h-5 !p-0"
+                v-tooltip.top="{ value: 'Filter out value', showDelay: 300 }"
+                @click.stop="handleExcludeFilter(entry.key, entry.value)"
+              />
+              <PrimeButton
+                v-if="entry.value !== '-'"
+                icon="pi pi-copy"
+                text
+                size="small"
+                class="!w-5 !h-5 !p-0"
+                v-tooltip.top="{ value: 'Copy value', showDelay: 300 }"
+                @click.stop="handleCopy(entry.value)"
+              />
+            </span>
+          </div>
+        </div>
+
+        <!-- Default mode: spacious layout for sidebar -->
+        <div
+          v-else
+          class="doc-list"
+        >
           <div
             v-for="(entry, index) in summaryEntries"
             :key="index"
@@ -203,7 +260,7 @@
             data-testid="event-document-copy-json"
           />
           <pre
-            class="p-4 font-mono text-xs text-color surface-ground rounded-md overflow-x-auto max-h-[400px] overflow-y-auto leading-5"
+            class="json-pre p-4 text-xs text-color surface-ground rounded-md overflow-x-auto max-h-[400px] overflow-y-auto leading-5"
             data-testid="event-document-json"
             >{{ jsonDocument }}</pre
           >
@@ -227,8 +284,12 @@
   }
 
   :deep(.event-document-tabs .p-tabview-nav-link) {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  :deep(.event-document-tabs .p-tabview-nav-container) {
+    margin-bottom: 0.75rem;
   }
 
   /* ── Document list layout ─────────────────────────────────────── */
@@ -285,5 +346,73 @@
     word-break: break-word;
     overflow-wrap: break-word;
     padding-left: 0.25rem;
+  }
+
+  /* ── Compact layout (inline expansion) ─────────────────────── */
+  .doc-compact {
+    display: flex;
+    flex-direction: column;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .doc-compact__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.75rem;
+    border-bottom: 1px solid var(--surface-border);
+    min-height: 1.6rem;
+  }
+
+  .doc-compact__row:last-child {
+    border-bottom: none;
+  }
+
+  .doc-compact__row:hover {
+    background: var(--surface-hover);
+  }
+
+  .doc-compact__key {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--series-one-color, #fba86f);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 120px;
+    max-width: 160px;
+  }
+
+  .doc-compact__value {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .doc-compact__actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+
+  .doc-compact__row:hover .doc-compact__actions {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* ── JSON pre block ─────────────────────────────────────────── */
+  .json-pre {
+    font-family:
+      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   }
 </style>

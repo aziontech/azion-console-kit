@@ -135,11 +135,12 @@
     flex-direction: column;
     border-left: 1px solid var(--surface-border);
     background: var(--surface-ground);
-    height: 100%;
+    align-self: stretch;
     overflow: hidden;
     width: 480px;
     min-width: 360px;
     max-width: 50vw;
+    flex-shrink: 0;
   }
 
   .detail-sidebar__header {

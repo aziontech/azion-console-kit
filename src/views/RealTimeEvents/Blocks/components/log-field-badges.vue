@@ -163,6 +163,7 @@
     cursor: pointer;
     padding: 2px 0;
     max-width: 100%;
+    max-height: 44px;
     overflow: hidden;
   }
 

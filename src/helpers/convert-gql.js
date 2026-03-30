@@ -67,7 +67,15 @@ function buildGraphQLQueryTotalRecords({ filterParameter, dataset, limit, filter
  * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
  * @return {string} The constructed GraphQL query string.
  */
-function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
+function buildGraphQLQuery({
+  filterParameter,
+  dataset,
+  limit,
+  offset,
+  orderBy,
+  filterQuery,
+  fields
+}) {
   const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
   return [
     `query (`,
@@ -75,6 +83,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
     `) {`,
     `\t${dataset} (`,
     `\t\tlimit: ${limit}`,
+    ...(offset ? [`\t\toffset: ${offset}`] : []),
     `\t\torderBy: [${orderBy}]`,
     `\t\tfilter: {`,
     filter,
@@ -149,6 +158,7 @@ const convertGQL = (filter, table) => {
     filterParameter,
     dataset: table.dataset,
     limit: table.limit,
+    ...(table.offset && { offset: table.offset }),
     orderBy: table.orderBy,
     filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
