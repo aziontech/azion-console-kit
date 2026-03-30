@@ -93,12 +93,12 @@
     }
   ]
 
-  // Get the current active navigation from route
+  // Get the current active navigation from route name
   const activeNav = computed(() => {
-    const path = route.path
-    if (path.includes('import-from-git')) return 'import'
-    if (path.includes('start-from-template')) return 'templates'
-    if (path.includes('create-resource')) return 'resources'
+    const routeName = route.name
+    if (routeName === 'create-import-from-git') return 'import'
+    if (routeName === 'create-start-from-template') return 'templates'
+    if (routeName === 'create-create-resource') return 'resources'
     return 'import' // default
   })
 
@@ -262,10 +262,10 @@
           >
             <!-- Back to Templates Button -->
             <button
-              class="w-64 h-8 px-2.5 py-1.5 rounded outline outline-1 outline-offset-[-1px] outline-Root-surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              class="w-64 h-8 px-2.5 py-1.5 rounded surface-border border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
               @click="goBackToMenu"
             >
-              <i class="pi pi-arrow-left text-xs" />
+              <i class="pi pi-angle-left" />
               <span
                 class="flex-1 text-left text-listbox-option-focus-color text-xs font-normal font-['Sora']"
                 >Templates</span
@@ -343,10 +343,10 @@
           >
             <!-- Back to Resources Button -->
             <button
-              class="w-64 h-8 px-2.5 py-1.5 rounded outline outline-1 outline-offset-[-1px] outline-Root-surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              class="w-64 h-8 px-2.5 py-1.5 rounded border surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
               @click="goBackToMenu"
             >
-              <i class="pi pi-arrow-left text-xs" />
+              <i class="pi pi-angle-left" />
               <span
                 class="flex-1 text-left text-listbox-option-focus-color text-xs font-normal font-['Sora']"
                 >Resources</span

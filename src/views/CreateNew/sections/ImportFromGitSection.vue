@@ -232,7 +232,7 @@
   }
 
   const handleViewAllTemplates = () => {
-    // Navigate to full templates list
+    router.push({ name: 'create-start-from-template' })
   }
 </script>
 
