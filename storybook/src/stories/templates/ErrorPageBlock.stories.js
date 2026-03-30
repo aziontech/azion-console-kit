@@ -1,4 +1,4 @@
-import PrimeButton from 'primevue/button'
+import Button from '@aziontech/webkit/button'
 import Illustration403 from '@aziontech/webkit/svg/error-403'
 import Illustration404 from '@aziontech/webkit/svg/error-404'
 import ErrorPageBlock from '@/templates/error-page-block/index.vue';
@@ -35,7 +35,7 @@ export const Forbidden403 = {
     components: {
       ErrorPageBlock,
       Illustration403,
-      PrimeButton
+      Button
     },
     setup() {
       const handleGoBackHome = () => {
@@ -55,11 +55,11 @@ export const Forbidden403 = {
         </template>
 
         <template #actions>
-          <PrimeButton
+          <Button
             label="Back to Home"
             @click="handleGoBackHome"
           />
-          <PrimeButton
+          <Button
             outlined
             label="Contact Support"
             @click="handleContactSupport"
@@ -79,7 +79,7 @@ export const NotFound404 = {
     components: {
       ErrorPageBlock,
       Illustration404,
-      PrimeButton
+      Button
     },
     setup() {
       const handleGoBackHome = () => {
@@ -99,11 +99,11 @@ export const NotFound404 = {
         </template>
 
         <template #actions>
-          <PrimeButton
+          <Button
             label="Back to Home"
             @click="handleGoBackHome"
           />
-          <PrimeButton
+          <Button
             outlined
             label="Contact Support"
             @click="handleContactSupport"
