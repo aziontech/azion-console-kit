@@ -56,5 +56,6 @@ specs.json
 .claude/
 .opencode/
 CLAUDE.md
+AGENTS.md
 docs/ARCHITECTURE.md
 hooks/
