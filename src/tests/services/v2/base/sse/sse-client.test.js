@@ -340,7 +340,13 @@ describe('SSEClient', () => {
 
   describe('reconnection', () => {
     it('should attempt reconnection with exponential backoff', () => {
-      const { sut } = makeSut({ reconnectMaxAttempts: 3, reconnectBaseDelay: 1000 })
+      // connectionStabilityThreshold: 0 makes the connection immediately "stable"
+      // so errors are treated as NETWORK errors (not SERVER errors)
+      const { sut } = makeSut({
+        reconnectMaxAttempts: 3,
+        reconnectBaseDelay: 1000,
+        connectionStabilityThreshold: 0
+      })
       sut.connect()
       vi.advanceTimersByTime(1)
 
@@ -357,7 +363,14 @@ describe('SSEClient', () => {
     })
 
     it('should emit maxReconnectAttempts after exhausting retries', () => {
-      const { sut } = makeSut({ reconnectMaxAttempts: 1, reconnectBaseDelay: 100 })
+      // connectionStabilityThreshold: 0 treats errors as NETWORK errors
+      // serverErrorMaxAttempts high to avoid server_unavailable event
+      const { sut } = makeSut({
+        reconnectMaxAttempts: 1,
+        reconnectBaseDelay: 100,
+        connectionStabilityThreshold: 0,
+        serverErrorMaxAttempts: 10
+      })
       const maxHandler = vi.fn()
 
       sut.on('maxReconnectAttempts', maxHandler)

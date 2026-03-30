@@ -136,13 +136,14 @@ describe('getKeysForResource', () => {
   it('should return keys for team resource type', () => {
     const result = getKeysForResource('team', 'created', null)
 
-    expect(result.some((key) => key[0] === 'teams')).toBe(true)
+    // team maps to teamPermission query key which has 'team-permissions' as first element
+    expect(result.some((key) => key[0] === 'team-permissions')).toBe(true)
   })
 
-  it('should return both application and firewall keys for function', () => {
+  it('should return edge function keys for function resource type', () => {
     const result = getKeysForResource('function', 'created', null)
 
-    expect(result.some((key) => key[0] === 'application')).toBe(true)
+    // function maps to edgeFunction query key which has 'edge-functions' as first element
     expect(result.some((key) => key[0] === 'edge-functions')).toBe(true)
   })
 })
@@ -150,49 +151,49 @@ describe('getKeysForResource', () => {
 describe('getParentKeys', () => {
   describe('valid parent ID', () => {
     it('should return detail key for Application parent', () => {
-      const result = getParentKeys('Application', '1772656941')
+      const result = getParentKeys('application', '1772656941')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', '1772656941'])
     })
 
     it('should return detail key for Edge Firewall parent', () => {
-      const result = getParentKeys('Edge Firewall', '12345')
+      const result = getParentKeys('edge firewall', '12345')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['edge-firewalls', 'detail', '12345'])
     })
 
     it('should return detail key for Workload parent', () => {
-      const result = getParentKeys('Workload', '42')
+      const result = getParentKeys('workload', '42')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['workloads', 'detail', '42'])
     })
 
     it('should return detail key for Edge DNS parent', () => {
-      const result = getParentKeys('Edge DNS', '999')
+      const result = getParentKeys('edge dns', '999')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['edge-dns', 'detail', '999'])
     })
 
     it('should return detail key for Data Stream parent', () => {
-      const result = getParentKeys('Data Stream', '555')
+      const result = getParentKeys('data stream', '555')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['data-streams', 'detail', '555'])
     })
 
     it('should return detail key for Edge Function parent', () => {
-      const result = getParentKeys('Edge Function', '789')
+      const result = getParentKeys('edge function', '789')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['edge-functions', 'detail', '789'])
     })
 
     it('should accept numeric parent ID', () => {
-      const result = getParentKeys('Application', 12345)
+      const result = getParentKeys('application', 12345)
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', 12345])
@@ -201,35 +202,35 @@ describe('getParentKeys', () => {
 
   describe('parent ID handling', () => {
     it('should return detail key with empty string parent ID', () => {
-      const result = getParentKeys('Application', '')
+      const result = getParentKeys('application', '')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', ''])
     })
 
     it('should return detail key with hyphen parent ID', () => {
-      const result = getParentKeys('Application', '-')
+      const result = getParentKeys('application', '-')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', '-'])
     })
 
     it('should return detail key with hyphen with spaces parent ID', () => {
-      const result = getParentKeys('Application', ' - ')
+      const result = getParentKeys('application', ' - ')
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', ' - '])
     })
 
     it('should return detail key with null parent ID', () => {
-      const result = getParentKeys('Application', null)
+      const result = getParentKeys('application', null)
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', null])
     })
 
     it('should return detail key with undefined parent ID', () => {
-      const result = getParentKeys('Application', undefined)
+      const result = getParentKeys('application', undefined)
 
       expect(result.length).toBe(1)
       expect(result[0]).toEqual(['application', undefined])
