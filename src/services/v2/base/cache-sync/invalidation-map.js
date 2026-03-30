@@ -95,7 +95,7 @@ const GROUPS = {
   EDGE_FIREWALL_FUNCTIONS: 'edge-firewall-functions',
   EDGE_FIREWALL_RULES_ENGINE: 'edge-firewall-rules-engine',
   WORKLOADS: 'workloads',
-  TEAMS: 'teams',
+  TEAMS: 'teamPermission',
   EDGE_DNS: 'edge-dns',
   EDGE_STORAGE: 'edge-storage',
   DATA_STREAM: 'data-stream',
@@ -107,7 +107,7 @@ const GROUPS = {
   CUSTOM_PAGES: 'custom-pages',
   EDGE_SERVICE: 'edge-service',
   EDGE_NODE: 'edge-node',
-  USER: 'user',
+  USER: 'users',
   ACCOUNT: 'account',
   BILLING: 'billing'
 }
@@ -158,9 +158,8 @@ const PARENT_TYPE_TO_QUERY_KEY = {
   waf: 'waf',
 
   // User Menu
-  team: 'teams', // ainda sem conseguir testar
-  'team Permission': 'teamPermission', // ainda se conseguir testar
-  user: 'users',
+  team: 'teamPermission', // ainda sem conseguir testar
+  'team permission': 'teamPermission', // ainda se conseguir testar
   'personal token': 'personalToken',
 
   // Account: 'account',
@@ -178,12 +177,12 @@ const PARENT_TYPE_TO_QUERY_KEY = {
 const RESOURCE_TYPE_MAP = {
   // Account & User
   account: createSimpleMapping(queryKeys.account, GROUPS.ACCOUNT),
-  user: createSimpleMapping(queryKeys.user, GROUPS.USER),
+  user: createSimpleMapping(queryKeys.users, GROUPS.USER),
+  users: createSimpleMapping(queryKeys.users, GROUPS.USER),
   contract: createSimpleMapping(queryKeys.contract),
   account_settings: createSimpleMapping(queryKeys.accountSettings, GROUPS.ACCOUNT),
   billing: createSimpleMapping(queryKeys.billing, GROUPS.BILLING),
   personal_token: createSimpleMapping(queryKeys.personalToken),
-  users: createSimpleMapping(queryKeys.users, GROUPS.USER),
 
   // Solutions & Marketplace
   solution: createSimpleMapping(queryKeys.solutions),
@@ -228,7 +227,7 @@ const RESOURCE_TYPE_MAP = {
   connector: createDetailMapping(queryKeys.edgeConnectors, GROUPS.EDGE_CONNECTORS),
 
   // Teams & Permissions
-  team: createSimpleMapping(queryKeys.teams, GROUPS.TEAMS),
+  team: createDetailMapping(queryKeys.teamPermission, GROUPS.TEAMS),
   team_permission: createDetailMapping(queryKeys.teamPermission, GROUPS.TEAMS),
 
   // WAF
