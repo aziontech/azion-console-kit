@@ -1,15 +1,18 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import { teamPermissionService } from '@/services/v2/team-permission'
   import { documentationAccountsProducts } from '@/helpers/azion-documentation-catalog'
+  import { ref } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -76,6 +79,8 @@
       productName: 'Team'
     })
   }
+
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 </script>
 
 <template>
@@ -97,19 +102,20 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
         :listService="teamPermissionService.list"
         :columns="getColumns"
-        editPagePath="/teams-permission/edit"
-        emptyListMessage="No teams found."
         :actions="actions"
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :defaultOrderingFieldName="'name'"
+        editPagePath="/teams-permission/edit"
+        createPagePath="teams-permission/create"
+        defaultOrderingFieldName="name"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"
         :csvMapper="csvMapper"
-        hideLastModifiedColumn
+        :lazy="true"
+        emptyListMessage="No teams found."
+        :hideLastModifiedColumn="true"
         :emptyBlock="{
           title: 'No team permissions yet',
           description: 'Create your first team to define and assign permissions to users.',
@@ -117,8 +123,10 @@
           createPagePath: 'teams-permission/create',
           documentationService: documentationAccountsProducts.teamPermissions
         }"
-      >
-      </FetchListTableBlock>
+        @on-load-data="emit('on-load-data', $event)"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
+      />
     </template>
   </ContentBlock>
 </template>

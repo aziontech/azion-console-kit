@@ -10,13 +10,12 @@
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
-  import SimpleTable from '@/templates/list-table-block/simple-table.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableSimple from '@/components/list-table/ListTableSimple.vue'
+  import Skeleton from 'primevue/skeleton'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import WorkloadsEmptyState from './workloads-empty-state.vue'
-  import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
 
-  const tableDefinitionsStore = useTableDefinitionsStore()
   const router = useRouter()
   const isLoading = ref(false)
   const { openDeleteDialog } = useDeleteDialog()
@@ -406,7 +405,7 @@
     try {
       const response = await workloadService.listWorkloads({
         page: 1,
-        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        pageSize: 10,
         ordering: '-last_modified',
         fields: [
           'name',
@@ -435,7 +434,7 @@
   const loadEdgeDns = async () => {
     try {
       const response = await edgeDNSService.listEdgeDNSService({
-        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        pageSize: 10,
         page: 1,
         ordering: '-last_modified',
         fields: ['id', 'name', 'domain', 'active', 'last_modified']
@@ -468,7 +467,7 @@
   const loadObjectStorage = async () => {
     try {
       const response = await edgeStorageService.listEdgeStorageBuckets({
-        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        pageSize: 10,
         page: 1,
         ordering: '-last_modified'
       })
@@ -486,7 +485,7 @@
   const loadFunctions = async () => {
     try {
       const response = await edgeFunctionService.listEdgeFunctionsService({
-        pageSize: tableDefinitionsStore.getNumberOfLinesPerPage,
+        pageSize: 10,
         page: 1,
         ordering: '-last_modified'
       })
@@ -511,7 +510,30 @@
     }
   }
 
+  const ROWS_LIMIT = 5
+
+  const displayData = computed(() => {
+    if (isLoading.value) {
+      return Array.from({ length: ROWS_LIMIT }, (_unused, index) => ({
+        id: `skeleton-${index}`,
+        isSkeletonRow: true
+      }))
+    }
+    return currentData.value.slice(0, ROWS_LIMIT)
+  })
+
+  const getFieldValue = (rowData, field) => {
+    if (!field) return null
+    const keys = field.split('.')
+    let value = rowData
+    for (const key of keys) {
+      value = value?.[key]
+    }
+    return value
+  }
+
   const handleRowClick = (event) => {
+    if (event.data?.isSkeletonRow) return
     const routeMap = {
       workloads: { name: editWorkloadRouteName.value, params: { id: event.data.id } },
       'edge-dns': { name: 'edit-edge-dns', params: { id: event.data.id } },
@@ -577,18 +599,59 @@
     <WorkloadsEmptyState
       v-if="selectedResource === 'workloads' && currentData.length === 0 && !isLoading"
     />
-    <SimpleTable
+    <ListTableSimple
       v-else
-      :data="currentData"
+      :data="displayData"
       :columns="currentColumns"
-      :rows-limit="5"
-      :loading="isLoading"
+      :loading="false"
+      :rowsLimit="ROWS_LIMIT"
+      :viewAllLink="currentViewAllLink"
+      :viewAllLabel="currentViewAllLabel"
+      :emptyBlock="emptyBlock"
       :actions="currentActions"
-      :view-all-link="currentViewAllLink"
-      :view-all-label="currentViewAllLabel"
-      @row-click="handleRowClick"
-      :empty-block="emptyBlock"
-      hideIllustration
-    />
+    >
+      <template
+        v-for="col in currentColumns"
+        :key="col.field"
+        #[`column-${col.field}`]="{ data: rowData }"
+      >
+        <div
+          :class="{ 'cursor-pointer hover:underline': col.enableClick && !rowData.isSkeletonRow }"
+          @click.stop="
+            col.enableClick && !rowData.isSkeletonRow && handleRowClick({ data: rowData })
+          "
+        >
+          <template v-if="rowData.isSkeletonRow">
+            <Skeleton
+              class="h-[14px]"
+              :width="col.skeletonWidth || '80%'"
+            />
+          </template>
+          <template v-else-if="col.type === 'component' && col.component">
+            <component :is="col.component(getFieldValue(rowData, col.field))" />
+          </template>
+          <template v-else>
+            <span>{{ getFieldValue(rowData, col.field) }}</span>
+          </template>
+        </div>
+      </template>
+    </ListTableSimple>
   </div>
 </template>
+
+<style scoped lang="scss">
+  :deep(.p-datatable-footer) {
+    padding: 0;
+    border: none;
+  }
+
+  :deep(.p-datatable-tbody > tr > td) {
+    height: 44px;
+    padding: 0 12px;
+  }
+
+  :deep(.p-datatable-thead > tr > th) {
+    height: 44px;
+    padding: 0 12px;
+  }
+</style>

@@ -62,7 +62,7 @@
   </div>
 </template>
 <script setup>
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from 'primevue/api'

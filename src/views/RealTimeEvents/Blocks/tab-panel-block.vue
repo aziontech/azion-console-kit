@@ -1,6 +1,7 @@
 <script setup>
   import { computed, onBeforeMount, onMounted, ref } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block'
+  // TODO: migrate import to @aziontech/webkit/list-data-table when published
+  import DataTable from '@aziontech/webkit/list-data-table'
   import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
@@ -8,10 +9,14 @@
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
   import { useToast } from 'primevue/usetoast'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { FilterMatchMode } from 'primevue/api'
+  import { getCsvCellContentFromRowData } from '@/helpers'
 
   defineOptions({ name: 'TabPanelBlock' })
 
   const toast = useToast()
+  const tableDefinitions = useTableDefinitionsStore()
 
   const props = defineProps({
     loadService: {
@@ -35,10 +40,57 @@
   })
 
   const { getFiltersFromHash, setFilterInHash } = useRouteFilterManager()
-  const listTableBlockRef = ref(null)
+  const dataTableRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
   const recordsFound = ref(0)
+
+  // Table state (migrated from index.vue)
+  const data = ref([])
+  const isLoading = ref(false)
+  const selectedColumns = ref([])
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
+  const firstItemIndex = ref(0)
+  const filters = ref({
+    global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+  })
+
+  const filterBy = computed(() => {
+    const columns = props.tabSelected?.columns || []
+    const filtersPath = columns.filter((el) => el.filterPath).map((el) => el.filterPath)
+    const columnFilters = columns.map((item) => item.field)
+    return [...columnFilters, ...filtersPath]
+  })
+
+  const hasExportToCsvMapper = computed(() => !!props.tabSelected?.customColumnMapper)
+
+  const formatSummaryToCSV = (summary) => {
+    const summaryValue = summary
+      .map((item) => `${item.key}: ${item.value.toString().replace(/"/g, '""')}`)
+      .join(' | ')
+    return `"${summaryValue}"`
+  }
+
+  const exportFunctionMapper = (rowData) => {
+    if (!hasExportToCsvMapper.value) return
+    const columnMapper = props.tabSelected.customColumnMapper(rowData)
+    if (rowData.field === 'summary') {
+      const values = [...columnMapper.summary]
+      columnMapper.summary = formatSummaryToCSV(values)
+    }
+    return getCsvCellContentFromRowData({ columnMapper, rowData })
+  }
+
+  const handleExportTableDataToCSV = () => {
+    dataTableRef.value?.exportCSV?.()
+  }
+
+  const changeNumberOfLinesPerPage = (event) => {
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
+    firstItemIndex.value = event.first
+  }
 
   const defaultFilter = {
     tsRange: {
@@ -65,8 +117,34 @@
     })
   }
 
-  const reloadListTable = async () => {
-    listTableBlockRef.value?.reload()
+  const editItemSelected = ({ data: item }) => {
+    openDetailDrawer(item)
+  }
+
+  const loadData = async () => {
+    try {
+      isLoading.value = true
+      const response = await listProvider()
+      data.value = response
+    } catch (error) {
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error?.message || error
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage
+        })
+      }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const reload = () => {
+    loadData()
   }
 
   const reloadListTableWithHash = async () => {
@@ -74,7 +152,7 @@
       ...filterData.value,
       dataset: props.tabSelected.dataset
     })
-    reloadListTable()
+    reload()
   }
 
   const refreshFilterData = () => {
@@ -119,7 +197,8 @@
   })
 
   onMounted(() => {
-    reloadListTable()
+    selectedColumns.value = props.tabSelected?.columns || []
+    reload()
   })
 </script>
 
@@ -161,33 +240,94 @@
           data-testid="data-table-actions-column-header-toggle-columns"
         />
       </div>
-      <ListTableBlock
-        lazyLoad
-        hiddenHeader
-        :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
-        isGraphql
-        frozenSize="3rem"
-        :showColumnSelector="false"
-        ref="listTableBlockRef"
-        :listService="listProvider"
-        :columns="props.tabSelected.columns"
-        :editInDrawer="openDetailDrawer"
-        emptyListMessage="No logs have been found for this period."
-        :csvMapper="props.tabSelected.customColumnMapper"
-        :exportFileName="`${props.tabSelected.tabRouter}-logs`"
-        data-testid="table-tab-panel-block"
+      <div
+        class="max-w-full"
+        data-testid="data-table-container"
       >
-        <template #actions-header="{ exportTableCSV }">
-          <PrimeButton
-            outlined
-            icon="pi pi-download"
-            class="min-w-max"
-            @click="exportTableCSV"
-            v-tooltip.left="{ value: 'Export to CSV', showDelay: 200 }"
-            data-testid="data-table-actions-column-header-toggle-columns"
-          />
-        </template>
-      </ListTableBlock>
+        <DataTable
+          ref="dataTableRef"
+          class="overflow-clip rounded-md"
+          scrollable
+          removableSort
+          :data="data"
+          :columns="selectedColumns"
+          dataKey="id"
+          @rowClick="editItemSelected"
+          :rowHover="true"
+          v-model:filters="filters"
+          :paginator="true"
+          :rowsPerPageOptions="[10, 20, 50, 100]"
+          :rows="minimumOfItemsPerPage"
+          @page="changeNumberOfLinesPerPage"
+          :globalFilterFields="filterBy"
+          :exportFilename="`${props.tabSelected.tabRouter}-logs`"
+          :exportFunction="exportFunctionMapper"
+          :loading="isLoading"
+          :notShowEmptyBlock="true"
+          scrollHeight="auto"
+          :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
+          data-testid="table-tab-panel-block"
+          :first="firstItemIndex"
+        >
+          <DataTable.Column
+            :sortable="!col.disableSort"
+            v-for="col of selectedColumns"
+            :key="col.field"
+            :field="col.field"
+            :header="col.header"
+            :sortField="col?.sortField"
+            :class="{ 'hover:cursor-pointer': true }"
+            data-testid="data-table-column"
+          >
+            <template #body="{ data: rowData }">
+              <template v-if="col.type !== 'component'">
+                <div :data-testid="`list-table-block__column__${col.field}__row`">
+                  {{ rowData[col.field] }}
+                </div>
+              </template>
+              <template v-else>
+                <component
+                  :is="col.component(rowData[col.field])"
+                  :data-testid="`list-table-block__column__${col.field}__row`"
+                />
+              </template>
+            </template>
+          </DataTable.Column>
+          <DataTable.Column
+            :frozen="true"
+            :alignFrozen="'right'"
+            headerStyle="width: 3rem"
+            data-testid="data-table-actions-column"
+          >
+            <template #header>
+              <div
+                class="flex justify-end w-full gap-2"
+                data-testid="data-table-actions-column-header"
+              >
+                <PrimeButton
+                  v-if="hasExportToCsvMapper"
+                  outlined
+                  icon="pi pi-download"
+                  class="min-w-max"
+                  @click="handleExportTableDataToCSV"
+                  v-tooltip.left="{ value: 'Export to CSV', showDelay: 200 }"
+                  data-testid="data-table-actions-column-header-toggle-columns"
+                />
+              </div>
+            </template>
+          </DataTable.Column>
+          <template #empty>
+            <div class="my-4 flex flex-col gap-3 justify-center items-start">
+              <p
+                class="text-md font-normal text-secondary"
+                data-testid="list-table-block__empty-message__text"
+              >
+                No logs have been found for this period.
+              </p>
+            </div>
+          </template>
+        </DataTable>
+      </div>
     </div>
   </data>
 </template>

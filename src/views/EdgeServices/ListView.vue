@@ -1,12 +1,12 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { computed, inject, ref } from 'vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
-  import { computed, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -19,6 +19,8 @@
       required: true
     }
   })
+
+  const listTableRef = ref()
 
   const csvMapper = (rowData) => {
     return {
@@ -148,18 +150,18 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <ListTable
+        ref="listTableRef"
+        emptyListMessage="No services found."
         :listService="edgeServiceService.listEdgeServiceService"
         :columns="getColumns"
+        :actions="actions"
         createPagePath="edge-services/create"
         editPagePath="/edge-services/edit"
-        :actions="actions"
-        emptyListMessage="No services found."
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        :defaultOrderingFieldName="'-last_modified'"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Edge Services"
         :csvMapper="csvMapper"
+        :lazy="true"
         :emptyBlock="{
           title: 'No Edge Services yet',
           description:
@@ -168,6 +170,8 @@
           createPagePath: 'edge-services/create',
           documentationService: documentationService
         }"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
       />
     </template>
   </ContentBlock>

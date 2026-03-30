@@ -89,7 +89,7 @@
   import { computed, inject } from 'vue'
   import PrimePassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyCredentialDialog' })
 

@@ -1,71 +1,15 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock
-        pageTitle="Real-Time Purge"
-        description="Invalidate cached content to control content freshness across Azion’s global infrastructure."
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Purge"
-            @click="handleTrackEvent"
-            createPagePath="real-time-purge/create"
-            data-testid="create_Purge_button"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <InlineMessage
-        class="w-fit mb-8"
-        severity="info"
-        icon="pi pi-spin pi-spinner"
-        v-if="isLoading"
-      >
-        Purge requests are queued. The table will update automatically once processing is complete.
-      </InlineMessage>
-      <ListTableBlock
-        ref="listPurgeRef"
-        :listService="props.listRealTimePurgeService"
-        :columns="getColumns"
-        addButtonLabel="Purge"
-        createPagePath="real-time-purge/create"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        :isGraphql="true"
-        :enableEditClick="false"
-        emptyListMessage="No purge found."
-        :actions="actionsRow"
-        :defaultOrderingFieldName="'-last_modified'"
-        hide-last-modified-column
-        :paginator="false"
-        exportFileName="Real-Time Purge"
-        :empty-block="{
-          title: 'No Purge requests yet',
-          description: 'Create your first purge request to remove cached content.',
-          createButtonLabel: 'Purge',
-          createPagePath: 'real-time-purge/create',
-          documentationService: documentationService
-        }"
-      >
-      </ListTableBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import InlineMessage from 'primevue/inlinemessage'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { computed, ref, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2/purge/purge-service'
-  // import { useRouter } from 'vue-router'
-  // import { useAccountStore } from '@/stores/account'
   import { usePurgeStore } from '@/stores/purge'
   import { capitalizeFirstLetter } from '@/helpers'
 
@@ -80,34 +24,16 @@
     }
   })
 
-  const listPurgeRef = ref('')
-  // const route = useRoute()
-  // const router = useRouter()
   const isLoading = ref(null)
   const toast = useToast()
-  // const timeToReload = 9000
-  // const { accountData } = useAccountStore()
   const purgeStore = usePurgeStore()
   const repurgesNeedingFocus = ref(0)
-  // const feedbackPurge = ref(
-  //   'The purge has been successfully triggered and is now listed in the table.'
-  // )
-
-  // const user = accountData
   const countPurge = ref(0)
+  const hasContentToList = ref(true)
+  const listTableRef = ref()
 
-  const handleLoadData = async () => {
-    // countPurge.value = listPurgeRef.value.data?.filter((item) => item.user === user.email).length
-    // const { isPending } = route.query
-    // const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
-    // if (hasPendingMismatch) {
-    //   isLoading.value = true
-    //   countPurge.value++
-    //   repurgesNeedingFocus.value++
-    //   handleTimeLoad()
-    // } else {
-    //   router.replace({ query: {} })
-    // }
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 
   const handleTrackEvent = () => {
@@ -146,7 +72,6 @@
       if (error && typeof error.showErrors === 'function') {
         error.showErrors(toast)
       } else {
-        // Fallback for legacy errors or non-ErrorHandler errors
         const errorMessage = error?.message || error
         showToast('error', errorMessage)
       }
@@ -162,7 +87,6 @@
     repurgesNeedingFocus.value++
     try {
       await repurgeEvent(item)
-      // await handleTimeLoad()
     } catch (error) {
       isLoading.value = false
     } finally {
@@ -215,35 +139,62 @@
       }
     ]
   })
-
-  // const applyFocus = (usersPurge, listPurge) => {
-  //   const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
-  //   const focusIds = newPurge.map((item) => item.id)
-  //   return listPurge.map((item) => ({
-  //     ...item,
-  //     focus: focusIds.includes(item.id)
-  //   }))
-  // }
-
-  // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-  // const handleTimeLoad = async () => {
-  //   let totalOfUserPurges = 0
-  //   do {
-  //     await sleep(timeToReload)
-  //     const listPurge = await props.listRealTimePurgeService()
-  //     if (!repurgesNeedingFocus.value) return
-  //     const usersPurge = listPurge.filter((item) => item.user === user.email)
-  //     totalOfUserPurges = usersPurge.length
-
-  //     if (totalOfUserPurges === countPurge.value) {
-  //       listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
-  //       listPurgeRef.value.updateDataTablePagination()
-  //       router.replace({ query: {} })
-  //       showToast('success', feedbackPurge.value)
-  //     }
-  //   } while (totalOfUserPurges !== countPurge.value)
-  //   isLoading.value = false
-  //   repurgesNeedingFocus.value = 0
-  // }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Real-Time Purge"
+        description="Invalidate cached content to control content freshness across Azion's global infrastructure."
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Purge"
+            @click="handleTrackEvent"
+            createPagePath="real-time-purge/create"
+            data-testid="create_Purge_button"
+          />
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <InlineMessage
+        class="w-fit mb-8"
+        severity="info"
+        icon="pi pi-spin pi-spinner"
+        v-if="isLoading"
+      >
+        Purge requests are queued. The table will update automatically once processing is complete.
+      </InlineMessage>
+      <ListTable
+        v-if="hasContentToList"
+        ref="listTableRef"
+        :listService="props.listRealTimePurgeService"
+        :columns="getColumns"
+        :actions="actionsRow"
+        :isGraphql="true"
+        :enableEditClick="false"
+        defaultOrderingFieldName="-last_modified"
+        exportFileName="Real-Time Purge"
+        emptyListMessage="No purge found."
+        :paginator="false"
+        :hideLastModifiedColumn="true"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No Purge requests yet"
+        description="Create your first purge request to remove cached content."
+        createButtonLabel="Purge"
+        createPagePath="real-time-purge/create"
+        :documentationService="props.documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
+</template>
