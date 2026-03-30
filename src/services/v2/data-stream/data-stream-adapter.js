@@ -3,10 +3,19 @@ import * as Errors from '@/services/axios/errors'
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const mapDataSourceName = {
-  http: 'Edge Applications',
+  http: 'Applications',
   activity: 'Activity History',
   functions: 'Functions',
-  waf: 'WAF Events'
+  waf: 'WAF Events',
+  workloads: 'Applications',
+  functions_console: 'Functions',
+  activity_history: 'Activity History'
+}
+
+const mapDataSourceValueToSlug = {
+  http: 'workloads',
+  functions: 'functions_console',
+  activity: 'activity_history'
 }
 
 const endpointTypeNameMap = {
@@ -257,14 +266,11 @@ export const DataStreamAdapter = {
         const samplingTransform = dataStream.transform?.find((item) => item.type === 'sampling')
         const templateId = dataStream.transform?.find((item) => item.type === 'render_template')
         const endpointOutput = dataStream.outputs?.[0]
-
         return {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
-          dataSource:
-            dataSourceInput?.attributes?.data_source ||
-            mapDataSourceName[dataSourceInput?.attributes?.data_source],
+          dataSource: dataSourceInput?.attributes?.data_source,
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
           domainOption: samplingTransform ? '1' : '0',
@@ -305,7 +311,7 @@ export const DataStreamAdapter = {
         {
           type: 'raw_logs',
           attributes: {
-            data_source: payload.dataSource
+            data_source: mapDataSourceValueToSlug[payload.dataSource] || payload.dataSource
           }
         }
       ],
@@ -386,5 +392,12 @@ export const DataStreamAdapter = {
       name: payload.name,
       dataSet: payload?.data_set
     }
+  },
+  transformListDataSources(data) {
+    return data.map((dataSource) => ({
+      slug: dataSource.slug,
+      name: mapDataSourceName[dataSource.slug] || dataSource.name,
+      active: dataSource.active
+    }))
   }
 }

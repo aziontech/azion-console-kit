@@ -14,6 +14,7 @@
             :options="listDataSources"
             optionLabel="label"
             optionValue="value"
+            :loading="loadingDataSources"
             :value="dataSource"
             appendTo="self"
             description="Represents the data source the data will be collected from."
@@ -27,11 +28,11 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-
+  import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   defineProps({
     disabled: {
       type: Boolean,
@@ -39,12 +40,26 @@
     }
   })
 
-  const listDataSources = ref([
-    { label: 'Activity History', value: 'activity' },
-    { label: 'Edge Applications', value: 'http' },
-    { label: 'Functions', value: 'functions' },
-    { label: 'WAF Events', value: 'waf' }
-  ])
-
+  const listDataSources = ref([])
+  const loadingDataSources = ref(false)
   const { value: dataSource } = useField('dataSource')
+
+  const loadDataSources = async () => {
+    try {
+      loadingDataSources.value = true
+      const response = await dataStreamService.listDataSourcesService()
+      listDataSources.value = response.body.map((item) => ({
+        label: item.name,
+        value: item.slug
+      }))
+    } catch (error) {
+      listDataSources.value = []
+    } finally {
+      loadingDataSources.value = false
+    }
+  }
+
+  onMounted(() => {
+    loadDataSources()
+  })
 </script>
