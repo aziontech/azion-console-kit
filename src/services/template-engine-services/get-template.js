@@ -76,21 +76,41 @@ export const getTemplate = async (templateId) => {
   return parseHttpResponse(httpResponse)
 }
 
+const checkHasSettings = (inputSchema) => {
+  if (!inputSchema) return false
+
+  // Check if properties object has any field with instantiation_data_path
+  if (inputSchema.properties && typeof inputSchema.properties === 'object') {
+    const properties = inputSchema.properties
+    return Object.values(properties).some(
+      (property) => property.instantiation_data_path !== undefined && property.instantiation_data_path !== ''
+    )
+  }
+
+  // Fallback: check groups
+  if (inputSchema.groups && Array.isArray(inputSchema.groups)) {
+    return inputSchema.groups.length > 1
+  }
+
+  return false
+}
+
 const adapt = (httpResponse) => {
   const instantiationData = httpResponse.body.instantiation_data
   const templateInfo = extractTemplateInfo(instantiationData)
+  const inputSchema = httpResponse.body.input_schema
 
   return {
     body: {
       createdAt: httpResponse.body.created_at,
-      inputSchema: httpResponse.body.input_schema,
+      inputSchema,
       instantiationData,
       isActive: httpResponse.body.is_active,
       name: httpResponse.body.name,
       templateType: httpResponse.body.template_type,
       updatedAt: httpResponse.body.updated_at,
       uuid: httpResponse.body.uuid,
-      hasSettings: httpResponse.body.input_schema.groups.length > 1 ? true : false,
+      hasSettings: checkHasSettings(inputSchema),
       imagePreview: httpResponse.body.imagePreview,
       templateTitle: templateInfo.templateTitle,
       templateDescription: templateInfo.templateDescription,

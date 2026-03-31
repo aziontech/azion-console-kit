@@ -2,14 +2,10 @@
   import { ref, defineOptions, watch, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  // import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from '@templates/template-engine-block/form-loading'
-  // New refactored components (using centralized layout)
-  import NewEngineJsonForm from '@templates/template-engine-block/new-engine-jsonform'
-  import NewEngineAzion from '@templates/template-engine-block/new-engine-azion'
-  // Legacy components - kept for reference, will be removed in future refactoring
-  // import EngineJsonForm from '@templates/template-engine-block/engine-jsonform'
-  // import EngineAzion from '@templates/template-engine-block/engine-azion'
+  import EngineJsonForm from '@templates/template-engine-block/engine-jsonform'
+  import EngineAzion from '@templates/template-engine-block/engine-azion'
+
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -349,7 +345,7 @@
   <FormLoading v-if="isLoading" />
   <div v-else>
     <div v-if="isJsonForm">
-      <NewEngineJsonForm
+      <EngineJsonForm
         ref="jsonFormEngineRef"
         :schema="inputSchema"
         :has-settings="hasSettings"
@@ -368,7 +364,7 @@
       />
     </div>
     <div v-else>
-      <NewEngineAzion
+      <EngineAzion
         ref="azionEngineRef"
         :schema="inputSchema"
         :has-settings="hasSettings"

@@ -1,11 +1,15 @@
 <script setup>
-  import { computed, ref, markRaw, watch, onMounted, onBeforeUnmount } from 'vue'
+  import { computed, ref, markRaw, watch, onMounted, defineOptions } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from 'primevue/dropdown'
-  import { useToast } from 'primevue/usetoast'
   import LabelBlock from '@/templates/label-block'
-  import FormHorizontal from '@templates/create-form-block/form-horizontal'
+  import OAuthGithub from './oauth-github.vue'
+  import LayoutEngineBlock from './layout-engine-block.vue'
+  import { workloadService } from '@/services/v2/workload/workload-service'
+
+  // JSON Forms Custom Renderers
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'
   import { InputTextControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlTester'
   import InputPasswordControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-password/inputPasswordControlRenderer.vue'
@@ -18,8 +22,8 @@
   import { DropdownControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/dropdown/dropdownControlTester'
   import InputTextPrivacyControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text-privacy/inputTextPrivacyControlRenderer.vue'
   import { InputTextPrivacyControlTester } from '@templates/form-fields-inputs/jsonform-custom-render/input-text-privacy/inputTextPrivacyControlTester'
-  import { vcsService } from '@/services/v2/vcs/vcs-service'
-  import OAuthGithub from './oauth-github.vue'
+
+  defineOptions({ name: 'engineJsonForm' })
 
   const props = defineProps({
     schema: {
@@ -29,42 +33,72 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    hasSettings: {
+      type: Boolean,
+      default: true
+    },
+    loadingDeploy: {
+      type: Boolean,
+      default: false
+    },
+    disabledDeploy: {
+      type: Boolean,
+      default: false
+    },
+    // Deploy Status Card props
+    executionId: {
+      type: String,
+      default: ''
+    },
+    deployFailed: {
+      type: Boolean,
+      default: false
+    },
+    applicationName: {
+      type: String,
+      default: ''
+    },
+    deployStartTime: {
+      type: Number,
+      default: null
+    },
+    appUrl: {
+      type: String,
+      default: ''
+    },
+    successNextSteps: {
+      type: Array,
+      default: () => []
+    },
+    // Results from deployment (needed for patch domains)
+    results: {
+      type: Object,
+      default: null
     }
   })
 
+  const emit = defineEmits([
+    'next',
+    'deploy',
+    'finish',
+    'retry',
+    'manage',
+    'open-url',
+    'next-step',
+    'save-domains'
+  ])
+
   const toast = useToast()
-  const callbackUrl = ref('')
-  const listOfIntegrations = ref([])
-  const isIntegrationsLoading = ref(false)
+
+  const layoutRef = ref(null)
   const oauthGithubRef = ref(null)
-  const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
+
   const selectedIntegration = ref('')
   const vcsIntegrationError = ref('')
-
   const formData = ref({})
   const errors = ref([])
-
-  const hasIntegrations = computed(() => {
-    const githubIntegration = props.schema.properties.platform_feature__vcs_integration__uuid
-    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
-    return hasGithubIntegration
-  })
-
-  const formSchema = computed(() => {
-    const schema = { ...props.schema }
-    schema.properties = parsePropertiesSchema(schema.properties)
-    return schema
-  })
-
-  const hasIntegrationsList = computed(() => {
-    return listOfIntegrations.value?.length > 0
-  })
-
-  const isVcsRequired = computed(() => {
-    if (!hasIntegrations.value) return false
-    const requiredFields = props.schema.required || []
-    return requiredFields.includes(vcsIntegrationFieldName.value)
-  })
+  const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
   const customRenderers = [
     {
@@ -92,14 +126,97 @@
       renderer: InputTextPrivacyControlRenderer
     }
   ]
+
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
 
+  const hasIntegrations = computed(() => {
+    const githubIntegration = props.schema?.properties?.platform_feature__vcs_integration__uuid
+    const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
+    return hasGithubIntegration
+  })
+
+  const formSchema = computed(() => {
+    const schema = { ...props.schema }
+    schema.properties = parsePropertiesSchema(schema.properties || {})
+    return schema
+  })
+
+  const isVcsRequired = computed(() => {
+    if (!hasIntegrations.value) return false
+    const requiredFields = props.schema?.required || []
+    return requiredFields.includes(vcsIntegrationFieldName.value)
+  })
+
+  /**
+   * Computed property for repository groups (group[0])
+   * Returns the first group from the schema groups array
+   * For JSON Forms, groups are not used the same way as Azion form
+   */
+  const repositoryGroups = computed(() => {
+    const groups = props.schema?.groups || []
+    return groups.length > 0 ? [groups[0]] : []
+  })
+
+  /**
+   * Computed property for settings groups (group[1+])
+   * Returns all groups except the first one
+   * For JSON Forms, groups are not used the same way as Azion form
+   */
+  const settingsGroups = computed(() => {
+    const groups = props.schema?.groups || []
+    return groups.slice(1)
+  })
+
+  const layoutProps = computed(() => ({
+    title: props.schema?.title || 'Start from Template',
+    previewSrc: props.schema?.imagePreview || props.schema?.previewSrc || '',
+    previewAlt: props.schema?.previewAlt || '',
+    templateTitle: props.schema?.templateTitle || props.schema?.name || '',
+    templateUrl: props.schema?.templateUrl || '',
+    templateIcon: props.schema?.templateIcon || '',
+    templateDescription: props.schema?.templateDescription || props.schema?.description || '',
+    githubUrl:
+      props.schema?.templatePath || props.schema?.githubUrl || props.schema?.repository || '',
+    schema: props.schema,
+    isDrawer: props.isDrawer,
+    // Groups for each step
+    repositoryGroups: repositoryGroups.value,
+    settingsGroups: settingsGroups.value,
+    // Flow control props
+    hasSettings: props.hasSettings,
+    loadingDeploy: props.loadingDeploy,
+    disabledDeploy: props.disabledDeploy,
+    // Validation prop
+    onValidate: validateForm,
+    // Deploy simulation props
+    simulateDeploy: props.schema?.simulateDeploy ?? false,
+    appUrl: props.appUrl || props.schema?.appUrl || '',
+    successNextSteps: props.successNextSteps || props.schema?.successNextSteps || [],
+    // Deploy Status Card props
+    executionId: props.executionId,
+    deployFailed: props.deployFailed,
+    applicationName: props.applicationName,
+    deployStartTime: props.deployStartTime,
+    // Results for DeploySuccessCard
+    results: props.results
+  }))
+
+  /**
+   * Handles JSON Forms change events
+   * Updates formData and errors refs
+   * @param {Object} event - The change event from JsonForms
+   */
   const onChangeAzionForm = (event) => {
     formData.value = event.data
     errors.value = event.errors
   }
-
+  /**
+   * Validates the entire form including VCS integration
+   * @returns {boolean} Whether the form is valid
+   */
   const validateForm = () => {
+    // For JSON Forms, we validate the entire form
+    // since JSON Forms handles validation internally for all fields
     const jsonFormErrors = errors.value.filter(
       (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
     )
@@ -112,11 +229,15 @@
     return !hasJsonFormErrors && !hasVcsError
   }
 
+  /**
+   * Gets all form data as an array of field objects
+   * @returns {Array} Array of field objects with name, value, and instantiation_data_path
+   */
   const getFormData = () => {
     const data = []
 
     if (hasIntegrations.value) {
-      const vcsField = props.schema.properties[vcsIntegrationFieldName.value]
+      const vcsField = props.schema?.properties?.[vcsIntegrationFieldName.value]
       data.push(
         parseData({
           name: vcsIntegrationFieldName.value,
@@ -128,13 +249,13 @@
 
     const keys = Object.keys(formData.value)
     keys.forEach((key) => {
-      const field = props.schema.properties[key]
+      const field = props.schema?.properties?.[key]
 
       data.push(
         parseData({
           name: key,
           value: formData.value[key],
-          instantiationDataPath: field.instantiation_data_path
+          instantiationDataPath: field?.instantiation_data_path
         })
       )
     })
@@ -142,6 +263,11 @@
     return data
   }
 
+  /**
+   * Parses field data into standard format
+   * @param {Object} field - The field to parse
+   * @returns {Object} Parsed field object
+   */
   const parseData = (field) => {
     return {
       name: field.name,
@@ -150,6 +276,11 @@
     }
   }
 
+  /**
+   * Parses properties schema, removing VCS integration fields
+   * @param {Object} properties - The schema properties
+   * @returns {Object} Parsed properties without VCS fields
+   */
   const parsePropertiesSchema = (properties) => {
     const data = {}
     const keys = Object.keys(properties)
@@ -163,117 +294,161 @@
     return data
   }
 
+  /**
+   * Updates the selected integration value
+   * @param {string} installationId - The selected installation ID
+   */
+  const updateIntegrationValue = (installationId) => {
+    selectedIntegration.value = installationId
+  }
+
+  /**
+   * Triggers GitHub connection via OAuthGithub component
+   */
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
       oauthGithubRef.value.connectWithGithub()
     }
   }
 
-  const listIntegrations = async () => {
-    try {
-      isIntegrationsLoading.value = true
-      const data = await vcsService.listIntegrations()
-
-      if (data && data.length > 0) {
-        selectedIntegration.value = data[0].value
-      }
-
-      listOfIntegrations.value = data
-    } catch (error) {
-      error.showErrors(toast)
-    } finally {
-      isIntegrationsLoading.value = false
-    }
+  /**
+   * Sets callback URL via LayoutEngineBlock
+   * @param {string} uri - The callback URI
+   */
+  const setCallbackUrl = (uri) => {
+    layoutRef.value?.setCallbackUrl(uri)
+  }
+  /**
+   * Handles the next button click
+   */
+  const handleNext = () => {
+    emit('next')
   }
 
-  const handleGithubIntegrationMessage = async (event) => {
-    if (event.origin !== window.location.origin) return
+  const handleDeploy = () => {
+    emit('deploy')
+  }
 
-    if (event.data.event === 'integration-data') {
-      await saveIntegration(event.data)
-    } else if (event.data.event === 'integration-connected') {
-      await listIntegrations()
-    } else if (event.data.event === 'integration-error') {
-      const errorMessage =
-        event.data.data?.error_description || event.data.data?.error || 'Unknown error'
+  const handleFinish = () => {
+    emit('finish')
+  }
+
+  const handleRetry = () => {
+    emit('retry')
+  }
+
+  const handleManage = (data) => {
+    emit('manage', data)
+  }
+
+  const handleOpenUrl = (url) => {
+    emit('open-url', url)
+  }
+
+  const handleNextStep = (data) => {
+    emit('next-step', data)
+  }
+
+  /**
+   * Handles saving domain settings via patchWorkloadDomains
+   * Called when user saves domain settings from DeploySuccessCard
+   * @param {Object} values - The domain form values
+   */
+  const handleSaveDomains = async (values) => {
+    try {
+      const workloadId = props.results?.domain?.id
+      if (!workloadId) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Workload ID not found'
+        })
+        return
+      }
+
+      await workloadService.patchWorkloadDomains(workloadId, values)
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Domain settings updated successfully'
+      })
+    } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
-        summary: `GitHub integration failed: ${errorMessage}`
+        summary: 'Error',
+        detail: error.message || 'Failed to update domain settings'
       })
     }
   }
 
-  const addEventListenerToGithubIntegration = () => {
-    window.addEventListener('message', handleGithubIntegrationMessage)
-  }
-
-  const removeEventListenerToGithubIntegration = () => {
-    window.removeEventListener('message', handleGithubIntegrationMessage)
-  }
-
-  const saveIntegration = async (integration) => {
-    isIntegrationsLoading.value = true
-    try {
-      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
-    } catch (error) {
-      error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.message}`,
-        severity: 'error'
-      }))
-    } finally {
-      await listIntegrations()
-    }
-  }
-
-  const setCallbackUrl = (uri) => {
-    callbackUrl.value = uri
-  }
-
-  const updateIntegrationValue = (installationId) => {
-    selectedIntegration.value = installationId
-  }
-
-  const loadIntegrationOnShowButton = async () => {
-    await listIntegrations()
-    addEventListenerToGithubIntegration()
-  }
-
   onMounted(async () => {
     if (hasIntegrations.value) {
-      await loadIntegrationOnShowButton()
+      await layoutRef.value?.loadIntegrationOnShowButton()
     }
-  })
-
-  onBeforeUnmount(() => {
-    removeEventListenerToGithubIntegration()
   })
 
   watch(
     () => props.schema,
     async (newValue) => {
-      const githubIntegration = newValue.properties?.platform_feature__vcs_integration__uuid
+      const githubIntegration = newValue?.properties?.platform_feature__vcs_integration__uuid
       const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
 
       if (hasGithubIntegration) {
-        await loadIntegrationOnShowButton()
+        await layoutRef.value?.loadIntegrationOnShowButton()
       }
     },
     { deep: true }
   )
 
-  defineExpose({ validateForm, getFormData })
+  watch(
+    () => layoutRef.value?.listOfIntegrations,
+    (newList) => {
+      if (newList?.value && newList.value.length) {
+        selectedIntegration.value = newList.value[0].value
+      }
+    },
+    { deep: true }
+  )
+
+  defineExpose({
+    validateForm,
+    getFormData,
+    formData,
+    errors,
+    layoutRef,
+    // Expose goToDeploying from LayoutEngineBlock
+    goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose goToSuccess from LayoutEngineBlock
+    goToSuccess: () => layoutRef.value?.goToSuccess?.(),
+    // Expose currentStep from LayoutEngineBlock
+    currentStep: computed(() => layoutRef.value?.currentStep)
+  })
 </script>
 
 <template>
-  <div class="w-full grow flex flex-col gap-8 max-md:gap-6">
-    <FormHorizontal
-      v-if="hasIntegrations"
-      title="GitHub Connection"
-      :isDrawer="false"
+  <div class="flex justify-center">
+    <LayoutEngineBlock
+      ref="layoutRef"
+      v-bind="layoutProps"
+      @next="handleNext"
+      @deploy="handleDeploy"
+      @finish="handleFinish"
+      @retry="handleRetry"
+      @manage="handleManage"
+      @save-domains="handleSaveDomains"
+      @open-url="handleOpenUrl"
+      @next-step="handleNextStep"
     >
-      <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <!-- GitHub Connection Slot -->
+      <template #github-connection="slotProps">
+        <div
+          v-if="hasIntegrations"
+          class="flex flex-col gap-2"
+        >
           <LabelBlock
             v-if="isVcsRequired"
             label="Git Scope"
@@ -281,26 +456,26 @@
             :isRequired="isVcsRequired"
           />
           <OAuthGithub
-            v-show="!hasIntegrationsList"
+            v-show="!slotProps.hasIntegrationsList"
             ref="oauthGithubRef"
             @onCallbackUrl="setCallbackUrl"
-            :loading="isIntegrationsLoading"
+            :loading="slotProps.isIntegrationsLoading"
           />
           <div
-            v-if="hasIntegrationsList"
-            class="flex flex-col max-w-xs w-full gap-2"
+            v-if="slotProps.hasIntegrationsList"
+            class="flex flex-col gap-2"
           >
             <Dropdown
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
-              :loading="isIntegrationsLoading"
+              :loading="slotProps.isIntegrationsLoading"
               v-model="selectedIntegration"
-              :options="listOfIntegrations"
+              :options="slotProps.listOfIntegrations"
               optionLabel="label"
               optionValue="value"
               placeholder="Select a scope"
               @change="updateIntegrationValue(selectedIntegration)"
-              class="w-full"
+              class="w-full sm:max-w-xs"
               appendTo="self"
             >
               <template #footer>
@@ -310,7 +485,7 @@
                       class="p-dropdown-item flex items-center cursor-pointer"
                       @click="triggerConnectWithGithub"
                     >
-                      <i class="pi pi-plus-circle mr-2"></i>
+                      <i class="pi pi-plus-circle mr-2" />
                       <div>Add GitHub Account</div>
                     </li>
                   </ul>
@@ -329,14 +504,10 @@
           </small>
         </div>
       </template>
-    </FormHorizontal>
 
-    <FormHorizontal
-      :title="schema.title"
-      :isDrawer="false"
-    >
+      <!-- Inputs Slot - JSON Forms field rendering -->
       <template #inputs>
-        <div class="sm:max-w-lg">
+        <div class="sm:max-w-lg w-full">
           <JsonForms
             class="flex flex-col gap-8 max-md:gap-6"
             :data="formData"
@@ -346,6 +517,6 @@
           />
         </div>
       </template>
-    </FormHorizontal>
+    </LayoutEngineBlock>
   </div>
 </template>
