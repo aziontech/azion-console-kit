@@ -17,7 +17,10 @@
   import FormSignupBlock from '@/templates/signup-block/form-signup-block.vue'
   import TestimonialsCarousel from '@aziontech/webkit/testimonials-carousel'
   import Axur from '@/assets/svg/axur-logo.vue'
-  import { h } from 'vue'
+  import { h, onMounted } from 'vue'
+  import { usePlans } from '@/composables/usePlans'
+
+  const { initialize } = usePlans()
 
   const props = defineProps({
     signupService: { required: true, type: Function },
@@ -33,4 +36,8 @@
       logo: h(Axur)
     }
   ]
+
+  onMounted(() => {
+    initialize()
+  })
 </script>
