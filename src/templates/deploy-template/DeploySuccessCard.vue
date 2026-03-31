@@ -91,7 +91,7 @@
     // Add Workload (domain)
     if (props.results.domain?.url) {
       resources.push({
-        type: 'Workload',
+        type: `${hasFlagBlockApiV4() ? 'Domain' : 'Workloads'}`,
         redirect: () =>
           router.push({
             name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
@@ -179,8 +179,14 @@
 
   /**
    * vee-validate form fields setup
+   * meta is used to track if the field has been touched (user interacted with it)
+   * to prevent showing validation errors before user interaction
    */
-  const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
+  const {
+    errorMessage: domainsErrorMessage,
+    value: domains,
+    meta: domainsMeta
+  } = useField('domains')
   const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
   const { value: useCustomDomain } = useField('useCustomDomain')
   const { value: customDomain } = useField('customDomain')
@@ -299,10 +305,6 @@
     emit('onSave', values)
   })
 
-  const handleViewEdge = () => {
-    window.open(props.appUrl, '_blank', 'noopener,noreferrer')
-  }
-
   /**
    * Load workload data and populate form fields
    */
@@ -365,15 +367,15 @@
       <p class="text-sm text-color-secondary leading-5">
         Your application is being distributed, in few minutes, the application will be available on
 
-        <PrimeButton
-          type="button"
-          :label="appUrlDisplay"
-          link
-          iconPos="right"
-          size="small"
-          icon="pi pi-external-link"
-          @click="handleViewEdge"
-        />
+        <a
+          :href="props.appUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[var(--text-color-link)] text-xs inline-flex items-center gap-1"
+        >
+          <span class="hover:underline">{{ appUrlDisplay }}</span>
+          <i class="pi pi-external-link text-xs !no-underline" />
+        </a>
       </p>
 
       <TemplateInfoBlock
@@ -425,7 +427,7 @@
                         placeholder="example.com"
                         emptyMessage="No domains available"
                         :value="domain.domain"
-                        :class="{ 'p-invalid': domainsErrorMessage }"
+                        :class="{ 'p-invalid': domainsErrorMessage && domainsMeta.touched }"
                         @change="updateDomainValue(index, $event.value)"
                         data-testid="domains-form__domain-dropdown"
                       />
@@ -449,7 +451,7 @@
                   </div>
 
                   <small
-                    v-if="domainsErrorMessage"
+                    v-if="domainsErrorMessage && domainsMeta.touched"
                     class="p-error text-xs font-normal leading-tight"
                   >
                     {{ domainsErrorMessage }}

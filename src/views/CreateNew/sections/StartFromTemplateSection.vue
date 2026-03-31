@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, inject } from 'vue'
+  import { ref, computed, inject, reactive } from 'vue'
   import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
@@ -11,7 +11,14 @@
   const searchQuery = ref('')
 
   // Inject selected template filters from parent component
-  const selectedTemplateFilters = inject('selectedTemplateFilters', ref({}))
+  const selectedTemplateFilters = inject(
+    'selectedTemplateFilters',
+    reactive({
+      frameworks: [],
+      useCases: [],
+      databases: []
+    })
+  )
 
   // Get account store and feature flag
   const accountStore = useAccountStore()
@@ -59,7 +66,10 @@
           description: template.headline,
           icon: template.vendor?.icon || template.icon,
           vendor: template.vendor,
-          slug: template.slug
+          slug: template.slug,
+          category: template.category || [],
+          framework: template.framework,
+          database: template.database
         }))
       })
     }
@@ -74,7 +84,10 @@
           description: template.headline,
           icon: template.vendor?.icon || template.icon,
           vendor: template.vendor,
-          slug: template.slug
+          slug: template.slug,
+          category: template.category || [],
+          framework: template.framework,
+          database: template.database
         }))
       })
     }
@@ -84,10 +97,8 @@
 
   // Helper to check if any filters are selected
   const hasActiveFilters = computed(() => {
-    if (!selectedTemplateFilters.value) return false
-    return Object.values(selectedTemplateFilters.value).some(
-      (filters) => filters && filters.length > 0
-    )
+    if (!selectedTemplateFilters) return false
+    return Object.values(selectedTemplateFilters).some((filters) => filters && filters.length > 0)
   })
 
   // Filter templates based on search query and selected filters
@@ -99,36 +110,56 @@
       categories = categories.map((category) => ({
         ...category,
         items: category.items.filter((item) => {
-          // Check if template matches any of the selected filters (OR logic)
-          // Template metadata fields that could match filters
-          const templateMeta = item.meta || {}
-          const templateFramework = item.framework || templateMeta.framework
-          const templateUseCase = item.useCase || templateMeta.useCase
-          const templateDatabase = item.database || templateMeta.database
+          // Get template's category slugs array - handle both array and string
+          let templateCategorySlugs = []
+          if (Array.isArray(item.category)) {
+            templateCategorySlugs = item.category
+              .map((cat) => {
+                if (typeof cat === 'object' && cat !== null) {
+                  return cat.slug?.toLowerCase() || ''
+                }
+                return typeof cat === 'string' ? cat.toLowerCase() : ''
+              })
+              .filter((slug) => slug !== '')
+          } else if (typeof item.category === 'string' && item.category) {
+            templateCategorySlugs = [item.category.toLowerCase()]
+          }
+
+          // Get template's framework and database
+          const templateFramework = item.framework?.toLowerCase() || ''
+          const templateDatabase = item.database?.toLowerCase() || ''
 
           // Collect all selected filters from all groups
           const allSelectedFilters = [
-            ...(selectedTemplateFilters.value.frameworks || []),
-            ...(selectedTemplateFilters.value.useCases || []),
-            ...(selectedTemplateFilters.value.databases || [])
+            ...(selectedTemplateFilters.frameworks || []),
+            ...(selectedTemplateFilters.useCases || []),
+            ...(selectedTemplateFilters.databases || [])
           ]
 
           // Check if template matches ANY of the selected filters (OR logic)
           return allSelectedFilters.some((filterVal) => {
             const filterLower = filterVal.toLowerCase()
-            const templateFrameworkLower = templateFramework?.toLowerCase() || ''
-            const templateUseCaseLower = templateUseCase?.toLowerCase() || ''
-            const templateDatabaseLower = templateDatabase?.toLowerCase() || ''
 
-            return (
-              templateFrameworkLower.includes(filterLower) ||
-              filterLower.includes(templateFrameworkLower) ||
-              templateUseCaseLower.includes(filterLower) ||
-              filterLower.includes(templateUseCaseLower) ||
-              templateDatabaseLower.includes(filterLower) ||
-              filterLower.includes(templateDatabaseLower) ||
+            // Check if filter matches any category slug
+            const matchesCategory = templateCategorySlugs.includes(filterLower)
+
+            // Check if filter matches framework (only if template has a framework)
+            const matchesFramework =
+              templateFramework &&
+              (templateFramework.includes(filterLower) || filterLower.includes(templateFramework))
+
+            // Check if filter matches database (only if template has a database)
+            const matchesDatabase =
+              templateDatabase &&
+              (templateDatabase.includes(filterLower) || filterLower.includes(templateDatabase))
+
+            // Check if filter matches name or description
+            const matchesNameOrDescription =
               item.name?.toLowerCase().includes(filterLower) ||
               item.description?.toLowerCase().includes(filterLower)
+
+            return (
+              matchesCategory || matchesFramework || matchesDatabase || matchesNameOrDescription
             )
           })
         })
@@ -173,7 +204,7 @@
     <!-- Search Input -->
     <div class="w-full">
       <div
-        class="w-full h-8 bg-surface-50 rounded-md shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)] inline-flex justify-start items-center"
+        class="w-full h-8 surface-50 rounded-md shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)] inline-flex justify-start items-center"
       >
         <div class="w-full h-8 py-1.5 flex justify-start items-center gap-2">
           <span
@@ -234,7 +265,7 @@
           <div
             v-for="template in category.items"
             :key="template.id"
-            class="group h-36 p-4 bg-surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
+            class="group h-36 p-4 surface-50 border surface-border rounded hover:outline hover:outline-1 hover:outline-surface-100 flex justify-start items-start gap-2.5 overflow-hidden hover:outline-primary transition-all cursor-pointer"
             :class="filteredCategories.length === 1 ? 'w-full max-w-[236px]' : 'w-full sm:w-64'"
             @click="handleTemplateClick(template)"
             data-testid="template-card"

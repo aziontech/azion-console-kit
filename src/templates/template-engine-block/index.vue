@@ -247,11 +247,6 @@
       // Update route query to success step with domain info
       const domain = response.result?.domain?.cname || response.result?.domain?.url || ''
       updateRouteQuery('success', currentExecutionId.value, domain)
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Successfully created!'
-      })
     } catch (error) {
       toast.add({
         closable: true,

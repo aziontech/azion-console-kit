@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, onBeforeUnmount, ref, provide, watch } from 'vue'
+  import { computed, onMounted, onBeforeUnmount, ref, reactive, provide, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Menu from 'primevue/menu'
   import Checkbox from 'primevue/checkbox'
@@ -31,8 +31,12 @@
     { label: 'Observe', value: 'observe' }
   ]
 
-  // Template filters for Templates section
-  const selectedTemplateFilters = ref({})
+  // Template filters for Templates section - using reactive for proper provide/inject reactivity
+  const selectedTemplateFilters = reactive({
+    frameworks: [],
+    useCases: [],
+    databases: []
+  })
   provide('selectedTemplateFilters', selectedTemplateFilters)
 
   // Track which filter groups are expanded
@@ -48,22 +52,31 @@
       key: 'useCases',
       label: 'Use Cases',
       options: [
+        { label: 'AI', value: 'ai' },
         { label: 'Blog', value: 'blog' },
+        { label: 'CDN', value: 'cdn' },
+        { label: 'CMS', value: 'cms' },
         { label: 'Documentation', value: 'documentation' },
         { label: 'E-commerce', value: 'ecommerce' },
-        { label: 'Portfolio', value: 'portfolio' },
-        { label: 'Landing Page', value: 'landing-page' }
+        { label: 'Marketing Website', value: 'marketing-website' },
+        { label: 'Portfolio Website', value: 'portfolio-website' },
+        { label: 'Security', value: 'security' },
+        { label: 'Starter', value: 'starter' },
+        { label: 'Static Site', value: 'static-site' },
+        { label: 'Web Application', value: 'web-application' }
       ]
     },
     {
       key: 'databases',
       label: 'Databases',
       options: [
-        { label: 'MySQL', value: 'mysql' },
-        { label: 'PostgreSQL', value: 'postgresql' },
+        { label: 'Azion KV Store', value: 'azion-kv' },
+        { label: 'Azion SQL Database', value: 'azion-sql' },
         { label: 'MongoDB', value: 'mongodb' },
-        { label: 'Redis', value: 'redis' },
-        { label: 'SQLite', value: 'sqlite' }
+        { label: 'Neon', value: 'neon' },
+        { label: 'TiDB', value: 'tidb' },
+        { label: 'Turso', value: 'turso' },
+        { label: 'Upstash Redis', value: 'upstash-redis' }
       ]
     },
     {
@@ -176,20 +189,20 @@
 
   // Toggle template filter selection
   const toggleTemplateFilter = (groupKey, filterValue) => {
-    if (!selectedTemplateFilters.value[groupKey]) {
-      selectedTemplateFilters.value[groupKey] = []
+    if (!selectedTemplateFilters[groupKey]) {
+      selectedTemplateFilters[groupKey] = []
     }
-    const index = selectedTemplateFilters.value[groupKey].indexOf(filterValue)
+    const index = selectedTemplateFilters[groupKey].indexOf(filterValue)
     if (index === -1) {
-      selectedTemplateFilters.value[groupKey].push(filterValue)
+      selectedTemplateFilters[groupKey].push(filterValue)
     } else {
-      selectedTemplateFilters.value[groupKey].splice(index, 1)
+      selectedTemplateFilters[groupKey].splice(index, 1)
     }
   }
 
   // Check if a filter is selected
   const isFilterSelected = (groupKey, filterValue) => {
-    return selectedTemplateFilters.value[groupKey]?.includes(filterValue) || false
+    return selectedTemplateFilters[groupKey]?.includes(filterValue) || false
   }
 
   /**
@@ -256,7 +269,7 @@
       <div class="w-full min-h-full flex flex-col xl:flex-row px-1 gap-4 xl:gap-8 mt-4 md:mt-8">
         <!-- Sidebar Navigation -->
         <nav
-          class="w-full xl:w-64 flex-shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto"
+          class="w-full xl:w-64 flex-shrink-0 sticky top-5 self-start max-h-screen overflow-y-auto"
         >
           <!-- Default Menu for Import section (or when showMainMenu is true) -->
           <div
@@ -373,7 +386,7 @@
           >
             <!-- Back to Resources Button -->
             <button
-              class="w-64 h-8 px-2.5 py-1.5 rounded border surface-border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              class="w-64 h-8 px-2.5 py-1.5 rounded border surface-border inline-flex justify-start items-center gap-3 hover:surface-100 transition-colors"
               @click="goBackToMenu"
             >
               <i class="pi pi-angle-left" />
@@ -394,7 +407,7 @@
                 <div
                   v-for="category in categoryOptions"
                   :key="category.value"
-                  class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:bg-surface-100 transition-colors cursor-pointer"
+                  class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:surface-100 transition-colors cursor-pointer"
                   @click="toggleCategory(category.value)"
                 >
                   <Checkbox

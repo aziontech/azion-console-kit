@@ -339,7 +339,7 @@
         </div>
 
         <!-- Repository List -->
-        <div class="bg-surface-50 rounded-md border surface-border overflow-hidden">
+        <div class="surface-50 rounded-md border surface-border overflow-hidden">
           <!-- Loading State -->
           <div
             v-if="isRepositoriesLoading"
@@ -372,7 +372,7 @@
             <div
               v-for="repo in filteredRepositories"
               :key="repo.id || repo.name"
-              class="px-3 sm:px-5 py-2.5 sm:py-3 border-b surface-border flex items-center justify-between gap-2 sm:gap-2.5 hover:bg-surface-100 transition-colors"
+              class="px-3 sm:px-5 py-2.5 sm:py-3 border-b surface-border flex items-center justify-between gap-2 sm:gap-2.5 hover:surface-100 transition-colors"
             >
               <div class="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
                 <!-- Provider Icon -->
@@ -547,7 +547,7 @@
           <article
             v-for="template in limitedTemplates"
             :key="template.id"
-            class="p-3 sm:p-4 bg-surface-50 rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:bg-surface-100 hover:shadow-md"
+            class="p-3 sm:p-4 surface-50 rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:surface-100 hover:shadow-md"
             @click="handleTemplateSelect(template)"
           >
             <div class="flex flex-col gap-3 sm:gap-4">
@@ -559,7 +559,7 @@
               />
               <div
                 v-else
-                class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm bg-surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
               >
                 {{ template.name?.charAt(0)?.toUpperCase() || 'T' }}
               </div>

@@ -26,36 +26,31 @@
           description: isFlagBlockApiV4
             ? 'Configure domains for your applications.'
             : 'Implement serverless functions and scalable applications.',
-          route: isFlagBlockApiV4 ? '/domains/create' : '/workloads/create',
-          icon: domainWorkloadText.icon
+          route: isFlagBlockApiV4 ? '/domains/create' : '/workloads/create'
         },
         {
           id: 'application',
           name: 'Application',
           description: 'Boost performance, enhance delivery.',
-          route: '/applications/create',
-          icon: 'ai ai-edge-application'
+          route: '/applications/create'
         },
         {
           id: 'orchestrator',
           name: 'Orchestrator',
           description: 'Deploy, manage, monitor and automate edge workloads.',
-          route: '/edge-node',
-          icon: 'ai ai-edge-services'
+          route: '/edge-node'
         },
         {
           id: 'variable',
           name: 'Variable',
           description: 'Store and manage key-value pairs for your applications.',
-          route: '/variables/create',
-          icon: 'ai ai-variables'
+          route: '/variables/create'
         },
         {
           id: 'function',
           name: 'Function',
           description: 'Run serverless functions at the edge.',
-          route: '/functions/create',
-          icon: 'ai ai-edge-functions'
+          route: '/functions/create'
         }
       ]
     },
@@ -66,15 +61,13 @@
           id: 'sql-database',
           name: 'SQL Database',
           description: 'Store relational and structured data.',
-          route: '/sql-database/create',
-          icon: 'ai ai-edge-sql'
+          route: '/sql-database/create'
         },
         {
           id: 'object-storage',
           name: 'Object Storage',
           description: 'Store unstructured data in scalable way.',
-          route: '/object-storage',
-          icon: 'ai ai-edge-storage'
+          route: '/object-storage'
         }
       ]
     },
@@ -85,43 +78,37 @@
           id: 'firewall',
           name: 'Firewall',
           description: 'Defend, prevent network level attacks.',
-          route: '/firewalls/create',
-          icon: 'ai ai-edge-firewall'
+          route: '/firewalls/create'
         },
         {
           id: 'waf',
           name: 'Web Application Firewall (WAF)',
           description: 'Protect apps, block vulnerabilities.',
-          route: '/waf/create',
-          icon: 'ai ai-waf-rules'
+          route: '/waf/create'
         },
         {
           id: 'edge-dns',
           name: 'Edge DNS',
           description: 'Resolve DNS quickly and securely.',
-          route: '/edge-dns/create',
-          icon: 'ai ai-edge-dns'
+          route: '/edge-dns/create'
         },
         {
           id: 'server-certificate',
           name: 'Server Certificate',
           description: 'Ensure secure connection to domains.',
-          route: '/digital-certificates/create',
-          icon: 'ai ai-digital-certificates'
+          route: '/digital-certificates/create'
         },
         {
           id: 'trusted-certificate',
           name: 'Trusted Certificate',
           description: 'Ensure secure connection to domains.',
-          route: '/digital-certificates/create',
-          icon: 'ai ai-digital-certificates'
+          route: '/digital-certificates/create'
         },
         {
           id: 'revocation-list',
           name: 'Revocation List',
           description: 'Ensure secure connection to domains.',
-          route: '/digital-certificates/create',
-          icon: 'ai ai-digital-certificates'
+          route: '/digital-certificates/create'
         }
       ]
     },
@@ -132,15 +119,13 @@
           id: 'data-stream',
           name: 'Data Stream',
           description: 'Stream data for real-time analysis.',
-          route: '/data-stream/create',
-          icon: 'ai ai-data-stream'
+          route: '/data-stream/create'
         },
         {
           id: 'edge-pulse',
           name: 'Edge Pulse',
           description: 'Monitor, optimize edge perfomance.',
-          route: '/edge-pulse',
-          icon: 'ai ai-edge-pulse'
+          route: '/edge-pulse'
         }
       ]
     }
@@ -222,7 +207,7 @@
       <div
         v-for="category in filteredCategories"
         :key="category.title"
-        class="flex flex-col justify-start items-start gap-1.5 bg-surface-50 rounded-md"
+        class="flex flex-col justify-start items-start gap-1.5 rounded-md"
         :class="{ 'col-span-full': category.items.length === 1 }"
       >
         <!-- Category Header -->
@@ -240,17 +225,14 @@
           <button
             v-for="item in category.items"
             :key="item.id"
-            class="self-stretch px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-surface-100 transition-colors inline-flex justify-start items-start gap-2.5 overflow-hidden cursor-pointer text-left w-full"
+            class="self-stretch px-3 sm:px-4 py-2.5 sm:py-3 hover:surface-100 transition-colors inline-flex justify-start items-start gap-2.5 overflow-hidden cursor-pointer text-left w-full"
             :class="{ 'max-w-[236px]': filteredCategories.length === 1 }"
             @click="handleResourceClick(item)"
           >
             <div class="flex-1 inline-flex flex-col justify-start items-start gap-1.5 sm:gap-2">
-              <div class="flex items-center gap-2">
-                <i :class="[item.icon, 'text-sm text-color']"></i>
-                <span class="text-xs font-semibold text-color leading-3">
-                  {{ item.name }}
-                </span>
-              </div>
+              <span class="text-xs font-semibold text-color leading-3">
+                {{ item.name }}
+              </span>
               <span
                 class="self-stretch text-xs font-normal text-color-secondary leading-4 line-clamp-2"
               >
