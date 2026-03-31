@@ -135,10 +135,91 @@
     return hasGithubIntegration
   })
 
-  const formSchema = computed(() => {
-    const schema = { ...props.schema }
-    schema.properties = parsePropertiesSchema(schema.properties || {})
+  /**
+   * Repository step form schema
+   * Contains only fields from the first group (repository group)
+   * Uses horizontal grid layout (sm:grid-cols-2)
+   */
+  const repositoryFormSchema = computed(() => {
+    // Return empty valid schema if props.schema is null/undefined
+    if (!props.schema) {
+      return { type: 'object', properties: {} }
+    }
+
+    const schema = { ...props.schema, type: 'object' }
+    const repositoryGroup = props.schema?.groups?.[0]
+
+    if (!repositoryGroup || !repositoryGroup.fields) {
+      // Fallback: if no groups structure, use all properties
+      schema.properties = parsePropertiesSchema(schema.properties || {})
+      return schema
+    }
+
+    // Extract field names from the first group
+    const repositoryFieldNames = repositoryGroup.fields.map((field) => field.name)
+
+    // Filter properties to only include repository fields
+    const filteredProperties = {}
+    repositoryFieldNames.forEach((fieldName) => {
+      if (schema.properties?.[fieldName]) {
+        filteredProperties[fieldName] = schema.properties[fieldName]
+      }
+    })
+
+    schema.properties = parsePropertiesSchema(filteredProperties)
     return schema
+  })
+
+  /**
+   * Settings step form schema
+   * Contains only fields from groups[1+] (settings groups)
+   * Uses full-width layout (each input takes the entire line)
+   */
+  const settingsFormSchema = computed(() => {
+    // Return empty valid schema if props.schema is null/undefined
+    if (!props.schema) {
+      return { type: 'object', properties: {} }
+    }
+
+    const schema = { ...props.schema, type: 'object' }
+    const settingsGroups = props.schema?.groups?.slice(1) || []
+
+    if (settingsGroups.length === 0) {
+      // No settings groups - return empty schema with valid structure
+      return { type: 'object', properties: {} }
+    }
+
+    // Extract field names from settings groups
+    const settingsFieldNames = settingsGroups.flatMap(
+      (group) => group.fields?.map((field) => field.name) || []
+    )
+
+    // Filter properties to only include settings fields
+    const filteredProperties = {}
+    settingsFieldNames.forEach((fieldName) => {
+      if (schema.properties?.[fieldName]) {
+        filteredProperties[fieldName] = schema.properties[fieldName]
+      }
+    })
+
+    schema.properties = parsePropertiesSchema(filteredProperties)
+    return schema
+  })
+
+  /**
+   * Computed property to check if repository form has any properties
+   * Used to conditionally render JsonForms to prevent errors with empty schema
+   */
+  const hasRepositoryFormProperties = computed(() => {
+    return Object.keys(repositoryFormSchema.value?.properties || {}).length > 0
+  })
+
+  /**
+   * Computed property to check if settings form has any properties
+   * Used to conditionally render JsonForms to prevent errors with empty schema
+   */
+  const hasSettingsFormProperties = computed(() => {
+    return Object.keys(settingsFormSchema.value?.properties || {}).length > 0
   })
 
   const isVcsRequired = computed(() => {
@@ -443,28 +524,31 @@
       @open-url="handleOpenUrl"
       @next-step="handleNextStep"
     >
-      <!-- GitHub Connection Slot -->
+      <!-- GitHub Connection Slot - Keep for OAuth callback but hidden -->
       <template #github-connection="slotProps">
-        <div
-          v-if="hasIntegrations"
-          class="flex flex-col gap-2"
-        >
-          <LabelBlock
-            v-if="isVcsRequired"
-            label="Git Scope"
-            :for="vcsIntegrationFieldName"
-            :isRequired="isVcsRequired"
-          />
-          <OAuthGithub
-            v-show="!slotProps.hasIntegrationsList"
-            ref="oauthGithubRef"
-            @onCallbackUrl="setCallbackUrl"
-            :loading="slotProps.isIntegrationsLoading"
-          />
+        <OAuthGithub
+          v-if="hasIntegrations && !slotProps.hasIntegrationsList"
+          v-show="false"
+          ref="oauthGithubRef"
+          @onCallbackUrl="setCallbackUrl"
+          :loading="slotProps.isIntegrationsLoading"
+        />
+      </template>
+
+      <!-- Repository Step - Inputs Slot with horizontal layout including Git Scope -->
+      <template #inputs="slotProps">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Git Scope Field - first grid item, inline with Application Name -->
           <div
-            v-if="slotProps.hasIntegrationsList"
+            v-if="hasIntegrations"
             class="flex flex-col gap-2"
           >
+            <LabelBlock
+              v-if="isVcsRequired"
+              label="Git Scope"
+              :for="vcsIntegrationFieldName"
+              :isRequired="isVcsRequired"
+            />
             <Dropdown
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
@@ -475,7 +559,7 @@
               optionValue="value"
               placeholder="Select a scope"
               @change="updateIntegrationValue(selectedIntegration)"
-              class="w-full sm:max-w-xs"
+              class="w-full"
               appendTo="self"
             >
               <template #footer>
@@ -492,26 +576,34 @@
                 </div>
               </template>
             </Dropdown>
+            <small
+              v-if="vcsIntegrationError"
+              class="p-error text-xs font-normal leading-tight"
+            >
+              {{ vcsIntegrationError }}
+            </small>
           </div>
-          <small
-            v-if="vcsIntegrationError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ vcsIntegrationError }}
-          </small>
-          <small class="text-xs font-normal text-color-secondary">
-            Select the scope for this template.
-          </small>
+
+          <!-- JSON Forms fields - display: contents allows children to participate in parent grid -->
+          <JsonForms
+            v-if="hasRepositoryFormProperties"
+            style="display: contents"
+            :data="formData"
+            :schema="repositoryFormSchema"
+            :renderers="renderers"
+            @change="onChangeAzionForm"
+          />
         </div>
       </template>
 
-      <!-- Inputs Slot - JSON Forms field rendering -->
-      <template #inputs>
-        <div class="sm:max-w-lg w-full">
+      <!-- Settings Step - Settings Inputs Slot with full-width layout -->
+      <template #settings-inputs>
+        <div class="w-full">
           <JsonForms
-            class="flex flex-col gap-8 max-md:gap-6"
+            v-if="hasSettingsFormProperties"
+            class="flex flex-col gap-4"
             :data="formData"
-            :schema="formSchema"
+            :schema="settingsFormSchema"
             :renderers="renderers"
             @change="onChangeAzionForm"
           />

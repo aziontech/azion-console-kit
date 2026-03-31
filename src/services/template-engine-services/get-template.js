@@ -83,7 +83,8 @@ const checkHasSettings = (inputSchema) => {
   if (inputSchema.properties && typeof inputSchema.properties === 'object') {
     const properties = inputSchema.properties
     return Object.values(properties).some(
-      (property) => property.instantiation_data_path !== undefined && property.instantiation_data_path !== ''
+      (property) =>
+        property.instantiation_data_path !== undefined && property.instantiation_data_path !== ''
     )
   }
 
