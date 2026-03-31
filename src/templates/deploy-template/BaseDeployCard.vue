@@ -6,6 +6,10 @@
       type: String,
       required: true
     },
+    titleSize: {
+      type: String,
+      default: 'text-xl'
+    },
     hideFooter: {
       type: Boolean,
       default: false
@@ -25,7 +29,10 @@
   <div class="flex flex-col w-full max-w-[700px] border surface-border rounded-md">
     <!-- Header -->
     <div class="h-14 px-4 sm:px-6 border-b surface-border flex items-center justify-between">
-      <div class="text-color text-xl font-semibold leading-5">
+      <div
+        class="text-color font-semibold leading-5"
+        :class="titleSize"
+      >
         <Skeleton
           v-if="loading"
           class="h-6 w-48"

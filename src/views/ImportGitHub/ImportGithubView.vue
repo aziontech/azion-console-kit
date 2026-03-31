@@ -681,7 +681,18 @@
               >
               <div class="flex items-center gap-1">
                 <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
-                <span class="text-[10px] font-normal text-text-color-muted leading-3">
+                <a
+                  v-if="route.query.repository"
+                  :href="route.query.repository"
+                  target="_blank"
+                  class="text-[10px] font-normal text-text-color-muted leading-3 hover:text-link cursor-pointer"
+                >
+                  {{ repositoryOwnerRef }}/{{ repositoryNameRef }}
+                </a>
+                <span
+                  v-else
+                  class="text-[10px] font-normal text-text-color-muted leading-3"
+                >
                   {{ repositoryOwnerRef }}/{{ repositoryNameRef }}
                 </span>
               </div>

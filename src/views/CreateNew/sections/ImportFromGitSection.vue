@@ -281,6 +281,48 @@
                 <span class="truncate">{{ slotProps.value?.label || 'Select account' }}</span>
               </div>
             </template>
+            <template #option="slotProps">
+              <div class="flex items-center gap-2 text-xs">
+                <i
+                  :class="[
+                    'pi',
+                    selectedProviderTab === 'github'
+                      ? 'pi-github'
+                      : selectedProviderTab === 'gitlab'
+                        ? 'pi-gitlab'
+                        : selectedProviderTab === 'azure'
+                          ? 'pi-microsoft'
+                          : 'pi-bitbucket'
+                  ]"
+                ></i>
+                <span>{{ slotProps.option.label }}</span>
+              </div>
+            </template>
+            <template #footer>
+              <div class="p-dropdown-items-wrapper">
+                <ul class="p-dropdown-items">
+                  <li
+                    class="p-dropdown-item flex items-center text-xs"
+                    @click="
+                      handleProviderConnect({
+                        key: selectedProviderTab,
+                        name:
+                          selectedProviderTab.charAt(0).toUpperCase() + selectedProviderTab.slice(1)
+                      })
+                    "
+                  >
+                    <i class="pi pi-plus-circle mr-2"></i>
+                    <div>
+                      Add
+                      {{
+                        selectedProviderTab?.charAt(0).toUpperCase() + selectedProviderTab?.slice(1)
+                      }}
+                      Account
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </template>
           </Dropdown>
 
           <!-- Search Input -->
@@ -493,7 +535,8 @@
 
     <!-- Recommended Templates Card -->
     <BaseDeployCard
-      title="Recommended Templates"
+      title="Recomended Templates"
+      title-size="text-sm"
       class="flex-1 min-w-0"
       :loading="isLoading"
     >

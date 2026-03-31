@@ -203,7 +203,7 @@
               class="h-8 w-full"
               v-model.trim="searchQuery"
               data-testid="data-table-search-input"
-              placeholder="Search"
+              placeholder="Search on Resources..."
             />
           </span>
         </div>

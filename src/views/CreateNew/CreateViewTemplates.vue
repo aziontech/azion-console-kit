@@ -272,10 +272,11 @@
                   class: [
                     'h-8 rounded cursor-pointer transition-colors mb-2',
                     context.item?.active
-                      ? 'bg-listbox-option-focus-background text-listbox-option-focus-color'
+                      ? ' text-listbox-option-focus-color surface-300 h-full'
                       : 'text-color-secondary bg-surface-100'
                   ]
                 }),
+
                 content: { class: 'w-full' },
                 action: { class: 'w-full flex items-center justify-between px-2' },
                 label: { class: 'text-xs font-sora order-1' },
@@ -446,20 +447,5 @@
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
-  }
-
-  /* Test styles for menu focus - yellow color */
-  .create-menu :deep(.p-menuitem:focus-within),
-  .create-menu :deep(.p-menuitem-content:focus),
-  .create-menu :deep(.p-menuitem-action:focus) {
-    background-color: yellow !important;
-    outline: 2px solid orange !important;
-    outline-offset: 2px;
-  }
-
-  .create-menu :deep(li:focus),
-  .create-menu :deep(li:focus-within) {
-    background-color: yellow !important;
-    outline: 2px solid orange !important;
   }
 </style>
