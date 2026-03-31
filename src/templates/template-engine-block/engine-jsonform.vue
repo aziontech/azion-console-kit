@@ -264,7 +264,8 @@
     repositoryGroups: repositoryGroups.value,
     settingsGroups: settingsGroups.value,
     // Flow control props
-    hasSettings: props.hasSettings,
+    // When there are no settings form properties, show Deploy button instead of Next
+    hasSettings: props.hasSettings && hasSettingsFormProperties.value,
     loadingDeploy: props.loadingDeploy,
     disabledDeploy: props.disabledDeploy,
     // Validation prop
