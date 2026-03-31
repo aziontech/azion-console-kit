@@ -150,6 +150,26 @@
     return requiredFields.includes(vcsIntegrationFieldName.value)
   })
 
+  /**
+   * Computed property for repository groups (group[0])
+   * Returns the first group from the schema groups array
+   * For JSON Forms, groups are not used the same way as Azion form
+   */
+  const repositoryGroups = computed(() => {
+    const groups = props.schema?.groups || []
+    return groups.length > 0 ? [groups[0]] : []
+  })
+
+  /**
+   * Computed property for settings groups (group[1+])
+   * Returns all groups except the first one
+   * For JSON Forms, groups are not used the same way as Azion form
+   */
+  const settingsGroups = computed(() => {
+    const groups = props.schema?.groups || []
+    return groups.slice(1)
+  })
+
   const layoutProps = computed(() => ({
     title: props.schema?.title || 'Start from Template',
     previewSrc: props.schema?.imagePreview || props.schema?.previewSrc || '',
@@ -162,6 +182,9 @@
       props.schema?.templatePath || props.schema?.githubUrl || props.schema?.repository || '',
     schema: props.schema,
     isDrawer: props.isDrawer,
+    // Groups for each step
+    repositoryGroups: repositoryGroups.value,
+    settingsGroups: settingsGroups.value,
     // Flow control props
     hasSettings: props.hasSettings,
     loadingDeploy: props.loadingDeploy,
@@ -195,6 +218,8 @@
    * @returns {boolean} Whether the form is valid
    */
   const validateForm = () => {
+    // For JSON Forms, we validate the entire form
+    // since JSON Forms handles validation internally for all fields
     const jsonFormErrors = errors.value.filter(
       (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
     )
@@ -400,6 +425,8 @@
     layoutRef,
     // Expose goToDeploying from LayoutEngineBlock
     goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose goToSuccess from LayoutEngineBlock
+    goToSuccess: () => layoutRef.value?.goToSuccess?.(),
     // Expose currentStep from LayoutEngineBlock
     currentStep: computed(() => layoutRef.value?.currentStep)
   })

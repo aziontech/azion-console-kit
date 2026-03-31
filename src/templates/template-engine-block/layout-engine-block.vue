@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
+  import { ref, computed, onBeforeUnmount, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
@@ -167,6 +167,7 @@
   // Step Navigation State
   const currentStep = ref('repository')
   const isTransitioning = ref(false)
+  const isSavingDomains = ref(false)
   const step2Ref = ref(null)
   const step3Ref = ref(null)
   const step4Ref = ref(null)
@@ -228,8 +229,20 @@
    * @param {MessageEvent} event - The message event from the OAuth window
    */
   const handleGithubIntegrationMessage = async (event) => {
+    if (event.origin !== window.location.origin) return
+
     if (event.data.event === 'integration-data') {
       await saveIntegration(event.data)
+    } else if (event.data.event === 'integration-connected') {
+      await listIntegrations()
+    } else if (event.data.event === 'integration-error') {
+      const errorMessage =
+        event.data.data?.error_description || event.data.data?.error || 'Unknown error'
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: `GitHub integration failed: ${errorMessage}`
+      })
     }
   }
 
@@ -257,7 +270,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
       error.showWithOptions?.(toast, (err) => ({
-        summary: `GitHub integration failed: ${err.detail}`,
+        summary: `GitHub integration failed: ${err.message}`,
         severity: 'error'
       }))
     } finally {
@@ -298,6 +311,7 @@
   /**
    * Navigate to settings step (step 2)
    * Validates form first, then proceeds if valid
+   * No scroll needed - settings card appears right after repository card
    */
   const goToSettings = async () => {
     const isValid = await validateBeforeProceed()
@@ -305,30 +319,18 @@
 
     currentStep.value = 'settings'
     emit('next')
-
-    nextTick(() => {
-      step2Ref.value?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      })
-    })
+    // No scrollIntoView - card appears in natural flow
   }
 
   /**
    * Navigate to deploying step (step 3)
    * Called when user clicks Deploy on TemplateSettingsCard
+   * No scroll needed - DeployStatusCard appears right after settings
    */
   const goToDeploying = () => {
     currentStep.value = 'deploying'
     showNextButton.value = false
-
-    nextTick(() => {
-      // Scroll to step 3
-      step3Ref.value?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      })
-    })
+    // No scrollIntoView - card appears in natural flow
   }
 
   /**
@@ -355,24 +357,19 @@
   /**
    * Navigate to success step (step 4)
    * Called after deploy finishes successfully
+   * No scroll needed - DeployStatusCard stays in the same position
    */
   const goToSuccess = () => {
     currentStep.value = 'success'
-
-    nextTick(() => {
-      step4Ref.value?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      })
-    })
+    // No scrollIntoView - content is already visible in the same position
   }
 
   /**
    * Handle deploy finish
    * Called when DeployStatusCard emits 'finish' (deploy completed)
+   * Only emits finish - parent will fetch results and pass them back
    */
   const handleFinish = () => {
-    goToSuccess()
     emit('finish')
   }
 
@@ -413,8 +410,13 @@
    * Handle save domains action
    * Called when user saves domain settings from DeploySuccessCard
    */
-  const handleSaveDomains = (values) => {
-    emit('save-domains', values)
+  const handleSaveDomains = async (values) => {
+    isSavingDomains.value = true
+    try {
+      emit('save-domains', values)
+    } finally {
+      isSavingDomains.value = false
+    }
   }
 
   /**
@@ -425,6 +427,19 @@
     isTransitioning.value = false
     clearDeploySimulation()
   }
+
+  /**
+   * Watch for results prop changes
+   * When results are populated (from null to object), navigate to success step
+   */
+  watch(
+    () => props.results,
+    (newResults) => {
+      if (newResults && currentStep.value === 'deploying') {
+        goToSuccess()
+      }
+    }
+  )
 
   onBeforeUnmount(() => {
     removeEventListenerToGithubIntegration()
@@ -468,13 +483,17 @@
     >
       <DeploySuccessCard
         :app-url="props.appUrl"
+        :execution-id="props.executionId"
         :preview-src="props.previewSrc"
         :preview-alt="props.previewAlt"
         :template-title="props.templateTitle"
         :template-url="props.templateUrl"
         :template-description="props.templateDescription"
         :github-url="props.githubUrl"
+        :results="props.results"
         :next-steps="props.successNextSteps"
+        :workload-id="props.results?.domain?.id"
+        :is-saving="isSavingDomains"
         @on-save="handleSaveDomains"
       >
         <template #customize-domain>
@@ -698,7 +717,7 @@
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"
         :next-steps="props.nextSteps"
-        :deploy-started="currentStep === 'deploying'"
+        :deploy-started="currentStep === 'deploying' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
         @manage="handleManage"

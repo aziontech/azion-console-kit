@@ -1,5 +1,5 @@
 <script setup>
-  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { inject, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   import PrimeButton from 'primevue/button'
@@ -14,6 +14,7 @@
 
   import { useLoadingStore } from '@/stores/loading'
   import { useSolutionStore } from '@/stores/solution-create'
+  import { scriptRunnerService } from '@/services/v2/script-runner'
 
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
@@ -110,12 +111,22 @@
     await loadSolutionByVendor()
   })
 
-  watchEffect(() => {
-    if (!route.params.vendor || !route.params.solution) {
-      return
-    }
-    loadSolutionByVendor()
-  })
+  // Only watch route.params changes, not query changes
+  // This prevents reloading when query params change during deploy flow
+  watch(
+    () => ({ vendor: route.params.vendor, solution: route.params.solution }),
+    (newParams, oldParams) => {
+      // Only reload if params actually changed (not on query changes)
+      if (
+        newParams.vendor &&
+        newParams.solution &&
+        (newParams.vendor !== oldParams?.vendor || newParams.solution !== oldParams?.solution)
+      ) {
+        loadSolutionByVendor()
+      }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
@@ -185,6 +196,7 @@
           @submitClick="handleSubmitClick"
           :getTemplateService="props.getTemplateService"
           :instantiateTemplateService="props.instantiateTemplateService"
+          :getResultsService="scriptRunnerService.loadExecutionResultsService"
           :templateId="solution.referenceId"
         />
       </form>

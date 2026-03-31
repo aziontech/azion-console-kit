@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   import { useForm, useField, useFieldArray } from 'vee-validate'
   import * as yup from 'yup'
   import Accordion from 'primevue/accordion'
@@ -14,6 +14,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup.vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { workloadService } from '@/services/v2/workload/workload-service'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   const props = defineProps({
@@ -61,6 +62,18 @@
     results: {
       type: Object,
       default: null
+    },
+
+    // Workload ID for loading existing domain data
+    workloadId: {
+      type: [String, Number],
+      default: null
+    },
+
+    // Loading state for save operation
+    isSaving: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -78,7 +91,7 @@
     // Add Workload (domain)
     if (props.results.domain?.url) {
       resources.push({
-        type: 'Workload',
+        type: `${hasFlagBlockApiV4() ? 'Domain' : 'Workloads'}`,
         redirect: () =>
           router.push({
             name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
@@ -154,7 +167,7 @@
   /**
    * vee-validate form setup with validation schema and initial values
    */
-  const { handleSubmit } = useForm({
+  const { handleSubmit, setValues } = useForm({
     validationSchema,
     initialValues: {
       domains: [{ domain: '' }],
@@ -166,13 +179,20 @@
 
   /**
    * vee-validate form fields setup
+   * meta is used to track if the field has been touched (user interacted with it)
+   * to prevent showing validation errors before user interaction
    */
-  const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
+  const {
+    errorMessage: domainsErrorMessage,
+    value: domains,
+    meta: domainsMeta
+  } = useField('domains')
   const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
   const { value: useCustomDomain } = useField('useCustomDomain')
   const { value: customDomain } = useField('customDomain')
 
   const domainsOptions = ref([])
+  const isLoadingWorkload = ref(false)
 
   /**
    * Add a new domain field to the list
@@ -271,6 +291,13 @@
   ]
 
   /**
+   * Computed loading icon for save button
+   */
+  const saveButtonIcon = computed(() => {
+    return props.isSaving ? 'pi pi-spin pi-spinner' : ''
+  })
+
+  /**
    * Handle form submission
    * Called when validation passes
    */
@@ -278,10 +305,57 @@
     emit('onSave', values)
   })
 
+  /**
+   * Load workload data and populate form fields
+   */
+  const loadWorkloadData = async () => {
+    if (!props.workloadId) return
+
+    isLoadingWorkload.value = true
+    try {
+      const workload = await workloadService.loadWorkload({ id: props.workloadId })
+      // Transform domains from { subdomain, domain } to { domain: 'full.domain' }
+      const loadedDomains = workload.domains
+        .filter((domainItem) => domainItem.domain)
+        .map((domainItem) => ({
+          domain: domainItem.subdomain
+            ? `${domainItem.subdomain}.${domainItem.domain}`
+            : domainItem.domain
+        }))
+
+      // Ensure at least one domain field exists
+      if (loadedDomains.length === 0) {
+        loadedDomains.push({ domain: '' })
+      }
+
+      setValues({
+        domains: loadedDomains,
+        useCustomDomain: workload.useCustomDomain || false,
+        customDomain: workload.customDomain || '',
+        workloadHostnameAllowAccess: workload.workloadHostnameAllowAccess || false
+      })
+    } catch (error) {
+      // Silently fail - form will use default empty values
+    } finally {
+      isLoadingWorkload.value = false
+    }
+  }
+
   // Load domain suggestions on mount
-  onMounted(() => {
-    sugestionDomains()
+  onMounted(async () => {
+    await sugestionDomains()
   })
+
+  // Watch for workloadId changes to load existing domain data
+  watch(
+    () => props.workloadId,
+    (newWorkloadId) => {
+      if (newWorkloadId) {
+        loadWorkloadData()
+      }
+    },
+    { immediate: false }
+  )
 </script>
 
 <template>
@@ -292,15 +366,16 @@
     <template #content>
       <p class="text-sm text-color-secondary leading-5">
         Your application is being distributed, in few minutes, the application will be available on
+
         <a
           :href="props.appUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-primary hover:text-primary-hover transition-colors inline-flex items-center gap-1"
+          class="text-[var(--text-color-link)] text-xs inline-flex items-center gap-1"
         >
-          <span class="underline">{{ appUrlDisplay }}</span>
-          <i class="pi pi-external-link text-[10px]" /> </a
-        >.
+          <span class="hover:underline">{{ appUrlDisplay }}</span>
+          <i class="pi pi-external-link text-xs !no-underline" />
+        </a>
       </p>
 
       <TemplateInfoBlock
@@ -327,108 +402,117 @@
               </div>
             </template>
             <div class="flex flex-col gap-4 p-4">
-              <div class="flex flex-col gap-2">
-                <LabelBlock label="Domain" />
-                <div
-                  v-for="(domain, index) in domains"
-                  :key="index"
-                  class="flex flex-col sm:flex-row gap-2 w-full"
-                >
-                  <div class="flex flex-col w-full gap-2">
-                    <FieldDropdown
-                      editable
-                      :focusOnHover="false"
-                      :name="`domains[${index}].domain`"
-                      :options="domainsOptions"
-                      optionLabel="label"
-                      optionValue="label"
-                      placeholder="example.com"
-                      emptyMessage="No domains available"
-                      :value="domain.domain"
-                      :class="{ 'p-invalid': domainsErrorMessage }"
-                      @change="updateDomainValue(index, $event.value)"
-                      data-testid="domains-form__domain-dropdown"
+              <div
+                v-if="isLoadingWorkload"
+                class="flex items-center justify-center py-4"
+              >
+                <i class="pi pi-spin pi-spinner text-2xl text-primary" />
+              </div>
+              <template v-else>
+                <div class="flex flex-col gap-2">
+                  <LabelBlock label="Domain" />
+                  <div
+                    v-for="(domain, index) in domains"
+                    :key="index"
+                    class="flex flex-col sm:flex-row gap-2 w-full"
+                  >
+                    <div class="flex flex-col w-full gap-2">
+                      <FieldDropdown
+                        editable
+                        :focusOnHover="false"
+                        :name="`domains[${index}].domain`"
+                        :options="domainsOptions"
+                        optionLabel="label"
+                        optionValue="label"
+                        placeholder="example.com"
+                        emptyMessage="No domains available"
+                        :value="domain.domain"
+                        :class="{ 'p-invalid': domainsErrorMessage && domainsMeta.touched }"
+                        @change="updateDomainValue(index, $event.value)"
+                        data-testid="domains-form__domain-dropdown"
+                      />
+                      <small
+                        class="text-xs text-color-secondary font-normal leading-5 -mt-1"
+                        v-if="!index"
+                      >
+                        Type your domain or select from Edge DNS.
+                      </small>
+                    </div>
+
+                    <PrimeButton
+                      v-if="hasMultipleDomains"
+                      :class="{ 'mb-6': !index }"
+                      @click="removeDomain(index)"
+                      icon="pi pi-trash"
+                      class="p-button-outlined p-button-sm p-button-danger self-end"
+                      data-testid="domains-form__remove-domain-button"
+                      title="Remove domain"
                     />
-                    <small
-                      class="text-xs text-color-secondary font-normal leading-5 -mt-1"
-                      v-if="!index"
-                    >
-                      Type your domain or select from Edge DNS.
-                    </small>
                   </div>
 
+                  <small
+                    v-if="domainsErrorMessage && domainsMeta.touched"
+                    class="p-error text-xs font-normal leading-tight"
+                  >
+                    {{ domainsErrorMessage }}
+                  </small>
+                </div>
+
+                <div class="flex mt-1">
                   <PrimeButton
-                    v-if="hasMultipleDomains"
-                    @click="removeDomain(index)"
-                    icon="pi pi-trash"
-                    class="p-button-outlined p-button-sm p-button-danger self-end"
-                    data-testid="domains-form__remove-domain-button"
-                    title="Remove domain"
+                    @click="addNewDomain"
+                    label="Add Another"
+                    icon="pi pi-plus-circle"
+                    outlined
+                    size="small"
+                    data-testid="domains-form__add-domain-button"
+                    title="Add Another"
                   />
                 </div>
 
-                <small
-                  v-if="domainsErrorMessage"
-                  class="p-error text-xs font-normal leading-tight"
-                >
-                  {{ domainsErrorMessage }}
-                </small>
-              </div>
-
-              <div class="flex mt-1">
-                <PrimeButton
-                  @click="addNewDomain"
-                  label="Add Another"
-                  icon="pi pi-plus-circle"
-                  outlined
-                  size="small"
-                  data-testid="domains-form__add-domain-button"
-                  title="Add Another"
+                <FieldSwitchBlock
+                  nameField="useCustomDomain"
+                  name="useCustomDomain"
+                  auto
+                  title="Custom Domain"
+                  subtitle="You can use an free azion.app domain."
+                  :isCard="false"
                 />
-              </div>
 
-              <FieldSwitchBlock
-                nameField="useCustomDomain"
-                name="useCustomDomain"
-                auto
-                title="Custom Domain"
-                subtitle="You can use an free azion.app domain."
-                :isCard="false"
-              />
-
-              <div
-                v-if="useCustomDomain"
-                class="flex w-full gap-2 flex-col"
-              >
-                <div class="flex flex-col w-full gap-2">
-                  <FieldInputGroup
-                    placeholder="my-custom-name"
-                    label="Azion Custom Domain"
-                    required
-                    :value="customDomain"
-                    name="customDomain"
-                    data-testid="workload-custom-domain-field"
-                  >
-                    <template #button>
-                      <PrimeButton
-                        label=".azion.app"
-                        size="small"
-                        class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
-                        outlined
-                      />
-                    </template>
-                  </FieldInputGroup>
+                <div
+                  v-if="useCustomDomain"
+                  class="flex w-full gap-2 flex-col"
+                >
+                  <div class="flex flex-col w-full gap-2">
+                    <FieldInputGroup
+                      placeholder="my-custom-name"
+                      label="Azion Custom Domain"
+                      required
+                      :value="customDomain"
+                      name="customDomain"
+                      data-testid="workload-custom-domain-field"
+                    >
+                      <template #button>
+                        <PrimeButton
+                          label=".azion.app"
+                          size="small"
+                          class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
+                          outlined
+                        />
+                      </template>
+                    </FieldInputGroup>
+                  </div>
                 </div>
-              </div>
 
-              <FieldSwitchBlock
-                nameField="workloadHostnameAllowAccess"
-                name="workloadHostnameAllowAccess"
-                auto
-                title="Workload Domain Allow Access"
-                subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
-                :isCard="false"
-              />
+                <FieldSwitchBlock
+                  nameField="workloadHostnameAllowAccess"
+                  name="workloadHostnameAllowAccess"
+                  auto
+                  title="Workload Domain Allow Access"
+                  subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
+                  :isCard="false"
+                />
+              </template>
             </div>
             <div class="bg-neutral-950 h-16 p-4 flex justify-end rounded-b-md">
               <PrimeButton
@@ -437,6 +521,8 @@
                 @click="onSubmit"
                 icon-pos="right"
                 class="max-md:w-full md:min-w-[5rem]"
+                :icon="saveButtonIcon"
+                :disabled="isSaving"
               />
             </div>
           </AccordionTab>

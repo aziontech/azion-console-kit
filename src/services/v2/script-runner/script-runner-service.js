@@ -5,7 +5,7 @@ import * as Errors from '@/services/axios/errors'
 export class ScriptRunnerService {
   constructor() {
     this.adapter = ScriptRunnerAdapter
-    this.baseURL = 'script-runner'
+    this.baseURL = 'api/script-runner'
   }
 
   #getUrl(id, suffix = '') {
@@ -20,7 +20,6 @@ export class ScriptRunnerService {
       method: 'GET',
       url: this.#getUrl(null, `/executions/${executionId}/logs`)
     })
-
     return this.adapter.transformLogsResponse(data)
   }
 
@@ -29,17 +28,15 @@ export class ScriptRunnerService {
       method: 'GET',
       url: this.#getUrl(null, `/executions/${executionId}/status`)
     })
-
     return this.adapter.transformStatusResponse(data)
   }
 
   loadExecutionResultsService = async (executionId) => {
-    const { data, statusCode } = await httpService.request({
+    const { data, status } = await httpService.request({
       method: 'GET',
       url: this.#getUrl(null, `/executions/${executionId}/results`)
     })
-
-    return this.#parseHttpResponse(data, statusCode)
+    return this.#parseHttpResponse(data, status)
   }
 
   #parseHttpResponse(data, statusCode) {
@@ -47,22 +44,22 @@ export class ScriptRunnerService {
       case 200: {
         const hasErrors = data.result?.errors || data.result?.error
         if (hasErrors) {
-          throw new Error(data.result?.message).message
+          throw new Error(data.result?.message || 'Deployment failed with errors')
         }
         return this.adapter.transformExecutionResultsResponse(data)
       }
       case 400:
-        throw new Errors.NotFoundError().message
+        throw new Errors.NotFoundError()
       case 401:
-        throw new Errors.InvalidApiTokenError().message
+        throw new Errors.InvalidApiTokenError()
       case 403:
-        throw new Errors.PermissionError().message
+        throw new Errors.PermissionError()
       case 404:
-        throw new Errors.NotFoundError().message
+        throw new Errors.NotFoundError()
       case 500:
-        throw new Errors.InternalServerError().message
+        throw new Errors.InternalServerError()
       default:
-        throw new Errors.UnexpectedError().message
+        throw new Errors.UnexpectedError()
     }
   }
 }

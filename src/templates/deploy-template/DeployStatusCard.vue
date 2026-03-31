@@ -160,7 +160,7 @@
 
 <template>
   <div class="flex flex-col w-full gap-8">
-    <BaseDeployCard :title="hasApplicationName">
+    <BaseDeployCard title="Deployment">
       <template #header-right>
         <span v-if="isUnfinished">
           {{ elapsedTime }}

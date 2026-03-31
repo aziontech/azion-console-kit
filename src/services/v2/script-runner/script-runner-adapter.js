@@ -40,20 +40,26 @@ export const ScriptRunnerAdapter = {
   },
 
   transformExecutionResultsResponse(data) {
-    const { result } = data
+    const result = data?.result || {}
 
-    return {
+    const transformedResult = {
       result: {
-        domain: {
-          id: result.domain.id,
-          url: `https://${result.domain.url}`
-        },
-        edgeApplication: {
-          id: result.edge_application.id,
-          name: result.edge_application.name
-        },
+        domain: result.domain
+          ? {
+              id: result.domain.id,
+              url: `https://${result.domain.url}`,
+              cname: result.domain.url
+            }
+          : null,
+        edgeApplication: result.edge_application
+          ? {
+              id: result.edge_application.id,
+              name: result.edge_application.name
+            }
+          : null,
         extras: result.extras
       }
     }
+    return transformedResult
   }
 }
