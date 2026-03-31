@@ -229,8 +229,20 @@
    * @param {MessageEvent} event - The message event from the OAuth window
    */
   const handleGithubIntegrationMessage = async (event) => {
+    if (event.origin !== window.location.origin) return
+
     if (event.data.event === 'integration-data') {
       await saveIntegration(event.data)
+    } else if (event.data.event === 'integration-connected') {
+      await listIntegrations()
+    } else if (event.data.event === 'integration-error') {
+      const errorMessage =
+        event.data.data?.error_description || event.data.data?.error || 'Unknown error'
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: `GitHub integration failed: ${errorMessage}`
+      })
     }
   }
 
@@ -258,7 +270,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
       error.showWithOptions?.(toast, (err) => ({
-        summary: `GitHub integration failed: ${err.detail}`,
+        summary: `GitHub integration failed: ${err.message}`,
         severity: 'error'
       }))
     } finally {

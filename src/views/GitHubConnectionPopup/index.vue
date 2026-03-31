@@ -67,14 +67,35 @@
 
   const sendPostMessage = () => {
     const platformUrl = window.location.origin
-    const data = {
-      event: 'integration-data',
-      data: route.query
-    }
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(data, platformUrl)
+
+    if (route.query.code) {
+      // OAuth authorization callback - send to parent for processing
+      const data = {
+        event: 'integration-data',
+        data: route.query
+      }
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(data, platformUrl)
+      }
+    } else if (route.query.error) {
+      // OAuth error callback (e.g., user denied access)
+      const data = {
+        event: 'integration-error',
+        data: route.query
+      }
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(data, platformUrl)
+      }
+    } else {
+      // GitHub App installation callback - just reload integrations list
+      const data = {
+        event: 'integration-connected'
+      }
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(data, platformUrl)
+      }
     }
 
-    window.parent.close()
+    window.close()
   }
 </script>
