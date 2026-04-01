@@ -7,9 +7,10 @@
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
   import DeployStatusCard from '@/templates/deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
+
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import Button from 'primevue/button'

@@ -2,7 +2,7 @@
   import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   const emit = defineEmits(['blur', 'input', 'paste'])
   const props = defineProps({

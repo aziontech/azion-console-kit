@@ -2,7 +2,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
   import { computed, toRef, useSlots, useAttrs } from 'vue'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   const props = defineProps({
     value: {

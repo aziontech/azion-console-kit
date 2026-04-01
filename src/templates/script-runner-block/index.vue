@@ -84,7 +84,7 @@
   import ProgressSpinner from 'primevue/progressspinner'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   import { scriptRunnerService } from '@/services/v2/script-runner'
 
   export default {
