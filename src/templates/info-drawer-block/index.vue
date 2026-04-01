@@ -1,7 +1,6 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import Button from 'primevue/button'
 
   defineOptions({ name: 'info-drawer-block' })
@@ -61,9 +60,12 @@
     }"
   >
     <template #header>
-      <h2 class="text-xl truncate">{{ props.title }}</h2>
+      <h2 class="text-xl truncate">
+        {{ props.title }}
+      </h2>
+      
       <div class="flex gap-2 items-center">
-        <ConsoleFeedback styleTextColor="text-color" />
+        <slot name="header-actions"></slot>
         <Button
           outlined
           class="text-color"

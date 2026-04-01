@@ -1,21 +1,26 @@
 <script setup>
   import { computed, onBeforeMount, ref, nextTick } from 'vue'
-  import ActionBarBlock from '@/templates/action-bar-block'
+
   import Divider from 'primevue/divider'
-  import GoBack from '@/templates/action-bar-block/go-back'
-  import EmptyDrawer from '@/templates/empty-drawer'
-  import { columnBuilder } from '@/components/list-table/columns/column-builder'
-  // TODO: migrate import to @aziontech/webkit/list-data-table when published
-  import DataTable from '@aziontech/webkit/list-data-table'
-  import advancedFilter from '@/templates/advanced-filter'
   import Dropdown from 'primevue/dropdown'
   import PrimeTag from 'primevue/tag'
-  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { useToast } from 'primevue/usetoast'
+
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ActionBarBlock from '@/templates/action-bar-block'
+  import EmptyDrawer from '@/templates/empty-drawer'
+  import GoBack from '@/templates/action-bar-block/go-back'
+  import advancedFilter from '@/templates/advanced-filter'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+
+  // TODO: migrate import to @aziontech/webkit/list-data-table when published
+  import DataTable from '@aziontech/webkit/list-data-table'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+
   import { useAccountStore } from '@/stores/account'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   const accountStore = useAccountStore()
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
@@ -403,6 +408,10 @@
     expandable
     expandedDefault
   >
+    <template #header-actions>
+      <ConsoleFeedback />
+    </template>
+
     <template #content>
       <div class="flex flex-col w-full">
         <div class="flex flex-col p-0 gap-6 sm:gap-8">
@@ -581,6 +590,7 @@
         </div>
       </div>
     </template>
+
     <template
       #footer
       v-if="hasEnableWafTuning"
