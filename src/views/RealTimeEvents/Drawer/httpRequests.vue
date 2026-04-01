@@ -9,7 +9,7 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import TableEvents from './tableEvents.vue'
-  
+
   defineOptions({ name: 'drawer-events-http-requests' })
 
   const props = defineProps({
@@ -82,7 +82,7 @@
     <template #header-actions>
       <ConsoleFeedback />
     </template>
-    
+
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <TabView

@@ -71,7 +71,7 @@
     <template #header-actions>
       <ConsoleFeedback />
     </template>
-    
+
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <TabView

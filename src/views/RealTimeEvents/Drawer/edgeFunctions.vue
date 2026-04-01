@@ -9,7 +9,7 @@
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import TableEvents from './tableEvents.vue'
-  
+
   defineOptions({ name: 'DrawerEventsFunctions' })
 
   const props = defineProps({
