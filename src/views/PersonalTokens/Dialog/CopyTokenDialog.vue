@@ -80,6 +80,7 @@
   import InlineMessage from '@aziontech/webkit/inline-message'
   import PrimePassword from '@aziontech/webkit/password'
   import CopyBlock from '@aziontech/webkit/button-copy'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'CopyTokenDialog' })
 
