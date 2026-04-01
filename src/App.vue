@@ -51,9 +51,13 @@
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
-  watch(currentTheme, (theme) => {
-    themeApply(theme)
-  })
+  watch(
+    currentTheme,
+    (theme) => {
+      themeApply(theme)
+    },
+    { immediate: true }
+  )
 
   watch(account, () => {
     updateTrackingTraits()

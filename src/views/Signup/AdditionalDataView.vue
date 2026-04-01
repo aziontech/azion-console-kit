@@ -19,12 +19,18 @@
           <template #footer>
             <PrimeButton
               severity="primary"
-              :label="submitButtonLabel"
-              class="w-full font-proto-mono"
+              class="w-full font-protomono flex items-center justify-center"
               :icon="showLoading"
               :disabled="isDisabledSubmit"
               @click="onSubmit"
-            />
+            >
+              <Transition
+                name="label-fade"
+                mode="out-in"
+              >
+                <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
+              </Transition>
+            </PrimeButton>
           </template>
         </CardBox>
       </div>
@@ -102,3 +108,15 @@
     }
   })
 </script>
+
+<style scoped>
+  .label-fade-enter-active,
+  .label-fade-leave-active {
+    transition: opacity 150ms ease;
+  }
+
+  .label-fade-enter-from,
+  .label-fade-leave-to {
+    opacity: 0;
+  }
+</style>

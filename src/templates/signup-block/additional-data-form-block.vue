@@ -17,7 +17,7 @@
             <div
               class="flex items-center rounded-[6px] border px-[10px] py-1 surface-section surface-border w-fit"
             >
-              <span class="font-proto-mono text-[10px] font-semibold leading-4 text-color">
+              <span class="font-protomono text-[10px] font-semibold leading-4 text-color">
                 {{ item.tagLabel }}
               </span>
             </div>

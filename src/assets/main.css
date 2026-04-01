@@ -40,3 +40,18 @@ body.p-overflow-hidden {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
 }
+
+.azion {
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.azion.azion-dark {
+  color-scheme: dark;
+}
+
+.azion.azion-light {
+  color-scheme: light;
+}
