@@ -6,10 +6,6 @@
   import { computed } from 'vue'
 
   const props = defineProps({
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     moduleActions: {
       type: Object,
       required: true
@@ -109,7 +105,6 @@
           >
             <BigNumbers
               :report="bigNumberReport"
-              :clipboardWrite="clipboardWrite"
               :groupData="groupData"
             />
           </template>
@@ -123,7 +118,6 @@
         <GraphsCardBlock
           :report="report"
           :groupData="groupData"
-          :clipboardWrite="clipboardWrite"
         />
       </template>
     </div>

@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import Calendar from 'primevue/calendar'
-  import FieldMultiSelect from '@/templates/form-fields-inputs/fieldMultiSelect'
-  import LabelBlock from '@/templates/label-block'
+  import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
 
   const capabilitiesOptions = [
@@ -52,16 +52,14 @@
     isDrawer
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          name="name"
-          placeholder="My credential"
-          data-testid="credential-form__name-field"
-          description="Give a unique and descriptive name to identify the credential."
-          required
-        />
-      </div>
+      <FieldText
+        label="Name"
+        name="name"
+        placeholder="My credential"
+        data-testid="credential-form__name-field"
+        description="Give a unique and descriptive name to identify the credential."
+        required
+      />
     </template>
   </FormHorizontal>
 

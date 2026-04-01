@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
 
@@ -39,17 +39,15 @@
       :disabled="disableNameEdit"
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            :required="!showDangerZone"
-            name="name"
-            placeholder="Sample Bucket"
-            :value="name"
-            description="Give a unique and descriptive name to identify this bucket."
-            data-testid="edge-storage-form__name-field"
-          />
-        </div>
+        <FieldText
+          label="Name"
+          :required="!showDangerZone"
+          name="name"
+          placeholder="Sample Bucket"
+          :value="name"
+          description="Give a unique and descriptive name to identify this bucket."
+          data-testid="edge-storage-form__name-field"
+        />
       </template>
     </FormHorizontal>
     <FormHorizontal

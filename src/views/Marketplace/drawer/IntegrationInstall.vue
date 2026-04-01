@@ -15,7 +15,7 @@
   import * as yup from 'yup'
   import PermissionsFieldset from '../components/PermissionsFieldset'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
 
   const router = useRouter()
 

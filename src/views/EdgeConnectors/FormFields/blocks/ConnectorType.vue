@@ -25,7 +25,7 @@
   import { useRoute } from 'vue-router'
   import { computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
 
   defineProps({
     isDrawer: {

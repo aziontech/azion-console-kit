@@ -2,9 +2,9 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import EditView from '@/views/EdgeDNS/EditView.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
@@ -15,19 +15,19 @@
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeDNSRecordsService } from '@/services/v2/edge-dns/edge-dns-records-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import ListTable from '@/components/list-table/ListTable.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    clipboardWrite: { type: Function, required: true },
     updatedRedirect: { type: String, required: true },
     documentationService: { type: Function, required: true }
   })
@@ -43,8 +43,8 @@
 
   const showCreateRecordDrawer = ref(false)
   const showEditRecordDrawer = ref(false)
-  const listEDNSResourcesRef = ref('')
   const selectedEdgeDnsRecordToEdit = ref(0)
+  const listTableRef = ref(null)
 
   const defaultTabs = {
     mainSettings: 0,
@@ -113,7 +113,7 @@
           data: Array.isArray(columnData) ? columnData : columnData?.content,
           columnAppearance: 'text-array-with-popup',
           dependencies: {
-            showCopy: !!props.clipboardWrite
+            showCopy: true
           }
         })
       }
@@ -153,6 +153,11 @@
 
   const title = computed(() => {
     return edgeDNS.value?.name || ''
+  })
+
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeDNS.value) return true
+    return false
   })
 
   const showMainSettings = computed(() => {
@@ -278,17 +283,21 @@
   }
 
   const handleCreatedSuccessfully = () => {
-    reloadResourcesList()
+    listTableRef.value?.reload()
     handleTrackSuccessCreated()
   }
 
   const handleEditedSuccessfully = () => {
-    reloadResourcesList()
+    listTableRef.value?.reload()
     handleTrackSuccessEdit()
   }
 
-  const reloadResourcesList = () => {
-    listEDNSResourcesRef.value.reload()
+  // --- DataTable setup ---
+
+  const frozenColumns = ['name']
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackEventGoToEdit()
   }
 
   // --- Tab navigation ---
@@ -382,7 +391,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -396,10 +406,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeDNS"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"
@@ -444,24 +451,22 @@
           <EditView
             v-if="showMainSettings"
             :edgeDNS="edgeDNS"
-            :clipboardWrite="clipboardWrite"
             :updatedRedirect="updatedRedirect"
           />
 
           <div v-if="showRecords">
-            <FetchListTableBlock
-              ref="listEDNSResourcesRef"
-              addButtonLabel="Record"
-              defaultOrderingFieldName="id"
-              :editInDrawer="openEditDrawerEDNSResource"
-              :columns="recordListColumns"
+            <ListTable
+              ref="listTableRef"
               :listService="listRecordsServiceEdgeDNSDecorator"
-              emptyListMessage="No records found."
+              :columns="recordListColumns"
               :actions="actions"
-              isTabs
+              :editInDrawer="openEditDrawerEDNSResource"
+              defaultOrderingFieldName="id"
               exportFileName="Edge DNS Records"
-              @on-before-go-to-edit="handleTrackEventGoToEdit"
-              hideLastModifiedColumn
+              :lazy="true"
+              :frozenColumns="frozenColumns"
+              :isTabs="true"
+              emptyListMessage="No records found."
               :emptyBlock="{
                 title: 'No records yet',
                 description:
@@ -471,15 +476,8 @@
                 documentationService: documentationService,
                 inTabs: true
               }"
+              @on-before-go-to-edit="handleBeforeGoToEdit"
             >
-              <template #addButton>
-                <PrimeButton
-                  icon="pi pi-plus"
-                  label="Record"
-                  @click="openCreateDrawerEDNSResource"
-                  data-testid="create_Record_button"
-                />
-              </template>
               <template #emptyBlockButton>
                 <PrimeButton
                   class="max-md:w-full w-fit"
@@ -490,7 +488,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-            </FetchListTableBlock>
+            </ListTable>
 
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"

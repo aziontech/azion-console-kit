@@ -5,8 +5,8 @@
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import SelectPanel from '@/components/select-panel'
   import DescriptionText from '@/components/description-text/descriptionText'
   import TitleDescriptionArea from '@/components/title-description-area'
@@ -212,17 +212,15 @@
     description="Instantiate a serverless function created with Functions within the Application. Use Rules Engine to activate the function."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="edge-application-function-instance-form__name-field"
-          label="Name"
-          required
-          name="name"
-          v-model="name"
-          placeholder="My Application function instance"
-          description="Give a unique and descriptive name to identify the function instance."
-        />
-      </div>
+      <FieldText
+        data-testid="edge-application-function-instance-form__name-field"
+        label="Name"
+        required
+        name="name"
+        v-model="name"
+        placeholder="My Application function instance"
+        description="Give a unique and descriptive name to identify the function instance."
+      />
     </template>
   </FormHorizontal>
 

@@ -103,7 +103,7 @@
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'
   import { useThemeStore } from '@/stores/theme'
   import DrawerTemplate from '@/views/DataStream/Drawer'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
 
   defineProps({
     disabled: {

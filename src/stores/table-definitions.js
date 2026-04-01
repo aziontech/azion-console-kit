@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useTableDefinitionsStore = defineStore({
   id: 'tableDefinitions',
   state: () => ({
-    numberOfLinesPerPage: 10
+    numberOfLinesPerPage: 50
   }),
   persist: {
     paths: ['numberOfLinesPerPage']

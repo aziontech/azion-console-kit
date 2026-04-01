@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeTeamPermissionBaseUrl } from './make-team-permission-base-url'
 import * as Errors from '@/services/axios/errors'
-import { teamsService } from '@/services/users-services/list-teams-service'
+import { teamsService } from '@/services/v2/teams/teams-service'
 import { teamPermissionService } from './team-permission-service'
 
 export const deleteTeamPermissionService = async (teamPermissionId) => {

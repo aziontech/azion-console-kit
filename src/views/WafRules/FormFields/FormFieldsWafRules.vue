@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   import { ref } from 'vue'
 
@@ -114,17 +114,15 @@
     description="Create a WAF rule set to protect servers and applications against threat families. Configure a behavior on Rules Engine for Firewall to apply and run this rule set."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give a unique and descriptive name to identify the WAF rule set."
-          name="name"
-          data-testid="waf-rules-form__name-field"
-          :value="name"
-          placeholder="My WAF rule"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give a unique and descriptive name to identify the WAF rule set."
+        name="name"
+        data-testid="waf-rules-form__name-field"
+        :value="name"
+        placeholder="My WAF rule"
+      />
     </template>
   </FormHorizontal>
   <FormHorizontal

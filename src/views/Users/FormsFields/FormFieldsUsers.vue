@@ -3,15 +3,15 @@
   import { storeToRefs } from 'pinia'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldPhoneNumber from '@/templates/form-fields-inputs/fieldPhoneNumber'
-  import LabelBlock from '@/templates/label-block'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldPhoneNumber from '@aziontech/webkit/field-phone-number'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import MultiSelect from 'primevue/multiselect'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -202,28 +202,24 @@
     data-testid="users-form__section__profile"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="First Name"
-          required
-          name="firstName"
-          placeholder="John"
-          :value="firstName"
-          description="The first name of the user."
-          data-testid="users-form__first-name-field"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Last Name"
-          required
-          name="lastName"
-          placeholder="Doe"
-          :value="lastName"
-          description="The last name of the user."
-          data-testid="users-form__last-name-field"
-        />
-      </div>
+      <FieldText
+        label="First Name"
+        required
+        name="firstName"
+        placeholder="John"
+        :value="firstName"
+        description="The first name of the user."
+        data-testid="users-form__first-name-field"
+      />
+      <FieldText
+        label="Last Name"
+        required
+        name="lastName"
+        placeholder="Doe"
+        :value="lastName"
+        description="The last name of the user."
+        data-testid="users-form__last-name-field"
+      />
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
@@ -276,18 +272,16 @@
     data-testid="users-form__section__contact-information"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Email"
-          required
-          name="email"
-          placeholder="example@email.com"
-          :value="email"
-          description="Email of the user. A confirmation email will be sent to this address upon sign up."
-          type="email"
-          data-testid="users-form__email-field"
-        />
-      </div>
+      <FieldText
+        label="Email"
+        required
+        name="email"
+        placeholder="example@email.com"
+        :value="email"
+        description="Email of the user. A confirmation email will be sent to this address upon sign up."
+        type="email"
+        data-testid="users-form__email-field"
+      />
 
       <FieldPhoneNumber
         :options="filteredCountriesMobile"

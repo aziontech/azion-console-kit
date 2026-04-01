@@ -14,14 +14,19 @@
         :schema="validationSchema"
         @loaded-service-object="setConnectorName"
       >
-        <template #form>
+        <template #form="{ loading }">
+          <FormSkeleton v-if="loading" />
           <FormFieldsEdgeConnectors
+            v-else
             :schema="validationSchema"
             :resetForm="resetForm"
             :isLoadingData="isLoadingData"
           />
         </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
+        <template
+          v-if="!isFormLoading"
+          #action-bar="{ onSubmit, onCancel, loading }"
+        >
           <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
             @onCancel="onCancel"
@@ -41,6 +46,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
+  import FormSkeleton from './components/FormSkeleton.vue'
   import { validationSchema } from './Config/validation'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -51,6 +57,7 @@
   const cachedConnector = edgeConnectorsService.getEdgeConnectorFromCache(route.params?.id) ?? {}
   const connectorName = ref(cachedConnector.name || 'Edit Connector')
   const isLoadingData = ref(true)
+  const isFormLoading = ref(true)
 
   if (cachedConnector.name) {
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedConnector.name)
@@ -59,6 +66,7 @@
   const setConnectorName = (connector) => {
     connectorName.value = connector.name
     isLoadingData.value = false
+    isFormLoading.value = false
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, connector.name)
   }
 </script>

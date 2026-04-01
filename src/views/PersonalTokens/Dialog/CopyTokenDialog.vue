@@ -51,15 +51,12 @@
         </span>
       </div>
       <div>
-        <PrimeButton
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          size="small"
-          aria-label="Copy Personal Token"
+        <CopyBlock
+          :value="personalTokenValue"
           label="Copy"
+          copiedLabel="Copied"
           :disabled="!personalTokenValue"
-          @click="params.copy"
+          aria-label="Copy Personal Token"
           data-testid="copy-token-dialog__token-field__copy-token-button"
         />
       </div>
@@ -82,7 +79,7 @@
   import PrimeDialog from 'primevue/dialog'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimePassword from 'primevue/password'
-  import PrimeButton from 'primevue/button'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyTokenDialog' })
 

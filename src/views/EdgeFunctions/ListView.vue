@@ -1,11 +1,11 @@
 <script setup>
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { computed, inject, ref } from 'vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { computed, inject } from 'vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -16,6 +16,8 @@
       type: Function
     }
   })
+
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -53,6 +55,7 @@
       status: rowData.data?.content
     }
   }
+
   const allowedFilters = [
     {
       header: 'Name',
@@ -71,6 +74,7 @@
       field: 'active'
     }
   ]
+
   const getColumns = computed(() => [
     {
       field: 'name',
@@ -132,8 +136,8 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
+      sortField: 'active',
+      filterPath: 'active',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -176,19 +180,19 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
+        :actions="actions"
         createPagePath="functions/create?origin=list"
         editPagePath="/functions/edit"
-        @on-before-go-to-add-page="handleCreateTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Functions found."
-        :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Functions"
+        emptyListMessage="No functions found."
         :csvMapper="csvMapper"
+        :lazy="true"
+        :frozenColumns="['name']"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Functions yet',
@@ -198,6 +202,8 @@
           createPagePath: 'functions/create?origin=list',
           documentationService: documentationService
         }"
+        @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
       />
     </template>
   </ContentBlock>

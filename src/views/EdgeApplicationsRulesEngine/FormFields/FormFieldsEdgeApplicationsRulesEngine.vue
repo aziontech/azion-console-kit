@@ -2,13 +2,13 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
-  import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldAutoComplete from '@aziontech/webkit/field-auto-complete'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
@@ -206,10 +206,6 @@
     },
     errors: {
       type: Object
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     },
     loadingOrigins: {
       type: Boolean,
@@ -588,26 +584,23 @@
         @onSuccess="handleSuccessOrigin"
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
-        :clipboardWrite="clipboardWrite"
       />
       <DrawerFunction
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
       />
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          :readonly="isDefaultPhase"
-          :disabled="isDefaultPhase"
-          placeholder="My rule"
-          :value="name"
-          description="Give a unique and descriptive name to identify the rule."
-          data-testid="rule-form-general-name"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        :readonly="isDefaultPhase"
+        :disabled="isDefaultPhase"
+        placeholder="My rule"
+        :value="name"
+        description="Give a unique and descriptive name to identify the rule."
+        data-testid="rule-form-general-name"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"

@@ -99,33 +99,16 @@
             <div class="flex flex-col gap-6">
               <!-- Password field -->
               <div class="flex flex-col gap-2">
-                <div class="flex flex-col gap-2">
-                  <label
-                    for="password"
-                    class="font-semibold text-sm"
-                    :class="classPasswordError"
-                  >
-                    Password
-                  </label>
-                  <Password
-                    toggleMask
-                    v-model="password"
-                    id="password"
-                    @vue:mounted="({ el }) => autofocusInput(el)"
-                    class="w-full"
-                    :class="classPasswordError"
-                    @keydown.enter="validateAndSubmit"
-                    :feedback="false"
-                    :disabled="isButtonLoading"
-                    data-testid="signin-block__password-input"
-                  />
-                  <small
-                    class="p-error text-xs font-normal leading-tight"
-                    v-if="hasRequestErrorMessage"
-                  >
-                    {{ hasRequestErrorMessage }}
-                  </small>
-                </div>
+                <FieldPassword
+                  ref="passwordFieldRef"
+                  name="password"
+                  label="Password"
+                  :disabled="isButtonLoading"
+                  :additionalError="hasRequestErrorMessage || ''"
+                  data-testid="signin-block__password-input"
+                  @submit="validateAndSubmit"
+                  @vue:mounted="focusPasswordField"
+                />
 
                 <!-- Forgot password link -->
                 <div>
@@ -172,10 +155,10 @@
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
-  import Password from 'primevue/password'
+  import FieldPassword from '@aziontech/webkit/field-password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
-  import { ref, inject, onMounted, computed } from 'vue'
+  import { ref, inject, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Divider from 'primevue/divider'
   import * as yup from 'yup'
@@ -218,10 +201,6 @@
     return errors.value.email ? 'p-invalid p-error' : ''
   })
 
-  const classPasswordError = computed(() => {
-    return hasRequestErrorMessage.value ? 'p-invalid' : ''
-  })
-
   const verifyErrorsOnUrl = () => {
     const { error_description: errorMessage } = route.query
 
@@ -257,6 +236,15 @@
 
   const { value: email } = useField('email')
   const { value: password, resetField } = useField('password')
+
+  const passwordFieldRef = ref(null)
+
+  const focusPasswordField = () => {
+    nextTick(() => {
+      const el = passwordFieldRef.value?.$el || passwordFieldRef.value
+      if (el) autofocusInput(el)
+    })
+  }
 
   const goToSignup = () => {
     router.push({ name: 'signup' })

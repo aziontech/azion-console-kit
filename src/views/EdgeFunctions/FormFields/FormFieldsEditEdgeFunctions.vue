@@ -10,21 +10,20 @@
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
-  import CodePreview from '../components/code-preview.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextIcon from '@aziontech/webkit/field-text-icon'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  // import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import { azionJsonFormWindowOpener } from '@/helpers/azion-documentation-window-opener'
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { defaultSchemaFormBuilder } from './Config'
 
-  defineProps(['previewData', 'run'])
-  const emit = defineEmits(['update:previewData', 'update:run', 'update:name', 'additionalErrors'])
+  defineProps(['run'])
+  const emit = defineEmits(['update:run', 'update:name', 'additionalErrors'])
 
   let SPLITTER_PROPS = ref({
     height: '50vh',
@@ -32,7 +31,6 @@
     panelsSizes: [60, 40]
   })
 
-  const previewState = ref(true)
   const hasFormBuilder = ref(false)
   const showFormBuilder = ref(false)
   const azionFormData = ref({})
@@ -54,10 +52,6 @@
   const { value: runtime } = useField('runtime')
   const { value: runtimeFormat } = useField('runtimeFormat')
 
-  const showPreview = computed(() => {
-    return previewState.value && runtime.value !== 'azion_lua'
-  })
-
   const initialCodeValue = ref('')
   const initialJsonArgsValue = ref('{}')
 
@@ -71,18 +65,6 @@
 
   const hasArgsError = computed(() => {
     return !!argsError.value
-  })
-
-  const updateObject = computed(() => {
-    const previewValues = {
-      code: code.value,
-      args: defaultArgs.value
-    }
-
-    emit('update:previewData', previewValues)
-    emit('update:run', runtime.value)
-
-    return previewValues
   })
 
   const executionEnvironmentOptions = [
@@ -168,13 +150,6 @@
     schemaAzionFormString.value = indentJsonStringify(defaultSchemaFormBuilder)
   }
 
-  const updateSizesPainel = (value) => {
-    SPLITTER_PROPS.value = {
-      ...SPLITTER_PROPS.value,
-      panelsSizes: value
-    }
-  }
-
   const resetFormBuilder = () => {
     hasFormBuilder.value = false
     azionFormData.value = setAzionFormData({})
@@ -248,16 +223,14 @@
         description="Edit a Function that runs closer to users to use with Application or Firewall."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldText
-              label="Name"
-              required
-              name="name"
-              placeholder="My function"
-              :value="name"
-              description="Give a unique and descriptive name to identify the Function."
-            />
-          </div>
+          <FieldText
+            label="Name"
+            required
+            name="name"
+            placeholder="My function"
+            :value="name"
+            description="Give a unique and descriptive name to identify the Function."
+          />
         </template>
       </FormHorizontal>
 
@@ -316,16 +289,8 @@
     </TabPanel>
 
     <TabPanel header="Code">
-      <ResizableSplitter
-        v-if="activeTab === 1"
-        :style="{ height: SPLITTER_PROPS.height }"
-        class="mt-8 surface-border border rounded-md hidden md:flex"
-        @resizeend="previewState = true"
-        :initialTopPanelPercent="60"
-        direction="vertical"
-        @update:panelSizes="updateSizesPainel"
-      >
-        <template #panel-a>
+      <div v-if="activeTab === 1">
+        <div class="flex flex-col h-full gap-2 mt-8">
           <CodeEditor
             v-model="code"
             :initialValue="initialCodeValue"
@@ -333,27 +298,7 @@
             :errors="hasCodeError"
             :readOnly="isProprietaryCode"
           />
-        </template>
-        <template #panel-b>
-          <div
-            v-if="showPreview"
-            class="h-full"
-          >
-            <CodePreview :updateObject="updateObject" />
-          </div>
-        </template>
-      </ResizableSplitter>
-
-      <div
-        v-if="activeTab === 1"
-        class="flex flex-col mt-0 surface-border border rounded-md gap-2 md:hidden h-[50vh]"
-      >
-        <CodeEditor
-          v-model="code"
-          :initialValue="initialCodeValue"
-          :runtime="runtimeFormat.format"
-          :errors="hasCodeError"
-        />
+        </div>
         <small
           v-if="codeError"
           class="p-error text-xs font-normal"
@@ -376,33 +321,18 @@
           />
         </div>
 
-        <ResizableSplitter
-          class="!z-20 relative"
-          :style="{ height: SPLITTER_PROPS.height }"
-          direction="vertical"
-          :panelSizes="SPLITTER_PROPS.panelsSizes"
-          :initialTopPanelPercent="60"
-          @update:panelSizes="(val) => (SPLITTER_PROPS.panelsSizes = val)"
-          @resizeend="
-            () => {
-              argsEditorRerenderKey++
-            }
-          "
-          v-if="!showFormBuilder"
-        >
-          <template #panel-a>
-            <CodeEditor
-              :key="argsEditorRerenderKey"
-              v-model="defaultArgs"
-              runtime="json"
-              :initialValue="defaultArgs"
-              :minimap="false"
-              :errors="hasArgsError"
-              class="h-full"
-              @update:modelValue="codeEditorArgsUpdate"
-            />
-          </template>
-        </ResizableSplitter>
+        <div v-if="!showFormBuilder">
+          <CodeEditor
+            :key="argsEditorRerenderKey"
+            v-model="defaultArgs"
+            runtime="json"
+            :initialValue="defaultArgs"
+            :minimap="false"
+            :errors="hasArgsError"
+            class="h-full"
+            @update:modelValue="codeEditorArgsUpdate"
+          />
+        </div>
 
         <div v-if="hasFormBuilder">
           <ResizableSplitter
@@ -444,14 +374,12 @@
                   class="flex flex-col items-center justify-center h-full gap-2"
                 >
                   <p>Configure the form builder.</p>
-                  <!--
                   <PrimeButton
                     outlined
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
                   />
-                  -->
                 </div>
               </div>
               <div class="flex items-center justify-end mt-2">

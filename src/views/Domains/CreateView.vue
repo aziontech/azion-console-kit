@@ -58,12 +58,8 @@
   const tracker = inject('tracker')
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
-  const props = defineProps({
+  defineProps({
     createDomainService: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
       type: Function,
       required: true
     },
@@ -90,8 +86,7 @@
     domainName.value = value?.domainName
     dialog.open(CopyDomainDialog, {
       data: {
-        domain: domainName.value,
-        copy: copyDomain
+        domain: domainName.value
       },
       onClose: () => {
         router.push({ path: value.urlToEditView })
@@ -103,25 +98,6 @@
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
-  }
-
-  const copyDomain = async () => {
-    const toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    }
-
-    try {
-      props.clipboardWrite(domainName.value)
-      toast.add({ ...toastConfig })
-    } catch (error) {
-      toast.add({
-        ...toastConfig,
-        severity: 'error',
-        detail: 'The domain was not copied to the clipboard. Try copying it again.'
-      })
-    }
   }
 
   const renderToastDomainCreateSuccesfully = () => {

@@ -1,16 +1,16 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from 'primevue/inputnumber'
   import MultiSelect from 'primevue/multiselect'
   import PrimeTag from 'primevue/tag'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
-  import LabelBlock from '@/templates/label-block'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
+  import LabelBlock from '@aziontech/webkit/label'
 
   import { useField } from 'vee-validate'
   import { computed, inject, ref } from 'vue'
@@ -581,7 +581,7 @@
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
-          class="max-w-[150px]"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
           data-testid="form-horizontal-modules-subscription-contact-sales-button"

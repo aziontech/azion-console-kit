@@ -6,7 +6,7 @@ import { getLinkDownloadInvoice } from '@/helpers/invoice'
 import { formatDateToMonthYear, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 import { paymentService } from '@/services/v2/payment/payment-service'
 
-const PAGE_SIZE = 200
+const PAGE_SIZE = 100
 const ACCOUNTING_LIST_LIMIT = 12
 
 const STATUS_AS_TAG = {

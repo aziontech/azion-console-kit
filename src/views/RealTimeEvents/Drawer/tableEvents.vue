@@ -34,17 +34,14 @@
             class="flex gap-4 items-center w-full"
           >
             <div
-              class="w-full max-w-[200px] sm:max-w-sm overflow-y-scroll"
+              class="w-full max-w-[200px] sm:max-w-sm overflow-y-auto"
               data-testid="data-table-value"
               :class="hasContent(data.value.content) ?? 'p-2'"
             >
               {{ data.value.content }}
             </div>
-            <PrimeButton
-              outlined
-              icon="pi pi-copy"
-              class="max-md:w-full"
-              @click="handleCopy(data.value.content)"
+            <CopyBlock
+              :value="data.value.content"
               data-testid="data-table-copy-button"
               v-if="hasContent(data.value.content)"
             />
@@ -65,13 +62,11 @@
   </div>
 </template>
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from 'primevue/api'
   import InputText from 'primevue/inputtext'
-  import { useToast } from 'primevue/usetoast'
-  import { clipboardWrite } from '@/helpers/clipboard'
 
   import { ref } from 'vue'
 
@@ -84,21 +79,9 @@
 
   const keyToFormatJson = ['stacktrace', 'requestData']
 
-  const toast = useToast()
-
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-
-  const handleCopy = (value) => {
-    clipboardWrite(value)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Successfully copied!'
-    })
-  }
 
   const hasContent = (content) => content !== '-'
 </script>

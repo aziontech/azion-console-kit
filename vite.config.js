@@ -114,14 +114,6 @@ const getConfig = () => {
         '/v4': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`
         }),
-        '/webpagetest': createProxyConfig({
-          target: 'https://www.azion.com/api/webpagetest',
-          rewrite: (path) => path.replace(/^\/webpagetest/, '')
-        }),
-        '/webpagetest-external': createProxyConfig({
-          target: 'https://www.azion.com/api/webpagetest',
-          rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        }),
         '/ai': createProxyConfig({
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
           rewrite: (path) => path.replace(/^\/ai/, '')
@@ -129,6 +121,10 @@ const getConfig = () => {
         '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
+        }),
+        '/appcues': createProxyConfig({
+          target: 'https://api.appcues.com',
+          rewrite: (path) => path.replace(/^\/appcues/, '')
         })
       }
     }

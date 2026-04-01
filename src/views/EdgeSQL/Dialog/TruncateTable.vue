@@ -22,10 +22,10 @@
         >
           <div class="flex justify-start">
             <span
-              class="text-[var(--p-tag-danger-color)] text-sm font-normal font-['Roboto_Mono'] leading-tight"
+              class="text-[var(--p-tag-danger-color)] text-sm font-normal font-mono leading-tight"
               >TRUNCATE TABLE
             </span>
-            <span class="text-color text-sm font-normal font-['Roboto_Mono'] leading-tight ml-2">
+            <span class="text-color text-sm font-normal font-mono leading-tight ml-2">
               "{{ table }}"
             </span>
           </div>

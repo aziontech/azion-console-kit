@@ -1,11 +1,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
-  import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
-  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+  import FieldDropdownIcon from '@aziontech/webkit/field-dropdown-icon'
+  import FieldNumber from '@aziontech/webkit/field-number'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldText from '@aziontech/webkit/field-text'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
@@ -524,26 +524,22 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          data-testid="edge-firewall-rule-form__name"
-          :value="name"
-          placeholder="My rule"
-          description="Give a unique and descriptive name to identify the rule."
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Description"
-          name="description"
-          data-testid="edge-firewall-rule-form__description"
-          :value="description"
-          description="Add a short description or comment to the rule."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        data-testid="edge-firewall-rule-form__name"
+        :value="name"
+        placeholder="My rule"
+        description="Give a unique and descriptive name to identify the rule."
+      />
+      <FieldText
+        label="Description"
+        name="description"
+        data-testid="edge-firewall-rule-form__description"
+        :value="description"
+        description="Add a short description or comment to the rule."
+      />
     </template>
   </FormHorizontal>
 

@@ -1,11 +1,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldText from '@aziontech/webkit/field-text'
   import { ref, computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import LabelBlock from '@/templates/label-block'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 
@@ -76,18 +76,16 @@
     description="Configure the resources needed to install, uninstall, and reload your services."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Path"
-          required
-          name="name"
-          placeholder="/tmp/myresource"
-          :disabled="isFieldDisabled"
-          :value="name"
-          description="The path where the resource will be saved on the edge node."
-          data-testid="edge-service-drawer-form__path-field"
-        />
-      </div>
+      <FieldText
+        label="Path"
+        required
+        name="name"
+        placeholder="/tmp/myresource"
+        :disabled="isFieldDisabled"
+        :value="name"
+        description="The path where the resource will be saved on the edge node."
+        data-testid="edge-service-drawer-form__path-field"
+      />
       <div class="flex flex-col sm:w-2/5 gap-2">
         <FieldDropdown
           label="Type"

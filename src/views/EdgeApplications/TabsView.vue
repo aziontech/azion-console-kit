@@ -19,6 +19,7 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import PrimeButton from 'primevue/button'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
@@ -37,7 +38,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
@@ -262,6 +262,12 @@
     return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
   })
 
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeApplication.value) return true
+    if (hasFlagBlockApiV4() && !isApplicationLoaded.value) return true
+    return false
+  })
+
   const tabs = ref([
     {
       header: 'Main Settings',
@@ -287,8 +293,7 @@
       addButtonLabel: 'Origin',
       props: () => ({
         ...props.originsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -300,8 +305,7 @@
       addButtonLabel: 'Device',
       props: () => ({
         ...props.deviceGroupsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -353,7 +357,6 @@
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription:
           edgeApplication.value[applicationAcceleratorEnabled.value],
         navigateToApplicationAccelerator: navigateToApplicationAccelerator
@@ -390,7 +393,11 @@
 </script>
 
 <template>
-  <ContentBlock data-testid="edge-application-details-content-block">
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock
+    v-else
+    data-testid="edge-application-details-content-block"
+  >
     <template #heading>
       <MigrationMessage />
 
@@ -408,10 +415,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeApplication"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"

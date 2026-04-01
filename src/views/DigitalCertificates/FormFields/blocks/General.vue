@@ -5,17 +5,15 @@
     :description="tabDescriptionByDCType"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="digitalCertificateName"
-          :placeholder="tabPlaceholderByDCType"
-          :value="digitalCertificateName"
-          data-testid="digital-certificate__name-field"
-          :description="inputDescriptionByDCType"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="digitalCertificateName"
+        :placeholder="tabPlaceholderByDCType"
+        :value="digitalCertificateName"
+        data-testid="digital-certificate__name-field"
+        :description="inputDescriptionByDCType"
+      />
     </template>
   </FormHorizontal>
 </template>
@@ -24,7 +22,7 @@
   import { computed } from 'vue'
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import { useDigitalCertificate } from '../composables/certificate'
 
   defineOptions({ name: 'DigitalCertificatesFormFieldsGeneral' })

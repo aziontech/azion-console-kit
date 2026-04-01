@@ -1,16 +1,16 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import MultiSelect from 'primevue/multiselect'
-  import LabelBlock from '@/templates/label-block'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import LabelBlock from '@aziontech/webkit/label'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import InlineMessage from 'primevue/inlinemessage'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
@@ -206,16 +206,14 @@
     description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My domain"
-          :value="name"
-          description="Give a unique and descriptive name to identify the domain."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My domain"
+        :value="name"
+        description="Give a unique and descriptive name to identify the domain."
+      />
     </template>
   </form-horizontal>
 

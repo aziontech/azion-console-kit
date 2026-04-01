@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import { useField } from 'vee-validate'
 
   const { value: name } = useField('name')
@@ -24,16 +24,14 @@
     description="Create a Workload with Azion to launch an Application and set up security with digital certificates."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My Workload"
-          :value="name"
-          description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My Workload"
+        :value="name"
+        description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
+      />
     </template>
   </form-horizontal>
 </template>

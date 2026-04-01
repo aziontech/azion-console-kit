@@ -1,11 +1,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import fieldDropdownLazyLoaderWithFilter from '@aziontech/webkit/field-dropdown-lazy-loader-with-filter'
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
-  import fieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
+  import fieldDropdownMultiSelectLazyLoader from '@aziontech/webkit/field-dropdown-multi-select-lazy-loader'
   import PrimeButton from 'primevue/button'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
@@ -129,7 +129,7 @@
           optionLabel="name"
           optionValue="value"
           keyToFilter="status"
-          :valuesToFilter="['active', 'challenge_verification']"
+          :valuesToFilter="['active', 'challenge_verification', 'inactive']"
           :value="mtls.certificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate."

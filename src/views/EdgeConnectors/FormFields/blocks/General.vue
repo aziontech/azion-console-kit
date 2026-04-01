@@ -8,17 +8,15 @@
     :isDrawer="isDrawer"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give an unique and descriptive name to identify the Connectors."
-          name="name"
-          :value="name"
-          placeholder="My Connector"
-          data-testid="edge-connectors-form__general__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give an unique and descriptive name to identify the Connectors."
+        name="name"
+        :value="name"
+        placeholder="My Connector"
+        data-testid="edge-connectors-form__general__name-field"
+      />
     </template>
   </FormHorizontal>
 </template>
@@ -26,7 +24,7 @@
 <script setup>
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsGeneral' })
 

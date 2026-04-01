@@ -8,26 +8,21 @@
     :header="`${params.title} has been created`"
   >
     <div class="flex flex-col sm:flex-row sm:items-end gap-6">
-      <div class="flex flex-col w-full gap-2">
-        <FieldText
-          id="key"
-          :name="params.title"
-          :label="params.title"
-          :value="keyValue"
-          disabled
-          ref="keyInput"
-          icon="pi pi-lock"
-        />
-      </div>
+      <FieldText
+        id="key"
+        :name="params.title"
+        :label="params.title"
+        :value="keyValue"
+        disabled
+        ref="keyInput"
+        icon="pi pi-lock"
+      />
       <div>
-        <PrimeButton
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          :aria-label="`Copy ${params.title}`"
+        <CopyBlock
+          :value="keyValue"
           label="Copy"
-          size="small"
-          @click="params.copy(keyValue)"
+          copiedLabel="Copied"
+          :aria-label="`Copy ${params.title}`"
           :data-testid="`copy-key-dialog__token-field__copy-key-button`"
         />
       </div>
@@ -48,8 +43,8 @@
 <script setup>
   import { computed, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import PrimeButton from 'primevue/button'
+  import FieldText from '@aziontech/webkit/field-text'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyKeyDialog' })
 

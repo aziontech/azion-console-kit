@@ -3,7 +3,6 @@
   import EditFormBlock from '@templates/edit-form-block'
   import FormFieldsEdgeDnsEdit from './FormFields/FormFieldsEditEdgeDns.vue'
   import { inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
@@ -12,12 +11,9 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    clipboardWrite: { type: Function, required: true },
     updatedRedirect: { type: String, required: true },
     edgeDNS: { type: Object }
   })
-
-  const toast = useToast()
 
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -34,15 +30,6 @@
 
   const loadEdgeDNSService = () => {
     return props.edgeDNS
-  }
-
-  const handleCopy = (nameserver) => {
-    props.clipboardWrite(nameserver)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
   }
 
   const handleTrackEditEvent = () => {
@@ -77,7 +64,7 @@
       @on-edit-fail="handleTrackFailEditEvent"
     >
       <template #form>
-        <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
+        <FormFieldsEdgeDnsEdit />
       </template>
       <template #action-bar="{ onSubmit, onCancel, loading }">
         <ActionBarTemplate

@@ -23,7 +23,7 @@
 <script setup>
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsOriginIpAcl' })
 

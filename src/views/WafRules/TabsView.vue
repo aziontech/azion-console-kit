@@ -13,6 +13,7 @@
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -127,11 +128,17 @@
     }
   }
 
+  const shouldShowSkeleton = computed(() => {
+    if (!waf.value) return true
+    return false
+  })
+
   renderTabCurrentRouter()
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -144,10 +151,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="flex align-center justify-between relative"
-        v-if="waf"
-      >
+      <div class="flex align-center justify-between relative">
         <TabView
           ref="tabViewRef"
           :activeIndex="activeTab"
@@ -190,7 +194,7 @@
         </div>
       </div>
 
-      <div v-if="waf">
+      <div>
         <EditView
           v-if="activeTab === mapTabs.mainSettings"
           :updatedRedirect="props.wafServices.updatedRedirect"

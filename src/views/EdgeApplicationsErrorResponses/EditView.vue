@@ -1,9 +1,10 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsErrorResponses from '@/views/EdgeApplicationsErrorResponses/FormFields/FormFieldsErrorResponses'
+  import FormSkeleton from '@/views/EdgeApplicationsErrorResponses/components/FormSkeleton.vue'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
@@ -79,6 +80,12 @@
     })
   })
 
+  const isFormLoading = ref(true)
+
+  const handleLoadedServiceObject = () => {
+    isFormLoading.value = false
+  }
+
   const router = useRouter()
   const gotToList = () => {
     router.push({ name: 'list-edge-applications' })
@@ -94,16 +101,22 @@
       isTabs
       @on-edit-success="handleTrackSuccessEdit"
       @on-edit-fail="handleTrackFailedToEdit"
+      @loaded-service-object="handleLoadedServiceObject"
       disableRedirect
     >
-      <template #form="{ errors }">
+      <template #form="{ errors, loading }">
+        <FormSkeleton v-if="loading" />
         <FormFieldsErrorResponses
+          v-else
           :edgeApplicationId="edgeApplicationId"
           :listOriginsService="props.listOriginsService"
           :errors="errors"
         />
       </template>
-      <template #action-bar="{ onSubmit, loading }">
+      <template
+        v-if="!isFormLoading"
+        #action-bar="{ onSubmit, loading }"
+      >
         <ActionBarBlockWithTeleport
           @onSubmit="onSubmit"
           @onCancel="gotToList"

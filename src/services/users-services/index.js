@@ -1,8 +1,8 @@
 import { usersService } from '@/services/v2/users/users-service'
+import { teamsService } from '@/services/v2/teams/teams-service'
 import { loadAccountDetailsService } from './get-account-detail-service'
 import { listCountriesPhoneService } from './list-countries-phone-service'
 import { listTimezonesService } from './list-timezones-service'
-import { teamsService } from './list-teams-service'
 import { loadAnotherUserService } from './load-another-user-service'
 
 const listUsersService = usersService.listUsers

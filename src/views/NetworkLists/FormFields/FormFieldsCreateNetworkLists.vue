@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import LabelBlock from '@/templates/label-block'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import LabelBlock from '@aziontech/webkit/label'
+  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import { networkGrouRadio } from '../Config/typeNetwork'
 
   import { useField } from 'vee-validate'
@@ -70,17 +70,15 @@
     description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Firewall."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My Network List"
-          :value="name"
-          description="Give a unique and descriptive name to identify the network list."
-          data-testid="network-list-form__name"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My Network List"
+        :value="name"
+        description="Give a unique and descriptive name to identify the network list."
+        data-testid="network-list-form__name"
+      />
     </template>
   </FormHorizontal>
 

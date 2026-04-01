@@ -4,16 +4,18 @@
   import Divider from 'primevue/divider'
   import GoBack from '@/templates/action-bar-block/go-back'
   import EmptyDrawer from '@/templates/empty-drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import WithSelectionBehavior from '@/templates/list-table-block/with-selection-behavior.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  // TODO: migrate import to @aziontech/webkit/list-data-table when published
+  import DataTable from '@aziontech/webkit/list-data-table'
   import advancedFilter from '@/templates/advanced-filter'
   import Dropdown from 'primevue/dropdown'
   import PrimeTag from 'primevue/tag'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   const accountStore = useAccountStore()
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
@@ -83,7 +85,6 @@
 
   const selectedFilterAdvanced = ref([])
   const totalRecordsFound = ref(0)
-  const listTableRef = ref(null)
 
   const visibleDrawer = computed({
     get: () => props.visible,
@@ -146,6 +147,56 @@
 
   const toast = useToast()
   const advancedFilterRef = ref(null)
+
+  // DataTable setup (migrated from with-selection-behavior)
+  const tableDefinitions = useTableDefinitionsStore()
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
+  const tableData = ref([])
+  const tableIsLoading = ref(false)
+  const tableSelectedColumns = ref([])
+  const dataTableRef = ref(null)
+
+  const tableFilterBy = computed(() => {
+    const filtersPath = tableColumns.filter((el) => el.filterPath).map((el) => el.filterPath)
+    const columnFilters = tableColumns.map((item) => item.field)
+    return [...columnFilters, ...filtersPath]
+  })
+
+  const loadTableData = async (params = {}) => {
+    try {
+      tableIsLoading.value = true
+      const response = await listAttacks(params)
+      tableData.value = response
+    } catch (error) {
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error?.message || error
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage
+        })
+      }
+    } finally {
+      tableIsLoading.value = false
+    }
+  }
+
+  const reloadTable = (query = {}) => {
+    loadTableData({ page: 1, ...query })
+  }
+
+  const changeNumberOfLinesPerPage = (event) => {
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
+  }
+
+  const handleExportTableDataToCSV = () => {
+    dataTableRef.value?.exportCSV?.()
+  }
 
   const setNetworkListSelectedOption = (value) => {
     selectedFilter.value.network = value
@@ -212,7 +263,7 @@
         .join(','),
       pathsList: filter.filter((item) => item.valueField === 'pathsList')[0]?.value
     }
-    listTableRef.value?.reload({ filters: query })
+    reloadTable({ filters: query })
   }
 
   const toggleDrawerVisibility = (isVisible) => {
@@ -313,10 +364,11 @@
   ]
 
   const downloadCSV = () => {
-    listTableRef.value?.handleExportTableDataToCSV()
+    handleExportTableDataToCSV()
   }
 
   onBeforeMount(() => {
+    tableSelectedColumns.value = tableColumns
     valueNetworkId.value = props.parentSelectedFilter.network?.id
     selectedFilter.value = props.parentSelectedFilter
     const { disabledIP, disabledCountries } = selectedFilter.value.network?.value || {}
@@ -336,6 +388,8 @@
       if (advancedFilterRef.value) {
         advancedFilterRef.value.updateDisplayFilter(props.parentSelectedFilterAdvanced)
         advancedFilterRef.value.searchFilter()
+      } else {
+        loadTableData({ page: 1 })
       }
     })
   })
@@ -445,17 +499,83 @@
                 />
               </div>
 
-              <WithSelectionBehavior
-                ref="listTableRef"
-                v-model:selectedItensData="selectedAttack"
-                :columns="tableColumns"
-                :listService="listAttacks"
-                disabledList
-                disableEditOnClick
-                :hasListService="true"
-                hiddenHeader
-                exportFileName="Possible Attacks"
-              />
+              <div
+                class="max-w-full"
+                data-testid="data-table-container"
+              >
+                <DataTable
+                  ref="dataTableRef"
+                  :data="tableData"
+                  :columns="tableColumns"
+                  :loading="tableIsLoading"
+                  :paginator="true"
+                  :rowsPerPageOptions="[10, 20, 50, 100]"
+                  :rows="minimumOfItemsPerPage"
+                  v-model:selection="selectedAttack"
+                  @page="changeNumberOfLinesPerPage"
+                  :globalFilterFields="tableFilterBy"
+                  emptyListMessage="No requests found."
+                  dataKey="id"
+                  exportFilename="Possible Attacks"
+                  :notShowEmptyBlock="true"
+                  data-testid="data-table"
+                >
+                  <DataTable.Column
+                    selectionMode="multiple"
+                    :pt="{
+                      rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+                    }"
+                    headerStyle="width: 3rem"
+                  />
+                  <DataTable.Column
+                    :sortable="!col.disableSort"
+                    v-for="col of tableSelectedColumns"
+                    :key="col.field"
+                    :field="col.field"
+                    :header="col.header"
+                    :sortField="col?.sortField"
+                    headerClass="p-highlight"
+                    data-testid="data-table-column"
+                  >
+                    <template #body="{ data: rowData }">
+                      <template v-if="col.type !== 'component'">
+                        <div :data-testid="`list-table-block__column__${col.field}__row`">
+                          {{ rowData[col.field] }}
+                        </div>
+                      </template>
+                      <template v-else>
+                        <component
+                          :is="col.component(rowData[col.field])"
+                          :data-testid="`list-table-block__column__${col.field}__row`"
+                        />
+                      </template>
+                    </template>
+                  </DataTable.Column>
+                  <DataTable.Column
+                    :frozen="true"
+                    :alignFrozen="'right'"
+                    headerStyle="width: 13rem"
+                    data-testid="data-table-actions-column"
+                  >
+                    <template #header>
+                      <DataTable.ColumnSelector
+                        :columns="tableColumns"
+                        v-model:selectedColumns="tableSelectedColumns"
+                      />
+                    </template>
+                  </DataTable.Column>
+                  <template #empty>
+                    <div class="my-4 flex flex-col gap-3 justify-center items-start">
+                      <p
+                        class="text-md font-normal text-secondary"
+                        data-testid="list-table-block__empty-message__text"
+                      >
+                        No requests found.
+                      </p>
+                    </div>
+                  </template>
+                </DataTable>
+              </div>
             </div>
           </div>
         </div>

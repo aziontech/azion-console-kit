@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import PrimeButton from 'primevue/button'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import { defaultConditions, itemDefaultCondition } from '@/views/WafRules/Config'

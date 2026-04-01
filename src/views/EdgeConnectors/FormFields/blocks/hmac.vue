@@ -109,10 +109,10 @@
   import { onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import LabelBlock from '@/templates/label-block'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldTextIcon from '@aziontech/webkit/field-text-icon'
+  import FieldText from '@aziontech/webkit/field-text'
+  import LabelBlock from '@aziontech/webkit/label'
   import Password from 'primevue/password'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })

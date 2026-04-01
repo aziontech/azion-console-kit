@@ -1,28 +1,26 @@
 <template>
   <FormHorizontal
-    title="General"
     isDrawer
+    title="General"
     description="Provide the details to create a custom template for your data stream."
     data-testid="data-stream-form__template__section__general"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          description="Give a unique and descriptive name to identify the custom template."
-          name="name"
-          :value="name"
-          placeholder="My custom template"
-          data-testid="data-stream-form__template__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        description="Give a unique and descriptive name to identify the custom template."
+        name="name"
+        :value="name"
+        placeholder="My custom template"
+        data-testid="data-stream-form__template__name-field"
+      />
     </template>
   </FormHorizontal>
 
   <FormHorizontal
-    title="Data Set"
     isDrawer
+    title="Data Set"
     description="Define the variables and structure for the data set in JSON format."
     data-testid="data-stream-form__template__section__data-set"
   >
@@ -64,7 +62,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
   import DangerCard from '@/templates/danger-card-block/index.vue'
   import { computed, ref } from 'vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'

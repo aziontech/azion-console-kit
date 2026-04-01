@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import fieldDropdown from '@aziontech/webkit/field-dropdown'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
@@ -59,7 +59,7 @@
       :disabled="disabled"
       :filter="filter"
       :loading="loading"
-      :aditionalError="errorMessage"
+      :additionalError="errorMessage"
       @onChange="onChange"
       @onBlur="onBlur"
     />

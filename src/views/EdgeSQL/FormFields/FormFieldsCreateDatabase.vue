@@ -6,17 +6,15 @@
       data-testid="create-database-form-general"
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
-            label="Name"
-            name="name"
-            placeholder="my-database"
-            :value="name"
-            description="Give a unique and descriptive name to identify the database."
-            data-testid="database-name-field"
-            required
-          />
-        </div>
+        <FieldText
+          label="Name"
+          name="name"
+          placeholder="my-database"
+          :value="name"
+          description="Give a unique and descriptive name to identify the database."
+          data-testid="database-name-field"
+          required
+        />
       </template>
     </FormHorizontal>
   </div>
@@ -24,7 +22,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
 
   import { useField } from 'vee-validate'
 

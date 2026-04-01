@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import { useToast } from 'primevue/usetoast'

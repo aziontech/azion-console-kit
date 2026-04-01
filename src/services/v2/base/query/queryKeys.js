@@ -5,7 +5,8 @@ export const queryKeys = {
   },
   user: {
     all: ['user'],
-    info: () => [...queryKeys.user.all, 'info']
+    info: () => [...queryKeys.user.all, 'info'],
+    settings: () => [...queryKeys.user.all, 'settings']
   },
   contract: {
     all: ['contract'],
@@ -17,7 +18,8 @@ export const queryKeys = {
   },
   solutions: {
     all: ['solutions'],
-    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type]
+    list: (group, type) => [...queryKeys.solutions.all, 'list', group, type],
+    trending: () => [...queryKeys.solutions.all, 'trending']
   },
   marketplace: {
     all: ['marketplace'],
@@ -229,6 +231,11 @@ export const queryKeys = {
     list: (params) => [...queryKeys.edgeSql.all, 'list', params],
     detail: (id) => [...queryKeys.edgeSql.all, 'detail', id]
   },
+  appcues: {
+    all: ['appcues'],
+    tags: () => [...queryKeys.appcues.all, 'tags'],
+    launchpads: () => [...queryKeys.appcues.all, 'launchpads']
+  },
   networkLists: {
     all: ['network-lists'],
     list: (params) => [...queryKeys.networkLists.all, 'list', params],
@@ -286,5 +293,9 @@ export const queryKeys = {
         params
       ]
     }
+  },
+  timezones: {
+    all: ['timezones'],
+    list: () => [...queryKeys.timezones.all, 'list']
   }
 }

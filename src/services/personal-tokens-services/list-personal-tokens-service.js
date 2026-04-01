@@ -3,7 +3,7 @@ import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 import { sortDate } from '@/utils/date-sort'
 import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
-export const listPersonalTokens = async ({ page = 1, pageSize = 200, search = '' }) => {
+export const listPersonalTokens = async ({ page = 1, pageSize = 100, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePersonalTokensBaseUrl()}?${makeSearchParams({ page, pageSize, search })}`,
     method: 'GET'

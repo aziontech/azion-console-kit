@@ -4,10 +4,10 @@
   import PickList from 'primevue/picklist'
   import Skeleton from 'primevue/skeleton'
   import { useField } from 'vee-validate'
-  import LabelBlock from '@/templates/label-block'
+  import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   const props = defineProps({
     listPermissionService: {
@@ -67,16 +67,14 @@
     description="Use permissions to manage and oversee users by defining access levels of client accounts."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="teams-permissions-form__name__field-text"
-          label="Name"
-          required
-          name="name"
-          :value="name"
-          description="Give a unique and descriptive name to identify the team."
-        />
-      </div>
+      <FieldText
+        data-testid="teams-permissions-form__name__field-text"
+        label="Name"
+        required
+        name="name"
+        :value="name"
+        description="Give a unique and descriptive name to identify the team."
+      />
     </template>
   </FormHorizontal>
 

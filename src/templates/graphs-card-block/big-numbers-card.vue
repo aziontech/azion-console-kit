@@ -10,7 +10,6 @@
       </span>
       <MoreOptionsMenu
         :report="report"
-        :clipboardWrite="clipboardWrite"
         :groupData="groupData"
       />
     </header>
@@ -39,7 +38,6 @@
   defineOptions({ name: 'GraphsCardBlock' })
 
   const props = defineProps({
-    clipboardWrite: Function,
     report: {
       type: Object,
       required: true

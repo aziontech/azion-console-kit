@@ -1,6 +1,7 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditNetworkLists from './FormFields/FormFieldsEditNetworkLists'
+  import FormSkeleton from './components/FormSkeleton.vue'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
@@ -17,6 +18,7 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const networkListName = ref('Network List')
+  const isFormLoading = ref(true)
 
   const cachedNetworkList = networkListsService.getNetworkListFromCache(route.params?.id) ?? {}
 
@@ -28,6 +30,7 @@
   const setNetworkListName = (networkList) => {
     networkListName.value = networkList.name
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, networkList.name)
+    isFormLoading.value = false
   }
   const options = ref([
     { name: 'ASN', value: 'asn' },
@@ -94,7 +97,7 @@
       <PageHeadingBlock
         :pageTitle="networkListName"
         description="Configure IP addresses and ranges used by security rules."
-      ></PageHeadingBlock>
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -107,11 +110,17 @@
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
-        <template #form>
-          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
+        <template #form="{ loading }">
+          <FormSkeleton v-if="isFormLoading" />
+          <FormFieldsEditNetworkLists
+            v-else
+            :listCountriesService="props.listCountriesService"
+            :loading="loading"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
+            v-if="!isFormLoading"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"

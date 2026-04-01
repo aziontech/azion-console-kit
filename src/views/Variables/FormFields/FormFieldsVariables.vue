@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import FieldText from '@aziontech/webkit/field-text'
   import InlineMessage from 'primevue/inlinemessage'
 
   import { useField } from 'vee-validate'
@@ -17,32 +17,28 @@
     description="Create environment variables or secrets to use with configured Functions."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Key"
-          required
-          name="key"
-          placeholder="VARIABLE_KEY_NAME"
-          :value="key"
-          description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
-          underscore."
-          data-testid="variables-form__key-field"
-          sensitive
-        />
-      </div>
+      <FieldText
+        label="Key"
+        required
+        name="key"
+        placeholder="VARIABLE_KEY_NAME"
+        :value="key"
+        description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
+        underscore."
+        data-testid="variables-form__key-field"
+        sensitive
+      />
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Value"
-          required
-          name="value"
-          placeholder="VARIABLE_VALUE"
-          :value="value"
-          description="Enter the data associated with the variable key."
-          data-testid="variables-form__value-field"
-          sensitive
-        />
-      </div>
+      <FieldText
+        label="Value"
+        required
+        name="value"
+        placeholder="VARIABLE_VALUE"
+        :value="value"
+        description="Enter the data associated with the variable key."
+        data-testid="variables-form__value-field"
+        sensitive
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <div class="flex items-center">
           <FieldSwitchBlock

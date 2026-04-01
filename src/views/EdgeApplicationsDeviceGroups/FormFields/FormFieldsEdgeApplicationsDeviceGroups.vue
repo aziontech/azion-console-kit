@@ -1,8 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField } from 'vee-validate'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
 
   const { value: name } = useField('name')
   const { value: userAgent } = useField('userAgent')
@@ -15,16 +15,14 @@
     description="Edit the device group main settings."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          :value="name"
-          placeholder="My device group"
-          description="Give a unique and descriptive name to identify the device group."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        :value="name"
+        placeholder="My device group"
+        description="Give a unique and descriptive name to identify the device group."
+      />
     </template>
   </FormHorizontal>
 

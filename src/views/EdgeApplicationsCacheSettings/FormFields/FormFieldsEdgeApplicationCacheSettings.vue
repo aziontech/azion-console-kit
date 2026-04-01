@@ -5,16 +5,14 @@
     isDrawer
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          name="name"
-          label="Name"
-          required
-          placeholder="My cache setting"
-          description="Give a unique and descriptive name to identify the cache setting."
-          data-testid="edge-application-cache-settings-form__name-field"
-        />
-      </div>
+      <FieldText
+        name="name"
+        label="Name"
+        required
+        placeholder="My cache setting"
+        description="Give a unique and descriptive name to identify the cache setting."
+        data-testid="edge-application-cache-settings-form__name-field"
+      />
     </template>
   </FormHorizontal>
 
@@ -30,7 +28,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@aziontech/webkit/field-text'
 
   // Form blocks
   import BrowserCache from './blocks/BrowserCache.vue'

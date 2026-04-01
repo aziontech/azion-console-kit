@@ -9,77 +9,28 @@
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
-        <div class="flex flex-col gap-2">
-          <label
-            for="password"
-            class="font-semibold text-sm"
-            >New Password</label
-          >
-          <div>
-            <Password
-              toggleMask
-              v-model="password"
-              id="password"
-              class="w-full"
-              :class="{ 'p-invalid': errors.password }"
-              :feedback="false"
-            />
-          </div>
-          <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
-
-          <ul class="text-color-secondary list-inside space-y-3">
-            <span class="font-semibold text-sm text-color">Must have at least:</span>
-            <li
-              class="flex gap-3 items-center text-color-secondary"
-              :key="i"
-              v-for="(requirement, i) in passwordRequirementsList"
-            >
-              <div class="w-3">
-                <div
-                  class="w-2 h-2 bg-orange-bullet animate-fadeIn"
-                  v-if="!requirement.valid"
-                ></div>
-                <div
-                  class="pi pi-check text-sm text-success-check animate-fadeIn"
-                  v-else
-                ></div>
-              </div>
-
-              <div>
-                {{ requirement.label }}
-              </div>
-            </li>
-          </ul>
-        </div>
+        <FieldPassword
+          name="password"
+          label="New Password"
+          showStrength
+          required
+          :additionalError="errors.password"
+          @strength="onStrengthChange"
+        />
 
         <div class="flex flex-col gap-2">
-          <label
-            for="confirm-password"
-            class="font-semibold text-sm"
-            >Confirm Password</label
+          <FieldPassword
+            name="confirmPassword"
+            label="Confirm Password"
+            required
+            :additionalError="confirmPasswordError"
+          />
+          <InlineMessage
+            v-if="isMatchError"
+            severity="error"
           >
-          <div class="flex flex-col gap-2">
-            <Password
-              toggleMask
-              v-model="confirmPassword"
-              id="confirm-password"
-              class="w-full"
-              :class="{ 'p-invalid': errors.confirmPassword }"
-              :feedback="false"
-            />
-            <InlineMessage
-              v-if="isMatchError"
-              severity="error"
-            >
-              {{ errors.confirmPassword }}
-            </InlineMessage>
-            <small
-              v-if="otherPasswordErrors"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ errors.confirmPassword }}
-            </small>
-          </div>
+            {{ errors.confirmPassword }}
+          </InlineMessage>
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
@@ -123,8 +74,8 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
-  import Password from 'primevue/password'
-  import { useField, useForm } from 'vee-validate'
+  import FieldPassword from '@aziontech/webkit/field-password'
+  import { useForm } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
@@ -133,19 +84,19 @@
   const isMatchError = computed(() => {
     return errors.value.confirmPassword === MATCH_ERROR_MESSAGE
   })
-  const otherPasswordErrors = computed(() => {
-    return errors.value.confirmPassword !== MATCH_ERROR_MESSAGE
+  const confirmPasswordError = computed(() => {
+    if (errors.value.confirmPassword === MATCH_ERROR_MESSAGE) return ''
+    return errors.value.confirmPassword || ''
   })
 
   const isButtonLoading = ref(false)
   const isPasswordReseted = ref(false)
   const requestError = ref('')
-  const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
-  ])
+  const passwordStrength = ref(null)
+
+  const onStrengthChange = (strength) => {
+    passwordStrength.value = strength
+  }
 
   const props = defineProps({
     resetPasswordService: { type: Function, required: true },
@@ -158,16 +109,8 @@
       .required('Password is a required field')
       .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
       .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
-      .test('requirements', '', (value) => {
-        const hasUpperCase = value && /[A-Z]/.test(value)
-        const hasLowerCase = value && /[a-z]/.test(value)
-        const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
-        const hasMinLength = value?.length > 7
-        passwordRequirementsList.value[0].valid = hasMinLength
-        passwordRequirementsList.value[1].valid = hasUpperCase
-        passwordRequirementsList.value[2].valid = hasLowerCase
-        passwordRequirementsList.value[3].valid = hasSpecialChar
-        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+      .test('requirements', 'Password does not meet requirements.', () => {
+        return passwordStrength.value?.level === 'strong'
       }),
     confirmPassword: yup
       .string()
@@ -176,8 +119,6 @@
   })
 
   const { errors, values, meta } = useForm({ validationSchema })
-  const { value: password } = useField('password')
-  const { value: confirmPassword } = useField('confirmPassword')
 
   const route = useRoute()
   const resetPassword = async () => {
