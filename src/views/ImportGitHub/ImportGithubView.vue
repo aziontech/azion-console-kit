@@ -704,6 +704,7 @@
               name="domain"
               :placeholder="suggestedDomain"
               :value="domain"
+              :disabled="isDeploying"
               description="This domain can be changed later and replaced with a custom domain."
             />
           </div>
@@ -724,6 +725,7 @@
               autoFilterFocus
               placeholder="Select a framework"
               class="w-full"
+              :disabled="isDeploying"
             >
               <template #value="slotProps">
                 <div
@@ -767,6 +769,7 @@
               name="rootDirectory"
               placeholder="./"
               :value="rootDirectory"
+              :disabled="isDeploying"
             />
           </div>
 
@@ -796,6 +799,7 @@
                     :isPublic="isInstallCommandEditable"
                     @update:isPublic="isInstallCommandEditable = $event"
                     :showPrivacyIcon="false"
+                    :disabled="isDeploying"
                   />
                 </div>
               </div>
@@ -831,6 +835,7 @@
                           :name="`newVariables[${index}].key`"
                           :value="newVariables[index].key"
                           placeholder="VARIABLE_KEY_NAME"
+                          :disabled="isDeploying"
                           @paste="handlePasteVariables($event, index)"
                         />
                         <small
@@ -851,6 +856,7 @@
                           :value="newVariables[index].value"
                           placeholder="VARIABLE_VALUE"
                           :isPublic="newVariables[index].isPublic"
+                          :disabled="isDeploying"
                           @update:isPublic="newVariables[index].isPublic = $event"
                         />
                         <small
@@ -869,6 +875,7 @@
                           icon="pi pi-minus-circle"
                           outlined
                           type="button"
+                          :disabled="isDeploying"
                           @click="removeVariable(index)"
                         />
                       </div>
@@ -881,6 +888,7 @@
                     icon="pi pi-plus-circle"
                     outlined
                     :label="addVariableLabel"
+                    :disabled="isDeploying"
                     @click="addVariable"
                   />
                 </div>

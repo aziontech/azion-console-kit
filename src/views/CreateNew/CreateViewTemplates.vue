@@ -269,7 +269,7 @@
       <div class="w-full min-h-full flex flex-col xl:flex-row px-1 gap-4 xl:gap-8 mt-4 md:mt-8">
         <!-- Sidebar Navigation -->
         <nav
-          class="w-full xl:w-64 flex-shrink-0 sticky top-5 self-start max-h-screen overflow-y-auto"
+          class="w-full xl:w-64 flex-shrink-0 sticky top-5 self-start max-h-screen overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
         >
           <!-- Default Menu for Import section (or when showMainMenu is true) -->
           <div
