@@ -1,72 +1,71 @@
 <template>
-  <div>
-    <section
-      class="flex max-lg:flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:h-visible-area"
-    >
-      <div
-        class="w-auto 2xl:w-full flex flex-col items-center justify-start gap-16 px-20 static max-md:px-0 lg:sticky lg:top-0"
-      >
-        <LottieAnimation
-          v-if="isAnimationDark"
-          :animationData="AdditionalDataAnimationDark"
-          :loop="true"
-        />
-        <LottieAnimation
-          v-else
-          :animationData="AdditionalDataAnimationLight"
-          :loop="true"
-        />
+  <div class="flex flex-col min-h-screen var(--bg-color)">
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col items-center justify-center py-8 px-4 gap-6">
+      <!-- Card Container -->
+      <div class="w-full max-w-xl">
+        <CardBox title="How are you planning to use Azion?">
+          <template #content>
+            <div class="p-6 overflow-visible">
+              <AdditionalDataFormBlock
+                :postAdditionalDataService="postAdditionalDataService"
+                :patchFullnameService="patchFullnameService"
+                :updateAccountInfoService="updateAccountInfoService"
+                ref="additionalDataRef"
+              />
+            </div>
+          </template>
 
-        <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
-          <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
-          <p class="text-xl font-normal text-color-secondary">
-            Find opportunities to explore Azion and improve your projects following a unique
-            journey, aligned with your needs.
-          </p>
-        </div>
+          <template #footer>
+            <PrimeButton
+              severity="primary"
+              :label="submitButtonLabel"
+              class="w-full font-proto-mono"
+              :icon="showLoading"
+              :disabled="isDisabledSubmit"
+              @click="onSubmit"
+            />
+          </template>
+        </CardBox>
       </div>
+
+      <!-- Enterprise Link -->
       <div
-        class="flex flex-col justify-start items-center h-fit"
-        :class="[widthClass]"
+        class="bg-[var(--surface-100)] border border-[var(--surface-border)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
       >
-        <div
-          class="card w-full surface-border border rounded-md surface-section p-6 flex flex-col gap-8 xl:p-8"
+        <span class="text-xs text-[var(--text-color-secondary)]"
+          >Have enterprise requirements?
+        </span>
+        <a
+          href="https://www.azion.com/en/contact/"
+          target="_blank"
+          class="text-xs text-[var(--text-color-link)] hover:underline"
         >
-          <AdditionalDataFormBlock
-            :postAdditionalDataService="postAdditionalDataService"
-            :patchFullnameService="patchFullnameService"
-            :updateAccountInfoService="updateAccountInfoService"
-            ref="additionalDataRef"
-          />
-        </div>
+          Get in touch
+        </a>
+        <span class="text-xs text-[var(--text-color-secondary)]"> with our team.</span>
       </div>
-    </section>
-    <ActionBar>
-      <template #default>
-        <PrimeButton
-          severity="primary"
-          label="Submit"
-          icon-pos="right"
-          class="max-md:w-full"
-          :icon="showLoading"
-          :disabled="isDisabledSubmit"
-          @click="onSubmit"
-        />
-      </template>
-    </ActionBar>
+
+      <!-- Compare Plans Link -->
+      <div>
+        <a
+          href="https://www.azion.com/en/pricing/"
+          target="_blank"
+          class="text-xs text-[var(--text-color-link)] hover:underline flex items-center gap-1"
+        >
+          Compare Plans
+          <i class="pi pi-arrow-right text-[10px]" />
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
-  import ActionBar from '@/templates/action-bar-block'
+  import CardBox from '@aziontech/webkit/card-box'
+  import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-  import { LottieAnimation } from 'lottie-web-vue'
-  import { useThemeStore } from '@/stores/theme'
-  import { storeToRefs } from 'pinia'
-  import AdditionalDataAnimationDark from '@/assets/animations/additional-data-dark.json'
-  import AdditionalDataAnimationLight from '@/assets/animations/additional-data-light.json'
 
   const additionalDataRef = ref(null)
 
@@ -78,15 +77,10 @@
     return additionalDataRef.value?.loading ? 'pi pi-spin pi-spinner' : ''
   })
 
-  const widthClass = computed(() => {
-    return additionalDataRef.value?.hasFormValues ? 'w-auto' : 'w-full'
-  })
-
-  const { currentTheme } = storeToRefs(useThemeStore())
-
-  const isAnimationDark = computed(() => {
-    const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    return currentTheme.value === 'dark' || (currentTheme.value === 'system' && isSystemDark)
+  const submitButtonLabel = computed(() => {
+    const plan = additionalDataRef.value?.plan
+    if (plan === 'hobby') return 'Start Deploying'
+    return 'Continue'
   })
 
   const onSubmit = () => {
