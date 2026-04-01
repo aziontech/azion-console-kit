@@ -2,7 +2,7 @@
   import { computed, ref, markRaw, watch, onMounted, onBeforeUnmount } from 'vue'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import Dropdown from 'primevue/dropdown'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import { useToast } from 'primevue/usetoast'
   import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'

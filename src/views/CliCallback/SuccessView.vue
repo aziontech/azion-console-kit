@@ -23,5 +23,5 @@
     PrimeButton
   }
 
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
 </script>

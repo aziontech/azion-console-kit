@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import ChevronRightIcon from 'primevue/icons/chevronright'
 
   defineOptions({ name: 'breadcrumb-skeleton' })

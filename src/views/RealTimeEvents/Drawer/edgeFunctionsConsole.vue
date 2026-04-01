@@ -4,9 +4,9 @@
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TableEvents from './tableEvents.vue'
-  import Skeleton from 'primevue/skeleton'
-  import TabPanel from 'primevue/tabpanel'
-  import TabView from 'primevue/tabview'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
 
   defineOptions({ name: 'drawer-events-functions-console' })

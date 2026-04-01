@@ -5,8 +5,8 @@
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PrimeButton from 'primevue/button'
-  import MultiSelect from 'primevue/multiselect'
+  import PrimeButton from '@aziontech/webkit/button'
+  import MultiSelect from '@aziontech/webkit/multiselect'
   import { useField } from 'vee-validate'
   import { ref, computed, watch, onMounted } from 'vue'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'

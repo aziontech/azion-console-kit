@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'

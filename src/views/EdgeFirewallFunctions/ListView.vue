@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'

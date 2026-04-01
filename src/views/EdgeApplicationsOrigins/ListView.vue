@@ -2,7 +2,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, inject, ref } from 'vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import edgeConnectorsGif from '@/assets/images/edgeConnectors.gif'

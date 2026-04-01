@@ -1,6 +1,6 @@
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'action-bar-block' })
 

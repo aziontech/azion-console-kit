@@ -87,9 +87,9 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import { useToast } from 'primevue/usetoast'
 
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
-  import Sidebar from 'primevue/sidebar'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import Sidebar from '@aziontech/webkit/sidebar'
   import MakeCreateModalBlock from '@/templates/create-modal-block/make-create-modal-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

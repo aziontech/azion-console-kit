@@ -2,10 +2,10 @@
   import { inject, onMounted, ref, watchEffect } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
-  import Sidebar from 'primevue/sidebar'
-  import Skeleton from 'primevue/skeleton'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from 'primevue/usetoast'
 
   import ContentBlock from '@/templates/content-block'

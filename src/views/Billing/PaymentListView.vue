@@ -59,7 +59,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import { openContactSupport, openAzionDiscord } from '@/helpers'

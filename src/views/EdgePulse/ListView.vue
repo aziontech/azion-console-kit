@@ -42,8 +42,8 @@
 </template>
 
 <script setup>
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsDefault from './FormFields/FormFieldsDefault.vue'

@@ -9,7 +9,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
 
   defineOptions({
     name: 'skeleton-block'

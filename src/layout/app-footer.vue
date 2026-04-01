@@ -98,9 +98,9 @@
   } from '@/helpers'
 
   import { computed } from 'vue'
-  import Toolbar from 'primevue/toolbar'
+  import Toolbar from '@aziontech/webkit/toolbar'
   import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()

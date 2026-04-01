@@ -1,9 +1,9 @@
 <script setup>
   import { computed, ref, inject, onMounted } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeTag from 'primevue/tag'
-  import InputNumber from 'primevue/inputnumber'
-  import Skeleton from 'primevue/skeleton'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeTag from '@aziontech/webkit/tag'
+  import InputNumber from '@aziontech/webkit/inputnumber'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
   import { storeToRefs } from 'pinia'

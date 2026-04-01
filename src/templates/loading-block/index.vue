@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-  import ProgressBar from 'primevue/progressbar'
+  import ProgressBar from '@aziontech/webkit/progressbar'
 
   defineOptions({ name: 'page-loading-block' })
   defineProps({

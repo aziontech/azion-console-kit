@@ -1,8 +1,8 @@
 <script setup>
   import { computed, ref, inject, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from 'primevue/button'
-  import PrimeInputText from 'primevue/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeInputText from '@aziontech/webkit/inputtext'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'

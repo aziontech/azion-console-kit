@@ -41,7 +41,7 @@
 
 <script setup>
   import { onMounted, onUnmounted } from 'vue'
-  import SplitButton from 'primevue/splitbutton'
+  import SplitButton from '@aziontech/webkit/splitbutton'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
   const { uploadFiles, isProcessing } = useEdgeStorage()

@@ -1,7 +1,7 @@
 <script setup>
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
-  import Breadcrumb from 'primevue/breadcrumb'
-  import Skeleton from 'primevue/skeleton'
+  import Breadcrumb from '@aziontech/webkit/breadcrumb'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { computed, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
 
