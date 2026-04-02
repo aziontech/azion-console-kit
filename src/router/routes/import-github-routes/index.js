@@ -2,6 +2,7 @@ import * as VulcanService from '@/services/vulcan-services'
 import * as GitHubServices from '@/services/github-services'
 import * as TemplateEngineService from '@/services/template-engine-services'
 import * as MarketplaceService from '@/services/marketplace-services'
+import * as ScriptRunnerService from '@/services/script-runner-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
@@ -16,7 +17,8 @@ export const importGithubRoutes = {
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
-        loadSolutionService: MarketplaceService.loadSolutionService
+        loadSolutionService: MarketplaceService.loadSolutionService,
+        getResultsService: ScriptRunnerService.loadScriptRunnerExecutionResultsService
       },
       meta: {
         title: 'Import from GitHub',
