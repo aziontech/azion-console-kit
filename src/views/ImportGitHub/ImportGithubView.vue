@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
   import { useForm, useField } from 'vee-validate'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
@@ -63,7 +63,6 @@
   const deployStore = useDeploy()
   const toast = useToast()
   const route = useRoute()
-  const router = useRouter()
 
   // Step Navigation State
   const currentStep = ref('settings')
@@ -191,11 +190,42 @@
   }
 
   const initializeFromQueryParams = async () => {
-    const { gitScope: queryGitScope, repositoryName: queryRepoName } = route.query
+    const {
+      gitScope: queryGitScope,
+      repositoryName: queryRepoName,
+      formDomain,
+      formPreset,
+      formRootDirectory,
+      formInstallCommand,
+      formVariables
+    } = route.query
 
-    // Sempre popula o domain com o suggestedDomain quando disponível
-    if (suggestedDomain.value) {
+    // Check if we're restoring from a previous state (deploying step with saved form values)
+    const isRestoringFormState = route.query.step && route.query.executionId
+
+    // Only set domain to suggestedDomain if there's no formDomain in the route and not restoring
+    if (isRestoringFormState && formDomain) {
+      domain.value = formDomain
+    } else if (suggestedDomain.value) {
       domain.value = suggestedDomain.value
+    }
+
+    // Restore other form values from route if available
+    if (formPreset) {
+      preset.value = formPreset
+    }
+    if (formRootDirectory) {
+      rootDirectory.value = formRootDirectory
+    }
+    if (formInstallCommand) {
+      installCommand.value = formInstallCommand
+    }
+    if (formVariables) {
+      try {
+        newVariables.value = JSON.parse(formVariables)
+      } catch (error) {
+        // Silently fail - use default variables
+      }
     }
 
     if (queryGitScope && queryRepoName) {
@@ -203,9 +233,10 @@
     }
 
     // Força o form a refletir os valores corretos
+    // Use restored values from route if available, otherwise use defaults
     resetForm({
       values: {
-        domain: suggestedDomain.value || domain.value || '',
+        domain: domain.value || suggestedDomain.value || '',
         preset: preset.value || '',
         rootDirectory: rootDirectory.value || '/',
         installCommand: installCommand.value || 'npm install',
@@ -355,15 +386,26 @@
   }
 
   // Step Navigation Methods
-  const updateRouteQuery = (step, id = null, domain = null) => {
-    const query = { step }
+  const updateRouteQuery = (step, id = null, domainValue = null, formValues = null) => {
+    // Preserve existing query params and add/overwrite step-related ones
+    const query = { ...route.query, step }
     if (id) {
       query.executionId = id
     }
-    if (domain) {
-      query.domain = domain
+    if (domainValue) {
+      query.domain = domainValue
     }
-    router.replace({ query })
+    // Persist form values in route query to preserve them during navigation
+    if (formValues) {
+      query.formDomain = formValues.domain
+      query.formPreset = formValues.preset
+      query.formRootDirectory = formValues.rootDirectory
+      query.formInstallCommand = formValues.installCommand
+      // Variables are stored as JSON string
+      if (formValues.newVariables && formValues.newVariables.length > 0) {
+        query.formVariables = JSON.stringify(formValues.newVariables)
+      }
+    }
   }
 
   const goToDeploying = () => {
@@ -423,6 +465,7 @@
     currentStep.value = 'settings'
     deployFailed.value = false
     executionId.value = ''
+    isDeploying.value = false
     emit('retry')
   }
 
@@ -524,8 +567,8 @@
         // Set execution ID from response for DeployStatusCard
         if (response?.result?.uuid) {
           executionId.value = response.result.uuid
-          // Update route query params to preserve state on reload
-          updateRouteQuery('deploying', executionId.value)
+          // Update route query params to preserve state on reload, including form values
+          updateRouteQuery('deploying', executionId.value, formValues.domain, formValues)
         }
 
         // Set app URL for success card
@@ -542,7 +585,11 @@
           detail: error.message || 'Failed to deploy'
         })
       } finally {
-        isDeploying.value = false
+        // Only reset isDeploying if we're not in the deploying step
+        // When currentStep is 'deploying', the fields should remain disabled
+        if (currentStep.value !== 'deploying') {
+          isDeploying.value = false
+        }
       }
     },
     ({ errors }) => {
@@ -586,6 +633,9 @@
       executionId.value = routeExecutionId
       isRestoringState.value = true
 
+      // Form values are now restored in initializeFromQueryParams before this runs
+      // This function only handles the step state restoration
+
       if (step === 'deploying') {
         currentStep.value = 'deploying'
         deployStartTime.value = Date.now()
@@ -617,10 +667,13 @@
       }
     }
   }
-
-  // Repository owner and name from query params (with fallback to props)
-  const repositoryOwnerRef = route.query.repositoryOwner || props.repositoryOwner
-  const repositoryNameRef = route.query.repositoryName || props.repositoryName
+  let repositoryOwnerRef = ''
+  let repositoryNameRef = ''
+  if (currentStep.value === 'settings') {
+    // Repository owner and name from query params (with fallback to props)
+    repositoryOwnerRef = route.query.repositoryOwner || props.repositoryOwner
+    route.query.repositoryName || props.repositoryName
+  }
 
   onMounted(async () => {
     await Promise.all([loadSolutionByVendor(), loadListIntegrations()])
@@ -628,7 +681,9 @@
     presetsList.value = await props.listVulcanPresetsService()
 
     // Initialize from query params if available
-    await initializeFromQueryParams()
+    if (currentStep.value === 'settings') {
+      await initializeFromQueryParams()
+    }
 
     // Restore state from route query params after loading required data
     await restoreStateFromRoute()
@@ -697,206 +752,204 @@
       </template>
 
       <template #content>
-        <template v-if="currentStep === 'settings'">
-          <div class="flex flex-col w-full gap-2">
-            <FieldText
-              label="Domain"
-              required
-              name="domain"
-              :placeholder="suggestedDomain"
-              :value="domain"
-              :disabled="isDeploying"
-              description="This domain can be changed later and replaced with a custom domain."
-            />
-          </div>
+        <div class="flex flex-col w-full gap-2">
+          <FieldText
+            label="Domain"
+            required
+            name="domain"
+            :placeholder="suggestedDomain"
+            :value="domain"
+            :disabled="isDeploying"
+            description="This domain can be changed later and replaced with a custom domain."
+          />
+        </div>
 
-          <div class="flex flex-col w-full gap-2">
-            <LabelBlock
-              for="preset"
-              label="Framework"
-              isRequired
-            />
-            <Dropdown
-              name="preset"
-              v-model="preset"
-              :options="presetsList"
-              filter
-              optionLabel="label"
-              optionValue="value"
-              autoFilterFocus
-              placeholder="Select a framework"
-              class="w-full"
-              :disabled="isDeploying"
-            >
-              <template #value="slotProps">
-                <div
-                  v-if="slotProps.value"
-                  class="flex items-center"
-                >
-                  <i
-                    :class="getPresetIconClass(slotProps.value)"
-                    class="w-3.5 h-3.5 mr-2"
-                  ></i>
-                  <div>
-                    {{
-                      getOptionNameByValue({
-                        listOption: presetsList,
-                        optionValue: slotProps.value,
-                        key: 'value'
-                      })
-                    }}
-                  </div>
-                </div>
-                <div v-else>
-                  {{ slotProps.placeholder }}
-                </div>
-              </template>
-              <template #option="slotProps">
-                <div class="flex items-center">
-                  <i
-                    :class="getPresetIconClass(slotProps.option.value)"
-                    class="w-3.5 h-3.5 mr-2"
-                  ></i>
-                  <div>{{ slotProps.option.label }}</div>
-                </div>
-              </template>
-            </Dropdown>
-          </div>
-
-          <div class="flex flex-col w-full gap-2">
-            <FieldText
-              label="Root Directory"
-              required
-              name="rootDirectory"
-              placeholder="./"
-              :value="rootDirectory"
-              :disabled="isDeploying"
-            />
-          </div>
-
-          <Accordion :active-index="null">
-            <AccordionTab
-              :pt="{
-                header: { class: 'bg-surface-overlay' },
-                headerAction: {
-                  class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
-                },
-                content: { class: '!p-0 bg-surface-overlay' }
-              }"
-            >
-              <template #header>
-                <div class="flex items-center gap-2">
-                  <span>Build Settings</span>
-                </div>
-              </template>
-              <div class="p-4 flex flex-col gap-4">
-                <div class="flex flex-col w-full gap-2">
-                  <FieldInputTextPrivacy
-                    label="Install Command"
-                    required
-                    name="installCommand"
-                    placeholder="npm install"
-                    :value="installCommand"
-                    :isPublic="isInstallCommandEditable"
-                    @update:isPublic="isInstallCommandEditable = $event"
-                    :showPrivacyIcon="false"
-                    :disabled="isDeploying"
-                  />
+        <div class="flex flex-col w-full gap-2">
+          <LabelBlock
+            for="preset"
+            label="Framework"
+            isRequired
+          />
+          <Dropdown
+            name="preset"
+            v-model="preset"
+            :options="presetsList"
+            filter
+            optionLabel="label"
+            optionValue="value"
+            autoFilterFocus
+            placeholder="Select a framework"
+            class="w-full"
+            :disabled="isDeploying"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center"
+              >
+                <i
+                  :class="getPresetIconClass(slotProps.value)"
+                  class="w-3.5 h-3.5 mr-2"
+                ></i>
+                <div>
+                  {{
+                    getOptionNameByValue({
+                      listOption: presetsList,
+                      optionValue: slotProps.value,
+                      key: 'value'
+                    })
+                  }}
                 </div>
               </div>
-            </AccordionTab>
+              <div v-else>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center">
+                <i
+                  :class="getPresetIconClass(slotProps.option.value)"
+                  class="w-3.5 h-3.5 mr-2"
+                ></i>
+                <div>{{ slotProps.option.label }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
 
-            <AccordionTab
-              :pt="{
-                header: { class: 'bg-surface-overlay' },
-                headerAction: {
-                  class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
-                },
-                content: { class: '!p-0 bg-surface-overlay' }
-              }"
-            >
-              <template #header>
-                <div class="flex items-center gap-2">
-                  <span>Environment Variables</span>
-                </div>
-              </template>
-              <div class="p-4 flex flex-col gap-4">
-                <template v-if="newVariables?.length">
-                  <div
-                    v-for="(variable, index) in newVariables"
-                    class="flex flex-col gap-2"
-                    :key="index"
-                  >
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                      <div class="flex flex-col sm:w-1/2 w-full gap-2">
-                        <FieldText
-                          :label="index === 0 ? 'Key' : ''"
-                          required
-                          autocapitalize="characters"
-                          :name="`newVariables[${index}].key`"
-                          :value="newVariables[index].key"
-                          placeholder="VARIABLE_KEY_NAME"
-                          :disabled="isDeploying"
-                          @paste="handlePasteVariables($event, index)"
-                        />
-                        <small
-                          v-if="index === newVariables.length - 1"
-                          class="text-xs text-color-secondary font-normal leading-5"
-                        >
-                          Give a name or identifier for the variable. Accepts upper-case letters,
-                          numbers, and underscore.
-                        </small>
-                      </div>
-                      <div class="flex flex-col sm:w-1/2 w-full gap-2">
-                        <FieldInputTextPrivacy
-                          :label="index === 0 ? 'Value' : ''"
-                          required
-                          labelPublic=""
-                          labelPrivate="Secret"
-                          :name="`newVariables[${index}].value`"
-                          :value="newVariables[index].value"
-                          placeholder="VARIABLE_VALUE"
-                          :isPublic="newVariables[index].isPublic"
-                          :disabled="isDeploying"
-                          @update:isPublic="newVariables[index].isPublic = $event"
-                        />
-                        <small
-                          v-if="index === newVariables.length - 1"
-                          class="text-xs text-color-secondary font-normal leading-5"
-                        >
-                          Enter the data associated with the variable key.
-                        </small>
-                      </div>
-                      <div
-                        class="flex"
-                        :class="{ 'mt-[30px]': !index }"
+        <div class="flex flex-col w-full gap-2">
+          <FieldText
+            label="Root Directory"
+            required
+            name="rootDirectory"
+            placeholder="./"
+            :value="rootDirectory"
+            :disabled="isDeploying"
+          />
+        </div>
+
+        <Accordion :active-index="null">
+          <AccordionTab
+            :pt="{
+              header: { class: 'bg-surface-overlay' },
+              headerAction: {
+                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+              },
+              content: { class: '!p-0 bg-surface-overlay' }
+            }"
+          >
+            <template #header>
+              <div class="flex items-center gap-2">
+                <span>Build Settings</span>
+              </div>
+            </template>
+            <div class="p-4 flex flex-col gap-4">
+              <div class="flex flex-col w-full gap-2">
+                <FieldInputTextPrivacy
+                  label="Install Command"
+                  required
+                  name="installCommand"
+                  placeholder="npm install"
+                  :value="installCommand"
+                  :isPublic="isInstallCommandEditable"
+                  @update:isPublic="isInstallCommandEditable = $event"
+                  :showPrivacyIcon="false"
+                  :disabled="isDeploying"
+                />
+              </div>
+            </div>
+          </AccordionTab>
+
+          <AccordionTab
+            :pt="{
+              header: { class: 'bg-surface-overlay' },
+              headerAction: {
+                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+              },
+              content: { class: '!p-0 bg-surface-overlay' }
+            }"
+          >
+            <template #header>
+              <div class="flex items-center gap-2">
+                <span>Environment Variables</span>
+              </div>
+            </template>
+            <div class="p-4 flex flex-col gap-4">
+              <template v-if="newVariables?.length">
+                <div
+                  v-for="(variable, index) in newVariables"
+                  class="flex flex-col gap-2"
+                  :key="index"
+                >
+                  <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                      <FieldText
+                        :label="index === 0 ? 'Key' : ''"
+                        required
+                        autocapitalize="characters"
+                        :name="`newVariables[${index}].key`"
+                        :value="newVariables[index].key"
+                        placeholder="VARIABLE_KEY_NAME"
+                        :disabled="isDeploying"
+                        @paste="handlePasteVariables($event, index)"
+                      />
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
                       >
-                        <Button
-                          class="h-8"
-                          icon="pi pi-minus-circle"
-                          outlined
-                          type="button"
-                          :disabled="isDeploying"
-                          @click="removeVariable(index)"
-                        />
-                      </div>
+                        Give a name or identifier for the variable. Accepts upper-case letters,
+                        numbers, and underscore.
+                      </small>
+                    </div>
+                    <div class="flex flex-col sm:w-1/2 w-full gap-2">
+                      <FieldInputTextPrivacy
+                        :label="index === 0 ? 'Value' : ''"
+                        required
+                        labelPublic=""
+                        labelPrivate="Secret"
+                        :name="`newVariables[${index}].value`"
+                        :value="newVariables[index].value"
+                        placeholder="VARIABLE_VALUE"
+                        :isPublic="newVariables[index].isPublic"
+                        :disabled="isDeploying"
+                        @update:isPublic="newVariables[index].isPublic = $event"
+                      />
+                      <small
+                        v-if="index === newVariables.length - 1"
+                        class="text-xs text-color-secondary font-normal leading-5"
+                      >
+                        Enter the data associated with the variable key.
+                      </small>
+                    </div>
+                    <div
+                      class="flex"
+                      :class="{ 'mt-[30px]': !index }"
+                    >
+                      <Button
+                        class="h-8"
+                        icon="pi pi-minus-circle"
+                        outlined
+                        type="button"
+                        :disabled="isDeploying"
+                        @click="removeVariable(index)"
+                      />
                     </div>
                   </div>
-                </template>
-
-                <div class="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    icon="pi pi-plus-circle"
-                    outlined
-                    :label="addVariableLabel"
-                    :disabled="isDeploying"
-                    @click="addVariable"
-                  />
                 </div>
+              </template>
+
+              <div class="flex flex-col sm:flex-row gap-4">
+                <Button
+                  icon="pi pi-plus-circle"
+                  outlined
+                  :label="addVariableLabel"
+                  :disabled="isDeploying"
+                  @click="addVariable"
+                />
               </div>
-            </AccordionTab>
-          </Accordion>
-        </template>
+            </div>
+          </AccordionTab>
+        </Accordion>
       </template>
 
       <template
