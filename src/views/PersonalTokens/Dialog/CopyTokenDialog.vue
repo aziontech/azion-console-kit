@@ -76,10 +76,11 @@
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimePassword from 'primevue/password'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InlineMessage from '@aziontech/webkit/inline-message'
+  import PrimePassword from '@aziontech/webkit/password'
   import CopyBlock from '@aziontech/webkit/button-copy'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'CopyTokenDialog' })
 
