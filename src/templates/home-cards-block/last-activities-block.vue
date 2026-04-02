@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onMounted, h } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ListTableSimple from '@/components/list-table/ListTableSimple.vue'
   import Skeleton from '@aziontech/webkit/skeleton'
   import OperationTag from '@/views/ActivityHistory/components/OperationTag.vue'

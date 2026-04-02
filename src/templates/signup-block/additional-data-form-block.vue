@@ -155,7 +155,7 @@
 <script setup>
   import PrimeInputText from '@aziontech/webkit/inputtext'
   import PrimeSkeleton from '@aziontech/webkit/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'

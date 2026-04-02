@@ -162,7 +162,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import Divider from '@aziontech/webkit/divider'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 

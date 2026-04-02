@@ -51,7 +51,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
 
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'

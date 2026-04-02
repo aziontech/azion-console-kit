@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
 
   import DataTable from '@aziontech/webkit/list-data-table'

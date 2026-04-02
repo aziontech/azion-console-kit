@@ -85,7 +85,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDialog from '@aziontech/webkit/dialog'

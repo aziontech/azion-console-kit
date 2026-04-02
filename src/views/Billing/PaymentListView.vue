@@ -60,7 +60,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import PrimeButton from '@aziontech/webkit/button'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'

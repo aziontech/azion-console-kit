@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, inject, onMounted } from 'vue'
-  import { useDialog } from 'primevue/usedialog'
-  import { useToast } from 'primevue/usetoast'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeTag from '@aziontech/webkit/tag'
   import InputNumber from '@aziontech/webkit/inputnumber'

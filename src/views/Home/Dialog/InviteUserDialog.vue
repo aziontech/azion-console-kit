@@ -2,7 +2,7 @@
   import { ref, watch } from 'vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'

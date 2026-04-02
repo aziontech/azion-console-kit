@@ -13,7 +13,7 @@
   import MultiSelect from '@aziontech/webkit/multiselect'
 
   import advancedFilter from '@/templates/advanced-filter'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'

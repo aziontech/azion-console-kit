@@ -380,10 +380,10 @@
 <script setup>
   defineOptions({ name: 'tables-view' })
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
-  import { FilterMatchMode } from 'primevue/api'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import InlineMessage from '@aziontech/webkit/inline-message'
-  import ConfirmDialog from 'primevue/confirmdialog'
+  import ConfirmDialog from '@aziontech/webkit/confirm-dialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
   import AlterColumn from './Dialog/AlterColumn.vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'

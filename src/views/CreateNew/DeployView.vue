@@ -147,7 +147,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from '@aziontech/webkit/card'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { useDeploy } from '@/stores/deploy'

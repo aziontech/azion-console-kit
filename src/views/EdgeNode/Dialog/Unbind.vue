@@ -93,7 +93,7 @@
 <script setup>
   import { computed, ref, inject } from 'vue'
   import { useField, useForm } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDialog from '@aziontech/webkit/dialog'

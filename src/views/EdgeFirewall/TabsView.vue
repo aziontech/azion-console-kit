@@ -6,7 +6,7 @@
   import TabView from '@aziontech/webkit/tabview'
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'

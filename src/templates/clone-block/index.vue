@@ -54,7 +54,7 @@
 <script setup>
   import { inject, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
 

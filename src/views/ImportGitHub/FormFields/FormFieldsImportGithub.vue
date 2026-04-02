@@ -5,7 +5,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Divider from '@aziontech/webkit/divider'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'

@@ -7,7 +7,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
   import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'

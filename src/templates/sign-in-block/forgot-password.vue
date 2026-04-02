@@ -102,7 +102,7 @@
   import * as yup from 'yup'
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   const SUBMIT_TIMER = 60
 

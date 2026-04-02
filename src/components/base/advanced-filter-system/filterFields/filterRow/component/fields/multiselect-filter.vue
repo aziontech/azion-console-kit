@@ -3,7 +3,7 @@
   import MultiSelect from '@aziontech/webkit/multiselect'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'multiSelectFilter' })
 

@@ -6,7 +6,7 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'

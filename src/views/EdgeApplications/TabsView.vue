@@ -10,7 +10,7 @@
   import InlineMessage from '@aziontech/webkit/inline-message'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from '@aziontech/webkit/tabview'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref, provide, inject, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'

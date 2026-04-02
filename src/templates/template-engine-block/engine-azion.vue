@@ -2,7 +2,7 @@
   import { ref, defineOptions, watch, onMounted, computed, onBeforeUnmount } from 'vue'
   import InputText from '@aziontech/webkit/inputtext'
   import Password from '@aziontech/webkit/password'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'

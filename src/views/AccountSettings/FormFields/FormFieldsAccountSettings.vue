@@ -6,7 +6,7 @@
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import { useRouter } from 'vue-router'
   import InputText from '@aziontech/webkit/inputtext'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useField } from 'vee-validate'
   import { useLoadingStore } from '@/stores/loading'
   import { deleteAccountService } from '@/services/account-services/delete-account-service'
