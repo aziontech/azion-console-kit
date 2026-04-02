@@ -107,7 +107,7 @@
           />
 
           <div
-            class="flex flex-col w-full sm:max-w-xs gap-1 pl-14"
+            class="flex flex-col w-full sm:max-w-xs gap-1"
             v-if="tieredCache"
           >
             <FieldDropdown

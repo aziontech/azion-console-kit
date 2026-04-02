@@ -198,7 +198,7 @@
         />
       </div>
       <div
-        class="flex gap-6 flex-col md:pl-12"
+        class="flex gap-6 flex-col"
         v-if="protocols?.http?.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -282,7 +282,7 @@
         </div>
       </div>
       <div
-        class="flex gap-6 max-sm:flex-col md:pl-12"
+        class="flex gap-6 max-sm:flex-col"
         v-if="showTlsAndCipherDropdown"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -329,7 +329,7 @@
         />
       </div>
       <div
-        class="flex gap-6 max-sm:flex-col md:pl-12"
+        class="flex gap-6 max-sm:flex-col"
         v-if="protocols?.http?.useHttp3"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
