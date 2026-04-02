@@ -294,14 +294,26 @@
     if (parsedVariables.length > 1 || (parsedVariables.length === 1 && pastedText.includes('\n'))) {
       event.preventDefault()
 
+      // Get existing keys (excluding the current row being edited)
+      const existingKeys = new Set(
+        newVariables.value
+          .filter((variable, idx) => idx !== index && newVariables.value[idx]?.key?.trim())
+          .map((variable) => variable.key.toUpperCase())
+      )
+
+      // Filter out variables with duplicate keys
+      const uniqueVariables = parsedVariables.filter(
+        (variable) => !existingKeys.has(variable.key.toUpperCase())
+      )
+
       // Replace the current variable at index with the first parsed one
       // and add the rest as new variables
-      if (!parsedVariables.length) {
-        newVariables.value[index] = parsedVariables[0]
+      if (uniqueVariables.length) {
+        newVariables.value[index] = uniqueVariables[0]
 
         // Add remaining variables
-        for (let idx = 1; idx < parsedVariables.length; idx++) {
-          newVariables.value.push(parsedVariables[idx])
+        for (let idx = 1; idx < uniqueVariables.length; idx++) {
+          newVariables.value.push(uniqueVariables[idx])
         }
       }
     }
