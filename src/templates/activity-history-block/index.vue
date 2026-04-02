@@ -133,7 +133,7 @@
   import Tag from '@aziontech/webkit/tag'
   import InputText from '@aziontech/webkit/inputtext'
   import { ref, computed, onMounted, watch } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import Paginator from '@aziontech/webkit/paginator'
 
   const emit = defineEmits(['on-load-data'])

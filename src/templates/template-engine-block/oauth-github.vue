@@ -13,7 +13,7 @@
   import { ref, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   const toast = useToast()
 

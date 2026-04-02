@@ -81,7 +81,7 @@
 
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
-  import Toast from 'primevue/toast'
+  import Toast from '@aziontech/webkit/toast'
   import Tag from '@aziontech/webkit/tag'
   import { reactive } from 'vue'
 

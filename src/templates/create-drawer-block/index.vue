@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from '@aziontech/webkit/sidebar'

@@ -11,7 +11,7 @@
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeTag from '@aziontech/webkit/tag'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useAccountStore } from '@/stores/account'

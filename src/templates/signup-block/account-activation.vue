@@ -36,7 +36,7 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 

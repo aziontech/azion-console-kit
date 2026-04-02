@@ -449,8 +449,8 @@
   const DataTableColumnSelector = DataTable.ColumnSelector
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
-  import { useToast } from 'primevue/usetoast'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'

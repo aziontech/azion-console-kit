@@ -8,7 +8,7 @@
   import { useField } from 'vee-validate'
   import { ref, onMounted, watch } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   const toast = useToast()
 

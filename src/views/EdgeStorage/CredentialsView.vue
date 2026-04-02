@@ -6,7 +6,7 @@
   import CopyCredentialDialog from './Dialog/CopyCredentialDialog.vue'
   import { ref } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import * as yup from 'yup'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'

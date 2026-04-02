@@ -8,7 +8,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from '@aziontech/webkit/tabview'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref, onMounted, inject, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'

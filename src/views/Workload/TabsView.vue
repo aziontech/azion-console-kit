@@ -4,7 +4,7 @@
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from '@aziontech/webkit/tabview'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { ref, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'

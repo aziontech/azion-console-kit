@@ -8,9 +8,9 @@
   import { eventsPlaygroundOpener } from '@/helpers'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeTag from '@aziontech/webkit/tag'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import { FilterMatchMode } from 'primevue/api'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
   import { getCsvCellContentFromRowData } from '@/helpers'
 
   defineOptions({ name: 'TabPanelBlock' })

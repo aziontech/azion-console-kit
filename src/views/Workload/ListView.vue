@@ -2,7 +2,7 @@
   import { computed, ref, inject } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()

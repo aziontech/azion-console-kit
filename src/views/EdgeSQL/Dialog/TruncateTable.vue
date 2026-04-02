@@ -54,7 +54,7 @@
   import Dialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'
   import { useEdgeSQL } from '../composable/useEdgeSQL'
 

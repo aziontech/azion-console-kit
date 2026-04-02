@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from '@aziontech/webkit/sidebar'
   import { useThemeStore } from '@/stores/theme'

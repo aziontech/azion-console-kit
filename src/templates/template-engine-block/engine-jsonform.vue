@@ -3,7 +3,7 @@
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import InputTextControlRenderer from '@templates/form-fields-inputs/jsonform-custom-render/input-text/inputTextControlRenderer.vue'

@@ -2,7 +2,7 @@
   import { inject, computed } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'
   defineOptions({ name: 'edge-services-toggle-status' })
 

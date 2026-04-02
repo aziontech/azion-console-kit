@@ -8,7 +8,7 @@
   import { computed, ref, inject } from 'vue'
   import ListTable from '@/components/list-table'
   import { DataTableActionsButtons } from '@/components/list-table'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { purgeService } from '@/services/v2/purge/purge-service'
   import { usePurgeStore } from '@/stores/purge'
   import { capitalizeFirstLetter } from '@/helpers'

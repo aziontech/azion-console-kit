@@ -112,7 +112,7 @@
   import { createFeedbackServices } from '@/services/feedback-services'
   import { useLayout } from '@/composables/use-layout'
   import { AZION_CONTACT_SUPPORT } from '@/helpers/azion-documentation-window-opener'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import Dialog from '@aziontech/webkit/dialog'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Textarea from '@aziontech/webkit/textarea'

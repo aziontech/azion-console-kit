@@ -36,7 +36,7 @@
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import PrimeButton from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
   import socialIdpsData from '@/helpers/social-idps'
 

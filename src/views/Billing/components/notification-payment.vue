@@ -48,7 +48,7 @@
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'notification-payment' })
 

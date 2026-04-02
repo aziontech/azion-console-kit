@@ -417,7 +417,7 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
-  import { FilterMatchMode } from 'primevue/api'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
 
   import Button from '@aziontech/webkit/button'
   import PrimeButton from '@aziontech/webkit/button'

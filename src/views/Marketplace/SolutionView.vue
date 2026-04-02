@@ -290,7 +290,7 @@
   import InlineMessage from '@aziontech/webkit/inline-message'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useLoadingStore } from '@/stores/loading'
   import IntegrationInstall from './drawer/IntegrationInstall'
   import CreateEdgeApplication from './drawer/CreateEdgeApplication'

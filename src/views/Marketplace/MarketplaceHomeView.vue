@@ -122,7 +122,7 @@
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'
   import LoadingEmptySearch from './components/LoadingEmptySearch'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { marketplaceService } from '@/services/v2/marketplace'
   import { useDebounceFn } from '@vueuse/core'
 

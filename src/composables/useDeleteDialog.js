@@ -1,4 +1,4 @@
-import { useDialog } from 'primevue/usedialog'
+import { useDialog } from '@aziontech/webkit/use-dialog'
 import DeleteDialog from '@/components/list-table/dialog/delete-dialog.vue'
 
 /**

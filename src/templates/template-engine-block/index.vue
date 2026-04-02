@@ -1,6 +1,6 @@
 <script setup>
   import { ref, defineOptions, watch, onMounted, computed } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from '@templates/template-engine-block/form-loading'
   import EngineJsonForm from '@templates/template-engine-block/engine-jsonform'
