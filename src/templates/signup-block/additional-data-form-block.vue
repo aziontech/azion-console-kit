@@ -153,8 +153,8 @@
 </template>
 
 <script setup>
-  import PrimeInputText from 'primevue/inputtext'
-  import PrimeSkeleton from 'primevue/skeleton'
+  import PrimeInputText from '@aziontech/webkit/inputtext'
+  import PrimeSkeleton from '@aziontech/webkit/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, computed, watch } from 'vue'

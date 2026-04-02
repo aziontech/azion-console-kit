@@ -1,5 +1,5 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
+  import InputText from '@aziontech/webkit/inputtext'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'textFilter' })

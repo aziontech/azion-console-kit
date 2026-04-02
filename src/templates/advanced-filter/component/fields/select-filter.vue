@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import Select from 'primevue/dropdown'
+  import Select from '@aziontech/webkit/dropdown'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'

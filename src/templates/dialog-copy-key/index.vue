@@ -42,9 +42,10 @@
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
+  import PrimeDialog from '@aziontech/webkit/dialog'
   import FieldText from '@aziontech/webkit/field-text'
   import CopyBlock from '@aziontech/webkit/button-copy'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'CopyKeyDialog' })
 

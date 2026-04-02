@@ -1,6 +1,6 @@
 <script setup>
   import { computed } from 'vue'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
 
   const props = defineProps({
     metric: {

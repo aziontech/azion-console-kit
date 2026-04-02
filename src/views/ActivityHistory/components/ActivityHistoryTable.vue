@@ -2,7 +2,7 @@
   import { ref, computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   import DataTable from '@aziontech/webkit/list-data-table'
   import DataTimeRange from '@/components/base/dataTimeRange'

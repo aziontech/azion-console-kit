@@ -11,7 +11,7 @@
 
 <script setup>
   import { ref, watch } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { useToast } from 'primevue/usetoast'
 

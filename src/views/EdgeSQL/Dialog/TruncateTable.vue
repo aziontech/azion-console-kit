@@ -51,8 +51,8 @@
 </template>
 
 <script setup>
-  import Dialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import Dialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useToast } from 'primevue/usetoast'
   import { capitalizeFirstLetter } from '@/helpers'

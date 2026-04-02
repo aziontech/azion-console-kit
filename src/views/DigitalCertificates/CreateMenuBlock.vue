@@ -20,8 +20,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import Menu from 'primevue/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Menu from '@aziontech/webkit/menu'
   import { ref } from 'vue'
 
   const menu = ref(null)

@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'
   import CreateDrawerBlock from '@/templates/create-drawer-block'
   import FormFieldsCredential from './FormFields/FormFieldsCredential.vue'

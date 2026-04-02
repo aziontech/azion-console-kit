@@ -1,5 +1,5 @@
 <script setup>
-  import Chip from 'primevue/chip'
+  import Chip from '@aziontech/webkit/chip'
 
   const props = defineProps({
     itemFilter: {

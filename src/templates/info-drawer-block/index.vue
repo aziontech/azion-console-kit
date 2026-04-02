@@ -1,8 +1,8 @@
 <script setup>
   import { computed, ref } from 'vue'
-  import Sidebar from 'primevue/sidebar'
+  import Sidebar from '@aziontech/webkit/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import Button from 'primevue/button'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])

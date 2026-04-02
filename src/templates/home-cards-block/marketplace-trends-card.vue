@@ -155,7 +155,7 @@
 
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
 

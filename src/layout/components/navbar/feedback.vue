@@ -113,10 +113,10 @@
   import { useLayout } from '@/composables/use-layout'
   import { AZION_CONTACT_SUPPORT } from '@/helpers/azion-documentation-window-opener'
   import { useToast } from 'primevue/usetoast'
-  import Dialog from 'primevue/dialog'
-  import Dropdown from 'primevue/dropdown'
-  import Textarea from 'primevue/textarea'
-  import PrimeButton from 'primevue/button'
+  import Dialog from '@aziontech/webkit/dialog'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import Textarea from '@aziontech/webkit/textarea'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'console-feedback' })
 

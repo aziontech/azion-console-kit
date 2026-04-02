@@ -41,9 +41,9 @@
   </Accordion>
 </template>
 <script>
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
-  import ProgressSpinner from 'primevue/progressspinner'
+  import Accordion from '@aziontech/webkit/accordion'
+  import AccordionTab from '@aziontech/webkit/accordion-tab'
+  import ProgressSpinner from '@aziontech/webkit/progressspinner'
 
   export default {
     name: 'script-runner-block',

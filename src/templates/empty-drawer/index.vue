@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
-  import Sidebar from 'primevue/sidebar'
-  import PrimeButton from 'primevue/button'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import PrimeButton from '@aziontech/webkit/button'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   defineOptions({ name: 'empty-drawer' })

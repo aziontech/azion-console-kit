@@ -47,8 +47,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
 
   import { useToast } from 'primevue/usetoast'

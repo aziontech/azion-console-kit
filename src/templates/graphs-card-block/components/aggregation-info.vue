@@ -20,8 +20,8 @@
 </template>
 
 <script setup>
-  import PrimeSkeleton from 'primevue/skeleton'
-  import PrimeTag from 'primevue/tag'
+  import PrimeSkeleton from '@aziontech/webkit/skeleton'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { computed } from 'vue'
 
   const props = defineProps({

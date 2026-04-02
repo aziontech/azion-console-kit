@@ -3,7 +3,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inline-message'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { computed, ref, inject } from 'vue'
   import ListTable from '@/components/list-table'

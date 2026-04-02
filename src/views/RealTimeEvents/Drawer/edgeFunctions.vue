@@ -3,10 +3,10 @@
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TableEvents from './tableEvents.vue'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
-  import TabPanel from 'primevue/tabpanel'
-  import TabView from 'primevue/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
 

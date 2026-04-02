@@ -3,7 +3,7 @@
   import { useToast } from 'primevue/usetoast'
   import ContentBlock from '@/templates/content-block'
   import { onBeforeRouteLeave } from 'vue-router'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inline-message'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
