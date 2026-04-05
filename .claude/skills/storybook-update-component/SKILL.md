@@ -1,3 +1,8 @@
+---
+name: storybook-update-component
+description: Update existing Storybook component stories to reflect component changes (props, slots, events)
+---
+
 # Updating Storybook Component
 
 This skill provides comprehensive guidance for updating existing component stories in the Console Storybook, ensuring documentation stays synchronized with component changes.
@@ -240,6 +245,52 @@ parameters: {
   }
 }
 ```
+
+**For components with dependency injection:**
+```javascript
+// Component uses inject('dialogRef')
+// Story needs a wrapper component to provide the injection
+
+import { ref, provide } from 'vue';
+
+// Wrapper component mimics the provider
+const ComponentWrapper = {
+  components: { Component },
+  props: {
+    // Props that will be passed to injected data
+    prop1: { type: String, default: 'value' }
+  },
+  setup(props) {
+    // Create the injection data
+    const injectedData = ref({
+      data: { prop1: props.prop1 },
+      close: () => console.log('close')
+    });
+
+    // Provide the injection
+    provide('dialogRef', injectedData);
+
+    return {};
+  },
+  template: `<Component />`
+};
+
+// Story uses wrapper
+export const Default = {
+  render: () => ({
+    components: { ComponentWrapper },
+    template: '<ComponentWrapper prop1="value" />'
+  })
+};
+```
+
+**When you need a wrapper:**
+- Component has `inject('dialogRef')` or similar
+- Component designed for PrimeVue Dynamic Dialogs
+- Story fails with "injection not found" errors
+- Component renders nothing without provider
+
+See Troubleshooting section for more details.
 
 ### Step 7: Update Component Description
 
@@ -568,6 +619,26 @@ Before completing, verify:
 - Use `@/templates/` for template components
 - Use `@/components/` for other components
 - Check component is in correct directory
+
+**Component Requires Injection:**
+If component uses `inject()` and story fails or renders nothing:
+- Check component for `inject('dialogRef')` or similar
+- Create wrapper component in story file
+- Use `provide()` in wrapper's setup to provide expected injection
+- Wrapper mimics what the service/framework provides at runtime
+- Example: PrimeVue Dynamic Dialogs provide `dialogRef` automatically in production
+- In Storybook, must manually provide it via wrapper
+- See Step 6 for injection wrapper pattern
+
+**Debugging Injection Issues:**
+```javascript
+// Add console.log to understand what component expects
+setup() {
+  const injected = inject('dialogRef');
+  console.log('Expected injection:', injected);
+  // This will show undefined if not provided
+}
+```
 
 ## Examples
 

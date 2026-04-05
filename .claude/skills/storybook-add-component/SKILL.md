@@ -1,3 +1,8 @@
+---
+name: storybook-add-component
+description: Add a new component to Console Storybook with complete documentation, proper patterns, and successful builds
+---
+
 # Adding Component to Storybook
 
 This skill provides comprehensive guidance for adding new components to the Console Storybook with complete documentation, proper patterns, and successful builds.
@@ -214,6 +219,94 @@ Include in `parameters.docs.description.component`:
 - Key features
 - Any important notes
 
+### Step 7.5: Handle Dependency Injection Components
+
+**When a component uses `inject()`** to receive data from a parent provider (common in dynamic dialogs, modals, or service-based components), you need a wrapper component in the story.
+
+**Pattern: Wrapper Component for Dependency Injection**
+
+Use this pattern when:
+- Component uses `inject('dialogRef')` or similar
+- Component is designed for PrimeVue Dynamic Dialogs
+- Component expects data from a service at runtime
+
+**Example - DialogCopyKey component:**
+```javascript
+import DialogCopyKey from '@/templates/dialog-copy-key/index.vue';
+import { ref, provide } from 'vue';
+
+export default {
+  title: 'Templates/DialogCopyKey',
+  component: DialogCopyKey,
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'A dialog component that uses dialogRef injection for data.'
+      }
+    }
+  }
+};
+
+// Wrapper component provides the injection
+const DialogWrapper = {
+  components: { DialogCopyKey },
+  props: {
+    title: {
+      type: String,
+      default: 'API Key'
+    },
+    keyValue: {
+      type: String,
+      default: 'sk-1234567890abcdef'
+    }
+  },
+  setup(props) {
+    // Create the data structure the component expects
+    const dialogData = ref({
+      title: props.title,
+      key: props.keyValue
+    });
+
+    // Create dialogRef that mimics PrimeVue's dynamic dialog
+    const dialogRef = ref({
+      data: dialogData.value,
+      close: () => {
+        console.log('Dialog closed');
+      }
+    });
+
+    // Provide the injection
+    provide('dialogRef', dialogRef);
+
+    return {};
+  },
+  template: `
+    <DialogCopyKey />
+  `
+};
+
+export const Default = {
+  render: () => ({
+    components: { DialogWrapper },
+    template: '<DialogWrapper title="Personal Token" keyValue="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />'
+  })
+};
+```
+
+**Why this is needed:**
+- In production, PrimeVue's dialog service automatically provides `dialogRef`
+- In Storybook's isolated environment, the service doesn't exist
+- Wrapper manually provides the injection the component expects
+- Without it, the component would fail or render nothing
+
+**Common scenarios requiring wrappers:**
+- `inject('dialogRef')` - PrimeVue dynamic dialogs
+- `inject('toast')` - Toast notification services
+- `inject('router')` - Custom router implementations
+- `inject('store')` - Vuex/Pinia store injections
+- Any service-based dependency injection
+
 ### Step 8: Test Build
 Run build command and verify success:
 ```bash
@@ -351,6 +444,13 @@ export const Default = {
 - Include components: { Component } in render function
 - Use v-bind="args" in template
 - Wrap slot content in `<template #slotName>`
+
+**Component Uses Dependency Injection:**
+- Check if component has `inject()` calls
+- Create wrapper component that provides the injection
+- Use `provide('injectionKey', ref({...}))` in wrapper's setup
+- Mimic the data structure the component expects
+- See Step 7.5 for detailed pattern
 
 **Component Not Found:**
 - Verify import path uses `@/templates/` alias
