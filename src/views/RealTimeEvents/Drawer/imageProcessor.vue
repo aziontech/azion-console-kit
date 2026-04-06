@@ -1,13 +1,12 @@
 <script setup>
-  import Skeleton from 'primevue/skeleton'
-  import TabPanel from 'primevue/tabpanel'
-  import TabView from 'primevue/tabview'
-  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import TableEvents from './tableEvents.vue'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
 
   import { computed, ref, watch } from 'vue'
   defineOptions({ name: 'drawer-events-image-processor' })
@@ -74,10 +73,6 @@
     v-model:visible="showDrawer"
     :title="title"
   >
-    <template #header-actions>
-      <ConsoleFeedback />
-    </template>
-
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <TabView

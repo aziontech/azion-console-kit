@@ -1,7 +1,8 @@
 <script setup>
   import { computed, ref } from 'vue'
-  import Sidebar from 'primevue/sidebar'
-  import PrimeButton from 'primevue/button'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import PrimeButton from '@aziontech/webkit/button'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   defineOptions({ name: 'empty-drawer' })
 
@@ -72,10 +73,10 @@
       <template #header>
         <h2>{{ title }}</h2>
         <div class="flex items-center gap-2">
-          <slot name="header-actions"></slot>
+          <ConsoleFeedback styleTextColor="text-color" />
           <PrimeButton
-            outlined
             @click="toggleExpandDrawer"
+            outlined
             :icon="isExpanded ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
           />
         </div>

@@ -1,7 +1,8 @@
 <script setup>
   import { computed, ref } from 'vue'
-  import Sidebar from 'primevue/sidebar'
-  import Button from 'primevue/button'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])
@@ -60,12 +61,9 @@
     }"
   >
     <template #header>
-      <h2 class="text-xl truncate">
-        {{ props.title }}
-      </h2>
-
+      <h2 class="text-xl truncate">{{ props.title }}</h2>
       <div class="flex gap-2 items-center">
-        <slot name="header-actions"></slot>
+        <ConsoleFeedback styleTextColor="text-color" />
         <Button
           outlined
           class="text-color"
