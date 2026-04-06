@@ -47,15 +47,16 @@ cypress.env.*
 .edge
 !azion/production
 !azion/stage
-
 azion/
 /cypress/downloads
+
 #Paths added by Azion CLI
 .edge/
 .vulcan
 specs.json
-.claude/
-.opencode/
-CLAUDE.md
 docs/ARCHITECTURE.md
 hooks/
+
+# AI
+CLAUDE.md
+.opencode/
