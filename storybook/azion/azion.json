@@ -1,14 +1,15 @@
 {
   "name": "azion-console-kit-storybook",
-  "bucket": "",
+  "bucket": "console-kit-storybook",
   "preset": "html",
   "env": "production",
-  "prefix": "",
+  "prefix": "20260406184524",
   "rotate-prefix": true,
+  "not-first-run": true,
   "function": [],
   "application": {
-    "id": 0,
-    "name": "__DEFAULT__"
+    "id": 1775518977,
+    "name": "azion-console-kit-storybook"
   },
   "domain": {
     "id": 0,
@@ -22,15 +23,46 @@
   "origin": null,
   "rules-engine": {
     "created": false,
-    "rules": null
+    "rules": [
+      {
+        "id": 535935,
+        "name": "Deliver Static Assets and Set Cache Policy",
+        "phase": "request"
+      },
+      {
+        "id": 535936,
+        "name": "Redirect to index.html",
+        "phase": "request"
+      },
+      {
+        "id": 535937,
+        "name": "Redirect to index.html for Subpaths",
+        "phase": "request"
+      }
+    ]
   },
-  "cache-settings": null,
+  "cache-settings": [
+    {
+      "id": 277250,
+      "name": "azion-console-kit-storybook"
+    }
+  ],
   "workloads": {
-    "id": 0,
-    "name": "",
-    "domains": null,
-    "url": "",
-    "deployment_id": null
+    "id": 1775513810,
+    "name": "azion-console-kit-storybook",
+    "domains": [],
+    "url": "https://msgwjn8tmz0.map.azionedge.net",
+    "deployment_id": [
+      {
+        "id": 191712,
+        "name": "azion-console-kit-storybook"
+      }
+    ]
   },
-  "connectors": null
+  "connectors": [
+    {
+      "id": 14277,
+      "name": "azion-console-kit-storybook"
+    }
+  ]
 }

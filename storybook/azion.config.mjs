@@ -24,29 +24,29 @@ export default {
   },
   storage: [
     {
-      name: '$BUCKET_NAME',
-      prefix: '$BUCKET_PREFIX',
+      name: 'console-kit-storybook',
+      prefix: '20260406184524',
       dir: './dist',
       workloadsAccess: 'read_only'
     }
   ],
   connectors: [
     {
-      name: '$CONNECTOR_NAME',
+      name: 'azion-console-kit-storybook',
       active: true,
       type: 'storage',
       attributes: {
-        bucket: '$BUCKET_NAME',
-        prefix: '$BUCKET_PREFIX'
+        bucket: 'console-kit-storybook',
+        prefix: '20260406184524'
       }
     }
   ],
   applications: [
     {
-      name: '$APPLICATION_NAME',
+      name: 'azion-console-kit-storybook',
       cache: [
         {
-          name: '$APPLICATION_NAME',
+          name: 'azion-console-kit-storybook',
           browser: {
             maxAgeSeconds: 7200
           },
@@ -77,13 +77,13 @@ export default {
               {
                 type: 'set_connector',
                 attributes: {
-                  value: '$CONNECTOR_NAME'
+                  value: 'azion-console-kit-storybook'
                 }
               },
               {
                 type: 'set_cache_policy',
                 attributes: {
-                  value: '$APPLICATION_NAME'
+                  value: 'azion-console-kit-storybook'
                 }
               },
               {
@@ -109,7 +109,7 @@ export default {
               {
                 type: 'set_connector',
                 attributes: {
-                  value: '$CONNECTOR_NAME'
+                  value: 'azion-console-kit-storybook'
                 }
               },
               {
@@ -138,7 +138,7 @@ export default {
               {
                 type: 'set_connector',
                 attributes: {
-                  value: '$CONNECTOR_NAME'
+                  value: 'azion-console-kit-storybook'
                 }
               },
               {
@@ -156,18 +156,18 @@ export default {
   ],
   workloads: [
     {
-      name: '$WORKLOAD_NAME',
+      name: 'azion-console-kit-storybook',
       active: true,
       infrastructure: 1,
       deployments: [
         {
-          name: '$DEPLOYMENT_NAME',
+          name: 'azion-console-kit-storybook',
           current: true,
           active: true,
           strategy: {
             type: 'default',
             attributes: {
-              application: '$APPLICATION_NAME'
+              application: 'azion-console-kit-storybook'
             }
           }
         }
