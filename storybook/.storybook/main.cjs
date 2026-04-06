@@ -1,13 +1,8 @@
-import vue from '@vitejs/plugin-vue';
-import { resolve } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const vue = require('@vitejs/plugin-vue').default;
+const { resolve } = require('path');
 
 /** @type {import('@storybook/vue3-vite').StorybookConfig} */
-const config = {
+module.exports = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
@@ -78,5 +73,3 @@ const config = {
     return config;
   }
 };
-
-export default config;
