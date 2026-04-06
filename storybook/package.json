@@ -7,9 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "storybook build -o dist -c .storybook",
-    "npx:dev": "npx storybook dev -p 6006 -c .storybook",
-    "npx:build": "npx storybook build -o dist -c .storybook",
-    "npx:preview": "npx http-server dist -p 6007"
+    "dev": "storybook dev -p 6006 -c .storybook",
+    "preview": "npx http-server dist -p 6007"
   },
   "dependencies": {
     "@aziontech/icons": "^1.4.0",
