@@ -8,7 +8,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'A dialog component that displays a key/token value with copy functionality and a warning message. Uses PrimeDialog with a password input (with toggle mask) and receives parameters via dialogRef injection. Designed to be used with dynamic dialog systems.'
+        component: 'A dialog component that displays a personal token value with copy functionality and a warning message. Uses PrimeDialog with a password input (with toggle mask and readonly) and receives the token via dialogRef injection. Designed to be used with PrimeVue dynamic dialog systems. The token is displayed once with a warning to copy it before closing.'
       }
     }
   }
@@ -18,19 +18,14 @@ export default {
 const DialogWrapper = {
   components: { DialogCopyKey },
   props: {
-    title: {
+    personalToken: {
       type: String,
-      default: 'API Key'
-    },
-    keyValue: {
-      type: String,
-      default: 'sk-1234567890abcdef1234567890abcdef'
+      default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
     }
   },
   setup(props) {
     const dialogData = ref({
-      title: props.title,
-      key: props.keyValue
+      personalToken: props.personalToken
     });
 
     const dialogRef = ref({
@@ -52,6 +47,6 @@ const DialogWrapper = {
 export const Default = {
   render: () => ({
     components: { DialogWrapper },
-    template: '<DialogWrapper title="Personal Token" keyValue="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" />'
+    template: '<DialogWrapper personalToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" />'
   })
 };
