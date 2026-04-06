@@ -1,0 +1,36 @@
+{
+  "name": "azion-console-kit-storybook",
+  "bucket": "",
+  "preset": "html",
+  "env": "production",
+  "prefix": "",
+  "rotate-prefix": true,
+  "function": [],
+  "application": {
+    "id": 0,
+    "name": "__DEFAULT__"
+  },
+  "domain": {
+    "id": 0,
+    "name": "__DEFAULT__",
+    "domain_name": "",
+    "url": ""
+  },
+  "rt-purge": {
+    "purge_on_publish": true
+  },
+  "origin": null,
+  "rules-engine": {
+    "created": false,
+    "rules": null
+  },
+  "cache-settings": null,
+  "workloads": {
+    "id": 0,
+    "name": "",
+    "domains": null,
+    "url": "",
+    "deployment_id": null
+  },
+  "connectors": null
+}

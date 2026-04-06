@@ -6,9 +6,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "npx storybook dev -p 6006 -c .storybook",
-    "build": "npx storybook build -o dist -c .storybook",
-    "preview": "npx http-server dist -p 6007"
+    "build": "storybook build -o dist -c .storybook",
+    "npx:dev": "npx storybook dev -p 6006 -c .storybook",
+    "npx:build": "npx storybook build -o dist -c .storybook",
+    "npx:preview": "npx http-server dist -p 6007"
   },
   "dependencies": {
     "@aziontech/icons": "^1.4.0",
