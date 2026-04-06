@@ -1,7 +1,7 @@
 import CreateFormBlock from '@/templates/create-form-block/index.vue';
 
 export default {
-  title: 'Templates/CreateFormBlock',
+  title: '[tech debit] / Templates/CreateFormBlock',
   component: CreateFormBlock,
   tags: ['autodocs']
 };

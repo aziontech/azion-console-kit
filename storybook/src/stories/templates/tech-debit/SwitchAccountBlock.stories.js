@@ -1,7 +1,7 @@
 import SwitchAccountBlock from '@/templates/switch-account-block/index.vue';
 
 export default {
-  title: 'Templates/SwitchAccountBlock',
+  title: '[tech debit] / Templates/SwitchAccountBlock',
   component: SwitchAccountBlock,
   tags: ['autodocs']
 };

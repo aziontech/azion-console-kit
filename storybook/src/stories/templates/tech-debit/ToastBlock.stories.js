@@ -2,7 +2,7 @@ import ToastBlock from '@/templates/toast-block/index.vue';
 import { useToast } from 'primevue/usetoast';
 
 export default {
-  title: 'Templates/ToastBlock',
+  title: '[tech debit] / Templates/ToastBlock',
   component: ToastBlock,
   tags: ['autodocs'],
   parameters: {

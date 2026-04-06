@@ -1,7 +1,7 @@
 import SingleBlock from '@/templates/single-block/index.vue';
 
 export default {
-  title: 'Templates/SingleBlock',
+  title: '[tech debit] / Templates/SingleBlock',
   component: SingleBlock,
   tags: ['autodocs']
 };

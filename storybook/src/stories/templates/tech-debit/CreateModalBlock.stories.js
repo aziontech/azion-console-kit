@@ -1,7 +1,7 @@
 import CreateModalBlock from '@/templates/create-modal-block/index.vue';
 
 export default {
-  title: 'Templates/CreateModalBlock',
+  title: '[tech debit] / Templates/CreateModalBlock',
   component: CreateModalBlock,
   tags: ['autodocs'],
   argTypes: {

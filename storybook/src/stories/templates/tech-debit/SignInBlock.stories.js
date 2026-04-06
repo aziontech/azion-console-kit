@@ -1,7 +1,7 @@
 import SignInBlock from '@/templates/sign-in-block/index.vue';
 
 export default {
-  title: 'Templates/SignInBlock',
+  title: '[tech debit] / Templates/SignInBlock',
   component: SignInBlock,
   tags: ['autodocs']
 };

@@ -1,7 +1,7 @@
 import EditFormBlock from '@/templates/edit-form-block/index.vue';
 
 export default {
-  title: 'Templates/EditFormBlock',
+  title: '[tech debit] / Templates/EditFormBlock',
   component: EditFormBlock,
   tags: ['autodocs']
 };

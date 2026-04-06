@@ -1,7 +1,7 @@
 import AdvancedFilter from '@/templates/advanced-filter/index.vue';
 
 export default {
-  title: 'Templates/AdvancedFilter',
+  title: '[tech debit] / Templates/AdvancedFilter',
   component: AdvancedFilter,
   tags: ['autodocs']
 };
