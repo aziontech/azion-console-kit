@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-  import Card from 'primevue/card'
+  import Card from '@aziontech/webkit/card'
   import { useChat } from '../composables/use-chat'
 
   const { suggestions, sendMessage } = useChat()

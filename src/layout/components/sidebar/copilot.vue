@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
   import { useRouter } from 'vue-router'

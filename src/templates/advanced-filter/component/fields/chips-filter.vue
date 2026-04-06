@@ -1,5 +1,5 @@
 <script setup>
-  import chips from 'primevue/chips'
+  import chips from '@aziontech/webkit/chips'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'chipsFilter' })

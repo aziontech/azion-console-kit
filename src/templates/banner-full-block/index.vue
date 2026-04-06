@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-  import Message from 'primevue/message'
+  import Message from '@aziontech/webkit/message'
   import LaunchweekLogo from '@/assets/svg/launchweek-logo.vue'
   import { openLaunchWeek } from '@/helpers/azion-documentation-window-opener'
   defineOptions({ name: 'BannerFullBlock' })

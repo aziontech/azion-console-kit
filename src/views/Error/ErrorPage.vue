@@ -2,7 +2,7 @@
   import { useRouter } from 'vue-router'
   import Illustration403 from '@aziontech/webkit/svg/error-403'
   import Illustration404 from '@aziontech/webkit/svg/error-404'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ErrorPageBlock from '@/templates/error-page-block'
 
   const props = defineProps({

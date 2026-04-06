@@ -8,7 +8,7 @@
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { onMounted } from 'vue'
   import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
   import { variablesService } from '@/services/v2/variables'

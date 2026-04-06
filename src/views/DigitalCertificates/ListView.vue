@@ -4,7 +4,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
-  import SelectButton from 'primevue/selectbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
   import ListTable from '@/components/list-table'

@@ -2,8 +2,8 @@
   import { useThemeStore } from '@/stores/theme'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PrimeButton from 'primevue/button'
-  import { useToast } from 'primevue/usetoast'
+  import PrimeButton from '@aziontech/webkit/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
   import { capitalizeFirstLetter } from '@/helpers'
 

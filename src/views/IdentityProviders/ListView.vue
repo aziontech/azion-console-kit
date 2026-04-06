@@ -8,7 +8,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { onBeforeRouteLeave } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'

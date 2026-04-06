@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import CopyBlock from '@aziontech/webkit/button-copy'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
 
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
-  import Divider from 'primevue/divider'
+  import Divider from '@aziontech/webkit/divider'
 
   const props = defineProps({
     documentationService: {

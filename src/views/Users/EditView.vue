@@ -6,7 +6,7 @@
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import FormSkeleton from './components/FormSkeleton.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'

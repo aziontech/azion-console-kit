@@ -18,7 +18,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeTag from 'primevue/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import AggregationInfo from '../aggregation-info.vue'
 
   const props = defineProps({
