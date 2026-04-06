@@ -43,7 +43,7 @@
           class="w-full"
         >
           <!-- Checkout Component -->
-          <CheckoutPaymentBlock
+          <ChoosingPlanContainer
             :plan="selectedPlan"
             :getStripeClientService="getStripeClientService"
             ref="checkoutRef"
@@ -88,7 +88,7 @@
 <script setup>
   import CardBox from '@aziontech/webkit/card-box'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
-  import CheckoutPaymentBlock from '@/templates/signup-block/checkout-payment-block.vue'
+  import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PrimeButton from 'primevue/button'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
