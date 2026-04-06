@@ -6,7 +6,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
-  import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
+  import DialogCopyKey from '@/templates/dialog-copy-key'
   import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -70,7 +70,7 @@
       productName: 'Personal Token'
     })
     personalTokenKey.value = token
-    dialog.open(CopyTokenDialog, {
+    dialog.open(DialogCopyKey, {
       data: {
         personalToken: personalTokenKey.value
       },
