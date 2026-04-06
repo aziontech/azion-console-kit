@@ -37,7 +37,7 @@
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
-          class="max-w-[150px]"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="openContactSales"
           data-testid="form-horizontal-modules-subscription-contact-sales-button"
@@ -50,8 +50,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
-  import PrimeButton from 'primevue/button'
-  import PrimeTag from 'primevue/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
 
   defineProps({

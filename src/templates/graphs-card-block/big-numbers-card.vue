@@ -10,7 +10,6 @@
       </span>
       <MoreOptionsMenu
         :report="report"
-        :clipboardWrite="clipboardWrite"
         :groupData="groupData"
       />
     </header>
@@ -31,7 +30,7 @@
   </div>
 </template>
 <script setup>
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { computed } from 'vue'
   import ChartOwner from './components/chart-owner.vue'
   import MoreOptionsMenu from './components/more-options-menu.vue'
@@ -39,7 +38,6 @@
   defineOptions({ name: 'GraphsCardBlock' })
 
   const props = defineProps({
-    clipboardWrite: Function,
     report: {
       type: Object,
       required: true

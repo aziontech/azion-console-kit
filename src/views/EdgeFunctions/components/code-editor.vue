@@ -24,6 +24,7 @@
   })
 
   const code = ref(props.initialValue)
+
   const EDITOR_OPTIONS = ref({
     minimap: { enabled: props.minimap },
     tabSize: 2,

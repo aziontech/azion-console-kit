@@ -1,9 +1,9 @@
-import { FilterMatchMode } from 'primevue/api'
+import { FilterMatchMode } from '@aziontech/webkit/api'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDeleteDialog } from '@/composables/useDeleteDialog'
-import { useDialog } from 'primevue/usedialog'
-import { useToast } from 'primevue/usetoast'
+import { useDialog } from '@aziontech/webkit/use-dialog'
+import { useToast } from '@aziontech/webkit/use-toast'
 import { useTableDefinitionsStore } from '@/stores/table-definitions'
 import { getCsvCellContentFromRowData } from '@/helpers'
 
@@ -15,7 +15,7 @@ export function useDataTable(props, emit) {
   const tableDefinitions = useTableDefinitionsStore()
 
   // Reactive variables
-  const isLoading = ref(false)
+  const isLoading = ref(!props.loadDisabled)
   const data = ref([])
   const selectedColumns = ref([])
   const selectedId = ref(null)
@@ -60,9 +60,14 @@ export function useDataTable(props, emit) {
     set: (value) => emit('update:selectedItensData', value)
   })
 
-  // Actions configuration
-  const isRenderActions = computed(() => !!props.actions?.length)
-  const isRenderOneOption = computed(() => props.actions?.length === 1)
+  // Actions configuration (handle both plain arrays and computed refs)
+  const resolvedActions = computed(() => {
+    const actions = props.actions
+    if (Array.isArray(actions)) return actions
+    return actions?.value || []
+  })
+  const isRenderActions = computed(() => !!resolvedActions.value.length)
+  const isRenderOneOption = computed(() => resolvedActions.value.length === 1)
   const hasExportToCsvMapper = computed(() => !!props.csvMapper)
 
   // Filters configuration
@@ -260,7 +265,7 @@ export function useDataTable(props, emit) {
       }
     }
 
-    return (props.actions || [])
+    return (resolvedActions.value || [])
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
   }

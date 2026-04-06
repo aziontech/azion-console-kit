@@ -3,7 +3,7 @@
  *
  * @param {Object} params - The parameters to get the csv cell content.
  * @param {Object.<string, Object>} params.columnMapper - Object with each custom column as key and the mapper function for that column as value.
- * @param {import('primevue/datatable').DataTableExportFunctionOptions} params.rowData - The row data from the data table.
+ * @param {Object} params.rowData - The row data from the data table.
  * @return {string} The csv cell content.
  *
  * @example

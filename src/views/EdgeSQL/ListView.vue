@@ -1,16 +1,15 @@
 <script setup>
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
-
+  import InlineMessage from '@aziontech/webkit/inline-message'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import InlineMessage from 'primevue/inlinemessage'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useEdgeSQL } from './composable/useEdgeSQL'
   import * as Helpers from '@/helpers'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'list-edge-sql-databases' })
 
@@ -18,23 +17,22 @@
   const router = useRouter()
   const { databaseCreated, setCurrentDatabase, setDatabaseCreated } = useEdgeSQL()
 
-  const hasContentToList = ref(true)
-  const fetchListRef = ref(null)
+  const listTableRef = ref()
   const pollingInterval = ref(null)
   const deletePollingInterval = ref(null)
-  const isLoading = ref(false)
+  const isPollingLoading = ref(false)
   const isDeleting = ref(false)
   const databaseDeleted = ref(null)
 
   const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified', 'last_editor']
 
-  const reloadList = () => {
-    fetchListRef.value?.reload?.()
-  }
-
   const checkDatabaseStatus = async (databaseId) => {
     const result = await edgeSQLService.checkDatabaseStatus(databaseId, 'id,name,status')
     return result.body.status
+  }
+
+  const reload = () => {
+    listTableRef.value?.reload?.()
   }
 
   const startPolling = (databaseId) => {
@@ -46,7 +44,7 @@
       if (status === 'created' || status === 'ready') {
         stopPolling()
         setDatabaseCreated(null)
-        reloadList()
+        reload()
       } else if (status === 'failed' || status === 'error') {
         stopPolling()
         setDatabaseCreated(null)
@@ -63,7 +61,7 @@
       } catch (error) {
         stopDeletePolling()
         databaseDeleted.value = null
-        reloadList()
+        reload()
       }
     }, 3000)
   }
@@ -73,7 +71,7 @@
       clearInterval(pollingInterval.value)
       pollingInterval.value = null
     }
-    isLoading.value = false
+    isPollingLoading.value = false
   }
 
   const stopDeletePolling = () => {
@@ -88,10 +86,6 @@
     const response = await edgeSQLService.deleteDatabase(databaseId)
     databaseDeleted.value = databaseId
     return response
-  }
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
   }
 
   const handleTrackEvent = () => {
@@ -170,7 +164,7 @@
     databaseCreated,
     (newDatabase) => {
       if (newDatabase?.id) {
-        isLoading.value = true
+        isPollingLoading.value = true
         startPolling(newDatabase.id)
       } else {
         stopPolling()
@@ -193,19 +187,13 @@
   )
 
   watch(
-    () => fetchListRef.value?.data,
+    () => listTableRef.value?.dataTableRef?.data,
     (data) => {
-      if (Array.isArray(data) && data.length) {
-        const databaseCreating = data.find((database) => {
-          const statusContent =
-            typeof database.status === 'string' ? database.status : database.status?.content
-          return statusContent === 'creating'
-        })
-
-        if (databaseCreating?.id) {
-          startPolling(databaseCreating.id)
-        }
-      }
+      if (!data) return
+      const creatingDatabases = data.filter((database) => database.status?.content === 'creating')
+      creatingDatabases.forEach((database) => {
+        startPolling(database.id)
+      })
     },
     { immediate: true }
   )
@@ -240,28 +228,24 @@
         class="w-fit mb-8"
         severity="info"
         icon="pi pi-spin pi-spinner"
-        v-if="isLoading || isDeleting"
+        v-if="isPollingLoading || isDeleting"
       >
         Database requests are queued. The table will update automatically once processing is
         complete.
       </InlineMessage>
-      <FetchListTableBlock
-        ref="fetchListRef"
-        editPagePath="/sql-database/database"
-        :enableEditClick="false"
+      <ListTable
+        ref="listTableRef"
         :listService="edgeSQLService.listDatabases"
         :columns="getColumns"
-        :apiFields="EDGE_SQL_API_FIELDS"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Databases found."
-        data-testid="edge-sql-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
-        :frozen-columns="['name']"
+        editPagePath="/sql-database/database"
+        :enableEditClick="false"
+        defaultOrderingFieldName="name"
         exportFileName="SQL Database"
         :csvMapper="csvMapper"
+        :apiFields="EDGE_SQL_API_FIELDS"
+        :lazy="true"
+        :frozenColumns="['name']"
         :emptyBlock="{
           title: 'No SQL Databases yet',
           description: 'Create your first database to store relational data and run SQL queries.',
@@ -269,6 +253,8 @@
           createPagePath: '/sql-database/create',
           documentationService: Helpers.documentationGuideProducts.edgeSQL
         }"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
       />
     </template>
   </ContentBlock>

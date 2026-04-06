@@ -116,13 +116,13 @@
 <script setup>
   import { computed, ref, watch, onMounted } from 'vue'
   import BannerContentBlock from '@/templates/content-block/banner'
-  import InputText from 'primevue/inputtext'
-  import Listbox from 'primevue/listbox'
-  import PrimeButton from 'primevue/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Listbox from '@aziontech/webkit/listbox'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'
   import LoadingEmptySearch from './components/LoadingEmptySearch'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { marketplaceService } from '@/services/v2/marketplace'
   import { useDebounceFn } from '@vueuse/core'
 

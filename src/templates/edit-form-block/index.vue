@@ -1,6 +1,6 @@
 <script setup>
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { ref, computed, nextTick, onBeforeUnmount, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -131,14 +131,22 @@
       }
 
       const { id } = route.params
+
       const loadedValues = await props.loadService({ id })
 
       if (!loadedValues || Object.keys(loadedValues).length === 0) {
         return
       }
 
+      // Filter out undefined values from initialValues to prevent overwriting loaded data
+      const definedInitialValues = props.initialValues
+        ? Object.fromEntries(
+            Object.entries(props.initialValues).filter(([, value]) => value !== undefined)
+          )
+        : {}
+
       const mergedValues = hasCachedValues
-        ? { ...loadedValues, ...props.initialValues }
+        ? { ...loadedValues, ...definedInitialValues }
         : loadedValues
 
       emit('loaded-service-object', mergedValues)

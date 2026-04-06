@@ -1,5 +1,5 @@
-import { useDialog } from 'primevue/usedialog'
-import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
+import { useDialog } from '@aziontech/webkit/use-dialog'
+import DeleteDialog from '@/components/list-table/dialog/delete-dialog.vue'
 
 /**
  * Derives the confirmation text for deletion.

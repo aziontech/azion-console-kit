@@ -1,10 +1,10 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerService from '@/views/EdgeNode/Drawer'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
@@ -18,8 +18,8 @@
   })
 
   const hasContentToList = ref(true)
-  const listServiceEdgeNodeRef = ref('')
   const drawerServiceRef = ref('')
+  const listTableRef = ref(null)
 
   const getColumns = computed(() => [
     {
@@ -71,15 +71,6 @@
     })
   }
 
-  const reloadServicesList = () => {
-    edgeNodeService.invalidateEdgeNodeServicesCache(props.edgeNodeId)
-    if (hasContentToList.value) {
-      listServiceEdgeNodeRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
-  }
-
   const actions = [
     {
       type: 'dialog',
@@ -99,6 +90,15 @@
       }
     }
   ]
+
+  const reloadServicesList = () => {
+    edgeNodeService.invalidateEdgeNodeServicesCache(props.edgeNodeId)
+    if (hasContentToList.value) {
+      listTableRef.value?.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 </script>
 
 <template>
@@ -110,25 +110,27 @@
       @onSuccess="reloadServicesList"
     />
     <div v-if="hasContentToList">
-      <ListTableBlock
-        ref="listServiceEdgeNodeRef"
+      <ListTable
+        ref="listTableRef"
         :listService="listServicesWithDecorator"
         :columns="getColumns"
         :editInDrawer="openEditServiceDrawer"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No services found."
         :actions="actions"
-        isTabs
+        editPagePath="/"
+        createPagePath="/"
         exportFileName="Edge Node Services"
+        emptyListMessage="No services found."
+        :isTabs="true"
+        @on-load-data="handleLoadData"
       >
-        <template #addButton>
+        <template #header-actions>
           <PrimeButton
             icon="pi pi-plus"
             label="Service"
             @click="openCreateServiceDrawer"
           />
         </template>
-      </ListTableBlock>
+      </ListTable>
     </div>
     <EmptyResultsBlock
       v-else

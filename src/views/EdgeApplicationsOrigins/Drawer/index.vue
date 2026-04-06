@@ -4,11 +4,10 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import CopyKeyDialog from '@templates/dialog-copy-key'
   import { refDebounced } from '@vueuse/core'
-  import { useToast } from 'primevue/usetoast'
   import { onMounted } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { loadProductsListService } from '@/services/contract-services'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'
@@ -40,10 +39,6 @@
     documentationService: {
       type: Function,
       required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     }
   })
 
@@ -60,7 +55,6 @@
   })
 
   const accountStore = useAccountStore()
-  const toast = useToast()
   const showCreateOriginDrawer = ref(false)
   const hasLiveIngest = ref(false)
   const showEditOriginDrawer = ref(false)
@@ -244,16 +238,6 @@
       .track()
   }
 
-  const copyToKey = async (originKey) => {
-    props.clipboardWrite(originKey)
-
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
-  }
-
   const handleFailedEditOrigin = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -284,8 +268,7 @@
     dialog.open(CopyKeyDialog, {
       data: {
         title: 'Origin Key',
-        key: feedback.originKey,
-        copy: copyToKey
+        key: feedback.originKey
       }
     })
 
@@ -317,7 +300,6 @@
         ref="createFormDrawer"
         :disabledFields="disabledFields"
         :listOrigins="originTypesOptions"
-        :copyToClipboard="copyToKey"
       />
     </template>
   </CreateDrawerBlock>
@@ -337,7 +319,6 @@
         isEditMode
         :disabledFields="disabledFields"
         :listOrigins="originTypesOptions"
-        :copyToClipboard="copyToKey"
       />
     </template>
   </EditDrawerBlock>

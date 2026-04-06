@@ -24,7 +24,7 @@
   import { computed, onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inline-message'
   import { MIN_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
 
   import GeneralSection from './blocks/GeneralSection.vue'
@@ -98,7 +98,7 @@
     if (!props.resetForm) return
     const initialValues = {
       name: name.value,
-      dataSource: 'http',
+      dataSource: 'workloads',
       template: templateId,
       dataSet: '',
       domainOption: '1',

@@ -17,9 +17,9 @@
   import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
-  import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeButton from 'primevue/button'
+  import Divider from '@aziontech/webkit/divider'
+  import InlineMessage from '@aziontech/webkit/inline-message'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
@@ -206,10 +206,6 @@
     },
     errors: {
       type: Object
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     },
     loadingOrigins: {
       type: Boolean,
@@ -588,7 +584,6 @@
         @onSuccess="handleSuccessOrigin"
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
-        :clipboardWrite="clipboardWrite"
       />
       <DrawerFunction
         ref="drawerFunctionRef"

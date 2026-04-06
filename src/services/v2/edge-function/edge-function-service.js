@@ -35,13 +35,16 @@ export class EdgeFunctionService extends BaseService {
   }
 
   loadEdgeFunction = async (params = { fields: [] }) => {
-    const { data } = await this.http.request({
+    const response = await this.http.request({
       method: 'GET',
       url: this.#getUrl(params.id),
       params: {
         fields: params.fields
       }
     })
+
+    // API response has nested structure: response.data = { data: { id, name, code, ... } }
+    const data = response.data?.data ?? response.data
 
     return this.adapter?.transformLoadEdgeFunction?.(data, params.fields) ?? data
   }
@@ -169,12 +172,18 @@ export class EdgeFunctionService extends BaseService {
   }
 
   loadEdgeFunctionService = async ({ id }) => {
-    const { data } = await this.http.request({
+    const response = await this.http.request({
       method: 'GET',
       url: this.#getUrl(id)
     })
 
-    return this.adapter?.transformLoadEdgeFunction?.(data, []) ?? data
+    // API response has nested structure: response.data = { data: { id, name, code, ... } }
+    // We need to extract the inner data object
+    const data = response.data?.data ?? response.data
+
+    const transformed = this.adapter?.transformLoadEdgeFunction?.(data, []) ?? data
+
+    return transformed
   }
 
   createEdgeFunctionsService = async (payload) => {

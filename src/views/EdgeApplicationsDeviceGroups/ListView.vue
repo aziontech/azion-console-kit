@@ -1,10 +1,11 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
-  import PrimeButton from 'primevue/button'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
+
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -18,19 +19,11 @@
     documentationService: {
       required: true,
       type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
     }
   })
 
   const drawerDeviceGroups = ref('')
-  const listDeviceGroupsEdgeApplicationsRef = ref('')
-
-  const reloadList = () => {
-    listDeviceGroupsEdgeApplicationsRef.value.reload()
-  }
+  const listTableRef = ref(null)
 
   const getColumns = computed(() => {
     return [
@@ -74,6 +67,8 @@
     ]
   })
 
+  const DEVICE_GROUP_API_FIELDS = ['id', 'name', 'user_agent']
+
   const handleSuccess = () => {
     drawerDeviceGroups.value.closeDrawer()
     reloadList()
@@ -95,8 +90,6 @@
   const deleteDeviceGroupsWithDecorator = async (id) => {
     return await deviceGroupService.deleteDeviceGroupService(props.edgeApplicationId, id)
   }
-
-  const DEVICE_GROUP_API_FIELDS = ['id', 'name', 'user_agent']
 
   const actions = [
     {
@@ -123,6 +116,14 @@
       .track()
   }
 
+  const reloadList = () => {
+    listTableRef.value?.reload()
+  }
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackClickToEdit()
+  }
+
   defineExpose({
     openCreateDrawer: openCreateDeviceGroupDrawer
   })
@@ -137,20 +138,20 @@
     :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
     :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
   />
-  <FetchListTableBlock
-    ref="listDeviceGroupsEdgeApplicationsRef"
+  <ListTable
+    ref="listTableRef"
     :listService="listDeviceGroupsWithDecorator"
-    :editInDrawer="openEditDeviceGroupDrawer"
     :columns="getColumns"
-    :defaultOrderingFieldName="'name'"
-    :apiFields="DEVICE_GROUP_API_FIELDS"
-    @on-before-go-to-edit="handleTrackClickToEdit"
-    emptyListMessage="No device groups found."
+    :frozenColumns="['name']"
+    :editInDrawer="openEditDeviceGroupDrawer"
     :actions="actions"
-    isTabs
-    :frozen-columns="['name']"
+    defaultOrderingFieldName="name"
+    :apiFields="DEVICE_GROUP_API_FIELDS"
     exportFileName="Application Device Groups"
-    hideLastModifiedColumn
+    :lazy="true"
+    :isTabs="true"
+    :hideLastModifiedColumn="true"
+    emptyListMessage="No device groups found."
     :emptyBlock="{
       title: 'No device groups yet',
       description:
@@ -159,6 +160,7 @@
       createPagePath: '/edge-applications/device-groups/create',
       documentationService: props.documentationService
     }"
+    @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
       <PrimeButton
@@ -170,5 +172,5 @@
         label="Device Group"
       />
     </template>
-  </FetchListTableBlock>
+  </ListTable>
 </template>

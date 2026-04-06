@@ -43,7 +43,7 @@
 <script>
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import Steps from 'primevue/steps'
+  import Steps from '@aziontech/webkit/steps'
 
   export default {
     name: 'StepsBlock',

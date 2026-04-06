@@ -1,7 +1,7 @@
 <script setup>
   import { ref, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
@@ -45,10 +45,6 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     },
     currentPhase: {
       type: String,
@@ -336,7 +332,6 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :originsOptions="originsOptions"
-        :clipboardWrite="clipboardWrite"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
@@ -375,7 +370,6 @@
         @refreshOrigins="handleRefreshOrigins"
         @refreshCacheSettings="handleRefreshCacheSettings"
         @navigate-to-main-settings="handleNavigateToMainSettings"
-        :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"

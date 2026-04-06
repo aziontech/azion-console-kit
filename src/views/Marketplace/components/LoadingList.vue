@@ -42,6 +42,6 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
 </script>

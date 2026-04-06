@@ -1,11 +1,14 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed } from 'vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import { computed, ref } from 'vue'
+  import ListTable from '@/components/list-table'
   import { mfaService } from '@/services/v2/mfa/mfa-service'
-  defineProps({
+
+  const props = defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -13,6 +16,9 @@
   })
 
   const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id', 'email']
+
+  const hasContentToList = ref(true)
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -64,6 +70,10 @@
       }
     }
   ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
 </script>
 
 <template>
@@ -75,22 +85,30 @@
       />
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        v-if="hasContentToList"
+        ref="listTableRef"
         :listService="mfaService.listMfaService"
         :columns="getColumns"
-        emptyListMessage="No MFA users found."
         :actions="actions"
-        :apiFields="MFA_USERS_API_FIELDS"
         :enableEditClick="false"
+        :apiFields="MFA_USERS_API_FIELDS"
         exportFileName="Multi-Factor Authentication Management"
         :csvMapper="csvMapper"
-        hideLastModifiedColumn
-        :emptyBlock="{
-          title: 'No MFA configurations yet',
-          description: 'Create your first MFA configuration to enhance account security.',
-          documentationService: documentationService
-        }"
+        :hideLastModifiedColumn="true"
+        emptyListMessage="No MFA users found."
+        @on-load-data="handleLoadData"
       />
+      <EmptyResultsBlock
+        v-else
+        title="No MFA configurations yet"
+        description="Create your first MFA configuration to enhance account security."
+        :documentationService="props.documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

@@ -8,9 +8,9 @@
   import FieldPhoneNumber from '@aziontech/webkit/field-phone-number'
   import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Dropdown from 'primevue/dropdown'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import MultiSelect from 'primevue/multiselect'
+  import MultiSelect from '@aziontech/webkit/multiselect'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
 
   const props = defineProps({

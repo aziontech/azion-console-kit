@@ -138,16 +138,16 @@
 
 <script setup>
   import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
-  import Tag from 'primevue/tag'
-  import Divider from 'primevue/divider'
+  import Tag from '@aziontech/webkit/tag'
+  import Divider from '@aziontech/webkit/divider'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { useSolutionStore } from '@/stores/solution-create'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
-  import PrimeCard from 'primevue/card'
-  import { useToast } from 'primevue/usetoast'
+  import PrimeCard from '@aziontech/webkit/card'
+  import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { useDeploy } from '@/stores/deploy'

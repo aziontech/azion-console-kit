@@ -11,8 +11,7 @@ export const edgeDnsRoutes = {
       name: 'list-edge-dns',
       component: () => import('@views/EdgeDNS/ListView.vue'),
       props: {
-        documentationService: documentationSecureProducts.edgeDNS,
-        clipboardWrite: Helpers.clipboardWrite
+        documentationService: documentationSecureProducts.edgeDNS
       },
       meta: {
         title: 'Edge DNS',
@@ -28,9 +27,6 @@ export const edgeDnsRoutes = {
       path: 'create',
       name: 'create-edge-dns',
       component: () => import('@views/EdgeDNS/CreateView.vue'),
-      props: {
-        clipboardWrite: Helpers.clipboardWrite
-      },
       meta: {
         title: 'Create Zone',
         breadCrumbs: [
@@ -54,7 +50,6 @@ export const edgeDnsRoutes = {
       name: 'edit-edge-dns',
       component: () => import('@views/EdgeDNS/TabsView.vue'),
       props: {
-        clipboardWrite: Helpers.clipboardWrite,
         updatedRedirect: 'list-edge-dns',
         documentationService: Helpers.documentationCatalog.records
       },

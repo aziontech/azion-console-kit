@@ -45,15 +45,13 @@
       </div>
 
       <div class="flex justify-start w-full">
-        <PrimeButton
-          icon="pi pi-clone"
-          data-testid="domains-dialog__copy-domain__button"
-          outlined
-          type="button"
-          aria-label="Copy"
+        <CopyBlock
+          :value="domainValue"
           label="Copy"
+          copiedLabel="Copied"
           :disabled="hasDomain"
-          @click="params.copy"
+          data-testid="domains-dialog__copy-domain__button"
+          aria-label="Copy"
         />
       </div>
     </div>
@@ -79,10 +77,11 @@
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeInputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InlineMessage from '@aziontech/webkit/inline-message'
+  import PrimeInputText from '@aziontech/webkit/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyDomainDialog' })
 

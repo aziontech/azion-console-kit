@@ -48,8 +48,8 @@
 </template>
 
 <script setup>
-  import PrimeTag from 'primevue/tag'
-  import Toolbar from 'primevue/toolbar'
+  import PrimeTag from '@aziontech/webkit/tag'
+  import Toolbar from '@aziontech/webkit/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
   import ChatMessages from '../components/chat-list-messages.vue'
