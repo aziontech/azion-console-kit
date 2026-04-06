@@ -684,7 +684,7 @@
   if (currentStep.value === 'settings') {
     // Repository owner and name from query params (with fallback to props)
     repositoryOwnerRef = route.query.repositoryOwner || props.repositoryOwner
-    route.query.repositoryName || props.repositoryName
+    repositoryNameRef = route.query.repositoryName || props.repositoryName
   }
 
   onMounted(async () => {
@@ -739,8 +739,8 @@
           <div class="py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-1.5">
               <span class="text-[10px] font-normal text-text-color-muted leading-3"
-                >Importing from</span
-              >
+                >Importing from
+              </span>
               <div class="flex items-center gap-1">
                 <i class="pi pi-github w-3.5 h-3.5 text-text-color-muted text-[10px]"></i>
                 <a

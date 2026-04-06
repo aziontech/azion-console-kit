@@ -728,10 +728,10 @@
 
     <div
       v-if="currentStep === 'repository'"
-      class="mt-8 justify-start text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
+      class="mt-8 flex justify-center text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
       <span
-        class="cursor-pointer flex justify-center px-3 py-1 rounded hover:surface-hover dark:hover:bg-gray-800 transition-colors duration-150 w-auto"
+        class="cursor-pointer flex justify-center px-3 py-1 rounded hover:surface-hover dark:hover:bg-gray-800 transition-colors duration-150 md:w-44 w-full"
         @click="navigateToMarkketplace"
       >
         Browse Templates →
