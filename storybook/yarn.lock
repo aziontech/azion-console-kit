@@ -12,12 +12,12 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.4.0.tgz#10b90da5545ee61a3d0f4688e25e6ea3cc936921"
   integrity sha512-V2AQJoY4iV6ZlrcKiCW9pyZeMJXou8cg2sqmsTn3KTH7G/cLiHD0QZG/y8md8rfSSSEvsBzR/82JM45+taaRIQ==
 
-"@aziontech/theme@^1.4.0":
+"@aziontech/theme@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.8.0.tgz#5bf7b156cafc6bee1a3687b72edddcbf7132c82c"
   integrity sha512-D058F22F1W8QCZ8AulpZaMrchze6Sus1AG3Cvh3vIUA6smtOe/m4J3T2HV3G5GgPHf70BGYbxeobysyBRaKU2g==
 
-"@aziontech/webkit@^1.12.3":
+"@aziontech/webkit@^1.19.0":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.19.0.tgz#c957cd60fe14aeb21bb68d1b69ab0b9f4175c0ae"
   integrity sha512-EBSXeNiLzhWwfFw68P87jI13Qzu5kktXd9WWHfFsi5rbWdyfD0vDl33bpHOOlW4m/N55NZu7hCyq6t9iz9U1ig==
