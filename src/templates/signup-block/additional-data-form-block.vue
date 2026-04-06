@@ -26,26 +26,13 @@
       </div>
 
       <!-- Full Name -->
-      <div class="flex flex-col gap-2">
-        <label class="flex gap-1 items-center text-sm font-semibold text-[var(--text-color)]">
-          Your Full Name
-          <span class="text-[var(--badge-tag-primary-border)]">*</span>
-          <span class="text-[10px] text-[var(--text-color-secondary)] font-normal">(Required)</span>
-        </label>
-        <PrimeInputText
-          v-model="fullName"
-          name="fullName"
-          id="fullName"
-          placeholder="John Doe"
-          class="w-full"
-        />
-        <small
-          v-if="errors.fullName"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ errors.fullName }}
-        </small>
-      </div>
+      <FieldText
+        name="fullName"
+        label="Your Full Name"
+        placeholder="John Doe"
+        class="w-full"
+        required
+      />
 
       <!-- Role Dropdown -->
       <div class="relative z-10">
@@ -71,8 +58,8 @@
         :key="item"
       >
         <div class="w-full mb-6">
-          <PrimeSkeleton class="h-4 mb-4 w-2/3" />
-          <PrimeSkeleton class="h-10 w-full" />
+          <Skeleton class="h-4 mb-4 w-2/3" />
+          <Skeleton class="h-10 w-full" />
         </div>
       </div>
     </div>
@@ -80,44 +67,43 @@
 </template>
 
 <script setup>
-  import PrimeInputText from 'primevue/inputtext'
-  import PrimeSkeleton from 'primevue/skeleton'
-
+  import { ref, inject, computed, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { ref, inject, computed, onMounted, watch } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
+  // import { useRouter } from 'vue-router'
+  import * as yup from 'yup'
+  // import { useAccountStore } from '@/stores/account'
   import { usePlans } from '@/composables/usePlans'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
-  import * as yup from 'yup'
+  import FieldText from '@aziontech/webkit/field-text'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const router = useRouter()
+  // const router = useRouter()
   const toast = useToast()
-  const { userId } = useAccountStore()
-  const accountStore = useAccountStore()
+  // const { userId } = useAccountStore()
+  // const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
   })
 
-  const props = defineProps({
-    postAdditionalDataService: {
-      type: Function,
-      required: true
-    },
-    patchFullnameService: {
-      type: Function,
-      required: true
-    },
-    updateAccountInfoService: {
-      type: Function,
-      required: true
-    }
-  })
+  // const props = defineProps({
+  //   postAdditionalDataService: {
+  //     type: Function,
+  //     required: true
+  //   },
+  //   patchFullnameService: {
+  //     type: Function,
+  //     required: true
+  //   },
+  //   updateAccountInfoService: {
+  //     type: Function,
+  //     required: true
+  //   }
+  // })
 
   const additionalDataInfo = ref([
     {
@@ -168,13 +154,12 @@
       .required('Your Full Name is required')
   })
 
-  const { meta, errors } = useForm({
+  const { meta } = useForm({
     validationSchema
   })
 
   const { value: plan } = useField('plan')
   const { value: role } = useField('role')
-  const { value: fullName } = useField('fullName')
 
   // Initialize plans from URL/storage
   const { plan: storedPlan, initialize: initializePlans, setParam: setPlanParam } = usePlans()
@@ -232,43 +217,48 @@
     loading.value = true
 
     try {
-      const usersPayload = fullName.value
-      const accountPayload = role.value
-      const additionalDataPayload = {
-        plan: plan.value,
-        role: role.value,
-        fullName: fullName.value,
-        id: userId
-      }
+      // const usersPayload = values.fullName
+      // const accountPayload = role.value
+      // const additionalDataPayload = {
+      //   plan: plan.value,
+      //   role: role.value,
+      //   fullName: values.fullName,
+      //   id: userId
+      // }
 
-      const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
+      // const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      // accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
-      const patchName = props.patchFullnameService(usersPayload)
-      const postAddData = props.postAdditionalDataService({
-        payload: additionalDataPayload,
-        options: additionalDataInfo.value
-      })
+      // const patchName = props.patchFullnameService(usersPayload)
+      // const postAddData = props.postAdditionalDataService({
+      //   payload: additionalDataPayload,
+      //   options: additionalDataInfo.value
+      // })
 
-      await patchName
-      await postAddData
+      // await patchName
+      // await postAddData
 
-      tracker.signUp
-        .submittedAdditionalData({
-          plan: plan.value,
-          role: role.value,
-          fullName: fullName.value
-        })
-        .track()
+      // tracker.signUp
+      //   .submittedAdditionalData({
+      //     plan: plan.value,
+      //     role: role.value,
+      //     fullName: values.fullName
+      //   })
+      //   .track()
+
+      // For pro/scale plans, emit event to proceed to checkout step
+      emit('proceedToCheckout')
+      loading.value = false
     } catch (err) {
       const errors = JSON.parse(err)
       toast.add({ severity: 'error', detail: errors.errorMessage, summary: 'Error' })
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
-      router.push({ name: 'home' })
       loading.value = false
     }
   }
+
+  const emit = defineEmits(['proceedToCheckout'])
 
   defineExpose({
     submitForm,

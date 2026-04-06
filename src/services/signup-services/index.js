@@ -4,6 +4,7 @@ import { listCountriesService } from './list-countries-service'
 import { postAdditionalDataService } from './post-additional-data-service'
 import { patchFullnameService } from './patch-fullname-service'
 import { updateAccountInfoService } from './update-account-info-service'
+import { createCheckoutSessionService } from './create-checkout-session-service'
 
 export {
   signupService,
@@ -11,5 +12,6 @@ export {
   listCountriesService,
   postAdditionalDataService,
   patchFullnameService,
-  updateAccountInfoService
+  updateAccountInfoService,
+  createCheckoutSessionService
 }

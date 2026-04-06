@@ -5,12 +5,24 @@ const STORAGE_KEY = 'signup_plan_params'
 const DEFAULT_EXPIRATION_DAYS = 15
 
 const VALID_PLANS = ['hobby', 'scale', 'pro']
-const VALID_BILLING_CYCLES = ['month', 'year']
+const VALID_BILLING_CYCLES = ['monthly', 'yearly']
+
+// Shared state (singleton-style)
+const _plan = ref(null)
+const _billingCycle = ref(null)
+const _cupom = ref(null)
+
+// Active router context (refreshed on each usePlans call)
+const activeRoute = ref(null)
+const activeRouter = ref(null)
+
+// Ensure sync watcher is registered only once
+let hasSyncWatcher = false
 
 /**
  * @typedef {Object} PlanParams
  * @property {string|null} plan - The selected plan (hobby, scale, pro)
- * @property {string|null} billingCycle - The billing cycle (month, year)
+ * @property {string|null} billingCycle - The billing cycle (monthly, yearly)
  * @property {string|null} cupom - The coupon code
  */
 
@@ -24,10 +36,8 @@ export function usePlans() {
   const route = useRoute()
   const router = useRouter()
 
-  // Internal state
-  const _plan = ref(null)
-  const _billingCycle = ref(null)
-  const _cupom = ref(null)
+  activeRoute.value = route
+  activeRouter.value = router
 
   /**
    * Validates if a plan value is valid
@@ -74,7 +84,7 @@ export function usePlans() {
   const saveToStorage = () => {
     const data = {
       plan: _plan.value,
-      'billing-cycle': _billingCycle.value,
+      billingCycle: _billingCycle.value,
       cupom: _cupom.value,
       expiresAt: getExpirationTimestamp()
     }
@@ -98,7 +108,7 @@ export function usePlans() {
 
       return {
         plan: data.plan || null,
-        billingCycle: data['billing-cycle'] || null,
+        billingCycle: data.billingCycle || null,
         cupom: data.cupom || null
       }
     } catch {
@@ -120,15 +130,23 @@ export function usePlans() {
    * @returns {PlanParams|null}
    */
   const readFromUrl = () => {
-    const query = route.query
+    const currentRoute = activeRoute.value
+    if (!currentRoute) return null
+
+    const query = currentRoute.query
     const urlParams = {}
 
     if (query.plan && isValidPlan(query.plan)) {
       urlParams.plan = query.plan
     }
 
-    if (query['billing-cycle'] && isValidBillingCycle(query['billing-cycle'])) {
-      urlParams.billingCycle = query['billing-cycle']
+    const billingCycleQuery = query['billing-cycle'] ?? query.billingCycle
+    const normalizedBillingCycle = Array.isArray(billingCycleQuery)
+      ? billingCycleQuery[0]
+      : billingCycleQuery
+
+    if (typeof normalizedBillingCycle === 'string' && isValidBillingCycle(normalizedBillingCycle)) {
+      urlParams.billingCycle = normalizedBillingCycle
     }
 
     if (query.cupom && typeof query.cupom === 'string') {
@@ -142,7 +160,12 @@ export function usePlans() {
    * Sync params to URL query string
    */
   const syncToUrl = async () => {
-    const currentQuery = { ...route.query }
+    const currentRoute = activeRoute.value
+    const currentRouter = activeRouter.value
+
+    if (!currentRoute || !currentRouter) return
+
+    const currentQuery = { ...currentRoute.query }
     const newQuery = { ...currentQuery }
 
     // Update or remove plan
@@ -152,11 +175,19 @@ export function usePlans() {
       delete newQuery.plan
     }
 
-    // Update or remove billing-cycle
+    // Update or remove billingCycle (canonical URL param: billing-cycle)
     if (_billingCycle.value) {
       newQuery['billing-cycle'] = _billingCycle.value
-    } else if (currentQuery['billing-cycle']) {
-      delete newQuery['billing-cycle']
+      if (currentQuery.billingCycle) {
+        delete newQuery.billingCycle
+      }
+    } else {
+      if (currentQuery['billing-cycle']) {
+        delete newQuery['billing-cycle']
+      }
+      if (currentQuery.billingCycle) {
+        delete newQuery.billingCycle
+      }
     }
 
     // Update or remove cupom
@@ -170,8 +201,8 @@ export function usePlans() {
     const queryChanged = JSON.stringify(currentQuery) !== JSON.stringify(newQuery)
 
     if (queryChanged) {
-      await router.replace({
-        path: route.path,
+      await currentRouter.replace({
+        path: currentRoute.path,
         query: newQuery
       })
     }
@@ -276,13 +307,17 @@ export function usePlans() {
   }))
 
   // Watch for changes and sync to URL automatically
-  watch(
-    [_plan, _billingCycle, _cupom],
-    () => {
-      syncToUrl()
-    },
-    { deep: true }
-  )
+  if (!hasSyncWatcher) {
+    watch(
+      [_plan, _billingCycle, _cupom],
+      () => {
+        syncToUrl()
+      },
+      { deep: true }
+    )
+
+    hasSyncWatcher = true
+  }
 
   return {
     // State (reactive)
