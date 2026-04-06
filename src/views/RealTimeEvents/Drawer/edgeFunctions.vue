@@ -2,15 +2,14 @@
   import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
+  import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TableEvents from './tableEvents.vue'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from '@aziontech/webkit/tabview'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
-  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
 
-  defineOptions({ name: 'DrawerEventsFunctions' })
+  defineOptions({ name: 'drawer-events-functions-console' })
 
   const props = defineProps({
     loadService: {
@@ -18,7 +17,6 @@
       required: true
     }
   })
-
   const details = ref({})
   const showDrawer = ref(false)
   const loading = ref(false)
@@ -28,28 +26,34 @@
     loading.value = true
 
     try {
-      const response = await props.loadService(item)
-      details.value = response
+      details.value = await props.loadService(item)
     } finally {
       loading.value = false
     }
   }
+
+  watch(
+    () => showDrawer.value,
+    (value) => {
+      if (!value) {
+        details.value = {}
+      }
+    }
+  )
 
   const getValueByKey = (key) => {
     const item = details.value.data?.find((obj) => obj.key === key)
     return item ? item.value : '-'
   }
 
-  watch(showDrawer, (isVisible) => {
-    if (!isVisible) details.value = {}
-  })
-
   const title = computed(() => {
-    if (!details.value.functionLanguage) return 'More Details'
-    return `More Details: Function Language - ${details.value.functionLanguage}`
+    if (!details.value.lineSource) return 'More Details'
+    return `More Details: Line Source - ${details.value.lineSource}`
   })
 
-  defineExpose({ openDetailDrawer })
+  defineExpose({
+    openDetailDrawer
+  })
 </script>
 
 <template>
@@ -72,47 +76,14 @@
               hideDivider
             >
               <template #body>
-                <div class="gap-8 flex flex-col sm:flex-row w-full">
-                  <TextInfo
-                    label="Functions List"
-                    class="w-full sm:w-5/12 flex-1"
-                  >
-                    <ul>
-                      <li
-                        :key="index"
-                        v-for="(functionType, index) in getValueByKey('edgeFunctionsList')"
-                      >
-                        {{ functionType }}
-                      </li>
-                    </ul>
-                  </TextInfo>
-                  <BigNumber
-                    class="flex-1"
-                    label="Functions Time"
-                    sufix="s"
-                    :tooltipMessage="edgeFunctionsTime"
-                    >{{ getValueByKey('edgeFunctionsTime') }}</BigNumber
-                  >
-                </div>
-
-                <Divider />
-
                 <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-                  <div class="flex flex-col gap-3 flex-1">
-                    <TextInfo label="Functions Initiator Type List">
-                      {{ getValueByKey('edgeFunctionsInitiatorTypeList') }}
-                    </TextInfo>
-                    <TextInfo label="Functions Instance ID List">
-                      {{ getValueByKey('edgeFunctionsInstanceIdList') }}
-                    </TextInfo>
-                    <TextInfo label="Functions Solution ID">
-                      {{ getValueByKey('edgeFunctionsSolutionId') }}
-                    </TextInfo>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Line">{{ getValueByKey('line') }}</TextInfo>
+                    <TextInfo label="ID">{{ getValueByKey('id') }}</TextInfo>
                   </div>
                   <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                    <TextInfo label="Virtual Host ID">{{
-                      getValueByKey('virtualHostId')
-                    }}</TextInfo>
+                    <TextInfo label="Solution ID">{{ getValueByKey('solutionId') }}</TextInfo>
+                    <TextInfo label="Function ID">{{ getValueByKey('functionId') }}</TextInfo>
                     <TextInfo label="Configuration ID">{{
                       getValueByKey('configurationId')
                     }}</TextInfo>
