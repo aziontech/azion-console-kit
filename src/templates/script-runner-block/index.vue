@@ -247,8 +247,10 @@
       },
 
       scrollScriptRunnerLogs() {
-        const positionY = this.$refs.runner.scrollHeight
-        this.$refs.runner.scrollTo(0, positionY)
+        if (this.$refs.runner) {
+          const positionY = this.$refs.runner.scrollHeight
+          this.$refs.runner.scrollTo(0, positionY)
+        }
       }
     },
 
