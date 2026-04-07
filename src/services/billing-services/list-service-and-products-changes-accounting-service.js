@@ -126,26 +126,27 @@ const PRODUCT_NAMES = {
 
 const METRIC_SLUGS = {
   application_accelerator_data_transfer: {
-    title: 'Application Accelerator Data Transfer (per GB)',
+    title: 'Application Accelerator Data Transfer',
     unit: 'GB'
   },
   application_requests: { title: 'Applications Requests' },
   bot_manager_invocations: { title: 'Bot Manager Requests' },
   cache_purges: { title: 'Cache Purges' },
-  compute_time: { title: 'Edge Functions Compute Time (per 1,000 seconds)', unit: 'ms' },
+  compute_time: { title: 'Edge Functions Compute Time', unit: 'ms' },
   connector_load_balancer_data_transfer: {
-    title: 'Connector Load Balancer Data Transfer (per GB)',
+    title: 'Connector Load Balancer Data Transfer',
     unit: 'GB'
   },
   connector_shielded_connectors: {
-    title: 'Connector Origin Shield Shielded Connectors (per Unit)'
+    title: 'Connector Origin Shield Shielded Connectors ',
+    unit: 'Unit'
   },
   data_ingested: { title: 'Data Ingested', unit: 'GB' },
   data_scan: { title: 'Data Scan', unit: 'GB' },
   data_stream_data_streamed: { title: 'Data Streamed', unit: 'GB' },
   data_stream_data_transfer: { title: 'Data Stream Data Transfer' },
   data_stream_requests: { title: 'Data Stream Requests' },
-  data_transferred: { title: 'Total Data Transferred (per GB)', unit: 'GB' },
+  data_transferred: { title: 'Total Data Transferred', unit: 'GB' },
   ddos_protection_20gbps: { title: 'DDoS Protection 20 Gbps - FEE' },
   ddos_protection_50gbps: { title: 'DDoS Protection 50 Gbps - FEE' },
   ddos_protection_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
@@ -161,23 +162,23 @@ const METRIC_SLUGS = {
   hosted_zones: { title: 'Hosted Zones' },
   image_processor_images: { title: 'Images' },
   images_processed: { title: 'Images Processed' },
-  invocations: { title: 'Edge Functions Invocations (per Million)' },
+  invocations: { title: 'Edge Functions Invocations', unit: 'M' },
   live_ingest_data_ingestion: { title: 'Live Ingest Data Ingestion' },
   load_balancer_data_transferred: { title: 'Load Balancer Data Transfer', unit: 'GB' },
   network_layer_protection_requests: { title: 'Total Requests' },
   object_storage_class_a_operations: { title: 'Edge Storage Class A Operations' },
   object_storage_class_b_operations: { title: 'Edge Storage Class B Operations' },
   object_storage_class_c_operations: { title: 'Edge Storage Class C Operations' },
-  realtime_events_data_scan: { title: 'Real-Time Events - Data Scan (per GB)', unit: 'GB' },
-  realtime_events_storage: { title: 'Real-Time Events - Storage Data (per GB)', unit: 'GB' },
+  realtime_events_data_scan: { title: 'Real-Time Events - Data Scan', unit: 'GB' },
+  realtime_events_storage: { title: 'Real-Time Events - Storage Data', unit: 'GB' },
   requests: { title: 'Total Requests' },
   storage: { title: 'Storage', unit: 'GB' },
-  tiered_cache_data_transferred: { title: 'L2 Caching Total Data Transfer (per GB)', unit: 'GB' },
+  tiered_cache_data_transferred: { title: 'L2 Caching Total Data Transfer', unit: 'GB' },
   waf_exceptions_rules: { title: 'WAF - Exceptions Rules' },
   waf_requests: { title: 'WAF - Requests' },
   waf_rule_sets: { title: 'WAF - Rule Sets' },
-  workload_data_transfer: { title: 'Workload - Data Transfer (per GB)', unit: 'GB' },
-  workload_workloads: { title: 'Workload - Workloads (per Unit)', unit: 'Unit' }
+  workload_data_transfer: { title: 'Workload - Data Transfer', unit: 'GB' },
+  workload_workloads: { title: 'Workload - Workloads', unit: 'Unit' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {

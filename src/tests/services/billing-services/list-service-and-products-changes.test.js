@@ -175,7 +175,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Data Transferred (per GB)',
+            service: 'Total Data Transferred',
             slug: 'data_transferred',
             quantity: '1.727 GB',
             price: formatCurrencyString('BRL', 1.52),
