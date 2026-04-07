@@ -21,9 +21,6 @@ module.exports = {
   core: {
     disableTelemetry: true,
   },
-  features: {
-    storyStoreV7: true,
-  },
   viteFinal: async (config) => {
     // Add Vue plugin to handle .vue SFC files
     config.plugins = config.plugins || [];
