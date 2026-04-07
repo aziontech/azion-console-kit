@@ -40,7 +40,7 @@
 
 <script setup>
   import { ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -49,7 +49,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'

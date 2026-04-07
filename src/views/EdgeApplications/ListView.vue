@@ -3,7 +3,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'

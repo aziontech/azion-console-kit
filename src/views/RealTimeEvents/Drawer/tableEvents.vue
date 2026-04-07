@@ -63,10 +63,10 @@
 </template>
 <script setup>
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
-  import { FilterMatchMode } from 'primevue/api'
-  import InputText from 'primevue/inputtext'
+  import DataTable from '@aziontech/webkit/datatable'
+  import Column from '@aziontech/webkit/column'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
+  import InputText from '@aziontech/webkit/inputtext'
 
   import { ref } from 'vue'
 

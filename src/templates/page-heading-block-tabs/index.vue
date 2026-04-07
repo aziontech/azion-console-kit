@@ -41,7 +41,7 @@
 </template>
 
 <script>
-  import Breadcrumb from 'primevue/breadcrumb'
+  import Breadcrumb from '@aziontech/webkit/breadcrumb'
 
   export default {
     name: 'PageHeadingBlock',

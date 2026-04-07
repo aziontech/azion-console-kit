@@ -36,8 +36,8 @@
 <script setup>
   import { ref } from 'vue'
 
-  import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeMenu from '@aziontech/webkit/menu'
 
   defineOptions({ name: 'navbar-notiication-block' })
 

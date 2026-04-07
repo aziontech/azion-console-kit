@@ -90,10 +90,10 @@
 
 <script setup>
   import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InputNumber from '@aziontech/webkit/inputnumber'
+  import InputSwitch from '@aziontech/webkit/inputswitch'
   import { convertUnitToMilliseconds } from '@/helpers'
   import {
     createRelativeRange,

@@ -113,10 +113,10 @@
   import { storeToRefs } from 'pinia'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Listbox from 'primevue/listbox'
-  import Checkbox from 'primevue/checkbox'
+  import PrimeButton from '@aziontech/webkit/button'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import Listbox from '@aziontech/webkit/listbox'
+  import Checkbox from '@aziontech/webkit/checkbox'
   import {
     listServiceAndProductsChangesService,
     listServiceAndProductsChangesAccountingService,

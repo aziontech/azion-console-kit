@@ -3,7 +3,7 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })

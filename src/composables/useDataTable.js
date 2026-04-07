@@ -1,9 +1,9 @@
-import { FilterMatchMode } from 'primevue/api'
+import { FilterMatchMode } from '@aziontech/webkit/api'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDeleteDialog } from '@/composables/useDeleteDialog'
-import { useDialog } from 'primevue/usedialog'
-import { useToast } from 'primevue/usetoast'
+import { useDialog } from '@aziontech/webkit/use-dialog'
+import { useToast } from '@aziontech/webkit/use-toast'
 import { useTableDefinitionsStore } from '@/stores/table-definitions'
 import { getCsvCellContentFromRowData } from '@/helpers'
 

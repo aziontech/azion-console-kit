@@ -68,12 +68,12 @@
 
 <script setup>
   import { ref, inject, computed, onMounted, watch } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
   // import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   // import { useAccountStore } from '@/stores/account'
   import { usePlans } from '@/composables/usePlans'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from '@aziontech/webkit/skeleton'

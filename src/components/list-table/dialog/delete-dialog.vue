@@ -97,12 +97,12 @@
 <script setup>
   import { computed, ref, watch, inject } from 'vue'
   import { useField, useForm } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
-  import InputText from 'primevue/inputtext'
-  import Message from 'primevue/message'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Message from '@aziontech/webkit/message'
 
   const emit = defineEmits(['successfullyDeleted'])
 

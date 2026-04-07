@@ -8,16 +8,16 @@
 
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import MultiSelect from 'primevue/multiselect'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import MultiSelect from '@aziontech/webkit/multiselect'
 
   import advancedFilter from '@/templates/advanced-filter'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import PrimeTag from 'primevue/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { wafService } from '@/services/v2/waf/waf-service'

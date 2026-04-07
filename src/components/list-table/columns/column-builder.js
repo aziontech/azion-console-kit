@@ -1,5 +1,5 @@
 import { h } from 'vue'
-import Tag from 'primevue/tag'
+import Tag from '@aziontech/webkit/tag'
 
 // Consolidated webkit components
 import {

@@ -5,7 +5,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'

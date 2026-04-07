@@ -2,7 +2,7 @@
   import { computed, useSlots } from 'vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table' })
