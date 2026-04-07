@@ -96,6 +96,8 @@ export const sessionManager = {
     hasPrefetched = false
     resetCacheSync()
     await clearAllData()
+  },
+  notifySwitchAccountComplete() {
     sendSwitchAccountBroadcast()
   },
   async logout() {

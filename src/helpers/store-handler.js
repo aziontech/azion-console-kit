@@ -30,6 +30,5 @@ onSwitchAccount(() => {
     return
   }
 
-  useAccountStore().resetAccount()
-  window.location.assign(window.location.href)
+  window.location.reload()
 })
