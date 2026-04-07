@@ -34,8 +34,8 @@ const azionTheme = create({
   inputBorderRadius: 4,
 
   // Brand
-  brandTitle: 'Azion WebKit',
-  brandUrl: 'https://www.azion.com',
+  brandTitle: 'Console Storybook',
+  brandUrl: 'https://storybook-console.azion.app',
   brandImage: undefined,
   brandTarget: '_self',
 });
