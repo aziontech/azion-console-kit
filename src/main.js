@@ -6,6 +6,10 @@ import '@aziontech/theme'
 import '@aziontech/icons'
 import '@aziontech/webkit/styles/country-flags'
 
+// Inject CSS variables for semantic tokens
+import { injectCssVars } from '@aziontech/theme/tokens'
+injectCssVars()
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
