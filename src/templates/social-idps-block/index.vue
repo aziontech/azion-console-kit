@@ -34,9 +34,9 @@
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
   import socialIdpsData from '@/helpers/social-idps'
 

@@ -1,7 +1,7 @@
 <script setup>
   import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
-  import Calendar from 'primevue/calendar'
-  import Dropdown from 'primevue/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import { computed, onMounted, onUnmounted, ref, watch, inject } from 'vue'
 
   const props = defineProps({

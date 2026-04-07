@@ -1,22 +1,22 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import CreateDrawerBlock from '@/templates/create-drawer-block'
   import FormFieldsCredential from './FormFields/FormFieldsCredential.vue'
   import CopyCredentialDialog from './Dialog/CopyCredentialDialog.vue'
   import { ref } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import * as yup from 'yup'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
 
   const { getBucketSelected } = useEdgeStorage()
 
   const dialog = useDialog()
-  const listTableBlockRef = ref()
   const showCreateCredentialDrawer = ref(false)
   const bucketSelected = getBucketSelected()
+  const listTableRef = ref(null)
 
   const listCredentialsService = async (params = {}) => {
     return await edgeStorageService.listCredentials(bucketSelected, params)
@@ -50,7 +50,7 @@
         credential: response.data
       },
       onClose: () => {
-        listTableBlockRef.value?.reload()
+        listTableRef.value?.reload()
       }
     })
   }
@@ -69,7 +69,7 @@
     }
   ]
 
-  const columns = [
+  const credentialColumns = [
     {
       field: 'name',
       header: 'Name'
@@ -136,19 +136,16 @@
 
 <template>
   <div class="flex flex-col gap-8">
-    <ListTableBlock
-      ref="listTableBlockRef"
+    <ListTable
+      ref="listTableRef"
       :listService="listCredentialsService"
-      :columns="columns"
+      :columns="credentialColumns"
       :actions="actions"
-      tableName="credentials"
-      :isTabs="true"
-      :editInDrawer="false"
-      emptyListMessage="No credentials found"
-      :paginator="true"
       :enableEditClick="false"
-      default-ordering-field-name="-last_modified"
+      defaultOrderingFieldName="-last_modified"
       exportFileName="Credentials"
+      emptyListMessage="No credentials found"
+      isTabs
       :emptyBlock="{
         title: 'No credentials yet',
         description:
@@ -165,7 +162,7 @@
           data-testid="create_credential_button_empty"
         />
       </template>
-    </ListTableBlock>
+    </ListTable>
 
     <CreateDrawerBlock
       v-if="showCreateCredentialDrawer"

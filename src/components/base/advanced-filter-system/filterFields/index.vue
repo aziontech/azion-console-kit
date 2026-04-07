@@ -31,8 +31,8 @@
 
 <script setup>
   import { ref, defineModel } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
+  import PrimeButton from '@aziontech/webkit/button'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import FilterPanel from './filterPanel/index.vue'
 
   defineOptions({ name: 'FilterFields' })

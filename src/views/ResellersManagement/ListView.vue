@@ -1,13 +1,13 @@
 <script setup>
+  import { computed, ref, onBeforeMount } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
   import { useAccountStore } from '@/stores/account'
   import { useRouter } from 'vue-router'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, onBeforeMount } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'reseller-management-view' })
 
@@ -72,6 +72,13 @@
   const listAccountsResellerDecorator = async (params) => {
     return await listAccountsService({ account_type: 'reseller', ...params })
   }
+
+  const hasContentToList = ref(true)
+  const frozenColumns = ['name']
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
 </script>
 
 <template>
@@ -92,23 +99,24 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
         :listService="listAccountsResellerDecorator"
         :columns="getColumns"
-        emptyListMessage="No reseller accounts found."
         editPagePath="/management/edit"
-        enableEditClick
-        :frozen-columns="['name']"
+        :enableEditClick="true"
         exportFileName="Reseller Management"
         :csvMapper="csvMapper"
-        hideLastModifiedColumn
+        :lazy="true"
+        :frozenColumns="frozenColumns"
+        :hideLastModifiedColumn="true"
+        emptyListMessage="No reseller accounts found."
         :emptyBlock="{
           title: 'No Resellers yet',
           description: 'Create your first reseller account.',
           createButtonLabel: 'Reseller',
-          createPagePath: 'management/create',
-          documentationService: documentationService
+          createPagePath: 'management/create'
         }"
+        @on-load-data="handleLoadData"
       />
     </template>
   </ContentBlock>

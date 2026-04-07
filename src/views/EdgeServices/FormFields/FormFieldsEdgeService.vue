@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
   import { useField } from 'vee-validate'

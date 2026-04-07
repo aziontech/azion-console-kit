@@ -30,8 +30,8 @@
   </PrimeDialog>
 </template>
 <script setup>
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { azionOnboardingWindowOpener } from '@/helpers'

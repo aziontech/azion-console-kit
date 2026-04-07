@@ -19,5 +19,5 @@
 </template>
 
 <script setup>
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
 </script>

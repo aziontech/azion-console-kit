@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'

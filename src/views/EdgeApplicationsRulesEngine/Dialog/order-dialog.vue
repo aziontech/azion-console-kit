@@ -61,8 +61,8 @@
 
 <script setup>
   import { inject, computed } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
   import ReorderedRules from './components/ReorderedRules.vue'
 
   const dialogRef = inject('dialogRef')

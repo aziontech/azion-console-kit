@@ -4,14 +4,14 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
   import EditViewSkeleton from '@/views/EdgeNode/components/EditViewSkeleton.vue'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'tabs-edge-node' })

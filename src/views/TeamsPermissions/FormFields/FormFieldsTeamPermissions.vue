@@ -1,8 +1,8 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { watch, ref, onMounted } from 'vue'
-  import PickList from 'primevue/picklist'
-  import Skeleton from 'primevue/skeleton'
+  import PickList from '@aziontech/webkit/picklist'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { useField } from 'vee-validate'
   import LabelBlock from '@aziontech/webkit/label'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'

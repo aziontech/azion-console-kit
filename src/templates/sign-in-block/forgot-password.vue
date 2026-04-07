@@ -95,14 +95,14 @@
 </template>
 
 <script setup>
-  import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
-  import PrimeBadge from 'primevue/badge'
+  import InputText from '@aziontech/webkit/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeBadge from '@aziontech/webkit/badge'
 
   import * as yup from 'yup'
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   const SUBMIT_TIMER = 60
 

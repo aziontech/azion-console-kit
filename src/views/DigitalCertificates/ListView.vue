@@ -1,17 +1,16 @@
 <script setup>
   import { ref, computed, inject, watch } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
-  import SelectButton from 'primevue/selectbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
+  import ListTable from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const listTableBlock = ref(null)
 
   defineOptions({ name: 'digital-certificates-view' })
 
@@ -22,7 +21,6 @@
     handleClickToCreate,
     listService,
     deleteService,
-    firstLoadData,
     setFirstLoadData
   } = useDigitalCertificate()
 
@@ -44,6 +42,7 @@
   ]
   const digitalCertificateTypeSelected = ref('Certificates')
   const optionsSelectButton = ref(['Certificates', 'CRL'])
+  const listTableRef = ref()
 
   const items = [
     {
@@ -316,7 +315,7 @@
   })
 
   const changeListServiceByCertificateType = () => {
-    listTableBlock.value?.reload({}, listService.value)
+    listTableRef.value?.reload?.({}, listService.value)
   }
 
   watch(
@@ -368,7 +367,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Certificate Manager"
-        description="Manage TLS certificates used to secure traffic on Azion’s products."
+        description="Manage TLS certificates used to secure traffic on Azion's products."
       >
         <template #default>
           <SelectButton
@@ -385,24 +384,20 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
         :listService="listService"
         :columns="getColumns"
-        editPagePath="/digital-certificates/edit"
-        createPagePath="digital-certificates/create"
-        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No digital certificates found."
         :actions="actions"
-        @on-before-go-to-add-page="handleTrackEventGoToCreate"
-        @on-before-go-to-edit="handleTrackEventGoToEdit"
-        ref="listTableBlock"
-        :defaultOrderingFieldName="'-last_modified'"
+        createPagePath="digital-certificates/create"
+        editPagePath="/digital-certificates/edit"
+        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
+        defaultOrderingFieldName="-last_modified"
         :hiddenByDefault="hiddenColumns"
-        :firstLoadData="firstLoadData"
-        :frozenColumns="['name']"
         exportFileName="Certificate Manager"
         :csvMapper="csvMapper"
+        :lazy="true"
+        :frozenColumns="['name']"
         :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Certificates yet',
@@ -411,8 +406,10 @@
           createButtonLabel: 'Certificate Manager',
           documentationService: documentationBuildProducts.certificateManager
         }"
-      >
-      </FetchListTableBlock>
+        @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
+      />
     </template>
   </ContentBlock>
 </template>

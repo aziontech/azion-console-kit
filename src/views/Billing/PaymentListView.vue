@@ -1,40 +1,44 @@
 <template>
-  <ListTableBlock
-    ref="listPaymentMethodsRef"
+  <div
     v-if="hasContentToList"
-    :enableEditClick="false"
-    isTabs
-    :defaultOrderingFieldName="'is_default'"
-    :apiFields="API_FIELDS"
-    :allowedFilters="allowedFilters"
-    :columns="paymentsColumns"
-    :listService="listCreditCards"
-    @on-load-data="handleLoadData"
-    :actions="actionsRow"
-    emptyListMessage="No payment method found."
-    exportFileName="Payment Methods"
+    class="max-w-full mt-4"
+    data-testid="data-table-container"
   >
-    <template #addButton>
-      <div class="flex gap-4">
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Credit"
-          size="small"
-          @click="openDrawerAddCreditWithValidation"
-          data-testid="payment-methods__add-credit__button"
-          outlined
-        />
-        <PrimeButton
-          icon="pi pi-plus"
-          data-testid="payment-methods__add-payment-method__button"
-          severity="secondary"
-          size="small"
-          @click="openDrawerPaymentMethod"
-          label="Payment Method"
-        />
-      </div>
-    </template>
-  </ListTableBlock>
+    <ListTable
+      ref="listTableRef"
+      :listService="listCreditCards"
+      :columns="paymentsColumns"
+      :actions="actionsRow"
+      :enableEditClick="false"
+      defaultOrderingFieldName="is_default"
+      :apiFields="API_FIELDS"
+      exportFileName="Payment Methods"
+      :lazy="true"
+      emptyListMessage="No payment method found."
+      @on-load-data="handleLoadData"
+    >
+      <template #header-actions>
+        <div class="flex gap-4">
+          <PrimeButton
+            icon="pi pi-plus"
+            label="Credit"
+            size="small"
+            @click="openDrawerAddCreditWithValidation"
+            data-testid="payment-methods__add-credit__button"
+            outlined
+          />
+          <PrimeButton
+            icon="pi pi-plus"
+            data-testid="payment-methods__add-payment-method__button"
+            severity="secondary"
+            size="small"
+            @click="openDrawerPaymentMethod"
+            label="Payment Method"
+          />
+        </div>
+      </template>
+    </ListTable>
+  </div>
   <EmptyResultsBlock
     v-else
     title="No payment method has been added"
@@ -53,10 +57,10 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PrimeButton from 'primevue/button'
-  import { useToast } from 'primevue/usetoast'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import PrimeButton from '@aziontech/webkit/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
@@ -70,6 +74,7 @@
   ])
   const hasContentToList = ref(true)
   const toast = useToast()
+  const listTableRef = ref(null)
 
   const props = defineProps({
     documentPaymentMethodService: {
@@ -94,8 +99,6 @@
     return body
   }
 
-  const listPaymentMethodsRef = ref('')
-
   const openDrawerAddCreditWithValidation = () => {
     if (props.cardDefault.cardData) {
       emit('openDrawerAddCredit')
@@ -114,25 +117,6 @@
     'card_expiration_year',
     'is_default',
     'card_last_4_digits'
-  ]
-
-  const allowedFilters = [
-    {
-      header: 'Card Holder',
-      field: 'card_holder'
-    },
-    {
-      header: 'Brand',
-      field: 'card_brand'
-    },
-    {
-      header: 'Last 4 digits',
-      field: 'card_last_4_digits'
-    },
-    {
-      header: 'Default',
-      field: 'is_default'
-    }
   ]
 
   const paymentsColumns = ref([
@@ -245,7 +229,7 @@
 
   const reloadList = async () => {
     if (hasContentToList.value) {
-      await listPaymentMethodsRef.value.reload()
+      await listTableRef.value?.reload()
       return
     }
     hasContentToList.value = true

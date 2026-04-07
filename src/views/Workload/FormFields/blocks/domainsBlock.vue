@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import InputText from 'primevue/inputtext'
+  import InputText from '@aziontech/webkit/inputtext'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldInputGroup from '@aziontech/webkit/field-input-group'
-  import CopyBlock from '@aziontech/webkit/copy-block'
+  import CopyBlock from '@aziontech/webkit/button-copy'
 
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'

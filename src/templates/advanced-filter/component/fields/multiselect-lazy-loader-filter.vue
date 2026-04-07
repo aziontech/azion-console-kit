@@ -46,9 +46,9 @@
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
-  import MultiSelect from 'primevue/multiselect'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import MultiSelect from '@aziontech/webkit/multiselect'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
 
   defineOptions({ name: 'multiSelectLazyLoaderFilter' })
 

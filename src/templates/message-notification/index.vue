@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed } from 'vue'
 
   defineOptions({

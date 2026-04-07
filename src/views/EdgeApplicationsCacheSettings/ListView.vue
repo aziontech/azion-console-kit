@@ -1,10 +1,11 @@
 <script setup>
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table/ListTable.vue'
   import Drawer from './Drawer'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -27,8 +28,8 @@
     }
   })
 
-  const listTableBlockRef = ref('')
   const drawerRef = ref('')
+  const listTableRef = ref(null)
 
   //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
   const CACHE_SETTING_API_FIELDS = []
@@ -60,10 +61,6 @@
   }
   const openEditDrawer = (item) => {
     drawerRef.value.openEditDrawer(item.id)
-  }
-
-  const reloadList = () => {
-    listTableBlockRef.value.reload()
   }
 
   const getColumns = computed(() => {
@@ -113,6 +110,14 @@
       .track()
   }
 
+  const reloadList = () => {
+    listTableRef.value?.reload()
+  }
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackClickToEdit()
+  }
+
   defineExpose({
     openCreateDrawer
   })
@@ -131,28 +136,29 @@
     @onSuccess="reloadList"
   />
 
-  <FetchListTableBlock
-    ref="listTableBlockRef"
+  <ListTable
+    ref="listTableRef"
     :listService="listCacheSettingsServiceWithDecorator"
     :columns="getColumns"
-    :editInDrawer="openEditDrawer"
-    @on-before-go-to-edit="handleTrackClickToEdit"
-    emptyListMessage="No cache settings found."
-    :actions="actions"
-    isTabs
-    :apiFields="CACHE_SETTING_API_FIELDS"
     :frozenColumns="['name']"
+    :editInDrawer="openEditDrawer"
+    :actions="actions"
+    :apiFields="CACHE_SETTING_API_FIELDS"
     exportFileName="Application Cache Settings"
-    hideLastModifiedColumn
+    :lazy="true"
+    :isTabs="true"
+    :hideLastModifiedColumn="true"
+    emptyListMessage="No cache settings found."
     :emptyBlock="{
       title: 'No cache settings yet',
       description:
         'Create your first cache setting to control how your content is stored and delivered.',
       createButtonLabel: 'Cache Setting',
       createPagePath: '/edge-applications/cache-settings/create',
-      documentationService: documentationService,
+      documentationService: props.documentationService,
       emptyListMessage: 'No cache settings found.'
     }"
+    @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
       <PrimeButton
@@ -163,5 +169,5 @@
         data-testid="edge-application-cache-settings-list__create-cache-settings__button"
       />
     </template>
-  </FetchListTableBlock>
+  </ListTable>
 </template>

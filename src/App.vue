@@ -1,5 +1,5 @@
 <script setup>
-  import DynamicDialog from 'primevue/dynamicdialog'
+  import DynamicDialog from '@aziontech/webkit/dynamic-dialog'
   import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
@@ -53,7 +53,7 @@
 
   watch(currentTheme, (theme) => {
     themeApply(theme)
-  })
+  }, { immediate: true })
 
   watch(account, () => {
     updateTrackingTraits()

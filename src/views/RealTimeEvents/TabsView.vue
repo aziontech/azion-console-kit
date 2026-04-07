@@ -36,8 +36,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
+  import TabView from '@aziontech/webkit/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import { GetRelevantField } from '@/modules/real-time-events/filters'
   import { FILTERS_RULES } from '@/helpers'
 
