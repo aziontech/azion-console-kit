@@ -120,7 +120,7 @@
     "start-server-and-test": "^2.0.0",
     "storybook": "^8.6.0",
     "tailwindcss": "^3.3.3",
-    "vite": "^5.4.21",
+    "vite": "^6.4.2",
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^0.33.0",
     "vitest-sonar-reporter": "^1.0.0"
