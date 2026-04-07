@@ -219,12 +219,16 @@
               title="Remove domain"
             />
           </div>
-          <small
-            v-if="domainsErrorMessage"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ domainsErrorMessage }}
-          </small>
+          <div class="max-w-lg">
+            <div class="!w-1/2">
+              <small
+                v-if="domainsErrorMessage"
+                class="p-error text-xs font-normal leading-tight"
+              >
+                {{ domainsErrorMessage }}
+              </small>
+            </div>
+          </div>
           <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
             <div class="flex w-1/2">
               <small class="text-xs text-color-secondary font-normal leading-5">

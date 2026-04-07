@@ -101,7 +101,7 @@ export const WorkloadAdapter = {
         }
       },
       domains,
-      workload_hostname_allow_access: payload.workloadHostnameAllowAccess
+      workload_domain_allow_access: payload.workloadHostnameAllowAccess
     }
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
