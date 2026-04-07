@@ -55,6 +55,7 @@ azion/
 .vulcan
 specs.json
 .opencode/
+.claude/
 CLAUDE.md
 AGENTS.md
 docs/ARCHITECTURE.md
