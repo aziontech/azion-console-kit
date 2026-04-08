@@ -8,21 +8,6 @@
  * Registration Pattern:
  * - Register queryFns by exact key or prefix pattern
  * - Lookup uses prefix matching (first matching pattern wins)
- *
- * Usage:
- * ```javascript
- * // Register a queryFn
- * prefetchRegistry.register(['application', 'all'], () => applicationService.list())
- *
- * // Register with parameter extraction
- * prefetchRegistry.register(
- *   ['application', 'detail'],
- *   (queryKey) => applicationService.getById(queryKey[2])
- * )
- *
- * // Lookup
- * const queryFn = prefetchRegistry.get(['application', 'detail', '123'])
- * ```
  */
 
 /**
