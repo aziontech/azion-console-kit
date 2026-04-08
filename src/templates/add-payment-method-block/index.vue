@@ -5,7 +5,7 @@
   import Sidebar from '@aziontech/webkit/sidebar'
   import { useThemeStore } from '@/stores/theme'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@aziontech/webkit/label'
   import { useScrollToError } from '@/composables/useScrollToError'

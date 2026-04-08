@@ -3,7 +3,7 @@
   import InputNumber from '@aziontech/webkit/inputnumber'
   import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import InputText from '@aziontech/webkit/inputtext'
   import { ref } from 'vue'
   import cardFlagBlock from '@templates/card-flag-block'

@@ -382,7 +382,7 @@
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { FilterMatchMode } from '@aziontech/webkit/api'
   import { useEdgeSQL } from './composable/useEdgeSQL'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import ConfirmDialog from '@aziontech/webkit/confirm-dialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
   import AlterColumn from './Dialog/AlterColumn.vue'

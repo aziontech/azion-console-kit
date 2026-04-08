@@ -6,7 +6,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Sidebar from '@aziontech/webkit/sidebar'
   import Tag from '@aziontech/webkit/tag'
   import { useField, useForm } from 'vee-validate'

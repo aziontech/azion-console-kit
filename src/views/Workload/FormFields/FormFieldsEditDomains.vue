@@ -11,7 +11,7 @@
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'

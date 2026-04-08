@@ -287,7 +287,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'

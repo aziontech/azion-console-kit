@@ -7,7 +7,7 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
