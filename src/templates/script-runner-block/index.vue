@@ -41,7 +41,7 @@
   </Accordion>
 </template>
 <script>
-  import Accordion from '@aziontech/webkit/accordion'
+  import Accordion from 'primevue/accordion'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
 

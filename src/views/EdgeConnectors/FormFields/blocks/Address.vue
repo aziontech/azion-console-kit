@@ -232,7 +232,7 @@
   import Tag from '@aziontech/webkit/tag'
   import Divider from '@aziontech/webkit/divider'
   import Card from '@aziontech/webkit/card'
-  import Accordion from '@aziontech/webkit/accordion'
+  import Accordion from 'primevue/accordion'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldNumber from '@aziontech/webkit/field-number'
