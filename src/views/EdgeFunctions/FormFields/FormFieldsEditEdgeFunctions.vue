@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
 
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'

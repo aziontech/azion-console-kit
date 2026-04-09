@@ -1,6 +1,6 @@
 <script setup>
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useField } from 'vee-validate'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { computed } from 'vue'

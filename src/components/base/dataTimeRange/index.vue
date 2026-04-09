@@ -140,7 +140,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import { createRelativeRange, COMMON_DATE_RANGES } from '@utils/date.js'
   import { shiftQuickRange } from './utils/quick-range-navigation'

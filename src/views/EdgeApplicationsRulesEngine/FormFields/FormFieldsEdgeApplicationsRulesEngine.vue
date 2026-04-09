@@ -18,7 +18,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from '@aziontech/webkit/divider'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeButton from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'

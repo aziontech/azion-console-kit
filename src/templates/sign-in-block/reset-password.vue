@@ -73,7 +73,7 @@
 
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FieldPassword from '@aziontech/webkit/field-password'
   import { useForm } from 'vee-validate'
   import { computed, ref } from 'vue'

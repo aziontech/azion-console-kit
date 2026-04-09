@@ -2,7 +2,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import Tag from '@aziontech/webkit/tag'
   import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'

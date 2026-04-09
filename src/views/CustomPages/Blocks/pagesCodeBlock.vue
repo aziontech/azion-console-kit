@@ -4,7 +4,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'

@@ -72,7 +72,7 @@
   import { useEdgeSQL } from '../composable/useEdgeSQL'
   import { useSqlFormatter } from '../composable/useSqlFormatter'
   import { computed } from 'vue'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   const toast = useToast()
   const { formatSql } = useSqlFormatter()

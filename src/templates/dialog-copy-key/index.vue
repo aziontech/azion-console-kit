@@ -77,7 +77,7 @@
 <script setup>
   import { computed, inject } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimePassword from '@aziontech/webkit/password'
   import CopyBlock from '@aziontech/webkit/button-copy'
   import PrimeButton from '@aziontech/webkit/button'

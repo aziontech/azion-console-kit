@@ -71,7 +71,7 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'

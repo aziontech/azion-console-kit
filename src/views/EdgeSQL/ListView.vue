@@ -1,7 +1,7 @@
 <script setup>
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'

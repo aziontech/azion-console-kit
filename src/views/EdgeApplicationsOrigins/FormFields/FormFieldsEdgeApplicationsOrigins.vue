@@ -8,7 +8,7 @@
   import InputNumber from '@aziontech/webkit/field-number'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
 
