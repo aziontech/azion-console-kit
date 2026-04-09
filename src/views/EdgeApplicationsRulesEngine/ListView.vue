@@ -616,7 +616,7 @@
 
       <template #groupheader="slotProps">
         <div
-          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer"
+          class="vertical-align-middle font-medium line-height-3 top-[-0.225rem] relative cursor-pointer inline-block"
           @click="toggleGroup(slotProps.data)"
         >
           {{ getObjectPath(slotProps.data, 'phase.content') }}
