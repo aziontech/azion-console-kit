@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ToastBlock from '@/templates/toast-block/index.vue';
 import { useToast } from 'primevue/usetoast';
 
@@ -63,6 +64,7 @@ const ToastTemplate = (args) => ({
         action: {
           primary: {
             label: 'Confirm',
+            // eslint-disable-next-line no-console
             callback: () => console.log('Confirmed')
           },
           secondary: {

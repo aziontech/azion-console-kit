@@ -88,7 +88,7 @@
           >
             <!-- Inlined SqlDatabaseList for results -->
             <div
-              class="sql-database-list w-full h-full flex flex-col min-h-0 flex-1"
+              class="sql-database-list w-full flex flex-col"
               :class="{ 'overflow-auto': resultsView !== 'json' }"
             >
               <DataTable
