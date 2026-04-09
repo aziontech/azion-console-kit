@@ -3,6 +3,8 @@ import { persister, pauseQueryPersistence } from '@/services/v2/base/query/query
 import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
+import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
@@ -47,14 +49,6 @@ const getPageSize = () => {
   }
 }
 
-const scheduleIdleTask = (callback) => {
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(callback)
-  } else {
-    setTimeout(callback, 1)
-  }
-}
-
 const prefetchInBackground = () => {
   const accountStore = useAccountStore()
 
@@ -64,35 +58,30 @@ const prefetchInBackground = () => {
 
   const pageSize = getPageSize()
 
-  scheduleIdleTask(async () => {
-    await Promise.allSettled([
-      solutionService.prefetchList(hasFlagBlockApiV4()),
-      edgeAppService.prefetchList(pageSize),
-      workloadService.prefetchList(pageSize),
-      edgeFirewallService.prefetchList(pageSize)
-    ])
-
-    Promise.allSettled([
-      variablesService.prefetchList(),
-      marketplaceService.prefetchMarketplace(),
-      edgeStorageService.prefetchList(pageSize),
-      edgeDNSService.prefetchList(pageSize),
-      edgeFunctionService.prefetchList(pageSize),
-      edgeConnectorsService.prefetchList(pageSize),
-      dataStreamService.prefetchList(pageSize),
-      wafService.prefetchList(pageSize),
-      edgeSQLService.prefetchList(pageSize),
-      teamPermissionService.prefetchList(pageSize),
-      networkListsService.prefetchList(pageSize),
-      digitalCertificatesService.prefetchList(pageSize),
-      digitalCertificatesCRLService.prefetchList(pageSize),
-      customPageService.prefetchList(pageSize),
-      usersService.prefetchList(pageSize),
-      personalTokenService.prefetchList(pageSize),
-      edgeServiceService.prefetchList(pageSize),
-      edgeNodeService.prefetchList(pageSize)
-    ])
-  })
+  schedulePrefetch([
+    () => solutionService.prefetchList(hasFlagBlockApiV4()),
+    () => edgeAppService.prefetchList(pageSize),
+    () => workloadService.prefetchList(pageSize),
+    () => edgeFirewallService.prefetchList(pageSize),
+    () => variablesService.prefetchList(),
+    () => marketplaceService.prefetchMarketplace(),
+    () => edgeStorageService.prefetchList(pageSize),
+    () => edgeDNSService.prefetchList(pageSize),
+    () => edgeFunctionService.prefetchList(pageSize),
+    () => edgeConnectorsService.prefetchList(pageSize),
+    () => dataStreamService.prefetchList(pageSize),
+    () => wafService.prefetchList(pageSize),
+    () => edgeSQLService.prefetchList(pageSize),
+    () => teamPermissionService.prefetchList(pageSize),
+    () => networkListsService.prefetchList(pageSize),
+    () => digitalCertificatesService.prefetchList(pageSize),
+    () => digitalCertificatesCRLService.prefetchList(pageSize),
+    () => customPageService.prefetchList(pageSize),
+    () => usersService.prefetchList(pageSize),
+    () => personalTokenService.prefetchList(pageSize),
+    () => edgeServiceService.prefetchList(pageSize),
+    () => edgeNodeService.prefetchList(pageSize)
+  ])
 }
 
 let hasPrefetched = false
@@ -102,14 +91,21 @@ export const sessionManager = {
     if (hasPrefetched) return
     hasPrefetched = true
     prefetchInBackground()
+
+    const accountStore = useAccountStore()
+    if (accountStore.isClientAccount) {
+      startCacheSync()
+    }
   },
   async switchAccount() {
     hasPrefetched = false
+    resetCacheSync()
     await clearAllData()
     sendSwitchAccountBroadcast()
   },
   async logout() {
     hasPrefetched = false
+    resetCacheSync()
     await clearAllData()
   }
 }

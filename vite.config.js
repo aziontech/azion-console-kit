@@ -14,6 +14,7 @@ const getConfig = () => {
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
+  const BEHOLDER_URL = env.VITE_BEHOLDER_URL
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -133,6 +134,9 @@ const getConfig = () => {
         '/appcues': createProxyConfig({
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
+        }),
+        '/sse': createProxyConfig({
+          target: BEHOLDER_URL
         })
       }
     }
