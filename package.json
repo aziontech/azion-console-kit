@@ -56,7 +56,7 @@
     "@vee-validate/yup": "^4.15.1",
     "@vueuse/core": "^10.11.1",
     "analytics": "^0.8.19",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
@@ -143,7 +143,7 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "d3-color": "^3.1.0",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "**/@jsonforms/**/ajv": "^8.18.0",
     "**/azion/**/ajv": "^8.18.0"
   },
