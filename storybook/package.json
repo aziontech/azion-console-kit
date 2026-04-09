@@ -6,8 +6,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "npx storybook dev -p 6006 -c .storybook",
-    "build": "npx storybook build -o dist -c .storybook",
+    "build": "storybook build -o dist -c .storybook",
+    "dev": "storybook dev -p 6006 -c .storybook",
     "preview": "npx http-server dist -p 6007"
   },
   "dependencies": {
