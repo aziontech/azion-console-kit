@@ -89,11 +89,13 @@ export const WithActionButtons = {
       {
         label: 'Save Changes',
         severity: 'primary',
+        // eslint-disable-next-line no-console
         onClick: () => console.log('Save clicked')
       },
       {
         label: 'Discard',
         severity: 'secondary',
+        // eslint-disable-next-line no-console
         onClick: () => console.log('Discard clicked')
       }
     ]

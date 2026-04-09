@@ -9,6 +9,7 @@ const DialogOnboardingSchedulingWrapper = {
     const dialogRef = ref({
       data: {},
       close: () => {
+        // eslint-disable-next-line no-console
         console.log('Dialog closed');
       }
     });

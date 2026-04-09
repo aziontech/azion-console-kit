@@ -9,7 +9,7 @@
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
-  
+
   defineOptions({ name: 'drawer-events-http-requests' })
 
   const props = defineProps({
