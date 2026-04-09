@@ -127,6 +127,11 @@ const getConfig = () => {
         '/appcues': createProxyConfig({
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
+        }),
+        // Local mock server for service-orders (strips /local_api prefix)
+        '/local_api': createProxyConfig({
+          target: 'http://localhost:3333',
+          rewrite: (path) => path.replace(/^\/local_api/, '')
         })
       }
     }

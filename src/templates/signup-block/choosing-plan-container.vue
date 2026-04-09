@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full mx-auto bg-surface h-[800px] rounded border surface-border">
+  <div class="w-fit mx-auto bg-surface h-[800px] rounded border surface-border">
     <div class="flex h-full min-h-0 overflow-hidden md:flex-row">
       <CheckoutPlanBlock
         ref="planBlockRef"

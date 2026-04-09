@@ -71,9 +71,11 @@
           >
             <div class="flex-1 min-w-0">
               <p class="text-[13px] font-semibold text-default leading-normal">
-                #BrazilMentioned: ThePrimeagen - 5% OFF
+                {{ appliedCoupon.code }} - {{ appliedCoupon.discountPreview?.value }}% OFF
               </p>
-              <p class="text-xs uppercase text-muted leading-normal mt-1">PRIMEAGEN</p>
+              <p class="text-xs uppercase text-muted leading-normal mt-1">
+                {{ appliedCoupon.code }}
+              </p>
             </div>
             <button
               type="button"
@@ -91,28 +93,38 @@
     <div class="bg-surface flex flex-col gap-2 px-6 py-4 border-t border-default">
       <div class="flex justify-between text-sm">
         <span class="text-muted">Subtotal</span>
-        <span class="text-default">${{ subtotal }}/{{ billingCycleLabel }}</span>
+        <span class="text-default">${{ formattedSubtotal }}/{{ billingCycleLabel }}</span>
       </div>
-      <div
-        v-if="discount > 0"
-        class="flex justify-between text-sm"
-      >
-        <span class="text-muted">Discount</span>
-        <div class="text-right">
-          <span class="text-success">-${{ discount }}/{{ billingCycleLabel }}</span>
-          <span
-            v-if="billingCycle === 'yearly'"
-            class="block text-xs text-muted"
-          >
-            Yearly Discount
-          </span>
+      <Transition name="applied-coupon-slide">
+        <div
+          v-if="yearlyDiscount > 0"
+          class="flex justify-between text-sm"
+        >
+          <span class="text-muted">Annual Discount</span>
+          <div class="text-right">
+            <span class="text-success">-${{ formattedYearlyDiscount }}/year</span>
+            <span class="block text-xs text-muted"> Yearly Discount </span>
+          </div>
         </div>
-      </div>
+      </Transition>
+      <Transition name="applied-coupon-slide">
+        <div
+          v-if="couponDiscount > 0"
+          class="flex justify-between text-sm"
+        >
+          <span class="text-muted">Coupon Discount</span>
+          <div class="text-right">
+            <span class="text-success"
+              >-${{ formattedCouponDiscount }}/{{ billingCycleLabel }}</span
+            >
+          </div>
+        </div>
+      </Transition>
       <div class="flex justify-between text-base font-semibold">
         <span class="text-default">Total</span>
         <span class="text-default">
           <span class="text-muted font-normal">$</span>
-          {{ total }}
+          {{ formattedTotal }}
           <span class="text-muted font-normal text-sm">/{{ billingCycleLabel }}</span>
         </span>
       </div>
@@ -125,6 +137,8 @@
   import Button from '@aziontech/webkit/button'
   import FieldInput from '@aziontech/webkit/field-text'
   import { usePlans } from '@/composables/usePlans'
+  import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
+  import { useValidateCoupon, getPlanPricing } from '@/composables/usePlansService'
 
   defineOptions({
     name: 'pricing-calculation-block'
@@ -141,42 +155,79 @@
   })
 
   const { initialize, billingCycle: sharedBillingCycle, cupom: sharedCupom, setParam } = usePlans()
-
-  const VALID_COUPON = 'THEPRIMEGEN'
-  const REQUEST_DELAY_MS = 3000
+  const { data: plans } = serviceOrdersService.useListPlansQuery()
+  const { mutate: validateCoupon, isPending: isValidatingCoupon } = useValidateCoupon()
 
   const billingCycle = ref('yearly')
   const couponCode = ref('')
-  const appliedCoupon = ref(false)
-  const isApplyingCoupon = ref(false)
+  const appliedCoupon = ref(null)
   const couponError = ref('')
 
-  const planPricing = {
-    pro: { monthly: 25, yearly: 300 },
-    scale: { monthly: 50, yearly: 600 }
-  }
+  const planPricing = computed(() => getPlanPricing(plans.value, props.plan))
 
   const planLabel = computed(() => (props.plan === 'pro' ? 'Pro Plan' : 'Scale Plan'))
 
   const subtotal = computed(() => {
-    return planPricing[props.plan]?.[billingCycle.value] || 0
+    // Monthly: subtotal = monthly price
+    // Yearly: subtotal = monthly * 12 (what it would cost if paid monthly for 12 months)
+    if (billingCycle.value === 'yearly') {
+      return (planPricing.value?.monthly || 0) * 12
+    }
+    return planPricing.value?.monthly || 0
+  })
+
+  const yearlyDiscount = computed(() => {
+    // Yearly discount = difference between (monthly * 12) and yearly
+    if (billingCycle.value === 'yearly') {
+      const monthlyEquivalent = (planPricing.value?.monthly || 0) * 12
+      const yearlyPrice = planPricing.value?.yearly || 0
+      return monthlyEquivalent - yearlyPrice
+    }
+    return 0
+  })
+
+  const basePlanPrice = computed(() => {
+    return billingCycle.value === 'yearly'
+      ? planPricing.value?.yearly || 0
+      : planPricing.value?.monthly || 0
+  })
+
+  const couponDiscount = computed(() => {
+    // Coupon discount (works for both monthly and yearly)
+    if (appliedCoupon.value?.valid && appliedCoupon.value?.discountPreview) {
+      const { type, value } = appliedCoupon.value.discountPreview
+      if (type === 'percent') {
+        return Math.round(basePlanPrice.value * (value / 100))
+      }
+      if (type === 'fixed') {
+        return value
+      }
+    }
+    return 0
   })
 
   const discount = computed(() => {
-    if (billingCycle.value === 'yearly') {
-      return Math.round(subtotal.value * 0.2)
-    }
-
-    return appliedCoupon.value ? Math.round(subtotal.value * 0.1) : 0
+    return yearlyDiscount.value + couponDiscount.value
   })
 
   const total = computed(() => {
-    return subtotal.value - discount.value
+    return basePlanPrice.value - couponDiscount.value
   })
 
   const billingCycleLabel = computed(() => {
     return billingCycle.value === 'monthly' ? 'month' : 'year'
   })
+
+  const formatPrice = (value) => {
+    return Number(value).toFixed(2)
+  }
+
+  const formattedSubtotal = computed(() => formatPrice(subtotal.value))
+  const formattedYearlyDiscount = computed(() => formatPrice(yearlyDiscount.value))
+  const formattedCouponDiscount = computed(() => formatPrice(couponDiscount.value))
+  const formattedTotal = computed(() => formatPrice(total.value))
+
+  const isApplyingCoupon = computed(() => isValidatingCoupon.value)
 
   const isCouponLocked = computed(() => {
     return appliedCoupon.value || isApplyingCoupon.value
@@ -190,31 +241,36 @@
     couponCode.value = value
   }
 
-  const submitCupom = async () => {
+  const submitCupom = () => {
     const coupon = couponCode.value.trim()
 
-    if (!coupon || isApplyingCoupon.value) return
+    if (!coupon || isValidatingCoupon.value) return
 
-    isApplyingCoupon.value = true
     couponError.value = ''
+    const plan = plans.value?.find((item) => item.sku.toLowerCase() === props.plan.toLowerCase())
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, REQUEST_DELAY_MS)
-    })
-
-    if (coupon === VALID_COUPON) {
-      appliedCoupon.value = true
-      couponError.value = ''
-    } else {
-      appliedCoupon.value = false
-      couponError.value = 'Invalid coupon code'
-    }
-
-    isApplyingCoupon.value = false
+    validateCoupon(
+      { code: coupon, planId: plan?.id },
+      {
+        onSuccess: (data) => {
+          if (data.valid) {
+            appliedCoupon.value = data
+            couponError.value = ''
+          } else {
+            appliedCoupon.value = null
+            couponError.value = data.reasons?.[0] || 'Invalid coupon code'
+          }
+        },
+        onError: () => {
+          appliedCoupon.value = null
+          couponError.value = 'Failed to validate coupon'
+        }
+      }
+    )
   }
 
   const removeCoupon = () => {
-    appliedCoupon.value = false
+    appliedCoupon.value = null
     couponError.value = ''
     couponCode.value = ''
     setParam('cupom', null)
@@ -224,9 +280,9 @@
   billingCycle.value = sharedBillingCycle.value || 'yearly'
   couponCode.value = sharedCupom.value || ''
 
-  onMounted(async () => {
+  onMounted(() => {
     if (couponCode.value.trim()) {
-      await submitCupom()
+      submitCupom()
     }
   })
 
@@ -237,7 +293,7 @@
 
   watch(couponCode, (value) => {
     couponError.value = ''
-    appliedCoupon.value = false
+    appliedCoupon.value = null
     setParam('cupom', value || null)
     emit('update:couponCode', value)
   })

@@ -93,9 +93,29 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
+  import { usePlansList } from '@/composables/usePlansService'
+  import { useAccountStore } from '@/stores/account'
+  import { useServiceOrders } from '@/composables/useServiceOrders'
 
   const router = useRouter()
   const { initialize: initializePlans } = usePlans()
+  const accountStore = useAccountStore()
+  const { data: plansData, refetch: loadPlans } = usePlansList({ enabled: false })
+  const {
+    loadServiceOrder,
+    submitServiceOrder,
+    isLoading: isLoadingServiceOrder,
+    isSubmitting: isSubmittingServiceOrder
+  } = useServiceOrders()
+
+  // Helper to resolve planId from plan name
+  const getPlanIdFromName = (planName) => {
+    if (!plansData.value?.length) return null
+    const foundPlan = plansData.value.find(
+      (planItem) => planItem.sku?.toLowerCase() === planName?.toLowerCase()
+    )
+    return foundPlan?.id || null
+  }
 
   const additionalDataRef = ref(null)
 
@@ -107,11 +127,16 @@
   const isCheckoutStep = computed(() => currentStep.value === 'checkout')
   // Step 1 state
   const isDisabledSubmit = computed(() => {
-    return !additionalDataRef.value?.meta.valid || additionalDataRef.value?.loading
+    const metaValid = additionalDataRef.value?.meta?.valid
+    const formLoading = additionalDataRef.value?.loading
+    const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
+    return !metaValid || formLoading || serviceOrderLoading
   })
 
   const showLoading = computed(() => {
-    return additionalDataRef.value?.loading ? 'pi pi-spin pi-spinner' : ''
+    const formLoading = additionalDataRef.value?.loading
+    const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
+    return formLoading || serviceOrderLoading ? 'pi pi-spin pi-spinner' : ''
   })
 
   const submitButtonLabel = computed(() => {
@@ -120,12 +145,28 @@
     return 'Continue'
   })
 
-  onMounted(() => {
+  onMounted(async () => {
     initializePlans()
+    await loadPlans()
+    const accountId = accountStore.accountData?.id
+    if (accountId) {
+      await loadServiceOrder(accountId)
+    }
   })
 
   // Handlers
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    const plan = additionalDataRef.value?.plan
+    const accountId = accountStore.accountData?.id
+
+    // Handle service order (create or update) before proceeding
+    if (plan && accountId) {
+      const planId = getPlanIdFromName(plan)
+      if (planId) {
+        await submitServiceOrder({ accountId, planId })
+      }
+    }
+
     additionalDataRef.value?.submitForm()
   }
 

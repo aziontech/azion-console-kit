@@ -248,10 +248,14 @@
 
       // For pro/scale plans, emit event to proceed to checkout step
       emit('proceedToCheckout')
-      loading.value = false
     } catch (err) {
-      const errors = JSON.parse(err)
-      toast.add({ severity: 'error', detail: errors.errorMessage, summary: 'Error' })
+      const errorMessage = err?.message || err
+      const errors = typeof errorMessage === 'string' ? { errorMessage } : errorMessage
+      toast.add({
+        severity: 'error',
+        detail: errors.errorMessage || 'Error submitting form',
+        summary: 'Error'
+      })
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
       loading.value = false

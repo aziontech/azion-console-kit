@@ -266,6 +266,11 @@ export const queryKeys = {
     all: ['personal-tokens'],
     list: (params) => [...queryKeys.personalToken.all, 'list', params]
   },
+  plans: {
+    all: ['plans'],
+    list: () => [...queryKeys.plans.all, 'list'],
+    validateCoupon: (code, planId) => [...queryKeys.plans.all, 'validate-coupon', code, planId]
+  },
   edgeService: {
     all: ['edge-services'],
     list: (params) => [...queryKeys.edgeService.all, 'list', params],
