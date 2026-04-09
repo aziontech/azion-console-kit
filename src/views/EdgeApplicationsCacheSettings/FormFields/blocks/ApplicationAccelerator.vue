@@ -242,7 +242,7 @@
 </template>
 
 <script setup>
-  import Accordion from '@aziontech/webkit/accordion'
+  import Accordion from 'primevue/accordion'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldGroupCheckbox from '@aziontech/webkit/field-group-checkbox'
