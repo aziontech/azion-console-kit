@@ -3,7 +3,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EditView from '@/views/EdgeFirewall/EditView'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from '@aziontech/webkit/use-toast'

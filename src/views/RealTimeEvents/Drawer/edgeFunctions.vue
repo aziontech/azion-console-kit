@@ -6,7 +6,7 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'

@@ -1,6 +1,6 @@
 <script setup>
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import EditView from '@/views/EdgeServices/EditView'
   import ContentBlock from '@/templates/content-block'

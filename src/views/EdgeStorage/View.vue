@@ -6,7 +6,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsEdgeStorage from './FormFields/FormFieldsEdgeStorage.vue'
   import CredentialsView from './CredentialsView.vue'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
