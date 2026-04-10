@@ -182,13 +182,6 @@
       documentationService: documentationService
     }"
   >
-    <template #header-actions>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Function Instance"
-        @click="openCreateFunctionDrawer"
-      />
-    </template>
     <template #emptyBlockButton>
       <PrimeButton
         class="max-md:w-full w-fit"
