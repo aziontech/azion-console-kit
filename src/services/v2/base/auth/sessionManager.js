@@ -4,7 +4,7 @@ import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
-import { resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
+import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
