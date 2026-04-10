@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * This file was automatically generated based on your preset configuration.
  *
