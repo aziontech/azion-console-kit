@@ -577,7 +577,7 @@
           </div>
 
           <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
-            <div class="flex flex-col h-fit sm:max-w-[15.625rem] w-full">
+            <div class="flex flex-col sm:w-[15.625rem] w-full overflow-hidden">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -599,7 +599,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
+            <div class="flex flex-col sm:w-[15.625rem] w-full gap-2">
               <FieldDropdown
                 :options="
                   getOperatorsOptionsByCriteriaVariable({
@@ -617,7 +617,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
+            <div class="flex flex-col sm:w-[15.625rem] w-full gap-2">
               <FieldText
                 v-if="showArgumentBySelectedOperator({ criteriaIndex, criteriaInnerRowIndex })"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
