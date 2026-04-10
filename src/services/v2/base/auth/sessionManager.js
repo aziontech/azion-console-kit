@@ -3,8 +3,8 @@ import { persister, pauseQueryPersistence } from '@/services/v2/base/query/query
 import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
+import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
