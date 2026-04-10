@@ -60,3 +60,4 @@ hooks/
 # AI
 CLAUDE.md
 .opencode/
+.claude/
