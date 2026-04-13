@@ -1,5 +1,7 @@
 /* eslint-disable no-useless-escape */
-export default {
+import { defineConfig } from 'azion'
+
+export default defineConfig({
   build: {
     preset: 'html',
     polyfills: true
@@ -223,4 +225,4 @@ export default {
       ]
     }
   ]
-}
+})

@@ -4,7 +4,7 @@
   "preset": "html",
   "env": "production",
   "prefix": "20260413110920",
-  "rotate-prefix": true,
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": [],
   "application": {
