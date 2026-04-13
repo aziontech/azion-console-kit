@@ -194,7 +194,8 @@
           const storedData = localStorage.getItem(LOCAL_STORAGE_KEY)
           if (storedData) storedKeys = JSON.parse(storedData)
         } catch {
-          // Ignore silently
+          //eslint-disable-next-line no-console
+          console.warn('[MonthlyUsageCard] No keys found in localstorage')
         }
 
         const keysToUse =
