@@ -7,7 +7,7 @@ export default {
   storage: [
     {
       name: 'console-kit-storybook',
-      prefix: '20260413110420',
+      prefix: '20260413110920',
       dir: './dist',
       workloadsAccess: 'read_only'
     }
@@ -19,7 +19,7 @@ export default {
       type: 'storage',
       attributes: {
         bucket: 'console-kit-storybook',
-        prefix: '20260413110420'
+        prefix: '20260413110920'
       }
     }
   ],
