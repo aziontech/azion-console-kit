@@ -49,6 +49,12 @@ const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConf
         conditional: 'and',
         operator: 'matches',
         inputValue: regex
+      },
+      {
+        variable: '${uri}',
+        conditional: 'and',
+        operator: 'does_not_match',
+        inputValue: '^/sse'
       }
     ],
     behavior: {
@@ -510,7 +516,20 @@ const config = {
         name: 'OAuth Security Headers - Login and Signup',
         description:
           'Applies strict COOP headers only to authentication-related pages to protect OAuth flows without breaking external links.',
-        match: '^/(login|signup|switch-account|mfa)',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/(login|signup|switch-account|mfa)'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
+          }
+        ],
         behavior: {
           setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
         }
@@ -518,7 +537,20 @@ const config = {
       {
         name: 'OAuth Security Headers - GitHub Connection',
         description: 'Applies strict COOP headers to GitHub connection popup pages.',
-        match: '^/github-connection-popup',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^/github-connection-popup'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
+          }
+        ],
         behavior: {
           setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
         }
@@ -527,7 +559,20 @@ const config = {
         name: 'Secure Headers - General',
         description:
           'Sets various security headers to enhance the security posture of responses, including protections against clickjacking, XSS, and other web vulnerabilities.',
-        match: '^\\/',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^\\/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
+          }
+        ],
         behavior: {
           setHeaders: [
             'X-Frame-Options: SAMEORIGIN',
@@ -579,6 +624,12 @@ const config = {
             operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
           }
         ],
         behavior: {
