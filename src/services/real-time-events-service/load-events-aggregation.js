@@ -104,43 +104,123 @@ const parseHttpResponse = (response, dataset) => {
   }
 }
 
+const MINUTE_IN_MILLISECONDS = 60_000
+const HOUR_IN_MILLISECONDS = 3_600_000
+const DAY_IN_MILLISECONDS = 86_400_000
+const TWO_AND_A_HALF_DAYS = DAY_IN_MILLISECONDS * 2.5
+const SIXTY_DAYS = DAY_IN_MILLISECONDS * 60
+
 /**
- * Load bucketed event counts for histogram visualization.
- * Sends a single GraphQL request with aliased sub-queries — one per time bucket —
- * to get an accurate count distribution across the full time range.
+ * Determines the resampling interval based on the time range duration.
+ * Follows the same rules as Real-Time Metrics FillResultQuery.
  *
- * This avoids the truncation problem of groupBy:[ts] + limit, which only returns
- * the earliest N distinct timestamps and leaves the rest of the range empty.
+ * @param {number} durationMs - Duration in milliseconds
+ * @returns {number} Interval in milliseconds (minute, hour, or day)
+ */
+function getResamplingInterval(durationMs) {
+  if (durationMs < TWO_AND_A_HALF_DAYS) return MINUTE_IN_MILLISECONDS
+  if (durationMs > SIXTY_DAYS) return DAY_IN_MILLISECONDS
+  return HOUR_IN_MILLISECONDS
+}
+
+/**
+ * Truncates a timestamp to the start of the given interval.
+ *
+ * @param {Date} date - The date to truncate
+ * @param {number} intervalMs - The interval in milliseconds
+ * @returns {number} Truncated timestamp in milliseconds
+ */
+function truncateToInterval(date, intervalMs) {
+  const dateObj = new Date(date)
+  if (intervalMs === MINUTE_IN_MILLISECONDS) {
+    dateObj.setSeconds(0, 0)
+  } else if (intervalMs === HOUR_IN_MILLISECONDS) {
+    dateObj.setMinutes(0, 0, 0)
+  } else {
+    dateObj.setHours(0, 0, 0, 0)
+  }
+  return dateObj.getTime()
+}
+
+/**
+ * Resamples event aggregation data to fill gaps with zero-count entries.
+ * Generates expected timestamps for the full time range at the calculated interval,
+ * merges with API response data, and fills missing timestamps with { ts, count: 0 }.
+ *
+ * @param {Array<{ts: string, count: number}>} data - API response data
+ * @param {Object} tsRange - { tsRangeBegin, tsRangeEnd }
+ * @returns {Array<{ts: string, count: number}>} Resampled data sorted by timestamp
+ */
+function resampleEventsData(data, tsRange) {
+  const begin = new Date(tsRange.tsRangeBegin).getTime()
+  const end = new Date(tsRange.tsRangeEnd).getTime()
+  const durationMs = end - begin
+
+  if (durationMs <= 0) return data
+
+  const intervalMs = getResamplingInterval(durationMs)
+  const alignedBegin = truncateToInterval(new Date(begin), intervalMs)
+  const alignedEnd = truncateToInterval(new Date(end), intervalMs)
+
+  // Index existing data by truncated timestamp for O(1) lookup
+  // API returns exact timestamps (e.g. "2026-04-13T03:01:23Z") but we generate
+  // aligned timestamps (e.g. "2026-04-13T03:01:00Z"), so we must truncate API
+  // timestamps before indexing to ensure the Map lookup matches.
+  const dataByTs = new Map()
+  for (const item of data) {
+    const truncatedTs = truncateToInterval(new Date(item.ts), intervalMs)
+    const existing = dataByTs.get(truncatedTs)
+    if (existing) {
+      // Multiple API rows can fall into the same bucket — sum their counts
+      existing.count = (existing.count || 0) + (item.count || 0)
+    } else {
+      dataByTs.set(truncatedTs, { ts: new Date(truncatedTs).toISOString(), count: item.count || 0 })
+    }
+  }
+
+  // Generate all expected timestamps and merge with existing data
+  const result = []
+  for (let ts = alignedBegin; ts <= alignedEnd; ts += intervalMs) {
+    const existing = dataByTs.get(ts)
+    if (existing) {
+      result.push(existing)
+    } else {
+      result.push({ ts: new Date(ts).toISOString(), count: 0 })
+    }
+  }
+
+  // Sort by timestamp ascending
+  result.sort((prev, next) => new Date(prev.ts).getTime() - new Date(next.ts).getTime())
+
+  return result
+}
+
+/**
+ * Load aggregated event counts for chart/histogram visualization.
+ * Sends a SINGLE GraphQL query with groupBy:[ts], aggregate:{count:rows}, orderBy:[ts_ASC].
+ * No aliases, no sub-queries, no artificial limit cap.
+ * Applies resampling to fill temporal gaps with zero-count entries.
  *
  * @param {Object} params
  * @param {string} params.dataset - Dataset name (e.g., 'httpEvents')
  * @param {Object} params.tsRange - { tsRangeBegin, tsRangeEnd }
  * @param {Object} [params.filters] - Additional filters (and, in)
- * @param {number} [params.bucketCount] - Number of histogram buckets (auto-calculated if omitted)
  * @returns {Promise<Array<{ts: string, count: number}>>}
  */
-export const loadBucketedEventsAggregation = async ({
-  dataset,
-  tsRange,
-  filters = {},
-  bucketCount
-}) => {
+export const loadEventsChartAggregation = async ({ dataset, tsRange, filters = {} }) => {
   if (!tsRange?.tsRangeBegin || !tsRange?.tsRangeEnd) {
     return []
   }
 
-  const begin = new Date(tsRange.tsRangeBegin).getTime()
-  const end = new Date(tsRange.tsRangeEnd).getTime()
-  const duration = end - begin
-
-  if (duration <= 0) return []
-
-  if (!bucketCount) {
-    bucketCount = calculateHistogramBuckets(duration)
-  }
-
-  const bucketSize = duration / bucketCount
-  const payload = buildBucketedQuery({ dataset, begin, bucketSize, bucketCount, filters })
+  const payload = convertGQLAggregation({
+    dataset,
+    tsRange,
+    groupBy: ['ts'],
+    aggregation: { count: 'rows' },
+    orderBy: 'ts_ASC',
+    limit: 10000,
+    filters
+  })
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
@@ -151,122 +231,11 @@ export const loadBucketedEventsAggregation = async ({
     body: payload
   })
 
-  return parseBucketedResponse(httpResponse, begin, bucketSize, bucketCount)
-}
+  const data = parseHttpResponse(httpResponse, dataset)
 
-/**
- * Calculate an appropriate number of histogram buckets based on time range duration.
- * Aims for a readable bar density that avoids overcrowding or sparse charts.
- */
-function calculateHistogramBuckets(durationMs) {
-  const MINUTE = 60_000
-  const HOUR = 60 * MINUTE
-  const DAY = 24 * HOUR
+  if (!data.length) return []
 
-  if (durationMs <= 15 * MINUTE) return Math.max(Math.ceil(durationMs / MINUTE), 5)
-  if (durationMs <= HOUR) return 30
-  if (durationMs <= 6 * HOUR) return 36
-  if (durationMs <= DAY) return 48
-  if (durationMs <= 7 * DAY) return 42
-  return 60
-}
-
-/**
- * Build a single GraphQL query with aliased sub-queries for each time bucket.
- * Each alias queries the count for a narrow tsRange slice.
- */
-function buildBucketedQuery({ dataset, begin, bucketSize, bucketCount, filters }) {
-  const variables = {}
-
-  // Shared filter variables (same across all buckets)
-  const sharedFilterParts = []
-
-  if (filters.and) {
-    Object.entries(filters.and).forEach(([key, value]) => {
-      const varName = `f_${key}`
-      variables[varName] = value
-      sharedFilterParts.push(`${key}: $${varName}`)
-    })
-  }
-
-  if (filters.in) {
-    Object.entries(filters.in).forEach(([key, value]) => {
-      const varName = `fi_${key}`
-      variables[varName] = Array.isArray(value)
-        ? value.map((item) => (item.value !== undefined ? item.value : item))
-        : value
-      sharedFilterParts.push(`${key}: $${varName}`)
-    })
-  }
-
-  // Build one aliased sub-query per bucket
-  const bucketLines = []
-  for (let idx = 0; idx < bucketCount; idx++) {
-    const bStart = new Date(begin + idx * bucketSize).toISOString()
-    const bEnd = new Date(begin + (idx + 1) * bucketSize).toISOString()
-
-    variables[`b${idx}s`] = bStart
-    variables[`b${idx}e`] = bEnd
-
-    const filterParts = [`tsRange: { begin: $b${idx}s, end: $b${idx}e }`, ...sharedFilterParts]
-
-    bucketLines.push(
-      `b${idx}: ${dataset}(limit: 1, aggregate: { count: rows }, filter: { ${filterParts.join(', ')} }) { count }`
-    )
-  }
-
-  // Variable declarations
-  const varDecls = Object.entries(variables).map(([key, value]) => {
-    let type
-    if (/^b\d+[se]$/.test(key)) {
-      type = 'DateTime!'
-    } else if (Array.isArray(value)) {
-      type = '[String]'
-    } else if (typeof value === 'number') {
-      type = Number.isInteger(value) ? 'Int' : 'Float'
-    } else {
-      type = 'String'
-    }
-    return `$${key}: ${type}`
-  })
-
-  const query = `query(${varDecls.join(', ')}) {\n  ${bucketLines.join('\n  ')}\n}`
-
-  return { query, variables }
-}
-
-/**
- * Parse the aliased bucketed response into chart-ready data.
- */
-function parseBucketedResponse(response, beginMs, bucketSizeMs, bucketCount) {
-  const { body, statusCode } = response
-
-  switch (statusCode) {
-    case 200: {
-      const results = []
-      for (let idx = 0; idx < bucketCount; idx++) {
-        const bucketData = body.data?.[`b${idx}`]
-        const count = Array.isArray(bucketData) ? bucketData[0]?.count || 0 : 0
-        results.push({
-          ts: new Date(beginMs + idx * bucketSizeMs).toISOString(),
-          count
-        })
-      }
-      return results
-    }
-    case 400:
-      throw new Error(body.detail || 'Bad Request')
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Error(body.detail || 'Forbidden')
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 500:
-      throw new Errors.InternalServerError().message
-    default:
-      throw new Errors.UnexpectedError().message
-  }
+  return resampleEventsData(data, tsRange)
 }
 
 export default loadEventsAggregation

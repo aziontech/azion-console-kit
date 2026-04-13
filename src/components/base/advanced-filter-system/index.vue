@@ -142,7 +142,14 @@
     )
     filterData.value.tsRange = {
       tsRangeBegin,
-      tsRangeEnd
+      tsRangeEnd,
+      label: filterDataRange.value.label || '',
+      labelStart: filterDataRange.value.labelStart || '',
+      labelEnd: filterDataRange.value.labelEnd || ''
+    }
+
+    if (filterDataRange.value?.relative) {
+      filterData.value.tsRange.relative = { ...filterDataRange.value.relative }
     }
 
     if (filterDataRange.value?.autoRefresh) {
@@ -244,8 +251,14 @@
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
       label: filterData.value.tsRange.label || '',
+      labelStart: filterData.value.tsRange.labelStart || '',
+      labelEnd: filterData.value.tsRange.labelEnd || '',
       utcOffset: userUTC,
       autoRefresh: filterData.value.tsRange.autoRefresh
+    }
+
+    if (filterData.value.tsRange.relative) {
+      filterDataRange.value.relative = { ...filterData.value.tsRange.relative }
     }
 
     hasPendingDateUpdate.value = false

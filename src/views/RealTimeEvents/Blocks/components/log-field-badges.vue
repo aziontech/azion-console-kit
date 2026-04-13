@@ -1,6 +1,5 @@
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'LogFieldBadges' })
 
@@ -98,7 +97,7 @@
       <span
         v-for="(item, index) in visibleFields"
         :key="index"
-        class="log-badge group/badge"
+        class="log-badge"
         :class="{
           'log-badge--highlighted': highlightSet.has(item.key),
           [`log-badge--${getBadgeSeverity(item)}`]: getBadgeSeverity(item)
@@ -112,26 +111,16 @@
         >
           {{ truncateValue(item.value) }}
         </span>
-
-        <!-- Hover actions -->
         <span class="log-badge__actions">
-          <PrimeButton
-            icon="pi pi-filter"
-            text
-            rounded
-            size="small"
-            class="!w-4 !h-4 !p-0"
+          <i
+            class="pi pi-filter log-badge__action-icon log-badge__action-icon--filter"
             @click.stop="emit('add-filter', item.key, item.value)"
-            v-tooltip.top="{ value: 'Filter for value', showDelay: 300 }"
+            title="Filter for value"
           />
-          <PrimeButton
-            icon="pi pi-filter-slash"
-            text
-            rounded
-            size="small"
-            class="!w-4 !h-4 !p-0"
+          <i
+            class="pi pi-filter-slash log-badge__action-icon log-badge__action-icon--exclude"
             @click.stop="emit('exclude-filter', item.key, item.value)"
-            v-tooltip.top="{ value: 'Filter out value', showDelay: 300 }"
+            title="Exclude value"
           />
         </span>
       </span>
@@ -172,7 +161,6 @@
     align-items: center;
     gap: 2px;
     padding: 1px 6px;
-    padding-right: 32px;
     border-radius: 3px;
     font-size: 0.72rem;
     line-height: 1.4;
@@ -257,26 +245,43 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 180px;
+    border-radius: 2px;
   }
 
+  /* ── Inline hover action icons ──────────────────────────────── */
   .log-badge__actions {
-    position: absolute;
-    right: 2px;
-    top: 50%;
-    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
-    gap: 0;
-    flex-shrink: 0;
+    gap: 1px;
+    margin-left: 2px;
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.1s ease;
-    background: inherit;
-    padding-left: 4px;
   }
 
   .log-badge:hover .log-badge__actions {
     visibility: visible;
     opacity: 1;
+  }
+
+  .log-badge__action-icon {
+    font-size: 0.6rem;
+    padding: 2px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    transition: color 0.1s ease, background-color 0.1s ease;
+  }
+
+  .log-badge__action-icon:hover {
+    background: var(--surface-hover);
+  }
+
+  .log-badge__action-icon--filter:hover {
+    color: var(--primary-color);
+  }
+
+  .log-badge__action-icon--exclude:hover {
+    color: var(--red-400, #f87171);
   }
 </style>

@@ -326,16 +326,23 @@
 
     const preservedAutoRefresh = model.value?.autoRefresh
 
+    const relativeLabel = `${quickSelectDirection.value} ${quickSelectValue.value} ${quickSelectUnit.value}`
+
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: '',
+      label: relativeLabel,
       labelStart: '',
       labelEnd: '',
       quick: {
         value: quickSelectValue.value,
         unit: quickSelectUnit.value,
         direction: quickSelectDirection.value
+      },
+      relative: {
+        direction: quickSelectDirection.value,
+        value: quickSelectValue.value,
+        unit: quickSelectUnit.value
       },
       autoRefresh: preservedAutoRefresh
     }

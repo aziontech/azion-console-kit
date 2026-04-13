@@ -229,7 +229,7 @@
               @click="toggleField(fieldName)"
             />
             <span
-              class="text-sm font-mono text-color flex-1 truncate"
+              class="text-xs text-color flex-1 truncate"
               @click="toggleFieldStats(fieldName)"
             >
               {{ fieldName }}
@@ -263,7 +263,7 @@
                 @click.stop="toggleField(field.value)"
               />
               <span
-                class="text-sm font-mono flex-1 truncate"
+                class="text-xs flex-1 truncate"
                 :class="isFieldSelected(field.value) ? 'text-color font-medium' : 'text-color'"
               >
                 {{ field.value }}
@@ -331,10 +331,9 @@
   .field-sidebar {
     display: flex;
     flex-direction: column;
-    width: 280px;
-    min-width: 280px;
-    flex: 0 0 280px;
-    align-self: stretch;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
     overflow: hidden;
     border-right: 1px solid var(--surface-border);
     background: var(--surface-ground);
@@ -349,8 +348,5 @@
   .slide-sidebar-leave-to {
     transform: translateX(-100%);
     opacity: 0;
-    width: 0;
-    min-width: 0;
-    flex: 0 0 0;
   }
 </style>

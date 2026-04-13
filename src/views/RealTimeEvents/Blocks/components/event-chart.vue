@@ -1,6 +1,8 @@
 <script setup>
   import { computed, onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
   import c3 from 'c3'
+  import Skeleton from 'primevue/skeleton'
+  import InlineMessage from 'primevue/inlinemessage'
   import { getChartConfig } from '../constants/chart-configs'
 
   defineOptions({ name: 'EventChart' })
@@ -23,6 +25,10 @@
       default: null
     },
     isLoading: {
+      type: Boolean,
+      default: false
+    },
+    hasError: {
       type: Boolean,
       default: false
     }
@@ -309,6 +315,12 @@
   // Watchers
   watch(() => props.data, initChart, { deep: true })
   watch(() => [props.tsRangeBegin, props.tsRangeEnd], initChart)
+  // Re-init when loading finishes — chartRef only exists in DOM after isLoading becomes false
+  watch(() => props.isLoading, (loading, wasLoading) => {
+    if (wasLoading && !loading) {
+      initChart()
+    }
+  })
 
   onMounted(initChart)
 
@@ -339,12 +351,20 @@
       <span class="chart-header__hint">Drag to zoom</span>
     </div>
 
-    <!-- Loading -->
+    <!-- Loading skeleton (GraphsCardBlock pattern) -->
     <div
       v-if="isLoading"
       class="chart-loading"
     >
-      <i class="pi pi-spin pi-spinner" />
+      <Skeleton class="w-full h-full" />
+    </div>
+
+    <!-- Error -->
+    <div
+      v-else-if="hasError"
+      class="chart-empty"
+    >
+      <InlineMessage severity="error">Failed to load chart data</InlineMessage>
     </div>
 
     <!-- Chart -->
@@ -420,15 +440,8 @@
   }
 
   .chart-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 180px;
-    color: var(--primary-color);
-  }
-
-  .chart-loading i {
-    font-size: 1.25rem;
+    padding: 0.75rem;
   }
 
   .chart-container {

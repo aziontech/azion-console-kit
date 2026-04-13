@@ -341,7 +341,6 @@
         preset: model.value?.relative?.preset
       }
 
-      const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
         model.value.startDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -352,11 +351,9 @@
           preset: model.value?.relative?.preset
         }
 
-        if (shouldSetDefaultRelativeRange) {
-          model.value.endDate = now
-          model.value.labelEnd = 'now'
-          model.value.label = ''
-        }
+        model.value.endDate = now
+        model.value.labelEnd = 'now'
+        model.value.label = ''
       } else {
         model.value.endDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -423,6 +420,16 @@
 
   onMounted(() => {
     if (props.mode === 'relative') {
+      const rel =
+        model.value?.relative ||
+        (props.editingField === 'start' ? model.value?.relativeStart : model.value?.relativeEnd)
+
+      if (rel?.value && rel?.unit) {
+        relativeDirection.value = rel.direction || 'last'
+        relativeValue.value = rel.value
+        relativeUnit.value = rel.unit
+      }
+
       updateRelativeRange()
     }
   })
