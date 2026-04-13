@@ -15,6 +15,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
 
     try {
       await loadUserAndAccountInfo()
+      sessionManager.afterLogin()
 
       // Check if needs service order plan
       const needsServiceOrder = accountStore.hasServiceOrderPlan === false

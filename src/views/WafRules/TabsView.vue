@@ -5,7 +5,7 @@
   import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
   import ListWafRulesTuning from '@/views/WafRules/ListWafRulesTuning.vue'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
   import { ref, computed, nextTick } from 'vue'

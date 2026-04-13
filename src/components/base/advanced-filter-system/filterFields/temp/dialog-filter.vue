@@ -2,7 +2,7 @@
   import ButtonPrime from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import Sidebar from '@aziontech/webkit/sidebar'
   import { useField, useForm } from 'vee-validate'

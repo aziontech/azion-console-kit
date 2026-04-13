@@ -19,7 +19,7 @@
 
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useRouter } from 'vue-router'
 

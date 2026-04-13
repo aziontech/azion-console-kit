@@ -10,7 +10,7 @@ const DialogOnboardingSchedulingWrapper = {
       data: {},
       close: () => {
         // eslint-disable-next-line no-console
-        console.log('Dialog closed')
+        console.log('Dialog closed');
       }
     })
 

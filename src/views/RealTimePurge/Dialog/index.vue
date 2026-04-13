@@ -2,7 +2,7 @@
   import { ref, watch, inject } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   defineOptions({ name: 'dialog-real-time-purge' })
 

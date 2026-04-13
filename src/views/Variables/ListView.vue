@@ -102,7 +102,7 @@
             size="small"
             label="Variable"
             @click="handleTrackEvent"
-            createPagePath="variables/create"
+            createPagePath="/variables/create"
             data-testid="create_Variable_button"
           />
         </template>
@@ -116,7 +116,7 @@
         :actions="actions"
         :frozenColumns="['key']"
         editPagePath="/variables/edit"
-        createPagePath="variables/create"
+        createPagePath="/variables/create"
         exportFileName="Variables"
         :lazy="false"
         emptyListMessage="No variables found."
@@ -125,7 +125,7 @@
           description:
             'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
-          createPagePath: 'variables/create',
+          createPagePath: '/variables/create',
           documentationService: documentationCatalog.variables
         }"
         @on-before-go-to-edit="checkIfIsEditable"

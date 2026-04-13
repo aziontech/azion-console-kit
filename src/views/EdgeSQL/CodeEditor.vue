@@ -88,7 +88,7 @@
           >
             <!-- Inlined SqlDatabaseList for results -->
             <div
-              class="sql-database-list w-full h-full flex flex-col min-h-0 flex-1"
+              class="sql-database-list w-full flex flex-col"
               :class="{ 'overflow-auto': resultsView !== 'json' }"
             >
               <DataTable
@@ -135,7 +135,7 @@
                 <template #header>
                   <DataTable.Header :showDivider="!!sqlAppliedFilters.length">
                     <template #first-line>
-                      <div class="flex flex-col gap-2 w-full">
+                      <div class="flex flex-col gap-2 w-full py-2">
                         <div class="flex items-center gap-2 justify-between">
                           <div class="text-color text-lg font-medium">Results</div>
 

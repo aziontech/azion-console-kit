@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'

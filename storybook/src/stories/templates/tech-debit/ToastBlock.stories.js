@@ -1,5 +1,6 @@
-import ToastBlock from '@/templates/toast-block/index.vue'
-import { useToast } from 'primevue/usetoast'
+/* eslint-disable no-console */
+import ToastBlock from '@/templates/toast-block/index.vue';
+import { useToast } from 'primevue/usetoast';
 
 export default {
   title: '[tech debit] / Templates/ToastBlock',

@@ -4,7 +4,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import Accordion from '@aziontech/webkit/accordion'
+  import Accordion from 'primevue/accordion'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
   import { defaultConditions, itemDefaultCondition } from '@/views/WafRules/Config'
   import { ref } from 'vue'

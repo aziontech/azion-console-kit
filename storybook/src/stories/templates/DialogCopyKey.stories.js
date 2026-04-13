@@ -34,7 +34,7 @@ const DialogWrapper = {
       data: dialogData.value,
       close: () => {
         // eslint-disable-next-line no-console
-        console.log('Dialog closed')
+        console.log('Dialog closed');
       }
     })
 

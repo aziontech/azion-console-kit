@@ -88,7 +88,7 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'
   import QrcodeVue from 'qrcode.vue'
 

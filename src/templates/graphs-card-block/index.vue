@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-  import InlineMessage from '@aziontech/webkit/inline-message'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
   import AggregationInfo from './components/aggregation-info.vue'

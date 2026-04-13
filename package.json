@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.56.0",
+  "version": "1.57.0",
   "private": false,
   "type": "module",
   "repository": {
@@ -41,7 +41,7 @@
     "@analytics/segment": "^2.1.0",
     "@aziontech/icons": "^1.4.0",
     "@aziontech/theme": "^1.8.0",
-    "@aziontech/webkit": "^1.19.0",
+    "@aziontech/webkit": "^1.19.2",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.7.0",
     "@jsonforms/vue": "3.7.0",
@@ -56,7 +56,7 @@
     "@vee-validate/yup": "^4.15.1",
     "@vueuse/core": "^10.11.1",
     "analytics": "^0.8.19",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "c3": "^0.7.20",
     "caniuse-lite": "^1.0.30001751",
     "deep-chat": "^1.4.11",
@@ -120,7 +120,7 @@
     "start-server-and-test": "^2.0.0",
     "storybook": "^8.6.0",
     "tailwindcss": "^3.3.3",
-    "vite": "^5.4.21",
+    "vite": "^6.4.2",
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^0.33.0",
     "vitest-sonar-reporter": "^1.0.0"
@@ -143,7 +143,7 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "d3-color": "^3.1.0",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "**/@jsonforms/**/ajv": "^8.18.0",
     "**/azion/**/ajv": "^8.18.0"
   },

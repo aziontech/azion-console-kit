@@ -4,7 +4,7 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from '@aziontech/webkit/tabview'
+  import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'

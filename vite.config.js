@@ -15,6 +15,7 @@ const getConfig = () => {
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
+  const BEHOLDER_URL = env.VITE_BEHOLDER_URL
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -128,11 +129,14 @@ const getConfig = () => {
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
         }),
+        '/sse': createProxyConfig({
+          target: BEHOLDER_URL
+        }),
         // Local mock server for service-orders (strips /local_api prefix)
         '/local_api': createProxyConfig({
           target: 'http://localhost:3333',
           rewrite: (path) => path.replace(/^\/local_api/, '')
-        })
+        }),
       }
     }
   }
