@@ -3,8 +3,8 @@
   "bucket": "console-kit-storybook",
   "preset": "html",
   "env": "production",
-  "prefix": "20260406184524",
-  "rotate-prefix": true,
+  "prefix": "20260413110920",
+  "rotate-prefix": false,
   "not-first-run": true,
   "function": [],
   "application": {
@@ -25,8 +25,13 @@
     "created": false,
     "rules": [
       {
+        "id": 536324,
+        "name": "Default Rule",
+        "phase": "request"
+      },
+      {
         "id": 535935,
-        "name": "Deliver Static Assets and Set Cache Policy",
+        "name": "Static Assets and Set Cache Policy",
         "phase": "request"
       },
       {
@@ -38,6 +43,16 @@
         "id": 535937,
         "name": "Redirect to index.html for Subpaths",
         "phase": "request"
+      },
+      {
+        "id": 538579,
+        "name": "Debug",
+        "phase": "response"
+      },
+      {
+        "id": 538580,
+        "name": "CORS Header",
+        "phase": "response"
       }
     ]
   },
@@ -50,7 +65,9 @@
   "workloads": {
     "id": 1775513810,
     "name": "azion-console-kit-storybook",
-    "domains": [],
+    "domains": [
+      "storybook-console.azion.app"
+    ],
     "url": "https://msgwjn8tmz0.map.azionedge.net",
     "deployment_id": [
       {

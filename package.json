@@ -34,8 +34,10 @@
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
     "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
     "architecture:report": "node scripts/architecture-report/index.cjs",
-    "storybook:dev": "cd storybook && yarn dev",
-    "storybook:build": "cd storybook && yarn build"
+    "storybook:build": "cd storybook && storybook build -o dist -c .storybook && cd ..",
+    "storybook:dev": "cd storybook && storybook dev -p 6006 -c .storybook && cd ..",
+    "storybook:preview": "cd storybook && npx http-server dist -p 6007 && cd ..",
+    "storybook:deploy": "cd storybook && azion deploy --local --debug && cd .."
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
@@ -100,7 +102,7 @@
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/test-utils": "^2.4.1",
     "@whitespace/storybook-addon-html": "^6.0.0",
-    "autoprefixer": "^10.4.14",
+    "autoprefixer": "^10.4.27",
     "react-syntax-highlighter": "^15.6.1",
     "azion": "^1.20.10",
     "cypress": "13.14.0",
@@ -114,7 +116,7 @@
     "eslint-plugin-xss": "^0.1.12",
     "husky": "^8.0.0",
     "jsdom": "^22.1.0",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.8",
     "prettier": "^3.0.0",
     "sass": "1.77.6",
     "start-server-and-test": "^2.0.0",
