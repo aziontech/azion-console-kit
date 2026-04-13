@@ -5,7 +5,7 @@ on:
     branches:
       - storybook
     paths:
-      - 'src/storybook/**'
+      - 'storybook/**'
 
 jobs:
   deploy:
@@ -39,15 +39,15 @@ jobs:
           azion whoami
 
       - name: Install storybook dependencies
-        working-directory: src/storybook
+        working-directory: storybook
         run: yarn install
       
       - name: Building Storybook
-        working-directory: src/storybook
+        working-directory: storybook
         run: |
           yarn build
           
       - name: Azion Deploy
-        working-directory: src/storybook
+        working-directory: storybook
         run: |
           yarn deploy
