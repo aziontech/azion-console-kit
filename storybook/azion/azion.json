@@ -25,6 +25,11 @@
     "created": false,
     "rules": [
       {
+        "id": 536324,
+        "name": "Default Rule",
+        "phase": "request"
+      },
+      {
         "id": 535935,
         "name": "Static Assets and Set Cache Policy",
         "phase": "request"

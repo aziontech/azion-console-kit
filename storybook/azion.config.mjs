@@ -1,23 +1,4 @@
 /* eslint-disable no-useless-escape */
-/**
- * This file was automatically generated based on your preset configuration.
- *
- * For better type checking and IntelliSense:
- * 1. Install azion as dev dependency:
- *    npm install -D azion
- *
- * 2. Use defineConfig:
- *    import { defineConfig } from 'azion'
- *
- * 3. Replace the configuration with defineConfig:
- *    export default defineConfig({
- *      // Your configuration here
- *    })
- *
- * For more configuration options, visit:
- * https://github.com/aziontech/lib/tree/main/packages/config
- */
-
 export default {
   build: {
     preset: 'html',
@@ -49,7 +30,7 @@ export default {
         {
           name: 'azion-console-kit-storybook',
           browser: {
-            maxAgeSeconds: 7200
+            maxAgeSeconds: 300
           },
           edge: {
             maxAgeSeconds: 7200
@@ -59,10 +40,35 @@ export default {
       rules: {
         request: [
           {
-            name: 'Deliver Static Assets and Set Cache Policy',
+            name: 'Default Rule',
+            description:
+              'For all requests',
+            active: false,
+            criteria: [
+              [
+                {
+                  variable: '${uri}',
+                  conditional: 'if',
+                  operator: 'starts_with',
+                  argument:
+                    '/'
+                }
+              ]
+            ],
+            behaviors: [
+              {
+                type: 'set_connector',
+                attributes: {
+                  value: 'azion-console-kit-storybook'
+                }
+              }
+            ]
+          },
+          {
+            name: 'Static Assets and Set Cache Policy',
             description:
               'Deliver static assets directly from storage and set cache policy',
-            active: true,
+            active: false,
             criteria: [
               [
                 {
@@ -86,9 +92,6 @@ export default {
                 attributes: {
                   value: 'azion-console-kit-storybook'
                 }
-              },
-              {
-                type: 'deliver'
               }
             ]
           },
@@ -124,7 +127,7 @@ export default {
           {
             name: 'Redirect to index.html for Subpaths',
             description: 'Handle subpath requests by rewriting to index.html',
-            active: true,
+            active: false,
             criteria: [
               [
                 {
