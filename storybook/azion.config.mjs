@@ -7,7 +7,7 @@ export default {
   storage: [
     {
       name: 'console-kit-storybook',
-      prefix: '20260406184524',
+      prefix: '20260412231706',
       dir: './dist',
       workloadsAccess: 'read_only'
     }
@@ -19,7 +19,7 @@ export default {
       type: 'storage',
       attributes: {
         bucket: 'console-kit-storybook',
-        prefix: '20260406184524'
+        prefix: '20260412231706'
       }
     }
   ],
@@ -41,8 +41,7 @@ export default {
         request: [
           {
             name: 'Default Rule',
-            description:
-              'For all requests',
+            description: 'For all requests',
             active: false,
             criteria: [
               [
@@ -50,8 +49,7 @@ export default {
                   variable: '${uri}',
                   conditional: 'if',
                   operator: 'starts_with',
-                  argument:
-                    '/'
+                  argument: '/'
                 }
               ]
             ],

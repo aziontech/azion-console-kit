@@ -3,7 +3,7 @@
   "bucket": "console-kit-storybook",
   "preset": "html",
   "env": "production",
-  "prefix": "20260406184524",
+  "prefix": "20260412231706",
   "rotate-prefix": true,
   "not-first-run": true,
   "function": [],
@@ -43,16 +43,6 @@
         "id": 535937,
         "name": "Redirect to index.html for Subpaths",
         "phase": "request"
-      },
-      {
-        "id": 536268,
-        "name": "CORS | Access-Control-Allow-Origin: *",
-        "phase": "response"
-      },
-      {
-        "id": 536269,
-        "name": "Debug",
-        "phase": "response"
       }
     ]
   },
@@ -65,7 +55,9 @@
   "workloads": {
     "id": 1775513810,
     "name": "azion-console-kit-storybook",
-    "domains": [],
+    "domains": [
+      "storybook-console.azion.app"
+    ],
     "url": "https://msgwjn8tmz0.map.azionedge.net",
     "deployment_id": [
       {
