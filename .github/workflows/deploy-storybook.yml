@@ -26,13 +26,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          cache: 'yarn'
           # registry-url: 'https://registry.npmjs.org'
 
       - name: Install workspace dependencies
-        run: |
-          cd storybook
-          yarn install
-          cd ..
+        working-directory: src/storybook
+        run: yarn install
 
       - name: Install Azion CLI
         run: |
@@ -51,9 +50,9 @@ jobs:
       - name: Building Storybook
         working-directory: src/storybook
         run: |
-          yarn storybook:build
+          yarn build
           
       - name: Azion Deploy
         working-directory: src/storybook
         run: |
-          yarn storybook:deploy
+          yarn deploy
