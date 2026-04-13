@@ -42,7 +42,7 @@ export default {
           {
             name: 'Default Rule',
             description: 'For all requests',
-            active: false,
+            active: true,
             criteria: [
               [
                 {
