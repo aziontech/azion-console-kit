@@ -77,6 +77,12 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
+    hasServiceOrderPlan(state) {
+      // false = needs to purchase (redirects to additional-data)
+      // true/null/undefined = has plan or doesn't need (proceeds normally)
+      const value = state.account?.has_service_order_plan
+      return value === false ? false : true
+    },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     },

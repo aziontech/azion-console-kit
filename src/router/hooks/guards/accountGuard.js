@@ -16,6 +16,20 @@ export async function accountGuard({ to, accountStore, tracker }) {
     try {
       await loadUserAndAccountInfo()
 
+      // Check if needs service order plan
+      const needsServiceOrder = accountStore.hasServiceOrderPlan === false
+      const isAdditionalDataRoute = to.name === 'additional-data'
+
+      // If needs service order and not on additional-data route, redirect
+      if (needsServiceOrder && !isAdditionalDataRoute) {
+        return { name: 'additional-data' }
+      }
+
+      // If doesn't need service order and trying to access additional-data, go to home
+      if (!needsServiceOrder && isAdditionalDataRoute) {
+        return { name: 'home' }
+      }
+
       if (to.meta.isPublic) {
         return '/'
       }
