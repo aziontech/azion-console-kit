@@ -155,7 +155,7 @@ export default {
         response: [
           {
             name: 'Debug',
-            description: 'Set header -- Access-Control-Allow-Origin: *',
+            description: 'Set header -- x-azion-debug',
             active: false,
             criteria: [
               [
