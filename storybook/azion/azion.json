@@ -26,7 +26,7 @@
     "rules": [
       {
         "id": 535935,
-        "name": "Deliver Static Assets and Set Cache Policy",
+        "name": "Static Assets and Set Cache Policy",
         "phase": "request"
       },
       {
@@ -38,6 +38,16 @@
         "id": 535937,
         "name": "Redirect to index.html for Subpaths",
         "phase": "request"
+      },
+      {
+        "id": 536268,
+        "name": "CORS | Access-Control-Allow-Origin: *",
+        "phase": "response"
+      },
+      {
+        "id": 536269,
+        "name": "Debug",
+        "phase": "response"
       }
     ]
   },
