@@ -2,6 +2,7 @@
   "name": "azion-console-kit-storybook",
   "private": false,
   "description": "Storybook documentation for azion-console-kit templates",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "storybook build -o dist -c .storybook",
