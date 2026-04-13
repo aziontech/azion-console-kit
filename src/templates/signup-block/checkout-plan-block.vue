@@ -4,6 +4,7 @@
       <PricingCalculationBlock
         ref="pricingCalculationRef"
         :plan="plan"
+        @update:billing-cycle="handleBillingCycleChange"
       />
 
       <PaymentMethodBlock ref="paymentMethodRef" />
@@ -33,18 +34,20 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import Button from '@aziontech/webkit/button'
   import AddressInformationBlock from './address-information-block.vue'
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
+  import { useServiceOrders } from '@/composables/useServiceOrders'
+  import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
 
   defineOptions({
     name: 'checkout-plan-block'
   })
   const emit = defineEmits(['onBack', 'onSubmit'])
 
-  defineProps({
+  const props = defineProps({
     plan: {
       type: String,
       required: true,
@@ -52,11 +55,15 @@
     }
   })
 
+  const { data: plansData } = usePlansList()
+  const { serviceOrder, updatePlanPricing } = useServiceOrders()
+
   const pricingCalculationRef = ref(null)
   const paymentMethodRef = ref(null)
   const addressInformationRef = ref(null)
   const isSubmitting = ref(false)
   const showLoading = ref(false)
+  const billingCycle = ref('yearly')
 
   const paymentMethod = computed(() => ({
     cardHolderName: paymentMethodRef.value?.paymentMethod?.value?.cardHolderName || '',
@@ -65,9 +72,9 @@
     securityCode: paymentMethodRef.value?.paymentMethod?.value?.securityCode || ''
   }))
 
-  const billingCycle = computed(() => {
-    return pricingCalculationRef.value?.billingCycle?.value || 'yearly'
-  })
+  const handleBillingCycleChange = (value) => {
+    billingCycle.value = value
+  }
 
   const addressInformation = computed(() => ({
     country: addressInformationRef.value?.addressInformation?.value?.country || '',
@@ -89,6 +96,16 @@
   const handleSubmit = () => {
     emit('onSubmit', paymentMethod.value)
   }
+
+  watch(billingCycle, async (newBillingCycle) => {
+    if (!serviceOrder.value?.serviceOrderId) return
+
+    const planPricingId = getPlanPricingId(plansData.value, props.plan, newBillingCycle)
+
+    if (planPricingId) {
+      await updatePlanPricing(planPricingId)
+    }
+  })
 
   defineExpose({
     billingCycle,

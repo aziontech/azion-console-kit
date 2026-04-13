@@ -137,6 +137,10 @@ const getConfig = () => {
           target: 'http://localhost:3333',
           rewrite: (path) => path.replace(/^\/local_api/, '')
         }),
+        '/edge_api': createProxyConfig({
+          target: 'https://urvlgkvpxla.map.azionedge.net',
+          rewrite: (path) => path.replace(/^\/edge_api/, '')
+        })
       }
     }
   }

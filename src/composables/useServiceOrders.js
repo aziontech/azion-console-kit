@@ -2,6 +2,15 @@ import { ref, computed } from 'vue'
 // eslint-disable-next-line azion-architecture/require-vue-query
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 
+// Shared state (singleton-style)
+const serviceOrder = ref(null)
+const isLoading = ref(false)
+const isSubmitting = ref(false)
+const error = ref(null)
+
+// Computed (derived from shared state)
+const hasServiceOrder = computed(() => serviceOrder.value !== null)
+
 /**
  * Composable for managing service orders in signup/plan subscription flow.
  * Handles fetching, creating, and updating service orders without caching.
@@ -9,12 +18,6 @@ import { serviceOrdersService } from '@/services/v2/service-orders/service-order
  * @returns {Object} Service orders state and methods
  */
 export function useServiceOrders() {
-  // State
-  const serviceOrder = ref(null)
-  const isLoading = ref(false)
-  const isSubmitting = ref(false)
-  const error = ref(null)
-
   /**
    * Load service orders for a specific account
    * @param {string} accountId - Account ID to load
@@ -51,6 +54,7 @@ export function useServiceOrders() {
    * @param {Object} payload - Creation payload
    * @param {string} payload.accountId - Account ID
    * @param {string} payload.planId - Plan UUID
+   * @param {string} payload.planPricingId - Plan Pricing ID
    * @returns {Promise<Object>} Created service order
    */
   const createServiceOrder = async (payload) => {
@@ -77,6 +81,7 @@ export function useServiceOrders() {
    * Update an existing service order
    * @param {string} id - Service order ID
    * @param {Object} payload - Update payload
+   * @param {string} [payload.planPricingId] - Plan Pricing ID (optional)
    * @returns {Promise<Object>} Updated service order
    */
   const updateServiceOrder = async (id, payload) => {
@@ -104,16 +109,48 @@ export function useServiceOrders() {
    * @param {Object} params - Submission parameters
    * @param {string} params.accountId - Account ID
    * @param {string} params.planId - Plan UUID
+   * @param {string} params.planPricingId - Plan Pricing ID
    * @returns {Promise<Object>} Service order response
    */
   const submitServiceOrder = async (params) => {
-    const { accountId, planId } = params
+    const { accountId, planId, planPricingId } = params
 
     if (serviceOrder.value) {
-      return updateServiceOrder(serviceOrder.value.serviceOrderId, { accountId, planId })
+      return updateServiceOrder(serviceOrder.value.serviceOrderId, {
+        accountId,
+        planId,
+        planPricingId
+      })
     }
 
-    return createServiceOrder({ accountId, planId })
+    return createServiceOrder({ accountId, planId, planPricingId })
+  }
+
+  /**
+   * Update only planPricingId of existing service order
+   * @param {string} planPricingId - New plan pricing ID
+   * @returns {Promise<Object|undefined>} Updated service order or undefined if no service order exists
+   */
+  const updatePlanPricing = async (planPricingId) => {
+    if (!serviceOrder.value?.serviceOrderId) {
+      return
+    }
+
+    isSubmitting.value = true
+    try {
+      const response = await serviceOrdersService.updateServiceOrder(
+        serviceOrder.value.serviceOrderId,
+        { planPricingId }
+      )
+      if (response?.data) {
+        serviceOrder.value = response.data
+      }
+      return response
+    } catch {
+      // Fail silently
+    } finally {
+      isSubmitting.value = false
+    }
   }
 
   /**
@@ -125,9 +162,6 @@ export function useServiceOrders() {
     isSubmitting.value = false
     error.value = null
   }
-
-  // Computed
-  const hasServiceOrder = computed(() => serviceOrder.value !== null)
 
   return {
     // State
@@ -142,6 +176,7 @@ export function useServiceOrders() {
     createServiceOrder,
     updateServiceOrder,
     submitServiceOrder,
+    updatePlanPricing,
     reset
   }
 }

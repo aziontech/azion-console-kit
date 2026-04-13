@@ -152,7 +152,8 @@ export const ServiceOrdersAdapter = {
   toCreatePayload(payload = {}) {
     return {
       accountId: payload.accountId,
-      planId: payload.planId
+      planId: payload.planId,
+      planPricingId: payload.planPricingId
     }
   },
 
@@ -160,6 +161,7 @@ export const ServiceOrdersAdapter = {
     return {
       accountId: payload.accountId,
       planId: payload.planId,
+      planPricingId: payload.planPricingId,
       status: payload.status,
       type: payload.type,
       gatewayId: payload.gatewayId,

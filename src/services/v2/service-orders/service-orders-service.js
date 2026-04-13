@@ -10,7 +10,7 @@ export class ServiceOrdersService extends BaseService {
   // Plans and Coupons endpoints
   // Production: '/v4/product_catalog/plans' and '/v4/product_catalog/coupons'
   // Local dev with mock: '/local_api/v4/product_catalog/...'
-  #plansBaseURL = '/local_api/v4/product_catalog/plans'
+  #plansBaseURL = '/edge_api/api/v1/plans'
   #couponsBaseURL = '/local_api/v4/product_catalog/coupons'
 
   listPlansService = async () => {

@@ -22,7 +22,7 @@
           </template>
 
           <template #footer>
-            <PrimeButton
+            <Button
               severity="primary"
               class="w-full font-protomono flex items-center justify-center"
               :icon="showLoading"
@@ -35,7 +35,7 @@
               >
                 <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
               </Transition>
-            </PrimeButton>
+            </Button>
           </template>
         </CardBox>
         <div
@@ -89,16 +89,16 @@
   import CardBox from '@aziontech/webkit/card-box'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
-  import PrimeButton from 'primevue/button'
+  import Button from '@aziontech/webkit/button'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
-  import { usePlansList } from '@/composables/usePlansService'
+  import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
   import { useAccountStore } from '@/stores/account'
   import { useServiceOrders } from '@/composables/useServiceOrders'
 
   const router = useRouter()
-  const { initialize: initializePlans } = usePlans()
+  const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
   const accountStore = useAccountStore()
   const { data: plansData, refetch: loadPlans } = usePlansList({ enabled: false })
   const {
@@ -158,12 +158,15 @@
   const onSubmit = async () => {
     const plan = additionalDataRef.value?.plan
     const accountId = accountStore.accountData?.id
+    const billingCycle = storedBillingCycle.value || 'yearly'
 
     // Handle service order (create or update) before proceeding
     if (plan && accountId) {
       const planId = getPlanIdFromName(plan)
-      if (planId) {
-        await submitServiceOrder({ accountId, planId })
+      const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
+
+      if (planId && planPricingId) {
+        await submitServiceOrder({ accountId, planId, planPricingId })
       }
     }
 

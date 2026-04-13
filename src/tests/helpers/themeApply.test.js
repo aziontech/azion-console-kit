@@ -26,11 +26,11 @@ describe('themeApply', () => {
   it.each([
     {
       useSystemInDarkMode: true,
-      result: 'azion azion-dark'
+      result: 'azion-dark'
     },
     {
       useSystemInDarkMode: false,
-      result: 'azion-light azion'
+      result: 'azion-light'
     }
   ])(
     'should define theme as $result when system theme is $useSystemInDarkMode for dark mode',
@@ -52,22 +52,22 @@ describe('themeApply', () => {
     {
       matchesSystemThemeDark: true,
       selectedTheme: 'dark',
-      result: 'azion azion-dark'
+      result: 'azion-dark'
     },
     {
       matchesSystemThemeDark: true,
       selectedTheme: 'light',
-      result: 'azion-light azion'
+      result: 'azion-light'
     },
     {
       matchesSystemThemeDark: false,
       selectedTheme: undefined,
-      result: 'azion-light azion'
+      result: 'azion-light'
     },
     {
       matchesSystemThemeDark: true,
       selectedTheme: undefined,
-      result: 'azion azion-dark'
+      result: 'azion-dark'
     }
   ])(
     `should change application theme when $selectedTheme to $result`,

@@ -51,3 +51,22 @@ export function getPlanPricing(plans, planName) {
 
   return { monthly, yearly }
 }
+
+/**
+ * Helper to get plan pricing ID by billing cycle
+ * @param {Array} plans - List of plans from API
+ * @param {string} planName - Plan name (pro, scale, hobby)
+ * @param {string} billingCycle - Billing cycle (monthly, yearly)
+ * @returns {string|null} planPricingId
+ */
+export function getPlanPricingId(plans, planName, billingCycle) {
+  if (!Array.isArray(plans) || !planName || !billingCycle) {
+    return null
+  }
+
+  const plan = plans.find((item) => item.sku.toLowerCase() === planName.toLowerCase())
+  if (!plan?.pricings) return null
+
+  const pricing = plan.pricings.find((pricingItem) => pricingItem.periodicity === billingCycle)
+  return pricing?.id || null
+}
