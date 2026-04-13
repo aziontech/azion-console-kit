@@ -7,8 +7,10 @@
   "type": "module",
   "scripts": {
     "build": "storybook build -o dist -c .storybook",
+    "build:azion": "azion build --debug",
     "dev": "storybook dev -p 6006 -c .storybook",
-    "preview": "npx http-server dist -p 6007"
+    "preview": "npx http-server dist -p 6007",
+    "deploy": "azion deploy --local --debug"
   },
   "dependencies": {
     "@aziontech/icons": "^1.4.0",

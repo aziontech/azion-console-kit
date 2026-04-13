@@ -7,7 +7,7 @@ export default {
   storage: [
     {
       name: 'console-kit-storybook',
-      prefix: '20260412231706',
+      prefix: '20260413110420',
       dir: './dist',
       workloadsAccess: 'read_only'
     }
@@ -19,7 +19,7 @@ export default {
       type: 'storage',
       attributes: {
         bucket: 'console-kit-storybook',
-        prefix: '20260412231706'
+        prefix: '20260413110420'
       }
     }
   ],
@@ -152,7 +152,54 @@ export default {
             ]
           }
         ],
-        response: []
+        response: [
+          {
+            name: 'Debug',
+            description: 'Set header -- Access-Control-Allow-Origin: *',
+            active: false,
+            criteria: [
+              [
+                {
+                  variable: '${uri}',
+                  conditional: 'if',
+                  operator: 'starts_with',
+                  argument: '/'
+                }
+              ]
+            ],
+            behaviors: [
+              {
+                type: 'add_response_header',
+                attributes: {
+                  value: 'x-azion-debug: 01'
+                }
+              }
+            ]
+          },
+          {
+            name: 'CORS Header',
+            description: 'Set header -- Access-Control-Allow-Origin: *',
+            active: true,
+            criteria: [
+              [
+                {
+                  variable: '${uri}',
+                  conditional: 'if',
+                  operator: 'starts_with',
+                  argument: '/'
+                }
+              ]
+            ],
+            behaviors: [
+              {
+                type: 'add_response_header',
+                attributes: {
+                  value: 'Access-Control-Allow-Origin: *'
+                }
+              }
+            ]
+          }
+        ]
       }
     }
   ],

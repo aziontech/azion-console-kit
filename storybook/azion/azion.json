@@ -3,7 +3,7 @@
   "bucket": "console-kit-storybook",
   "preset": "html",
   "env": "production",
-  "prefix": "20260412231706",
+  "prefix": "20260413110420",
   "rotate-prefix": true,
   "not-first-run": true,
   "function": [],
@@ -43,6 +43,16 @@
         "id": 535937,
         "name": "Redirect to index.html for Subpaths",
         "phase": "request"
+      },
+      {
+        "id": 538579,
+        "name": "Debug",
+        "phase": "response"
+      },
+      {
+        "id": 538580,
+        "name": "CORS Header",
+        "phase": "response"
       }
     ]
   },
