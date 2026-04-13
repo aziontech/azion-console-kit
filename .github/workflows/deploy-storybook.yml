@@ -9,7 +9,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
 
     permissions:
@@ -18,20 +17,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GIT_PKG }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'yarn'
-          # registry-url: 'https://registry.npmjs.org'
-
-      - name: Install workspace dependencies
-        working-directory: src/storybook
-        run: yarn install
 
       - name: Install Azion CLI
         run: |
@@ -46,6 +37,10 @@ jobs:
         run: |
           azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}  
           azion whoami
+
+      - name: Install storybook dependencies
+        working-directory: src/storybook
+        run: yarn install
       
       - name: Building Storybook
         working-directory: src/storybook
