@@ -12,6 +12,7 @@ export async function logoutGuard({ to, accountStore, tracker }) {
   }
 
   if (to.path === '/logout' || to.query.ref === 'logout') {
+    loadingStore.startLoading()
     tracker.reset()
     await sessionManager.logout()
     await logoutService()

@@ -17,9 +17,9 @@
   import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
-  import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeButton from 'primevue/button'
+  import Divider from '@aziontech/webkit/divider'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
@@ -206,10 +206,6 @@
     },
     errors: {
       type: Object
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     },
     loadingOrigins: {
       type: Boolean,
@@ -588,26 +584,23 @@
         @onSuccess="handleSuccessOrigin"
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
-        :clipboardWrite="clipboardWrite"
       />
       <DrawerFunction
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
       />
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          :readonly="isDefaultPhase"
-          :disabled="isDefaultPhase"
-          placeholder="My rule"
-          :value="name"
-          description="Give a unique and descriptive name to identify the rule."
-          data-testid="rule-form-general-name"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        :readonly="isDefaultPhase"
+        :disabled="isDefaultPhase"
+        placeholder="My rule"
+        :value="name"
+        description="Give a unique and descriptive name to identify the rule."
+        data-testid="rule-form-general-name"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"

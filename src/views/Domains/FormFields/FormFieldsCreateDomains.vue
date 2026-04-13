@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
@@ -181,17 +181,15 @@
   >
     <template #title> General </template>
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My domain"
-          data-testid="domains-form__name-field"
-          :value="name"
-          description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My domain"
+        data-testid="domains-form__name-field"
+        :value="name"
+        description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
+      />
     </template>
   </form-horizontal>
   <form-horizontal

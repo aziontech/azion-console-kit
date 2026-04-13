@@ -1,23 +1,25 @@
 <script setup>
-  import ListTableBlock from '@templates/list-table-block/graphic.vue'
+  import ListTableGraphic from '@/components/list-table/ListTableGraphic.vue'
   import { computed } from 'vue'
+
+  defineOptions({ name: 'list-chart' })
+
   const props = defineProps({
     resultChart: Array
   })
 
-  const HEIGHT_ROW = '375px'
   const chartData = computed(() => props.resultChart[0].data)
   const columns = computed(() => props.resultChart[0].columns)
 </script>
 
 <template>
   <div class="w-full h-full">
-    <ListTableBlock
-      :scrollHeight="HEIGHT_ROW"
+    <ListTableGraphic
       :data="chartData"
       :columns="columns"
+      scrollHeight="375px"
+      emptyListMessage="No registers found."
       smallRow
-      hiddenHeader
     />
   </div>
 </template>

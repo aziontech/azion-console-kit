@@ -60,7 +60,7 @@
 <script setup>
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
   import ActionBar from '@/templates/action-bar-block'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import { LottieAnimation } from 'lottie-web-vue'
   import { useThemeStore } from '@/stores/theme'

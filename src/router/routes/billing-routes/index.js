@@ -13,7 +13,6 @@ export const billingRoutes = {
     loadInvoiceDataService: BillingServices.loadInvoiceDataService,
     loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService,
     listServiceAndProductsChangesService: BillingServices.listServiceAndProductsChangesService,
-    clipboardWrite: Helpers.clipboardWrite,
     getStripeClientService: BillingServices.getStripeClientService,
     documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods,
     listPaymentHistoryService: BillingServices.listPaymentHistoryService,

@@ -1,66 +1,18 @@
-<template>
-  <DrawerBlock
-    ref="drawerRef"
-    :optionsStatusCode="pagesValue"
-    @onSuccess="updateList"
-  />
-  <FormHorizontal
-    :isDrawer="props.isDrawer"
-    title="Page Codes"
-    description="Use the Page Codes table to configure error pages by editing HTTP status codes. Click a row to open the settings panel and customize values like Response TTL, Custom Status Code, and Page Path (URI)."
-    :pt="classesPt"
-  >
-    <template #inputs>
-      <div>
-        <InlineMessage
-          class="p-2"
-          name="pages"
-          severity="error"
-          v-if="errorMessage"
-        >
-          {{ errorMessage }}
-        </InlineMessage>
-        <ListTableBlock
-          ref="listStatusCodeRef"
-          isTabs
-          :enableEditClick="false"
-          :columns="statusCodeColumns"
-          :editInDrawer="openEditStatusCodeDrawer"
-          :listService="listPagesCodeService"
-          :actions="actionsRow"
-          emptyListMessage="No status codes found."
-          exportFileName="Page Codes"
-        >
-          <template #addButton>
-            <PrimeButton
-              icon="pi pi-plus"
-              label="Custom Page Code"
-              data-testid="status-code__add-button"
-              severity="secondary"
-              @click="openCreateStatusCodeDrawer"
-              :disabled="disabledButtonAdd"
-              class="w-full sm:w-auto"
-            />
-          </template>
-        </ListTableBlock>
-      </div>
-    </template>
-  </FormHorizontal>
-</template>
-
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
-  import ListTableBlock from '@/templates/list-table-block'
+  import DataTable from '@aziontech/webkit/list-data-table'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { ref, computed } from 'vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
-  import InlineMessage from 'primevue/inlinemessage'
 
-  const listStatusCodeRef = ref(null)
   const drawerRef = ref(null)
+  const listTableRef = ref(null)
+  const searchValue = ref('')
 
   const { value: pagesValue, errorMessage, handleReset } = useField('pages')
   const {
@@ -155,6 +107,21 @@
     }
   ]
 
+  const actionsRow = [
+    {
+      type: 'delete',
+      label: 'Delete',
+      title: 'Page Code',
+      icon: 'pi pi-trash',
+      disabled: (item) => item.code.origin === 'Azion',
+      service: (item) => deletePage(item)
+    }
+  ]
+
+  const openEditStatusCodeDrawer = (item) => {
+    drawerRef.value.openEditDrawer(item)
+  }
+
   const updateList = (item) => {
     handleReset()
     if (item.code.origin) return
@@ -168,7 +135,7 @@
       pushPages(item)
     }
 
-    listStatusCodeRef.value.reload()
+    listTableRef.value?.reload()
   }
 
   const deletePage = (idPage) => {
@@ -177,21 +144,10 @@
       removePages(idx)
     }
 
-    listStatusCodeRef.value.reload()
+    listTableRef.value?.reload()
   }
 
-  const actionsRow = [
-    {
-      type: 'delete',
-      label: 'Delete',
-      title: 'Page Code',
-      icon: 'pi pi-trash',
-      disabled: (item) => item.code.origin === 'Azion',
-      service: (item) => deletePage(item)
-    }
-  ]
-
-  const listPagesCodeService = () => {
+  function listPagesCodeService() {
     const hasPages = !!pagesValue.value?.length
     if (hasPages) {
       const pagesCodes = new Set(pagesValue.value.map((page) => page.code.value))
@@ -209,10 +165,6 @@
     return STATUS_CODE_OPTIONS
   }
 
-  const openEditStatusCodeDrawer = (item) => {
-    drawerRef.value.openEditDrawer(item)
-  }
-
   const openCreateStatusCodeDrawer = () => {
     drawerRef.value.openEditDrawer({
       type: 'page_connector',
@@ -224,3 +176,66 @@
     })
   }
 </script>
+
+<template>
+  <DrawerBlock
+    ref="drawerRef"
+    :optionsStatusCode="pagesValue"
+    @onSuccess="updateList"
+  />
+  <FormHorizontal
+    :isDrawer="props.isDrawer"
+    title="Page Codes"
+    description="Use the Page Codes table to configure error pages by editing HTTP status codes. Click a row to open the settings panel and customize values like Response TTL, Custom Status Code, and Page Path (URI)."
+    :pt="classesPt"
+  >
+    <template #inputs>
+      <div>
+        <InlineMessage
+          class="p-2"
+          name="pages"
+          severity="error"
+          v-if="errorMessage"
+        >
+          {{ errorMessage }}
+        </InlineMessage>
+        <ListTable
+          ref="listTableRef"
+          :listService="listPagesCodeService"
+          :columns="statusCodeColumns"
+          :actions="actionsRow"
+          :enableEditClick="false"
+          :editInDrawer="openEditStatusCodeDrawer"
+          emptyListMessage="No status codes found."
+          :showColumnSelector="false"
+          :inlineAction="true"
+          isTabs
+          :lazy="false"
+        >
+          <template #header>
+            <div
+              class="flex flex-wrap justify-between gap-2 w-full px-3"
+              data-testid="data-table-header"
+            >
+              <span class="flex flex-row items-center gap-2 max-sm:w-full">
+                <DataTable.Search
+                  class="w-full md:min-w-[20rem]"
+                  v-model="searchValue"
+                />
+              </span>
+              <PrimeButton
+                icon="pi pi-plus"
+                label="Custom Page Code"
+                data-testid="status-code__add-button"
+                severity="secondary"
+                @click="openCreateStatusCodeDrawer"
+                :disabled="disabledButtonAdd"
+                class="w-full sm:w-auto"
+              />
+            </div>
+          </template>
+        </ListTable>
+      </div>
+    </template>
+  </FormHorizontal>
+</template>

@@ -69,9 +69,9 @@
 </script>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import InlineMessage from 'primevue/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'

@@ -4,6 +4,7 @@ import process from 'process'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, loadEnv } from 'vite'
+import { webkitViteConfig } from '@aziontech/webkit/vite'
 import istanbul from 'vite-plugin-istanbul'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
@@ -59,6 +60,7 @@ const getConfig = () => {
           ]
         : [])
     ],
+    optimizeDeps: webkitViteConfig.optimizeDeps,
     resolve: {
       preserveSymlinks: true, // Vite doesn't follow the symlink (@aziontech/icons in dev mode)
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
@@ -114,14 +116,6 @@ const getConfig = () => {
         }),
         '/v4': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`
-        }),
-        '/webpagetest': createProxyConfig({
-          target: 'https://www.azion.com/api/webpagetest',
-          rewrite: (path) => path.replace(/^\/webpagetest/, '')
-        }),
-        '/webpagetest-external': createProxyConfig({
-          target: 'https://www.azion.com/api/webpagetest',
-          rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
         }),
         '/ai': createProxyConfig({
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,

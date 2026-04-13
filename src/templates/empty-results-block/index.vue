@@ -1,6 +1,6 @@
 <script setup>
   import { useRouter } from 'vue-router'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Illustration from '@/assets/svg/illustration-layers'
 
   defineOptions({ name: 'empty-results-block' })

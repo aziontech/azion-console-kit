@@ -1,17 +1,16 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, inject } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
   import CloneBlock from '@/templates/clone-block'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'edge-firewall-view' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-
   const tracker = inject('tracker')
 
   defineProps({
@@ -92,6 +91,12 @@
     }
   ])
 
+  const frozenColumns = ['name']
+
+  const allowedFilters = computed(() => {
+    return getColumns.value.filter((col) => col.header && col.header !== 'Last Modified')
+  })
+
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
       productName: 'Edge Firewall'
@@ -102,6 +107,14 @@
     tracker.product.clickToEdit({
       productName: 'Edge Firewall'
     })
+  }
+
+  const handleBeforeGoToAddPage = () => {
+    handleTrackEvent()
+  }
+
+  const handleBeforeGoToEdit = () => {
+    handleTrackEditEvent()
   }
 </script>
 
@@ -125,19 +138,18 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        :listService="edgeFirewallService.listEdgeFirewallService"
+        :columns="getColumns"
+        :actions="actions"
         createPagePath="/firewalls/create"
         editPagePath="/firewalls/edit"
-        :listService="edgeFirewallService.listEdgeFirewallService"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        :columns="getColumns"
-        emptyListMessage="No Firewall found."
-        @on-before-go-to-add-page="handleTrackEvent"
-        :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Firewalls"
-        :allowedFilters="getColumns"
+        :lazy="true"
+        :frozenColumns="frozenColumns"
+        :allowedFilters="allowedFilters"
+        emptyListMessage="No Firewall found."
         :emptyBlock="{
           title: 'No Firewalls yet',
           description:
@@ -146,6 +158,8 @@
           createPagePath: '/firewalls/create',
           documentationService: documentationService
         }"
+        @on-before-go-to-add-page="handleBeforeGoToAddPage"
+        @on-before-go-to-edit="handleBeforeGoToEdit"
       />
     </template>
   </ContentBlock>

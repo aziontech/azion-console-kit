@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import InputText from 'primevue/inputtext'
-  import PrimeTag from 'primevue/tag'
+  import InputText from '@aziontech/webkit/inputtext'
+  import PrimeTag from '@aziontech/webkit/tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -14,7 +14,7 @@
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
-  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+  import CopyBlock from '@aziontech/webkit/button-copy'
   const isLetEncrypt = ref(false)
 
   const props = defineProps({
@@ -142,7 +142,7 @@
     edgeApplication.value = id
   }
 
-  const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
+  const emit = defineEmits(['edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
 
@@ -201,16 +201,14 @@
     description="Check the details of the Azion domain, including the domain address to access the Application, and modify digital certificate options."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My domain"
-          :value="name"
-          description="Give a unique and descriptive name to identify the domain."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My domain"
+        :value="name"
+        description="Give a unique and descriptive name to identify the domain."
+      />
     </template>
   </form-horizontal>
 

@@ -17,7 +17,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useLayout } from '@/composables/use-layout'
 
   defineOptions({ name: 'ButtonHelper' })

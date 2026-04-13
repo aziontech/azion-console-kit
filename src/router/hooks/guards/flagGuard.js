@@ -1,7 +1,7 @@
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function flagGuard({ to }) {
+export function flagGuard({ to }) {
   if (to.meta?.isPublic) {
     return true
   }

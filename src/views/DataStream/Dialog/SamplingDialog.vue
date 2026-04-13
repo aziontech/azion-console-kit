@@ -44,9 +44,9 @@
 </template>
 
 <script setup>
-  import PrimeDialog from 'primevue/dialog'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
 
   const emit = defineEmits(['confirm', 'cancel'])
 </script>

@@ -1,12 +1,12 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import PrimeButton from 'primevue/button'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
+  import ListTable from '@/components/list-table/ListTable.vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -44,7 +44,8 @@
   const router = useRouter()
   const route = useRoute()
   const drawerFunctionRef = ref('')
-  const listFunctionsEdgeFirewallRef = ref('')
+  const listTableRef = ref(null)
+
   const documentationService = () => {
     openDocumentationProducts('/secure/firewall/functions-instances/')
   }
@@ -126,10 +127,6 @@
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
-  const reloadList = () => {
-    listFunctionsEdgeFirewallRef.value.reload()
-  }
-
   const actions = [
     {
       label: 'Delete',
@@ -139,9 +136,17 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  const frozenColumns = ['name']
+
+  const reloadList = () => {
+    listTableRef.value?.reload()
+  }
+
   defineExpose({
     openCreateDrawer: openCreateFunctionDrawer
   })
+
   onMounted(() => {
     openDrawerById({ id: route.query.id })
   })
@@ -158,16 +163,18 @@
     :loadEdgeFunctionService="loadEdgeFunctionService"
     @onSuccess="reloadList"
   />
-  <FetchListTableBlock
-    ref="listFunctionsEdgeFirewallRef"
-    addButtonLabel="Function Instance"
+  <ListTable
+    ref="listTableRef"
     :listService="listFunctionsInstance"
     :columns="getColumns"
-    :editInDrawer="openEditFunctionDrawer"
     :actions="actions"
-    isTabs
-    :frozen-columns="['name']"
+    :editInDrawer="openEditFunctionDrawer"
+    defaultOrderingFieldName="id"
     exportFileName="Firewall Functions"
+    :lazy="true"
+    :frozenColumns="frozenColumns"
+    :isTabs="true"
+    emptyListMessage="No functions found."
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',
@@ -175,13 +182,6 @@
       documentationService: documentationService
     }"
   >
-    <template #addButton>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Function Instance"
-        @click="openCreateFunctionDrawer"
-      />
-    </template>
     <template #emptyBlockButton>
       <PrimeButton
         class="max-md:w-full w-fit"
@@ -192,5 +192,5 @@
         @click="openCreateFunctionDrawer"
       />
     </template>
-  </FetchListTableBlock>
+  </ListTable>
 </template>

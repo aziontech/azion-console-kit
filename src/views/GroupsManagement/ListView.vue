@@ -1,18 +1,22 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
   import { useAccountStore } from '@/stores/account'
   import { useRouter } from 'vue-router'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, onBeforeMount } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { computed, onBeforeMount, ref } from 'vue'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'group-management-view' })
 
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
+  const hasContentToList = ref(true)
+  const listTableRef = ref()
 
   onBeforeMount(() => {
     if (accountType !== 'company') {
@@ -73,6 +77,10 @@
   const listAccountsGroupDecorator = async (params) => {
     return await listAccountsService({ account_type: 'group', ...params })
   }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
 </script>
 
 <template>
@@ -93,23 +101,30 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        v-if="hasContentToList"
+        ref="listTableRef"
         :listService="listAccountsGroupDecorator"
         :columns="getColumns"
+        :frozenColumns="['name']"
         editPagePath="/management/edit"
-        emptyListMessage="No groups found."
-        :frozen-columns="['name']"
         exportFileName="Group Management"
         :csvMapper="csvMapper"
-        hideLastModifiedColumn
-        :emptyBlock="{
-          title: 'No groups yet',
-          description: 'Create your first group to manage permissions for resource access.',
-          createButtonLabel: 'Group',
-          createPagePath: 'management/create',
-          documentationService: documentationService
-        }"
+        :hideLastModifiedColumn="true"
+        emptyListMessage="No groups found."
+        @on-load-data="handleLoadData"
       />
+      <EmptyResultsBlock
+        v-else
+        title="No groups yet"
+        description="Create your first group to manage permissions for resource access."
+        createButtonLabel="Group"
+        createPagePath="management/create"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
   </ContentBlock>
 </template>

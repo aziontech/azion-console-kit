@@ -4,8 +4,8 @@
 
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import SelectPanel from '@/components/select-panel'
@@ -223,16 +223,14 @@
         description="Edit a Function that runs closer to users to use with Application or Firewall."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldText
-              label="Name"
-              required
-              name="name"
-              placeholder="My function"
-              :value="name"
-              description="Give a unique and descriptive name to identify the Function."
-            />
-          </div>
+          <FieldText
+            label="Name"
+            required
+            name="name"
+            placeholder="My function"
+            :value="name"
+            description="Give a unique and descriptive name to identify the Function."
+          />
         </template>
       </FormHorizontal>
 

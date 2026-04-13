@@ -1,11 +1,11 @@
 <script setup>
-  import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'edge-connectors-view' })
 
@@ -16,8 +16,7 @@
     }
   })
 
-  const refListTable = ref()
-  const hasContentToList = ref(true)
+  const listTableRef = ref()
 
   const actions = [
     {
@@ -28,10 +27,6 @@
       service: edgeConnectorsService.deleteEdgeConnectorsService
     }
   ]
-
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
 
   const csvMapper = (rowData) => {
     return {
@@ -103,6 +98,10 @@
       }
     ]
   })
+
+  const allowedFilters = computed(() => {
+    return getColumns.value.filter((col) => col.header && col.header !== 'Last Modified')
+  })
 </script>
 <template>
   <ContentBlock>
@@ -122,20 +121,20 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTable
+        ref="listTableRef"
+        emptyListMessage="No connectors found."
         :listService="edgeConnectorsService.listEdgeConnectorsService"
         :columns="getColumns"
-        ref="refListTable"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No Connectors found."
         :actions="actions"
         createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
-        data-testid="edge-connectors-list-table-block"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozen-columns="['name']"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Connectors"
         :csvMapper="csvMapper"
+        :lazy="true"
+        :frozenColumns="['name']"
+        :allowedFilters="allowedFilters"
         :emptyBlock="{
           title: 'No Connectors yet',
           description:

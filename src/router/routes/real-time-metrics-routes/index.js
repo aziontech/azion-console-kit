@@ -1,4 +1,4 @@
-import { clipboardWrite, metricsPlaygroundOpener } from '@/helpers'
+import { metricsPlaygroundOpener } from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimeMetricsRoutes = {
@@ -6,8 +6,7 @@ export const realTimeMetricsRoutes = {
   name: 'real-time-metrics',
   component: () => import('@views/RealTimeMetrics/RealTimeMetricsView.vue'),
   props: {
-    playgroundOpener: metricsPlaygroundOpener,
-    clipboardWrite
+    playgroundOpener: metricsPlaygroundOpener
   },
   meta: {
     title: 'Real-Time Metrics',

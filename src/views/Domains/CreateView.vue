@@ -40,7 +40,7 @@
 
 <script setup>
   import { ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -49,7 +49,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
@@ -58,12 +58,8 @@
   const tracker = inject('tracker')
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
-  const props = defineProps({
+  defineProps({
     createDomainService: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
       type: Function,
       required: true
     },
@@ -90,8 +86,7 @@
     domainName.value = value?.domainName
     dialog.open(CopyDomainDialog, {
       data: {
-        domain: domainName.value,
-        copy: copyDomain
+        domain: domainName.value
       },
       onClose: () => {
         router.push({ path: value.urlToEditView })
@@ -103,25 +98,6 @@
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
-  }
-
-  const copyDomain = async () => {
-    const toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    }
-
-    try {
-      props.clipboardWrite(domainName.value)
-      toast.add({ ...toastConfig })
-    } catch (error) {
-      toast.add({
-        ...toastConfig,
-        severity: 'error',
-        detail: 'The domain was not copied to the clipboard. Try copying it again.'
-      })
-    }
   }
 
   const renderToastDomainCreateSuccesfully = () => {

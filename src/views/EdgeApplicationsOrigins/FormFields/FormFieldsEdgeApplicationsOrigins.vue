@@ -1,13 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import CopyBlock from '@aziontech/webkit/button-copy'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/field-number'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
 
@@ -17,10 +18,6 @@
     disabledFields: {
       type: Boolean,
       default: false
-    },
-    copyToClipboard: {
-      type: Function,
-      required: true
     },
     listOrigins: {
       required: true,
@@ -166,17 +163,15 @@
     description="Create a origin server configuration for the Application. Use Rules Engine to activate origins."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          placeholder="My origin"
-          name="name"
-          :value="name"
-          data-testid="form-horizontal-general-name"
-          description="Give a unique and descriptive name to identify the origin."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        placeholder="My origin"
+        name="name"
+        :value="name"
+        data-testid="form-horizontal-general-name"
+        description="Give a unique and descriptive name to identify the origin."
+      />
     </template>
   </FormHorizontal>
 
@@ -200,15 +195,12 @@
             icon="pi pi-lock"
           />
         </div>
-        <PrimeButton
-          class="h-8 max-sm:w-full"
-          icon="pi pi-clone"
-          outlined
-          type="button"
-          aria-label="Copy Origin Key"
+        <CopyBlock
+          :value="originKey"
           label="Copy"
+          copiedLabel="Copied"
           :disabled="!originKey"
-          @click="props.copyToClipboard(originKey)"
+          aria-label="Copy Origin Key"
         />
       </div>
     </template>

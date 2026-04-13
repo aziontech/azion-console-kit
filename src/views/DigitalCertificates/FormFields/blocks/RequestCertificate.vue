@@ -5,77 +5,63 @@
     description="Generate a CSR and submit it to a certificate authority to generate a digital certificate."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Subject Name"
-          required
-          name="common"
-          placeholder="example.com"
-          :value="common"
-          data-testid="digital-certificate__subject-name-field"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__country"
-          label="Country/Region"
-          required
-          placeholder="BR"
-          :value="country"
-          name="country"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__state"
-          label="State/Province"
-          required
-          placeholder="São Paulo"
-          :value="state"
-          name="state"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__city"
-          label="City/Locality"
-          required
-          placeholder="São Paulo"
-          :value="city"
-          name="city"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__organization"
-          label="Organization"
-          required
-          placeholder="Company Name S.A."
-          :value="organization"
-          name="organization"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__organization-unit"
-          label="Organization Unit"
-          required
-          placeholder="IT Department"
-          :value="organizationUnity"
-          name="organizationUnity"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="digital-certificate__email"
-          label="Email"
-          required
-          placeholder="example@email.com"
-          type="email"
-          :value="email"
-          name="email"
-        />
-      </div>
+      <FieldText
+        label="Subject Name"
+        required
+        name="common"
+        placeholder="example.com"
+        :value="common"
+        data-testid="digital-certificate__subject-name-field"
+      />
+      <FieldText
+        data-testid="digital-certificate__country"
+        label="Country/Region"
+        required
+        placeholder="BR"
+        :value="country"
+        name="country"
+      />
+      <FieldText
+        data-testid="digital-certificate__state"
+        label="State/Province"
+        required
+        placeholder="São Paulo"
+        :value="state"
+        name="state"
+      />
+      <FieldText
+        data-testid="digital-certificate__city"
+        label="City/Locality"
+        required
+        placeholder="São Paulo"
+        :value="city"
+        name="city"
+      />
+      <FieldText
+        data-testid="digital-certificate__organization"
+        label="Organization"
+        required
+        placeholder="Company Name S.A."
+        :value="organization"
+        name="organization"
+      />
+      <FieldText
+        data-testid="digital-certificate__organization-unit"
+        label="Organization Unit"
+        required
+        placeholder="IT Department"
+        :value="organizationUnity"
+        name="organizationUnity"
+      />
+      <FieldText
+        data-testid="digital-certificate__email"
+        label="Email"
+        required
+        placeholder="example@email.com"
+        type="email"
+        :value="email"
+        name="email"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldDropdown
           name="privateKeyType"

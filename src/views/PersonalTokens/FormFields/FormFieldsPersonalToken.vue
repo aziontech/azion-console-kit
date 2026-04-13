@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Calendar from 'primevue/calendar'
-  import Dropdown from 'primevue/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import LabelBlock from '@aziontech/webkit/label'
@@ -118,17 +118,15 @@
     data-testid="personal-token-form__section__general"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          :value="name"
-          :disabled="disabledFields"
-          description="Give a unique and descriptive name to identify the personal token."
-          data-testid="personal-token-form__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        :value="name"
+        :disabled="disabledFields"
+        description="Give a unique and descriptive name to identify the personal token."
+        data-testid="personal-token-form__name-field"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"

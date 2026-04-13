@@ -57,6 +57,7 @@
           v-if="item.to"
           v-bind="props.action"
           :to="item.to"
+          @click="closeMobileMenu"
         >
           {{ item.label }}
         </router-link>
@@ -99,6 +100,7 @@
             <router-link
               v-bind="props.action"
               :to="item.to"
+              @click="closeMobileMenu"
             >
               {{ item.label }}
             </router-link>
@@ -219,6 +221,7 @@
         v-if="item.to"
         v-bind="props.action"
         :to="item.to"
+        @click="closeDesktopMenu"
       >
         {{ item.label }}
       </router-link>
@@ -253,6 +256,7 @@
         <router-link
           :to="item.to"
           class="text-sm leading-none block px-2 py-[12px] hover:bg-[var(--surface-hover)] rounded text-color transition-[background-color,border-color,box-shadow] duration-200"
+          @click="closeDesktopMenu"
         >
           {{ item.label }}
         </router-link>
@@ -343,12 +347,12 @@
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
-  import Avatar from 'primevue/avatar'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
-  import PrimeMenu from 'primevue/menu'
-  import Sidebar from 'primevue/sidebar'
+  import Avatar from '@aziontech/webkit/avatar'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import PrimeMenu from '@aziontech/webkit/menu'
+  import Sidebar from '@aziontech/webkit/sidebar'
   import { useLoadingStore } from '@/stores/loading'
 
   defineOptions({ name: 'profile-block' })

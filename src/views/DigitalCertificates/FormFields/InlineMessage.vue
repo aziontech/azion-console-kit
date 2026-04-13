@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import InlineMessage from 'primevue/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useRouter } from 'vue-router'
 

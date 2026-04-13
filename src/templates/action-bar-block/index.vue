@@ -1,6 +1,7 @@
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import ButtonSave from '@aziontech/webkit/button-save'
+  import ButtonCancel from '@aziontech/webkit/button-cancel'
 
   defineOptions({ name: 'action-bar-block' })
 
@@ -10,7 +11,6 @@
     loading: Boolean,
     inDrawer: Boolean,
     cancelDisabled: Boolean,
-    submitDisabled: Boolean,
     primaryActionLabel: { type: String, default: 'Save' },
     secondaryActionLabel: { type: String, default: 'Cancel' }
   })
@@ -23,21 +23,9 @@
     emit('onCancel')
   }
 
-  const calculateLoadIconByLoadingState = computed(() => {
-    return props.loading ? 'pi pi-spin pi-spinner' : ''
-  })
-
-  const isDisabledSubmit = computed(() => {
-    return props.submitDisabled || props.loading
-  })
-
-  const isDisabledCancel = computed(() => {
-    return props.cancelDisabled || props.loading
-  })
-
-  const inDrawerStyles = computed(() => {
-    return props.inDrawer
-  })
+  const isDisabledCancel = computed(() => props.cancelDisabled || props.loading)
+  const isDisabledSubmit = computed(() => props.loading)
+  const inDrawerStyles = computed(() => props.inDrawer)
 </script>
 <template>
   <div
@@ -57,24 +45,19 @@
         data-testid="form-actions-buttons"
       >
         <slot>
-          <PrimeButton
-            severity="primary"
+          <ButtonCancel
             :label="props.secondaryActionLabel"
-            outlined
-            class="max-md:min-w-max"
-            @click="handleCancel"
             :disabled="isDisabledCancel"
+            class="max-md:min-w-max"
             data-testid="form-actions-cancel-button"
+            @click="handleCancel"
           />
-          <PrimeButton
-            severity="primary"
+          <ButtonSave
             :label="props.primaryActionLabel"
-            @click="handleSubmit"
-            icon-pos="right"
+            :loading="isDisabledSubmit"
             class="max-md:w-full md:min-w-[5rem]"
-            :icon="calculateLoadIconByLoadingState"
-            :disabled="isDisabledSubmit"
             data-testid="form-actions-submit-button"
+            @click="handleSubmit"
           />
         </slot>
       </div>

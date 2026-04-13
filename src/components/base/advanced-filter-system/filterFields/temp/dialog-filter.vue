@@ -1,10 +1,10 @@
 <script setup>
-  import ButtonPrime from 'primevue/button'
-  import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
-  import InlineMessage from 'primevue/inlinemessage'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Sidebar from 'primevue/sidebar'
+  import ButtonPrime from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import Sidebar from '@aziontech/webkit/sidebar'
   import { useField, useForm } from 'vee-validate'
   import { computed, ref } from 'vue'
 

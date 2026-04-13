@@ -4,15 +4,16 @@
   import EditView from '@/views/WafRules/EditView.vue'
   import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
   import ListWafRulesTuning from '@/views/WafRules/ListWafRulesTuning.vue'
-  import TabPanel from 'primevue/tabpanel'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
-  import { useToast } from 'primevue/usetoast'
-  import PrimeButton from 'primevue/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import PrimeButton from '@aziontech/webkit/button'
   import { ref, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -127,11 +128,17 @@
     }
   }
 
+  const shouldShowSkeleton = computed(() => {
+    if (!waf.value) return true
+    return false
+  })
+
   renderTabCurrentRouter()
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -144,10 +151,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="flex align-center justify-between relative"
-        v-if="waf"
-      >
+      <div class="flex align-center justify-between relative">
         <TabView
           ref="tabViewRef"
           :activeIndex="activeTab"
@@ -190,7 +194,7 @@
         </div>
       </div>
 
-      <div v-if="waf">
+      <div>
         <EditView
           v-if="activeTab === mapTabs.mainSettings"
           :updatedRedirect="props.wafServices.updatedRedirect"

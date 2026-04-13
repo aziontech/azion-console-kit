@@ -23,8 +23,9 @@
 <script setup>
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
-  import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
+  import { clipboardWrite } from '@/helpers/clipboard'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeMenu from '@aziontech/webkit/menu'
   import { computed, ref, toRef, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -35,7 +36,6 @@
 
   const props = defineProps({
     report: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
     groupData: { type: Object, required: true }
   })
 
@@ -132,7 +132,7 @@
     clickedToRealTimeMetrics('copyQuery')
     const { query, variables } = reportData.value.reportQuery
     const clipboardQuery = formatGQL(query, variables)
-    await props.clipboardWrite(clipboardQuery)
+    await clipboardWrite(clipboardQuery)
   }
 
   const formatGQL = (gql, variables) => {

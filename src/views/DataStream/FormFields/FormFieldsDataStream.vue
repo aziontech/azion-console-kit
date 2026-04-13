@@ -24,7 +24,7 @@
   import { computed, onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { MIN_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
 
   import GeneralSection from './blocks/GeneralSection.vue'

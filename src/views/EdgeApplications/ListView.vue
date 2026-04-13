@@ -1,14 +1,14 @@
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import ListTable from '@/components/list-table/ListTable.vue'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -22,6 +22,8 @@
   })
 
   const toast = useToast()
+  const listTableRef = ref(null)
+
   const actions = [
     {
       type: 'dialog',
@@ -123,6 +125,20 @@
       }
     ]
   })
+
+  const frozenColumns = ['name']
+
+  const allowedFilters = computed(() => {
+    return getColumns.value.filter((col) => col.header && col.header !== 'Last Modified')
+  })
+
+  const handleBeforeGoToAddPage = () => {
+    handleTrackEvent()
+  }
+
+  const handleBeforeGoToEdit = (item) => {
+    handleTrackEditEvent(item)
+  }
 </script>
 
 <template>
@@ -145,20 +161,19 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
-        createPagePath="/applications/create?origin=list"
-        editPagePath="/applications/edit"
+      <ListTable
+        ref="listTableRef"
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No applications found."
-        data-testid="edge-applications-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
-        :frozenColumns="['name']"
+        createPagePath="/applications/create?origin=list"
+        editPagePath="/applications/edit"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Applications"
-        :allowedFilters="getColumns"
+        :lazy="true"
+        :frozenColumns="frozenColumns"
+        :allowedFilters="allowedFilters"
+        emptyListMessage="No applications found."
         :emptyBlock="{
           title: 'No Applications yet',
           description:
@@ -168,6 +183,8 @@
           documentationService: props.documentationService,
           emptyListMessage: 'No Applications found.'
         }"
+        @on-before-go-to-add-page="handleBeforeGoToAddPage"
+        @on-before-go-to-edit="handleBeforeGoToEdit"
       />
     </template>
   </ContentBlock>

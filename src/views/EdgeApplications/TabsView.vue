@@ -7,10 +7,10 @@
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
-  import InlineMessage from 'primevue/inlinemessage'
-  import TabPanel from 'primevue/tabpanel'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref, provide, inject, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -20,7 +20,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
@@ -38,7 +38,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
@@ -294,8 +293,7 @@
       addButtonLabel: 'Origin',
       props: () => ({
         ...props.originsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -307,8 +305,7 @@
       addButtonLabel: 'Device',
       props: () => ({
         ...props.deviceGroupsServices,
-        edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -360,7 +357,6 @@
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
-        clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription:
           edgeApplication.value[applicationAcceleratorEnabled.value],
         navigateToApplicationAccelerator: navigateToApplicationAccelerator

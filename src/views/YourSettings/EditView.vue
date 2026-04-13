@@ -23,6 +23,7 @@
             v-show="!loading && !isFormLoading"
             :timezoneOptions="optionsTimezone"
             :listCountriesPhoneService="listCountriesPhoneService"
+            @password-strength="onPasswordStrengthChange"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -46,7 +47,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
   import FormSkeleton from './components/FormSkeleton.vue'
@@ -172,12 +173,11 @@
     onSubmit()
   }
 
-  const passwordRequirementsList = ref([
-    { label: '8 characters', valid: false },
-    { label: '1 uppercase letter', valid: false },
-    { label: '1 lowercase letter', valid: false },
-    { label: '1 special character (example: !?<>@#$%)', valid: false }
-  ])
+  const passwordStrength = ref(null)
+
+  const onPasswordStrengthChange = (strength) => {
+    passwordStrength.value = strength
+  }
 
   const validationSchema = yup.object({
     firstName: yup.string().required().max(30).label('First Name'),
@@ -190,23 +190,15 @@
     twoFactorEnabled: yup.boolean(),
     oldPassword: yup.string(),
     password: yup.string().when('oldPassword', {
-      is: (val) => !!val, // Set the field as required when oldPassword has a value
+      is: (val) => !!val,
       then: () =>
         yup
           .string()
           .required()
           .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
-          .test('requirements', 'password does not meet the requirements', (value) => {
-            const hasUpperCase = value && /[A-Z]/.test(value)
-            const hasLowerCase = value && /[a-z]/.test(value)
-            const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
-            const hasMinLength = value?.length > 7
-            passwordRequirementsList.value[0].valid = hasMinLength
-            passwordRequirementsList.value[1].valid = hasUpperCase
-            passwordRequirementsList.value[2].valid = hasLowerCase
-            passwordRequirementsList.value[3].valid = hasSpecialChar
-            return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+          .test('requirements', 'Password does not meet the requirements.', () => {
+            return passwordStrength.value?.level === 'strong'
           })
           .label('Password')
     }),

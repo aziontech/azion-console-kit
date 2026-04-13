@@ -243,7 +243,7 @@
 
 <script setup>
   import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
+  import AccordionTab from '@aziontech/webkit/accordion-tab'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldGroupCheckbox from '@aziontech/webkit/field-group-checkbox'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
@@ -251,7 +251,7 @@
   import FieldDropdownMultiSelectLazyLoader from '@aziontech/webkit/field-dropdown-multi-select-lazy-loader'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { useRoute } from 'vue-router'
 

@@ -2,12 +2,12 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EditView from '@/views/EdgeFirewall/EditView'
-  import TabPanel from 'primevue/tabpanel'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
-  import { useToast } from 'primevue/usetoast'
-  import PrimeButton from 'primevue/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
@@ -17,6 +17,7 @@
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   const breadcrumbs = useBreadcrumbs()
   const tableDefinitionsStore = useTableDefinitionsStore()
@@ -184,6 +185,11 @@
     return edgeFirewall.value?.name || ''
   })
 
+  const shouldShowSkeleton = computed(() => {
+    if (!edgeFirewall.value) return true
+    return false
+  })
+
   const updatedFirewall = (firewall) => {
     edgeFirewall.value = { ...edgeFirewall.value, ...firewall }
     verifyTab(edgeFirewall.value)
@@ -224,7 +230,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
@@ -238,10 +245,7 @@
         @leave="unsaved.confirmLeave"
         @stay="unsaved.cancelLeave"
       />
-      <div
-        class="h-full w-full"
-        v-if="edgeFirewall"
-      >
+      <div class="h-full w-full">
         <div class="flex align-center justify-between relative">
           <TabView
             ref="tabViewRef"

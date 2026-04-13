@@ -78,8 +78,7 @@ export const edgeApplicationRoutes = {
             createOriginService: OriginsService.createOriginService,
             editOriginService: OriginsService.editOriginService,
             loadOriginService: OriginsService.loadOriginService,
-            documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
-            clipboardWrite: Helpers.clipboardWrite
+            documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
           },
           cacheSettingsServices: {
             documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
@@ -93,8 +92,7 @@ export const edgeApplicationRoutes = {
           rulesEngineServices: {
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService
-          },
-          clipboardWrite: Helpers.clipboardWrite
+          }
         }
       },
       meta: {

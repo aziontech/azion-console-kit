@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
@@ -211,17 +211,15 @@
     description="Instantiate a function within your Firewall. Use Rules Engine to activate the function."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          v-model="name"
-          description="Give a unique and descriptive name to identify the Firewall function instance."
-          placeholder="My Firewall function instance"
-          data-testid="edge-firewall-functions-form__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        v-model="name"
+        description="Give a unique and descriptive name to identify the Firewall function instance."
+        placeholder="My Firewall function instance"
+        data-testid="edge-firewall-functions-form__name-field"
+      />
     </template>
   </FormHorizontal>
 

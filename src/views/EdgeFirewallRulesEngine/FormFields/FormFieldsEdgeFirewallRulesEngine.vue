@@ -6,8 +6,8 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
   import DrawerNetworkList from '@/views/NetworkLists/Drawer/index.vue'
   import DrawerWafRules from '@/views/WafRules/Drawer/createDrawer.vue'
@@ -524,26 +524,22 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          data-testid="edge-firewall-rule-form__name"
-          :value="name"
-          placeholder="My rule"
-          description="Give a unique and descriptive name to identify the rule."
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Description"
-          name="description"
-          data-testid="edge-firewall-rule-form__description"
-          :value="description"
-          description="Add a short description or comment to the rule."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        data-testid="edge-firewall-rule-form__name"
+        :value="name"
+        placeholder="My rule"
+        description="Give a unique and descriptive name to identify the rule."
+      />
+      <FieldText
+        label="Description"
+        name="description"
+        data-testid="edge-firewall-rule-form__description"
+        :value="description"
+        description="Add a short description or comment to the rule."
+      />
     </template>
   </FormHorizontal>
 
@@ -581,7 +577,7 @@
           </div>
 
           <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
-            <div class="flex flex-col h-fit sm:max-w-[15.625rem] w-full">
+            <div class="flex flex-col sm:w-[15.625rem] w-full overflow-hidden">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -603,7 +599,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
+            <div class="flex flex-col sm:w-[15.625rem] w-full gap-2">
               <FieldDropdown
                 :options="
                   getOperatorsOptionsByCriteriaVariable({
@@ -621,7 +617,7 @@
               />
             </div>
 
-            <div class="flex flex-col sm:max-w-[15.625rem] w-full gap-2">
+            <div class="flex flex-col sm:w-[15.625rem] w-full gap-2">
               <FieldText
                 v-if="showArgumentBySelectedOperator({ criteriaIndex, criteriaInnerRowIndex })"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"

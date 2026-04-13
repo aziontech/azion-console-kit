@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -212,17 +212,15 @@
     description="Instantiate a serverless function created with Functions within the Application. Use Rules Engine to activate the function."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          data-testid="edge-application-function-instance-form__name-field"
-          label="Name"
-          required
-          name="name"
-          v-model="name"
-          placeholder="My Application function instance"
-          description="Give a unique and descriptive name to identify the function instance."
-        />
-      </div>
+      <FieldText
+        data-testid="edge-application-function-instance-form__name-field"
+        label="Name"
+        required
+        name="name"
+        v-model="name"
+        placeholder="My Application function instance"
+        description="Give a unique and descriptive name to identify the function instance."
+      />
     </template>
   </FormHorizontal>
 

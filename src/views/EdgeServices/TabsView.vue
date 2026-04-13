@@ -1,7 +1,7 @@
 <script setup>
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import EditView from '@/views/EdgeServices/EditView'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
@@ -10,9 +10,10 @@
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import EditViewSkeleton from './components/EditViewSkeleton.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -41,6 +42,12 @@
   }
 
   const title = ref(cachedService.name || '')
+  const isServiceLoaded = ref(!!cachedService.name)
+
+  const shouldShowSkeleton = computed(() => {
+    if (!isServiceLoaded.value) return true
+    return false
+  })
 
   const tabs = ref([
     {
@@ -90,6 +97,7 @@
 
   const updateEdgeServiceValue = (value) => {
     title.value = value.name
+    isServiceLoaded.value = true
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, value.name)
   }
 
@@ -139,7 +147,8 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <EditViewSkeleton v-if="shouldShowSkeleton" />
+  <ContentBlock v-else>
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"

@@ -271,10 +271,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import MultiSelect from 'primevue/multiselect'
+  import MultiSelect from '@aziontech/webkit/multiselect'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import Password from 'primevue/password'
+  import Password from '@aziontech/webkit/password'
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
   import LabelBlock from '@aziontech/webkit/label'

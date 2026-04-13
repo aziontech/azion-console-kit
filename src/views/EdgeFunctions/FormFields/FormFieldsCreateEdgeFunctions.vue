@@ -2,8 +2,8 @@
   import { computed, onMounted, onUnmounted, ref, markRaw } from 'vue'
   import { useField } from 'vee-validate'
   import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import { useResize } from '@/composables/useResize'
@@ -207,16 +207,14 @@
         description="Create Functions that run closer to users to use with Application or Firewall."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldText
-              required
-              label="Name"
-              name="name"
-              description="Give a unique and descriptive name to identify the Function."
-              placeholder="My Function"
-              :value="name"
-            />
-          </div>
+          <FieldText
+            required
+            label="Name"
+            name="name"
+            description="Give a unique and descriptive name to identify the Function."
+            placeholder="My Function"
+            :value="name"
+          />
         </template>
       </FormHorizontal>
 

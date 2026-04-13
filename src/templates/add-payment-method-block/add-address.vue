@@ -9,17 +9,15 @@
         data-sentry-mask
         class="flex flex-col gap-6 md:gap-8 md:flex-row"
       >
-        <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <FieldText
-            data-testid="account-settings__postal-code"
-            label="Postal Code"
-            required
-            name="postalCode"
-            placeholder="00.000.000-00"
-            :value="postalCode"
-            description="Postal code of the account owner."
-          />
-        </div>
+        <FieldText
+          data-testid="account-settings__postal-code"
+          label="Postal Code"
+          required
+          name="postalCode"
+          placeholder="00.000.000-00"
+          :value="postalCode"
+          description="Postal code of the account owner."
+        />
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldDropdown
             label="Country"
@@ -81,27 +79,23 @@
         data-sentry-mask
         class="flex flex-col gap-6 md:gap-8 md:flex-row"
       >
-        <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <FieldText
-            label="Address"
-            required
-            name="address"
-            placeholder="123 Example Ave."
-            :value="address"
-            description="Account owner's street address."
-            data-testid="account-settings__address"
-          />
-        </div>
-        <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <FieldText
-            label="Apartment, floor, etc."
-            name="complement"
-            placeholder="1st floor"
-            :value="complement"
-            description="Additional information for the address."
-            data-testid="account-settings__complement"
-          />
-        </div>
+        <FieldText
+          label="Address"
+          required
+          name="address"
+          placeholder="123 Example Ave."
+          :value="address"
+          description="Account owner's street address."
+          data-testid="account-settings__address"
+        />
+        <FieldText
+          label="Apartment, floor, etc."
+          name="complement"
+          placeholder="1st floor"
+          :value="complement"
+          description="Additional information for the address."
+          data-testid="account-settings__complement"
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -111,7 +105,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'

@@ -1,15 +1,18 @@
 <script setup>
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeCard from 'primevue/card'
-  import PrimeDialog from 'primevue/dialog'
-  import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
-  import Menu from 'primevue/menu'
-  import PrimeTag from 'primevue/tag'
-  import { computed, ref, watch } from 'vue'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  // TODO: migrate import to @aziontech/webkit/list-data-table when published
+  import DataTable from '@aziontech/webkit/list-data-table'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeCard from '@aziontech/webkit/card'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import Divider from '@aziontech/webkit/divider'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import Menu from '@aziontech/webkit/menu'
+  import PrimeTag from '@aziontech/webkit/tag'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   defineOptions({ name: 'SwitchAccountBlock' })
   const emit = defineEmits(['update:showSwitchAccount'])
@@ -88,7 +91,55 @@
   ])
   const menu = ref()
 
+  // Lazy loading state (previously managed by with-lazy-and-dropdown-filter.vue)
+  const isLoading = ref(false)
+  const first = ref(1)
+  const limitRows = ref(10)
+  const errorMessage = ref(null)
+  const listRecords = ref([])
+  const filters = ref(filterSwitch.value)
+  const totalRecords = ref(0)
+  const pageInitial = 1
+  const limitShowRows = 10
+
   const isLoadingAccount = computed(() => !props.account?.accountTypeIcon)
+
+  const loadData = async ({ page = pageInitial, pageSize = limitShowRows } = {}) => {
+    try {
+      isLoading.value = true
+      listRecords.value = []
+      const { results, totalPages } = await props.listTypeAccountService({
+        page,
+        pageSize,
+        ...filters.value
+      })
+      totalRecords.value = totalPages * limitShowRows
+      listRecords.value = results
+    } catch (error) {
+      errorMessage.value = error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const applyFilter = () => {
+    limitRows.value = limitShowRows
+    first.value = 1
+    loadData({ page: 1 })
+  }
+
+  const onPage = (event) => {
+    const page = event.page + pageInitial
+    loadData({ page, pageSize: event.rows })
+  }
+
+  const onRowSelect = (event) => {
+    onSelectedAccount(event.data)
+  }
+
+  onMounted(async () => {
+    await loadData()
+  })
 
   watch(
     () => props.showSwitchAccount,
@@ -229,40 +280,138 @@
             />
           </template>
         </PrimeCard>
-        <ListTableBlock
-          :listService="listTypeAccountService"
-          :limitShowRows="10"
-          pageTitle="Accounts List"
-          :columns="columns"
-          :headerFilter="filterSwitch"
-          @onSelectedRow="onSelectedAccount"
-          description="Type the account name to filter results."
-          emptyListMessage="No accounts found."
-        >
-          <template #headerFilters="{ filter, applyFilter }">
-            <div class="flex flex-wrap justify-between gap-2 w-full rounded">
-              <span class="p-input-icon-left max-sm:w-full">
-                <i class="pi pi-search" />
-                <InputText
-                  class="md:w-20rem max-sm:w-full"
-                  v-model.trim="filter.textSnippet"
-                  @keyup.enter="applyFilter()"
-                  placeholder="Search by name or ID"
-                />
-              </span>
 
-              <Dropdown
-                appendTo="self"
-                @change="applyFilter"
-                :options="filterType"
-                class="md:w-14rem max-sm:w-full"
-                optionLabel="label"
-                optionValue="value"
-                v-model="filter.type"
-              />
+        <div class="max-w-full">
+          <div class="flex flex-col items-start gap-2 mb-4 self-stretch w-full">
+            <div class="text-xl font-medium">Accounts List</div>
+            <div class="text-sm font-normal leading-[normal] text-color-secondary">
+              Type the account name to filter results.
             </div>
-          </template>
-        </ListTableBlock>
+          </div>
+
+          <InlineMessage
+            v-if="errorMessage"
+            class="mb-4"
+            severity="error"
+          >
+            {{ errorMessage }}
+          </InlineMessage>
+
+          <DataTable
+            v-show="!isLoading"
+            :data="listRecords"
+            :columns="columns"
+            :loading="false"
+            dataKey="id"
+            lazy
+            :paginator="totalRecords > limitShowRows"
+            :rows="limitRows"
+            :rowsPerPageOptions="[10, 20, 50, 100]"
+            :totalRecords="totalRecords"
+            :first="first"
+            :notShowEmptyBlock="true"
+            emptyListMessage="No accounts found."
+            @page="onPage($event)"
+            @rowClick="onRowSelect"
+            :pt="{
+              root: { class: 'border surface-border rounded' },
+              header: { class: 'p-3.5' }
+            }"
+            tableClass="p-datatable-sm"
+          >
+            <template #header>
+              <div class="flex flex-wrap justify-between gap-2 w-full rounded">
+                <span class="p-input-icon-left max-sm:w-full">
+                  <i class="pi pi-search" />
+                  <InputText
+                    class="md:w-20rem max-sm:w-full"
+                    v-model.trim="filters.textSnippet"
+                    @keyup.enter="applyFilter()"
+                    placeholder="Search by name or ID"
+                  />
+                </span>
+
+                <Dropdown
+                  appendTo="body"
+                  @change="applyFilter"
+                  :options="filterType"
+                  class="md:w-14rem max-sm:w-full"
+                  optionLabel="label"
+                  optionValue="value"
+                  v-model="filters.type"
+                />
+              </div>
+            </template>
+
+            <DataTable.Column
+              v-for="col of columns"
+              :key="col.field"
+              :field="col.field"
+              :header="col.header"
+            >
+              <template #body="{ data: rowData }">
+                <template v-if="col.type !== 'component'">
+                  <div :data-testid="`list-table-block__column__${col.field}__row`">
+                    {{ rowData[col.field] }}
+                  </div>
+                </template>
+                <template v-else>
+                  <component
+                    :is="col.component({ ...rowData[col.field], value: rowData })"
+                    :data-testid="`list-table-block__column__${col.field}__row`"
+                  />
+                </template>
+              </template>
+            </DataTable.Column>
+          </DataTable>
+
+          <DataTable
+            v-if="isLoading"
+            :data="Array(10)"
+            :columns="columns"
+            :loading="false"
+            :notShowEmptyBlock="true"
+            :pt="{
+              root: { class: 'border surface-border rounded' },
+              header: { class: 'rounded' }
+            }"
+          >
+            <template #header>
+              <div class="flex flex-wrap justify-between gap-2 w-full rounded">
+                <span class="p-input-icon-left max-sm:w-full">
+                  <i class="pi pi-search" />
+                  <InputText
+                    class="md:w-20rem max-sm:w-full"
+                    v-model.trim="filters.textSnippet"
+                    @keyup.enter="applyFilter()"
+                    placeholder="Search by name or ID"
+                  />
+                </span>
+
+                <Dropdown
+                  appendTo="body"
+                  @change="applyFilter"
+                  :options="filterType"
+                  class="md:w-14rem max-sm:w-full"
+                  optionLabel="label"
+                  optionValue="value"
+                  v-model="filters.type"
+                />
+              </div>
+            </template>
+
+            <DataTable.Column
+              v-for="col of columns"
+              :key="col.field"
+              :field="col.field"
+              :header="col.header"
+            >
+              <template #body>
+                <Skeleton />
+              </template>
+            </DataTable.Column>
+          </DataTable>
+        </div>
       </div>
     </PrimeDialog>
   </div>

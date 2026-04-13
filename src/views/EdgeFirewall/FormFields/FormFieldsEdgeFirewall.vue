@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeTag from 'primevue/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { useField } from 'vee-validate'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -48,17 +48,15 @@
     description="Create a Firewall to configure security logics and protect servers and applications."
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          data-testid="edge-firewall-form__name-field"
-          :value="name"
-          placeholder="My Firewall"
-          description="Give a unique and descriptive name to identify the Firewall."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        data-testid="edge-firewall-form__name-field"
+        :value="name"
+        placeholder="My Firewall"
+        description="Give a unique and descriptive name to identify the Firewall."
+      />
     </template>
   </FormHorizontal>
   <FormHorizontal

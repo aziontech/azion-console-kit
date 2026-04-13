@@ -1,11 +1,10 @@
 <script setup>
+  import { computed, inject, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, inject } from 'vue'
-  import { DataTableActionsButtons } from '@/components/DataTable'
+  import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import ListTable from '@/components/list-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -24,6 +23,8 @@
       type: Function
     }
   })
+
+  const listTableRef = ref()
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -126,6 +127,8 @@
       }
     ]
   })
+
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 </script>
 
 <template>
@@ -147,19 +150,20 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
-        :listService="listUsersService"
+      <ListTable
+        ref="listTableRef"
+        :listService="props.listUsersService"
         :columns="getColumns"
-        editPagePath="/users/edit"
-        @on-before-go-to-add-page="handleTrackEvent"
-        @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No users found."
         :actions="actions"
-        :defaultOrderingFieldName="'-last_modified'"
+        editPagePath="/users/edit"
+        createPagePath="users/create"
+        defaultOrderingFieldName="-last_modified"
         :frozenColumns="['firstName']"
         exportFileName="Users"
         :csvMapper="csvMapper"
-        hideLastModifiedColumn
+        :lazy="true"
+        emptyListMessage="No users found."
+        :hideLastModifiedColumn="true"
         :emptyBlock="{
           title: 'No users yet',
           description: 'Create your first additional user to grant access to the account.',
@@ -167,6 +171,9 @@
           createPagePath: 'users/create',
           documentationService: documentationService
         }"
+        @on-load-data="emit('on-load-data', $event)"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
       />
     </template>
   </ContentBlock>

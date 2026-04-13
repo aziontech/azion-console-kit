@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { computed } from 'vue'
   import { useThemeStore } from '@/stores/theme'
   import { useField } from 'vee-validate'
@@ -41,17 +41,15 @@
     :isDrawer="isDrawer"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My service"
-          :value="name"
-          description="Give a unique and descriptive name to identify the service."
-          data-testid="edge-service-form__name-field"
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My service"
+        :value="name"
+        description="Give a unique and descriptive name to identify the service."
+        data-testid="edge-service-form__name-field"
+      />
     </template>
   </FormHorizontal>
 

@@ -19,7 +19,6 @@
       >
         <template #form>
           <FormFieldsEditDigitalCertificates
-            :clipboardWrite="props.clipboardWrite"
             :documentationService="props.documentationService"
             :isLoading="isDetailLoading"
           />
@@ -53,10 +52,6 @@
   import { useDigitalCertificate } from './FormFields/composables/certificate'
 
   const props = defineProps({
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       required: true,
       type: Function

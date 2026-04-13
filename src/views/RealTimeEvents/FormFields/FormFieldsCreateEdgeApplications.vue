@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from 'primevue/button'
-  import Card from 'primevue/card'
-  import Dropdown from 'primevue/dropdown'
-  import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
-  import InputText from 'primevue/inputtext'
-  import RadioButton from 'primevue/radiobutton'
-  import PrimeTag from 'primevue/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Card from '@aziontech/webkit/card'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InputNumber from '@aziontech/webkit/inputnumber'
+  import InputSwitch from '@aziontech/webkit/inputswitch'
+  import InputText from '@aziontech/webkit/inputtext'
+  import RadioButton from '@aziontech/webkit/radiobutton'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -116,15 +116,13 @@
     v-if="handleBlock('general')"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          placeholder="My Application"
-          :value="name"
-          description="Give a unique and descriptive name to identify the Application."
-        />
-      </div>
+      <FieldText
+        label="Name *"
+        name="name"
+        placeholder="My Application"
+        :value="name"
+        description="Give a unique and descriptive name to identify the Application."
+      />
     </template>
   </FormHorizontal>
 
@@ -757,7 +755,7 @@
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
-          class="max-w-[150px]"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
         />

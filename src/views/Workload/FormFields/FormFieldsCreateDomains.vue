@@ -3,8 +3,8 @@
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import PrimeButton from 'primevue/button'
-  import MultiSelect from 'primevue/multiselect'
+  import PrimeButton from '@aziontech/webkit/button'
+  import MultiSelect from '@aziontech/webkit/multiselect'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/Drawer'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
@@ -238,17 +238,15 @@
   >
     <template #title> General </template>
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name"
-          required
-          name="name"
-          placeholder="My Workload"
-          data-testid="domains-form__name-field"
-          :value="name"
-          description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
-        />
-      </div>
+      <FieldText
+        label="Name"
+        required
+        name="name"
+        placeholder="My Workload"
+        data-testid="domains-form__name-field"
+        :value="name"
+        description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
+      />
     </template>
   </form-horizontal>
   <form-horizontal

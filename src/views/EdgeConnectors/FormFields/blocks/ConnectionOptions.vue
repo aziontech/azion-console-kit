@@ -194,7 +194,7 @@
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerEdgeStorage from '@/views/EdgeStorage/Drawer/index.vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })

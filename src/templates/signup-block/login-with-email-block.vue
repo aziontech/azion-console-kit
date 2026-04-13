@@ -26,56 +26,16 @@
       >
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label
-        for="password"
-        class="font-semibold text-sm"
-      >
-        Password
-      </label>
-      <Password
-        class="col-span-1 min-w-full"
-        :class="{ 'p-invalid': errors.password }"
-        toggleMask
-        v-model="password"
-        promptLabel="Choose a password"
-        weakLabel="Weak"
-        autocomplete="off"
-        mediumLabel="Medium"
-        strongLabel="Strong"
-        :strongRegex="strongPasswordRegex"
-        required
-        :pt="{
-          meter: 'rounded-md',
-          meterLabel: 'text-sm'
-        }"
-      >
-        <template #header> </template>
-        <template #footer>
-          <div class="mt-4 text-sm space-y-4">
-            <PrimeDivider />
-            <p class="font-medium">Must have at least:</p>
-          </div>
-
-          <div class="text-sm p-4 py-0 mt-2">
-            <ul class="list-square font-normal space-y-2 text-color-secondary">
-              <li
-                v-for="requirement in passwordRequirementsList"
-                :key="requirement.text"
-              >
-                <span>{{ requirement.text }}</span>
-              </li>
-            </ul>
-          </div>
-        </template>
-      </Password>
-
-      <small
-        v-if="errors.password"
-        class="p-error text-xs font-normal leading-tight"
-        >{{ errors.password }}</small
-      >
-    </div>
+    <FieldPassword
+      name="password"
+      label="Password"
+      showStrength
+      :strongRegex="strongPasswordRegex"
+      :requirements="passwordRequirementsList"
+      :additionalError="errors.password"
+      required
+      @strength="onStrengthChange"
+    />
   </div>
 
   <PrimeButton
@@ -87,12 +47,11 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import Password from 'primevue/password'
-  import InputText from 'primevue/inputtext'
-  import PrimeDivider from 'primevue/divider'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import FieldPassword from '@aziontech/webkit/field-password'
 
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
@@ -128,13 +87,19 @@
   const strongPasswordRegex =
     '^(?=.*[-_!@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.{8,})'
 
-  const passwordRequirementsList = ref([
-    { text: '8 characters', valid: false },
-    { text: '1 uppercase letter', valid: false },
-    { text: '1 lowercase letter', valid: false },
-    { text: '1 number', valid: false },
-    { text: '1 special character', valid: false }
-  ])
+  const passwordRequirementsList = [
+    { text: '8 characters' },
+    { text: '1 uppercase letter' },
+    { text: '1 lowercase letter' },
+    { text: '1 number' },
+    { text: '1 special character (example: !?<>@#$%)' }
+  ]
+
+  const passwordStrength = ref(null)
+
+  const onStrengthChange = (strength) => {
+    passwordStrength.value = strength
+  }
 
   const validationSchema = yup.object({
     email: yup
@@ -147,26 +112,13 @@
       .required('Password is a required field.')
       .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
       .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
-      .test('requirements', 'Password does not meet requirements.', (value) => {
-        const hasUpperCase = value && /[A-Z]/.test(value)
-        const hasLowerCase = value && /[a-z]/.test(value)
-        const hasSpecialChar = value && /[!-_@#$%^&*(),.?":{}|<>]/.test(value)
-        const hasMinLength = value?.length > 7
-        const hasNumber = value && /[0-9]/.test(value)
-
-        passwordRequirementsList.value[0].valid = hasMinLength
-        passwordRequirementsList.value[1].valid = hasUpperCase
-        passwordRequirementsList.value[2].valid = hasLowerCase
-        passwordRequirementsList.value[3].valid = hasNumber
-        passwordRequirementsList.value[4].valid = hasSpecialChar
-
-        return hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar
+      .test('requirements', 'Password does not meet requirements.', () => {
+        return passwordStrength.value?.level === 'strong'
       })
   })
 
   const { errors, handleSubmit } = useForm({ validationSchema })
 
-  const { value: password } = useField('password')
   const { value: email } = useField('email')
 
   const toast = useToast()
