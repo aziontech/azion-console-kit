@@ -145,6 +145,7 @@
   const columnSelectorPanel = ref(null)
 
   const MAX_SELECTIONS = 6
+  const LOCAL_STORAGE_KEY = 'monthly_usage_selected_keys'
 
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
@@ -161,6 +162,7 @@
   const handleSelectionChange = (newSelection) => {
     if (newSelection.length <= MAX_SELECTIONS) {
       selectedOptions.value = newSelection
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newSelection))
     }
   }
 
@@ -186,7 +188,19 @@
 
       if (products?.length) {
         allUsageOptions.value = buildAllUsageOptions(products)
-        selectedOptions.value = DEFAULT_SELECTED_KEYS.filter((key) =>
+
+        let storedKeys = null
+        try {
+          const storedData = localStorage.getItem(LOCAL_STORAGE_KEY)
+          if (storedData) storedKeys = JSON.parse(storedData)
+        } catch {
+          // Ignore silently
+        }
+
+        const keysToUse =
+          Array.isArray(storedKeys) && storedKeys.length > 0 ? storedKeys : DEFAULT_SELECTED_KEYS
+
+        selectedOptions.value = keysToUse.filter((key) =>
           allUsageOptions.value.some((opt) => opt.key === key)
         )
       } else {
@@ -209,8 +223,8 @@
         if (!desc.service) return
 
         const key = `${product.slug}_${desc.slug}`
-        const label =
-          product.service === desc.service ? product.service : `${product.service} ${desc.service}`
+        const isIncluded = desc.service.toLowerCase().includes(product.service.toLowerCase())
+        const label = isIncluded ? desc.service : `${product.service} ${desc.service}`
 
         options.push({
           key,
