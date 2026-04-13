@@ -1,6 +1,6 @@
 # Azion Console Kit Storybook
 
-This Storybook showcases templates from the azion-console-kit project.
+This Storybook showcases templates/components from the azion-console-kit project.
 
 ## Getting Started
 
