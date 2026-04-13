@@ -34,10 +34,10 @@
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
     "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
     "architecture:report": "node scripts/architecture-report/index.cjs",
-    "storybook:build": "cd storybook && yarn build && cd ..",
-    "storybook:dev": "cd storybook && yarn dev && cd ..",
-    "storybook:preview": "cd storybook && yarn preview && cd ..",
-    "storybook:deploy": "cd storybook && yarn deploy && cd .."
+    "storybook:build": "cd storybook && storybook build -o dist -c .storybook && cd ..",
+    "storybook:dev": "cd storybook && storybook dev -p 6006 -c .storybook && cd ..",
+    "storybook:preview": "cd storybook && npx http-server dist -p 6007 && cd ..",
+    "storybook:deploy": "cd storybook && azion deploy --local --debug && cd .."
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
