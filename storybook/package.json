@@ -13,7 +13,7 @@
   "dependencies": {
     "@aziontech/icons": "^1.4.0",
     "@aziontech/theme": "^1.8.0",
-    "@aziontech/webkit": "^1.19.1",
+    "@aziontech/webkit": "^1.19.2",
     "@tailwindcss/typography": "^0.5.10",
     "primeflex": "^3.3.1",
     "primevue": "3.35.0",
