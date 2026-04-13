@@ -38,8 +38,7 @@ jobs:
           azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}  
           azion whoami
 
-      - name: Install storybook dependencies
-        working-directory: storybook
+      - name: Install dependencies
         run: yarn install
       
       - name: Building Storybook
