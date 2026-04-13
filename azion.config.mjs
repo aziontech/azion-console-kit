@@ -516,20 +516,7 @@ const config = {
         name: 'OAuth Security Headers - Login and Signup',
         description:
           'Applies strict COOP headers only to authentication-related pages to protect OAuth flows without breaking external links.',
-        criteria: [
-          {
-            variable: '${uri}',
-            conditional: 'if',
-            operator: 'matches',
-            inputValue: '^/(login|signup|switch-account|mfa)'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/sse'
-          }
-        ],
+        match: '^/(login|signup|switch-account|mfa)',
         behavior: {
           setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
         }
@@ -537,20 +524,7 @@ const config = {
       {
         name: 'OAuth Security Headers - GitHub Connection',
         description: 'Applies strict COOP headers to GitHub connection popup pages.',
-        criteria: [
-          {
-            variable: '${uri}',
-            conditional: 'if',
-            operator: 'matches',
-            inputValue: '^/github-connection-popup'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/sse'
-          }
-        ],
+        match: '^/github-connection-popup',
         behavior: {
           setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
         }
