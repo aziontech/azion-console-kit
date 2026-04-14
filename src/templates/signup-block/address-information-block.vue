@@ -12,14 +12,15 @@
             label="Country"
             required
             :value="country"
-            :options="countryOptions"
-            optionLabel="label"
-            optionValue="value"
+            :options="countriesOptions.options"
+            :loading="!countriesOptions.done"
+            optionLabel="name"
+            optionValue="geonameId"
             placeholder="Select a Country"
             appendTo="self"
             filter
             class="w-full"
-            @change="country = $event.value"
+            @change="handleCountryChange"
           />
         </div>
 
@@ -43,26 +44,35 @@
             label="State/Region"
             required
             :value="region"
-            :options="regionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select an State/Region"
+            :options="regionsOptions.options"
+            :loading="!regionsOptions.done"
+            optionLabel="name"
+            optionValue="geonameId"
+            placeholder="Select a State/Region"
             appendTo="self"
             filter
+            :disabled="!country"
             class="w-full"
-            @change="region = $event.value"
+            @change="handleRegionChange"
           />
         </div>
 
         <div class="flex flex-col gap-2 w-full">
-          <FieldInput
+          <FieldDropdown
             name="city"
             label="City"
             required
             :value="city"
+            :options="citiesOptions.options"
+            :loading="!citiesOptions.done"
+            optionLabel="name"
+            optionValue="geonameId"
             placeholder="Select a City"
+            appendTo="self"
+            filter
+            :disabled="!region"
             class="w-full"
-            @input="city = $event"
+            @change="city = $event.value"
           />
         </div>
       </div>
@@ -94,35 +104,152 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import FieldInput from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import {
+    listCountriesService,
+    listRegionsService,
+    listCitiesService
+  } from '@/services/account-settings-services'
+  import { updateAddressService } from '@/services/signup-services'
 
   defineOptions({
     name: 'address-information-block'
   })
 
-  const country = ref('')
-  const postalCode = ref('')
-  const region = ref('')
-  const city = ref('')
-  const address = ref('')
-  const complement = ref('')
+  const toast = useToast()
 
-  const countryOptions = ref([])
-  const regionOptions = ref([])
-  const addressInformation = computed(() => ({
-    country: country.value,
-    postalCode: postalCode.value,
-    region: region.value,
-    city: city.value,
-    address: address.value,
-    complement: complement.value
-  }))
-
-  defineExpose({
-    addressInformation
+  const addressSchema = yup.object({
+    postalCode: yup.string().required().label('Postal Code'),
+    country: yup.string().required().label('Country'),
+    region: yup.string().required().label('State/Region'),
+    city: yup.string().required().label('City'),
+    address: yup.string().required().label('Address'),
+    complement: yup.string()
   })
+
+  const { validate } = useForm({
+    validationSchema: addressSchema,
+    initialValues: {
+      postalCode: '',
+      country: '',
+      region: '',
+      city: '',
+      address: '',
+      complement: ''
+    }
+  })
+
+  const { value: country } = useField('country')
+  const { value: postalCode } = useField('postalCode')
+  const { value: region } = useField('region')
+  const { value: city } = useField('city')
+  const { value: address } = useField('address')
+  const { value: complement } = useField('complement')
+
+  const countriesOptions = ref({ options: [], done: true })
+  const regionsOptions = ref({ options: [], done: true })
+  const citiesOptions = ref({ options: [], done: true })
+
+  onMounted(() => {
+    setCountriesOptions()
+  })
+
+  const showToast = (summary, severity) => {
+    const options = {
+      severity,
+      summary,
+      closable: true
+    }
+    return toast.add(options)
+  }
+
+  const setCountriesOptions = async () => {
+    countriesOptions.value.done = false
+    try {
+      const response = await listCountriesService()
+      countriesOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      countriesOptions.value.done = true
+    }
+  }
+
+  const setRegionsOptions = async (countryId) => {
+    regionsOptions.value.done = false
+    citiesOptions.value.options = []
+    region.value = ''
+    city.value = ''
+    if (!countryId) return
+    try {
+      const response = await listRegionsService(countryId)
+      regionsOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      regionsOptions.value.done = true
+    }
+  }
+
+  const setCitiesOptions = async (regionId) => {
+    citiesOptions.value.done = false
+    city.value = ''
+    if (!regionId) return
+    try {
+      const response = await listCitiesService(regionId)
+      citiesOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      citiesOptions.value.done = true
+    }
+  }
+
+  const handleCountryChange = (event) => {
+    country.value = event.value
+  }
+
+  const handleRegionChange = (event) => {
+    region.value = event.value
+  }
+
+  watch(country, (countryId) => {
+    if (countryId) setRegionsOptions(countryId)
+  })
+
+  watch(region, (regionId) => {
+    if (regionId) setCitiesOptions(regionId)
+  })
+
+  const saveAddress = async () => {
+    const { valid } = await validate()
+    if (!valid) return false
+
+    const payload = {
+      postalCode: postalCode.value,
+      country: country.value,
+      region: region.value,
+      city: city.value,
+      address: address.value,
+      complement: complement.value
+    }
+
+    await updateAddressService(payload)
+    return payload
+  }
+
+  const getCountry = (countryGeonameId) => {
+    return (
+      countriesOptions.value.options.find((opt) => opt.geonameId === countryGeonameId)?.name || ''
+    )
+  }
+
+  defineExpose({ saveAddress, getCountry })
 </script>
 
 <style scoped>

@@ -4,7 +4,9 @@
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"
+        :getStripeClientService="getStripeClientService"
         @onBack="emit('onBack')"
+        @onSubmit="handleSubmit"
       />
       <CheckoutFeaturesBlock :plan="plan" />
     </div>
@@ -33,19 +35,19 @@
     }
   })
 
-  const emit = defineEmits(['onSuccess', 'onError', 'onBack'])
+  const emit = defineEmits(['onSuccess', 'onError', 'onBack', 'onSubmit'])
 
   const planBlockRef = ref(null)
   const isSubmitting = ref(false)
   const showLoading = ref(false)
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (checkoutData) => {
     isSubmitting.value = true
     showLoading.value = true
 
     try {
-      // TODO: Implement payment submission
-      emit('onSuccess')
+      // Pass checkout data to parent for processing
+      emit('onSuccess', checkoutData)
     } catch (error) {
       emit('onError', error)
     } finally {

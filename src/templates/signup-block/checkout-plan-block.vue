@@ -7,7 +7,10 @@
         @update:billing-cycle="handleBillingCycleChange"
       />
 
-      <PaymentMethodBlock ref="paymentMethodRef" />
+      <PaymentMethodBlock
+        ref="paymentMethodRef"
+        :stripeClientService="getStripeClientService"
+      />
 
       <AddressInformationBlock ref="addressInformationRef" />
     </div>
@@ -41,17 +44,25 @@
   import PricingCalculationBlock from './pricing-calculation-block.vue'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
     name: 'checkout-plan-block'
   })
   const emit = defineEmits(['onBack', 'onSubmit'])
+  const toast = useToast()
+  const { scrollToError } = useScrollToError()
 
   const props = defineProps({
     plan: {
       type: String,
       required: true,
       validator: (value) => ['pro', 'scale'].includes(value)
+    },
+    getStripeClientService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -65,25 +76,9 @@
   const showLoading = ref(false)
   const billingCycle = ref('yearly')
 
-  const paymentMethod = computed(() => ({
-    cardHolderName: paymentMethodRef.value?.paymentMethod?.value?.cardHolderName || '',
-    cardNumber: paymentMethodRef.value?.paymentMethod?.value?.cardNumber || '',
-    expirationDate: paymentMethodRef.value?.paymentMethod?.value?.expirationDate || '',
-    securityCode: paymentMethodRef.value?.paymentMethod?.value?.securityCode || ''
-  }))
-
   const handleBillingCycleChange = (value) => {
     billingCycle.value = value
   }
-
-  const addressInformation = computed(() => ({
-    country: addressInformationRef.value?.addressInformation?.value?.country || '',
-    postalCode: addressInformationRef.value?.addressInformation?.value?.postalCode || '',
-    region: addressInformationRef.value?.addressInformation?.value?.region || '',
-    city: addressInformationRef.value?.addressInformation?.value?.city || '',
-    address: addressInformationRef.value?.addressInformation?.value?.address || '',
-    complement: addressInformationRef.value?.addressInformation?.value?.complement || ''
-  }))
 
   const couponCode = computed(() => {
     return pricingCalculationRef.value?.couponCode?.value || ''
@@ -93,8 +88,64 @@
     emit('onBack')
   }
 
-  const handleSubmit = () => {
-    emit('onSubmit', paymentMethod.value)
+  const handleSubmit = async () => {
+    isSubmitting.value = true
+    showLoading.value = true
+
+    try {
+      // 1. Validate payment method
+      const paymentErrors = await paymentMethodRef.value?.validate()
+      if (paymentErrors && Object.keys(paymentErrors).length > 0) {
+        scrollToError(paymentErrors)
+        return
+      }
+
+      // 2. Create Stripe token
+      const token = await paymentMethodRef.value?.createToken()
+      if (!token) {
+        throw new Error('Failed to create payment token')
+      }
+
+      // 3. Save/validate address
+      const address = await addressInformationRef.value?.saveAddress()
+      if (!address) {
+        return
+      }
+
+      // 4. Emit checkout data
+      const checkoutData = {
+        stripeToken: token.id,
+        cardHolderName: token.card.name,
+        cardBrand: token.card.brand,
+        cardLast4: token.card.last4,
+        cardExpirationMonth: token.card.exp_month,
+        cardExpirationYear: token.card.exp_year,
+        billingCycle: billingCycle.value,
+        couponCode: couponCode.value,
+        address: {
+          postalCode: address.postalCode,
+          country: addressInformationRef.value?.getCountry(Number(address.country)) || '',
+          countryId: address.country,
+          region: address.region,
+          city: address.city,
+          address: address.address,
+          complement: address.complement
+        }
+      }
+
+      emit('onSubmit', checkoutData)
+    } catch (error) {
+      const options = {
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || error
+      }
+      toast.add(options)
+    } finally {
+      isSubmitting.value = false
+      showLoading.value = false
+    }
   }
 
   watch(billingCycle, async (newBillingCycle) => {
@@ -109,9 +160,7 @@
 
   defineExpose({
     billingCycle,
-    couponCode,
-    paymentMethod,
-    addressInformation
+    couponCode
   })
 </script>
 
