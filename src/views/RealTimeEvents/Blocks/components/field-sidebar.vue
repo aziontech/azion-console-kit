@@ -156,42 +156,6 @@
         />
       </div>
 
-      <!-- Dataset Selector -->
-      <div class="p-3 border-b surface-border">
-        <label class="block text-xs font-medium text-color-secondary mb-2 uppercase tracking-wide">
-          Dataset
-        </label>
-        <Dropdown
-          :modelValue="selectedDataset?.panel"
-          :options="datasetOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select dataset..."
-          class="w-full"
-          @change="handleDatasetChange"
-          data-testid="dataset-selector"
-        >
-          <template #option="{ option }">
-            <span>{{ option.label }}</span>
-          </template>
-          <template #value="{ placeholder, value }">
-            <span v-if="value">{{ datasetOptions.find((d) => d.value === value)?.label }}</span>
-            <span
-              v-else
-              class="text-color-secondary"
-              >{{ placeholder }}</span
-            >
-          </template>
-        </Dropdown>
-        <!-- Dataset description -->
-        <p
-          v-if="selectedDataset?.description"
-          class="mt-2 text-xs text-color-secondary leading-4"
-        >
-          {{ selectedDataset.description }}
-        </p>
-      </div>
-
       <!-- Search fields -->
       <div class="p-3 border-b surface-border">
         <span class="p-input-icon-left w-full">

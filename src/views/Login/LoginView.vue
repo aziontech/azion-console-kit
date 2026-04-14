@@ -62,7 +62,10 @@
       return
     }
 
-    await sessionManager.logout()
+    if (import.meta.env.VITE_DEBUG_LOGIN !== 'true') {
+      await sessionManager.logout()
+    }
+
     const { email, activated } = route.query
     const isActivatedEmail = !!email && !activated
 

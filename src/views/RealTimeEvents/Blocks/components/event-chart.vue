@@ -31,10 +31,14 @@
     hasError: {
       type: Boolean,
       default: false
+    },
+    userTimezone: {
+      type: String,
+      default: 'UTC'
     }
   })
 
-  const emit = defineEmits(['brush-select'])
+  const emit = defineEmits(['brush-select', 'total-computed'])
 
   const chartRef = ref(null)
   const chartInstance = ref(null)
@@ -56,75 +60,107 @@
     '5xx': 'var(--series-five-color)'
   }
 
+  // Use Azion brand orange (#F3652B) from azion-theme for chart bars
   const DEFAULT_COLORS = [
-    'var(--series-one-color)',
-    'var(--series-two-color)',
-    'var(--series-three-color)',
-    'var(--series-four-color)',
-    'var(--series-five-color)'
+    '#F3652B',
+    'var(--green-500)',
+    'var(--text-color-link)',
+    'var(--p-tag-warning-color)',
+    'var(--red-500)'
   ]
 
   const chartConfig = computed(() => getChartConfig(props.configKey))
 
-  // Transform data for C3.js
+  // Transform data for C3.js with client-side bucketing.
+  // The API returns up to 10000 rows grouped by distinct timestamp (per second).
+  // We aggregate these into visual buckets (e.g., 1h for "Today") for clean bars.
   const chartData = computed(() => {
     if (!props.data?.length || !chartConfig.value) {
       return { columns: [], groups: [], seriesNames: [], maxValue: 0 }
     }
 
-    const config = chartConfig.value
-    const rawData = config.transformData ? config.transformData(props.data) : props.data
+    const rawData = props.data
 
-    const timestampMap = new Map()
-    const seriesSet = new Set()
-    const stackField = config.stackField
+    // Calculate bucket interval based on the time range
+    const duration =
+      props.tsRangeBegin && props.tsRangeEnd
+        ? new Date(props.tsRangeEnd) - new Date(props.tsRangeBegin)
+        : 0
 
-    rawData.forEach((item) => {
-      const ts = item.ts
-      if (!ts) return
+    const SEC = 1000
+    const MIN = 60 * SEC
+    const TARGET = 30
 
-      const seriesName = stackField ? item[stackField] : 'count'
-      if (stackField && seriesName) {
-        seriesSet.add(seriesName)
+    const INTERVALS = [
+      1 * SEC, 5 * SEC, 10 * SEC, 30 * SEC,
+      1 * MIN, 5 * MIN, 10 * MIN, 30 * MIN,
+      1 * HOUR, 3 * HOUR, 12 * HOUR, 1 * DAY, 7 * DAY, 30 * DAY
+    ]
+    const rawInterval = duration > 0 ? duration / TARGET : MIN
+    const bucketMs = INTERVALS.find((ci) => ci >= rawInterval) || 30 * DAY
+
+    // Generate all bucket slots covering the full range
+    const rangeStart = props.tsRangeBegin ? new Date(props.tsRangeBegin).getTime() : 0
+    const rangeEnd = props.tsRangeEnd ? new Date(props.tsRangeEnd).getTime() : 0
+    const alignedStart = rangeStart > 0 ? Math.floor(rangeStart / bucketMs) * bucketMs : 0
+
+    const bucketMap = new Map()
+
+    // Pre-fill all slots with zero
+    if (alignedStart > 0 && rangeEnd > 0) {
+      for (let ts = alignedStart; ts <= rangeEnd; ts += bucketMs) {
+        bucketMap.set(ts, 0)
       }
-
-      if (!timestampMap.has(ts)) {
-        timestampMap.set(ts, { ts, total: 0 })
-      }
-      const bucket = timestampMap.get(ts)
-      bucket[seriesName || 'count'] = item.count || 0
-      bucket.total += item.count || 0
-    })
-
-    const sortedTimestamps = Array.from(timestampMap.keys()).sort()
-
-    let maxValue = 0
-    sortedTimestamps.forEach((ts) => {
-      const bucket = timestampMap.get(ts)
-      if (bucket.total > maxValue) maxValue = bucket.total
-    })
-
-    let seriesNames = stackField ? Array.from(seriesSet) : ['count']
-    // Order status codes properly (2xx, 3xx, 4xx, 5xx)
-    if (stackField === 'status' || stackField === 'statusRange') {
-      const statusOrder = ['2xx', '3xx', '4xx', '5xx']
-      seriesNames = statusOrder.filter((status) => seriesSet.has(status))
-      // Add any other series not in the standard order
-      seriesSet.forEach((status) => {
-        if (!statusOrder.includes(status) && !seriesNames.includes(status)) {
-          seriesNames.push(status)
-        }
-      })
     }
 
-    const xColumn = ['x', ...sortedTimestamps.map((ts) => new Date(ts))]
-    const seriesColumns = seriesNames.map((name) => [
-      name,
-      ...sortedTimestamps.map((ts) => timestampMap.get(ts)?.[name] || 0)
-    ])
+    // Aggregate raw data into buckets
+    rawData.forEach((item) => {
+      if (!item.ts) return
+      const tsMs = new Date(item.ts).getTime()
+      const key = Math.floor(tsMs / bucketMs) * bucketMs
+      bucketMap.set(key, (bucketMap.get(key) || 0) + (item.count || 0))
+    })
+
+    const sortedKeys = Array.from(bucketMap.keys()).sort((prev, next) => prev - next)
+
+    let maxValue = 0
+    sortedKeys.forEach((key) => {
+      const val = bucketMap.get(key)
+      if (val > maxValue) maxValue = val
+    })
+
+    const seriesNames = ['count']
+
+    // Format X-axis labels in the user's timezone.
+    // We use 'category' axis instead of 'timeseries' so that C3/d3 doesn't
+    // reposition bars using its own UTC-based time scale.
+    const xLabels = sortedKeys.map((key) => {
+      const date = new Date(key)
+      const dur = duration
+      if (dur > 7 * DAY) {
+        return formatDateInTimezone(date, { month: '2-digit', day: '2-digit', hour12: false })
+      } else if (dur > DAY) {
+        return formatDateInTimezone(date, {
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        })
+      } else {
+        return formatDateInTimezone(date, {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        })
+      }
+    })
+
+    const xColumn = ['x', ...xLabels]
+    const countColumn = ['count', ...sortedKeys.map((key) => bucketMap.get(key) || 0)]
 
     return {
-      columns: [xColumn, ...seriesColumns],
+      columns: [xColumn, countColumn],
       groups: [seriesNames],
       seriesNames,
       maxValue
@@ -141,9 +177,40 @@
   })
 
   const formatNumber = (num) => {
+    if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B'
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
-    return String(num)
+    return String(Math.round(num))
+  }
+
+  /**
+   * Calculate a "nice" Y-axis maximum that produces clean tick labels.
+   * Rounds up to the nearest power-of-10 multiple (1, 2, 5 pattern).
+   */
+  const niceYMax = (maxValue) => {
+    if (maxValue <= 0) return 5
+    const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)))
+    const normalized = maxValue / magnitude
+    let niceMultiplier
+    if (normalized <= 1) niceMultiplier = 1
+    else if (normalized <= 2) niceMultiplier = 2
+    else if (normalized <= 5) niceMultiplier = 5
+    else niceMultiplier = 10
+    return niceMultiplier * magnitude
+  }
+
+  /**
+   * Format a Date for the chart axis / tooltip respecting the user timezone.
+   * Uses the same approach as getCurrentTimezone() in account-timezone.js.
+   */
+  const formatDateInTimezone = (date, opts) => {
+    const tz = props.userTimezone
+    try {
+      return date.toLocaleString('en-US', { ...opts, timeZone: tz }).replace(',', '')
+    } catch {
+      // Fallback: browser local timezone
+      return date.toLocaleString('en-US', opts).replace(',', '')
+    }
   }
 
   // Build chart config
@@ -153,10 +220,10 @@
     const config = chartConfig.value
     const { columns, groups, seriesNames, maxValue } = chartData.value
 
-    // Round up to nice number
-    const niceMax = Math.ceil(maxValue / 5) * 5 || 5
+    // Nice Y-axis scale
+    const yMax = niceYMax(maxValue)
 
-    // Colors using CSS variables
+    // Colors: use DS tokens from c3.scss (--series-one-color, etc.)
     const colors = {}
     seriesNames.forEach((name, index) => {
       colors[name] = SERIES_COLORS[name] || DEFAULT_COLORS[index % DEFAULT_COLORS.length]
@@ -176,6 +243,29 @@
       if (duration > 7 * DAY) timeFormat = '%m/%d'
     }
 
+    // Build a formatter that respects the user's configured timezone
+    const tzTickFormat = (date) => {
+      if (!(date instanceof Date)) return ''
+      const duration =
+        props.tsRangeBegin && props.tsRangeEnd
+          ? new Date(props.tsRangeEnd) - new Date(props.tsRangeBegin)
+          : 0
+      const opts = { hour12: false }
+      if (duration > 7 * DAY) {
+        opts.month = '2-digit'
+        opts.day = '2-digit'
+      } else if (duration > DAY) {
+        opts.month = '2-digit'
+        opts.day = '2-digit'
+        opts.hour = '2-digit'
+        opts.minute = '2-digit'
+      } else {
+        opts.hour = '2-digit'
+        opts.minute = '2-digit'
+      }
+      return formatDateInTimezone(date, opts)
+    }
+
     /* eslint-disable id-length */
     return {
       bindto: chartRef.value,
@@ -190,20 +280,19 @@
       },
       axis: {
         x: {
-          type: 'timeseries',
+          type: 'category',
           tick: {
-            format: timeFormat,
             multiline: false,
             culling: { max: 12 }
           },
           height: 28
         },
         y: {
-          max: niceMax,
+          max: yMax,
           min: 0,
-          padding: { top: 0, bottom: 0 },
+          padding: { top: 10, bottom: 0 },
           tick: {
-            count: 4,
+            count: 5,
             format: formatNumber
           }
         }
@@ -216,17 +305,10 @@
       tooltip: {
         grouped: true,
         format: {
-          title: (date) =>
-            date.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
           value: (val) => `${formatNumber(val)} events`
         }
       },
-      bar: { width: { ratio: 0.85 } },
+      bar: { width: { ratio: 0.92 } },
       padding: { left: 50, right: 15, top: 10, bottom: 5 },
       grid: { y: { show: true } },
       point: { show: false },
@@ -312,15 +394,23 @@
     selectionOverlay.value.style.width = `${width}px`
   }
 
+  // Emit the Metrics-based total to the parent whenever it changes
+  watch(totalEvents, (val) => emit('total-computed', val))
+
   // Watchers
   watch(() => props.data, initChart, { deep: true })
   watch(() => [props.tsRangeBegin, props.tsRangeEnd], initChart)
+  // Re-init when timezone changes so axis labels update
+  watch(() => props.userTimezone, initChart)
   // Re-init when loading finishes — chartRef only exists in DOM after isLoading becomes false
-  watch(() => props.isLoading, (loading, wasLoading) => {
-    if (wasLoading && !loading) {
-      initChart()
+  watch(
+    () => props.isLoading,
+    (loading, wasLoading) => {
+      if (wasLoading && !loading) {
+        initChart()
+      }
     }
-  })
+  )
 
   onMounted(initChart)
 
@@ -485,18 +575,19 @@
     font-size: 0.75rem;
   }
 
-  /* C3 overrides */
+  /* C3 overrides — use DS tokens from c3.scss */
   :deep(.c3) {
     font-size: 10px;
+    font-family: var(--font-family);
   }
 
   :deep(.c3 .c3-axis-x .tick text) {
-    fill: var(--text-color-secondary);
+    fill: var(--text-color-secondary) !important;
     font-size: 9px;
   }
 
   :deep(.c3 .c3-axis-y .tick text) {
-    fill: var(--text-color-secondary);
+    fill: var(--text-color-secondary) !important;
     font-size: 9px;
   }
 
@@ -508,10 +599,14 @@
     stroke: var(--surface-border);
   }
 
+  :deep(.c3 .c3-axis path, .c3 .c3-axis line) {
+    stroke: var(--surface-border) !important;
+  }
+
   :deep(.c3-grid line) {
     stroke: var(--surface-border);
     stroke-dasharray: 2, 2;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   :deep(.c3-legend-item) {
@@ -529,5 +624,11 @@
 
   :deep(.c3-bar) {
     stroke-width: 0;
+  }
+
+  :deep(.c3-tooltip-container) {
+    background-color: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
   }
 </style>

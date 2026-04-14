@@ -1,4 +1,5 @@
 import * as RealTimeEventsService from '@/services/real-time-events-service'
+import { loadEventsChartAggregation } from '@/services/real-time-events-service/load-events-aggregation'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimeEventsRoutes = {
@@ -39,7 +40,8 @@ export const realTimeEventsRoutes = {
       loadService: RealTimeEventsService.loadActivityHistory
     },
     loadFieldsData: RealTimeEventsService.loadFieldsEventsData,
-    getTotalRecords: RealTimeEventsService.getTotalRecords
+    getTotalRecords: RealTimeEventsService.getTotalRecords,
+    loadEventsChartAggregation
   },
   meta: {
     title: 'Real-Time Events',
