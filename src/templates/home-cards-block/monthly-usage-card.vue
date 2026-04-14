@@ -129,11 +129,11 @@
 
   const DEFAULT_USAGE_LIST = [{ label: 'No usage data available', value: '---', key: 'no_data' }]
 
-  const DEFAULT_SELECTED_KEYS = [
-    'edge_dns_hosted_zones',
-    'edge_storage_edge_storage_data_stored',
-    'edge_application_requests',
-    'edge_application_data_transferred'
+  const DEFAULT_SELECTED_KEY_GROUPS = [
+    ['edge_dns_hosted_zones', 'edge_dns_edge_dns_zones'],
+    ['edge_storage_edge_storage_data_stored', 'object_storage_edge_storage_data_stored'],
+    ['edge_application_requests', 'application_application_requests'],
+    ['edge_application_data_transferred', 'application_data_transferred']
   ]
 
   const accountStore = useAccountStore()
@@ -171,6 +171,14 @@
     return allUsageOptions.value.filter((option) => selectedOptions.value.includes(option.key))
   })
 
+  const buildDefaultSelection = (availableOptionKeys) => {
+    const defaultKeys = DEFAULT_SELECTED_KEY_GROUPS.map((group) =>
+      group.find((key) => availableOptionKeys.includes(key))
+    ).filter(Boolean)
+
+    return [...new Set(defaultKeys)].slice(0, MAX_SELECTIONS)
+  }
+
   const listServiceAndProductsChanges = async () => {
     isLoading.value = true
     try {
@@ -190,20 +198,37 @@
         allUsageOptions.value = buildAllUsageOptions(products)
 
         let storedKeys = null
+        let hasStoredConfig = false
         try {
           const storedData = localStorage.getItem(LOCAL_STORAGE_KEY)
-          if (storedData) storedKeys = JSON.parse(storedData)
+          hasStoredConfig = storedData !== null
+          if (hasStoredConfig) storedKeys = JSON.parse(storedData)
         } catch {
           //eslint-disable-next-line no-console
           console.warn('[MonthlyUsageCard] No keys found in localstorage')
         }
 
-        const keysToUse =
-          Array.isArray(storedKeys) && storedKeys.length > 0 ? storedKeys : DEFAULT_SELECTED_KEYS
+        const availableOptionKeys = allUsageOptions.value.map((opt) => opt.key)
+        const defaultSelection = buildDefaultSelection(availableOptionKeys)
+        const fallbackSelection =
+          defaultSelection.length > 0
+            ? defaultSelection
+            : availableOptionKeys.slice(0, MAX_SELECTIONS)
 
-        selectedOptions.value = keysToUse.filter((key) =>
-          allUsageOptions.value.some((opt) => opt.key === key)
-        )
+        if (hasStoredConfig && Array.isArray(storedKeys)) {
+          const validStoredSelection = storedKeys
+            .filter((key) => availableOptionKeys.includes(key))
+            .slice(0, MAX_SELECTIONS)
+
+          selectedOptions.value =
+            storedKeys.length === 0
+              ? []
+              : validStoredSelection.length > 0
+                ? validStoredSelection
+                : fallbackSelection
+        } else {
+          selectedOptions.value = fallbackSelection
+        }
       } else {
         allUsageOptions.value = DEFAULT_USAGE_LIST
       }
@@ -230,7 +255,7 @@
         options.push({
           key,
           label,
-          value: desc.quantity || '---'
+          value: desc.quantity ?? '---'
         })
       })
     })
