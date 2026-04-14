@@ -14,11 +14,11 @@ export class ServiceOrdersService extends BaseService {
   #couponsBaseURL = '/local_api/v4/product_catalog/coupons'
 
   listPlansService = async () => {
-    const response = await this.http.request({
+    const { data } = await this.http.request({
       method: 'GET',
       url: this.#plansBaseURL
     })
-    return ServiceOrdersAdapter.transformPlansList(response.data?.results ?? [])
+    return ServiceOrdersAdapter.transformPlansList(data.data ?? [])
   }
 
   listPlansWithCache = async () => {

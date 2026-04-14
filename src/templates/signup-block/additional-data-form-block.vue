@@ -71,7 +71,7 @@
   import { useField, useForm } from 'vee-validate'
   // import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  // import { useAccountStore } from '@/stores/account'
+  import { useAccountStore } from '@/stores/account'
   import { usePlans } from '@/composables/usePlans'
   import { useToast } from '@aziontech/webkit/use-toast'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
@@ -83,8 +83,7 @@
   const tracker = inject('tracker')
   // const router = useRouter()
   const toast = useToast()
-  // const { userId } = useAccountStore()
-  // const accountStore = useAccountStore()
+  const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -160,6 +159,7 @@
 
   const { value: plan } = useField('plan')
   const { value: role } = useField('role')
+  const { value: fullName } = useField('fullName')
 
   // Initialize plans from URL/storage
   const { plan: storedPlan, initialize: initializePlans, setParam: setPlanParam } = usePlans()
@@ -198,11 +198,45 @@
     }))
   })
 
-  // Pre-select plan from URL params on mount
+  // Map jobRole from kebab-case (stored in accountStore) to title case (used in dropdown)
+  const jobRoleKebabToTitle = (kebabRole) => {
+    const roleMap = {
+      'software-developer': 'Software Developer',
+      'devops-engineer': 'DevOps Engineer',
+      'infrastructure-analyst': 'Infrastructure Analyst',
+      'network-engineer': 'Network Engineer',
+      'security-specialist': 'Security Specialist',
+      'data-engineer': 'Data Engineer',
+      'ai-ml-engineer': 'AI/ML Engineer',
+      'iot-engineer': 'IoT Engineer',
+      'team-lead': 'Team Lead',
+      other: 'Other'
+    }
+    return roleMap[kebabRole] || null
+  }
+
+  // Pre-fill form fields on mount
   onMounted(() => {
     initializePlans()
+
+    // Pre-fill plan from URL params/storage
     if (storedPlan.value && ['hobby', 'pro', 'scale'].includes(storedPlan.value)) {
       plan.value = storedPlan.value
+    }
+
+    // Pre-fill fullName from accountStore
+    const { first_name, last_name } = accountStore.account || {}
+    if (first_name || last_name) {
+      fullName.value = `${first_name || ''} ${last_name || ''}`.trim()
+    }
+
+    // Pre-fill role from accountStore
+    const jobRole = accountStore.account?.jobRole
+    if (jobRole) {
+      const roleTitle = jobRoleKebabToTitle(jobRole)
+      if (roleTitle) {
+        role.value = roleTitle
+      }
     }
   })
 
