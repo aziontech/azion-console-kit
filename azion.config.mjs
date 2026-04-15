@@ -49,12 +49,6 @@ const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConf
         conditional: 'and',
         operator: 'matches',
         inputValue: regex
-      },
-      {
-        variable: '${uri}',
-        conditional: 'and',
-        operator: 'does_not_match',
-        inputValue: '^/sse'
       }
     ],
     behavior: {
