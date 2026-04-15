@@ -4,7 +4,6 @@
   import InputText from 'primevue/inputtext'
   import Checkbox from 'primevue/checkbox'
   import ProgressBar from 'primevue/progressbar'
-  import Dropdown from 'primevue/dropdown'
 
   defineOptions({ name: 'FieldSidebar' })
 
@@ -43,14 +42,6 @@
   ])
 
   const searchQuery = ref('')
-
-  const datasetOptions = computed(() => {
-    return props.datasets.map((dataset) => ({
-      label: dataset.title,
-      value: dataset.panel,
-      dataset: dataset
-    }))
-  })
 
   const fieldStats = computed(() => {
     if (!props.data.length) return {}
@@ -117,11 +108,6 @@
 
   const handleAddFilter = (fieldName, value) => {
     emit('add-filter', fieldName, value)
-  }
-
-  const handleDatasetChange = (event) => {
-    const selected = props.datasets.find((ds) => ds.panel === event.value)
-    emit('update:selectedDataset', selected)
   }
 
   const truncateFieldValue = (value, maxLen = 30) => {

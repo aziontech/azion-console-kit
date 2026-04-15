@@ -142,76 +142,91 @@ User → AdvancedFilterSystem (AQL + tsRange)
 
 ### Fase 1 — Quick Wins (1-2 sprints)
 
-- [x] **4.1.1 Substituir DataTable inline por `ListTableBlock` ou `DataTable` Azion** _(parcial)_
-  - Habilitadas `resizableColumns` + `columnResizeMode="expand"` no DataTable inline.
-  - Migração completa para Azion DataTable wrapper requer suporte a `expandedRows` no wrapper.
-  - **Ganho**: Sort por coluna, export CSV/JSON, column resize.
+#### 4.1.1 Substituir DataTable inline por `ListTableBlock` ou `DataTable` Azion
+- **O quê**: O `TabPanelBlock` renderiza `DataTable` do PrimeVue diretamente (~300 linhas de template/logic). Extrair para componente dedicado usando o wrapper Azion.
+- **Por quê**: Consistência com o resto do console, reuso de column selector, export, sort.
+- **Componente**: `src/components/DataTable/` + `src/templates/list-table-block/`
+- **Ganho**: Sort por coluna, export CSV, column selector nativo, filter por coluna.
 
-- [x] **4.1.2 Sidebar Resizável com `ResizableSplitter`**
-  - Layout com `ResizableSplitter` wrapping sidebar (panel-a) e tabela+detail (panel-b).
-  - **Componente**: `src/components/Splitter/ResizableSplitter.vue`
-  - **Ganho**: Paridade com Kibana, melhor uso de espaço.
+#### 4.1.2 Sidebar Resizável com `ResizableSplitter`
+- **O quê**: Substituir o layout fixo `240px` do sidebar por `ResizableSplitter` direction=vertical.
+- **Componente**: `src/components/Splitter/ResizableSplitter.vue`
+- **Ganho**: Paridade com Kibana, melhor uso de espaço.
 
-- [x] **4.1.3 Ícones de Tipo nos Campos**
-  - Adicionar ícones ao lado de cada campo no `FieldSidebar` indicando tipo.
-  - **Ganho**: UX profissional, paridade com Kibana.
+#### 4.1.3 Ícones de Tipo nos Campos
+- **O quê**: Adicionar ícones ao lado de cada campo no `FieldSidebar` indicando tipo (text, number, date, boolean, geo).
+- **Como**: Usar PrimeIcons (`pi-hashtag`, `pi-calendar`, `pi-align-left`, `pi-check-circle`, `pi-map-marker`).
+- **Ganho**: UX profissional, paridade com Kibana.
 
-- [x] **4.1.4 Export de Dados**
-  - Botões "Export CSV" e "Export JSON" no toolbar da tabela.
-  - **Ganho**: Feature essencial para análise de logs.
+#### 4.1.4 Export de Dados
+- **O quê**: Botão "Export" no header da tabela para CSV e JSON.
+- **Como**: Reutilizar `csvMapper` pattern do `ListTableBlock` + adicionar JSON export.
+- **Ganho**: Feature essencial para análise de logs.
 
-- [x] **4.1.5 Empty State com `EmptyResultsBlock`**
-  - DataTable #empty slot usa `EmptyResultsBlock` com ícone de busca.
-  - **Componente**: `src/templates/empty-results-block/`
-  - **Ganho**: Consistência visual.
+#### 4.1.5 Empty State com `EmptyResultsBlock`
+- **O quê**: Substituir o div simples de "no events" por `EmptyResultsBlock` com ilustração.
+- **Componente**: `src/templates/empty-results-block/`
+- **Ganho**: Consistência visual.
 
 ### Fase 2 — Melhorias Estruturais (2-3 sprints)
 
-- [ ] **4.2.1 Refatorar `TabPanelBlock` (God Component)**
-  - Extrair em composables: `useEventsData()`, `useEventsFilter()`, `useEventsChart()`, `useEventsDetail()`, `useEventsKeyboard()`.
-  - **Ganho**: Manutenibilidade, testabilidade, separation of concerns.
+#### 4.2.1 Refatorar `TabPanelBlock` (God Component)
+- **O quê**: O arquivo tem ~1074 linhas orquestrando tudo. Extrair em composables:
+  - `useEventsData()` — fetch, pagination, load more
+  - `useEventsFilter()` — filter state, URL sync
+  - `useEventsChart()` — aggregation, chart data
+  - `useEventsDetail()` — detail view mode, active row, navigation
+  - `useEventsKeyboard()` — keyboard navigation
+- **Por quê**: Manutenibilidade, testabilidade, separation of concerns.
+- **Ganho**: Cada composable pode ser testado isoladamente.
 
-- [x] **4.2.2 Chart: Migrar padrões do GraphsCardBlock** _(parcial)_
-  - `EventChart` agora usa `Skeleton` loading e `InlineMessage` error states (padrão GraphsCardBlock).
-  - Mantém C3.js (mesmo engine do GraphsCardBlock internamente).
-  - **Ganho**: Consistência visual com skeleton/error states.
+#### 4.2.2 Chart: Migrar de C3.js para GraphsCardBlock
+- **O quê**: Substituir `EventChart` (C3.js) pelo `GraphsCardBlock` que já suporta bar, line, stacked-area, skeleton, error states.
+- **Componente**: `src/templates/graphs-card-block/`
+- **Por quê**: C3.js é mantido minimamente; GraphsCardBlock já tem tratamento de skeleton, error, resize, e chart types dinâmicos.
+- **Ganho**: Consistência com Real-Time Metrics, manutenção unificada.
 
-- [x] **4.2.3 Load More / Pagination**
-  - Paginação de 50 em 50 com botão "Load more".
-  - **Ganho**: UX incremental sem sobrecarga.
+#### 4.2.3 Infinite Scroll
+- **O quê**: Substituir "Load More" por virtual scrolling com IntersectionObserver.
+- **Como**: Usar PrimeVue DataTable `virtualScrollerOptions` ou implementar com `@tanstack/virtual`.
+- **Ganho**: UX fluida como Kibana, sem clique manual.
 
-- [x] **4.2.4 Column Resize na Tabela**
-  - `resizableColumns` + `columnResizeMode="expand"` habilitados.
-  - **Ganho**: Paridade com Kibana.
+#### 4.2.4 Column Resize na Tabela
+- **O quê**: Habilitar `resizableColumns` do PrimeVue DataTable.
+- **Como**: Prop `resizableColumns` + `columnResizeMode="expand"`.
+- **Ganho**: Paridade com Kibana.
 
-- [x] **4.2.5 Query History**
-  - Composable `useQueryHistory()` salva últimas 20 queries em localStorage.
-  - Dropdown com ícone pi-history no filter bar.
-  - **Ganho**: Produtividade do usuário.
+#### 4.2.5 Query History
+- **O quê**: Salvar últimas N queries em localStorage e mostrar dropdown no AQL editor.
+- **Como**: Composable `useQueryHistory()` + dropdown abaixo do AQL input.
+- **Ganho**: Produtividade do usuário.
 
 ### Fase 3 — Diferenciais (3-4 sprints)
 
-- [x] **4.3.1 Saved Searches**
-  - Composable `useSavedSearches()` com localStorage (até 50 buscas).
-  - UI com botão bookmark no toolbar, save input + lista de buscas salvas.
-  - Salva: filterData, selectedColumns, dataset.
-  - **Ganho**: Feature premium que Kibana tem via saved objects.
+#### 4.3.1 Saved Searches
+- **O quê**: Permitir salvar/carregar buscas nomeadas (query + filtros + colunas + dataset).
+- **Como**: API backend ou localStorage + UI com dialog de save/load.
+- **Ganho**: Feature premium que Kibana tem via saved objects.
 
-- [ ] **4.3.2 Context View (Surrounding Events)**
-  - Ao clicar em um evento, ver N eventos antes e depois no tempo.
-  - **Ganho**: Análise de incidentes.
+#### 4.3.2 Context View (Surrounding Events)
+- **O quê**: Ao clicar em um evento, poder ver N eventos antes e depois no tempo.
+- **Como**: Query adicional com `tsRange` centrado no ts do evento selecionado.
+- **Ganho**: Análise de incidentes.
 
-- [ ] **4.3.3 Syntax Highlight no AQL**
-  - Colorir tokens (campo=verde, operador=azul, valor=laranja) no ContentEditable.
-  - **Ganho**: UX profissional, reduz erros de query.
+#### 4.3.3 Syntax Highlight no AQL
+- **O quê**: Colorir tokens (campo=verde, operador=azul, valor=laranja) no ContentEditable.
+- **Como**: Tokenizer simples no `content-editable.vue` com spans coloridos.
+- **Ganho**: UX profissional, reduz erros de query.
 
-- [ ] **4.3.4 Mini Sparkline nos Campos do Sidebar**
-  - Ao lado das top values, mostrar mini bar chart de distribuição.
-  - **Ganho**: Visualização rápida de distribuição sem ocupar espaço.
+#### 4.3.4 Mini Sparkline nos Campos do Sidebar
+- **O quê**: Ao lado das top values, mostrar mini bar chart de distribuição (como Kibana).
+- **Como**: SVG inline ou CSS bars dentro do FieldSidebar.
+- **Ganho**: Visualização rápida de distribuição sem ocupar espaço.
 
-- [ ] **4.3.5 Alertas Inline**
-  - Criar alertas a partir de uma query.
-  - **Ganho**: Diferencial sobre Kibana Discover.
+#### 4.3.5 Alertas Inline
+- **O quê**: Permitir criar alertas a partir de uma query (ex: "notificar se status 5xx > 100 em 5min").
+- **Como**: Integrar com sistema de alertas Azion existente.
+- **Ganho**: Diferencial sobre Kibana Discover (que não tem alertas inline).
 
 ---
 
@@ -310,18 +325,8 @@ src/views/RealTimeEvents/
 
 ---
 
-## 8. Ações Já Realizadas
+## 8. Resumo de Ações Imediatas (já realizadas)
 
 - [x] **Fix**: `fillGaps` em `event-chart.vue` — normaliza timestamps para bucket boundaries
 - [x] **Cleanup**: Removidos `console.log` de debug em `tab-panel-block.vue`
 - [x] **Confirmação**: WebSocket observado é Vite HMR, não transporte de dados
-- [x] **Fix**: Filter bar font uppercase — substituído `font-mono` por monospace explícito
-- [x] **Fix**: Click-to-filter em badges — adicionada propriedade `field` nos filtros
-- [x] **Fix**: Inline expansion view compacta com prop `compact`
-- [x] **Fix**: JSON/pre font uppercase corrigido
-- [x] **Fix**: Alturas de linha uniformes na tabela
-- [x] **Fix**: Load more com paginação de 50 em 50
-- [x] **Fix**: Row selection visual com estado ativo
-- [x] **Fix**: Detail sidebar acompanha altura da tela
-- [x] **Fix**: Tab view (Table/JSON) estilização compacta
-- [x] **Fix**: Badge filter popover compacto (mini icons)

@@ -61,11 +61,6 @@ CLAUDE.md
 docs/ARCHITECTURE.md
 hooks/
 
-# AI
-CLAUDE.md
-.opencode/
-.claude/
-
 storybook/yarn.lock
 
 # Kiro specs

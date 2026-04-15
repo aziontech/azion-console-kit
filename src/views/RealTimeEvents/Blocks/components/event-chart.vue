@@ -235,37 +235,6 @@
       names[name] = config.seriesLabels?.[name] || name
     })
 
-    // Time format
-    let timeFormat = '%H:%M'
-    if (props.tsRangeBegin && props.tsRangeEnd) {
-      const duration = new Date(props.tsRangeEnd) - new Date(props.tsRangeBegin)
-      if (duration > DAY) timeFormat = '%m/%d %H:%M'
-      if (duration > 7 * DAY) timeFormat = '%m/%d'
-    }
-
-    // Build a formatter that respects the user's configured timezone
-    const tzTickFormat = (date) => {
-      if (!(date instanceof Date)) return ''
-      const duration =
-        props.tsRangeBegin && props.tsRangeEnd
-          ? new Date(props.tsRangeEnd) - new Date(props.tsRangeBegin)
-          : 0
-      const opts = { hour12: false }
-      if (duration > 7 * DAY) {
-        opts.month = '2-digit'
-        opts.day = '2-digit'
-      } else if (duration > DAY) {
-        opts.month = '2-digit'
-        opts.day = '2-digit'
-        opts.hour = '2-digit'
-        opts.minute = '2-digit'
-      } else {
-        opts.hour = '2-digit'
-        opts.minute = '2-digit'
-      }
-      return formatDateInTimezone(date, opts)
-    }
-
     /* eslint-disable id-length */
     return {
       bindto: chartRef.value,
