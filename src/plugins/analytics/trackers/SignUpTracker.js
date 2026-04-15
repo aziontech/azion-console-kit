@@ -16,6 +16,9 @@ export class SignUpTracker {
   /**
    * @param {Object} payload
    * @param {'google'|'azure'|'github'|'email'} payload.method
+   * @param {string} [payload.firstSessionUrl] - The first session URL
+   * @param {string} [payload.signupType] - 'sso' or 'email'
+   * @param {Object} [payload.signupTypeFlags] - Flags for signup type tracking
    *
    * @returns {AnalyticsTrackerAdapter}
    */
@@ -23,7 +26,15 @@ export class SignUpTracker {
     this.#trackerAdapter.addEvent({
       eventName: 'User Signed Up',
       props: {
-        method: payload.method
+        method: payload.method,
+        first_session_url: payload.firstSessionUrl,
+        signup_type: payload.signupType,
+        login_sso_google: payload.signupTypeFlags?.login_sso_google ?? false,
+        login_sso_github: payload.signupTypeFlags?.login_sso_github ?? false,
+        login_email: payload.signupTypeFlags?.login_email ?? false,
+        signup_sso_google: payload.signupTypeFlags?.signup_sso_google ?? false,
+        signup_sso_github: payload.signupTypeFlags?.signup_sso_github ?? false,
+        signup_email: payload.signupTypeFlags?.signup_email ?? false
       }
     })
     return this.#trackerAdapter
@@ -48,6 +59,9 @@ export class SignUpTracker {
   /**
    * @param {Object} payload
    * @param {'google'|'azure'|'github'} payload.method
+   * @param {string} [payload.firstSessionUrl] - The first session URL
+   * @param {string} [payload.signupType] - 'sso' or 'email'
+   * @param {Object} [payload.signupTypeFlags] - Flags for signup type tracking
    *
    * @returns {AnalyticsTrackerAdapter}
    */
@@ -55,7 +69,15 @@ export class SignUpTracker {
     this.#trackerAdapter.addEvent({
       eventName: 'User Authorized SSO',
       props: {
-        method: payload.method
+        method: payload.method,
+        first_session_url: payload.firstSessionUrl,
+        signup_type: payload.signupType,
+        login_sso_google: payload.signupTypeFlags?.login_sso_google ?? false,
+        login_sso_github: payload.signupTypeFlags?.login_sso_github ?? false,
+        login_email: payload.signupTypeFlags?.login_email ?? false,
+        signup_sso_google: payload.signupTypeFlags?.signup_sso_google ?? false,
+        signup_sso_github: payload.signupTypeFlags?.signup_sso_github ?? false,
+        signup_email: payload.signupTypeFlags?.signup_email ?? false
       }
     })
     return this.#trackerAdapter

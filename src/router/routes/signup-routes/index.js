@@ -2,6 +2,7 @@ import * as SignupService from '@/services/signup-services'
 import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
+import { getFirstSessionUrl } from '@/helpers/first-session-url'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
@@ -42,9 +43,20 @@ export const signupRoutes = {
         if (isFirstLogin && accountStore.ssoSignUpMethod) {
           /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
           const tracker = inject('tracker')
-          const signUpMethod = { method: accountStore.ssoSignUpMethod }
+          const method = accountStore.ssoSignUpMethod
 
-          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
+          // Set the appropriate signup flag
+          const signupFlag = `signup_sso_${method}`
+          accountStore.setSignupTypeFlag(signupFlag)
+
+          const signUpPayload = {
+            method,
+            firstSessionUrl: getFirstSessionUrl(),
+            signupType: 'sso',
+            signupTypeFlags: accountStore.getSignupTypeFlags()
+          }
+
+          tracker.signUp.userSignedUp(signUpPayload).signUp.userAuthorizedSso(signUpPayload)
         }
 
         if (isFirstLogin) {
