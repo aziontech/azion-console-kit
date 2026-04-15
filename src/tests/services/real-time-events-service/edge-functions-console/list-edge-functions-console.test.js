@@ -33,10 +33,10 @@ describe('EdgeFunctionsConsoleServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctions: [] } }
+      body: { data: { functionConsoleEvents: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'cellsConsoleEvents'
+    const datasetName = 'functionConsoleEvents'
     await sut(fixtures.filter)
 
     const query = [
@@ -84,7 +84,7 @@ describe('EdgeFunctionsConsoleServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { cellsConsoleEvents: [fixtures.edgeFunctionConsole] } }
+      body: { data: { functionConsoleEvents: [fixtures.edgeFunctionConsole] } }
     })
 
     const { sut } = makeSut()

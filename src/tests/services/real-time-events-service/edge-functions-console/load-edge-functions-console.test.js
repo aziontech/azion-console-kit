@@ -37,7 +37,7 @@ describe('EdgeFunctionsConsoleServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { cellsConsoleEvents: [] } }
+      body: { data: { functionConsoleEvents: [] } }
     })
     const { sut } = makeSut()
     await sut(fixtures.filter)
@@ -62,7 +62,7 @@ describe('EdgeFunctionsConsoleServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { cellsConsoleEvents: [fixtures.edgeFunctionConsole] } }
+      body: { data: { functionConsoleEvents: [fixtures.edgeFunctionConsole] } }
     })
 
     const { sut } = makeSut()
