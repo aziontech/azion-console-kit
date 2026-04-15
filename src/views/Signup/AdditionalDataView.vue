@@ -12,9 +12,9 @@
           <template #content>
             <div class="p-6 overflow-visible">
               <AdditionalDataFormBlock
-                :postAdditionalDataService="postAdditionalDataService"
-                :patchFullnameService="patchFullnameService"
-                :updateAccountInfoService="updateAccountInfoService"
+                :postAdditionalDataService="SignupServices.postAdditionalDataService"
+                :patchFullnameService="SignupServices.patchFullnameService"
+                :updateAccountInfoService="SignupServices.updateAccountInfoService"
                 ref="additionalDataRef"
                 @proceedToCheckout="handleProceedToCheckout"
               />
@@ -25,7 +25,6 @@
             <Button
               severity="primary"
               class="w-full font-protomono flex items-center justify-center"
-              :icon="showLoading"
               :disabled="isDisabledSubmit"
               @click="onSubmit"
             >
@@ -52,6 +51,11 @@
             @onBack="handleGoBack"
           />
         </div>
+        <PlanSuccessBlock
+          v-else-if="isSuccessStep"
+          :plan="selectedPlan"
+          @onStart="handleStartFromSuccess"
+        />
       </div>
       <!-- Enterprise Link (only in step 1) -->
       <template v-if="isAdditionalDataStep">
@@ -89,6 +93,7 @@
   import CardBox from '@aziontech/webkit/card-box'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
+  import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
   import Button from '@aziontech/webkit/button'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -96,6 +101,8 @@
   import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
   import { useAccountStore } from '@/stores/account'
   import { useServiceOrders } from '@/composables/useServiceOrders'
+  import * as SignupServices from '@/services/signup-services'
+  import { getStripeClientService } from '@/services/billing-services'
 
   const router = useRouter()
   const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
@@ -120,23 +127,18 @@
   const additionalDataRef = ref(null)
 
   // Step management
-  const currentStep = ref('additional-data') // 'additional-data' | 'checkout'
+  const currentStep = ref('success') // 'additional-data' | 'checkout' | 'success'
   const selectedPlan = ref(null)
 
   const isAdditionalDataStep = computed(() => currentStep.value === 'additional-data')
   const isCheckoutStep = computed(() => currentStep.value === 'checkout')
+  const isSuccessStep = computed(() => currentStep.value === 'success')
   // Step 1 state
   const isDisabledSubmit = computed(() => {
     const metaValid = additionalDataRef.value?.meta?.valid
     const formLoading = additionalDataRef.value?.loading
     const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
     return !metaValid || formLoading || serviceOrderLoading
-  })
-
-  const showLoading = computed(() => {
-    const formLoading = additionalDataRef.value?.loading
-    const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
-    return formLoading || serviceOrderLoading ? 'pi pi-spin pi-spinner' : ''
   })
 
   const submitButtonLabel = computed(() => {
@@ -174,12 +176,14 @@
   }
 
   const handleProceedToCheckout = () => {
+    selectedPlan.value = additionalDataRef.value?.plan
+
     if (additionalDataRef.value?.plan === 'hobby') {
-      // For hobby plan, skip checkout and go to home
-      // router.push({ name: 'home' })
+      // For hobby plan, skip checkout and show success
+      currentStep.value = 'success'
       return
     }
-    selectedPlan.value = additionalDataRef.value?.plan
+
     currentStep.value = 'checkout'
   }
 
@@ -188,7 +192,7 @@
   }
 
   const handleCheckoutSuccess = () => {
-    router.push({ name: 'home' })
+    currentStep.value = 'success'
   }
 
   const handleCheckoutError = (error) => {
@@ -196,24 +200,9 @@
     console.error('Checkout error:', error)
   }
 
-  defineProps({
-    postAdditionalDataService: {
-      type: Function,
-      required: true
-    },
-    patchFullnameService: {
-      type: Function,
-      required: true
-    },
-    updateAccountInfoService: {
-      type: Function,
-      required: true
-    },
-    getStripeClientService: {
-      type: Function,
-      required: true
-    }
-  })
+  const handleStartFromSuccess = () => {
+    router.push({ name: 'home' })
+  }
 </script>
 
 <style scoped>

@@ -5,7 +5,7 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 export class ServiceOrdersService extends BaseService {
   // Production: '/v4/service-orders'
   // Local dev with mock: '/local_api/v4/service-orders'
-  #baseURL = '/local_api/v4/service-orders'
+  #baseURL = '/edge_api/api/v1/service-orders'
 
   // Plans and Coupons endpoints
   // Production: '/v4/product_catalog/plans' and '/v4/product_catalog/coupons'

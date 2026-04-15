@@ -125,4 +125,36 @@ export class SignUpTracker {
     })
     return this.#trackerAdapter
   }
+
+  /**
+   * @param {Object} payload
+   * @param {'hobby'|'pro'|'scale'} payload.plan
+   *
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  successScreenViewed(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'Sign Up Success Screen Viewed',
+      props: {
+        plan: payload.plan
+      }
+    })
+    return this.#trackerAdapter
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {'hobby'|'pro'|'scale'} payload.plan
+   *
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  startDeployingClicked(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'Sign Up Start Deploying Clicked',
+      props: {
+        plan: payload.plan
+      }
+    })
+    return this.#trackerAdapter
+  }
 }
