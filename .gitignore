@@ -1,7 +1,6 @@
 # Logs
 logs
 *.log
-.npmrc
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -47,13 +46,18 @@ cypress.env.*
 .edge
 !azion/production
 !azion/stage
-azion/
-/cypress/downloads
 
+azion/
+
+src/views/Playground/PlaygroundView.vue
+/cypress/downloads
 #Paths added by Azion CLI
 .edge/
 .vulcan
 specs.json
+.claude/
+.opencode/
+CLAUDE.md
 docs/ARCHITECTURE.md
 hooks/
 
@@ -63,3 +67,6 @@ CLAUDE.md
 .claude/
 
 storybook/yarn.lock
+
+# Kiro specs
+.kiro/
