@@ -299,23 +299,13 @@ const adapt = ({ body, statusCode }) => {
     'metricSlug'
   ])
 
-  const productsWithUsage = new Set(
-    groupedMetrics
-      .filter((metric) => Number(metric.accounted || 0) > 0 || Number(metric.value || 0) > 0)
-      .map((metric) => metric.productSlug)
-  )
-
   const groupedRegionMetrics = groupBy(
     metricsRegionValueFilteredByFlag,
     metricsRegionAccountedFilteredByFlag,
     ['productSlug', 'metricSlug', 'regionName']
   )
 
-  const productsToShow = filteredProducts.filter((product) =>
-    productsWithUsage.has(product.productSlug)
-  )
-
-  const data = mapProducts(productsToShow, groupedMetrics, groupedRegionMetrics)
+  const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
 
   return { body: data, statusCode }
 }
