@@ -30,7 +30,7 @@ export const listEdgeFunctionsConsole = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'cellsConsoleEvents',
+    dataset: 'functionConsoleEvents',
     limit: 10000,
     fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'ts', 'line'],
     orderBy: 'ts_DESC'
@@ -39,15 +39,15 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (body) => {
-  const cellsConsoleEventsList = body.data?.cellsConsoleEvents
-  const parser = cellsConsoleEventsList?.length
-    ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
-        summary: buildSummary(cellsConsoleEvents, shouldLimitRequestUri, shouldShowTsColumn),
-        configurationId: cellsConsoleEvents.configurationId,
-        line: cellsConsoleEvents.line,
+  const functionConsoleEventsList = body.data?.functionConsoleEvents
+  const parser = functionConsoleEventsList?.length
+    ? functionConsoleEventsList.map((functionConsoleEvent) => ({
+        summary: buildSummary(functionConsoleEvent, shouldLimitRequestUri, shouldShowTsColumn),
+        configurationId: functionConsoleEvent.configurationId,
+        line: functionConsoleEvent.line,
         id: generateCurrentTimestamp(),
-        tsFormat: getCurrentTimezone(cellsConsoleEvents.ts),
-        ts: cellsConsoleEvents.ts
+        tsFormat: getCurrentTimezone(functionConsoleEvent.ts),
+        ts: functionConsoleEvent.ts
       }))
     : []
 

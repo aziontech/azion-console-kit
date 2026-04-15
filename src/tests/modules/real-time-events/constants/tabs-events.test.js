@@ -52,7 +52,7 @@ describe('RealTimeEventsModule', () => {
       expect(httpRequests.panel).toBe('httpRequests')
       expect(httpRequests.index).toBe(0)
       expect(httpRequests.title).toBe('HTTP Requests')
-      expect(httpRequests.dataset).toBe('httpEvents')
+      expect(httpRequests.dataset).toBe('workloadEvents')
       expect(httpRequests.tabRouter).toBe('http-requests')
       expect(httpRequests.columns.length).toBe(2)
     })

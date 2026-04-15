@@ -29,7 +29,7 @@ export const listHttpRequest = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'httpEvents',
+    dataset: 'workloadEvents',
     limit: 1000,
     fields: [
       'configurationId',
@@ -61,12 +61,12 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (httpResponse) => {
-  const data = httpResponse.data.httpEvents?.map((httpEventItem) => ({
+  const data = httpResponse.data.workloadEvents?.map((workloadEventItem) => ({
     id: generateCurrentTimestamp(),
-    requestId: httpEventItem.requestId,
-    summary: buildSummary(httpEventItem, shouldLimitRequestUri, shouldShowTsColumn),
-    ts: httpEventItem.ts,
-    tsFormat: getCurrentTimezone(httpEventItem.ts)
+    requestId: workloadEventItem.requestId,
+    summary: buildSummary(workloadEventItem, shouldLimitRequestUri, shouldShowTsColumn),
+    ts: workloadEventItem.ts,
+    tsFormat: getCurrentTimezone(workloadEventItem.ts)
   }))
 
   return {
