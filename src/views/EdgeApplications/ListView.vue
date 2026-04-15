@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -21,8 +22,14 @@
     }
   })
 
+  const router = useRouter()
+
   const toast = useToast()
   const listTableRef = ref(null)
+
+  const handleNavigateToCreate = () => {
+    router.push('/applications/create?origin=list')
+  }
 
   const actions = [
     {
@@ -179,10 +186,10 @@
           description:
             'Create your first application to define how requests are processed, routed, and handled.',
           createButtonLabel: 'Application',
-          createPagePath: '/applications/create?origin=list',
           documentationService: props.documentationService,
           emptyListMessage: 'No Applications found.'
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleBeforeGoToAddPage"
         @on-before-go-to-edit="handleBeforeGoToEdit"
       />
