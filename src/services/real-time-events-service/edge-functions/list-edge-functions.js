@@ -48,13 +48,12 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const eventData = response.data.functionEvents ?? response.data.edgeFunctionsEvents ?? []
-  const data = eventData?.map((functionEvents) => ({
+  const data = response.data.functionEvents?.map((functionEventItem) => ({
     id: generateCurrentTimestamp(),
-    summary: buildSummary(functionEvents, shouldLimitRequestUri, shouldShowTsColumn),
-    ts: functionEvents.ts,
-    tsFormat: getCurrentTimezone(functionEvents.ts),
-    configurationId: functionEvents.configurationId
+    summary: buildSummary(functionEventItem, shouldLimitRequestUri, shouldShowTsColumn),
+    ts: functionEventItem.ts,
+    tsFormat: getCurrentTimezone(functionEventItem.ts),
+    configurationId: functionEventItem.configurationId
   }))
 
   return {

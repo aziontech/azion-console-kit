@@ -51,7 +51,7 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [functionEvents = {}] = body.data.functionEvents ?? body.data.edgeFunctionsEvents ?? []
+  const [functionEvents = {}] = body.data.functionEvents
   functionEvents.edgeFunctionsList = functionEvents.edgeFunctionsList?.split(';')
 
   return {

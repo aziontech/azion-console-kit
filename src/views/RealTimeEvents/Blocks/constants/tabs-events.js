@@ -6,7 +6,7 @@ const TABS_EVENTS = {
     index: 0,
     title: 'HTTP Requests',
     description: 'Logs of events from requests made to your applications and firewalls.',
-    dataset: 'httpEvents',
+    dataset: 'workloadEvents',
     tabRouter: 'http-requests',
     columns: [
       {
@@ -60,7 +60,7 @@ const TABS_EVENTS = {
     index: 2,
     title: 'Functions Console',
     description: 'Logs of events from applications using Edge Runtime returned by Cells Console.',
-    dataset: 'cellsConsoleEvents',
+    dataset: 'functionConsoleEvents',
     tabRouter: 'edge-functions-console',
     columns: [
       {

@@ -63,7 +63,7 @@ const FILTERS_RULES = () => {
       'Upstream Cache Status',
       'Request Time'
     ],
-    httpEvents: [
+    workloadEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,
       'Status',
       'Upstream Status',

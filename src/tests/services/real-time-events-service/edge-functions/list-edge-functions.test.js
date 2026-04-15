@@ -33,7 +33,7 @@ describe('EdgeFunctionsServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctions: [] } }
+      body: { data: { functionEvents: [] } }
     })
     const { sut } = makeSut()
     const datasetName = 'functionEvents'
