@@ -527,7 +527,20 @@ const config = {
         name: 'Secure Headers - General',
         description:
           'Sets various security headers to enhance the security posture of responses, including protections against clickjacking, XSS, and other web vulnerabilities.',
-        match: '^\\/',
+        criteria: [
+          {
+            variable: '${uri}',
+            conditional: 'if',
+            operator: 'matches',
+            inputValue: '^\\/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
+          }
+        ],
         behavior: {
           setHeaders: [
             'X-Frame-Options: SAMEORIGIN',
@@ -579,6 +592,12 @@ const config = {
             operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
           }
         ],
         behavior: {
