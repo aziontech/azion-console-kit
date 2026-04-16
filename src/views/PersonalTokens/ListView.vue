@@ -96,7 +96,6 @@
         :columns="getColumns"
         :actions="actions"
         :enableEditClick="false"
-        createPagePath="personal-tokens/create"
         exportFileName="Personal Tokens"
         emptyListMessage="No personal tokens found."
         :emptyBlock="{

@@ -191,7 +191,6 @@
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="functions/create?origin=list"
         editPagePath="/functions/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Functions"

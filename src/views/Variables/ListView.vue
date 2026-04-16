@@ -121,7 +121,6 @@
         :actions="actions"
         :frozenColumns="['key']"
         editPagePath="/variables/edit"
-        createPagePath="/variables/create"
         exportFileName="Variables"
         :lazy="false"
         emptyListMessage="No variables found."

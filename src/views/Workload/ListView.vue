@@ -219,7 +219,6 @@
         :listService="workloadService.listWorkloads"
         :columns="getColumns"
         :actions="actions"
-        :createPagePath="createDomainPath"
         :editPagePath="`/${handleTextDomainWorkload.pluralLabel}/edit`"
         defaultOrderingFieldName="-last_modified"
         :hiddenByDefault="columnsHiddenByDefault"

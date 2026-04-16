@@ -162,7 +162,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/users/edit"
-        createPagePath="users/create"
         defaultOrderingFieldName="-last_modified"
         :frozenColumns="['firstName']"
         exportFileName="Users"

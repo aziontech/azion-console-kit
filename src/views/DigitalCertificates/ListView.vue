@@ -396,7 +396,6 @@
         :listService="listService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="digital-certificates/create"
         editPagePath="/digital-certificates/edit"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         defaultOrderingFieldName="-last_modified"

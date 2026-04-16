@@ -162,7 +162,6 @@
         :listService="edgeServiceService.listEdgeServiceService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="edge-services/create"
         editPagePath="/edge-services/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Edge Services"

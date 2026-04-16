@@ -150,7 +150,6 @@
         :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="edge-dns/create"
         editPagePath="/edge-dns/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Edge DNS"

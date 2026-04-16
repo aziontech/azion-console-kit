@@ -133,7 +133,6 @@
         :listService="edgeConnectorsService.listEdgeConnectorsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Connectors"

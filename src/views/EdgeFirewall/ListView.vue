@@ -148,7 +148,6 @@
         :listService="edgeFirewallService.listEdgeFirewallService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/firewalls/create"
         editPagePath="/firewalls/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Firewalls"
