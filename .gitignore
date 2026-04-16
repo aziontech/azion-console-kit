@@ -61,3 +61,5 @@ hooks/
 CLAUDE.md
 .opencode/
 .claude/
+
+storybook/yarn.lock
