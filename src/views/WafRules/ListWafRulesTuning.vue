@@ -1,7 +1,7 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'

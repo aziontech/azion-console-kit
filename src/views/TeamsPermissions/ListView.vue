@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -12,7 +13,12 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('teams-permission/create')
+  }
 
   const actions = [
     {
@@ -108,7 +114,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/teams-permission/edit"
-        createPagePath="teams-permission/create"
         defaultOrderingFieldName="name"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"
@@ -120,9 +125,9 @@
           title: 'No team permissions yet',
           description: 'Create your first team to define and assign permissions to users.',
           createButtonLabel: 'Team',
-          createPagePath: 'teams-permission/create',
           documentationService: documentationAccountsProducts.teamPermissions
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="emit('on-load-data', $event)"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"

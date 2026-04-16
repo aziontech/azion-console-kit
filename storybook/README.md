@@ -1,6 +1,6 @@
 # Azion Console Kit Storybook
 
-This Storybook showcases templates/components from the azion-console-kit project.
+This Storybook showcases templates from the azion-console-kit project.
 
 ## Getting Started
 
@@ -52,43 +52,6 @@ yarn build
 
 This will create a static build in the `storybook/dist` directory.
 
-### Previewing Build Locally
-
-After building, you can preview the static build locally:
-
-```bash
-cd storybook
-yarn preview
-```
-
-This serves the built Storybook on `http://localhost:6007`.
-
-### Deploying to Azion
-
-The Storybook can be deployed to Azion's edge network:
-
-```bash
-cd storybook
-yarn deploy
-```
-
-This requires:
-- Azion CLI installed
-- Valid `AZION_PERSONAL_TOKEN` configured via `azion -t <token>`
-
-The deployment is configured via `azion.config.mjs` and deploys to the `dist` directory.
-
-### Automated Deployment (CI/CD)
-
-Deployment is automated via GitHub Actions:
-
-- **Trigger**: Push to `storybook` branch with changes in `src/storybook/**`
-- **Workflow**: `.github/workflows/deploy-storybook.yml`
-- **Process**: Installs dependencies → Builds Storybook → Deploys to Azion edge network
-- **Requirements**: `AZION_PERSONAL_TOKEN` secret must be configured in GitHub repository
-
-**Important**: Local commits to the `storybook` branch will automatically trigger deployment if files in `src/storybook/` are modified.
-
 ## Features
 
 - **Dark/Light Theme Toggle**: Switch between dark and light themes to see how components look in both modes
@@ -133,34 +96,11 @@ The following templates have been documented in Storybook:
 30. **Template Engine Block** - Template execution engine interface
 31. **Toast Block** - Toast notification system
 
-## Available Scripts
-
-From the storybook directory:
-
-- `yarn dev` - Start development server on port 6006
-- `yarn build` - Build static Storybook to `dist/`
-- `yarn preview` - Preview built Storybook locally on port 6007
-- `yarn build:azion` - Build with Azion CLI (for edge deployment)
-- `yarn deploy` - Deploy to Azion edge network (requires Azion CLI and authentication)
-
 ## Configuration
 
 - **Storybook Configuration**: `.storybook/main.js` and `.storybook/preview.js`
 - **Tailwind Configuration**: `tailwind.config.js`
 - **PostCSS Configuration**: `postcss.config.js`
-- **Azion Configuration**: `azion.config.mjs` - Configures edge deployment, storage, caching, and routing rules
-
-### Azion Edge Configuration
-
-The `azion.config.mjs` file configures:
-
-- **Storage**: Static files served from `dist/` directory
-- **Caching**: 
-  - Browser cache: 5 minutes
-  - Edge cache: 2 hours
-- **Routing**: Handles directory requests and subpaths with automatic `index.html` rewriting
-- **CORS**: Enables `Access-Control-Allow-Origin: *` for all requests
-- **Connector**: Links to Azion storage bucket `console-kit-storybook`
 
 ## Path Aliases
 
@@ -200,11 +140,9 @@ The following templates were excluded due to complex external dependencies:
 - **Framework**: Vue 3.5.22
 - **UI Library**: PrimeVue 3.35.0
 - **Styling**: Tailwind CSS 3.3.3
-- **Build Tool**: Vite 6.4.2
+- **Build Tool**: Vite 5.4.21
 - **Storybook**: 8.6.18
 - **Theme**: @aziontech/theme
-- **Icons**: @aziontech/icons
-- **Deployment**: Azion Edge Network
 
 ## Notes
 
@@ -212,4 +150,3 @@ The following templates were excluded due to complex external dependencies:
 - All templates use Vue 3 Composition API
 - Dark mode is enabled by default
 - Components support PrimeVue's theming system
-- Commands can be run from the root directory with `yarn storybook:*` prefix, or from the `storybook/` directory directly with `yarn <command>`

@@ -247,7 +247,7 @@
 <script setup>
   import { useRouter } from 'vue-router'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import PrimeButton from '@aziontech/webkit/button'

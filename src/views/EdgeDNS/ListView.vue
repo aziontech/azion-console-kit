@@ -1,5 +1,6 @@
 <script setup>
   import { ref, computed, inject } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -20,7 +21,12 @@
     }
   })
 
+  const router = useRouter()
   const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+
+  const handleNavigateToCreate = () => {
+    router.push('edge-dns/create')
+  }
   const actions = [
     {
       label: 'Delete',
@@ -144,7 +150,6 @@
         :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="edge-dns/create"
         editPagePath="/edge-dns/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Edge DNS"
@@ -159,9 +164,9 @@
           description:
             'Create your first DNS zone to host authoritative records and control domain name resolution.',
           createButtonLabel: 'Zone',
-          createPagePath: 'edge-dns/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleBeforeGoToAddPage"
         @on-before-go-to-edit="handleBeforeGoToEdit"
       />

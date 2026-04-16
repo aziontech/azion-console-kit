@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
@@ -23,6 +23,10 @@
       router.push('/')
     }
   })
+
+  const handleNavigateToCreate = () => {
+    router.push('management/create')
+  }
 
   const csvMapper = (rowData) => {
     return {
@@ -119,7 +123,7 @@
         title="No groups yet"
         description="Create your first group to manage permissions for resource access."
         createButtonLabel="Group"
-        createPagePath="management/create"
+        @click-to-create="handleNavigateToCreate"
       >
         <template #illustration>
           <Illustration />

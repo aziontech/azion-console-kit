@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -17,7 +18,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('functions/create?origin=list')
+  }
 
   const actions = [
     {
@@ -185,7 +191,6 @@
         :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="functions/create?origin=list"
         editPagePath="/functions/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Functions"
@@ -199,9 +204,9 @@
           description:
             'Create your first function to execute code at Azion\'s global infrastructure.',
           createButtonLabel: 'Function',
-          createPagePath: 'functions/create?origin=list',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
       />
