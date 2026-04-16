@@ -167,6 +167,7 @@
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useAccountStore } from '@/stores/account'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const accountStore = useAccountStore()
@@ -271,7 +272,21 @@
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
       const signupTypeFlags = accountStore.getSignupTypeFlags()
-      tracker.signIn.userSignedIn({ method: 'email', signupTypeFlags }).track()
+
+      // Load user and account info to populate accountStore for HubSpot tracking
+      await loadUserAndAccountInfo()
+      const { userId: consoleUserId, accountData } = accountStore
+      tracker.signIn
+        .userSignedIn({
+          method: 'email',
+          signupTypeFlags,
+          email: accountData?.email || values.email,
+          userId: consoleUserId,
+          firstname: accountData?.first_name || accountData?.name?.split(' ')[0],
+          lastname: accountData?.last_name || accountData?.name?.split(' ').slice(1).join(' '),
+          company: accountData?.company_name
+        })
+        .track()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)

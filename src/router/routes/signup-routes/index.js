@@ -39,24 +39,50 @@ export const signupRoutes = {
       beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
         const isFirstLogin = accountStore.isFirstLogin
+        const signupTypeFlags = accountStore.getSignupTypeFlags()
 
-        if (isFirstLogin && accountStore.ssoSignUpMethod) {
+        // Check if this is a first login with signup tracking needed
+        const isEmailSignup = signupTypeFlags.signup_email
+        const isSsoSignup = accountStore.ssoSignUpMethod
+
+        if (isFirstLogin && (isSsoSignup || isEmailSignup)) {
           /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
           const tracker = inject('tracker')
-          const method = accountStore.ssoSignUpMethod
 
-          // Set the appropriate signup flag
-          const signupFlag = `signup_sso_${method}`
-          accountStore.setSignupTypeFlag(signupFlag)
+          // Determine the method for tracking
+          const method = isSsoSignup || 'email'
+
+          // Get user data for HubSpot tracking
+          const { userId: consoleUserId, accountData } = accountStore
+          const userEmail = accountData?.email
+          const userName = accountData?.name || ''
+          const companyName = accountData?.company_name || ''
+
+          // Parse first and last name from full name
+          const nameParts = userName.split(' ')
+          const firstname = nameParts[0] || ''
+          const lastname = nameParts.slice(1).join(' ') || ''
 
           const signUpPayload = {
             method,
             firstSessionUrl: getFirstSessionUrl(),
-            signupType: 'sso',
-            signupTypeFlags: accountStore.getSignupTypeFlags()
+            signupTypeFlags,
+            // HubSpot required fields
+            email: userEmail,
+            userId: consoleUserId,
+            firstname,
+            lastname,
+            company: companyName,
+            githubHandle: method === 'github' ? accountData?.github_handle : undefined
           }
 
-          tracker.signUp.userSignedUp(signUpPayload).signUp.userAuthorizedSso(signUpPayload)
+          // Track user signup with Segment and HubSpot
+          tracker.signUp.userSignedUp(signUpPayload)
+
+          // For SSO, also track the SSO authorization event
+          if (isSsoSignup) {
+            tracker.signUp.userAuthorizedSso(signUpPayload)
+          }
         }
 
         if (isFirstLogin) {
