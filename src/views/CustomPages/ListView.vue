@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -18,7 +19,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('/custom-pages/create')
+  }
 
   const actions = [
     {
@@ -129,10 +135,10 @@
         :emptyBlock="{
           title: 'No Custom Pages yet',
           description: 'Create your first custom page to control responses for defined conditions.',
-          createPagePath: '/custom-pages/create',
           createButtonLabel: 'Custom Page',
           documentationService: props.documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
       />

@@ -1,5 +1,6 @@
 <script setup>
   import { computed, ref, inject } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -20,8 +21,13 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
+  const router = useRouter()
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
+
+  const handleNavigateToCreate = () => {
+    router.push(createDomainPath)
+  }
   const columnsHiddenByDefault = ['lastEditor', 'protocols']
 
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
@@ -213,7 +219,6 @@
         :listService="workloadService.listWorkloads"
         :columns="getColumns"
         :actions="actions"
-        :createPagePath="createDomainPath"
         :editPagePath="`/${handleTextDomainWorkload.pluralLabel}/edit`"
         defaultOrderingFieldName="-last_modified"
         :hiddenByDefault="columnsHiddenByDefault"
@@ -225,10 +230,10 @@
         :emptyBlock="{
           title: titleEmptyPage,
           description: descriptionEmptyPage,
-          createPagePath: 'workloads/create',
           createButtonLabel: handleTextDomainWorkload.singularTitle,
           documentationService: documentationHandler
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleBeforeGoToAddPage"
         @on-before-go-to-edit="handleBeforeGoToEdit"

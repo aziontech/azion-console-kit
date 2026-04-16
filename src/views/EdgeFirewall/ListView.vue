@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -12,6 +13,7 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const router = useRouter()
 
   defineProps({
     documentationService: {
@@ -116,6 +118,10 @@
   const handleBeforeGoToEdit = () => {
     handleTrackEditEvent()
   }
+
+  const handleNavigateToCreate = () => {
+    router.push('/firewalls/create')
+  }
 </script>
 
 <template>
@@ -142,7 +148,6 @@
         :listService="edgeFirewallService.listEdgeFirewallService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/firewalls/create"
         editPagePath="/firewalls/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Firewalls"
@@ -155,11 +160,11 @@
           description:
             'Create your first firewall to define security modules and enforcement behavior for incoming traffic.',
           createButtonLabel: 'Firewall',
-          createPagePath: '/firewalls/create',
           documentationService: documentationService
         }"
         @on-before-go-to-add-page="handleBeforeGoToAddPage"
         @on-before-go-to-edit="handleBeforeGoToEdit"
+        @click-to-create="handleNavigateToCreate"
       />
     </template>
   </ContentBlock>

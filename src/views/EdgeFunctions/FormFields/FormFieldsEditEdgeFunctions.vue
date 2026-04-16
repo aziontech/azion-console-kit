@@ -10,7 +10,7 @@
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import SelectPanel from '@/components/select-panel'
   import CodeEditor from '../components/code-editor.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextIcon from '@aziontech/webkit/field-text-icon'

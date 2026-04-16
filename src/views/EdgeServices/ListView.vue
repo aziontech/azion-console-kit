@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -20,7 +21,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('edge-services/create')
+  }
 
   const csvMapper = (rowData) => {
     return {
@@ -156,7 +162,6 @@
         :listService="edgeServiceService.listEdgeServiceService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="edge-services/create"
         editPagePath="/edge-services/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Edge Services"
@@ -167,9 +172,9 @@
           description:
             'Create your first service to orchestrate variables and resources to your Edge Nodes.',
           createButtonLabel: 'Edge Service',
-          createPagePath: 'edge-services/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
       />

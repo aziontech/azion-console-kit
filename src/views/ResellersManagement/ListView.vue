@@ -13,6 +13,11 @@
 
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
+
+  const handleNavigateToCreate = () => {
+    router.push('management/create')
+  }
+
   onBeforeMount(() => {
     if (accountType !== 'brand') {
       router.push('/')
@@ -113,9 +118,9 @@
         :emptyBlock="{
           title: 'No Resellers yet',
           description: 'Create your first reseller account.',
-          createButtonLabel: 'Reseller',
-          createPagePath: 'management/create'
+          createButtonLabel: 'Reseller'
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="handleLoadData"
       />
     </template>

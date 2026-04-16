@@ -1,5 +1,6 @@
 <script setup>
   import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -16,7 +17,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('connectors/create')
+  }
 
   const actions = [
     {
@@ -127,7 +133,6 @@
         :listService="edgeConnectorsService.listEdgeConnectorsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/connectors/create"
         editPagePath="/connectors/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Connectors"
@@ -140,9 +145,9 @@
           description:
             'Create your first connector to define how traffic is routed from Azion to an origin or external service.',
           createButtonLabel: 'Connectors',
-          createPagePath: 'connectors/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
       />
     </template>
   </ContentBlock>
