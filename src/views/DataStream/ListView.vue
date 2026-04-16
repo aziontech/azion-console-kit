@@ -230,7 +230,6 @@
           :columns="getColumns"
           :actions="actions"
           editPagePath="/data-stream/edit"
-          createPagePath="/data-stream/create"
           :apiFields="DATA_STREAM_API_FIELDS"
           defaultOrderingFieldName="-last_modified"
           :frozenColumns="['name']"

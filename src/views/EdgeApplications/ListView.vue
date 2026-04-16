@@ -173,7 +173,6 @@
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Applications"

@@ -114,7 +114,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/teams-permission/edit"
-        createPagePath="teams-permission/create"
         defaultOrderingFieldName="name"
         :frozenColumns="['name']"
         exportFileName="Teams Permissions"

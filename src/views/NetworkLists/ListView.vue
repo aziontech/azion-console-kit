@@ -140,7 +140,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/network-lists/edit"
-        createPagePath="network-lists/create"
         :apiFields="NETWORK_LIST_API_FIELDS"
         defaultOrderingFieldName="-last_modified"
         :frozenColumns="['name']"
