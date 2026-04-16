@@ -3,12 +3,20 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider', 'hasSession']
+    paths: ['identifySignUpProvider', 'hasSession', 'signupTypeFlags']
   },
   state: () => ({
     account: {},
     hasSession: false,
     identifySignUpProvider: '',
+    signupTypeFlags: {
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: false
+    },
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -146,12 +154,36 @@ export const useAccountStore = defineStore({
       this.account = {}
       this.hasSession = false
       this.identifySignUpProvider = ''
+      this.signupTypeFlags = {
+        login_sso_google: false,
+        login_sso_github: false,
+        login_email: false,
+        signup_sso_google: false,
+        signup_sso_github: false,
+        signup_email: false
+      }
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method
     },
     resetSsoSignUpMethod() {
       this.identifySignUpProvider = ''
+    },
+    /**
+     * Sets a signup type flag to true.
+     * @param {string} flag - The flag name (e.g., 'signup_sso_google', 'login_email')
+     */
+    setSignupTypeFlag(flag) {
+      if (flag in this.signupTypeFlags) {
+        this.signupTypeFlags[flag] = true
+      }
+    },
+    /**
+     * Gets all signup type flags.
+     * @returns {Object} The signup type flags object
+     */
+    getSignupTypeFlags() {
+      return { ...this.signupTypeFlags }
     }
   }
 })
