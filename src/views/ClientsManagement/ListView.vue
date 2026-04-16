@@ -15,6 +15,10 @@
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
 
+  const handleNavigateToCreate = () => {
+    router.push('/client/management/create')
+  }
+
   onBeforeMount(() => {
     if (accountType !== 'reseller') {
       router.push('/')
@@ -98,9 +102,9 @@
         :emptyBlock="{
           title: 'No Clients yet',
           description: 'Create your first client account to manage configurations.',
-          createButtonLabel: 'Client',
-          createPagePath: '/client/management/create'
+          createButtonLabel: 'Client'
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="handleLoadData"
       />
     </template>

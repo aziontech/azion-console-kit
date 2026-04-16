@@ -15,7 +15,8 @@
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
     'update:selectedItensData',
-    'force-update'
+    'force-update',
+    'click-to-create'
   ])
 
   const props = defineProps({
@@ -346,6 +347,7 @@
       @sort="fetchOnSort"
       @rowReorder="onRowReorder"
       @rowClick="handleRowClick"
+      @click-to-create="emit('click-to-create')"
     >
       <!-- HEADER -->
       <template
