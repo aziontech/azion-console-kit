@@ -63,7 +63,7 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
-          httpEvents: [
+          workloadEvents: [
             handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
@@ -91,7 +91,7 @@ describe('RealTimeMetricsModule', () => {
             'Invocations',
             'Edge Functions Instance Id List'
           ],
-          edgeFunctionsEvents: [
+          functionEvents: [
             handleTextDomainWorkload.singularTitle,
             'Edge Function Id',
             'Compute Time',
