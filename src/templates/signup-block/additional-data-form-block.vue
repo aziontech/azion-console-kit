@@ -4,130 +4,48 @@
     @submit.prevent="submitForm"
   >
     <div
-      class="flex flex-col gap-8"
+      class="flex flex-col gap-6"
       v-if="additionalDataInfo?.length"
     >
-      <!-- Step 1: Plan -->
-      <FieldGroupRadio
-        :label="questionLabel('use')"
-        nameField="use"
-        auto
-        hideSelector
-        :options="adaptOptions('use')"
-        @onRadioChange="updateStep('use')"
-      />
-
-      <!-- Step 2: Role -->
-      <FieldGroupRadio
-        :label="questionLabel('role')"
-        nameField="role"
-        auto
-        hideSelector
-        :disabled="isFieldDisabled(stepOptions.role)"
-        :options="adaptOptions('role')"
-        @onRadioChange="updateStep('role')"
-      />
-
-      <!-- Step 2: Role Description -->
-      <div
-        class="w-full md:w-1/2"
-        v-if="showInputRoleField"
-      >
-        <div class="w-full flex flex-col gap-2">
-          <label
-            class="flex flex-col gap-3 font-semibold text-sm"
-            for="inputRole"
-          >
-            Describe your role*
-            <PrimeInputText
-              v-model="inputRole"
-              name="inputRole"
-              id="inputRole"
-            />
-          </label>
-          <small
-            v-if="errors.inputRole"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ errors.inputRole }}
-          </small>
-        </div>
+      <!-- Plan Selector -->
+      <div class="flex flex-col gap-2">
+        <BoxGridSelection
+          v-model="plan"
+          :items="planOptions"
+        >
+          <template #tag="{ item }">
+            <div
+              class="flex items-center rounded-[6px] border px-[10px] py-1 surface-section surface-border w-fit"
+            >
+              <span class="font-protomono text-[10px] font-semibold leading-4 text-color">
+                {{ item.tagLabel }}
+              </span>
+            </div>
+          </template>
+        </BoxGridSelection>
       </div>
 
-      <!-- Step 3: Company Size -->
-      <FieldGroupRadio
-        v-if="showCompanySizeField"
-        :label="questionLabel('companySize')"
-        nameField="companySize"
-        auto
-        hideSelector
-        :disabled="isFieldDisabled(stepOptions.companySize)"
-        :options="adaptOptions('companySize')"
-        @onRadioChange="updateStep('companySize')"
+      <!-- Full Name -->
+      <FieldText
+        name="fullName"
+        label="Your Full Name"
+        placeholder="John Doe"
+        class="w-full"
+        required
       />
 
-      <!-- Step 4: Full Name -->
-      <div class="w-full md:w-1/2">
-        <div class="w-full flex flex-col gap-2">
-          <label
-            class="flex flex-col gap-3 font-semibold text-sm"
-            :class="[disabledClass(stepOptions.fullName)]"
-            for="fullName"
-          >
-            {{ questionLabel('fullName') }}
-            <PrimeInputText
-              v-model="fullName"
-              name="fullName"
-              id="fullName"
-              :disabled="isFieldDisabled(stepOptions.fullName)"
-              @input="updateStep('fullName')"
-            />
-          </label>
-          <small
-            v-if="errors.fullName"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ errors.fullName }}
-          </small>
-        </div>
+      <!-- Role Dropdown -->
+      <div class="relative z-10">
+        <FieldDropdown
+          name="role"
+          :value="role"
+          :options="roleOptions"
+          optionLabel="title"
+          optionValue="inputValue"
+          placeholder="Choose an option that describes your role"
+          label="What best describes your role?"
+        />
       </div>
-
-      <!-- Step 3 : Company Website -->
-      <div
-        class="w-full md:w-1/2"
-        v-if="showCompanyWebsiteField"
-      >
-        <div class="w-full flex flex-col gap-2">
-          <label
-            class="flex flex-col gap-3 font-semibold text-sm"
-            :class="[disabledClass(stepOptions.companySize)]"
-            for="companyWebsite"
-          >
-            {{ questionLabel('companyWebsite') }}
-            <PrimeInputText
-              v-model="companyWebsite"
-              name="companyWebsite"
-              id="companyWebsite"
-              :disabled="isFieldDisabled(stepOptions.companySize)"
-            />
-          </label>
-          <small
-            v-if="errors.companyWebsite"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ errors.companyWebsite }}
-          </small>
-        </div>
-      </div>
-
-      <!-- Step 5: Onboarding Session -->
-      <FieldSwitchBlock
-        :title="questionLabel('onboardingSession')"
-        name="onboardingSession"
-        nameField="onboardingSession"
-        :isCard="false"
-        :disabled="isFieldDisabled(stepOptions.onboardingSession)"
-      />
     </div>
 
     <!-- Empty state -->
@@ -136,16 +54,12 @@
       v-else
     >
       <div
-        v-for="item in 5"
+        v-for="item in 3"
         :key="item"
       >
-        <div class="w-full mb-8">
-          <PrimeSkeleton class="h-4 mb-4 w-2/3" />
-          <div class="flex flex-wrap gap-3">
-            <PrimeSkeleton class="h-14 w-full md:w-28" />
-            <PrimeSkeleton class="h-14 w-full md:w-28" />
-            <PrimeSkeleton class="h-14 w-full md:w-28" />
-          </div>
+        <div class="w-full mb-6">
+          <Skeleton class="h-4 mb-4 w-2/3" />
+          <Skeleton class="h-10 w-full" />
         </div>
       </div>
     </div>
@@ -153,44 +67,43 @@
 </template>
 
 <script setup>
-  import PrimeInputText from '@aziontech/webkit/inputtext'
-  import PrimeSkeleton from '@aziontech/webkit/skeleton'
-  import { useToast } from '@aziontech/webkit/use-toast'
+  import { ref, inject, computed, onMounted, watch } from 'vue'
   import { useField, useForm } from 'vee-validate'
-  import { ref, inject, computed, watch } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
+  // import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useAccountStore } from '@/stores/account'
+  import { usePlans } from '@/composables/usePlans'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
+  import FieldText from '@aziontech/webkit/field-text'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const router = useRouter()
+  // const router = useRouter()
   const toast = useToast()
-  const { userId } = useAccountStore()
   const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
   })
 
-  const props = defineProps({
-    postAdditionalDataService: {
-      type: Function,
-      required: true
-    },
-    patchFullnameService: {
-      type: Function,
-      required: true
-    },
-    updateAccountInfoService: {
-      type: Function,
-      required: true
-    }
-  })
+  // const props = defineProps({
+  //   postAdditionalDataService: {
+  //     type: Function,
+  //     required: true
+  //   },
+  //   patchFullnameService: {
+  //     type: Function,
+  //     required: true
+  //   },
+  //   updateAccountInfoService: {
+  //     type: Function,
+  //     required: true
+  //   }
+  // })
 
-  const currentStep = ref(1)
   const additionalDataInfo = ref([
     {
       id: 1,
@@ -198,21 +111,9 @@
       required: true,
       show: true,
       values: [
-        {
-          id: 1,
-          value: 'Personal',
-          other_values: false
-        },
-        {
-          id: 2,
-          value: 'Work',
-          other_values: false
-        },
-        {
-          id: 3,
-          value: 'Study',
-          other_values: false
-        }
+        { id: 1, value: 'hobby', other_values: false },
+        { id: 2, value: 'pro', other_values: false },
+        { id: 3, value: 'scale', other_values: false }
       ]
     },
     {
@@ -221,89 +122,16 @@
       required: true,
       show: true,
       values: [
-        {
-          id: 4,
-          value: 'Software Developer',
-          other_values: false
-        },
-        {
-          id: 5,
-          value: 'DevOps Engineer',
-          other_values: false
-        },
-        {
-          id: 6,
-          value: 'Infrastructure Analyst',
-          other_values: false
-        },
-        {
-          id: 7,
-          value: 'Network Engineer',
-          other_values: false
-        },
-        {
-          id: 8,
-          value: 'Security Specialist',
-          other_values: false
-        },
-        {
-          id: 9,
-          value: 'Data Engineer',
-          other_values: false
-        },
-        {
-          id: 10,
-          value: 'AI/ML Engineer',
-          other_values: false
-        },
-        {
-          id: 11,
-          value: 'IoT Engineer',
-          other_values: false
-        },
-        {
-          id: 12,
-          value: 'Team Lead',
-          other_values: false
-        },
-        {
-          id: 13,
-          value: 'Other',
-          other_values: true
-        }
-      ]
-    },
-    {
-      id: 3,
-      key: 'How big is your company?',
-      required: false,
-      show: true,
-      values: [
-        {
-          id: 14,
-          value: 'Just me',
-          other_values: false
-        },
-        {
-          id: 15,
-          value: '2 to 100 employees',
-          other_values: false
-        },
-        {
-          id: 16,
-          value: '101 to 500 employees',
-          other_values: false
-        },
-        {
-          id: 17,
-          value: '501 to 1000 employees',
-          other_values: false
-        },
-        {
-          id: 18,
-          value: '1001+ employees',
-          other_values: false
-        }
+        { id: 4, value: 'Software Developer', other_values: false },
+        { id: 5, value: 'DevOps Engineer', other_values: false },
+        { id: 6, value: 'Infrastructure Analyst', other_values: false },
+        { id: 7, value: 'Network Engineer', other_values: false },
+        { id: 8, value: 'Security Specialist', other_values: false },
+        { id: 9, value: 'Data Engineer', other_values: false },
+        { id: 10, value: 'AI/ML Engineer', other_values: false },
+        { id: 11, value: 'IoT Engineer', other_values: false },
+        { id: 12, value: 'Team Lead', other_values: false },
+        { id: 13, value: 'Other', other_values: false }
       ]
     },
     {
@@ -311,167 +139,111 @@
       key: 'Your Full Name',
       required: true,
       show: true
-    },
-    {
-      id: 4,
-      key: 'Company Website?',
-      required: false,
-      show: true,
-      values: [
-        {
-          id: 19,
-          value: '',
-          other_values: true
-        }
-      ]
-    },
-    {
-      id: 5,
-      key: 'Do you want to schedule a onboarding session with an Azion expert?',
-      required: false,
-      show: true,
-      values: [
-        {
-          id: 20,
-          value: 'Yes',
-          other_values: false
-        },
-        {
-          id: 21,
-          value: 'No',
-          other_values: false
-        }
-      ]
     }
   ])
 
   const validationSchema = yup.object({
-    use: yup.string().required(),
-    role: yup.string().required(),
-    inputRole: yup
-      .string()
-      .trim()
-      .when('role', {
-        is: (val) => val === 'Other',
-        then: (schema) =>
-          schema
-            .max(255, 'Role Description must be less than 255 characters')
-            .required('Role Description is a required field')
-      }),
-    companySize: yup.string().when('use', {
-      is: (val) => val === 'Work',
-      then: (schema) => schema.required('Company Size is a required field')
-    }),
-    companyWebsite: yup.string().when('companySize', {
-      is: (val) => val && val !== 'Just me',
-      then: (schema) =>
-        schema
-          .trim()
-          .max(255, 'Company Website must be less than 255 characters')
-          .matches(
-            /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
-            'Company Website is a required field'
-          )
-          .required('Company Website is a required field')
-    }),
+    plan: yup.string().required().oneOf(['hobby', 'pro', 'scale']),
+    role: yup.string().required('Role is required'),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field')
-      .required(),
-    onboardingSession: yup.boolean()
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
+      .required('Your Full Name is required')
   })
 
-  const { values, resetField, meta, errors } = useForm({
-    validationSchema,
-    initialValues: {
-      onboardingSession: true
-    }
+  const { meta } = useForm({
+    validationSchema
   })
 
-  const { value: use } = useField('use')
+  const { value: plan } = useField('plan')
   const { value: role } = useField('role')
-  const { value: inputRole } = useField('inputRole')
-  const { value: companySize } = useField('companySize')
-  const { value: companyWebsite } = useField('companyWebsite')
   const { value: fullName } = useField('fullName')
-  const { value: onboardingSession } = useField('onboardingSession')
 
-  const stepOptions = {
-    use: 1,
-    role: 2,
-    companySize: 3,
-    fullName: 4,
-    onboardingSession: 5
+  // Initialize plans from URL/storage
+  const { plan: storedPlan, initialize: initializePlans, setParam: setPlanParam } = usePlans()
+
+  // Plan options for the selector
+  const planOptions = [
+    {
+      value: 'hobby',
+      icon: 'ai ai-instructor',
+      description: 'For learning and small personal projects.',
+      tagLabel: 'Hobby Plan',
+      ariaLabel: 'Hobby Plan - For learning and small personal projects.'
+    },
+    {
+      value: 'pro',
+      icon: 'pi pi-chart-line',
+      description: 'For professional or commercial applications.',
+      tagLabel: 'Pro Plan',
+      ariaLabel: 'Pro Plan - For professional or commercial applications.'
+    },
+    {
+      value: 'scale',
+      icon: 'pi pi-file-check',
+      description: 'For businesses requiring advanced security and compliance.',
+      tagLabel: 'Scale Plan',
+      ariaLabel: 'Scale Plan - For businesses requiring advanced security and compliance.'
+    }
+  ]
+
+  // Role options for dropdown
+  const roleOptions = computed(() => {
+    const roleData = additionalDataInfo.value[1]?.values || []
+    return roleData.map((option) => ({
+      title: option.value,
+      inputValue: option.value
+    }))
+  })
+
+  // Map jobRole from kebab-case (stored in accountStore) to title case (used in dropdown)
+  const jobRoleKebabToTitle = (kebabRole) => {
+    const roleMap = {
+      'software-developer': 'Software Developer',
+      'devops-engineer': 'DevOps Engineer',
+      'infrastructure-analyst': 'Infrastructure Analyst',
+      'network-engineer': 'Network Engineer',
+      'security-specialist': 'Security Specialist',
+      'data-engineer': 'Data Engineer',
+      'ai-ml-engineer': 'AI/ML Engineer',
+      'iot-engineer': 'IoT Engineer',
+      'team-lead': 'Team Lead',
+      other: 'Other'
+    }
+    return roleMap[kebabRole] || null
   }
 
-  const updateStep = (step) => {
-    const updateFromStep = {
-      use: () => (currentStep.value = stepOptions.role),
-      role: () => {
-        if (use.value === 'Work') {
-          currentStep.value = stepOptions.companySize
-        } else {
-          currentStep.value = stepOptions.fullName
-        }
-      },
-      companySize: () => (currentStep.value = stepOptions.fullName),
-      fullName: () => (currentStep.value = stepOptions.onboardingSession)
+  // Pre-fill form fields on mount
+  onMounted(() => {
+    initializePlans()
+
+    // Pre-fill plan from URL params/storage
+    if (storedPlan.value && ['hobby', 'pro', 'scale'].includes(storedPlan.value)) {
+      plan.value = storedPlan.value
     }
 
-    if (fullName.value) {
-      currentStep.value = stepOptions.onboardingSession
-      return
+    // Pre-fill fullName from accountStore
+    const { first_name, last_name } = accountStore.account || {}
+    if (first_name || last_name) {
+      fullName.value = `${first_name || ''} ${last_name || ''}`.trim()
     }
 
-    updateFromStep[step]()
-  }
-
-  const disabledClass = (step) => {
-    return currentStep.value < step ? 'p-disabled' : ''
-  }
-
-  const isFieldDisabled = (step) => {
-    return currentStep.value < step
-  }
-
-  const showInputRoleField = computed(() => {
-    return role.value === 'Other'
-  })
-
-  const showCompanySizeField = computed(() => {
-    return use.value === 'Work'
-  })
-
-  const showCompanyWebsiteField = computed(() => {
-    return companySize.value && companySize.value !== 'Just me'
-  })
-
-  const questionsMap = {
-    use: 0,
-    role: 1,
-    companySize: 2,
-    fullName: 3,
-    companyWebsite: 4,
-    onboardingSession: 5
-  }
-
-  const adaptOptions = (step) => {
-    const options = additionalDataInfo?.value[questionsMap[step]]?.values
-
-    return options?.map((option) => {
-      return {
-        title: option.value,
-        inputValue: option.value
+    // Pre-fill role from accountStore
+    const jobRole = accountStore.account?.jobRole
+    if (jobRole) {
+      const roleTitle = jobRoleKebabToTitle(jobRole)
+      if (roleTitle) {
+        role.value = roleTitle
       }
-    })
-  }
+    }
+  })
 
-  const questionLabel = (step, required = true) => {
-    const idx = questionsMap[step]
-    return required ? `${additionalDataInfo.value[idx]?.key}*` : additionalDataInfo.value[idx]?.key
-  }
+  watch(plan, (selectedPlan) => {
+    if (selectedPlan === undefined) return
+    setPlanParam('plan', selectedPlan ?? null)
+  })
 
   const loading = ref(false)
 
@@ -479,55 +251,57 @@
     loading.value = true
 
     try {
-      const usersPayload = fullName.value
-      const accountPayload = role.value
-      const additionalDataPayload = {
-        ...values,
-        id: userId
-      }
+      // const usersPayload = values.fullName
+      // const accountPayload = role.value
+      // const additionalDataPayload = {
+      //   plan: plan.value,
+      //   role: role.value,
+      //   fullName: values.fullName,
+      //   id: userId
+      // }
 
-      const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
+      // const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      // accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
-      const patchName = props.patchFullnameService(usersPayload)
-      const postAddData = props.postAdditionalDataService({
-        payload: additionalDataPayload,
-        options: additionalDataInfo.value
-      })
+      // const patchName = props.patchFullnameService(usersPayload)
+      // const postAddData = props.postAdditionalDataService({
+      //   payload: additionalDataPayload,
+      //   options: additionalDataInfo.value
+      // })
 
-      await patchName
-      await postAddData
+      // await patchName
+      // await postAddData
 
-      tracker.signUp.submittedAdditionalData(values).track()
+      // tracker.signUp
+      //   .submittedAdditionalData({
+      //     plan: plan.value,
+      //     role: role.value,
+      //     fullName: values.fullName
+      //   })
+      //   .track()
+
+      // For pro/scale plans, emit event to proceed to checkout step
+      emit('proceedToCheckout')
     } catch (err) {
-      const errors = JSON.parse(err)
-
-      toast.add({ severity: 'error', detail: errors.errorMessage, summary: 'Error' })
-
+      const errorMessage = err?.message || err
+      const errors = typeof errorMessage === 'string' ? { errorMessage } : errorMessage
+      toast.add({
+        severity: 'error',
+        detail: errors.errorMessage || 'Error submitting form',
+        summary: 'Error'
+      })
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
-      router.push({
-        name: 'home',
-        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
-      })
       loading.value = false
     }
   }
 
-  watch(use, (value) => {
-    if (value !== 'Work') {
-      resetField('companySize')
-      resetField('companyWebsite')
-      if (role.value) {
-        updateStep('role')
-      }
-    }
-  })
+  const emit = defineEmits(['proceedToCheckout'])
 
   defineExpose({
     submitForm,
     loading,
-    hasFormValues: additionalDataInfo.value?.length,
-    meta
+    meta,
+    plan
   })
 </script>

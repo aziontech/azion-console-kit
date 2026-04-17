@@ -1,110 +1,228 @@
 <template>
-  <div>
-    <section
-      class="flex max-lg:flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:h-visible-area"
-    >
-      <div
-        class="w-auto 2xl:w-full flex flex-col items-center justify-start gap-16 px-20 static max-md:px-0 lg:sticky lg:top-0"
-      >
-        <LottieAnimation
-          v-if="isAnimationDark"
-          :animationData="AdditionalDataAnimationDark"
-          :loop="true"
-        />
-        <LottieAnimation
-          v-else
-          :animationData="AdditionalDataAnimationLight"
-          :loop="true"
-        />
-
-        <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
-          <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
-          <p class="text-xl font-normal text-color-secondary">
-            Find opportunities to explore Azion and improve your projects following a unique
-            journey, aligned with your needs.
-          </p>
-        </div>
-      </div>
-      <div
-        class="flex flex-col justify-start items-center h-fit"
-        :class="[widthClass]"
-      >
-        <div
-          class="card w-full surface-border border rounded-md surface-section p-6 flex flex-col gap-8 xl:p-8"
+  <div class="flex flex-col min-h-screen var(--bg-color)">
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
+      <!-- Card Container (only for step 1) -->
+      <div class="w-full">
+        <CardBox
+          v-if="isAdditionalDataStep"
+          title="How are you planning to use Azion?"
+          class="mx-auto max-w-xl"
         >
-          <AdditionalDataFormBlock
-            :postAdditionalDataService="postAdditionalDataService"
-            :patchFullnameService="patchFullnameService"
-            :updateAccountInfoService="updateAccountInfoService"
-            ref="additionalDataRef"
+          <template #content>
+            <div class="p-6 overflow-visible">
+              <AdditionalDataFormBlock
+                :postAdditionalDataService="SignupServices.postAdditionalDataService"
+                :patchFullnameService="SignupServices.patchFullnameService"
+                :updateAccountInfoService="SignupServices.updateAccountInfoService"
+                ref="additionalDataRef"
+                @proceedToCheckout="handleProceedToCheckout"
+              />
+            </div>
+          </template>
+
+          <template #footer>
+            <Button
+              severity="primary"
+              class="w-full font-protomono flex items-center justify-center"
+              :disabled="isDisabledSubmit"
+              @click="onSubmit"
+            >
+              <Transition
+                name="label-fade"
+                mode="out-in"
+              >
+                <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
+              </Transition>
+            </Button>
+          </template>
+        </CardBox>
+        <div
+          v-else-if="isCheckoutStep"
+          class="w-full"
+        >
+          <!-- Checkout Component -->
+          <ChoosingPlanContainer
+            :plan="selectedPlan"
+            :getStripeClientService="getStripeClientService"
+            ref="checkoutRef"
+            @onSuccess="handleCheckoutSuccess"
+            @onError="handleCheckoutError"
+            @onBack="handleGoBack"
           />
         </div>
-      </div>
-    </section>
-    <ActionBar>
-      <template #default>
-        <PrimeButton
-          severity="primary"
-          label="Submit"
-          icon-pos="right"
-          class="max-md:w-full"
-          :icon="showLoading"
-          :disabled="isDisabledSubmit"
-          @click="onSubmit"
+        <PlanSuccessBlock
+          v-else-if="isSuccessStep"
+          :plan="selectedPlan"
+          @onStart="handleStartFromSuccess"
         />
+      </div>
+      <!-- Enterprise Link (only in step 1) -->
+      <template v-if="isAdditionalDataStep">
+        <div
+          class="bg-[var(--surface-100)] border border-[var(--surface-border)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
+        >
+          <span class="text-xs text-[var(--text-color-secondary)]"
+            >Have enterprise requirements?
+          </span>
+          <a
+            href="https://www.azion.com/en/contact/"
+            target="_blank"
+            class="text-xs text-[var(--text-color-link)] hover:underline"
+          >
+            Get in touch
+          </a>
+          <span class="text-xs text-[var(--text-color-secondary)]"> with our team.</span>
+        </div>
+
+        <!-- Compare Plans Link (only in step 1) -->
+        <a
+          href="https://www.azion.com/en/pricing/"
+          target="_blank"
+          class="text-xs text-[var(--text-color-link)] hover:underline flex items-center gap-1"
+        >
+          Compare Plans
+          <i class="pi pi-arrow-right text-[10px]" />
+        </a>
       </template>
-    </ActionBar>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
-  import ActionBar from '@/templates/action-bar-block'
-  import PrimeButton from '@aziontech/webkit/button'
-  import { computed, ref } from 'vue'
-  import { LottieAnimation } from 'lottie-web-vue'
-  import { useThemeStore } from '@/stores/theme'
-  import { storeToRefs } from 'pinia'
-  import AdditionalDataAnimationDark from '@/assets/animations/additional-data-dark.json'
-  import AdditionalDataAnimationLight from '@/assets/animations/additional-data-light.json'
+  import CardBox from '@aziontech/webkit/card-box'
+  import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
+  import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
+  import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
+  import Button from '@aziontech/webkit/button'
+  import { computed, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { usePlans } from '@/composables/usePlans'
+  import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
+  import { useAccountStore } from '@/stores/account'
+  import { useServiceOrders } from '@/composables/useServiceOrders'
+  import * as SignupServices from '@/services/signup-services'
+  import { getStripeClientService } from '@/services/billing-services'
+
+  const router = useRouter()
+  const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
+  const accountStore = useAccountStore()
+  const { data: plansData, refetch: loadPlans } = usePlansList({ enabled: false })
+  const {
+    loadServiceOrder,
+    submitServiceOrder,
+    isLoading: isLoadingServiceOrder,
+    isSubmitting: isSubmittingServiceOrder
+  } = useServiceOrders()
+
+  // Helper to resolve planId from plan name
+  const getPlanIdFromName = (planName) => {
+    if (!plansData.value?.length) return null
+    const foundPlan = plansData.value.find(
+      (planItem) => planItem.sku?.toLowerCase() === planName?.toLowerCase()
+    )
+    return foundPlan?.id || null
+  }
 
   const additionalDataRef = ref(null)
 
+  // Step management
+  const currentStep = ref('additional-data') // 'additional-data' | 'checkout' | 'success'
+  const selectedPlan = ref(null)
+
+  const isAdditionalDataStep = computed(() => currentStep.value === 'additional-data')
+  const isCheckoutStep = computed(() => currentStep.value === 'checkout')
+  const isSuccessStep = computed(() => currentStep.value === 'success')
+  // Step 1 state
   const isDisabledSubmit = computed(() => {
-    return !additionalDataRef.value?.meta.valid || additionalDataRef.value?.loading
+    const metaValid = additionalDataRef.value?.meta?.valid
+    const formLoading = additionalDataRef.value?.loading
+    const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
+    return !metaValid || formLoading || serviceOrderLoading
   })
 
-  const showLoading = computed(() => {
-    return additionalDataRef.value?.loading ? 'pi pi-spin pi-spinner' : ''
+  const submitButtonLabel = computed(() => {
+    const plan = additionalDataRef.value?.plan
+    if (plan === 'hobby') return 'Start Deploying'
+    return 'Continue'
   })
 
-  const widthClass = computed(() => {
-    return additionalDataRef.value?.hasFormValues ? 'w-auto' : 'w-full'
+  onMounted(async () => {
+    initializePlans()
+    await loadPlans()
+    const accountId = accountStore.accountData?.id
+    if (accountId) {
+      await loadServiceOrder(accountId)
+    }
   })
 
-  const { currentTheme } = storeToRefs(useThemeStore())
+  // Handlers
+  const onSubmit = async () => {
+    const plan = additionalDataRef.value?.plan
+    const accountId = accountStore.accountData?.id
+    const billingCycle = storedBillingCycle.value || 'yearly'
 
-  const isAnimationDark = computed(() => {
-    const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    return currentTheme.value === 'dark' || (currentTheme.value === 'system' && isSystemDark)
-  })
+    // Handle service order (create or update) before proceeding
+    if (plan && accountId) {
+      const planId = getPlanIdFromName(plan)
+      const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
 
-  const onSubmit = () => {
+      if (planId && planPricingId) {
+        await submitServiceOrder({ accountId, planId, planPricingId })
+      }
+    }
+
     additionalDataRef.value?.submitForm()
   }
 
-  defineProps({
-    postAdditionalDataService: {
-      type: Function,
-      required: true
-    },
-    patchFullnameService: {
-      type: Function,
-      required: true
-    },
-    updateAccountInfoService: {
-      type: Function,
-      required: true
+  const handleProceedToCheckout = () => {
+    selectedPlan.value = additionalDataRef.value?.plan
+
+    if (additionalDataRef.value?.plan === 'hobby') {
+      // For hobby plan, skip checkout and show success
+      currentStep.value = 'success'
+      return
     }
-  })
+
+    currentStep.value = 'checkout'
+  }
+
+  const handleGoBack = () => {
+    currentStep.value = 'additional-data'
+  }
+
+  const handleCheckoutSuccess = () => {
+    currentStep.value = 'success'
+  }
+
+  const handleCheckoutError = (error) => {
+    // eslint-disable-next-line no-console
+    console.error('Checkout error:', error)
+  }
+
+  const handleStartFromSuccess = () => {
+    router.push({ name: 'home' })
+  }
 </script>
+
+<style scoped>
+  .label-fade-enter-active,
+  .label-fade-leave-active {
+    transition: opacity 150ms ease;
+  }
+
+  .label-fade-enter-from,
+  .label-fade-leave-to {
+    opacity: 0;
+  }
+
+  .step-fade-enter-active,
+  .step-fade-leave-active {
+    transition: opacity 200ms ease;
+  }
+
+  .step-fade-enter-from,
+  .step-fade-leave-to {
+    opacity: 0;
+  }
+</style>
