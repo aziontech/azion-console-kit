@@ -127,7 +127,7 @@
   const additionalDataRef = ref(null)
 
   // Step management
-  const currentStep = ref('success') // 'additional-data' | 'checkout' | 'success'
+  const currentStep = ref('additional-data') // 'additional-data' | 'checkout' | 'success'
   const selectedPlan = ref(null)
 
   const isAdditionalDataStep = computed(() => currentStep.value === 'additional-data')
