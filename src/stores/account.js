@@ -79,7 +79,8 @@ export const useAccountStore = defineStore({
     },
     hasServiceOrderPlan(state) {
       // false = needs to purchase (redirects to additional-data)
-      // true/null/undefined = has plan or doesn't need (proceeds normally)
+      // true = has contract a plan
+      // null = is old account
       const value = state.account?.has_service_order_plan
       return value === false ? false : true
     },

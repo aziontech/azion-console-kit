@@ -61,5 +61,6 @@ hooks/
 CLAUDE.md
 .opencode/
 .claude/
-
+AGENTS.md
 storybook/yarn.lock
+.gitnexus

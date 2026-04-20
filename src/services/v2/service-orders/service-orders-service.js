@@ -60,11 +60,11 @@ export class ServiceOrdersService extends BaseService {
         ...(params.offset !== undefined && { offset: params.offset }),
         ...(params.status && { status: params.status }),
         ...(params.type && { type: params.type }),
-        ...{ account_id: params.accountId }
+        accountId: params.accountId
       }
     })
 
-    return ServiceOrdersAdapter.transformListResponse(response)
+    return ServiceOrdersAdapter.transformListResponse(response.data)
   }
 
   getServiceOrder = async (id) => {
