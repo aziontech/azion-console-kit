@@ -583,11 +583,11 @@
   })
 
   const totalRecords = computed(() => {
-    return fileData.value.length
+    return fileData.value?.length
   })
 
   const filterData = computed(() => {
-    let filteredData = fileData.value.filter((item) => {
+    let filteredData = fileData.value?.filter((item) => {
       return item.name.toLowerCase().includes(fileSearchTerm.value.toLowerCase())
     })
 
