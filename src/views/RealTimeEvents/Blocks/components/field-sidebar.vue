@@ -1,9 +1,10 @@
 <script setup>
-  import { ref, computed } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import Checkbox from 'primevue/checkbox'
-  import ProgressBar from 'primevue/progressbar'
+  import { ref, toRef } from 'vue'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Checkbox from '@aziontech/webkit/checkbox'
+  import ProgressBar from '@aziontech/webkit/progressbar'
+  import { useFieldStats } from '../../composables/useFieldStats'
 
   defineOptions({ name: 'FieldSidebar' })
 
@@ -43,53 +44,15 @@
 
   const searchQuery = ref('')
 
-  const fieldStats = computed(() => {
-    if (!props.data.length) return {}
-
-    const stats = {}
-    props.data.forEach((row) => {
-      if (!row.summary || !Array.isArray(row.summary)) return
-      row.summary.forEach(({ key, value }) => {
-        if (!stats[key]) {
-          stats[key] = {}
-        }
-        const strValue = String(value)
-        if (strValue && strValue !== '-') {
-          stats[key][strValue] = (stats[key][strValue] || 0) + 1
-        }
-      })
+  // All field-list derivations (stats, search filter, pinned partition) live
+  // in `useFieldStats` so this component stays purely presentational.
+  const { fieldStats, filteredFields, pinnedFields, availableFieldsNonPinned, isFieldSelected } =
+    useFieldStats({
+      data: toRef(props, 'data'),
+      availableFields: toRef(props, 'availableFields'),
+      searchQuery,
+      selectedFields: toRef(props, 'selectedFields')
     })
-
-    const result = {}
-    for (const [field, valueCounts] of Object.entries(stats)) {
-      const entries = Object.entries(valueCounts)
-        .sort((entrA, entrB) => entrB[1] - entrA[1])
-        .slice(0, 5)
-      const total = Object.values(valueCounts).reduce((sum, count) => sum + count, 0)
-      result[field] = {
-        total,
-        uniqueCount: Object.keys(valueCounts).length,
-        topValues: entries.map(([val, count]) => ({
-          value: val,
-          count,
-          percent: Math.round((count / total) * 100)
-        }))
-      }
-    }
-
-    return result
-  })
-
-  const filteredFields = computed(() => {
-    const query = searchQuery.value.toLowerCase()
-    return props.availableFields.filter(
-      (field) => !query || field.value.toLowerCase().includes(query)
-    )
-  })
-
-  const selectedFieldSet = computed(() => new Set(props.selectedFields))
-
-  const isFieldSelected = (fieldValue) => selectedFieldSet.value.has(fieldValue)
 
   const toggleField = (fieldValue) => {
     const current = [...props.selectedFields]
@@ -188,8 +151,93 @@
         </div>
       </div>
 
-      <!-- Available fields -->
+      <!-- Available fields (Pinned + Available sections) -->
       <div class="flex-1 overflow-y-auto">
+        <!-- Pinned section -->
+        <template v-if="pinnedFields.length">
+          <div class="px-3 py-2 flex items-center gap-1.5">
+            <i class="pi pi-bookmark-fill field-sidebar__pin-icon" />
+            <span class="field-sidebar__pin-label">PINNED</span>
+          </div>
+          <div class="flex flex-col">
+            <div
+              v-for="field in pinnedFields"
+              :key="'pinned-' + field.value"
+              class="flex flex-col"
+            >
+              <div
+                class="flex items-center gap-2 px-3 py-1.5 hover:surface-hover cursor-pointer"
+                @click="toggleFieldStats(field.value)"
+                data-testid="field-sidebar-pinned-item"
+              >
+                <Checkbox
+                  :modelValue="isFieldSelected(field.value)"
+                  :binary="true"
+                  class="!w-4 !h-4"
+                  @click.stop="toggleField(field.value)"
+                />
+                <span
+                  class="text-xs flex-1 truncate"
+                  :class="isFieldSelected(field.value) ? 'text-color font-medium' : 'text-color'"
+                >
+                  {{ field.value }}
+                </span>
+                <span
+                  v-if="fieldStats[field.value]"
+                  class="text-xs text-color-secondary"
+                  v-tooltip.top="{
+                    value: `${fieldStats[field.value].uniqueCount} unique values in loaded page`,
+                    showDelay: 300
+                  }"
+                >
+                  {{ fieldStats[field.value].uniqueCount }}
+                </span>
+              </div>
+
+              <div
+                v-if="expandedField === field.value && fieldStats[field.value]"
+                class="px-3 pb-2 ml-6"
+              >
+                <div class="rounded surface-hover p-2">
+                  <div class="text-xs text-color-secondary mb-1">
+                    Top {{ fieldStats[field.value].topValues.length }} of
+                    {{ fieldStats[field.value].uniqueCount }} values
+                  </div>
+                  <div
+                    v-for="(stat, statIdx) in fieldStats[field.value].topValues"
+                    :key="statIdx"
+                    class="field-sidebar__topvalue-row"
+                    :title="stat.value"
+                    @click="handleAddFilter(field.value, stat.value)"
+                  >
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between text-xs mb-0.5">
+                        <span class="truncate text-color">
+                          {{ truncateFieldValue(stat.value) }}
+                        </span>
+                        <span class="text-color-secondary ml-1 whitespace-nowrap">
+                          {{ stat.percent }}%
+                        </span>
+                      </div>
+                      <ProgressBar
+                        :value="stat.percent"
+                        :showValue="false"
+                        class="!h-1"
+                      />
+                    </div>
+                  </div>
+                  <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="availableFieldsNonPinned.length"
+            class="field-sidebar__divider"
+          />
+        </template>
+
+        <!-- Available section -->
         <div class="px-3 py-2">
           <span class="text-xs font-medium text-color-secondary uppercase tracking-wide">
             Available
@@ -197,7 +245,7 @@
         </div>
         <div class="flex flex-col">
           <div
-            v-for="field in filteredFields"
+            v-for="field in availableFieldsNonPinned"
             :key="field.value"
             class="flex flex-col"
           >
@@ -239,15 +287,13 @@
                 <div
                   v-for="(stat, statIdx) in fieldStats[field.value].topValues"
                   :key="statIdx"
-                  class="flex items-center gap-2 py-0.5"
+                  class="field-sidebar__topvalue-row"
+                  :title="stat.value"
+                  @click="handleAddFilter(field.value, stat.value)"
                 >
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between text-xs mb-0.5">
-                      <span
-                        class="truncate text-color cursor-pointer hover:underline"
-                        :title="stat.value"
-                        @click="handleAddFilter(field.value, stat.value)"
-                      >
+                      <span class="truncate text-color">
                         {{ truncateFieldValue(stat.value) }}
                       </span>
                       <span class="text-color-secondary ml-1 whitespace-nowrap">
@@ -261,6 +307,7 @@
                     />
                   </div>
                 </div>
+                <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
               </div>
             </div>
           </div>
@@ -287,6 +334,47 @@
     overflow: hidden;
     border-right: 1px solid var(--surface-border);
     background: var(--surface-ground);
+  }
+
+  .field-sidebar__pin-icon {
+    font-size: 12px;
+    color: var(--primary-color);
+  }
+
+  .field-sidebar__pin-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--primary-color);
+    text-transform: uppercase;
+  }
+
+  .field-sidebar__divider {
+    height: 1px;
+    background: var(--surface-border);
+    margin: 8px 12px;
+  }
+
+  .field-sidebar__topvalue-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+  }
+
+  .field-sidebar__topvalue-row:hover {
+    background-color: var(--surface-hover);
+  }
+
+  .field-sidebar__topvalue-hint {
+    font-size: 10px;
+    color: var(--text-color-secondary);
+    font-style: italic;
+    margin-top: 6px;
+    opacity: 0.8;
   }
 
   .slide-sidebar-enter-active,

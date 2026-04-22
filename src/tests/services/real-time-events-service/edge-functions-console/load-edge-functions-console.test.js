@@ -87,7 +87,7 @@ describe('EdgeFunctionsConsoleServices', () => {
         { key: 'source', value: fixtures.edgeFunctionConsole.source },
         { key: 'ts', value: expectedTs }
       ],
-      ts: 'February 23, 2024 at 06:07:25 PM'
+      ts: expectedTs
     })
   })
 })

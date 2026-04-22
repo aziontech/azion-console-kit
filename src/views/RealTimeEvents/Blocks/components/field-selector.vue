@@ -1,9 +1,9 @@
 <script setup>
   import { ref, computed, watch } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import InputText from 'primevue/inputtext'
-  import Checkbox from 'primevue/checkbox'
+  import PrimeButton from '@aziontech/webkit/button'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Checkbox from '@aziontech/webkit/checkbox'
 
   defineOptions({ name: 'FieldSelector' })
 
@@ -26,11 +26,14 @@
 
   const overlayRef = ref(null)
   const searchQuery = ref('')
+  const sortedAvailableFields = computed(() =>
+    [...props.availableFields].sort((left, right) => left.value.localeCompare(right.value))
+  )
 
   const filteredFields = computed(() => {
-    if (!searchQuery.value) return props.availableFields
+    if (!searchQuery.value) return sortedAvailableFields.value
     const query = searchQuery.value.toLowerCase()
-    return props.availableFields.filter((field) => field.label.toLowerCase().includes(query))
+    return sortedAvailableFields.value.filter((field) => field.label.toLowerCase().includes(query))
   })
 
   const selectedSet = computed(() => new Set(props.selectedFields))

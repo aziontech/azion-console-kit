@@ -1,10 +1,10 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import TabView from '@aziontech/webkit/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   defineOptions({ name: 'EventDocumentView' })

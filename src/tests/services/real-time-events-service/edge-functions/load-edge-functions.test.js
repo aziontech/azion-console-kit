@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadEdgeFunctions } from '@/services/real-time-events-service/edge-functions'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -84,10 +85,10 @@ describe('DataStreamingServices', () => {
         { key: 'edgeFunctionsSolutionId', value: fixtures.edgeFunction.edgeFunctionsSolutionId },
         { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
         { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage },
-        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
+        { key: 'ts', value: getCurrentTimezone(fixtures.edgeFunction.ts) },
         { key: 'virtualhostid', value: fixtures.edgeFunction.virtualhostid }
       ],
-      ts: 'February 23, 2024 at 06:07:25 PM'
+      ts: getCurrentTimezone(fixtures.edgeFunction.ts)
     })
   })
 })

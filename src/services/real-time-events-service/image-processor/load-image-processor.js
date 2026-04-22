@@ -23,7 +23,7 @@ export const loadImageProcessor = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'imagesProcessedEvents',
+    dataset: 'imageProcessedEvents',
     limit: 10000,
     fields: [
       'bytesSent',
@@ -68,7 +68,7 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [imagesProcessedEvents = {}] = body.data.imagesProcessedEvents
+  const [imagesProcessedEvents = {}] = body.data.imageProcessedEvents
 
   return {
     scheme: imagesProcessedEvents.scheme?.toUpperCase(),

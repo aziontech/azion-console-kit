@@ -77,7 +77,7 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
-          l2CacheEvents: [
+          tieredCacheEvents: [
             'Upstream Bytes Received',
             'Status',
             'Upstream Status',
@@ -105,14 +105,14 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
-          imagesProcessedEvents: [
+          imageProcessedEvents: [
             handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
             'Request Time'
           ],
-          idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+          edgeDnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           dataStreamedEvents: [
             handleTextDomainWorkload.singularTitle,

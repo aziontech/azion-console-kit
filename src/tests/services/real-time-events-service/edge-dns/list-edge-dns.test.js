@@ -2,6 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeDNS } from '@/services/real-time-events-service/edge-dns'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
+import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -37,7 +39,7 @@ describe('edgeDns', () => {
       body: { data: { httpRequest: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'idnsQueriesEvents'
+    const datasetName = 'edgeDnsQueriesEvents'
     await sut(fixtures.filter)
 
     const query = [
@@ -82,16 +84,18 @@ describe('edgeDns', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { idnsQueriesEvents: [fixtures.edgeDns] } }
+      body: { data: { edgeDnsQueriesEvents: [fixtures.edgeDns] } }
     })
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
+    const expectedTsFormat = getCurrentTimezone(fixtures.edgeDns.ts)
 
     expect(response).toEqual({
       data: [
@@ -107,7 +111,7 @@ describe('edgeDns', () => {
           ],
           uuid: fixtures.edgeDns.uuid,
           ts: fixtures.edgeDns.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: expectedTsFormat
         }
       ]
     })

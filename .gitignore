@@ -65,3 +65,4 @@ storybook/yarn.lock
 
 # Kiro specs
 .kiro/
+.kilo/

@@ -53,7 +53,7 @@ export default class Aql {
         let value = match[5].trim()
 
         const mappedOperator = this.mapOperatorValue(operator)
-        const operatorInfo = this.operatorInfo(suggestion.value.operator, mappedOperator)
+        const operatorInfo = this.operatorInfo(suggestion?.value?.operator, mappedOperator)
 
         if (operator.toUpperCase() === 'BETWEEN') {
           const [begin, end] = value
@@ -233,6 +233,7 @@ export default class Aql {
   }
 
   operatorInfo(operators, operator) {
+    if (!operators) return undefined
     return operators.find((op) => op.label === operator)?.value
   }
 

@@ -11,7 +11,7 @@ const USE_MOCK =
 // ── END DEV MOCK ────────────────────────────────────────────────────────
 
 export const getTotalRecords = async ({ filter, dataset }) => {
-  if (USE_MOCK && dataset === 'httpEvents') {
+  if (USE_MOCK && dataset === 'workloadEvents') {
     return '1.000'
   }
 

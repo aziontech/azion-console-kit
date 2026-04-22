@@ -30,7 +30,7 @@ export const listImageProcessor = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'imagesProcessedEvents',
+    dataset: 'imageProcessedEvents',
     limit: 10000,
     fields: [
       'configurationId',
@@ -48,7 +48,7 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+  const data = response.data.imageProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: imagesProcessedEvents.configurationId,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,

@@ -53,7 +53,7 @@ describe('ImageProcessorServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imagesProcessedEvents: [] } }
+      body: { data: { imageProcessedEvents: [] } }
     })
     const { sut } = makeSut()
     await sut(fixtures.filter)
@@ -78,7 +78,7 @@ describe('ImageProcessorServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imagesProcessedEvents: [fixtures.imageProcessor] } }
+      body: { data: { imageProcessedEvents: [fixtures.imageProcessor] } }
     })
 
     const { sut } = makeSut()
@@ -88,28 +88,28 @@ describe('ImageProcessorServices', () => {
     expect(response).toEqual({
       host: fixtures.imageProcessor.host,
       scheme: fixtures.imageProcessor.scheme,
-      ts: 'February 23, 2024 at 06:07:25 PM',
+      ts: expectedTs,
       data: [
-        { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
         { key: 'configurationId', value: fixtures.imageProcessor.configurationId },
         { key: 'host', value: fixtures.imageProcessor.host },
         { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
         { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
-        { key: 'referenceError', value: fixtures.imageProcessor.referenceError },
-        { key: 'remoteAddr', value: fixtures.imageProcessor.remoteAddr },
-        { key: 'remotePort', value: fixtures.imageProcessor.remotePort },
         { key: 'requestMethod', value: fixtures.imageProcessor.requestMethod },
         { key: 'requestTime', value: fixtures.imageProcessor.requestTime },
         { key: 'requestUri', value: fixtures.imageProcessor.requestUri },
         { key: 'scheme', value: fixtures.imageProcessor.scheme },
-        { key: 'solution', value: fixtures.imageProcessor.solution },
         { key: 'sslCipher', value: fixtures.imageProcessor.sslCipher },
         { key: 'sslProtocol', value: fixtures.imageProcessor.sslProtocol },
-        { key: 'sslSessionReused', value: fixtures.imageProcessor.sslSessionReused },
         { key: 'status', value: fixtures.imageProcessor.status },
+        { key: 'upstreamCacheStatus', value: fixtures.imageProcessor.upstreamCacheStatus },
+        { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
+        { key: 'referenceError', value: fixtures.imageProcessor.referenceError },
+        { key: 'remoteAddr', value: fixtures.imageProcessor.remoteAddr },
+        { key: 'remotePort', value: fixtures.imageProcessor.remotePort },
+        { key: 'solution', value: fixtures.imageProcessor.solution },
+        { key: 'sslSessionReused', value: fixtures.imageProcessor.sslSessionReused },
         { key: 'tcpinfoRtt', value: fixtures.imageProcessor.tcpinfoRtt },
         { key: 'ts', value: expectedTs },
-        { key: 'upstreamCacheStatus', value: fixtures.imageProcessor.upstreamCacheStatus },
         { key: 'upstreamResponseTime', value: fixtures.imageProcessor.upstreamResponseTime },
         { key: 'upstreamResponseTimeStr', value: fixtures.imageProcessor.upstreamResponseTimeStr },
         { key: 'upstreamStatus', value: fixtures.imageProcessor.upstreamStatus },

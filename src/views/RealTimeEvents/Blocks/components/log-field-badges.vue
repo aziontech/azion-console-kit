@@ -1,5 +1,6 @@
 <script setup>
   import { computed } from 'vue'
+  import { getSeverity } from '../../composables/useSeverityClassifier'
 
   defineOptions({ name: 'LogFieldBadges' })
 
@@ -16,6 +17,10 @@
       type: Array,
       default: () => []
     },
+    searchQuery: {
+      type: String,
+      default: ''
+    },
     dataset: {
       type: String,
       default: ''
@@ -26,39 +31,7 @@
 
   const highlightSet = computed(() => new Set(props.highlightFields))
 
-  /**
-   * Map of field names to severity classification functions
-   */
-  const SEVERITY_FIELDS = {
-    status: (val) => classifyHttpStatus(val),
-    statusCode: (val) => classifyHttpStatus(val),
-    upstreamStatus: (val) => classifyHttpStatus(val),
-    level: (val) => classifyLogLevel(val),
-    wafBlock: (val) => (String(val) === '1' ? 'error' : null),
-    referenceError: (val) => (val && val !== '-' ? 'error' : null)
-  }
-
-  function classifyHttpStatus(val) {
-    const num = Number(val)
-    if (isNaN(num)) return null
-    if (num >= 500) return 'error'
-    if (num >= 400) return 'warn'
-    return null
-  }
-
-  function classifyLogLevel(val) {
-    const lower = String(val).toLowerCase()
-    if (lower === 'error' || lower === 'err' || lower === 'fatal' || lower === 'crit')
-      return 'error'
-    if (lower === 'warn' || lower === 'warning') return 'warn'
-    return null
-  }
-
-  const getBadgeSeverity = (item) => {
-    const classifierFn = SEVERITY_FIELDS[item.key]
-    if (!classifierFn) return null
-    return classifierFn(item.value)
-  }
+  const getBadgeSeverity = (item) => getSeverity(item.key, item.value)
 
   const visibleFields = computed(() => {
     // Show highlighted fields first, then the rest
@@ -86,6 +59,21 @@
     const str = String(value)
     return str.length > maxLen ? `${str.slice(0, maxLen)}…` : str
   }
+
+  const highlightMatch = (text) => {
+    if (!props.searchQuery?.trim() || !text) return text
+    const str = String(text)
+    const needle = props.searchQuery.trim()
+    const pos = str.toLowerCase().indexOf(needle.toLowerCase())
+    if (pos === -1) return str
+    return (
+      str.slice(0, pos) +
+      '<mark class="search-highlight">' +
+      str.slice(pos, pos + needle.length) +
+      '</mark>' +
+      str.slice(pos + needle.length)
+    )
+  }
 </script>
 
 <template>
@@ -108,9 +96,8 @@
         <span
           class="log-badge__value"
           :title="String(item.value)"
-        >
-          {{ truncateValue(item.value) }}
-        </span>
+          v-html="highlightMatch(truncateValue(item.value))"
+        />
         <span class="log-badge__actions">
           <i
             class="pi pi-filter log-badge__action-icon log-badge__action-icon--filter"
@@ -164,7 +151,7 @@
     border-radius: 3px;
     font-size: 0.72rem;
     line-height: 1.4;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: ui-monospace, var(--text-body-xss), 'SF Mono', Menlo, Consolas, monospace;
     background: var(--surface-100);
     border: 1px solid var(--surface-200);
     max-width: 100%;
@@ -181,12 +168,12 @@
 
   /* ── Highlighted badges (selected as column) ──────────────────── */
   .log-badge--highlighted {
-    background: color-mix(in srgb, var(--series-one-color) 12%, transparent);
-    border-color: color-mix(in srgb, var(--series-one-color) 30%, transparent);
+    background: color-mix(in srgb, var(--orange-500) 12%, transparent);
+    border-color: color-mix(in srgb, var(--orange-500) 30%, transparent);
   }
 
   .log-badge--highlighted:hover {
-    background: color-mix(in srgb, var(--series-one-color) 20%, transparent);
+    background: color-mix(in srgb, var(--orange-500) 20%, transparent);
   }
 
   /* ── Severity color badges ────────────────────────────────────── */
@@ -228,7 +215,7 @@
 
   /* ── Badge parts ──────────────────────────────────────────────── */
   .log-badge__key {
-    color: var(--series-one-color, #fba86f);
+    color: #f5f5f5;
     font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
@@ -285,5 +272,12 @@
 
   .log-badge__action-icon--exclude:hover {
     color: var(--red-400, #f87171);
+  }
+
+  :deep(.search-highlight) {
+    background: var(--yellow-500, #eab308);
+    color: var(--surface-ground);
+    border-radius: 2px;
+    padding: 0 1px;
   }
 </style>

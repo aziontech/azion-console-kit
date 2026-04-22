@@ -29,6 +29,14 @@
     isLoadingFilters: {
       type: Boolean,
       default: false
+    },
+    hideFilterTags: {
+      type: Boolean,
+      default: false
+    },
+    dataset: {
+      type: String,
+      default: ''
     }
   })
 
@@ -223,7 +231,7 @@
       userUTC
     )
       .toISOString()
-      .replace(/(\..+)/, '')
+      .replace(/\.\d{3}/, '')
 
     const dateEnd = createUtcDateFromUserTimezoneParts(
       {
@@ -238,7 +246,7 @@
       userUTC
     )
       .toISOString()
-      .replace(/(\..+)/, '')
+      .replace(/\.\d{3}/, '')
 
     return {
       tsRangeBegin: dateBegin,
@@ -278,6 +286,20 @@
     },
     { deep: true }
   )
+
+  const syncDateRangeFromExternal = (startDate, endDate, label = 'Custom Range') => {
+    filterDataRange.value = {
+      ...filterDataRange.value,
+      startDate: startDate instanceof Date ? startDate : new Date(startDate),
+      endDate: endDate instanceof Date ? endDate : new Date(endDate),
+      label,
+      labelStart: '',
+      labelEnd: ''
+    }
+    hasPendingDateUpdate.value = false
+  }
+
+  defineExpose({ removeFilter, applyFilters, syncDateRangeFromExternal })
 </script>
 
 <template>
@@ -310,6 +332,7 @@
             :fieldsInFilter="props.fieldsInFilter"
             :searchAdvancedFilter="searchAdvancedFilter"
             :filterAdvanced="filterData.fields"
+            :dataset="props.dataset"
             ref="aqlRef"
             @dirty="onAqlDirtyChange"
             @validation="onAqlValidationChange"
@@ -346,7 +369,10 @@
           @click="applyFilters"
         />
       </div>
-      <div class="flex flex-1 w-full">
+      <div
+        class="flex flex-1 w-full"
+        v-if="!props.hideFilterTags"
+      >
         <FilterTagsDisplay
           :filters="filterData.fields"
           :fieldsInFilter="props.fieldsInFilter"

@@ -30,7 +30,7 @@ export const listTieredCache = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'l2CacheEvents',
+    dataset: 'tieredCacheEvents',
     limit: 10000,
     fields: [
       'bytesSent',
@@ -70,7 +70,7 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.l2CacheEvents?.map((tieredCacheEvents) => ({
+  const data = response.data.tieredCacheEvents?.map((tieredCacheEvents) => ({
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
     proxyHost: tieredCacheEvents.proxyHost,

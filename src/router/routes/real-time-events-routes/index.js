@@ -39,8 +39,6 @@ export const realTimeEventsRoutes = {
       listService: RealTimeEventsService.listActivityHistory,
       loadService: RealTimeEventsService.loadActivityHistory
     },
-    loadFieldsData: RealTimeEventsService.loadFieldsEventsData,
-    getTotalRecords: RealTimeEventsService.getTotalRecords,
     loadEventsChartAggregation
   },
   meta: {

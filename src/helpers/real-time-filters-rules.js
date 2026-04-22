@@ -77,7 +77,7 @@ const FILTERS_RULES = () => {
       'Upstream Cache Status',
       'Request Time'
     ],
-    l2CacheEvents: [
+    tieredCacheEvents: [
       'Upstream Bytes Received',
       'Status',
       'Upstream Status',
@@ -105,14 +105,14 @@ const FILTERS_RULES = () => {
       'Upstream Cache Status',
       'Request Time'
     ],
-    imagesProcessedEvents: [
+    imageProcessedEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,
       'Status',
       'Upstream Status',
       'Upstream Cache Status',
       'Request Time'
     ],
-    idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+    edgeDnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
     idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
     dataStreamedEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,

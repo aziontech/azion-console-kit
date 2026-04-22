@@ -30,16 +30,17 @@ describe('RealTimeEventsModule', () => {
         expect(tab).toHaveProperty('description')
         expect(tab).toHaveProperty('dataset')
         expect(tab).toHaveProperty('tabRouter')
-        expect(tab).toHaveProperty('columns')
+        expect(tab).toHaveProperty('availableFields')
+        expect(tab).toHaveProperty('defaultSelectedFields')
+        expect(tab).toHaveProperty('customColumnMapper')
       })
     })
 
-    it('columns should have the correct structure', () => {
+    it('customColumnMapper should return the correct structure', () => {
       Object.values(TABS_EVENTS).forEach((tab) => {
-        tab.columns.forEach((column) => {
-          expect(column).toHaveProperty('field')
-          expect(column).toHaveProperty('header')
-        })
+        const result = tab.customColumnMapper({ data: 'test' })
+        expect(result).toHaveProperty('tsFormat')
+        expect(result).toHaveProperty('summary')
       })
     })
 
@@ -54,33 +55,13 @@ describe('RealTimeEventsModule', () => {
       expect(httpRequests.title).toBe('HTTP Requests')
       expect(httpRequests.dataset).toBe('workloadEvents')
       expect(httpRequests.tabRouter).toBe('http-requests')
-      expect(httpRequests.columns.length).toBe(2)
+      expect(httpRequests.availableFields.length).toBeGreaterThan(0)
     })
 
-    it('should have the correct columns for each tab', () => {
-      const expectedColumns = {
-        httpRequests: ['tsFormat', 'summary'],
-        edgeFunctions: ['tsFormat', 'summary'],
-        edgeFunctionsConsole: ['tsFormat', 'summary'],
-        imageProcessor: ['tsFormat', 'summary'],
-        tieredCache: ['tsFormat', 'summary'],
-        edgeDNS: ['tsFormat', 'summary'],
-        dataStream: ['tsFormat', 'summary'],
-        activityHistory: ['tsFormat', 'summary']
-      }
-
-      Object.entries(TABS_EVENTS).forEach(([tabName, tabData]) => {
-        const actualColumns = tabData.columns.map((column) => column.field)
-        expect(actualColumns).toEqual(expectedColumns[tabName])
-      })
-    })
-
-    it('should have tsFormat field with sortField set to "ts" in all tabs', () => {
-      Object.values(TABS_EVENTS).forEach((tabData) => {
-        const tsFormatColumn = tabData.columns.find((column) => column.field === 'tsFormat')
-        expect(tsFormatColumn).toBeDefined()
-        expect(tsFormatColumn.field).toBe('tsFormat')
-        expect(tsFormatColumn.header).toBe('Time')
+    it('each tab should have availableFields as a non-empty array', () => {
+      Object.values(TABS_EVENTS).forEach((tab) => {
+        expect(Array.isArray(tab.availableFields)).toBe(true)
+        expect(tab.availableFields.length).toBeGreaterThan(0)
       })
     })
   })

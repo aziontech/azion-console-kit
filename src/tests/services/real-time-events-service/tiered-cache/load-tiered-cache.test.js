@@ -58,7 +58,7 @@ describe('tieredCacheServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { l2CacheEvents: [] } }
+      body: { data: { tieredCacheEvents: [] } }
     })
     const { sut } = makeSut()
     await sut(fixtures.filter)
@@ -83,7 +83,7 @@ describe('tieredCacheServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { l2CacheEvents: [fixtures.tieredCache] } }
+      body: { data: { tieredCacheEvents: [fixtures.tieredCache] } }
     })
 
     const expectedTs = getCurrentTimezone(fixtures.tieredCache.ts)
@@ -97,12 +97,19 @@ describe('tieredCacheServices', () => {
       serverProtocol: fixtures.tieredCache.serverProtocol,
       ts: expectedTs,
       data: [
+        { key: 'configurationId', value: fixtures.tieredCache.configurationId },
+        { key: 'host', value: fixtures.tieredCache.host },
+        { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
+        { key: 'requestTime', value: fixtures.tieredCache.requestTime },
+        { key: 'requestUri', value: fixtures.tieredCache.requestUri },
+        { key: 'scheme', value: fixtures.tieredCache.scheme },
+        { key: 'serverProtocol', value: fixtures.tieredCache.serverProtocol },
+        { key: 'status', value: fixtures.tieredCache.status },
+        { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus },
         { key: 'bytesSent', value: fixtures.tieredCache.bytesSent },
         { key: 'cacheKey', value: fixtures.tieredCache.cacheKey },
         { key: 'cacheTtl', value: fixtures.tieredCache.cacheTtl },
         { key: 'clientId', value: fixtures.tieredCache.clientId },
-        { key: 'configurationId', value: fixtures.tieredCache.configurationId },
-        { key: 'host', value: fixtures.tieredCache.host },
         { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
         { key: 'proxyStatus', value: fixtures.tieredCache.proxyStatus },
         { key: 'proxyUpstream', value: fixtures.tieredCache.proxyUpstream },
@@ -110,19 +117,12 @@ describe('tieredCacheServices', () => {
         { key: 'remoteAddr', value: fixtures.tieredCache.remoteAddr },
         { key: 'remotePort', value: fixtures.tieredCache.remotePort },
         { key: 'requestLength', value: fixtures.tieredCache.requestLength },
-        { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
-        { key: 'requestTime', value: fixtures.tieredCache.requestTime },
-        { key: 'requestUri', value: fixtures.tieredCache.requestUri },
-        { key: 'scheme', value: fixtures.tieredCache.scheme },
         { key: 'sentHttpContentType', value: fixtures.tieredCache.sentHttpContentType },
-        { key: 'serverProtocol', value: fixtures.tieredCache.serverProtocol },
         { key: 'solution', value: fixtures.tieredCache.solution },
-        { key: 'status', value: fixtures.tieredCache.status },
         { key: 'tcpinfoRtt', value: fixtures.tieredCache.tcpinfoRtt },
         { key: 'ts', value: expectedTs },
         { key: 'upstreamBytesReceived', value: fixtures.tieredCache.upstreamBytesReceived },
         { key: 'upstreamBytesReceivedStr', value: fixtures.tieredCache.upstreamBytesReceivedStr },
-        { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus },
         { key: 'upstreamConnectTime', value: fixtures.tieredCache.upstreamConnectTime },
         { key: 'upstreamHeaderTime', value: fixtures.tieredCache.upstreamHeaderTime },
         { key: 'upstreamResponseTime', value: fixtures.tieredCache.upstreamResponseTime },

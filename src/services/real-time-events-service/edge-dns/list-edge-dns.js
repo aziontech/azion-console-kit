@@ -30,7 +30,7 @@ export const listEdgeDNS = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'idnsQueriesEvents',
+    dataset: 'edgeDnsQueriesEvents',
     limit: 10000,
     fields: [
       'level',
@@ -49,7 +49,7 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
+  const data = response.data.edgeDnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeDnsQueriesEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: edgeDnsQueriesEvents.ts,

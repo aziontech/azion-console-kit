@@ -62,18 +62,9 @@ export function useSavedSearches() {
     persist()
   }
 
-  function updateSearch(id, updates) {
-    const idx = savedSearches.value.findIndex((search) => search.id === id)
-    if (idx !== -1) {
-      savedSearches.value[idx] = { ...savedSearches.value[idx], ...updates }
-      persist()
-    }
-  }
-
   return {
     savedSearches,
     saveSearch,
-    deleteSearch,
-    updateSearch
+    deleteSearch
   }
 }

@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import EventDocumentView from './event-document-view.vue'
 
   defineOptions({ name: 'DetailSidebarPanel' })

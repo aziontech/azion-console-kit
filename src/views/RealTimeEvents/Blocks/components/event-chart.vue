@@ -1,44 +1,121 @@
 <script setup>
-  import { computed, onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
+  import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
   import c3 from 'c3'
-  import Skeleton from 'primevue/skeleton'
-  import InlineMessage from 'primevue/inlinemessage'
-  import { getChartConfig } from '../constants/chart-configs'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import { useChartBuilder, buildC3Config } from '../../composables/useChartBuilder'
 
   defineOptions({ name: 'EventChart' })
 
   const props = defineProps({
-    data: {
-      type: Array,
-      default: () => []
-    },
-    configKey: {
-      type: String,
-      required: true
-    },
-    tsRangeBegin: {
-      type: [Date, String],
-      default: null
-    },
-    tsRangeEnd: {
-      type: [Date, String],
-      default: null
-    },
-    isLoading: {
-      type: Boolean,
-      default: false
-    },
-    hasError: {
-      type: Boolean,
-      default: false
-    },
-    userTimezone: {
-      type: String,
-      default: 'UTC'
-    }
+    data: { type: Array, default: () => [] },
+    configKey: { type: String, required: true },
+    tsRangeBegin: { type: [Date, String], default: null },
+    tsRangeEnd: { type: [Date, String], default: null },
+    isLoading: { type: Boolean, default: false },
+    hasError: { type: Boolean, default: false },
+    userTimezone: { type: String, default: 'UTC' },
+    // Stack selection for the Events histogram family. Ignored by the
+    // multi-series Metrics timeseries family (no stacking applies there).
+    stackBy: { type: String, default: 'none' },
+    // ── Unified View selector ──
+    // Grouped option model — [{ group, items: [{ label, value, ... }] }] —
+    // passed down from tab-panel-block. Replaces the legacy `stackByOptions`
+    // + separate `Metrics` top dropdown with a single control.
+    viewOptions: { type: Array, default: () => [] },
+    view: { type: String, default: 'events:none' },
+    showView: { type: Boolean, default: true },
+    showSummary: { type: Boolean, default: true }
   })
 
-  const emit = defineEmits(['brush-select', 'total-computed'])
+  const emit = defineEmits(['brush-select', 'total-computed', 'update:view', 'legend-filter'])
+
+  const isStacked = computed(() => props.stackBy && props.stackBy !== 'none')
+  const viewModel = computed({
+    get: () => props.view,
+    set: (value) => emit('update:view', value)
+  })
+
+  // ── View popover state ──
+  // The panel is teleported to <body> so stacking contexts of ancestor
+  // containers (chart card, ResizableSplitter) can't clip it. Position is
+  // computed from the trigger's bounding rect on open and re-applied on
+  // scroll/resize while the menu is open.
+  const isViewMenuOpen = ref(false)
+  const viewTriggerRef = ref(null)
+  const viewPanelRef = ref(null)
+  const viewPanelStyle = ref({ top: '0px', left: '0px', minWidth: '0px' })
+
+  const selectedViewLabel = computed(() => {
+    for (const group of props.viewOptions || []) {
+      const match = (group.items || []).find((item) => item.value === props.view)
+      if (match) return match.label
+    }
+    return 'Default'
+  })
+
+  const updateViewPanelPosition = () => {
+    const trigger = viewTriggerRef.value
+    if (!trigger) return
+    const rect = trigger.getBoundingClientRect()
+    viewPanelStyle.value = {
+      top: `${rect.bottom + 4}px`,
+      left: `${rect.right - Math.max(rect.width, 192)}px`,
+      minWidth: `${Math.max(rect.width, 192)}px`
+    }
+  }
+
+  const toggleViewMenu = () => {
+    isViewMenuOpen.value = !isViewMenuOpen.value
+    if (isViewMenuOpen.value) {
+      nextTick(updateViewPanelPosition)
+    }
+  }
+  const closeViewMenu = () => {
+    isViewMenuOpen.value = false
+  }
+  const selectViewItem = (value) => {
+    viewModel.value = value
+    closeViewMenu()
+  }
+  const onViewDocumentClick = (event) => {
+    if (!isViewMenuOpen.value) return
+    const trigger = viewTriggerRef.value
+    const panel = viewPanelRef.value
+    if (trigger?.contains(event.target)) return
+    if (panel?.contains(event.target)) return
+    closeViewMenu()
+  }
+  const onViewEscape = (event) => {
+    if (event.key === 'Escape') closeViewMenu()
+  }
+  const onViewportChange = () => {
+    if (isViewMenuOpen.value) updateViewPanelPosition()
+  }
+
+  // Metrics views where legend bucket == filterable value (pivot charts).
+  // Synthetic multi-series charts (Threats vs Requests, XSS, RFI, SQL,
+  // Other) are NOT listed here — in those charts each series is already a
+  // decomposition of the same universe, so clicking a legend entry should
+  // toggle series visibility (c3 native behavior) instead of trying to
+  // apply a nonsensical filter.
+  const PIVOT_METRICS_KEYS = new Set(['wafThreatsByHost', 'botTraffic', 'botCaptcha'])
+
+  const handleLegendClick = (bucket) => {
+    const isMetrics = typeof props.view === 'string' && props.view.startsWith('metrics:')
+    // Events histogram: only the status/requestMethod stacks emit filters.
+    if (!isMetrics && !isStacked.value) return
+    if (isMetrics) {
+      const metricsKey = props.view.slice('metrics:'.length)
+      // Non-pivot metrics chart: let c3 handle legend clicks natively
+      // (hide/show the series). Returning without emitting keeps the
+      // default toggle wired up inside useChartBuilder.
+      if (!PIVOT_METRICS_KEYS.has(metricsKey)) return
+      emit('legend-filter', { bucket, stackBy: props.stackBy, metricsKey })
+      return
+    }
+    emit('legend-filter', { bucket, stackBy: props.stackBy, metricsKey: null })
+  }
 
   const chartRef = ref(null)
   const chartInstance = ref(null)
@@ -47,265 +124,44 @@
   const dragEndX = ref(null)
   const selectionOverlay = ref(null)
 
-  // Time constants
-  const MINUTE = 60 * 1000
-  const HOUR = 60 * MINUTE
-  const DAY = 24 * HOUR
+  const { chartConfig, chartData, totalEvents, formattedTotal, chartKind } = useChartBuilder(props)
 
-  // Use CSS variables from c3.scss for series colors
-  const SERIES_COLORS = {
-    '2xx': 'var(--series-two-color)',
-    '3xx': 'var(--series-three-color)',
-    '4xx': 'var(--scale-orange)',
-    '5xx': 'var(--series-five-color)'
-  }
-
-  // Use Azion brand orange (#F3652B) from azion-theme for chart bars
-  const DEFAULT_COLORS = [
-    '#F3652B',
-    'var(--green-500)',
-    'var(--text-color-link)',
-    'var(--p-tag-warning-color)',
-    'var(--red-500)'
-  ]
-
-  const chartConfig = computed(() => getChartConfig(props.configKey))
-
-  // Transform data for C3.js with client-side bucketing.
-  // The API returns up to 10000 rows grouped by distinct timestamp (per second).
-  // We aggregate these into visual buckets (e.g., 1h for "Today") for clean bars.
-  const chartData = computed(() => {
-    if (!props.data?.length || !chartConfig.value) {
-      return { columns: [], groups: [], seriesNames: [], maxValue: 0 }
-    }
-
-    const rawData = props.data
-
-    // Calculate bucket interval based on the time range
-    const duration =
-      props.tsRangeBegin && props.tsRangeEnd
-        ? new Date(props.tsRangeEnd) - new Date(props.tsRangeBegin)
-        : 0
-
-    const SEC = 1000
-    const MIN = 60 * SEC
-    const TARGET = 30
-
-    const INTERVALS = [
-      1 * SEC, 5 * SEC, 10 * SEC, 30 * SEC,
-      1 * MIN, 5 * MIN, 10 * MIN, 30 * MIN,
-      1 * HOUR, 3 * HOUR, 12 * HOUR, 1 * DAY, 7 * DAY, 30 * DAY
-    ]
-    const rawInterval = duration > 0 ? duration / TARGET : MIN
-    const bucketMs = INTERVALS.find((ci) => ci >= rawInterval) || 30 * DAY
-
-    // Generate all bucket slots covering the full range
-    const rangeStart = props.tsRangeBegin ? new Date(props.tsRangeBegin).getTime() : 0
-    const rangeEnd = props.tsRangeEnd ? new Date(props.tsRangeEnd).getTime() : 0
-    const alignedStart = rangeStart > 0 ? Math.floor(rangeStart / bucketMs) * bucketMs : 0
-
-    const bucketMap = new Map()
-
-    // Pre-fill all slots with zero
-    if (alignedStart > 0 && rangeEnd > 0) {
-      for (let ts = alignedStart; ts <= rangeEnd; ts += bucketMs) {
-        bucketMap.set(ts, 0)
-      }
-    }
-
-    // Aggregate raw data into buckets
-    rawData.forEach((item) => {
-      if (!item.ts) return
-      const tsMs = new Date(item.ts).getTime()
-      const key = Math.floor(tsMs / bucketMs) * bucketMs
-      bucketMap.set(key, (bucketMap.get(key) || 0) + (item.count || 0))
-    })
-
-    const sortedKeys = Array.from(bucketMap.keys()).sort((prev, next) => prev - next)
-
-    let maxValue = 0
-    sortedKeys.forEach((key) => {
-      const val = bucketMap.get(key)
-      if (val > maxValue) maxValue = val
-    })
-
-    const seriesNames = ['count']
-
-    // Format X-axis labels in the user's timezone.
-    // We use 'category' axis instead of 'timeseries' so that C3/d3 doesn't
-    // reposition bars using its own UTC-based time scale.
-    const xLabels = sortedKeys.map((key) => {
-      const date = new Date(key)
-      const dur = duration
-      if (dur > 7 * DAY) {
-        return formatDateInTimezone(date, { month: '2-digit', day: '2-digit', hour12: false })
-      } else if (dur > DAY) {
-        return formatDateInTimezone(date, {
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
-      } else {
-        return formatDateInTimezone(date, {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
-      }
-    })
-
-    const xColumn = ['x', ...xLabels]
-    const countColumn = ['count', ...sortedKeys.map((key) => bucketMap.get(key) || 0)]
-
-    return {
-      columns: [xColumn, countColumn],
-      groups: [seriesNames],
-      seriesNames,
-      maxValue
-    }
-  })
-
-  const totalEvents = computed(() => {
-    if (!props.data?.length) return 0
-    return props.data.reduce((sum, item) => sum + (item.count || 0), 0)
-  })
-
-  const formattedTotal = computed(() => {
-    return new Intl.NumberFormat('en-US').format(totalEvents.value)
-  })
-
-  const formatNumber = (num) => {
-    if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B'
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
-    return String(Math.round(num))
-  }
-
-  /**
-   * Calculate a "nice" Y-axis maximum that produces clean tick labels.
-   * Rounds up to the nearest power-of-10 multiple (1, 2, 5 pattern).
-   */
-  const niceYMax = (maxValue) => {
-    if (maxValue <= 0) return 5
-    const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)))
-    const normalized = maxValue / magnitude
-    let niceMultiplier
-    if (normalized <= 1) niceMultiplier = 1
-    else if (normalized <= 2) niceMultiplier = 2
-    else if (normalized <= 5) niceMultiplier = 5
-    else niceMultiplier = 10
-    return niceMultiplier * magnitude
-  }
-
-  /**
-   * Format a Date for the chart axis / tooltip respecting the user timezone.
-   * Uses the same approach as getCurrentTimezone() in account-timezone.js.
-   */
-  const formatDateInTimezone = (date, opts) => {
-    const tz = props.userTimezone
-    try {
-      return date.toLocaleString('en-US', { ...opts, timeZone: tz }).replace(',', '')
-    } catch {
-      // Fallback: browser local timezone
-      return date.toLocaleString('en-US', opts).replace(',', '')
-    }
-  }
-
-  // Build chart config
-  const buildChartConfig = () => {
-    if (!chartData.value.columns.length || !chartRef.value) return null
-
-    const config = chartConfig.value
-    const { columns, groups, seriesNames, maxValue } = chartData.value
-
-    // Nice Y-axis scale
-    const yMax = niceYMax(maxValue)
-
-    // Colors: use DS tokens from c3.scss (--series-one-color, etc.)
-    const colors = {}
-    seriesNames.forEach((name, index) => {
-      colors[name] = SERIES_COLORS[name] || DEFAULT_COLORS[index % DEFAULT_COLORS.length]
-    })
-
-    // Labels
-    const names = {}
-    seriesNames.forEach((name) => {
-      names[name] = config.seriesLabels?.[name] || name
-    })
-
-    /* eslint-disable id-length */
-    return {
-      bindto: chartRef.value,
-      data: {
-        x: 'x',
-        columns,
-        type: 'bar',
-        groups,
-        colors,
-        names,
-        order: 'desc'
-      },
-      axis: {
-        x: {
-          type: 'category',
-          tick: {
-            multiline: false,
-            culling: { max: 12 }
-          },
-          height: 28
-        },
-        y: {
-          max: yMax,
-          min: 0,
-          padding: { top: 10, bottom: 0 },
-          tick: {
-            count: 5,
-            format: formatNumber
-          }
-        }
-      },
-      legend: {
-        show: true,
-        position: 'bottom',
-        equally: true
-      },
-      tooltip: {
-        grouped: true,
-        format: {
-          value: (val) => `${formatNumber(val)} events`
-        }
-      },
-      bar: { width: { ratio: 0.92 } },
-      padding: { left: 50, right: 15, top: 10, bottom: 5 },
-      grid: { y: { show: true } },
-      point: { show: false },
-      transition: { duration: 150 }
-    }
-    /* eslint-enable id-length */
-  }
+  // Chart lifecycle
+  let initChartTimer = null
+  // Monotonic token to cancel in-flight builds when a newer one is scheduled.
+  let buildToken = 0
 
   const initChart = () => {
-    nextTick(() => {
-      if (!chartRef.value) return
-      const c3Config = buildChartConfig()
-      if (!c3Config) return
-
+    clearTimeout(initChartTimer)
+    const myToken = ++buildToken
+    initChartTimer = setTimeout(() => {
+      initChartTimer = null
+      if (myToken !== buildToken) return
       if (chartInstance.value) {
         try {
           chartInstance.value.destroy()
-        } catch (_err) {
-          /* c3 destroy may throw if already disposed */
+        } catch {
+          /* noop */
         }
         chartInstance.value = null
       }
-
-      chartInstance.value = c3.generate(c3Config)
-    })
+      nextTick(() => {
+        if (myToken !== buildToken) return
+        if (!chartRef.value) return
+        const c3Config = buildC3Config({
+          chartRef: chartRef.value,
+          chartData: chartData.value,
+          chartConfig: chartConfig.value,
+          chartKind: chartKind.value,
+          onLegendClick: handleLegendClick
+        })
+        if (!c3Config) return
+        chartInstance.value = c3.generate(c3Config)
+      })
+    }, 100)
   }
 
-  // Brush handlers
+  // Brush selection
   const handleMouseDown = (event) => {
     if (!chartRef.value) return
     isDragging.value = true
@@ -324,24 +180,20 @@
   const handleMouseUp = () => {
     if (!isDragging.value) return
     isDragging.value = false
-
     if (dragStartX.value !== null && dragEndX.value !== null && chartRef.value) {
       const width = chartRef.value.offsetWidth
-      const startPercent = Math.min(dragStartX.value, dragEndX.value) / width
-      const endPercent = Math.max(dragStartX.value, dragEndX.value) / width
-
-      if (Math.abs(endPercent - startPercent) > 0.05 && props.tsRangeBegin && props.tsRangeEnd) {
+      const startPct = Math.min(dragStartX.value, dragEndX.value) / width
+      const endPct = Math.max(dragStartX.value, dragEndX.value) / width
+      if (Math.abs(endPct - startPct) > 0.05 && props.tsRangeBegin && props.tsRangeEnd) {
         const begin = new Date(props.tsRangeBegin).getTime()
         const end = new Date(props.tsRangeEnd).getTime()
         const range = end - begin
-
         emit('brush-select', {
-          begin: new Date(begin + startPercent * range),
-          end: new Date(begin + endPercent * range)
+          begin: new Date(begin + startPct * range),
+          end: new Date(begin + endPct * range)
         })
       }
     }
-
     dragStartX.value = null
     dragEndX.value = null
     updateSelectionOverlay()
@@ -349,47 +201,74 @@
 
   const updateSelectionOverlay = () => {
     if (!selectionOverlay.value) return
-
     if (dragStartX.value === null || dragEndX.value === null || !isDragging.value) {
       selectionOverlay.value.style.display = 'none'
       return
     }
-
     const left = Math.min(dragStartX.value, dragEndX.value)
     const width = Math.abs(dragEndX.value - dragStartX.value)
-
     selectionOverlay.value.style.display = 'block'
     selectionOverlay.value.style.left = `${left}px`
     selectionOverlay.value.style.width = `${width}px`
   }
 
-  // Emit the Metrics-based total to the parent whenever it changes
-  watch(totalEvents, (val) => emit('total-computed', val))
-
   // Watchers
-  watch(() => props.data, initChart, { deep: true })
+  watch(totalEvents, (val) => emit('total-computed', val))
+  // Identity-only watch: useEventsData replaces the array on every reload so
+  // deep traversal here would be pure overhead.
+  watch(() => props.data, initChart)
   watch(() => [props.tsRangeBegin, props.tsRangeEnd], initChart)
-  // Re-init when timezone changes so axis labels update
   watch(() => props.userTimezone, initChart)
-  // Re-init when loading finishes — chartRef only exists in DOM after isLoading becomes false
+  watch(() => props.stackBy, initChart)
   watch(
     () => props.isLoading,
-    (loading, wasLoading) => {
-      if (wasLoading && !loading) {
-        initChart()
-      }
+    (loading, was) => {
+      if (was && !loading) initChart()
     }
   )
 
-  onMounted(initChart)
+  // Resize observer
+  let resizeObserver = null
+
+  onMounted(() => {
+    initChart()
+    if ('ResizeObserver' in window && chartRef.value) {
+      resizeObserver = new ResizeObserver(() => {
+        if (chartInstance.value) {
+          try {
+            chartInstance.value.resize()
+          } catch {
+            initChart()
+          }
+        }
+      })
+      resizeObserver.observe(chartRef.value)
+    }
+    document.addEventListener('mousedown', onViewDocumentClick)
+    document.addEventListener('keydown', onViewEscape)
+    window.addEventListener('scroll', onViewportChange, true)
+    window.addEventListener('resize', onViewportChange)
+  })
 
   onBeforeUnmount(() => {
+    clearTimeout(initChartTimer)
+    initChartTimer = null
+    buildToken += 1 // invalidate any pending nextTick
+    document.removeEventListener('mousedown', onViewDocumentClick)
+    document.removeEventListener('keydown', onViewEscape)
+    window.removeEventListener('scroll', onViewportChange, true)
+    window.removeEventListener('resize', onViewportChange)
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
     if (chartInstance.value) {
       try {
         chartInstance.value.destroy()
-      } catch (_err) {
-        /* c3 destroy may throw if already disposed */
+      } catch {
+        /* noop */
       }
+      chartInstance.value = null
     }
   })
 
@@ -403,11 +282,78 @@
   >
     <!-- Header -->
     <div class="chart-header">
-      <span class="chart-header__count">
+      <span
+        v-if="showSummary"
+        class="chart-header__count"
+      >
         <span class="chart-header__total">{{ formattedTotal }}</span>
         <span class="chart-header__label">events</span>
       </span>
-      <span class="chart-header__hint">Drag to zoom</span>
+      <div
+        v-if="showView"
+        class="chart-header__controls"
+      >
+        <div
+          class="chart-header__view-control"
+          data-testid="event-chart-view"
+        >
+          <span class="chart-header__view-label">View</span>
+          <div class="chart-header__view-menu">
+            <button
+              ref="viewTriggerRef"
+              type="button"
+              class="chart-header__view-trigger"
+              :aria-expanded="isViewMenuOpen"
+              aria-haspopup="listbox"
+              @click="toggleViewMenu"
+            >
+              <span class="chart-header__view-trigger-label">{{ selectedViewLabel }}</span>
+              <i
+                class="pi pi-chevron-down chart-header__view-chevron"
+                :class="{ 'is-open': isViewMenuOpen }"
+              />
+            </button>
+            <Teleport to="body">
+              <div
+                v-if="isViewMenuOpen"
+                ref="viewPanelRef"
+                class="chart-header__view-panel"
+                :style="viewPanelStyle"
+                role="listbox"
+              >
+                <template
+                  v-for="group in viewOptions"
+                  :key="group.group"
+                >
+                  <div
+                    v-if="group.items?.length"
+                    class="chart-header__view-group"
+                  >
+                    <div class="chart-header__view-group-header">{{ group.group }}</div>
+                    <button
+                      v-for="item in group.items"
+                      :key="item.value"
+                      type="button"
+                      role="option"
+                      :aria-selected="item.value === viewModel"
+                      class="chart-header__view-item"
+                      :class="{ 'is-selected': item.value === viewModel }"
+                      @click="selectViewItem(item.value)"
+                    >
+                      <span class="chart-header__view-item-label">{{ item.label }}</span>
+                      <i
+                        v-if="item.value === viewModel"
+                        class="pi pi-check chart-header__view-item-check"
+                      />
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </Teleport>
+          </div>
+        </div>
+        <span class="chart-header__hint">Drag to zoom</span>
+      </div>
     </div>
 
     <!-- Loading skeleton (GraphsCardBlock pattern) -->
@@ -468,7 +414,6 @@
   .chart-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--surface-border);
     background: var(--surface-section);
@@ -496,6 +441,128 @@
     color: var(--text-color-secondary);
     opacity: 0.7;
     font-style: italic;
+  }
+
+  .chart-header__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* Keep the View dropdown and "Drag to zoom" hint anchored to the right
+       regardless of whether the events total is rendered on the left. */
+    margin-left: auto;
+  }
+
+  .chart-header__view-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .chart-header__view-label {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    letter-spacing: 0.01em;
+  }
+
+  .chart-header__view-menu {
+    position: relative;
+  }
+
+  .chart-header__view-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 9.5rem;
+    height: 1.75rem;
+    padding: 0 0.5rem;
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    color: var(--text-color);
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      border-color 120ms ease,
+      background 120ms ease;
+  }
+  .chart-header__view-trigger:hover,
+  .chart-header__view-trigger[aria-expanded='true'] {
+    border-color: var(--primary-color);
+    background: var(--surface-hover, var(--surface-card));
+  }
+
+  .chart-header__view-trigger-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .chart-header__view-chevron {
+    font-size: 0.625rem;
+    color: var(--text-color-secondary);
+    transition: transform 120ms ease;
+  }
+  .chart-header__view-chevron.is-open {
+    transform: rotate(180deg);
+  }
+
+  .chart-header__view-panel {
+    position: fixed;
+    z-index: 1000;
+    min-width: 12rem;
+    max-height: 20rem;
+    overflow-y: auto;
+    padding: 0.25rem 0;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .chart-header__view-group + .chart-header__view-group {
+    border-top: 1px solid var(--surface-border);
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+  }
+
+  .chart-header__view-group-header {
+    padding: 0.375rem 0.75rem 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-color-secondary);
+    opacity: 0.85;
+  }
+
+  .chart-header__view-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    color: var(--text-color);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .chart-header__view-item:hover {
+    background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  }
+  .chart-header__view-item.is-selected {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .chart-header__view-item-check {
+    font-size: 0.6875rem;
+    color: var(--primary-color);
   }
 
   .chart-loading {
@@ -544,60 +611,51 @@
     font-size: 0.75rem;
   }
 
-  /* C3 overrides — use DS tokens from c3.scss */
-  :deep(.c3) {
-    font-size: 10px;
-    font-family: var(--font-family);
+  /* Focus line visibility on dark background */
+  :deep(.c3-xgrid-focus line) {
+    stroke: var(--primary-color);
+    opacity: 0.6;
   }
 
-  :deep(.c3 .c3-axis-x .tick text) {
-    fill: var(--text-color-secondary) !important;
-    font-size: 9px;
-  }
-
-  :deep(.c3 .c3-axis-y .tick text) {
-    fill: var(--text-color-secondary) !important;
-    font-size: 9px;
-  }
-
-  :deep(.c3 .domain) {
-    stroke: var(--surface-border);
-  }
-
-  :deep(.c3 .tick line) {
-    stroke: var(--surface-border);
-  }
-
-  :deep(.c3 .c3-axis path, .c3 .c3-axis line) {
-    stroke: var(--surface-border) !important;
-  }
-
-  :deep(.c3-grid line) {
-    stroke: var(--surface-border);
-    stroke-dasharray: 2, 2;
-    opacity: 0.3;
-  }
-
-  :deep(.c3-legend-item) {
-    cursor: pointer;
-    font-size: 10px;
-  }
-
-  :deep(.c3-legend-item text) {
-    fill: var(--text-color);
-  }
-
-  :deep(.c3-legend-item-hidden) {
-    opacity: 0.15;
-  }
-
-  :deep(.c3-bar) {
-    stroke-width: 0;
-  }
-
+  /* Compact tooltip for the small chart area */
   :deep(.c3-tooltip-container) {
-    background-color: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: var(--border-radius);
+    padding: 10px 12px;
+    max-width: 280px;
+  }
+
+  :deep(.c3-tooltip th) {
+    font-size: 11px;
+    height: auto;
+    padding-bottom: 8px;
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :deep(.c3-tooltip th:nth-child(1)) {
+    height: auto;
+  }
+
+  :deep(.c3-tooltip td) {
+    font-size: 11px;
+    padding: 5px 0 8px 0;
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :deep(.c3-tooltip td.name > span) {
+    width: 40px;
+    top: -4px;
+  }
+
+  :deep(.c3-tooltip td.value) {
+    padding-left: 20px;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  /* Soften horizontal grid lines */
+  :deep(.c3-grid line) {
+    opacity: 0.15;
   }
 </style>

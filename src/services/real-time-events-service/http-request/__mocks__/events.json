@@ -1,6 +1,6 @@
 {
   "data": {
-    "httpEvents": [
+    "workloadEvents": [
       {
         "configurationId": "1529612809",
         "host": "lojadeseguros-api.hom.cloud.itau.com.br",

@@ -37,42 +37,112 @@
       </div>
     </div>
 
-    <Listbox
-      :options="filteredSuggestions"
-      ref="listboxRef"
-      optionLabel="label"
-      :modelValue="listboxModel"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-50 max-w-xs py-2 top-full left-0"
-      @update:modelValue="onListboxModelUpdate"
-      v-if="filteredSuggestions.length && showSuggestionsFocusInput"
-      data-testid="azion-query-language-suggestions"
-      :pt="{
-        root: { class: 'p-0' },
-        list: { 'data-testid': 'azion-query-language-suggestions-list' },
-        item: { class: 'p-0' }
-      }"
+    <!-- Unified dropdown: suggestions + recent queries -->
+    <div
+      v-if="(filteredSuggestions.length && showSuggestionsFocusInput) || showRecentQueries"
+      class="aql-dropdown-panel"
     >
-      <template #option="slotProps">
-        <div
-          class="w-full rounded-md"
-          style="
-            font-family:
-              ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-          "
-          :data-testid="`azion-query-language-list-item${slotProps.index}`"
-          @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
-          :class="[
-            'p-2 cursor-pointer ',
-            {
-              'bg-[var(--dropdown-hover-bg)] text-[var(--dropdown-hover-text)]':
-                slotProps.index === highlightedIndex
-            }
-          ]"
-        >
-          {{ slotProps.option.label }}
+      <!-- Field/operator/value suggestions -->
+      <Listbox
+        v-if="filteredSuggestions.length && showSuggestionsFocusInput"
+        :options="filteredSuggestions"
+        ref="listboxRef"
+        optionLabel="label"
+        :modelValue="listboxModel"
+        class="w-full max-h-48 overflow-y-auto"
+        @update:modelValue="onListboxModelUpdate"
+        data-testid="azion-query-language-suggestions"
+        :pt="{
+          root: { class: 'p-0 border-none shadow-none' },
+          list: { 'data-testid': 'azion-query-language-suggestions-list' },
+          item: { class: 'p-0' }
+        }"
+      >
+        <template #option="slotProps">
+          <div
+            class="w-full rounded-md"
+            style="font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
+            :data-testid="`azion-query-language-list-item${slotProps.index}`"
+            @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
+            :class="[
+              'p-2 cursor-pointer',
+              {
+                'bg-[var(--dropdown-hover-bg)] text-[var(--dropdown-hover-text)]':
+                  slotProps.index === highlightedIndex
+              }
+            ]"
+          >
+            {{ slotProps.option.label }}
+          </div>
+        </template>
+      </Listbox>
+
+      <!-- Recent queries -->
+      <div
+        v-if="showRecentQueries"
+        class="aql-recent-queries hidden md:block"
+        data-testid="aql-recent-queries"
+      >
+        <div class="aql-recent-queries__header">
+          <span class="aql-recent-queries__title">Recent queries</span>
+          <button
+            class="aql-recent-queries__clear"
+            @mousedown.prevent="clearQueryHistory"
+          >
+            <i class="pi pi-trash" />
+          </button>
         </div>
-      </template>
-    </Listbox>
+        <ul class="aql-recent-queries__list">
+          <li
+            v-for="(entry, idx) in queryHistory.slice(0, 8)"
+            :key="idx"
+            class="aql-recent-queries__item"
+            @mousedown.prevent="loadFromHistory(entry)"
+          >
+            <i class="pi pi-history aql-recent-queries__icon" />
+            <span class="aql-recent-queries__query">
+              <template
+                v-for="(part, fIdx) in getAqlHistoryParts(entry)"
+                :key="fIdx"
+              >
+                <template v-if="fIdx > 0"> AND </template>
+                {{ part.field }}
+              </template>
+            </span>
+            <template
+              v-for="(part, fIdx) in getAqlHistoryParts(entry)"
+              :key="'op-' + fIdx"
+            >
+              <span
+                v-if="part.operator"
+                class="aql-recent-queries__dataset"
+                >{{ part.operator }}</span
+              >
+            </template>
+            <span class="aql-recent-queries__value">
+              <template
+                v-for="(part, fIdx) in getAqlHistoryParts(entry)"
+                :key="'v-' + fIdx"
+              >
+                <template v-if="fIdx > 0"> AND </template>
+                {{ part.value }}
+              </template>
+            </span>
+            <span
+              v-if="entry.dataset"
+              class="aql-recent-queries__dataset"
+              >{{ entry.dataset }}</span
+            >
+            <button
+              class="aql-recent-queries__remove"
+              @mousedown.prevent.stop="removeQueryFromHistory(idx)"
+            >
+              <i class="pi pi-times" />
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +154,9 @@
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
   import { onClickOutside } from '@vueuse/core'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services/list-workloads-dynamic-fields-service.js'
+  import { useQueryHistory } from '@/views/RealTimeEvents/composables/useQueryHistory'
+
+  import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system/filterFields/filterRow/component'
 
   const AzionQueryLanguage = new Aql()
 
@@ -101,6 +174,18 @@
 
   const editable = ref(null)
 
+  const {
+    history: queryHistory,
+    addQuery: addQueryToHistory,
+    removeQuery: removeQueryFromHistory,
+    clearHistory: clearQueryHistory
+  } = useQueryHistory()
+
+  // Show recent queries section when input is focused and there's history
+  const showRecentQueries = computed(() => {
+    return showSuggestionsFocusInput.value && queryHistory.value.length > 0
+  })
+
   const emit = defineEmits(['dirty', 'validation'])
 
   defineOptions({ name: 'azion-query-language' })
@@ -117,6 +202,10 @@
     filterAdvanced: {
       type: Array,
       required: true
+    },
+    dataset: {
+      type: String,
+      default: ''
     }
   })
 
@@ -196,9 +285,7 @@
 
   const openSuggestions = () => {
     handleQuery({ useCursorOffset: true })
-    if (filteredSuggestions.value.length) {
-      showSuggestionsFocusInput.value = true
-    }
+    showSuggestionsFocusInput.value = true
   }
 
   const handleQuery = ({ useCursorOffset = false } = {}) => {
@@ -287,11 +374,68 @@
   }
 
   const markAsApplied = () => {
+    persistHistoryEntry()
     emit('dirty', false)
+  }
+
+  /**
+   * Build a human-readable query string from `filterAdvanced` and persist it
+   * to the shared Recent Queries history. The `dataset` prop is used as a badge
+   * so users can distinguish Metrics queries from Events queries side-by-side.
+   */
+  const persistHistoryEntry = () => {
+    const fields = props.filterAdvanced || []
+    if (!fields.length) return
+
+    const queryStr = fields
+      .map((filterField) => {
+        const fieldLabel = filterField.field || filterField.valueField
+        const operatorLabel = OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator
+        return `${fieldLabel} ${operatorLabel} ${filterField.value}`
+      })
+      .join(' AND ')
+
+    addQueryToHistory(queryStr, props.dataset || '', fields)
   }
 
   const handleSearch = () => {
     executeQuery()
+  }
+
+  const loadFromHistory = (entry) => {
+    if (entry.filterFields?.length) {
+      props.searchAdvancedFilter(entry.filterFields)
+    } else if (entry.query) {
+      query.value = entry.query
+      executeQuery()
+    }
+    showSuggestionsFocusInput.value = false
+  }
+
+  const getAqlHistoryParts = (entry) => {
+    if (entry.filterFields?.length) {
+      return entry.filterFields.map((filterField) => ({
+        field: filterField.field || filterField.valueField,
+        operator: OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator,
+        value: String(filterField.value)
+      }))
+    }
+    const operatorKeys = Object.keys(OPERATOR_MAPPING)
+    const segments = (entry.query || '').split(' AND ')
+    return segments.map((seg) => {
+      const trimmed = seg.trim()
+      for (const key of operatorKeys) {
+        const idx = trimmed.indexOf(` ${key} `)
+        if (idx !== -1) {
+          return {
+            field: trimmed.substring(0, idx),
+            operator: OPERATOR_MAPPING[key].label,
+            value: trimmed.substring(idx + key.length + 2)
+          }
+        }
+      }
+      return { field: trimmed, operator: '', value: '' }
+    })
   }
 
   const changeCurrentStep = (step) => {
@@ -349,3 +493,151 @@
 
   onClickOutside(ignoreClickOutside, () => (showSuggestionsFocusInput.value = false))
 </script>
+
+<style scoped>
+  .aql-dropdown-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--overlay-content-bg);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+  }
+
+  /* Force Listbox inside the panel to inherit the panel background */
+  .aql-dropdown-panel :deep(.p-listbox) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .aql-dropdown-panel :deep(.p-listbox-list) {
+    padding: 0.25rem 0;
+  }
+
+  .aql-recent-queries {
+    border-top: 1px solid var(--surface-border);
+  }
+
+  .aql-recent-queries__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .aql-recent-queries__title {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-family);
+  }
+
+  .aql-recent-queries__clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    padding: 0.25rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    font-size: 0.6875rem;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+  }
+
+  .aql-recent-queries__clear:hover {
+    opacity: 1;
+    color: var(--red-400);
+  }
+
+  .aql-recent-queries__list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .aql-recent-queries__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  .aql-recent-queries__item:hover {
+    background: var(--surface-hover);
+  }
+
+  .aql-recent-queries__icon {
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  .aql-recent-queries__query {
+    flex-shrink: 0;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    color: var(--text-color);
+    white-space: nowrap;
+  }
+
+  .aql-recent-queries__value {
+    flex: 1;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .aql-recent-queries__dataset {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    background: var(--surface-ground);
+    padding: 2px 6px;
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+  }
+
+  .aql-recent-queries__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    padding: 0.25rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition:
+      opacity 0.15s,
+      color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .aql-recent-queries__remove:hover {
+    opacity: 1;
+    color: var(--red-400);
+  }
+</style>

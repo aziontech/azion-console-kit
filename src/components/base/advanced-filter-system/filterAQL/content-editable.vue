@@ -34,6 +34,7 @@
 
   const editable = ref(null)
   const cursorOffset = ref(null)
+  const isInternalUpdate = ref(false)
 
   const updateCursorOffset = () => {
     cursorOffset.value = AzionQueryLanguage.saveCursorPosition(editable.value)
@@ -44,6 +45,7 @@
 
     const newValue = event.target.innerText
     editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
+    isInternalUpdate.value = true
     emit('update:modelValue', newValue)
     props.handleQuery()
     restoreCursorPosition()
@@ -64,6 +66,12 @@
   watch(
     () => props.modelValue,
     (newVal) => {
+      // Skip when the change came from our own handleInput — innerHTML is already set
+      // and cursor position is being restored. Re-setting innerHTML would destroy the cursor.
+      if (isInternalUpdate.value) {
+        isInternalUpdate.value = false
+        return
+      }
       if (editable.value) {
         editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
       }

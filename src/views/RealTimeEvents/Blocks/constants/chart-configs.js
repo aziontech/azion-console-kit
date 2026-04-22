@@ -4,16 +4,6 @@
  */
 
 /**
- * Status code colors using CSS variables from c3.scss
- */
-const STATUS_COLORS = {
-  '2xx': 'var(--series-two-color)', // Green
-  '3xx': 'var(--series-three-color)', // Blue
-  '4xx': 'var(--scale-orange)', // Orange
-  '5xx': 'var(--series-five-color)' // Red
-}
-
-/**
  * Default color palette
  */
 const DEFAULT_COLORS = [
@@ -33,7 +23,7 @@ const DEFAULT_COLORS = [
  */
 const CHART_CONFIGS = {
   httpRequests: {
-    dataset: 'httpEvents',
+    dataset: 'workloadEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -45,7 +35,7 @@ const CHART_CONFIGS = {
   },
 
   edgeFunctions: {
-    dataset: 'edgeFunctionsEvents',
+    dataset: 'functionEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -57,7 +47,7 @@ const CHART_CONFIGS = {
   },
 
   edgeFunctionsConsole: {
-    dataset: 'cellsConsoleEvents',
+    dataset: 'functionConsoleEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -69,7 +59,7 @@ const CHART_CONFIGS = {
   },
 
   imageProcessor: {
-    dataset: 'imagesProcessedEvents',
+    dataset: 'imageProcessedEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -81,7 +71,7 @@ const CHART_CONFIGS = {
   },
 
   tieredCache: {
-    dataset: 'l2CacheEvents',
+    dataset: 'tieredCacheEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -93,7 +83,7 @@ const CHART_CONFIGS = {
   },
 
   edgeDNS: {
-    dataset: 'idnsQueriesEvents',
+    dataset: 'edgeDnsQueriesEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -126,33 +116,129 @@ const CHART_CONFIGS = {
     dataUnit: 'count',
     xAxis: 'ts',
     colors: DEFAULT_COLORS
-  }
-}
+  },
 
-/**
- * Normalize HTTP status code to range
- */
-const normalizeStatusCode = (status) => {
-  if (!status) return '2xx'
+  // ── WAF metrics charts ──
+  wafThreats: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'area-spline',
+    splineInterpolation: 'monotone',
+    areaOpacity: 0.15,
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked'],
+    seriesLabels: {
+      wafRequestsAllowed: 'Allowed',
+      wafRequestsThreat: 'Threats',
+      wafRequestsBlocked: 'Blocked'
+    },
+    seriesColors: {
+      wafRequestsAllowed: '#22c55e',
+      wafRequestsThreat: '#eab308',
+      wafRequestsBlocked: '#ef4444'
+    },
+    colors: ['#22c55e', '#eab308', '#ef4444']
+  },
 
-  const statusStr = String(status)
+  wafXss: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsXssAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
 
-  if (statusStr.endsWith('xx')) {
-    return statusStr
-  }
+  wafRfi: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsRfiAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
 
-  const firstDigit = statusStr.charAt(0)
-  switch (firstDigit) {
-    case '2':
-      return '2xx'
-    case '3':
-      return '3xx'
-    case '4':
-      return '4xx'
-    case '5':
-      return '5xx'
-    default:
-      return '2xx'
+  wafSql: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsSqlAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafOther: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsOthersAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafThreatsByHost: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'host'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  // ── Bot Manager metrics charts ──
+  botTraffic: {
+    dataset: 'botManagerMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'classified'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    // Backend `classified` values are lowercase (confirmed by the Real-Time
+    // Metrics reports at src/modules/real-time-metrics/constants/reports.js):
+    // 'bad bot', 'good bot', 'legitimate', 'under evaluation'. Keeping the
+    // casing aligned prevents `useChartBuilder` from filtering seriesOrder
+    // down to an empty set and rendering a blank chart.
+    seriesOrder: ['bad bot', 'good bot', 'legitimate', 'under evaluation'],
+    seriesColors: {
+      'bad bot': '#ef4444',
+      'good bot': '#eab308',
+      legitimate: '#22c55e',
+      'under evaluation': '#6b7280'
+    },
+    colors: ['#ef4444', '#eab308', '#22c55e', '#6b7280']
+  },
+
+  botCaptcha: {
+    dataset: 'botManagerMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'challengeSolved'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
   }
 }
 
@@ -163,4 +249,4 @@ const getChartConfig = (tabKey) => {
   return CHART_CONFIGS[tabKey] || null
 }
 
-export { CHART_CONFIGS, getChartConfig, normalizeStatusCode, STATUS_COLORS, DEFAULT_COLORS }
+export { CHART_CONFIGS, getChartConfig, DEFAULT_COLORS }

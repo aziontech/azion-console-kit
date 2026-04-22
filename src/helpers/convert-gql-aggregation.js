@@ -3,7 +3,7 @@
  * Similar to Metrics but adapted for Events API structure.
  *
  * @param {Object} options - The options object
- * @param {string} options.dataset - The dataset name (e.g., 'httpEvents')
+ * @param {string} options.dataset - The dataset name (e.g., 'workloadEvents')
  * @param {Object} options.tsRange - Time range filter { tsRangeBegin, tsRangeEnd }
  * @param {Array} options.groupBy - Fields to group by (e.g., ['ts'])
  * @param {Object} options.aggregation - Aggregation config { count: 'rows' } or { sum: 'field' }

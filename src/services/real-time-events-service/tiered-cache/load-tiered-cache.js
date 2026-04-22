@@ -23,7 +23,7 @@ export const loadTieredCache = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'l2CacheEvents',
+    dataset: 'tieredCacheEvents',
     limit: 10000,
     fields: [
       'bytesSent',
@@ -74,7 +74,7 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [l2CacheEvents = {}] = body.data.l2CacheEvents
+  const [l2CacheEvents = {}] = body.data.tieredCacheEvents
 
   return {
     scheme: l2CacheEvents.scheme?.toUpperCase(),

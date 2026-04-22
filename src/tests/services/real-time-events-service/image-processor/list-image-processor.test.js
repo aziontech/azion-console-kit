@@ -39,7 +39,7 @@ describe('ImageProcessorServices', () => {
       body: { data: { httpRequest: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'imagesProcessedEvents'
+    const datasetName = 'imageProcessedEvents'
     await sut(fixtures.filter)
 
     const query = [
@@ -88,7 +88,7 @@ describe('ImageProcessorServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imagesProcessedEvents: [fixtures.imageProcessor] } }
+      body: { data: { imageProcessedEvents: [fixtures.imageProcessor] } }
     })
 
     const { sut } = makeSut()
@@ -102,13 +102,13 @@ describe('ImageProcessorServices', () => {
           httpReferer: fixtures.imageProcessor.httpReferer,
           httpUserAgent: fixtures.imageProcessor.httpUserAgent,
           summary: [
-            { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
             { key: 'configurationId', value: fixtures.imageProcessor.configurationId },
             { key: 'host', value: fixtures.imageProcessor.host },
             { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
             { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
             { key: 'requestUri', value: fixtures.imageProcessor.requestUri },
-            { key: 'status', value: fixtures.imageProcessor.status }
+            { key: 'status', value: fixtures.imageProcessor.status },
+            { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent }
           ],
           ts: fixtures.imageProcessor.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
