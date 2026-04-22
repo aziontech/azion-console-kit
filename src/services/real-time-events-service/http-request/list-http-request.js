@@ -11,9 +11,77 @@ import { getCurrentTimezone } from '@/helpers'
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
+const DATASET = 'workloadEvents'
+
+// All 58 workloadEvents fields split into two chunks (≤30 each + join keys).
+// `requestId` + `ts` in both for reliable merge.
+const FIELDS_CHUNK_A = [
+  'requestId',
+  'ts',
+  'bytesSent',
+  'configurationId',
+  'debugLog',
+  'geolocAsn',
+  'geolocCountryName',
+  'geolocRegionName',
+  'host',
+  'httpReferer',
+  'httpUserAgent',
+  'proxyStatus',
+  'requestLength',
+  'requestMethod',
+  'requestTime',
+  'requestUri',
+  'remoteAddress',
+  'remotePort',
+  'scheme',
+  'serverProtocol',
+  'sentHttpContentType',
+  'sentHttpXOriginalImageSize',
+  'sessionid',
+  'serverAddr',
+  'serverPort',
+  'solutionId',
+  'sslCipher',
+  'sslProtocol',
+  'sslServerName',
+  'sslSessionReused'
+]
+
+const FIELDS_CHUNK_B = [
+  'requestId',
+  'ts',
+  'stacktrace',
+  'status',
+  'streamname',
+  'tcpinfoRtt',
+  'upstreamAddr',
+  'upstreamAddrStr',
+  'upstreamBytesReceived',
+  'upstreamBytesReceivedStr',
+  'upstreamBytesSent',
+  'upstreamBytesSentStr',
+  'upstreamCacheStatus',
+  'upstreamConnectTime',
+  'upstreamConnectTimeStr',
+  'upstreamHeaderTime',
+  'upstreamHeaderTimeStr',
+  'upstreamResponseTime',
+  'upstreamResponseTimeStr',
+  'upstreamStatus',
+  'upstreamStatusStr',
+  'virtualhostId',
+  'wafAttackFamily',
+  'wafBlock',
+  'wafEvheaders',
+  'wafLearning',
+  'wafMatch',
+  'wafScore',
+  'wafTotalBlocked',
+  'wafTotalProcessed'
+]
+
 // ── DEV MOCK ────────────────────────────────────────────────────────────
-// Use VITE_ENVIRONMENT (not MODE) so that production-targeted local dev
-// sessions hit the real GraphQL API instead of the mock JSON.
 const USE_MOCK =
   import.meta.env.MODE === 'development' && import.meta.env.VITE_ENVIRONMENT !== 'production'
 
@@ -53,57 +121,58 @@ export const listHttpRequest = async (filter) => {
     return adaptMockResponse(body)
   }
 
-  const payload = adapt(filter)
-  const graphqlStore = useGraphQLStore()
-  graphqlStore.setQuery(payload)
-
   const decorator = new AxiosHttpClientSignalDecorator()
+  const makeRequest = (fields) => {
+    const payload = adapt(filter, fields)
+    useGraphQLStore().setQuery(payload)
+    return decorator.request({
+      baseURL: '/',
+      url: makeRealTimeEventsBaseUrl(),
+      method: 'POST',
+      body: payload
+    })
+  }
 
-  const httpResponse = await decorator.request({
-    baseURL: '/',
-    url: makeRealTimeEventsBaseUrl(),
-    method: 'POST',
-    body: payload
+  const [responseA, responseB] = await Promise.all([
+    makeRequest(FIELDS_CHUNK_A),
+    makeRequest(FIELDS_CHUNK_B)
+  ])
+
+  // Both must succeed
+  if (responseA.statusCode !== 200) return parseHttpResponse(responseA)
+  if (responseB.statusCode !== 200) return parseHttpResponse(responseB)
+
+  const rowsA = responseA.body.data?.[DATASET] || []
+  const rowsB = responseB.body.data?.[DATASET] || []
+
+  // Merge by requestId — both queries use the same filter + ordering so
+  // rows arrive in the same order. Build a Map from chunk B for O(1) lookup.
+  const chunkBByRequestId = new Map(rowsB.map((row) => [row.requestId, row]))
+
+  const mergedRows = rowsA.map((rowA, index) => {
+    const rowB =
+      rowsB[index]?.requestId === rowA.requestId
+        ? rowsB[index]
+        : chunkBByRequestId.get(rowA.requestId)
+    return { ...rowA, ...(rowB || {}) }
   })
 
-  return parseHttpResponse(httpResponse)
+  return adaptResponse({ data: { [DATASET]: mergedRows } })
 }
 
-const adapt = (filter) => {
+const adapt = (filter, fields) => {
   const table = {
-    dataset: 'workloadEvents',
-    limit: 1000,
-    fields: [
-      'configurationId',
-      'host',
-      'requestId',
-      'httpUserAgent',
-      'requestMethod',
-      'status',
-      'ts',
-      'upstreamBytesSent',
-      'sslProtocol',
-      'wafLearning',
-      'requestUri',
-      'requestTime',
-      'serverProtocol',
-      'upstreamCacheStatus',
-      'httpReferer',
-      'remoteAddress',
-      'wafMatch',
-      'serverPort',
-      'sslCipher',
-      'wafEvheaders',
-      'serverAddr',
-      'scheme'
-    ],
+    dataset: DATASET,
+    limit: filter?.pageSize || 1000,
+    ...(filter?.offset && { offset: filter.offset }),
+    fields,
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (httpResponse) => {
-  const data = httpResponse.data.workloadEvents?.map((workloadEventItem) => ({
+  const data = httpResponse.data[DATASET]?.map((workloadEventItem) => ({
     id: generateCurrentTimestamp(),
     requestId: workloadEventItem.requestId,
     summary: buildSummary(workloadEventItem, shouldLimitRequestUri, shouldShowTsColumn),
@@ -111,9 +180,7 @@ const adaptResponse = (httpResponse) => {
     tsFormat: getCurrentTimezone(workloadEventItem.ts)
   }))
 
-  return {
-    data
-  }
+  return { data }
 }
 
 const parseHttpResponse = (response) => {

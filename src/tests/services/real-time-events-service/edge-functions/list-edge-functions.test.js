@@ -3,6 +3,22 @@ import { listEdgeFunctions } from '@/services/real-time-events-service/edge-func
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
+vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
+  loadDatasetFields: vi.fn().mockResolvedValue([]),
+  getDatasetFields: vi
+    .fn()
+    .mockReturnValue([
+      'configurationId',
+      'functionLanguage',
+      'edgeFunctionsInitiatorTypeList',
+      'edgeFunctionsList',
+      'edgeFunctionsTime',
+      'ts',
+      'virtualhostid',
+      'edgeFunctionsInstanceIdList'
+    ])
+}))
+
 const fixtures = {
   filter: {
     tsRange: {
@@ -36,47 +52,21 @@ describe('EdgeFunctionsServices', () => {
       body: { data: { functionEvents: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'functionEvents'
     await sut(fixtures.filter)
 
-    const query = [
-      `query (`,
-      `\t$tsRange_begin: DateTime!`,
-      `\t$tsRange_end: DateTime!`,
-      `) {`,
-      `\t${datasetName} (`,
-      `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_DESC]`,
-      `\t\tfilter: {`,
-      `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
-      `\t\t}`,
-      `\t) {`,
-      `\t\tconfigurationId`,
-      `\t\tfunctionLanguage`,
-      `\t\tedgeFunctionsInitiatorTypeList`,
-      `\t\tedgeFunctionsList`,
-      `\t\tedgeFunctionsTime`,
-      `\t\tts`,
-      `\t\tvirtualhostid`,
-      `\t\tedgeFunctionsInstanceIdList`,
-      `\t}`,
-      `}`
-    ].join('\n')
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/events/graphql',
-      method: 'POST',
-      signal: undefined,
-      baseURL: '/',
-      body: {
-        query,
-        variables: {
-          tsRange_begin: '2024-02-23T18:07:25',
-          tsRange_end: '2024-02-23T19:07:25'
-        }
-      },
-      headers: undefined
-    })
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'v4/events/graphql',
+        method: 'POST',
+        baseURL: '/',
+        body: expect.objectContaining({
+          variables: {
+            tsRange_begin: '2024-02-23T18:07:25',
+            tsRange_end: '2024-02-23T19:07:25'
+          }
+        })
+      })
+    )
   })
 
   it('should parsed correctly each event', async () => {

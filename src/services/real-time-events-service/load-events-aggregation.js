@@ -572,14 +572,15 @@ function pickBucketMs(durationMs) {
     MIN = 60 * SEC,
     HOUR = 60 * MIN,
     DAY = 24 * HOUR
-  if (durationMs <= 1 * MIN) return 5 * SEC
+  if (durationMs <= 1 * MIN) return 1 * SEC
+  if (durationMs <= 5 * MIN) return 5 * SEC
+  if (durationMs <= 15 * MIN) return 10 * SEC
   if (durationMs <= 30 * MIN) return 30 * SEC
-  if (durationMs <= 1 * HOUR) return 2 * MIN
+  if (durationMs <= 1 * HOUR) return 1 * MIN
   if (durationMs <= 3 * HOUR) return 5 * MIN
   if (durationMs <= 6 * HOUR) return 10 * MIN
-  if (durationMs <= 12 * HOUR) return 20 * MIN
+  if (durationMs <= 12 * HOUR) return 30 * MIN
   if (durationMs <= 1 * DAY) return 30 * MIN
-  if (durationMs <= 3 * DAY) return 1 * HOUR
   if (durationMs <= 7 * DAY) return 3 * HOUR
   if (durationMs <= 30 * DAY) return 12 * HOUR
   return 1 * DAY

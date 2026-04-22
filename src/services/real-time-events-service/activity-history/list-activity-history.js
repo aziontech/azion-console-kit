@@ -6,55 +6,44 @@ import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
+import { CURATED_DATASET_FIELDS } from '../_shared/dataset-fields'
 
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-export const listActivityHistory = async (filter) => {
-  const payload = adapt(filter)
+const DATASET = 'activityHistoryEvents'
 
+export const listActivityHistory = async (filter) => {
+  const fields = [...CURATED_DATASET_FIELDS[DATASET]]
+
+  const payload = adapt(filter, fields)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
-  const response = await decorator.request({
+  const httpResponse = await decorator.request({
     baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return parseHttpResponse(response)
+  return parseHttpResponse(httpResponse)
 }
 
-const adapt = (filter) => {
+const adapt = (filter, fields) => {
   const table = {
-    dataset: 'activityHistoryEvents',
+    dataset: DATASET,
     limit: 10000,
-    fields: [
-      'userIp',
-      'authorName',
-      'title',
-      'resourceType',
-      'resourceId',
-      'userId',
-      'ts',
-      'comment',
-      'authorEmail',
-      'accountId',
-      'requestData',
-      'userAgent',
-      'remotePort',
-      'refererHeader'
-    ],
+    fields,
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+  const data = response.data[DATASET]?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(activityHistoryEvents, shouldLimitRequestUri, shouldShowTsColumn),
     userId: activityHistoryEvents.userId,

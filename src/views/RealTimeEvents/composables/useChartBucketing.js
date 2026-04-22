@@ -8,20 +8,18 @@ const MIN = 60 * SEC
 const HOUR = 60 * MIN
 const DAY = 24 * HOUR
 
-// Kibana-style auto interval: maps time range → proportional bucket size
+// Maps time range → bucket size (produces the target bucket count per range).
 const AUTO_INTERVALS = [
-  [1 * MIN, 5 * SEC],
-  [5 * MIN, 30 * SEC],
-  [10 * MIN, 30 * SEC],
-  [15 * MIN, 30 * SEC],
-  [30 * MIN, 1 * MIN],
-  [1 * HOUR, 2 * MIN],
-  [3 * HOUR, 5 * MIN],
-  [6 * HOUR, 10 * MIN],
-  [12 * HOUR, 20 * MIN],
-  [1 * DAY, 30 * MIN],
-  [3 * DAY, 1 * HOUR],
-  [7 * DAY, 3 * HOUR],
+  [1 * MIN, 1 * SEC], // 1 min / 1s  → 60 buckets
+  [5 * MIN, 5 * SEC], // 5 min / 5s  → 60 buckets
+  [15 * MIN, 10 * SEC], // 15 min / 10s → 90 buckets
+  [30 * MIN, 30 * SEC], // 30 min / 30s → 60 buckets
+  [1 * HOUR, 1 * MIN], // 1 h / 1m    → 60 buckets
+  [3 * HOUR, 5 * MIN], // 3 h / 5m    → 36 buckets
+  [6 * HOUR, 10 * MIN], // 6 h / 10m   → 36 buckets
+  [12 * HOUR, 30 * MIN], // 12 h / 30m  → 24 buckets
+  [1 * DAY, 30 * MIN], // 24 h / 30m  → 48 buckets
+  [7 * DAY, 3 * HOUR], // 7 d / 3h    → 56 buckets
   [30 * DAY, 12 * HOUR],
   [90 * DAY, 1 * DAY],
   [365 * DAY, 7 * DAY],

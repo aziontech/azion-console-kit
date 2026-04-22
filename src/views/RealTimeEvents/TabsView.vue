@@ -7,26 +7,99 @@
       />
     </template>
     <template #content>
-      <TabView
-        :activeIndex="tabSelectIndex"
-        class="w-full h-full"
-        @tab-click="handleTabClick"
+      <!-- Tab bar -->
+      <div
+        class="flex align-center justify-between relative"
+        data-testid="session-toolbar"
       >
-        <TabPanel
-          :header="tab.title"
-          v-for="tab in tabPanels"
-          :key="tab.index"
+        <TabView
+          :activeIndex="activeIndex"
+          :scrollable="true"
+          class="rte-events-tabview flex-1 min-w-0"
+          @tab-click="onTabClick"
         >
-          <TabPanelBlock
-            v-if="isTabActive(tab)"
-            :listService="selectedTabProps.listService"
-            :getTotalRecords="getTotalRecords"
-            :loadService="selectedTabProps.loadService"
-            :filterFields="generatedFilterFields"
-            :tabSelected="tab"
+          <TabPanel
+            v-for="tab in openTabs"
+            :key="tab.id ?? 'events'"
+            :pt="{
+              root: { 'data-testid': `rte-tab-${tab.id ?? 'events'}` }
+            }"
+          >
+            <template #header>
+              <SessionTabHeader
+                :tab="tab"
+                :active="(tab.id ?? null) === (activeTabId ?? null)"
+                @close="handleCloseTab"
+              />
+            </template>
+          </TabPanel>
+        </TabView>
+        <div class="flex items-center gap-1 ml-4">
+          <PrimeButton
+            icon="pi pi-folder"
+            text
+            rounded
+            aria-label="Add to tabs"
+            data-testid="open-session-browser-button"
+            v-tooltip.bottom="{ value: 'Add session to tabs', showDelay: 300 }"
+            @click="sessionBrowserVisible = true"
           />
-        </TabPanel>
-      </TabView>
+          <PrimeButton
+            icon="pi pi-share-alt"
+            text
+            rounded
+            aria-label="Share current view"
+            data-testid="share-current-view-button"
+            v-tooltip.bottom="{ value: 'Copy share link', showDelay: 300 }"
+            @click="handleShare"
+          />
+        </div>
+      </div>
+
+      <!-- Tab contents (KeepAlive preserves per-tab state) -->
+      <KeepAlive>
+        <TabPanelBlock
+          v-if="!activeTabId"
+          key="tab-events"
+          ref="tabPanelBlockRef"
+          :listService="selectedTabProps.listService"
+          :filterFields="generatedFilterFields"
+          :tabSelected="selectedTab"
+          :loadEventsChartAggregation="loadEventsChartAggregation"
+          :initialFilterState="pendingShareViewState?.filters"
+          :initialPageSize="pendingShareViewState?.pageSize"
+          :initialSelectedFields="pendingShareViewState?.selectedFields"
+          @dataset-change="handleDatasetChange"
+        />
+        <DashboardPanel
+          v-else-if="activePanelConfig"
+          :key="`tab-${activeTabId}`"
+          :panelConfig="activePanelConfig"
+          :listEventsService="dashboardListService"
+          :filterFields="generatedFilterFields"
+          :loadEventsChartAggregation="loadEventsChartAggregation"
+        />
+      </KeepAlive>
+
+      <!-- Session Browser Sidebar (picker) — readOnly while custom sessions
+           are disabled; Edit/Delete controls are hidden from the UI. -->
+      <SessionBrowser
+        v-model:visible="sessionBrowserVisible"
+        :panels="panels"
+        :activePanel="activeTabId"
+        :readOnly="true"
+        @select="handleBrowserSelect"
+        @edit="editSession"
+        @delete="deleteSession"
+      />
+
+      <!-- Session Creator Dialog -->
+      <SessionCreator
+        v-model:visible="sessionCreatorVisible"
+        :panelConfig="editingPanel"
+        :availableReports="availableReports"
+        @save="handleSessionSave"
+      />
     </template>
   </ContentBlock>
 </template>
@@ -34,22 +107,24 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref, onMounted } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import PrimeButton from '@aziontech/webkit/button'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import { GetRelevantField } from '@/modules/real-time-events/filters'
-  import { FILTERS_RULES } from '@/helpers'
-
+  import { computed, ref, onMounted, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import TabPanelBlock from '@/views/RealTimeEvents/Blocks/tab-panel-block.vue'
+  import SessionBrowser from '@/views/RealTimeEvents/Blocks/components/session-browser.vue'
+  import SessionCreator from '@/views/RealTimeEvents/Blocks/components/session-creator.vue'
+  import DashboardPanel from '@/views/RealTimeEvents/Blocks/components/dashboard-panel.vue'
+  import SessionTabHeader from '@/views/RealTimeEvents/Blocks/components/session-tab-header.vue'
   import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
-  import {
-    buildFieldsQuery,
-    adapterFields,
-    buildOperatorQuery
-  } from '@/views/RealTimeEvents/Blocks/constants/query-fields'
+  import { loadEventsFilterFields } from '@/modules/filter-loaders'
+  import { useSessionManager } from '@/views/RealTimeEvents/composables/useSessionManager'
 
   defineOptions({ name: 'RealTimeEventsTabsView' })
+
+  const toast = useToast()
 
   const props = defineProps({
     httpRequests: {
@@ -84,11 +159,7 @@
       type: Object,
       required: true
     },
-    loadFieldsData: {
-      type: Function,
-      required: true
-    },
-    getTotalRecords: {
+    loadEventsChartAggregation: {
       type: Function,
       required: true
     }
@@ -97,27 +168,104 @@
   const route = useRoute()
   const router = useRouter()
 
+  // ── Existing state ──
   const tabPanelBlockRef = ref(null)
-  const tabSelectIndex = ref(undefined)
-  const fieldAllDataset = ref({})
   const generatedFilterFields = ref([])
+  const selectedDatasetKey = ref(null)
 
-  const tabPanels = Object.values(TABS_EVENTS)
+  // ── Session management (composable) ──
+  // `localStorageAvailable` / `openSessionCreator` are no longer consumed in
+  // the template now that creating custom sessions is disabled, but they stay
+  // available from the composable for when the feature is re-enabled. They're
+  // omitted from the destructure to keep the lint clean.
+  const {
+    activeTabId,
+    openTabs,
+    panels,
+    sessionBrowserVisible,
+    sessionCreatorVisible,
+    editingPanel,
+    availableReports,
+    activePanelConfig,
+    pendingShareViewState,
+    openTab,
+    closeTab,
+    setActiveTab,
+    handleSessionSave,
+    editSession,
+    deleteSession,
+    shareCurrentView,
+    initializePanels
+  } = useSessionManager({ route, router, toast })
 
+  // Backwards-compat alias for watchers below
+  const activePanel = activeTabId
+
+  // ── Tab UI helpers ──
+  const activeIndex = computed(() =>
+    openTabs.value.findIndex((tab) => (tab.id ?? null) === (activeTabId.value ?? null))
+  )
+
+  const onTabClick = ({ index }) => {
+    const tab = openTabs.value[index]
+    if (!tab) return
+    if (tab.id === null) {
+      setActiveTab(null)
+    } else {
+      setActiveTab(tab.id)
+    }
+  }
+
+  const handleCloseTab = (tabId) => closeTab(tabId)
+
+  const handleBrowserSelect = (panelId) => {
+    openTab(panelId)
+    sessionBrowserVisible.value = false
+  }
+
+  const handleShare = () => {
+    let viewState = {}
+    if (!activeTabId.value && tabPanelBlockRef.value?.getCurrentShareState) {
+      viewState = tabPanelBlockRef.value.getCurrentShareState()
+    }
+    shareCurrentView(viewState)
+  }
+
+  // All available datasets
+  const allDatasets = Object.values(TABS_EVENTS)
+
+  // Currently selected tab/dataset (for Log Explorer)
+  const selectedTab = computed(() => {
+    return allDatasets.find((tab) => tab.panel === selectedDatasetKey.value) || allDatasets[0]
+  })
+
+  // Props for the selected tab (Log Explorer)
   const selectedTabProps = computed(() => {
-    const { panel } = tabPanels[tabSelectIndex.value]
+    const { panel } = selectedTab.value
     return props[panel] || {}
   })
 
-  const isTabActive = (tab) => {
-    return tab.index === tabSelectIndex.value
-  }
+  // ── Dashboard panel service resolution ──
+  // Resolve the correct list/load services for the active dashboard panel's dataset
+  const dashboardListService = computed(() => {
+    if (!activePanelConfig.value?.eventsConfig?.dataset) return () => Promise.resolve({ data: [] })
+    const dataset = activePanelConfig.value.eventsConfig.dataset
+    const tab = allDatasets.find((datasetTab) => datasetTab.dataset === dataset)
+    if (tab) {
+      const tabProps = props[tab.panel]
+      return tabProps?.listService || (() => Promise.resolve({ data: [] }))
+    }
+    return () => Promise.resolve({ data: [] })
+  })
 
-  const handleTabClick = async ({ index }) => {
-    const tab = tabPanels.find((tab) => tab.index === index)
-    await selectTab(tab)
-    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
-    tabPanelBlockRef.value?.reloadListTable()
+  // ── Existing Log Explorer logic ──
+  const handleDatasetChange = async (dataset) => {
+    if (dataset && dataset.panel !== selectedDatasetKey.value) {
+      selectedDatasetKey.value = dataset.panel
+      await updateRouter(dataset.tabRouter)
+      await reloadFilterFields(dataset)
+      tabPanelBlockRef.value?.reloadListTable()
+    }
   }
 
   const updateRouter = async (tabRouter) => {
@@ -132,70 +280,61 @@
     })
   }
 
-  const selectTab = async (tabSelectValue) => {
-    tabSelectIndex.value = tabSelectValue.index
-    await updateRouter(tabSelectValue.tabRouter)
-  }
-
   const initializeTabSelection = async () => {
     const { params } = route
     if (params.tab) {
-      const selectedTab = tabPanels.find((tab) => tab.tabRouter === params.tab)
-      await selectTab(selectedTab)
-      return
-    }
-
-    await selectTab(tabPanels[0])
-  }
-
-  const loadFieldsAndOperators = async () => {
-    fieldAllDataset.value = await props.loadFieldsData({
-      query: buildFieldsQuery()
-    })
-    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
-  }
-
-  const sortByMostRelevantFilters = (filters) => {
-    const { dataset } = tabPanels[tabSelectIndex.value]
-    const newOptions = filters.map(({ label, operator, value }) => {
-      const mostRelevant = GetRelevantField(label, dataset)
-      return {
-        label,
-        value,
-        mostRelevant,
-        operator
-      }
-    })
-
-    FILTERS_RULES().sortFields(newOptions)
-    return newOptions
-  }
-
-  let abortController = null
-  const fetchFieldsWithOperator = async (tabSelected) => {
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const { dataset } = tabSelected
-    const graphqlQuery = { query: buildOperatorQuery(dataset) }
-
-    try {
-      const operatorsData = await props.loadFieldsData({
-        ...graphqlQuery,
-        signal: abortController.signal
-      })
-
-      const filters = adapterFields(fieldAllDataset.value, operatorsData, dataset)
-      generatedFilterFields.value = sortByMostRelevantFilters(filters)
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        generatedFilterFields.value = []
+      const found = allDatasets.find((tab) => tab.tabRouter === params.tab)
+      if (found) {
+        selectedDatasetKey.value = found.panel
+        return
       }
     }
+    // Default to first dataset
+    selectedDatasetKey.value = allDatasets[0]?.panel
   }
 
-  onMounted(() => {
-    initializeTabSelection()
-    loadFieldsAndOperators()
+  const reloadFilterFields = async (tabSelected) => {
+    if (!tabSelected?.dataset) return
+    generatedFilterFields.value = await loadEventsFilterFields(tabSelected.dataset)
+  }
+
+  // ── Watch activePanel to load filter fields when switching tabs ──
+  watch(activePanel, async (newPanelId) => {
+    if (newPanelId && activePanelConfig.value?.eventsConfig?.dataset) {
+      // Switching to a dashboard panel
+      const dataset = activePanelConfig.value.eventsConfig.dataset
+      const tab = allDatasets.find((datasetTab) => datasetTab.dataset === dataset)
+      if (tab) {
+        await reloadFilterFields(tab)
+      }
+    } else if (!newPanelId) {
+      // Switching back to the Events (Log Explorer) tab — reload fields
+      // for the currently selected dataset so the sidebar is correct.
+      await reloadFilterFields(selectedTab.value)
+    }
+  })
+
+  // ── Initialize ──
+  onMounted(async () => {
+    initializePanels()
+    await initializeTabSelection()
+    reloadFilterFields(selectedTab.value)
   })
 </script>
+
+<style scoped>
+  /* Hide TabPanel body content — we render content separately via KeepAlive.
+     Everything else (colors, padding, active underline, hover, focus) is
+     owned by the PrimeVue @aziontech/theme, matching every other TabView
+     in the app. */
+  :deep(.rte-events-tabview .p-tabview-panels) {
+    display: none;
+  }
+
+  /* Suppress the theme's focus ring on mouse-click; keep it for keyboard
+     (:focus-visible) so a11y navigation still gets the DS ring. */
+  :deep(.rte-events-tabview .p-tabview-nav-link:focus:not(:focus-visible)) {
+    box-shadow: none;
+    outline: none;
+  }
+</style>

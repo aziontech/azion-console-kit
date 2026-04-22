@@ -173,12 +173,17 @@
       if (Array.isArray(parsed)) {
         filterData.value.fields = parsed
       }
-      aqlRef.value?.markAsApplied?.()
+      // History is persisted after the query succeeds — callers invoke
+      // `commitQueryToHistory()` once they confirm the data loaded.
       hasPendingQueryUpdate.value = false
     }
     updatedTime()
     emitUpdatedFilter()
     hasPendingDateUpdate.value = false
+  }
+
+  const commitQueryToHistory = () => {
+    aqlRef.value?.markAsApplied?.()
   }
 
   const onDateRangeSelect = () => {
@@ -299,7 +304,7 @@
     hasPendingDateUpdate.value = false
   }
 
-  defineExpose({ removeFilter, applyFilters, syncDateRangeFromExternal })
+  defineExpose({ removeFilter, applyFilters, commitQueryToHistory, syncDateRangeFromExternal })
 </script>
 
 <template>

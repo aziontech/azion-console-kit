@@ -105,27 +105,16 @@
                 v-for="(part, fIdx) in getAqlHistoryParts(entry)"
                 :key="fIdx"
               >
-                <template v-if="fIdx > 0"> AND </template>
-                {{ part.field }}
-              </template>
-            </span>
-            <template
-              v-for="(part, fIdx) in getAqlHistoryParts(entry)"
-              :key="'op-' + fIdx"
-            >
-              <span
-                v-if="part.operator"
-                class="aql-recent-queries__dataset"
-                >{{ part.operator }}</span
-              >
-            </template>
-            <span class="aql-recent-queries__value">
-              <template
-                v-for="(part, fIdx) in getAqlHistoryParts(entry)"
-                :key="'v-' + fIdx"
-              >
-                <template v-if="fIdx > 0"> AND </template>
-                {{ part.value }}
+                <template v-if="fIdx > 0">
+                  <span class="aql-recent-queries__and"> AND </span>
+                </template>
+                <span>{{ part.field }}</span>
+                <span
+                  v-if="part.operator"
+                  class="aql-recent-queries__dataset"
+                  >{{ part.operator }}</span
+                >
+                <span>{{ part.value }}</span>
               </template>
             </span>
             <span

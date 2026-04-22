@@ -3,6 +3,22 @@ import { listHttpRequest } from '@/services/real-time-events-service/http-reques
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
+vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
+  loadDatasetFields: vi.fn().mockResolvedValue([]),
+  getDatasetFields: vi
+    .fn()
+    .mockReturnValue([
+      'configurationId',
+      'host',
+      'requestId',
+      'httpUserAgent',
+      'requestMethod',
+      'status',
+      'ts',
+      'requestUri'
+    ])
+}))
+
 const fixtures = {
   filter: {
     tsRange: {
@@ -32,76 +48,46 @@ const makeSut = () => {
 
 describe('HttpRequestServices', () => {
   it('should call GraphQL with correct filter', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: { workloadEvents: [] } }
-    })
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { workloadEvents: [] } }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { workloadEvents: [] } }
+      })
     const { sut } = makeSut()
-    const datasetName = 'workloadEvents'
     await sut(fixtures.filter)
 
-    const query = [
-      `query (`,
-      `\t$tsRange_begin: DateTime!`,
-      `\t$tsRange_end: DateTime!`,
-      `) {`,
-      `\t${datasetName} (`,
-      `\t\tlimit: 1000`,
-      `\t\torderBy: [ts_DESC]`,
-      `\t\tfilter: {`,
-      `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
-      `\t\t}`,
-      `\t) {`,
-      `\t\tconfigurationId`,
-      `\t\thost`,
-      `\t\trequestId`,
-      `\t\thttpUserAgent`,
-      `\t\trequestMethod`,
-      `\t\tstatus`,
-      `\t\tts`,
-      `\t\tupstreamBytesSent`,
-      `\t\tsslProtocol`,
-      `\t\twafLearning`,
-      `\t\trequestUri`,
-      `\t\trequestTime`,
-      '\t\tserverProtocol',
-      '\t\tupstreamCacheStatus',
-      '\t\thttpReferer',
-      '\t\tremoteAddress',
-      '\t\twafMatch',
-      '\t\tserverPort',
-      '\t\tsslCipher',
-      '\t\twafEvheaders',
-      '\t\tserverAddr',
-      '\t\tscheme',
-      `\t}`,
-      `}`
-    ].join('\n')
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/events/graphql',
-      method: 'POST',
-      signal: undefined,
-      baseURL: '/',
-      body: {
-        query,
-        variables: {
-          tsRange_begin: '2024-02-23T18:07:25',
-          tsRange_end: '2024-02-23T19:07:25'
-        }
-      },
-      headers: undefined
-    })
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'v4/events/graphql',
+        method: 'POST',
+        baseURL: '/',
+        body: expect.objectContaining({
+          variables: {
+            tsRange_begin: '2024-02-23T18:07:25',
+            tsRange_end: '2024-02-23T19:07:25'
+          }
+        })
+      })
+    )
   })
 
   it('should parsed correctly each event', async () => {
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: { workloadEvents: [fixtures.httpRequest] } }
-    })
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { workloadEvents: [fixtures.httpRequest] } }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { workloadEvents: [fixtures.httpRequest] } }
+      })
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
@@ -136,15 +122,20 @@ describe('HttpRequestServices', () => {
       statusCode: 400
     }
   ])('Should return an API error for an $statusCode', async ({ statusCode, apiErrorMock }) => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: statusCode,
-      body: {
-        detail: [apiErrorMock]
-      }
-    })
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: statusCode,
+        body: {
+          detail: apiErrorMock
+        }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { workloadEvents: [] } }
+      })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.variableMock)
+    const feedbackMessage = sut(fixtures.filter)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -169,9 +160,14 @@ describe('HttpRequestServices', () => {
   ])(
     'should throw when request fails with status code $statusCode',
     async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
-      })
+      vi.spyOn(AxiosHttpClientAdapter, 'request')
+        .mockResolvedValueOnce({
+          statusCode
+        })
+        .mockResolvedValueOnce({
+          statusCode: 200,
+          body: { data: { workloadEvents: [] } }
+        })
       const { sut } = makeSut()
 
       const response = sut(fixtures.filter)

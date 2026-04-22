@@ -96,7 +96,12 @@ export function useFieldStats({
   const availableFieldsNonPinned = computed(() =>
     [...filteredFields.value]
       .filter((field) => !pinnedFieldSet.has(field.value))
-      .sort((left, right) => alphabeticalCompare(left.value, right.value))
+      .sort((left, right) => {
+        const leftHasStats = !!fieldStats.value[left.value]
+        const rightHasStats = !!fieldStats.value[right.value]
+        if (leftHasStats !== rightHasStats) return leftHasStats ? -1 : 1
+        return alphabeticalCompare(left.value, right.value)
+      })
   )
 
   const selectedFieldSet = computed(() => new Set(selectedFields.value || []))
