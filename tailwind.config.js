@@ -1,8 +1,8 @@
 import typography from '@tailwindcss/typography'
-import { theme } from '@aziontech/theme/tailwind/tailwind-theme'
-import semanticColors from '@aziontech/theme/tailwind/semantic-colors-plugin'
-import semanticTexts from '@aziontech/theme/tailwind/semantic-texts-plugin'
-import semanticSpacing from '@aziontech/theme/tailwind/semantic-spacing-plugin'
+import { theme } from '@aziontech/theme/tailwind/tailwind-theme.js'
+import semanticColors from '@aziontech/theme/tailwind/semantic-colors-plugin.js'
+import semanticTexts from '@aziontech/theme/tailwind/semantic-texts-plugin.js'
+import semanticSpacing from '@aziontech/theme/tailwind/semantic-spacing-plugin.js'
 
 /** @type {import('tailwindcss').Config} */
 export default {
