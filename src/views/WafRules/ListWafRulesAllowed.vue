@@ -3,7 +3,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import PrimeButton from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'

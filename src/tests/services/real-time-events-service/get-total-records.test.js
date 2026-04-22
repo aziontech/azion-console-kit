@@ -74,9 +74,9 @@ describe('getTotalRecords', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { httpEvents: [fixtures.httpRequest] } }
+      body: { data: { workloadEvents: [fixtures.httpRequest] } }
     })
-    const datasetName = 'httpEvents'
+    const datasetName = 'workloadEvents'
 
     const { sut } = makeSut()
     const response = await sut({ filter: fixtures.filter, dataset: datasetName })

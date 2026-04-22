@@ -286,7 +286,7 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {
       method: 'email',
       first_session_url: 'https://example.com/signup',
-      signup_type: 'email',
+      signup_type: 'signup_email',
       login_sso_google: false,
       login_sso_github: false,
       login_email: true,
@@ -321,7 +321,7 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', {
       method: 'google',
       first_session_url: 'https://example.com/signup',
-      signup_type: 'sso',
+      signup_type: 'signup_sso_google',
       login_sso_google: true,
       login_sso_github: false,
       login_email: false,

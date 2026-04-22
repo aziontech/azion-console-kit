@@ -19,6 +19,13 @@
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
+  const props = defineProps({
+    allowedRuntime: {
+      type: String,
+      default: null // null = all, 'azion_lua' = only Lua
+    }
+  })
+
   const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
@@ -67,9 +74,12 @@
   }
 
   const listEdgeFunctionsServiceDecorator = async (queryParams) => {
+    const runtimeParams = props.allowedRuntime ? { runtime: props.allowedRuntime } : {}
+
     const result = await edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
-      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment'],
+      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment', 'runtime'],
+      ...runtimeParams,
       ...queryParams
     })
 
@@ -236,41 +246,48 @@
           @onSuccess="handleDrawerSuccess"
         />
 
-        <FieldDropdownLazyLoader
-          required
-          disableEmitFirstRender
-          data-testid="edge-application-function-instance-form__edge-function"
-          label="Function"
-          name="edgeFunctionID"
-          optionLabel="name"
-          optionValue="id"
-          inputId="edgeFunctionID"
-          :service="listEdgeFunctionsServiceDecorator"
-          :loadService="loadEdgeFunctionServiceDecorator"
-          :moreOptions="['defaultArgs', 'azionForm']"
-          :value="edgeFunctionID"
-          @onSelectOption="changeArgs"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  class="w-full whitespace-nowrap flex"
-                  data-testid="edge-applications-functions-form__create-function-button"
-                  text
-                  @click="openDrawer"
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Function"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
+        <div class="flex">
+          <FieldDropdownLazyLoader
+            required
+            disableEmitFirstRender
+            data-testid="edge-application-function-instance-form__edge-function"
+            label="Function"
+            name="edgeFunctionID"
+            optionLabel="name"
+            optionValue="id"
+            inputId="edgeFunctionID"
+            :service="listEdgeFunctionsServiceDecorator"
+            :loadService="loadEdgeFunctionServiceDecorator"
+            :moreOptions="['defaultArgs', 'azionForm']"
+            :value="edgeFunctionID"
+            @onSelectOption="changeArgs"
+            :description="
+              allowedRuntime === 'azion_lua'
+                ? 'Only Lua functions can be used in the Response phase.'
+                : ''
+            "
+          >
+            <template #footer>
+              <ul class="p-2">
+                <li>
+                  <PrimeButton
+                    class="w-full whitespace-nowrap flex"
+                    data-testid="edge-applications-functions-form__create-function-button"
+                    text
+                    @click="openDrawer"
+                    size="small"
+                    icon="pi pi-plus-circle"
+                    :pt="{
+                      label: { class: 'w-full text-left' },
+                      root: { class: 'p-2' }
+                    }"
+                    label="Create Function"
+                  />
+                </li>
+              </ul>
+            </template>
+          </FieldDropdownLazyLoader>
+        </div>
       </div>
 
       <div

@@ -163,11 +163,12 @@
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+
   import Divider from '@aziontech/webkit/divider'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { useAccountStore } from '@/stores/account'
-  import { loadUserAndAccountInfo } from '@/helpers/account-data'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const accountStore = useAccountStore()

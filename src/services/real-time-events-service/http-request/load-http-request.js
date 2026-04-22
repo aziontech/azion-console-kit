@@ -50,7 +50,7 @@ const fieldsByRequest = [
 
 const mergeHttpEvents = (responses) => {
   return responses
-    .flatMap((res) => res.body?.data?.httpEvents || [])
+    .flatMap((res) => res.body?.data?.workloadEvents || [])
     .reduce((acc, event) => {
       Object.entries(event).forEach(([key, value]) => {
         acc[key] = acc[key] ? [].concat(acc[key], value) : value
@@ -66,7 +66,7 @@ const createPayload = (filter, fields) => {
       and: { tsEq: filter.ts, requestIdEq: filter.requestId }
     },
     {
-      dataset: 'httpEvents',
+      dataset: 'workloadEvents',
       limit: 10000,
       fields,
       orderBy: 'ts_ASC'

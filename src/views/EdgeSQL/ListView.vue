@@ -17,6 +17,10 @@
   const router = useRouter()
   const { databaseCreated, setCurrentDatabase, setDatabaseCreated } = useEdgeSQL()
 
+  const handleNavigateToCreate = () => {
+    router.push('/sql-database/create')
+  }
+
   const listTableRef = ref()
   const pollingInterval = ref(null)
   const deletePollingInterval = ref(null)
@@ -250,9 +254,9 @@
           title: 'No SQL Databases yet',
           description: 'Create your first database to store relational data and run SQL queries.',
           createButtonLabel: 'SQL Database',
-          createPagePath: '/sql-database/create',
           documentationService: Helpers.documentationGuideProducts.edgeSQL
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
       />

@@ -1,6 +1,6 @@
 # Azion Console Kit Storybook
 
-This Storybook showcases templates/components from the azion-console-kit project.
+This Storybook showcases templates from the azion-console-kit project.
 
 ## Getting Started
 
@@ -52,6 +52,7 @@ yarn build
 
 This will create a static build in the `storybook/dist` directory.
 
+<<<<<<< HEAD
 ### Previewing Build Locally
 
 After building, you can preview the static build locally:
@@ -89,6 +90,8 @@ Deployment is automated via GitHub Actions:
 
 **Important**: Local commits to the `storybook` branch will automatically trigger deployment if files in `src/storybook/` are modified.
 
+=======
+>>>>>>> dev
 ## Features
 
 - **Dark/Light Theme Toggle**: Switch between dark and light themes to see how components look in both modes
@@ -133,6 +136,7 @@ The following templates have been documented in Storybook:
 30. **Template Engine Block** - Template execution engine interface
 31. **Toast Block** - Toast notification system
 
+<<<<<<< HEAD
 ## Available Scripts
 
 From the storybook directory:
@@ -143,11 +147,14 @@ From the storybook directory:
 - `yarn build:azion` - Build with Azion CLI (for edge deployment)
 - `yarn deploy` - Deploy to Azion edge network (requires Azion CLI and authentication)
 
+=======
+>>>>>>> dev
 ## Configuration
 
 - **Storybook Configuration**: `.storybook/main.js` and `.storybook/preview.js`
 - **Tailwind Configuration**: `tailwind.config.js`
 - **PostCSS Configuration**: `postcss.config.js`
+<<<<<<< HEAD
 - **Azion Configuration**: `azion.config.mjs` - Configures edge deployment, storage, caching, and routing rules
 
 ### Azion Edge Configuration
@@ -161,6 +168,8 @@ The `azion.config.mjs` file configures:
 - **Routing**: Handles directory requests and subpaths with automatic `index.html` rewriting
 - **CORS**: Enables `Access-Control-Allow-Origin: *` for all requests
 - **Connector**: Links to Azion storage bucket `console-kit-storybook`
+=======
+>>>>>>> dev
 
 ## Path Aliases
 
@@ -200,11 +209,17 @@ The following templates were excluded due to complex external dependencies:
 - **Framework**: Vue 3.5.22
 - **UI Library**: PrimeVue 3.35.0
 - **Styling**: Tailwind CSS 3.3.3
+<<<<<<< HEAD
 - **Build Tool**: Vite 6.4.2
 - **Storybook**: 8.6.18
 - **Theme**: @aziontech/theme
 - **Icons**: @aziontech/icons
 - **Deployment**: Azion Edge Network
+=======
+- **Build Tool**: Vite 5.4.21
+- **Storybook**: 8.6.18
+- **Theme**: @aziontech/theme
+>>>>>>> dev
 
 ## Notes
 
@@ -212,4 +227,7 @@ The following templates were excluded due to complex external dependencies:
 - All templates use Vue 3 Composition API
 - Dark mode is enabled by default
 - Components support PrimeVue's theming system
+<<<<<<< HEAD
 - Commands can be run from the root directory with `yarn storybook:*` prefix, or from the `storybook/` directory directly with `yarn <command>`
+=======
+>>>>>>> dev
