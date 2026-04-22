@@ -78,19 +78,20 @@ describe('hubspotFormSubmitService', () => {
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     // Should not throw
-    await expect(
-      hubspotFormSubmitService({
-        email: 'test@example.com',
-        form_action: 'signup_email',
-        user_id__rtm_: 'user-123',
-        segment_userid: 'user-123'
-      })
-    ).resolves.not.toThrow()
+    const result = await hubspotFormSubmitService({
+      email: 'test@example.com',
+      form_action: 'signup_email',
+      user_id__rtm_: 'user-123',
+      segment_userid: 'user-123'
+    })
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      'HubSpot form submission failed:',
-      expect.any(Error)
-    )
+    expect(result).toEqual({ success: false, error: 'Network error' })
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith('HubSpot form submission failed:', {
+      error: 'Network error',
+      email: 'test@example.com',
+      form_action: 'signup_email'
+    })
   })
 
   it('should use correct form_action values for different signup types', async () => {
