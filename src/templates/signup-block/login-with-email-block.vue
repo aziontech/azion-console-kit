@@ -183,6 +183,9 @@
   const handleSignUpEmailClick = () => {
     const accountStore = useAccountStore()
     accountStore.resetSsoSignUpMethod()
+    // Set signup_email flag when user chooses email signup
+    accountStore.setSignupTypeFlag('login_email')
+    accountStore.setSignupTypeFlag('signup_email')
     showForm.value = true
     labelButton.value = 'Sign Up'
   }
