@@ -4,26 +4,65 @@
     @submit.prevent="submitForm"
   >
     <div
-      class="flex flex-col gap-6"
-      v-if="additionalDataInfo?.length"
+      class="flex flex-col gap-8"
+      v-if="isFormReady"
     >
-      <!-- Plan Selector -->
+      <!-- Plan Selector Card -->
       <div class="flex flex-col gap-2">
-        <BoxGridSelection
-          v-model="plan"
-          :items="planOptions"
-        >
-          <template #tag="{ item }">
-            <div
-              class="flex items-center rounded-[6px] border px-[10px] py-1 surface-section surface-border w-fit"
-            >
-              <span class="font-protomono text-[10px] font-semibold leading-4 text-color">
-                {{ item.tagLabel }}
-              </span>
-            </div>
-          </template>
-        </BoxGridSelection>
+        <label class="text-xs leading-4 text-color-secondary">Plan Selected</label>
+        <PlanSelectorCard
+          :plan="plan"
+          :planData="selectedPlanData"
+          :billingCycle="billingCycle"
+          @change="openPlanDrawer"
+        />
       </div>
+
+      <!-- How are you planning to use Azion? -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs leading-4 text-color-secondary">
+          How are you planning to use Azion?
+          <span class="text-primary">*</span>
+        </label>
+        <BoxGridSelection
+          v-model="usageIntent"
+          :items="usageIntentOptions"
+        />
+      </div>
+
+      <!-- Role -->
+      <Transition name="expand-step">
+        <div
+          v-if="showRoleStep"
+          class="flex flex-col gap-2"
+        >
+          <label class="text-xs leading-4 text-color-secondary">
+            What best describes your role?
+            <span class="text-primary">*</span>
+          </label>
+          <BoxGridSelection
+            v-model="role"
+            :items="roleOptions"
+          />
+        </div>
+      </Transition>
+
+      <!-- Company Size -->
+      <Transition name="expand-step">
+        <div
+          v-if="showCompanySizeStep"
+          class="flex flex-col gap-2"
+        >
+          <label class="text-xs leading-4 text-color-secondary">
+            How big is your company
+            <span class="text-primary">*</span>
+          </label>
+          <BoxGridSelection
+            v-model="companySize"
+            :items="companySizeOptions"
+          />
+        </div>
+      </Transition>
 
       <!-- Full Name -->
       <FieldText
@@ -34,17 +73,19 @@
         required
       />
 
-      <!-- Role Dropdown -->
-      <div class="relative z-10">
-        <FieldDropdown
-          name="role"
-          :value="role"
-          :options="roleOptions"
-          optionLabel="title"
-          optionValue="inputValue"
-          placeholder="Choose an option that describes your role"
-          label="What best describes your role?"
+      <!-- Terms Checkbox -->
+      <div class="flex items-start gap-3">
+        <Checkbox
+          v-model="termsAccepted"
+          :binary="true"
+          inputId="onboarding-checkbox"
         />
+        <label
+          for="onboarding-checkbox"
+          class="text-[13px] leading-5 font-medium text-color-secondary"
+        >
+          Schedule an onboarding session with an Azion expert
+        </label>
       </div>
     </div>
 
@@ -63,25 +104,35 @@
         </div>
       </div>
     </div>
+
+    <!-- Plan Selection Drawer -->
+    <PlanSelectionDrawer
+      v-model:visible="showPlanDrawer"
+      :plans="plansData"
+      :currentPlan="plan"
+      :billingCycle="billingCycle"
+      @select="handlePlanSelect"
+    />
   </form>
 </template>
 
 <script setup>
   import { ref, inject, computed, onMounted, watch } from 'vue'
   import { useField, useForm } from 'vee-validate'
-  // import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
   import { usePlans } from '@/composables/usePlans'
+  import { usePlansList } from '@/composables/usePlansService'
   import { useToast } from '@aziontech/webkit/use-toast'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import Checkbox from '@aziontech/webkit/checkbox'
+  import PlanSelectorCard from './plan-selector-card.vue'
+  import PlanSelectionDrawer from './plan-selection-drawer.vue'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  // const router = useRouter()
   const toast = useToast()
   const accountStore = useAccountStore()
 
@@ -89,68 +140,23 @@
     name: 'additional-data-form-block'
   })
 
-  // const props = defineProps({
-  //   postAdditionalDataService: {
-  //     type: Function,
-  //     required: true
-  //   },
-  //   patchFullnameService: {
-  //     type: Function,
-  //     required: true
-  //   },
-  //   updateAccountInfoService: {
-  //     type: Function,
-  //     required: true
-  //   }
-  // })
+  // Fetch plans from API
+  const { data: plansData } = usePlansList()
 
-  const additionalDataInfo = ref([
-    {
-      id: 1,
-      key: 'How are you planning to use Azion?',
-      required: true,
-      show: true,
-      values: [
-        { id: 1, value: 'hobby', other_values: false },
-        { id: 2, value: 'pro', other_values: false },
-        { id: 3, value: 'scale', other_values: false }
-      ]
-    },
-    {
-      id: 2,
-      key: 'What best describes your role?',
-      required: true,
-      show: true,
-      values: [
-        { id: 4, value: 'Software Developer', other_values: false },
-        { id: 5, value: 'DevOps Engineer', other_values: false },
-        { id: 6, value: 'Infrastructure Analyst', other_values: false },
-        { id: 7, value: 'Network Engineer', other_values: false },
-        { id: 8, value: 'Security Specialist', other_values: false },
-        { id: 9, value: 'Data Engineer', other_values: false },
-        { id: 10, value: 'AI/ML Engineer', other_values: false },
-        { id: 11, value: 'IoT Engineer', other_values: false },
-        { id: 12, value: 'Team Lead', other_values: false },
-        { id: 13, value: 'Other', other_values: false }
-      ]
-    },
-    {
-      id: 999,
-      key: 'Your Full Name',
-      required: true,
-      show: true
-    }
-  ])
+  const isFormReady = computed(() => Boolean(plansData.value))
 
   const validationSchema = yup.object({
     plan: yup.string().required().oneOf(['hobby', 'pro', 'scale']),
+    usageIntent: yup.string().required('Usage intent is required'),
     role: yup.string().required('Role is required'),
+    companySize: yup.string().required('Company size is required'),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
       .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
-      .required('Your Full Name is required')
+      .required('Your Full Name is required'),
+    termsAccepted: yup.boolean()
   })
 
   const { meta } = useForm({
@@ -158,47 +164,107 @@
   })
 
   const { value: plan } = useField('plan')
+  const { value: usageIntent } = useField('usageIntent')
   const { value: role } = useField('role')
+  const { value: companySize } = useField('companySize')
   const { value: fullName } = useField('fullName')
+  const { value: termsAccepted } = useField('termsAccepted')
 
   // Initialize plans from URL/storage
-  const { plan: storedPlan, initialize: initializePlans, setParam: setPlanParam } = usePlans()
+  const {
+    plan: storedPlan,
+    billingCycle: storedBillingCycle,
+    initialize: initializePlans,
+    setParam: setPlanParam
+  } = usePlans()
 
-  // Plan options for the selector
-  const planOptions = [
+  // Local billing cycle state
+  const billingCycle = ref('yearly')
+
+  // Plan drawer state
+  const showPlanDrawer = ref(false)
+
+  // Get selected plan data from API
+  const selectedPlanData = computed(() => {
+    if (!plansData.value?.length) return {}
+    return (
+      plansData.value.find(
+        (planItem) => planItem.sku?.toLowerCase() === plan.value?.toLowerCase()
+      ) || {}
+    )
+  })
+
+  const usageIntentOptions = [
+    { value: 'learn', description: 'Learn', ariaLabel: 'Learn usage intent' },
     {
-      value: 'hobby',
-      icon: 'ai ai-instructor',
-      description: 'For learning and small personal projects.',
-      tagLabel: 'Hobby Plan',
-      ariaLabel: 'Hobby Plan - For learning and small personal projects.'
+      value: 'personal-project',
+      description: 'Personal Project',
+      ariaLabel: 'Personal project usage intent'
+    },
+    { value: 'work', description: 'Work', ariaLabel: 'Work usage intent' }
+  ]
+
+  const roleOptions = [
+    {
+      value: 'Software Developer',
+      description: 'Software Developer',
+      ariaLabel: 'Software Developer role'
+    },
+    { value: 'DevOps Engineer', description: 'DevOps Engineer', ariaLabel: 'DevOps Engineer role' },
+    {
+      value: 'Infrastructure Analyst',
+      description: 'Infrastructure Analyst',
+      ariaLabel: 'Infrastructure Analyst role'
     },
     {
-      value: 'pro',
-      icon: 'pi pi-chart-line',
-      description: 'For professional or commercial applications.',
-      tagLabel: 'Pro Plan',
-      ariaLabel: 'Pro Plan - For professional or commercial applications.'
+      value: 'Network Engineer',
+      description: 'Network Engineer',
+      ariaLabel: 'Network Engineer role'
     },
     {
-      value: 'scale',
-      icon: 'pi pi-file-check',
-      description: 'For businesses requiring advanced security and compliance.',
-      tagLabel: 'Scale Plan',
-      ariaLabel: 'Scale Plan - For businesses requiring advanced security and compliance.'
+      value: 'Security Specialist',
+      description: 'Security Specialist',
+      ariaLabel: 'Security Specialist role'
+    },
+    { value: 'Data Engineer', description: 'Data Engineer', ariaLabel: 'Data Engineer role' },
+    { value: 'AI/ML Engineer', description: 'AI/ML Engineer', ariaLabel: 'AI/ML Engineer role' },
+    { value: 'IoT Engineer', description: 'IoT Engineer', ariaLabel: 'IoT Engineer role' },
+    { value: 'Team Lead', description: 'Team Lead', ariaLabel: 'Team Lead role' },
+    { value: 'Other', description: 'Other', ariaLabel: 'Other role' }
+  ]
+
+  // Company size options for BoxGridSelection
+  const companySizeOptions = [
+    {
+      value: 'just-me',
+      description: 'Just Me',
+      ariaLabel: 'Just me company size'
+    },
+    {
+      value: '2-100',
+      description: '2 to 100 employees',
+      ariaLabel: '2 to 100 employees company size'
+    },
+    {
+      value: '101-500',
+      description: '101 to 500 employees',
+      ariaLabel: '101 to 500 employees company size'
+    },
+    {
+      value: '501-1000',
+      description: '501 to 1000 employees',
+      ariaLabel: '501 to 1000 employees company size'
+    },
+    {
+      value: '1001+',
+      description: '1001+ employees',
+      ariaLabel: '1001 or more employees company size'
     }
   ]
 
-  // Role options for dropdown
-  const roleOptions = computed(() => {
-    const roleData = additionalDataInfo.value[1]?.values || []
-    return roleData.map((option) => ({
-      title: option.value,
-      inputValue: option.value
-    }))
-  })
-
-  // Map jobRole from kebab-case (stored in accountStore) to title case (used in dropdown)
+  const showRoleStep = computed(() => Boolean(usageIntent.value))
+  const showCompanySizeStep = computed(() => Boolean(usageIntent.value) && Boolean(role.value))
+  // Map jobRole from kebab-case to title case
   const jobRoleKebabToTitle = (kebabRole) => {
     const roleMap = {
       'software-developer': 'Software Developer',
@@ -215,6 +281,19 @@
     return roleMap[kebabRole] || null
   }
 
+  // Open plan selection drawer
+  const openPlanDrawer = () => {
+    showPlanDrawer.value = true
+  }
+
+  // Handle plan selection from drawer
+  const handlePlanSelect = ({ plan: selectedPlan, billingCycle: selectedBillingCycle }) => {
+    plan.value = selectedPlan
+    billingCycle.value = selectedBillingCycle
+    setPlanParam('plan', selectedPlan)
+    setPlanParam('billingCycle', selectedBillingCycle)
+  }
+
   // Pre-fill form fields on mount
   onMounted(() => {
     initializePlans()
@@ -222,6 +301,11 @@
     // Pre-fill plan from URL params/storage
     if (storedPlan.value && ['hobby', 'pro', 'scale'].includes(storedPlan.value)) {
       plan.value = storedPlan.value
+    }
+
+    // Pre-fill billing cycle
+    if (storedBillingCycle.value) {
+      billingCycle.value = storedBillingCycle.value
     }
 
     // Pre-fill fullName from accountStore
@@ -251,36 +335,7 @@
     loading.value = true
 
     try {
-      // const usersPayload = values.fullName
-      // const accountPayload = role.value
-      // const additionalDataPayload = {
-      //   plan: plan.value,
-      //   role: role.value,
-      //   fullName: values.fullName,
-      //   id: userId
-      // }
-
-      // const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      // accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
-
-      // const patchName = props.patchFullnameService(usersPayload)
-      // const postAddData = props.postAdditionalDataService({
-      //   payload: additionalDataPayload,
-      //   options: additionalDataInfo.value
-      // })
-
-      // await patchName
-      // await postAddData
-
-      // tracker.signUp
-      //   .submittedAdditionalData({
-      //     plan: plan.value,
-      //     role: role.value,
-      //     fullName: values.fullName
-      //   })
-      //   .track()
-
-      // For pro/scale plans, emit event to proceed to checkout step
+      // Emit event to proceed to checkout step
       emit('proceedToCheckout')
     } catch (err) {
       const errorMessage = err?.message || err
@@ -305,3 +360,25 @@
     plan
   })
 </script>
+
+<style scoped>
+  .expand-step-enter-active,
+  .expand-step-leave-active {
+    transition:
+      opacity 200ms ease,
+      max-height 260ms ease;
+    overflow: hidden;
+  }
+
+  .expand-step-enter-from,
+  .expand-step-leave-to {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  .expand-step-enter-to,
+  .expand-step-leave-from {
+    opacity: 1;
+    max-height: 560px;
+  }
+</style>
