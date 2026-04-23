@@ -328,9 +328,15 @@ export function buildC3Config({
       DEFAULT_COLORS[index % DEFAULT_COLORS.length]
   })
 
+  const LEGEND_MAX_CHARS = 24
+
+  // fullNames keeps the original label for tooltip display.
+  const fullNames = {}
   const names = {}
   seriesNames.forEach((name) => {
-    names[name] = config.seriesLabels?.[name] || name
+    const label = config.seriesLabels?.[name] || name
+    fullNames[name] = label
+    names[name] = label.length > LEGEND_MAX_CHARS ? `${label.slice(0, LEGEND_MAX_CHARS)}…` : label
   })
 
   // Chart type by kind:
@@ -399,6 +405,7 @@ export function buildC3Config({
       grouped: isMulti,
       format: {
         title: (idx) => chartData.tooltipLabels?.[idx] || String(idx),
+        name: (name) => fullNames[name] || name,
         value: (val) => `${formatDetailed(val)} events`
       }
     },

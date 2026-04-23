@@ -3,6 +3,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeBeholderBaseUrl } from '@/services/real-time-metrics-services/make-beholder-base-url'
 import { makeRealTimeEventsBaseUrl } from '@/services/real-time-events-service/make-real-time-events-service'
 import { loadAggregableFields } from '@/modules/filter-loaders/dataset-fields-loader'
+import { resolveChartApi } from '@/services/real-time-events-service/chart-api-router'
 
 export class MetricsChartError extends Error {
   constructor(message, { reason, detail } = {}) {
@@ -108,6 +109,64 @@ export function useMetricsChart(filterData, { onError } = {}) {
         /* noop */
       }
     }
+  }
+
+  /**
+   * Load chart data from the Metrics API for WAF/Bot fields that are returned
+   * as direct columns (no aggregate clause) — e.g. wafRequestsXssAttacks.
+   *
+   * The Real-Time Metrics module queries these fields without `aggregate: { sum: ... }`
+   * because they are pre-aggregated scalars in the httpMetrics dataset, not members
+   * of the HttpMetricsAggregatedFields enum. The query selects them directly in the
+   * return fields and the client sums them per bucket.
+   *
+   * Used as fallback for eventsApi configs when the range exceeds 30 minutes.
+   */
+  const loadFromMetricsApiFallback = async (config, begin, end) => {
+    const { metricsDataset, fields } = config.metricsApiFallback
+    if (!metricsDataset || !fields?.length) return false
+
+    const returnFields = ['ts', ...fields].join('\n    ')
+
+    const query = {
+      query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
+  ${metricsDataset} (
+    limit: 10000
+    groupBy: [ts]
+    orderBy: [ts_ASC]
+    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+  ) {
+    ${returnFields}
+  }
+}`,
+      variables: { tsRange_begin: begin, tsRange_end: end }
+    }
+
+    const response = await AxiosHttpClientAdapter.request({
+      baseURL: '/',
+      url: makeBeholderBaseUrl(),
+      method: 'POST',
+      body: JSON.stringify(query)
+    })
+
+    if (response.statusCode !== 200) {
+      throw new MetricsChartError(
+        response.body?.detail || 'The server could not load this chart.',
+        { reason: 'api-error', detail: response.body?.detail || null }
+      )
+    }
+
+    const rows = response.body?.data?.[metricsDataset]
+    if (!Array.isArray(rows)) {
+      data.value = []
+      return true
+    }
+
+    // Rows already have { ts, field1, field2, ... } shape — pass through directly.
+    data.value = rows
+      .filter((row) => row?.ts)
+      .sort((left, right) => new Date(left.ts) - new Date(right.ts))
+    return true
   }
 
   /**
@@ -229,19 +288,19 @@ export function useMetricsChart(filterData, { onError } = {}) {
           ? tsRange.tsRangeEnd.toISOString()
           : String(tsRange.tsRangeEnd)
 
-      // Events API fast path: WAF/Bot timeseries aggregate per-second over
-      // the raw Events dataset (workloadEvents / botManagerEvents) instead of
-      // Metrics, because the `<Dataset>AggregatedFields` enum in the live
-      // schema does not expose the calculated fields these charts need.
-      // Two shapes are supported:
-      //   • `series`:       explicit aliased sub-queries, one per filter.
-      //   • `groupByPivot`: single query with groupBy: [ts, <field>], pivoted
-      //                     on the field's value client-side.
+      // Route via the central chart-api-router: ≤ 30 min → Events API, > 30 min → Metrics API.
+      // Configs with `eventsApi` use Events API for short ranges; for longer ranges they fall back
+      // to Metrics API via `metricsApiFallback` if defined. If no fallback exists, Events API is
+      // always used (no Metrics equivalent available — caller should add metricsApiFallback).
       if (config.eventsApi?.series?.length || config.eventsApi?.groupByPivot?.field) {
+        const api = resolveChartApi(begin, end)
+        if (api === 'metrics' && config.metricsApiFallback) {
+          await loadFromMetricsApiFallback(config, begin, end)
+          return
+        }
         await loadFromEventsApi(config, begin, end)
         return
       }
-
       // Schema guard: drop any field not present in the live backend enum.
       // Prevents the 400 "Expected type <Dataset>AggregatedFields, found <X>"
       // response when docs and schema disagree (e.g. wafRequestsAllowed).
@@ -436,6 +495,11 @@ export const METRICS_CHART_CONFIGS = {
         // Blocked: WAF actually blocked the request.
         { name: 'wafRequestsBlocked', filters: { wafBlockEq: '1' } }
       ]
+    },
+    // For ranges > 30 min, fall back to Metrics API (httpMetrics exposes these fields).
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked']
     }
   },
   wafXss: {
@@ -445,6 +509,10 @@ export const METRICS_CHART_CONFIGS = {
     eventsApi: {
       dataset: 'workloadEvents',
       series: [{ name: 'wafRequestsXssAttacks', filters: { wafAttackFamilyEq: '$XSS' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsXssAttacks']
     }
   },
   wafRfi: {
@@ -454,6 +522,10 @@ export const METRICS_CHART_CONFIGS = {
     eventsApi: {
       dataset: 'workloadEvents',
       series: [{ name: 'wafRequestsRfiAttacks', filters: { wafAttackFamilyEq: '$RFI' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsRfiAttacks']
     }
   },
   wafSql: {
@@ -463,6 +535,10 @@ export const METRICS_CHART_CONFIGS = {
     eventsApi: {
       dataset: 'workloadEvents',
       series: [{ name: 'wafRequestsSqlAttacks', filters: { wafAttackFamilyEq: '$SQL' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsSqlAttacks']
     }
   },
   wafOther: {
@@ -472,6 +548,10 @@ export const METRICS_CHART_CONFIGS = {
     eventsApi: {
       dataset: 'workloadEvents',
       series: [{ name: 'wafRequestsOthersAttacks', filters: { wafAttackFamilyEq: '$OTHERS' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsOthersAttacks']
     }
   },
   // `wafThreatsByHost`, `botTraffic`, `botCaptcha` keep the Metrics API

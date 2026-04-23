@@ -4,6 +4,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
 import { makeBeholderBaseUrl } from '../real-time-metrics-services/make-beholder-base-url'
 import * as Errors from '@/services/axios/errors'
+import { resolveChartApi } from './chart-api-router'
 
 /**
  * Load aggregated event data for chart visualization.
@@ -410,17 +411,10 @@ export const loadEventsChartAggregation = async ({
     return EMPTY_RESULT
   }
 
-  // Calculate duration to determine which API to use
-  const beginMs = new Date(tsRange.tsRangeBegin).getTime()
-  const endMs = new Date(tsRange.tsRangeEnd).getTime()
-  const duration = endMs - beginMs
+  // Route to Events API (≤ 30 min) or Metrics API (> 30 min) via the central router.
+  const api = resolveChartApi(tsRange.tsRangeBegin, tsRange.tsRangeEnd)
 
-  // For short ranges (≤ 15 minutes), use Events API which returns second-level granularity.
-  // Metrics API has an adaptive resolver that resamples to minute-level for ranges up to 3 days.
-  // Events API returns raw events with per-second timestamps, allowing finer granularity.
-  const METRICS_API_DURATION_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
-
-  if (duration > 0 && duration <= METRICS_API_DURATION_THRESHOLD_MS) {
+  if (api === 'events') {
     return loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField })
   }
 

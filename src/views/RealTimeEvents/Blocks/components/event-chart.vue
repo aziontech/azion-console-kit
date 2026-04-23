@@ -414,7 +414,7 @@
     background: var(--surface-card);
     border: 1px solid var(--surface-border);
     border-radius: var(--border-radius);
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 0.75rem;
   }
 
@@ -616,6 +616,11 @@
 
   .chart-empty span {
     font-size: 0.75rem;
+  }
+
+  /* Tooltip above all chart content */
+  :deep(.c3-tooltip-container) {
+    z-index: 9999 !important;
   }
 
   /* Focus line visibility on dark background */
