@@ -500,7 +500,17 @@
   onBeforeUnmount(() => document.removeEventListener('keydown', onKeyDown))
   // Re-fetch data when KeepAlive reactivates this component (e.g. switching
   // back from Security/Performance tabs). Ensures chart + fields are fresh.
-  onActivated(() => {
+  onActivated(async () => {
+    // Wait for the DOM to settle (tab transition) before loading data so the
+    // chart container has its final dimensions when C3 initialises.
+    await nextTick()
+    // Re-apply filters to refresh relative time ranges (e.g. "Last 5 minutes"
+    // should be relative to now, not to when the tab was first mounted).
+    filterSystemRef.value?.applyFilters()
+    // Wait for the reactive filterData update triggered by applyFilters to
+    // propagate before calling loadData, otherwise load() may see a stale
+    // tsRange and bail out or fetch the wrong window.
+    await nextTick()
     loadData()
   })
   watch(isLoading, (loading, was) => {

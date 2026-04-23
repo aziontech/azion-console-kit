@@ -146,6 +146,8 @@ export function useEventsData({
 
   const load = async () => {
     if (isLoading.value) return
+    // Guard: filterData must have a valid tsRange before we can load
+    if (!filterData.value?.tsRange?.tsRangeBegin || !filterData.value?.tsRange?.tsRangeEnd) return
     const callId = ++loadCallId
     try {
       isLoading.value = true

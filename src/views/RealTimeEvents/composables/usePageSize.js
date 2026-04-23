@@ -3,10 +3,12 @@ import { ref } from 'vue'
 const STORAGE_KEY = 'rte-page-size'
 
 export const PAGE_SIZE_OPTIONS = [
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
   { label: '50', value: 50 },
   { label: '100', value: 100 },
-  { label: '1,000', value: 1000 },
-  { label: '2,000', value: 2000 }
+  { label: '250', value: 250 },
+  { label: '500', value: 500 }
 ]
 
 function loadPersistedSize() {
@@ -19,7 +21,7 @@ function loadPersistedSize() {
   } catch {
     /* noop */
   }
-  return 50
+  return 100
 }
 
 /**

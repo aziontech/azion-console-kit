@@ -48,7 +48,8 @@ const makeSut = () => {
 
 describe('HttpRequestServices', () => {
   it('should call GraphQL with correct filter', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request')
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce({
         statusCode: 200,
         body: { data: { workloadEvents: [] } }

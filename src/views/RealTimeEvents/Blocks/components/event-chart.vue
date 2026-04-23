@@ -130,6 +130,8 @@
   let initChartTimer = null
   // Monotonic token to cancel in-flight builds when a newer one is scheduled.
   let buildToken = 0
+  // Debounce timer for ResizeObserver to avoid excessive re-renders.
+  let resizeTimer = null
 
   const initChart = () => {
     clearTimeout(initChartTimer)
@@ -234,13 +236,16 @@
     initChart()
     if ('ResizeObserver' in window && chartRef.value) {
       resizeObserver = new ResizeObserver(() => {
-        if (chartInstance.value) {
-          try {
-            chartInstance.value.resize()
-          } catch {
+        // Debounce: only re-render after the container has stopped resizing
+        // (e.g. tab transition animation completes). This avoids dozens of
+        // re-renders during the CSS transition and fixes the Y-axis scale
+        // issue that occurs when C3 measures the container mid-animation.
+        clearTimeout(resizeTimer)
+        resizeTimer = setTimeout(() => {
+          if (chartInstance.value) {
             initChart()
           }
-        }
+        }, 150)
       })
       resizeObserver.observe(chartRef.value)
     }
@@ -252,7 +257,9 @@
 
   onBeforeUnmount(() => {
     clearTimeout(initChartTimer)
+    clearTimeout(resizeTimer)
     initChartTimer = null
+    resizeTimer = null
     buildToken += 1 // invalidate any pending nextTick
     document.removeEventListener('mousedown', onViewDocumentClick)
     document.removeEventListener('keydown', onViewEscape)

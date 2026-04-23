@@ -252,7 +252,7 @@
       case 'value':
         return AzionQueryLanguage.getValueSuggestions(domains.value, field)
       case 'logicOperator':
-        return [{ label: 'AND' }]
+        return [{ label: 'AND' }, { label: 'OR' }]
       default:
         return []
     }
@@ -346,6 +346,12 @@
       const restoreCursorInLastOffset = true
 
       selectSuggestion(suggestion)
+      editable.value.restoreCursorPosition(restoreCursorInLastOffset)
+    } else if (currentStep.value === 'logicOperator') {
+      // If we're at the logic operator step and user presses Enter,
+      // select AND automatically
+      const restoreCursorInLastOffset = true
+      selectSuggestion({ label: 'AND' })
       editable.value.restoreCursorPosition(restoreCursorInLastOffset)
     } else {
       executeQuery()
