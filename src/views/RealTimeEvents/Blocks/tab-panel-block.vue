@@ -788,10 +788,9 @@
                     />
                     <span
                       v-if="recordsFound"
-                      class="text-xs text-color-secondary px-2 py-1 bg-surface-section rounded"
-                    >
-                      {{ recordsFound }} documents found
-                    </span>
+                      class="ml-2 px-2 py-0.5 rounded-md text-color"
+                      style="font-size: 0.8125rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);"
+                    >{{ recordsFound }} Documents found</span>
                   </div>
                   <div class="flex gap-2 items-center">
                     <div class="relative hidden md:flex items-center">

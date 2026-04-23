@@ -1,8 +1,8 @@
 import { useAccountStore } from '@stores/account'
 
 /**
- * Format timestamp as compact string with milliseconds for RealTimeEvents.
- * Example: "Apr 22, 2026 at 18:47:53.832"
+ * Format timestamp as compact string for RealTimeEvents.
+ * Example: "Apr 22, 2026, 18:47:53"
  *
  * @param {string|Date} time - The timestamp to format
  * @returns {string} Formatted timestamp
@@ -23,7 +23,5 @@ export function formatTimestampCompact(time) {
     hour12: false
   }
 
-  const formatted = date.toLocaleString('en-US', options)
-  const ms = String(date.getMilliseconds()).padStart(3, '0')
-  return `${formatted}.${ms}`
+  return date.toLocaleString('en-US', options)
 }
