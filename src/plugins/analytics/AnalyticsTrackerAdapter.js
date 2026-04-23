@@ -18,18 +18,25 @@ import {
  */
 
 /**
- * Removes undefined, null, and empty string values from an object
+ * Recursively removes undefined, null, and empty string values from an object
  * @param {Object} obj - The object to clean
  * @returns {Object} - Cleaned object with only valid values
  */
 function cleanObject(obj) {
   if (!obj || typeof obj !== 'object') return {}
   return Object.fromEntries(
-    Object.entries(obj).filter(([, value]) => {
-      if (value === undefined || value === null) return false
-      if (typeof value === 'string' && value.trim() === '') return false
-      return true
-    })
+    Object.entries(obj)
+      .filter(([, value]) => {
+        if (value === undefined || value === null) return false
+        if (typeof value === 'string' && value.trim() === '') return false
+        return true
+      })
+      .map(([key, value]) => {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+          return [key, cleanObject(value)]
+        }
+        return [key, value]
+      })
   )
 }
 
@@ -90,8 +97,7 @@ export class AnalyticsTrackerAdapter {
     if (!this.#hasAnalytics()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
-      const cleanedProps = cleanObject({ ...props, application: 'console-kit' })
-      const propsWithTraits = cleanObject({ ...cleanedProps, ...this.#traits })
+      const propsWithTraits = cleanObject({ ...props, ...this.#traits, application: 'console-kit' })
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
@@ -104,7 +110,7 @@ export class AnalyticsTrackerAdapter {
    * @return {Promise<void>}
    */
   async identify(id) {
-    if (!id || !this.#hasAnalytics()) return
+    if (id === undefined || id === null || id === '' || !this.#hasAnalytics()) return
 
     const cleanedTraits = cleanObject(this.#traits)
     await this.#analyticsClient.identify(String(id), cleanedTraits)
