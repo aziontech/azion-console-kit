@@ -1,4 +1,4 @@
-import * as RealTimeEventsService from '@/services/real-time-events-service'
+import * as RealTimeEventsService from '@/views/RealTimeEvents/services'
 import { loadEventsChartAggregation } from '@/services/real-time-events-service/load-events-aggregation'
 
 /** @type {import('vue-router').RouteRecordRaw} */

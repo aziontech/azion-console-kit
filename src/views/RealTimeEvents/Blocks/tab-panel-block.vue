@@ -786,6 +786,12 @@
                         showDelay: 200
                       }"
                     />
+                    <span
+                      v-if="recordsFound"
+                      class="text-xs text-color-secondary px-2 py-1 bg-surface-section rounded"
+                    >
+                      {{ recordsFound }} documents found
+                    </span>
                   </div>
                   <div class="flex gap-2 items-center">
                     <div class="relative hidden md:flex items-center">
