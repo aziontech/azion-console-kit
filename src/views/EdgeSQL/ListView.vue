@@ -1,7 +1,7 @@
 <script setup>
   import { computed, inject, ref, watch, onUnmounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -16,6 +16,10 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const { databaseCreated, setCurrentDatabase, setDatabaseCreated } = useEdgeSQL()
+
+  const handleNavigateToCreate = () => {
+    router.push('/sql-database/create')
+  }
 
   const listTableRef = ref()
   const pollingInterval = ref(null)
@@ -250,9 +254,9 @@
           title: 'No SQL Databases yet',
           description: 'Create your first database to store relational data and run SQL queries.',
           createButtonLabel: 'SQL Database',
-          createPagePath: '/sql-database/create',
           documentationService: Helpers.documentationGuideProducts.edgeSQL
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
       />

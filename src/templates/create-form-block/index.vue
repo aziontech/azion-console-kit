@@ -1,6 +1,6 @@
 <script setup>
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref, onMounted, nextTick, useAttrs } from 'vue'
   import { useRouter } from 'vue-router'

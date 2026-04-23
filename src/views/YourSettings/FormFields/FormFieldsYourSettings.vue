@@ -3,7 +3,7 @@
   import { ref } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Dropdown from 'primevue/dropdown'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldPhoneNumberCountry from '@aziontech/webkit/field-phone-number-country'

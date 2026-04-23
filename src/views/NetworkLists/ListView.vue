@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -19,9 +20,14 @@
     }
   })
 
+  const router = useRouter()
   const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
 
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('network-lists/create')
+  }
 
   const actions = [
     {
@@ -134,7 +140,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/network-lists/edit"
-        createPagePath="network-lists/create"
         :apiFields="NETWORK_LIST_API_FIELDS"
         defaultOrderingFieldName="-last_modified"
         :frozenColumns="['name']"
@@ -147,9 +152,9 @@
           title: 'No Network Lists yet',
           description: 'Create your first network list to control traffic and security behavior.',
           createButtonLabel: 'Network List',
-          createPagePath: 'network-lists/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="emit('on-load-data', $event)"
         @on-before-go-to-edit="handleTrackEditEvent"
       />

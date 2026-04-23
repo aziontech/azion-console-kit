@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import InputText from 'primevue/inputtext'
+  import InputText from '@aziontech/webkit/inputtext'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldInputGroup from '@aziontech/webkit/field-input-group'
   import CopyBlock from '@aziontech/webkit/button-copy'
 
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
@@ -219,12 +219,16 @@
               title="Remove domain"
             />
           </div>
-          <small
-            v-if="domainsErrorMessage"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ domainsErrorMessage }}
-          </small>
+          <div class="max-w-lg">
+            <div class="!w-1/2">
+              <small
+                v-if="domainsErrorMessage"
+                class="p-error text-xs font-normal leading-tight"
+              >
+                {{ domainsErrorMessage }}
+              </small>
+            </div>
+          </div>
           <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
             <div class="flex w-1/2">
               <small class="text-xs text-color-secondary font-normal leading-5">

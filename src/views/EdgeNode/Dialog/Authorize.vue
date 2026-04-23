@@ -38,9 +38,9 @@
 
 <script setup>
   import { inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-  import DialogAuthorize from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import DialogAuthorize from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'Authorize-Dialog' })

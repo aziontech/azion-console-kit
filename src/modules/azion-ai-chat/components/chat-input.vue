@@ -45,8 +45,8 @@
 </template>
 
 <script setup>
-  import Textarea from 'primevue/textarea'
-  import PrimeButton from 'primevue/button'
+  import Textarea from '@aziontech/webkit/textarea'
+  import PrimeButton from '@aziontech/webkit/button'
   import { ref } from 'vue'
   import { useChat } from '../composables/use-chat'
 

@@ -105,7 +105,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'

@@ -62,7 +62,7 @@
 
 <script setup>
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
 
   defineOptions({

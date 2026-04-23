@@ -63,7 +63,7 @@ const FILTERS_RULES = () => {
       'Upstream Cache Status',
       'Request Time'
     ],
-    httpEvents: [
+    workloadEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,
       'Status',
       'Upstream Status',
@@ -91,7 +91,7 @@ const FILTERS_RULES = () => {
       'Invocations',
       'Edge Functions Instance Id List'
     ],
-    edgeFunctionsEvents: [
+    functionEvents: [
       TEXT_DOMAIN_WORKLOAD().singularTitle,
       'Edge Function Id',
       'Compute Time',

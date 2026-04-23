@@ -3,6 +3,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { computed, ref, inject } from 'vue'
+  import { useRouter } from 'vue-router'
   import ListTable from '@/components/list-table'
   import { DataTableActionsButtons } from '@/components/list-table'
   import { personalTokenService } from '@/services/v2/personal-token/personal-token-service'
@@ -17,7 +18,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('personal-tokens/create')
+  }
 
   const actions = [
     {
@@ -90,18 +96,17 @@
         :columns="getColumns"
         :actions="actions"
         :enableEditClick="false"
-        createPagePath="personal-tokens/create"
         exportFileName="Personal Tokens"
         emptyListMessage="No personal tokens found."
-        @on-before-go-to-add-page="handleTrackEvent"
         :emptyBlock="{
           title: 'No Personal Tokens yet',
           description: 'Create your first Personal Token to securely access your account via API.',
           documentationService: props.documentationService,
           emptyListMessage: 'No personal tokens found.',
-          createPagePath: 'personal-tokens/create',
           createButtonLabel: 'Personal Token'
         }"
+        @click-to-create="handleNavigateToCreate"
+        @on-before-go-to-add-page="handleTrackEvent"
       />
     </template>
   </ContentBlock>

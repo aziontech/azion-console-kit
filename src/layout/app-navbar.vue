@@ -163,8 +163,8 @@
   import ButtonCopilot from '@/layout/components/navbar/button-copilot.vue'
 
   import { ref, provide, watch } from 'vue'
-  import Skeleton from 'primevue/skeleton'
-  import PrimeButton from 'primevue/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter, useRoute } from 'vue-router'
   import { useWindowSize } from '@vueuse/core'
 

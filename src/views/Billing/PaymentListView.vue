@@ -56,11 +56,11 @@
 
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import PrimeButton from 'primevue/button'
-  import { useToast } from 'primevue/usetoast'
+  import PrimeButton from '@aziontech/webkit/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import { openContactSupport, openAzionDiscord } from '@/helpers'
   import { useAccountStore } from '@/stores/account'

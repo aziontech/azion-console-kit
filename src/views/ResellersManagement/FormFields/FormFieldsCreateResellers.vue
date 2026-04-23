@@ -178,7 +178,7 @@
 
   defineOptions({ name: 'form-fields-create-resellers' })
 
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useField } from 'vee-validate'
   import { onMounted, ref, watch, computed } from 'vue'
 

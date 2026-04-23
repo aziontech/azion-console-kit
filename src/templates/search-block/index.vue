@@ -70,10 +70,10 @@
   import { ref, watchEffect } from 'vue'
   import { useMagicKeys } from '@vueuse/core'
 
-  import Tag from 'primevue/tag'
-  import InputText from 'primevue/inputtext'
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import Tag from '@aziontech/webkit/tag'
+  import InputText from '@aziontech/webkit/inputtext'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
 
   const { meta, k: keyboardKeyK, control } = useMagicKeys()
 

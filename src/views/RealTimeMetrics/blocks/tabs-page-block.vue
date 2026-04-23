@@ -1,7 +1,7 @@
 <script setup>
-  import Dropdown from 'primevue/dropdown'
-  import Skeleton from 'primevue/skeleton'
-  import TabMenu from 'primevue/tabmenu'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import TabMenu from '@aziontech/webkit/tabmenu'
   import { computed } from 'vue'
 
   const props = defineProps({

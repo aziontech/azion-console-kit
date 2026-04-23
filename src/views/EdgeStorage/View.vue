@@ -7,11 +7,11 @@
   import FormFieldsEdgeStorage from './FormFields/FormFieldsEdgeStorage.vue'
   import CredentialsView from './CredentialsView.vue'
   import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
@@ -135,6 +135,13 @@
   }
 
   const loadService = ({ id }) => {
+    const cachedBucket = edgeStorageService.getBucketFromCache(id)
+    if (cachedBucket) {
+      return {
+        name: cachedBucket.name,
+        workloads_access: cachedBucket.workloadsAccess
+      }
+    }
     const bucket = findBucketById(id)
 
     return {

@@ -1,7 +1,7 @@
 <script setup>
   import { inject, onMounted, onUnmounted, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { usersService } from '@/services/v2/users/users-service'
   import { teamsService } from '@/services/v2/teams/teams-service'
   import { useAccountStore } from '@/stores/account'

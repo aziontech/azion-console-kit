@@ -67,11 +67,11 @@ describe('HttpRequestServices', () => {
       .spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce({
         statusCode: 200,
-        body: { data: { httpEvents: [] } }
+        body: { data: { workloadEvents: [] } }
       })
       .mockResolvedValueOnce({
         statusCode: 200,
-        body: { data: { httpEvents: [] } }
+        body: { data: { workloadEvents: [] } }
       })
 
     const { sut } = makeSut()
@@ -99,11 +99,11 @@ describe('HttpRequestServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce({
         statusCode: 200,
-        body: { data: { httpEvents: [fixtures.httpRequestFirst] } }
+        body: { data: { workloadEvents: [fixtures.httpRequestFirst] } }
       })
       .mockResolvedValueOnce({
         statusCode: 200,
-        body: { data: { httpEvents: [fixtures.httpRequestSecond] } }
+        body: { data: { workloadEvents: [fixtures.httpRequestSecond] } }
       })
 
     const { sut } = makeSut()

@@ -99,7 +99,7 @@
           <template #header>
             <DataTable.Header :showDivider="!!sqlAppliedFilters.length">
               <template #first-line>
-                <div class="flex flex-col gap-2 w-full">
+                <div class="flex flex-col gap-2 w-full py-2">
                   <div class="flex items-center gap-2 justify-between">
                     <div class="text-color text-lg font-medium">{{ tableName }}</div>
 
@@ -380,22 +380,22 @@
 <script setup>
   defineOptions({ name: 'tables-view' })
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
-  import { FilterMatchMode } from 'primevue/api'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
   import { useEdgeSQL } from './composable/useEdgeSQL'
-  import InlineMessage from 'primevue/inlinemessage'
-  import ConfirmDialog from 'primevue/confirmdialog'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import ConfirmDialog from '@aziontech/webkit/confirm-dialog'
   import TruncateTable from './Dialog/TruncateTable.vue'
   import AlterColumn from './Dialog/AlterColumn.vue'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import Menu from 'primevue/menu'
-  import PrimeButton from 'primevue/button'
-  import SplitButton from 'primevue/splitbutton'
-  import SelectButton from 'primevue/selectbutton'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Listbox from 'primevue/listbox'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import Column from 'primevue/column'
+  import Menu from '@aziontech/webkit/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import SplitButton from '@aziontech/webkit/splitbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import Listbox from '@aziontech/webkit/listbox'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import Column from '@aziontech/webkit/column'
   import { VueMonacoEditor as vueMonacoEditor } from '@guolao/vue-monaco-editor'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { TableActionManager } from './utils/table-actions'
@@ -809,7 +809,7 @@
     if (key == null) return
     const original = backups.value.get(key)
     if (original) {
-      const idx = editableData.value.findIndex((item) => getRowKey(item) === idx)
+      const idx = editableData.value.findIndex((item) => getRowKey(item) === key)
       if (idx !== -1) {
         editableData.value[idx] = { ...original }
       }

@@ -2,6 +2,8 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
   import FieldAutoComplete from '@aziontech/webkit/field-auto-complete'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
@@ -9,49 +11,69 @@
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
-  import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
-  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
-  import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-
-  import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
-  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
+  import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
+  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
+  import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
 
-  const getBehaviorsOriginOrEdgeConnectors = () => {
-    if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Connector', value: 'set_connector', requires: false }]
-    } else {
-      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+  const props = defineProps({
+    cacheSettingsOptions: {
+      type: Array,
+      required: true
+    },
+    isLoadingRequests: {
+      type: Boolean
+    },
+    originsOptions: {
+      type: Array,
+      required: true
+    },
+    isApplicationAcceleratorEnabled: {
+      type: Boolean
+    },
+    isImageOptimizationEnabled: {
+      type: Boolean
+    },
+    hideApplicationAcceleratorInDescription: {
+      type: Boolean
+    },
+    isEdgeFunctionEnabled: {
+      type: Boolean
+    },
+    edgeApplicationId: {
+      type: String,
+      required: true
+    },
+    initialPhase: {
+      type: String
+    },
+    selectedRulesEngineToEdit: {
+      type: Object,
+      default: () => {}
+    },
+    errors: {
+      type: Object
+    },
+    loadingOrigins: {
+      type: Boolean,
+      default: false
     }
-  }
+  })
 
-  const getEdgeConnectors = async (query) => {
-    return await edgeConnectorsService.listEdgeConnectorsService({
-      fields: 'id,name',
-      ...query
-    })
-  }
-
-  const getFunctionsInstanceOptions = async (query) => {
-    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
-      fields: 'id,name',
-      ...query
-    })
-  }
-
-  const loadFunctionsInstance = async ({ id }) => {
-    return await edgeApplicationFunctionService.loadEdgeApplicationFunction({
-      edgeApplicationID: props.edgeApplicationId,
-      functionID: id
-    })
-  }
+  const emit = defineEmits([
+    'toggleDrawer',
+    'refreshCacheSettings',
+    'refreshOrigins',
+    'refreshFunctions',
+    'navigate-to-main-settings'
+  ])
 
   const CRITERIA_OPERATOR_OPTIONS = [
     { label: 'is equal', value: 'is_equal' },
@@ -64,11 +86,15 @@
     { label: 'does not exist', value: 'does_not_exist' }
   ]
 
+  const ORIGIN_OR_CONNECTOR_OPTIONS = !hasFlagBlockApiV4()
+    ? [{ label: 'Set Connector', value: 'set_connector', requires: false }]
+    : [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+
   const BEHAVIORS_DEFAULT_OPTIONS = [
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    ...getBehaviorsOriginOrEdgeConnectors(),
+    ...ORIGIN_OR_CONNECTOR_OPTIONS,
     { label: 'Run Function', value: 'run_function', requires: false },
     { label: 'No Content (204)', value: 'no_content', requires: false }
   ]
@@ -161,57 +187,14 @@
     }
   ]
 
-  const emit = defineEmits([
-    'toggleDrawer',
-    'refreshCacheSettings',
-    'refreshOrigins',
-    'refreshFunctions',
-    'navigate-to-main-settings'
-  ])
-
-  const props = defineProps({
-    cacheSettingsOptions: {
-      type: Array,
-      required: true
-    },
-    isLoadingRequests: {
-      type: Boolean
-    },
-    originsOptions: {
-      type: Array,
-      required: true
-    },
-    isApplicationAcceleratorEnabled: {
-      type: Boolean
-    },
-    isImageOptimizationEnabled: {
-      type: Boolean
-    },
-    hideApplicationAcceleratorInDescription: {
-      type: Boolean
-    },
-    isEdgeFunctionEnabled: {
-      type: Boolean
-    },
-    edgeApplicationId: {
-      type: String,
-      required: true
-    },
-    initialPhase: {
-      type: String
-    },
-    selectedRulesEngineToEdit: {
-      type: Object,
-      default: () => {}
-    },
-    errors: {
-      type: Object
-    },
-    loadingOrigins: {
-      type: Boolean,
-      default: false
-    }
-  })
+  const BEHAVIORS_LABELS_TAGS = {
+    applicationAccelerator: !props.hideApplicationAcceleratorInDescription
+      ? ' - Required Application Accelerator'
+      : '',
+    https: '',
+    imageOptimization: !props.isImageOptimizationEnabled ? ' - Required Image Processor' : '',
+    edgeFunction: !props.isEdgeFunctionEnabled ? ' - Required Function' : ''
+  }
 
   const drawerRef = ref('')
   const drawerOriginRef = ref('')
@@ -219,20 +202,150 @@
   const drawerConnectorRef = ref('')
   const activeAccordions = ref([0])
   const behaviorIndexSelect = ref(null)
+  const variableItems = ref([])
+
+  const behaviorsRequestOptions = ref([
+    {
+      label: 'Add Request Cookie' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'add_request_cookie',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Add Request Header', value: 'add_request_header', requires: false },
+    {
+      label: 'Bypass Cache' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'bypass_cache',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    {
+      label: 'Capture Match Groups' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'capture_match_groups',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Deliver', value: 'deliver', requires: false },
+    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
+    { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
+    {
+      label: 'Filter Request Cookie' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'filter_request_cookie',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
+    {
+      label: 'Forward Cookies' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'forward_cookies',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'No Content (204)', value: 'no_content', requires: false },
+    {
+      label: 'Optimize Images' + BEHAVIORS_LABELS_TAGS.imageOptimization,
+      value: 'optimize_images',
+      requires: !props.isImageOptimizationEnabled
+    },
+    {
+      label: 'Redirect HTTP to HTTPS' + BEHAVIORS_LABELS_TAGS.https,
+      value: 'redirect_http_to_https',
+      requires: false
+    },
+    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
+    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
+    {
+      label: 'Rewrite Request' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'rewrite_request',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    {
+      label: 'Run Function' + BEHAVIORS_LABELS_TAGS.edgeFunction,
+      value: 'run_function',
+      requires: !props.isEdgeFunctionEnabled
+    },
+    { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
+    ...ORIGIN_OR_CONNECTOR_OPTIONS
+  ])
+
+  const behaviorsResponseOptions = ref([
+    {
+      label: 'Add Response Cookie' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'set_cookie',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Add Response Header', value: 'add_response_header', requires: false },
+    {
+      label: 'Capture Match Groups' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'capture_match_groups',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Deliver', value: 'deliver', requires: false },
+    { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
+    {
+      label: 'Filter Response Cookie' + BEHAVIORS_LABELS_TAGS.applicationAccelerator,
+      value: 'filter_response_cookie',
+      requires: !props.hideApplicationAcceleratorInDescription
+    },
+    { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
+    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
+    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
+    {
+      label: 'Run Function' + BEHAVIORS_LABELS_TAGS.edgeFunction,
+      value: 'run_function',
+      requires: !props.isEdgeFunctionEnabled
+    }
+  ])
+
+  const { value: name } = useField('name')
+  const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
+  const {
+    push: pushBehavior,
+    remove: removeBehavior,
+    fields: behaviors
+  } = useFieldArray('behaviors')
+  const { value: phase } = useField('phase')
+  const { value: description } = useField('description')
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
-  const behaviorsLabelsTags = computed(() => {
-    const empty = ''
+  const isDefaultPhase = computed(() => props.initialPhase === 'default')
 
-    return {
-      applicationAccelerator: !props.hideApplicationAcceleratorInDescription
-        ? ' - Required Application Accelerator'
-        : empty,
-      https: empty,
-      imageOptimization: !props.isImageOptimizationEnabled ? ' - Required Image Processor' : empty,
-      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Required Function' : empty
-    }
+  const isLoadingRequestsData = computed(() => {
+    return props.isLoadingRequests
+  })
+
+  const behaviorsOptionsMap = {
+    request: () => behaviorsRequestOptions.value,
+    default: () => {
+      if (behaviors.value.length === 1) {
+        return BEHAVIORS_DEFAULT_OPTIONS
+      }
+      return behaviorsRequestOptions.value
+    },
+    response: () => behaviorsResponseOptions.value
+  }
+
+  const behaviorsOptions = computed(() => {
+    return behaviorsOptionsMap[phase.value]() || []
+  })
+
+  const disableAddBehaviorButtonComputed = computed(() => {
+    const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
+
+    const disableAddBehaviorButton = true
+
+    const isBehaviorsListEmpty = !behaviors.value?.length
+    if (isBehaviorsListEmpty) return disableAddBehaviorButton
+
+    const excededMaximumNumberOfBehaviors = behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS
+    if (excededMaximumNumberOfBehaviors) return disableAddBehaviorButton
+
+    const lastBehavior = behaviors.value[behaviors.value.length - 1]
+
+    const isLastBehaviorEmpty = !lastBehavior.value.name
+    if (isLastBehaviorEmpty) return disableAddBehaviorButton
+
+    return DISABLE_ADD_BEHAVIOR_OPTIONS.includes(lastBehavior.value.name)
+  })
+
+  const maximumCriteriaReached = computed(() => {
+    const MAXIMUM_ALLOWED = 5
+    return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
   const placeholderBehaviors = (behavior) => {
@@ -251,108 +364,59 @@
     return placeholders[behavior] || ''
   }
 
-  const isDefaultPhase = computed(() => props.initialPhase === 'default')
+  const showDefaultField = (name) => {
+    return !DISABLE_TARGET_OPTIONS.includes(name)
+  }
 
-  const isLoadingRequestsData = computed(() => {
-    return props.isLoadingRequests
-  })
+  const isNotLastCriteria = (criteriaIndex) => {
+    return criteriaIndex !== criteria.value.length - 1
+  }
 
-  const behaviorsRequestOptions = ref([
-    {
-      label: 'Add Request Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'add_request_cookie',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Add Request Header', value: 'add_request_header', requires: false },
-    {
-      label: 'Bypass Cache' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'bypass_cache',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    {
-      label: 'Capture Match Groups' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'capture_match_groups',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Deliver', value: 'deliver', requires: false },
-    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
-    { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
-    {
-      label: 'Filter Request Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'filter_request_cookie',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
-    {
-      label: 'Forward Cookies' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'forward_cookies',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'No Content (204)', value: 'no_content', requires: false },
-    {
-      label: 'Optimize Images' + behaviorsLabelsTags.value.imageOptimization,
-      value: 'optimize_images',
-      requires: !props.isImageOptimizationEnabled
-    },
-    {
-      label: 'Redirect HTTP to HTTPS' + behaviorsLabelsTags.value.https,
-      value: 'redirect_http_to_https',
-      requires: false
-    },
-    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
-    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    {
-      label: 'Rewrite Request' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'rewrite_request',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    {
-      label: 'Run Function' + behaviorsLabelsTags.value.edgeFunction,
-      value: 'run_function',
-      requires: !props.isEdgeFunctionEnabled
-    },
-    { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
-    ...getBehaviorsOriginOrEdgeConnectors()
-  ])
+  const shouldRenderCriteriaValueInput = (criteriaIndex, conditionalIndex) => {
+    return (
+      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
+    )
+  }
 
-  const behaviorsResponseOptions = ref([
-    {
-      label: 'Add Response Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'set_cookie',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Add Response Header', value: 'add_response_header', requires: false },
-    {
-      label: 'Capture Match Groups' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'capture_match_groups',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Deliver', value: 'deliver', requires: false },
-    { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
-    {
-      label: 'Filter Response Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'filter_response_cookie',
-      requires: !props.hideApplicationAcceleratorInDescription
-    },
-    { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
-    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
-    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    {
-      label: 'Run Function' + behaviorsLabelsTags.value.edgeFunction,
-      value: 'run_function',
-      requires: !props.isEdgeFunctionEnabled
-    }
-  ])
+  const getBehaviorLabel = (behaviorItem) => {
+    return behaviorItem.isFirst ? 'Then' : 'And'
+  }
 
-  const { value: name } = useField('name')
-  const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
-  const {
-    push: pushBehavior,
-    remove: removeBehavior,
-    fields: behaviors
-  } = useFieldArray('behaviors')
-  const { value: phase } = useField('phase')
-  const { value: description } = useField('description')
+  const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
+    const MAXIMUM_ALLOWED = 10
+    return criteria.value[criteriaIndex].value.length >= MAXIMUM_ALLOWED
+  }
+
+  const getEdgeConnectors = async (query) => {
+    return await edgeConnectorsService.listEdgeConnectorsService({
+      fields: 'id,name',
+      ...query
+    })
+  }
+
+  const getFunctionsInstanceOptions = async (query) => {
+    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
+      fields: 'id,name',
+      ...query
+    })
+  }
+
+  const getLuaFunctionsInstanceOptions = async (query) => {
+    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
+      fields: 'id,name,function',
+      runtime: 'azion_lua',
+      pageSize: 100,
+      ...query
+    })
+  }
+
+  const loadFunctionsInstance = async ({ id }) => {
+    return await edgeApplicationFunctionService.loadEdgeApplicationFunction({
+      edgeApplicationID: props.edgeApplicationId,
+      functionID: id
+    })
+  }
 
   const removeConditional = (criteriaIndex, conditionalIndex) => {
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
@@ -398,46 +462,6 @@
     pushBehavior({ ...DEFAULT_BEHAVIOR })
   }
 
-  const behaviorsOptionsMap = {
-    request: () => behaviorsRequestOptions.value,
-    default: () => {
-      if (behaviors.value.length === 1) {
-        return BEHAVIORS_DEFAULT_OPTIONS
-      }
-      return behaviorsRequestOptions.value
-    },
-    response: () => behaviorsResponseOptions.value
-  }
-
-  const behaviorsOptions = computed(() => {
-    return behaviorsOptionsMap[phase.value]() || []
-  })
-
-  const disableAddBehaviorButtonComputed = computed(() => {
-    const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
-
-    const disableAddBehaviorButton = true
-
-    const isBehaviorsListEmpty = !behaviors.value?.length
-    if (isBehaviorsListEmpty) return disableAddBehaviorButton
-
-    const excededMaximumNumberOfBehaviors = behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS
-    if (excededMaximumNumberOfBehaviors) return disableAddBehaviorButton
-
-    const lastBehavior = behaviors.value[behaviors.value.length - 1]
-
-    const isLastBehaviorEmpty = !lastBehavior.value.name
-    if (isLastBehaviorEmpty) return disableAddBehaviorButton
-
-    return DISABLE_ADD_BEHAVIOR_OPTIONS.includes(lastBehavior.value.name)
-  })
-
-  const showDefaultField = (name) => {
-    return !DISABLE_TARGET_OPTIONS.includes(name)
-  }
-
-  const variableItems = ref([])
-
   const searchVariableOption = (event) => {
     let combinedOptions = [...VARIABLE_AUTOCOMPLETE_OPTIONS]
 
@@ -450,31 +474,6 @@
     variableItems.value = combinedOptions.filter((item) => item.includes(event.query))
   }
 
-  const isNotLastCriteria = (criteriaIndex) => {
-    return criteriaIndex !== criteria.value.length - 1
-  }
-
-  const shouldRenderCriteriaValueInput = (criteriaIndex, conditionalIndex) => {
-    return (
-      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
-      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
-    )
-  }
-
-  const getBehaviorLabel = (behaviorItem) => {
-    return behaviorItem.isFirst ? 'Then' : 'And'
-  }
-
-  const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
-    const MAXIMUM_ALLOWED = 10
-    return criteria.value[criteriaIndex].value.length >= MAXIMUM_ALLOWED
-  }
-
-  const maximumCriteriaReached = computed(() => {
-    const MAXIMUM_ALLOWED = 5
-    return criteria.value.length >= MAXIMUM_ALLOWED
-  })
-
   const openAccordionWithFormErrors = () => {
     if (!props.errors) return
 
@@ -485,6 +484,31 @@
       activeAccordions.value[indexMatch] = 0
     }
   }
+
+  const handleSuccess = () => {
+    emit('refreshCacheSettings')
+  }
+
+  const handleSuccessOrigin = () => {
+    emit('refreshOrigins')
+  }
+
+  const handleSuccessFunction = async (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
+  }
+
+  const successCreateConnector = ({ id }) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.edgeConnectorId = id
+    behaviorIndexSelect.value = null
+  }
+
+  const navigateToMainSettings = () => {
+    emit('navigate-to-main-settings')
+  }
+
   watch(
     () => criteria.value.length,
     () => {
@@ -533,29 +557,16 @@
     }
   )
 
-  const handleSuccess = () => {
-    emit('refreshCacheSettings')
-  }
-
-  const handleSuccessOrigin = () => {
-    emit('refreshOrigins')
-  }
-
-  const handleSuccessFunction = (functionId) => {
-    if (behaviorIndexSelect.value === null) return
-    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
-    behaviorIndexSelect.value = null
-  }
-
-  const successCreateConnector = ({ id }) => {
-    if (behaviorIndexSelect.value === null) return
-    behaviors.value[behaviorIndexSelect.value].value.edgeConnectorId = id
-    behaviorIndexSelect.value = null
-  }
-
-  const navigateToMainSettings = () => {
-    emit('navigate-to-main-settings')
-  }
+  // Clear functionId when phase changes to 'response' to avoid invalid selections
+  watch(phase, (newPhase, oldPhase) => {
+    if (oldPhase && oldPhase !== 'response' && newPhase === 'response') {
+      behaviors.value.forEach((behavior) => {
+        if (behavior.value.name === 'run_function' && behavior.value.functionId) {
+          behavior.value.functionId = undefined
+        }
+      })
+    }
+  })
 </script>
 
 <template>
@@ -589,6 +600,7 @@
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
+        :allowedRuntime="phase === 'response' ? 'azion_lua' : null"
       />
       <FieldText
         label="Name"
@@ -868,37 +880,48 @@
 
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
-              <FieldDropdownLazyLoader
-                :service="getFunctionsInstanceOptions"
-                :loadService="loadFunctionsInstance"
-                :loading="loadingFunctionsInstance"
-                :name="`behaviors[${behaviorIndex}].functionId`"
-                optionLabel="name"
-                optionValue="id"
-                :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.functionId"
-                :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
-              >
-                <template #footer>
-                  <ul class="p-2">
-                    <li>
-                      <PrimeButton
-                        class="w-full whitespace-nowrap flex"
-                        data-testid="edge-applications-rules-engine-form__create-function-instance-button"
-                        text
-                        @click="openDrawerFunction(behaviorIndex)"
-                        size="small"
-                        icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
-                        label="Create Function Instance"
-                      />
-                    </li>
-                  </ul>
-                </template>
-              </FieldDropdownLazyLoader>
+              <div class="flex flex-col gap-2 w-full">
+                <FieldDropdownLazyLoader
+                  :service="
+                    phase === 'response'
+                      ? getLuaFunctionsInstanceOptions
+                      : getFunctionsInstanceOptions
+                  "
+                  :loadService="loadFunctionsInstance"
+                  :loading="loadingFunctionsInstance"
+                  :name="`behaviors[${behaviorIndex}].functionId`"
+                  optionLabel="name"
+                  optionValue="id"
+                  :key="`${behaviorItem.key}-${phase}`"
+                  :value="behaviors[behaviorIndex].value.functionId"
+                  :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
+                  :description="
+                    phase === 'response'
+                      ? 'Only functions with Lua runtime are available for Response phase.'
+                      : ''
+                  "
+                >
+                  <template #footer>
+                    <ul class="p-2">
+                      <li>
+                        <PrimeButton
+                          class="w-full whitespace-nowrap flex"
+                          data-testid="edge-applications-rules-engine-form__create-function-instance-button"
+                          text
+                          @click="openDrawerFunction(behaviorIndex)"
+                          size="small"
+                          icon="pi pi-plus-circle"
+                          :pt="{
+                            label: { class: 'w-full text-left' },
+                            root: { class: 'p-2' }
+                          }"
+                          label="Create Function Instance"
+                        />
+                      </li>
+                    </ul>
+                  </template>
+                </FieldDropdownLazyLoader>
+              </div>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_connector'">
               <FieldDropdownLazyLoader

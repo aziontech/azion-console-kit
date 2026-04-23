@@ -7,7 +7,7 @@
   import { onMounted } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { loadProductsListService } from '@/services/contract-services'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'

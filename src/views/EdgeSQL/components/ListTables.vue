@@ -144,10 +144,10 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
-  import InputText from 'primevue/inputtext'
-  import Skeleton from 'primevue/skeleton'
-  import PrimeButton from 'primevue/button'
-  import Checkbox from 'primevue/checkbox'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Checkbox from '@aziontech/webkit/checkbox'
 
   const emit = defineEmits([
     'update:selectedTables',

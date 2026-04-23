@@ -75,7 +75,7 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, watch } from 'vue'
   import ContentEditable from './content-editable.vue'
-  import Listbox from 'primevue/listbox'
+  import Listbox from '@aziontech/webkit/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
   import { onClickOutside } from '@vueuse/core'

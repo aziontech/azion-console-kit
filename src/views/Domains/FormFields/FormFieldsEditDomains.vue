@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import InputText from 'primevue/inputtext'
-  import PrimeTag from 'primevue/tag'
+  import InputText from '@aziontech/webkit/inputtext'
+  import PrimeTag from '@aziontech/webkit/tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'

@@ -1,6 +1,6 @@
 <script setup>
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'dialog-unsaved' })
 

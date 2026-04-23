@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import { motion, AnimatePresence } from 'motion-v'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useInfoBannerStore } from '@/stores/info-banner'
 
   defineOptions({ name: 'InfoBanner' })

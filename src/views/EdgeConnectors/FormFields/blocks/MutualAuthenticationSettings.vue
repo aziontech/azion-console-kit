@@ -105,7 +105,7 @@
 <script setup>
   import { ref } from 'vue'
   import { useField } from 'vee-validate'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'

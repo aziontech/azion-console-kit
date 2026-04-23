@@ -2,9 +2,9 @@
   defineOptions({ name: 'advanced-filter' })
   import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { OPERATOR_MAPPING } from './component'
   import chipsDefaultDisplay from './component/display/chips-default-display.vue'
   import chipsRangeDisplay from './component/display/chips-range-display.vue'

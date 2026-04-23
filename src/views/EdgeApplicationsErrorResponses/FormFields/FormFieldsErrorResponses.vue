@@ -1,12 +1,12 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import InputText from 'primevue/inputtext'
+  import InputText from '@aziontech/webkit/inputtext'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
 

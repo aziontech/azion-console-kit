@@ -1,6 +1,6 @@
 <script setup>
   import { useLayout } from '@/composables/use-layout'
-  import Sidebar from 'primevue/sidebar'
+  import Sidebar from '@aziontech/webkit/sidebar'
 
   defineOptions({
     name: 'app-sidebar'

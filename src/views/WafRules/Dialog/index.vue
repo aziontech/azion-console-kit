@@ -1,8 +1,8 @@
 <script setup>
   import { ref, watch } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
-  import TextArea from 'primevue/textarea'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
+  import TextArea from '@aziontech/webkit/textarea'
 
   defineOptions({ name: 'dialog-allow-rule' })
 

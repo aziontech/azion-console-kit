@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-variables' })

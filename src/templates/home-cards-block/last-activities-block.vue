@@ -1,9 +1,9 @@
 <script setup>
   import { ref, computed, onMounted, h } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ListTableSimple from '@/components/list-table/ListTableSimple.vue'
-  import Skeleton from 'primevue/skeleton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import OperationTag from '@/views/ActivityHistory/components/OperationTag.vue'
   import { activityHistoryService } from '@/services/v2/activity-history/activity-history-service'
   import { resolveActivityHistoryRoute } from '@/services/v2/activity-history/activity-history-routing'
@@ -16,12 +16,15 @@
   const columns = [
     {
       field: 'date',
-      header: 'Date'
+      header: 'Date',
+      style: 'width: 13rem; max-width: 13rem',
+      truncate: true
     },
     {
       field: 'operation',
       header: 'Operation',
       type: 'component',
+      style: 'width: 8rem; max-width: 8rem',
       component: (value) => {
         if (!value) return null
         return h(OperationTag, { operation: value })
@@ -29,16 +32,22 @@
     },
     {
       field: 'resourceType',
-      header: 'Type'
+      header: 'Type',
+      style: 'width: 12rem; max-width: 10rem',
+      truncate: true
     },
     {
       field: 'resourceName',
       header: 'Resource',
-      enableClick: true
+      style: 'width: 14rem; max-width: 14rem',
+      enableClick: true,
+      truncate: true
     },
     {
       field: 'authorEmail',
-      header: 'Author Email'
+      header: 'Author Email',
+      style: 'width: 14rem; max-width: 14rem',
+      truncate: true
     }
   ]
 
@@ -151,7 +160,9 @@
             <component :is="col.component(getFieldValue(rowData, col.field))" />
           </template>
           <template v-else>
-            <span>{{ getFieldValue(rowData, col.field) }}</span>
+            <span :class="{ 'block truncate': col.truncate }">{{
+              getFieldValue(rowData, col.field)
+            }}</span>
           </template>
         </div>
       </template>

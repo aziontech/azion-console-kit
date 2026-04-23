@@ -1,14 +1,18 @@
 <script setup>
-  import DynamicDialog from 'primevue/dynamicdialog'
+  import DynamicDialog from '@aziontech/webkit/dynamic-dialog'
   import { computed, inject, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import { themeApply } from '@/helpers'
+  import { captureFirstSessionUrl } from '@/helpers/first-session-url'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+
+  // Capture the first session URL as early as possible
+  captureFirstSessionUrl()
 
   const DEFAULT_TITLE = 'Azion Console'
 
@@ -51,9 +55,13 @@
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
-  watch(currentTheme, (theme) => {
-    themeApply(theme)
-  })
+  watch(
+    currentTheme,
+    (theme) => {
+      themeApply(theme)
+    },
+    { immediate: true }
+  )
 
   watch(account, () => {
     updateTrackingTraits()

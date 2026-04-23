@@ -1,9 +1,9 @@
 <script setup>
   import { computed, onBeforeMount, ref } from 'vue'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
-  import Sidebar from 'primevue/sidebar'
-  import Skeleton from 'primevue/skeleton'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import ShareUrl from '@/layout/components/navbar/share-url'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import ActionBarBlock from '@/templates/action-bar-block'

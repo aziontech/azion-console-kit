@@ -2,7 +2,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FormFieldsCreateRealTimePurge from './FormFields/FormFieldsCreateRealTimePurge'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'

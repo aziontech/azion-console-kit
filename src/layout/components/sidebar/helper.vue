@@ -3,9 +3,9 @@
   import DiscordLogo from '@assets/svg/discord-logo'
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import PrimeMenu from 'primevue/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import PrimeMenu from '@aziontech/webkit/menu'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
 

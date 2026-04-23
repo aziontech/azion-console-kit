@@ -1,5 +1,5 @@
 <script setup>
-  import Sidebar from 'primevue/sidebar'
+  import Sidebar from '@aziontech/webkit/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   const emit = defineEmits(['update:visible'])
 

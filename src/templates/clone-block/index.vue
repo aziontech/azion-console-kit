@@ -54,12 +54,12 @@
 <script setup>
   import { inject, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
 
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
 
   defineOptions({ name: 'CloneBlock' })

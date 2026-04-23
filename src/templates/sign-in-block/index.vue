@@ -77,7 +77,10 @@
               </Divider>
             </div>
 
-            <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
+            <SocialIdpsBlock
+              v-model:showSocialIdps="showSocialIdps"
+              context="login"
+            />
           </div>
 
           <!-- Password step -->
@@ -153,18 +156,22 @@
   import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
   import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import Divider from 'primevue/divider'
+  import { useAccountStore } from '@/stores/account'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+
+  import Divider from '@aziontech/webkit/divider'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const accountStore = useAccountStore()
 
   defineOptions({ name: 'signInBlock' })
 
@@ -265,7 +272,22 @@
 
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
-      tracker.signIn.userSignedIn()
+      const signupTypeFlags = accountStore.getSignupTypeFlags()
+
+      // Load user and account info to populate accountStore for HubSpot tracking
+      await loadUserAndAccountInfo()
+      const { userId: consoleUserId, accountData } = accountStore
+      tracker.signIn
+        .userSignedIn({
+          method: 'email',
+          signupTypeFlags,
+          email: accountData?.email || values.email,
+          userId: consoleUserId,
+          firstname: accountData?.first_name || accountData?.name?.split(' ')[0],
+          lastname: accountData?.last_name || accountData?.name?.split(' ').slice(1).join(' '),
+          company: accountData?.company_name
+        })
+        .track()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)
@@ -274,7 +296,8 @@
 
       await switchClientAccount(userInfo.props)
     } catch {
-      tracker.signIn.userFailedSignIn().track()
+      const signupTypeFlags = accountStore.getSignupTypeFlags()
+      tracker.signIn.userFailedSignIn({ method: 'email', signupTypeFlags }).track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }

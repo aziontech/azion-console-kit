@@ -1,9 +1,9 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabPanel from 'primevue/tabpanel'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ObjectStorageCredentialsListView from './ObjectStorageCredentials/ListView.vue'

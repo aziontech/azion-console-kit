@@ -40,8 +40,8 @@
 </template>
 
 <script setup>
-  import Message from 'primevue/message'
-  import PrimeButton from 'primevue/button'
+  import Message from '@aziontech/webkit/message'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 

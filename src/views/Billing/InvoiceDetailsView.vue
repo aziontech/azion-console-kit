@@ -169,7 +169,7 @@
   import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
   import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'

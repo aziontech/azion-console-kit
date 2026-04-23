@@ -4,7 +4,7 @@
   import { capitalizeFirstLetter } from '@/helpers'
   import { ref, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 
   defineOptions({ name: 'edit-form-block-no-header' })

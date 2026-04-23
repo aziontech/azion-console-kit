@@ -55,7 +55,7 @@
 
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { listCommunicationsService } from '@/services/appcues-services'
 
   defineOptions({ name: 'CommunicationsCard' })

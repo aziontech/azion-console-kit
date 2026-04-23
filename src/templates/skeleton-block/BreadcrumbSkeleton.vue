@@ -6,9 +6,9 @@
           v-for="(breadcrumbWidth, breadcrumbIndex) in widths"
           :key="breadcrumbIndex"
         >
-          <ChevronRightIcon
+          <i
             v-if="breadcrumbIndex > 0"
-            class="text-color-secondary mx-2"
+            class="pi pi-chevron-right text-color-secondary mx-2"
           />
           <Skeleton
             :width="breadcrumbWidth"
@@ -28,8 +28,7 @@
 </template>
 
 <script setup>
-  import Skeleton from 'primevue/skeleton'
-  import ChevronRightIcon from 'primevue/icons/chevronright'
+  import Skeleton from '@aziontech/webkit/skeleton'
 
   defineOptions({ name: 'breadcrumb-skeleton' })
 

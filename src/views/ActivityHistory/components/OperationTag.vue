@@ -1,6 +1,6 @@
 <script setup>
   import { computed } from 'vue'
-  import Tag from 'primevue/tag'
+  import Tag from '@aziontech/webkit/tag'
 
   const props = defineProps({
     operation: {

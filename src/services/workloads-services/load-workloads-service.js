@@ -67,7 +67,7 @@ const adapt = (httpResponse) => {
         domain: match ? match[2] : domain
       }
     }),
-    workloadHostnameAllowAccess: body?.workload_hostname_allow_access,
+    workloadHostnameAllowAccess: body?.workload_domain_allow_access,
     customHostname: body?.domains[0] ? stripAzionDomain(body?.domains[0]) : '',
     edgeCertificate: body?.tls.certificate ?? 0,
     active: body.active,

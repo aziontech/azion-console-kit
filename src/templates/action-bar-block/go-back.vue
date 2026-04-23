@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
 
   const props = defineProps({

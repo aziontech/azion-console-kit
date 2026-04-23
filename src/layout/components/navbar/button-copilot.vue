@@ -18,7 +18,7 @@
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useLayout } from '@/composables/use-layout'
   import { useRoute } from 'vue-router'
 

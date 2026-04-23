@@ -6,15 +6,16 @@ import '@aziontech/theme'
 import '@aziontech/icons'
 import '@aziontech/webkit/styles/country-flags'
 
+// Inject CSS variables for semantic tokens
+import { injectCssVars } from '@aziontech/theme/tokens'
+injectCssVars()
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import PrimeVue from 'primevue/config'
-import Tooltip from 'primevue/tooltip'
-import ToastService from 'primevue/toastservice'
+import { WebkitPlugin } from '@aziontech/webkit/plugin'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
-import DialogService from 'primevue/dialogservice'
 import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
@@ -33,14 +34,11 @@ const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
-app.use(PrimeVue)
-app.directive('tooltip', Tooltip)
+app.use(WebkitPlugin)
 app.directive('prompt', customAiPrompt)
-app.use(ToastService)
 app.use(pinia)
 
 app.use(router)
-app.use(DialogService)
 app.use(queryPlugin)
 app.use(TrackerPlugin)
 app.use(SentryPlugin, {

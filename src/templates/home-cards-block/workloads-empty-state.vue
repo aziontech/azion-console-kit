@@ -1,8 +1,8 @@
 <script setup>
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Divider from '@aziontech/webkit/divider'
   import { useCreateModalStore } from '@/stores/create-modal'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
 

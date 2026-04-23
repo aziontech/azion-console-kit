@@ -3,8 +3,8 @@ import { persister, pauseQueryPersistence } from '@/services/v2/base/query/query
 import { useAccountStore } from '@/stores/account'
 import { sendSwitchAccountBroadcast } from '@/services/v2/base/auth/session-broadcast'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { startCacheSync, resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
 import { schedulePrefetch } from '@/services/v2/base/query/prefetchScheduler'
-import { resetCacheSync } from '@/services/v2/base/cache-sync/cache-sync-service'
 
 import { solutionService } from '@/services/v2/marketplace/solution-service'
 import { marketplaceService } from '@/services/v2/marketplace/marketplace-service'
@@ -91,15 +91,35 @@ export const sessionManager = {
     if (hasPrefetched) return
     hasPrefetched = true
     prefetchInBackground()
+
+    const accountStore = useAccountStore()
+    if (accountStore.isClientAccount) {
+      startCacheSync()
+    }
   },
+  /**
+   * Prepares the current tab for an account switch by clearing local session data
+   * (cache, persisted queries, account store). Does NOT broadcast to other tabs —
+   * the caller MUST invoke `notifySwitchAccountComplete()` after the switch API
+   * call succeeds. Splitting these prevents a race where other tabs reload with
+   * stale credentials before the new session is ready, causing 401 → logout.
+   */
   async switchAccount() {
     hasPrefetched = false
     resetCacheSync()
     await clearAllData()
+  },
+  /**
+   * Notifies other tabs that the account switch completed successfully so they
+   * can reload into the new session. MUST be called only after the switch API
+   * has returned successfully and the new session is established.
+   */
+  notifySwitchAccountComplete() {
     sendSwitchAccountBroadcast()
   },
   async logout() {
     hasPrefetched = false
+    resetCacheSync()
     await clearAllData()
   }
 }

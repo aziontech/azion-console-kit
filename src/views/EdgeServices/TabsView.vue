@@ -1,7 +1,7 @@
 <script setup>
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
+  import TabPanel from '@aziontech/webkit/tabpanel'
   import EditView from '@/views/EdgeServices/EditView'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
@@ -10,7 +10,7 @@
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'

@@ -34,15 +34,23 @@
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
   import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
 
   const tracker = inject('tracker')
+
+  const props = defineProps({
+    context: {
+      type: String,
+      default: 'signup',
+      validator: (value) => ['signup', 'login'].includes(value)
+    }
+  })
 
   const idps = ref([])
   const submittedIdp = ref(null)
@@ -86,8 +94,17 @@
 
     if (validateOAuthRedirect(idp.loginUrl)) {
       accountStore.setSsoSignUpMethod(idp.slug)
+      // Set the login_sso flag based on provider
+      const loginFlag = `login_sso_${idp.slug}`
+      accountStore.setSignupTypeFlag(loginFlag)
       window.location.assign(idp.loginUrl)
-      tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
+
+      // Track based on context (signup or login)
+      if (props.context === 'login') {
+        tracker.signIn.userClickedSignIn({ method: idp.slug }).track()
+      } else {
+        tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
+      }
     } else {
       loadingStore.finishLoading()
       submittedIdp.value = null

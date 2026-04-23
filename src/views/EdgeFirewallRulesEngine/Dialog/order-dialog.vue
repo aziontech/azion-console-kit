@@ -54,8 +54,8 @@
 
 <script setup>
   import { inject } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
 
   const dialogRef = inject('dialogRef')
 

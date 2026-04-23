@@ -11,7 +11,8 @@ vi.mock('@/helpers', () => ({
 
 vi.mock('@/services/v2/base/auth', () => ({
   sessionManager: {
-    logout: vi.fn().mockResolvedValue(undefined)
+    logout: vi.fn().mockResolvedValue(undefined),
+    afterLogin: vi.fn()
   }
 }))
 

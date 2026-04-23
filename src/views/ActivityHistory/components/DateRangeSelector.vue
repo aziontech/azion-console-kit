@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
-  import Dropdown from 'primevue/dropdown'
-  import PrimeButton from 'primevue/button'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import PrimeButton from '@aziontech/webkit/button'
 
   const props = defineProps({
     modelValue: {

@@ -1,8 +1,8 @@
 <script setup>
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import BigNumbers from '@/templates/graphs-card-block/big-numbers-card.vue'
-  import SelectButton from 'primevue/selectbutton'
-  import Skeleton from 'primevue/skeleton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { computed } from 'vue'
 
   const props = defineProps({

@@ -4,6 +4,7 @@ import process from 'process'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, loadEnv } from 'vite'
+import { webkitViteConfig } from '@aziontech/webkit/vite'
 import istanbul from 'vite-plugin-istanbul'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
@@ -14,6 +15,7 @@ const getConfig = () => {
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
+  const BEHOLDER_URL = env.VITE_BEHOLDER_URL
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -58,8 +60,10 @@ const getConfig = () => {
           ]
         : [])
     ],
+    optimizeDeps: webkitViteConfig.optimizeDeps,
     resolve: {
       preserveSymlinks: true, // Vite doesn't follow the symlink (@aziontech/icons in dev mode)
+      dedupe: ['vee-validate', 'vue'],
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -125,6 +129,9 @@ const getConfig = () => {
         '/appcues': createProxyConfig({
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
+        }),
+        '/sse': createProxyConfig({
+          target: BEHOLDER_URL
         })
       }
     }

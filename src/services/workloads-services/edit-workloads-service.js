@@ -56,7 +56,7 @@ const adapt = (payload) => {
         certificate: payload.mtlsTrustedCertificate
       }
     },
-    workload_hostname_allow_access: payload.workloadHostnameAllowAccess,
+    workload_domain_allow_access: payload.workloadHostnameAllowAccess,
     domains: payload.domains,
     network_map: payload.environment
   }

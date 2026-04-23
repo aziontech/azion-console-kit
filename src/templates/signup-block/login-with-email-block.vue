@@ -47,11 +47,11 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
 
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
@@ -183,6 +183,9 @@
   const handleSignUpEmailClick = () => {
     const accountStore = useAccountStore()
     accountStore.resetSsoSignUpMethod()
+    // Set signup_email flag when user chooses email signup
+    accountStore.setSignupTypeFlag('login_email')
+    accountStore.setSignupTypeFlag('signup_email')
     showForm.value = true
     labelButton.value = 'Sign Up'
   }

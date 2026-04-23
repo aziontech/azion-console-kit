@@ -15,6 +15,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
 
     try {
       await loadUserAndAccountInfo()
+      sessionManager.afterLogin()
 
       if (to.meta.isPublic) {
         return '/'

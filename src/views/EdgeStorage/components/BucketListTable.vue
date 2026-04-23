@@ -72,6 +72,10 @@
     }
   ]
 
+  const handleNavigateToCreate = () => {
+    router.push('/object-storage/create')
+  }
+
   const loadBuckets = async (params) => {
     try {
       const listBucketsResponse = await edgeStorageService.listEdgeStorageBuckets(params)
@@ -130,9 +134,9 @@
       title: 'No Buckets yet',
       description: 'Create your first bucket to store, organize, and access data.',
       createButtonLabel: 'Bucket',
-      createPagePath: '/object-storage/create',
       documentationService: documentationGuideProducts.edgeStorage
     }"
     @force-update="bucketTableNeedRefresh = true"
+    @click-to-create="handleNavigateToCreate"
   />
 </template>

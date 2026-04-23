@@ -23,7 +23,7 @@ export const loadEdgeFunctionsConsole = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'cellsConsoleEvents',
+    dataset: 'functionConsoleEvents',
     limit: 10000,
     fields: [
       'lineSource',
@@ -83,12 +83,12 @@ const levelMap = {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [cellsConsoleEvents = {}] = body.data.cellsConsoleEvents
+  const [functionConsoleEvents = {}] = body.data.functionConsoleEvents
 
   return {
-    lineSource: cellsConsoleEvents.lineSource,
-    level: levelMap[cellsConsoleEvents.level],
-    ts: getCurrentTimezone(cellsConsoleEvents.ts),
-    data: buildSummary(cellsConsoleEvents, false, shouldShowTsColumn)
+    lineSource: functionConsoleEvents.lineSource,
+    level: levelMap[functionConsoleEvents.level],
+    ts: getCurrentTimezone(functionConsoleEvents.ts),
+    data: buildSummary(functionConsoleEvents, false, shouldShowTsColumn)
   }
 }

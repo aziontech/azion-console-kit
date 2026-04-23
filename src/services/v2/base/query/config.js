@@ -6,7 +6,7 @@ export const PERSISTENCE_CONFIG = {
   IDB_NAME: 'azion',
   IDB_STORE_NAME: 'cache-store',
   CACHE_KEY: 'query-cache',
-  VERSION: 'v0',
+  VERSION: 'v1',
   MAX_AGE: toMilliseconds({ hours: 1 }),
   DEHYDRATE_OPTIONS: {
     shouldDehydrateQuery: (query) => {

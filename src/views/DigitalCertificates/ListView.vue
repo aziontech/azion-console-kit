@@ -1,10 +1,11 @@
 <script setup>
   import { ref, computed, inject, watch } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
-  import SelectButton from 'primevue/selectbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
   import ListTable from '@/components/list-table'
@@ -13,6 +14,8 @@
   const tracker = inject('tracker')
 
   defineOptions({ name: 'digital-certificates-view' })
+
+  const router = useRouter()
 
   const {
     certificateTypeList,
@@ -23,6 +26,10 @@
     deleteService,
     setFirstLoadData
   } = useDigitalCertificate()
+
+  const handleNavigateToCreate = () => {
+    router.push('digital-certificates/create')
+  }
 
   const DIGITAL_CERTIFICATE_API_FIELDS = [
     'id',
@@ -389,7 +396,6 @@
         :listService="listService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="digital-certificates/create"
         editPagePath="/digital-certificates/edit"
         :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         defaultOrderingFieldName="-last_modified"
@@ -402,10 +408,10 @@
         :emptyBlock="{
           title: 'No Certificates yet',
           description: 'Create your first certificate to secure application traffic with TLS.',
-          createPagePath: 'digital-certificates/create',
           createButtonLabel: 'Certificate Manager',
           documentationService: documentationBuildProducts.certificateManager
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"

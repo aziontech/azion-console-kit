@@ -37,8 +37,8 @@
 </template>
 
 <script setup>
-  import ProgressBar from 'primevue/progressbar'
-  import PrimeButton from 'primevue/button'
+  import ProgressBar from '@aziontech/webkit/progressbar'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed } from 'vue'
   import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE } from '@/composables/useEdgeStorage'
 

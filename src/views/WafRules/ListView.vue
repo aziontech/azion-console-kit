@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -18,7 +19,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref(null)
+
+  const handleNavigateToCreate = () => {
+    router.push('waf/create')
+  }
 
   const actions = [
     {
@@ -182,9 +188,9 @@
           title: 'No WAF Rules yet',
           description: 'Create your first WAF rule to inspect and control incoming requests.',
           createButtonLabel: 'WAF Rule',
-          createPagePath: 'waf/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackClickToCreate"
         @on-before-go-to-edit="handleTrackClickToEdit"

@@ -1,10 +1,10 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'

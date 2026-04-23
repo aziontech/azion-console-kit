@@ -1,9 +1,9 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import ContentBlock from '@/templates/content-block'
-  import { onBeforeRouteLeave } from 'vue-router'
-  import InlineMessage from 'primevue/inlinemessage'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
@@ -13,6 +13,8 @@
   import { DataTableActionsButtons } from '@/components/list-table'
 
   defineOptions({ name: 'data-stream-view' })
+
+  const router = useRouter()
 
   defineProps({
     documentationService: {
@@ -173,6 +175,10 @@
 
   const emit = defineEmits(['on-load-data'])
 
+  const handleNavigateToCreate = () => {
+    router.push('/data-stream/create')
+  }
+
   onBeforeRouteLeave((to, from, next) => {
     if (to.name === 'edit-data-stream' && isMaxDomainsReached.value) {
       return next(false)
@@ -224,7 +230,6 @@
           :columns="getColumns"
           :actions="actions"
           editPagePath="/data-stream/edit"
-          createPagePath="/data-stream/create"
           :apiFields="DATA_STREAM_API_FIELDS"
           defaultOrderingFieldName="-last_modified"
           :frozenColumns="['name']"
@@ -238,11 +243,11 @@
             title: 'No Data Streams yet',
             description:
               'Create your first stream to route events and log data to internal and external destinations.',
-            createPagePath: '/data-stream/create',
             createButtonLabel: 'Stream',
             documentationService: documentationService
           }"
           @on-load-data="emit('on-load-data', $event)"
+          @click-to-create="handleNavigateToCreate"
         />
       </div>
     </template>

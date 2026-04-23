@@ -1,9 +1,9 @@
 <script setup>
   import { computed, ref, markRaw, watch, onMounted, defineOptions } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import Dropdown from 'primevue/dropdown'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import LabelBlock from '@aziontech/webkit/label'
   import OAuthGithub from './oauth-github.vue'
   import LayoutEngineBlock from './layout-engine-block.vue'

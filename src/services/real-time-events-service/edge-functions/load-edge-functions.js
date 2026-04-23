@@ -23,7 +23,7 @@ export const loadEdgeFunctions = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'edgeFunctionsEvents',
+    dataset: 'functionEvents',
     limit: 10000,
     fields: [
       'functionLanguage',
@@ -51,13 +51,13 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [edgeFunctionsEvents = {}] = body.data.edgeFunctionsEvents
-  edgeFunctionsEvents.edgeFunctionsList = edgeFunctionsEvents.edgeFunctionsList?.split(';')
+  const [functionEvents = {}] = body.data.functionEvents
+  functionEvents.edgeFunctionsList = functionEvents.edgeFunctionsList?.split(';')
 
   return {
-    id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,
-    data: buildSummary(edgeFunctionsEvents, false, shouldShowTsColumn),
-    functionLanguage: edgeFunctionsEvents.functionLanguage,
-    ts: getCurrentTimezone(edgeFunctionsEvents.ts)
+    id: functionEvents.ts + functionEvents.configurationId,
+    data: buildSummary(functionEvents, false, shouldShowTsColumn),
+    functionLanguage: functionEvents.functionLanguage,
+    ts: getCurrentTimezone(functionEvents.ts)
   }
 }

@@ -113,7 +113,7 @@
   import FieldTextIcon from '@aziontech/webkit/field-text-icon'
   import FieldText from '@aziontech/webkit/field-text'
   import LabelBlock from '@aziontech/webkit/label'
-  import Password from 'primevue/password'
+  import Password from '@aziontech/webkit/password'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
 

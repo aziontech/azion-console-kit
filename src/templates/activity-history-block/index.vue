@@ -128,13 +128,13 @@
 
 <script setup>
   defineOptions({ name: 'activity-history-block' })
-  import Timeline from 'primevue/timeline'
-  import Card from 'primevue/card'
-  import Tag from 'primevue/tag'
-  import InputText from 'primevue/inputtext'
+  import Timeline from '@aziontech/webkit/timeline'
+  import Card from '@aziontech/webkit/card'
+  import Tag from '@aziontech/webkit/tag'
+  import InputText from '@aziontech/webkit/inputtext'
   import { ref, computed, onMounted, watch } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-  import Paginator from 'primevue/paginator'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import Paginator from '@aziontech/webkit/paginator'
 
   const emit = defineEmits(['on-load-data'])
 

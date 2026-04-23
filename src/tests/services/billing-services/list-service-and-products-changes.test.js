@@ -3,12 +3,18 @@ import { listServiceAndProductsChangesService } from '@/services/billing-service
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { formatCurrencyString } from '@/helpers'
 
+vi.mock('@/composables/user-flag', () => ({
+  setFeatureFlags: vi.fn(),
+  useFlag: vi.fn().mockReturnValue({ value: false }),
+  hasFlagBlockApiV4: vi.fn().mockReturnValue(false)
+}))
+
 const fixtures = {
   mockResponse: {
     data: {
       products: [
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           value: 6.75,
           currency: 'BRL'
         },
@@ -20,12 +26,12 @@ const fixtures = {
       ],
       productMetricsValue: [
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           value: 5.23
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           value: 1.52
         },
@@ -42,12 +48,12 @@ const fixtures = {
       ],
       productMetricsAccounted: [
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           accounted: 848506
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           accounted: 1.726767336
         },
@@ -64,25 +70,25 @@ const fixtures = {
       ],
       productMetricsRegionValue: [
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           regionName: 'Brazil',
           value: 4.97
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           regionName: 'Canada',
           value: 0
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           regionName: 'Brazil',
           value: 1.46
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           regionName: 'Canada',
           value: 0
@@ -102,25 +108,25 @@ const fixtures = {
       ],
       productMetricsRegionAccounted: [
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           regionName: 'Brazil',
           accounted: 776472
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'requests',
           regionName: 'Canada',
           accounted: 0
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           regionName: 'Brazil',
           accounted: 1.539394378
         },
         {
-          productSlug: 'edge_application',
+          productSlug: 'application',
           metricSlug: 'data_transferred',
           regionName: 'Canada',
           accounted: 0
@@ -145,7 +151,7 @@ const fixtures = {
       {
         service: 'Application',
         value: formatCurrencyString('BRL', 6.75),
-        slug: 'edge_application',
+        slug: 'application',
         currency: 'BRL',
         descriptions: [
           {
@@ -169,7 +175,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Data Transfered',
+            service: 'Total Data Transferred',
             slug: 'data_transferred',
             quantity: '1.727 GB',
             price: formatCurrencyString('BRL', 1.52),
@@ -185,6 +191,42 @@ const fixtures = {
                 quantity: '0 GB',
                 price: formatCurrencyString('BRL', 0.0),
                 slug: 'data_transferred'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        service: 'Data Stream',
+        value: formatCurrencyString('BRL', 0),
+        slug: 'data_stream',
+        currency: 'BRL',
+        descriptions: [
+          {
+            service: 'Data Streamed',
+            slug: 'data_stream_data_streamed',
+            quantity: '0 GB',
+            price: formatCurrencyString('BRL', 0),
+            data: [
+              {
+                country: 'Brazil',
+                quantity: '0 GB',
+                price: formatCurrencyString('BRL', 0),
+                slug: 'data_stream_data_streamed'
+              }
+            ]
+          },
+          {
+            service: 'Data Stream Requests',
+            slug: 'data_stream_requests',
+            quantity: '0',
+            price: formatCurrencyString('BRL', 0),
+            data: [
+              {
+                country: 'Brazil',
+                quantity: '0',
+                price: formatCurrencyString('BRL', 0),
+                slug: 'data_stream_requests'
               }
             ]
           }
@@ -214,7 +256,7 @@ describe('BillingServices', () => {
     const result = await sut()
 
     expect(result).toEqual(fixtures.formattedResponse.data)
-    expect(result.some((item) => item.slug === 'data_stream')).toBe(false)
+    expect(result.some((item) => item.slug === 'data_stream')).toBe(true)
   })
 
   it('should return an error if the request fails', async () => {

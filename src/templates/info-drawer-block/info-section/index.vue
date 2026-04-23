@@ -1,7 +1,7 @@
 <script setup>
-  import Divider from 'primevue/divider'
-  import PrimeTag from 'primevue/tag'
-  import Skeleton from 'primevue/skeleton'
+  import Divider from '@aziontech/webkit/divider'
+  import PrimeTag from '@aziontech/webkit/tag'
+  import Skeleton from '@aziontech/webkit/skeleton'
 
   defineOptions({ name: 'info-section' })
   const props = defineProps({

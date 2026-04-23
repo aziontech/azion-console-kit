@@ -5,10 +5,10 @@
   import { computed, ref } from 'vue'
   import { DataTableActionsButtons } from '@/components/list-table'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { onBeforeRouteLeave } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
@@ -125,6 +125,10 @@
     hasContentToList.value = event
   }
 
+  const handleNavigateToCreate = () => {
+    router.push('identity-providers/create')
+  }
+
   const handleEditRedirect = (item) => {
     router.push({ path: `identity-providers/edit/${item.protocol}/${item.id}` })
   }
@@ -171,7 +175,8 @@
         v-else
         title="No Identity Provider yet"
         description="Create your first identity provider to enable single sign-on authentication."
-        createPagePath="identity-providers/create"
+        createButtonLabel="Identity Provider"
+        @click-to-create="handleNavigateToCreate"
         :documentationService="props.documentationService"
       >
         <template #illustration>

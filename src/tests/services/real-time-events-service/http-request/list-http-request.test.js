@@ -34,10 +34,10 @@ describe('HttpRequestServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { httpRequest: [] } }
+      body: { data: { workloadEvents: [] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'httpEvents'
+    const datasetName = 'workloadEvents'
     await sut(fixtures.filter)
 
     const query = [
@@ -100,7 +100,7 @@ describe('HttpRequestServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { httpEvents: [fixtures.httpRequest] } }
+      body: { data: { workloadEvents: [fixtures.httpRequest] } }
     })
 
     const { sut } = makeSut()

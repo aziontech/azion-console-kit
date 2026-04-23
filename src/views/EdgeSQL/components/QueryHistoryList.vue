@@ -64,9 +64,9 @@
 </template>
 
 <script setup>
-  import InputText from 'primevue/inputtext'
-  import Skeleton from 'primevue/skeleton'
-  import Button from 'primevue/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import Button from '@aziontech/webkit/button'
 
   const emit = defineEmits(['update:searchTerm', 'select', 'open-menu'])
 

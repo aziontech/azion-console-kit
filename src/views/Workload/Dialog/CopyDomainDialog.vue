@@ -79,10 +79,10 @@
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import InlineMessage from 'primevue/inlinemessage'
-  import PrimeInputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import PrimeInputText from '@aziontech/webkit/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'CopyDomainDialog' })
 

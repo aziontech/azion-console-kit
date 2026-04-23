@@ -1,0 +1,50 @@
+name: Deploy Storybook
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'storybook/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+
+      - name: Install Azion CLI
+        run: |
+          curl -o azionlinux https://downloads.azion.com/linux/x86_64/azion
+          sudo mv azionlinux /usr/bin/azion
+          sudo chmod u+x /usr/bin/azion
+
+      - name: CLI version
+        run: azion --version
+        
+      - name: Configure token
+        run: |
+          azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}  
+          azion whoami
+
+      - name: Install storybook dependencies
+        run: yarn install
+      
+      - name: Building Storybook
+        run: |
+          yarn storybook:build
+          
+      - name: Azion Deploy
+        run: |
+          yarn storybook:deploy

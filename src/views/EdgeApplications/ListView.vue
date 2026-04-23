@@ -1,9 +1,10 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import CloneBlock from '@/templates/clone-block'
@@ -21,8 +22,14 @@
     }
   })
 
+  const router = useRouter()
+
   const toast = useToast()
   const listTableRef = ref(null)
+
+  const handleNavigateToCreate = () => {
+    router.push('/applications/create?origin=list')
+  }
 
   const actions = [
     {
@@ -166,7 +173,6 @@
         :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :actions="actions"
-        createPagePath="/applications/create?origin=list"
         editPagePath="/applications/edit"
         defaultOrderingFieldName="-last_modified"
         exportFileName="Applications"
@@ -179,10 +185,10 @@
           description:
             'Create your first application to define how requests are processed, routed, and handled.',
           createButtonLabel: 'Application',
-          createPagePath: '/applications/create?origin=list',
           documentationService: props.documentationService,
           emptyListMessage: 'No Applications found.'
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-add-page="handleBeforeGoToAddPage"
         @on-before-go-to-edit="handleBeforeGoToEdit"
       />

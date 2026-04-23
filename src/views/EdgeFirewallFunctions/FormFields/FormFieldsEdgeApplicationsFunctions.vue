@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'

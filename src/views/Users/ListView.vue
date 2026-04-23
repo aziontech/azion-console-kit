@@ -1,5 +1,6 @@
 <script setup>
   import { computed, inject, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -24,7 +25,12 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('users/create')
+  }
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -156,7 +162,6 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/users/edit"
-        createPagePath="users/create"
         defaultOrderingFieldName="-last_modified"
         :frozenColumns="['firstName']"
         exportFileName="Users"
@@ -168,9 +173,9 @@
           title: 'No users yet',
           description: 'Create your first additional user to grant access to the account.',
           createButtonLabel: 'User',
-          createPagePath: 'users/create',
           documentationService: documentationService
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-load-data="emit('on-load-data', $event)"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"

@@ -118,10 +118,10 @@
 
 <script setup>
   import { ref, computed, defineModel } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
   import FilterRow from '../filterRow/index.vue'
-  import Divider from 'primevue/divider'
+  import Divider from '@aziontech/webkit/divider'
   defineOptions({ name: 'FilterPanel' })
 
   // Model

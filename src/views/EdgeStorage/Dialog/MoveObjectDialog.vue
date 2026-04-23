@@ -93,10 +93,10 @@
 
 <script setup>
   import { computed, ref, inject } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeDialog from 'primevue/dialog'
-  import InputText from 'primevue/inputtext'
-  import Divider from 'primevue/divider'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Divider from '@aziontech/webkit/divider'
 
   defineOptions({ name: 'move-object-dialog' })
 

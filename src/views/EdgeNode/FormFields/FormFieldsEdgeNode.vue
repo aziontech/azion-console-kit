@@ -3,7 +3,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
-  import MultiSelect from 'primevue/multiselect'
+  import MultiSelect from '@aziontech/webkit/multiselect'
   import { useField } from 'vee-validate'
   import { onMounted, ref } from 'vue'
   defineOptions({ name: 'form-fields-edge-node' })

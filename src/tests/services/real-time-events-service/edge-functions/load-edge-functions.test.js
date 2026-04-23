@@ -36,7 +36,7 @@ describe('DataStreamingServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctionsEvents: [] } }
+      body: { data: { functionEvents: [] } }
     })
     const { sut } = makeSut()
     await sut(fixtures.filter)
@@ -61,7 +61,7 @@ describe('DataStreamingServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctionsEvents: [fixtures.edgeFunction] } }
+      body: { data: { functionEvents: [fixtures.edgeFunction] } }
     })
 
     const { sut } = makeSut()

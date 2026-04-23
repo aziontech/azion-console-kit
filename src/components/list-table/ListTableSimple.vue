@@ -125,7 +125,7 @@
       <template #footer>
         <div
           v-if="viewAllLink"
-          class="flex justify-center items-center py-3 cursor-pointer bg-[var(--surface-section)] border-[var(--surface-border)]"
+          class="flex justify-center items-center py-3 cursor-pointer bg-[var(--surface-ground)] border-[var(--surface-border)]"
           @click="navigateToViewAll"
           data-testid="list-table-simple-view-all"
           @mouseover="isHoverFooter = true"

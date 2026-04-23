@@ -1,5 +1,5 @@
 <script setup>
-  import InputNumber from 'primevue/inputnumber'
+  import InputNumber from '@aziontech/webkit/inputnumber'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
 

@@ -1,7 +1,7 @@
 <script setup>
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'

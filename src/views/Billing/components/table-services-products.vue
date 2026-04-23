@@ -74,8 +74,8 @@
 
 <script setup>
   import { ref } from 'vue'
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
+  import DataTable from '@aziontech/webkit/datatable'
+  import Column from '@aziontech/webkit/column'
   import SkeletonBlock from '@/templates/skeleton-block'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'

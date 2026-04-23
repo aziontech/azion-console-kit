@@ -24,8 +24,8 @@
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
   import { clipboardWrite } from '@/helpers/clipboard'
-  import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeMenu from '@aziontech/webkit/menu'
   import { computed, ref, toRef, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */

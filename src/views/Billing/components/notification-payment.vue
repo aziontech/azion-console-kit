@@ -43,12 +43,12 @@
   import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'notification-payment' })
 

@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import advancedFilter from '@/templates/advanced-filter'
   import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'

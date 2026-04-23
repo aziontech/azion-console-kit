@@ -1,7 +1,7 @@
 <script setup>
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-service-resources-tab' })

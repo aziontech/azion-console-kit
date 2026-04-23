@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, watch, onMounted } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeMenu from '@aziontech/webkit/menu'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
   import { useHomeMetrics } from '@/composables/useHomeMetrics'
   import MetricsCard from './metrics-card.vue'

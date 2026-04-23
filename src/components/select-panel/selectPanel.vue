@@ -30,7 +30,7 @@
 
 <script setup>
   import { ref } from 'vue'
-  import SelectButton from 'primevue/selectbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
   import TitleDescriptionArea from '../title-description-area'
 
   const emit = defineEmits(['update:modelValue'])

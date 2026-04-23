@@ -59,7 +59,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useRoute, useRouter } from 'vue-router'
 
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
 
   defineOptions({ name: 'form-fields-create-database' })

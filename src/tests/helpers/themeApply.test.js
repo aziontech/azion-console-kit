@@ -43,7 +43,8 @@ describe('themeApply', () => {
 
       sut('system')
 
-      expect(rootElementMock.className).toBe(result)
+      expect(rootElementMock.classList.contains('azion')).toBe(true)
+      expect(rootElementMock.classList.contains(result)).toBe(true)
     }
   )
 
@@ -76,7 +77,8 @@ describe('themeApply', () => {
       })
       sut(selectedTheme)
 
-      expect(rootElementMock.className).toBe(result)
+      expect(rootElementMock.classList.contains('azion')).toBe(true)
+      expect(rootElementMock.classList.contains(result)).toBe(true)
     }
   )
 })

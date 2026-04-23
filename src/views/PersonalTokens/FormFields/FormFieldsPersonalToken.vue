@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Calendar from 'primevue/calendar'
-  import Dropdown from 'primevue/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import LabelBlock from '@aziontech/webkit/label'

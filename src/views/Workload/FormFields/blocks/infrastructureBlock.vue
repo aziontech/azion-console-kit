@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import PrimeTag from 'primevue/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { computed } from 'vue'
   import { useField } from 'vee-validate'
 

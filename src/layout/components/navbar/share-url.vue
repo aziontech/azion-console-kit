@@ -41,9 +41,9 @@
 
 <script setup>
   import { ref, computed, nextTick } from 'vue'
-  import Button from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import OverlayPanel from 'primevue/overlaypanel'
+  import Button from '@aziontech/webkit/button'
+  import InputText from '@aziontech/webkit/inputtext'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
 
   const overlayPanel = ref()
   const copyButton = ref()

@@ -80,9 +80,9 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import Toast from 'primevue/toast'
-  import Tag from 'primevue/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Toast from '@aziontech/webkit/toast'
+  import Tag from '@aziontech/webkit/tag'
   import { reactive } from 'vue'
 
   defineOptions({ name: 'ToastBlock' })

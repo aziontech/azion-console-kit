@@ -1,0 +1,115 @@
+@layer tailwind-base, primevue;
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+/* Storybook Docs Preview (sbdocs/sbdocs-preview) canvas background */
+.sb-main-padded,
+.docs-story,
+.docs-story > * {
+  background: #ffffff !important;
+  transition: all 0.4s ease-in-out !important;
+}
+
+.azion-dark .sb-main-padded,
+.azion-dark .docs-story,
+.azion-dark .docs-story > * {
+  background: #0A0A0A !important;
+  transition: all 0.4s ease-in-out !important;}
+
+.docblock-code-toggle {
+  /* Avoid relying on `font-code` utility: Tailwind doesn't generate it (it generates `font-sans|serif|mono`). */
+  @apply !font-mono !font-normal;
+}
+.css-2p1np {
+  @apply !font-mono !font-normal;
+}
+
+/* Text Name Column Props */
+.css-in3yi3 {
+  @apply !font-code !font-normal !text-neutral-50;
+}
+
+.tabbutton > * {
+  @apply !font-mono !font-normal;
+}
+
+.docblock-argstable-head > tr {
+  @apply !font-code !lowercase;
+}
+
+.css-in3yi3 {
+  @apply !font-code !font-normal !text-neutral-50;
+}
+
+.css-7qiabv {
+  @apply !font-sans !text-neutral-500;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply !font-sans !font-normal;
+}
+
+/* Theme container styles */
+.azion {
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.azion-light > body {
+  background: #ffffff !important;
+  transition: all 0.4s ease-in-out !important;
+}
+.azion-dark > body {
+  background: #0A0A0A !important;
+  transition: all 0.4s ease-in-out !important;
+}
+
+.azion.azion-dark {
+  color-scheme: dark;
+}
+
+.azion.azion-light {
+  color-scheme: light;
+}
+
+/* https://github.com/primefaces/primevue/issues/882#issuecomment-1780802552 */
+body.p-overflow-hidden {
+  --scrollbar-width: 0px !important;
+}
+
+/* https://aziontech.atlassian.net/browse/UXE-1798 */
+/* child scroll behaviour is affecting the parent scroll behaviour */
+* {
+  overscroll-behavior: auto !important;
+}
+
+.grecaptcha-badge {
+  bottom: 75px !important;
+  z-index: 11;
+}
+
+.font-sora {
+  font-family: 'Sora', sans-serif;
+}
+
+.font-proto-mono, .font-proto {
+  font-family: 'Proto Mono', sans-serif;
+}
+
+.font-code {
+  font-family: 'Roboto Mono', monospace;;
+}
+

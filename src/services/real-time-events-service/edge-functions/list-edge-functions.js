@@ -30,7 +30,7 @@ export const listEdgeFunctions = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'edgeFunctionsEvents',
+    dataset: 'functionEvents',
     limit: 10000,
     fields: [
       'configurationId',
@@ -48,12 +48,12 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+  const data = response.data.functionEvents?.map((functionEventItem) => ({
     id: generateCurrentTimestamp(),
-    summary: buildSummary(edgeFunctionsEvents, shouldLimitRequestUri, shouldShowTsColumn),
-    ts: edgeFunctionsEvents.ts,
-    tsFormat: getCurrentTimezone(edgeFunctionsEvents.ts),
-    configurationId: edgeFunctionsEvents.configurationId
+    summary: buildSummary(functionEventItem, shouldLimitRequestUri, shouldShowTsColumn),
+    ts: functionEventItem.ts,
+    tsFormat: getCurrentTimezone(functionEventItem.ts),
+    configurationId: functionEventItem.configurationId
   }))
 
   return {

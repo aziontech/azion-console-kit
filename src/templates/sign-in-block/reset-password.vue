@@ -72,8 +72,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import InlineMessage from 'primevue/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FieldPassword from '@aziontech/webkit/field-password'
   import { useForm } from 'vee-validate'
   import { computed, ref } from 'vue'

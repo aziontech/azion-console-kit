@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputNumber from 'primevue/inputnumber'
+  import InputNumber from '@aziontech/webkit/inputnumber'
   import LabelBlock from '@aziontech/webkit/label'
   import { useField } from 'vee-validate'
-  import InlineMessage from 'primevue/inlinemessage'
-  import InputText from 'primevue/inputtext'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import InputText from '@aziontech/webkit/inputtext'
   import { ref } from 'vue'
   import cardFlagBlock from '@templates/card-flag-block'
   import { useRoute, useRouter } from 'vue-router'

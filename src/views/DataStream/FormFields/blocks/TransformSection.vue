@@ -61,7 +61,7 @@
 
         <div
           v-if="hasSampling"
-          class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
+          class="flex flex-col sm:max-w-xs w-full gap-2"
         >
           <FieldNumber
             :disabled="hasNoPermissionToEditDataStream"

@@ -436,12 +436,12 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import BucketListTable from './components/BucketListTable.vue'
-  import PrimeButton from 'primevue/button'
-  import SplitButton from 'primevue/splitbutton'
-  import Checkbox from 'primevue/checkbox'
-  import InputText from 'primevue/inputtext'
-  import Skeleton from 'primevue/skeleton'
-  import Breadcrumb from 'primevue/breadcrumb'
+  import PrimeButton from '@aziontech/webkit/button'
+  import SplitButton from '@aziontech/webkit/splitbutton'
+  import Checkbox from '@aziontech/webkit/checkbox'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Skeleton from '@aziontech/webkit/skeleton'
+  import Breadcrumb from '@aziontech/webkit/breadcrumb'
   import DragAndDrop from './components/DragAndDrop.vue'
   import ProgressCard from './components/ProgressCard.vue'
   import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
@@ -449,8 +449,8 @@
   const DataTableColumnSelector = DataTable.ColumnSelector
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
-  import { useToast } from 'primevue/usetoast'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { useResize } from '@/composables/useResize'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
@@ -583,11 +583,11 @@
   })
 
   const totalRecords = computed(() => {
-    return fileData.value.length
+    return fileData.value?.length
   })
 
   const filterData = computed(() => {
-    let filteredData = fileData.value.filter((item) => {
+    let filteredData = fileData.value?.filter((item) => {
       return item.name.toLowerCase().includes(fileSearchTerm.value.toLowerCase())
     })
 

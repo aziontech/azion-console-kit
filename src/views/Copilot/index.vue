@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import copilotView from '@/modules/azion-ai-chat/layout/view'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useAccountStore } from '@/stores/account'
   import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'

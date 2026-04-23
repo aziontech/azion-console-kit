@@ -88,7 +88,7 @@
           >
             <!-- Inlined SqlDatabaseList for results -->
             <div
-              class="sql-database-list w-full h-full flex flex-col min-h-0 flex-1"
+              class="sql-database-list w-full flex flex-col"
               :class="{ 'overflow-auto': resultsView !== 'json' }"
             >
               <DataTable
@@ -135,7 +135,7 @@
                 <template #header>
                   <DataTable.Header :showDivider="!!sqlAppliedFilters.length">
                     <template #first-line>
-                      <div class="flex flex-col gap-2 w-full">
+                      <div class="flex flex-col gap-2 w-full py-2">
                         <div class="flex items-center gap-2 justify-between">
                           <div class="text-color text-lg font-medium">Results</div>
 
@@ -417,17 +417,17 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
-  import { FilterMatchMode } from 'primevue/api'
+  import { FilterMatchMode } from '@aziontech/webkit/api'
 
-  import Button from 'primevue/button'
-  import PrimeButton from 'primevue/button'
-  import Menu from 'primevue/menu'
-  import SplitButton from 'primevue/splitbutton'
-  import SelectButton from 'primevue/selectbutton'
-  import OverlayPanel from 'primevue/overlaypanel'
-  import Listbox from 'primevue/listbox'
-  import InputText from 'primevue/inputtext'
-  import Column from 'primevue/column'
+  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Menu from '@aziontech/webkit/menu'
+  import SplitButton from '@aziontech/webkit/splitbutton'
+  import SelectButton from '@aziontech/webkit/selectbutton'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import Listbox from '@aziontech/webkit/listbox'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Column from '@aziontech/webkit/column'
   import { useThemeStore } from '@/stores/theme'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
 

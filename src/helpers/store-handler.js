@@ -1,5 +1,4 @@
 import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
-import { useAccountStore } from '@/stores/account'
 
 const isLoginPage = () => window.location.pathname === '/login'
 
@@ -30,6 +29,5 @@ onSwitchAccount(() => {
     return
   }
 
-  useAccountStore().resetAccount()
-  window.location.assign(window.location.href)
+  window.location.reload()
 })

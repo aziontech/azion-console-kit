@@ -1,10 +1,10 @@
 <script setup>
   import { ref, computed, defineModel, onMounted } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import Calendar from 'primevue/calendar'
-  import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
-  import InputNumber from 'primevue/inputnumber'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Calendar from '@aziontech/webkit/calendar'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InputText from '@aziontech/webkit/inputtext'
+  import InputNumber from '@aziontech/webkit/inputnumber'
   import {
     formatDateSimple,
     parseDateSimple,

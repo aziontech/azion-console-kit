@@ -1,20 +1,22 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { computed, ref, inject } from 'vue'
   import ListTable from '@/components/list-table'
   import { DataTableActionsButtons } from '@/components/list-table'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { purgeService } from '@/services/v2/purge/purge-service'
   import { usePurgeStore } from '@/stores/purge'
   import { capitalizeFirstLetter } from '@/helpers'
+  import { useRouter } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const router = useRouter()
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
@@ -34,6 +36,10 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+
+  const handleNavigateToCreate = () => {
+    router.push('real-time-purge/create')
   }
 
   const handleTrackEvent = () => {
@@ -188,7 +194,7 @@
         title="No Purge requests yet"
         description="Create your first purge request to remove cached content."
         createButtonLabel="Purge"
-        createPagePath="real-time-purge/create"
+        @click-to-create="handleNavigateToCreate"
         :documentationService="props.documentationService"
       >
         <template #illustration>

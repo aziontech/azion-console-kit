@@ -1,10 +1,10 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerService from '@/views/EdgeNode/Drawer'
-  import PrimeButton from 'primevue/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'

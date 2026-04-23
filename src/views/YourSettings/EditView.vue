@@ -18,13 +18,19 @@
         @loaded-service-object="isFormLoading = false"
       >
         <template #form="{ loading }">
-          <FormSkeleton v-if="loading || isFormLoading" />
-          <FormFieldsYourSettings
-            v-show="!loading && !isFormLoading"
-            :timezoneOptions="optionsTimezone"
-            :listCountriesPhoneService="listCountriesPhoneService"
-            @password-strength="onPasswordStrengthChange"
-          />
+          <div class="relative flex flex-col gap-8 max-md:gap-6">
+            <FormFieldsYourSettings
+              :timezoneOptions="optionsTimezone"
+              :listCountriesPhoneService="listCountriesPhoneService"
+              @password-strength="onPasswordStrengthChange"
+            />
+            <div
+              v-if="loading || isFormLoading"
+              class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
+            >
+              <FormSkeleton />
+            </div>
+          </div>
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
@@ -47,7 +53,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
   import FormSkeleton from './components/FormSkeleton.vue'

@@ -1,5 +1,5 @@
 <script setup>
-  import { onBeforeRouteLeave } from 'vue-router'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -14,8 +14,13 @@
 
   defineOptions({ name: 'variables-view' })
 
+  const router = useRouter()
   const enableRedirect = ref(true)
   const listTableRef = ref()
+
+  const handleNavigateToCreate = () => {
+    router.push('/variables/create')
+  }
 
   const actions = [
     {
@@ -102,7 +107,7 @@
             size="small"
             label="Variable"
             @click="handleTrackEvent"
-            createPagePath="variables/create"
+            createPagePath="/variables/create"
             data-testid="create_Variable_button"
           />
         </template>
@@ -116,7 +121,6 @@
         :actions="actions"
         :frozenColumns="['key']"
         editPagePath="/variables/edit"
-        createPagePath="variables/create"
         exportFileName="Variables"
         :lazy="false"
         emptyListMessage="No variables found."
@@ -125,9 +129,9 @@
           description:
             'Create your first variable to define reusable configuration values for platform resources.',
           createButtonLabel: 'Variable',
-          createPagePath: 'variables/create',
           documentationService: documentationCatalog.variables
         }"
+        @click-to-create="handleNavigateToCreate"
         @on-before-go-to-edit="checkIfIsEditable"
         @on-before-go-to-add-page="handleTrackEvent"
       />

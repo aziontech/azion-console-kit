@@ -4,8 +4,8 @@
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
-  import { useToast } from 'primevue/usetoast'
-  import { useDialog } from 'primevue/usedialog'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import { useDialog } from '@aziontech/webkit/use-dialog'
   import * as yup from 'yup'
   import CopyCredentialDialog from '@/views/EdgeStorage/Dialog/CopyCredentialDialog.vue'
 
