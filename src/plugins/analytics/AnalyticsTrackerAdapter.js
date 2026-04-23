@@ -17,6 +17,22 @@ import {
  * @typedef {'Edge Application'|'Origins'|'Domains'|'Edge Functions'} AzionProductsNames
  */
 
+/**
+ * Removes undefined, null, and empty string values from an object
+ * @param {Object} obj - The object to clean
+ * @returns {Object} - Cleaned object with only valid values
+ */
+function cleanObject(obj) {
+  if (!obj || typeof obj !== 'object') return {}
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => {
+      if (value === undefined || value === null) return false
+      if (typeof value === 'string' && value.trim() === '') return false
+      return true
+    })
+  )
+}
+
 export class AnalyticsTrackerAdapter {
   /** @type {TrackerEvent[]} */
   #events = []
@@ -74,8 +90,8 @@ export class AnalyticsTrackerAdapter {
     if (!this.#hasAnalytics()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
-      props.application = 'console-kit'
-      const propsWithTraits = { ...props, ...this.#traits }
+      const cleanedProps = cleanObject({ ...props, application: 'console-kit' })
+      const propsWithTraits = cleanObject({ ...cleanedProps, ...this.#traits })
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
@@ -88,10 +104,10 @@ export class AnalyticsTrackerAdapter {
    * @return {Promise<void>}
    */
   async identify(id) {
-    const userId = `${id}`
-    if (!userId || !this.#hasAnalytics()) return
+    if (!id || !this.#hasAnalytics()) return
 
-    await this.#analyticsClient.identify(userId, this.#traits)
+    const cleanedTraits = cleanObject(this.#traits)
+    await this.#analyticsClient.identify(String(id), cleanedTraits)
   }
 
   /**
@@ -111,10 +127,10 @@ export class AnalyticsTrackerAdapter {
    */
   assignGroupTraits(traitsToAssign) {
     if (!this.#hasAnalytics()) return
-    if (!traitsToAssign) {
+    if (!traitsToAssign || typeof traitsToAssign !== 'object') {
       throw new Error('Invalid traits provided')
     }
-    this.#traits = { ...traitsToAssign }
+    this.#traits = cleanObject(traitsToAssign)
   }
 
   /**
