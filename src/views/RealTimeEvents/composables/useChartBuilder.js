@@ -154,13 +154,15 @@ function buildMultiSeries(
   // senoidal artifact when rendered as splines).
   const autoBucket = getBucketInterval(duration)
   const nativeBucket = detectNativeInterval(rawData)
-  // Use the coarser of auto vs native interval, but cap native at the
-  // duration itself to avoid collapsing all data into a single bucket
-  // when the API returns sparse or irregular timestamps.
-  const cappedNative = (nativeBucket > 0 && nativeBucket <= duration) ? nativeBucket : 0
+  // Use the coarser of auto vs native interval, but cap native to at most
+  // 2x the auto bucket. This prevents sparse API data (e.g. hourly points
+  // over a 7-day range) from inflating the interval so much that the last
+  // days of the range get truncated.
+  const maxNative = autoBucket * 2
+  const cappedNative = (nativeBucket > 0 && nativeBucket <= maxNative) ? nativeBucket : 0
   const interval = cappedNative > autoBucket ? cappedNative : autoBucket
   const alignedStart = Math.floor(rangeStart / interval) * interval
-  const alignedEnd = Math.floor(rangeEnd / interval) * interval
+  const alignedEnd = Math.ceil(rangeEnd / interval) * interval
 
   // Pre-fill all slots from aligned start to aligned end with zeros.
   const slotCount = Math.max(0, Math.floor((alignedEnd - alignedStart) / interval) + 1)
