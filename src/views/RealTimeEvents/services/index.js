@@ -23,12 +23,8 @@ function wrapServiceWithCompactTimestamp(originalService) {
 }
 
 // Export wrapped versions of all services
-export const listHttpRequest = wrapServiceWithCompactTimestamp(
-  OriginalServices.listHttpRequest
-)
-export const listEdgeFunctions = wrapServiceWithCompactTimestamp(
-  OriginalServices.listEdgeFunctions
-)
+export const listHttpRequest = wrapServiceWithCompactTimestamp(OriginalServices.listHttpRequest)
+export const listEdgeFunctions = wrapServiceWithCompactTimestamp(OriginalServices.listEdgeFunctions)
 export const listEdgeFunctionsConsole = wrapServiceWithCompactTimestamp(
   OriginalServices.listEdgeFunctionsConsole
 )

@@ -99,7 +99,13 @@
   // decomposition of the same universe, so clicking a legend entry should
   // toggle series visibility (c3 native behavior) instead of trying to
   // apply a nonsensical filter.
-  const PIVOT_METRICS_KEYS = new Set(['wafThreatsByHost', 'botTraffic', 'botCaptcha', 'cacheHitMiss', 'tieredCacheHitMiss'])
+  const PIVOT_METRICS_KEYS = new Set([
+    'wafThreatsByHost',
+    'botTraffic',
+    'botCaptcha',
+    'cacheHitMiss',
+    'tieredCacheHitMiss'
+  ])
 
   const handleLegendClick = (bucket) => {
     const isMetrics = typeof props.view === 'string' && props.view.startsWith('metrics:')
@@ -623,7 +629,6 @@
 
   /* Tooltip above all chart content */
   :deep(.c3-tooltip-container) {
-    position: fixed !important;
     z-index: 99999 !important;
     pointer-events: none;
   }

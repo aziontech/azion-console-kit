@@ -150,7 +150,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     colors: ['#ef4444']
@@ -162,7 +162,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     colors: ['#ef4444']
@@ -174,7 +174,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     colors: ['#ef4444']
@@ -186,7 +186,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     colors: ['#ef4444']
@@ -198,7 +198,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts', 'host'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     colors: DEFAULT_COLORS
@@ -211,7 +211,7 @@ const CHART_CONFIGS = {
     groupBy: ['ts', 'classified'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     // Backend `classified` values are lowercase (confirmed by the Real-Time
@@ -235,16 +235,21 @@ const CHART_CONFIGS = {
     groupBy: ['ts', 'challengeSolved'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
-    colors: DEFAULT_COLORS
+    seriesOrder: ['Resolved', 'Unresolved'],
+    seriesColors: {
+      Resolved: '#22c55e',
+      Unresolved: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
   },
 
   // ── Performance metrics charts ──
 
   cacheHitMiss: {
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
@@ -259,7 +264,7 @@ const CHART_CONFIGS = {
   },
 
   tieredCacheHitMiss: {
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
@@ -321,7 +326,7 @@ const CHART_CONFIGS = {
   },
 
   requestsSavedMissed: {
-    chartType: 'bar',
+    chartType: 'spline',
     dataUnit: 'count',
     xAxis: 'ts',
     seriesOrder: ['savedRequests', 'missedRequests'],

@@ -197,7 +197,7 @@ export function useMetricsChart(filterData, { onError } = {}) {
         })
       }
       data.value = Array.from(perTs.values()).sort(
-        (a, b) => new Date(a.ts) - new Date(b.ts)
+        (rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts)
       )
     } else {
       const rows = response.body?.data?.[metricsDataset]
@@ -211,6 +211,155 @@ export function useMetricsChart(filterData, { onError } = {}) {
         .sort((left, right) => new Date(left.ts) - new Date(right.ts))
     }
     return true
+  }
+
+  /**
+   * Build and issue one multi-alias GraphQL query against the Metrics API —
+   * one alias per series, each with its own filter. Identical in spirit to
+   * `loadFromEventsApi` with `series`, but targets the Metrics endpoint
+   * (`makeBeholderBaseUrl`) instead of the Events endpoint.
+   *
+   * Used for datasets that only exist in the Metrics API (e.g. botManagerMetrics)
+   * where a single groupBy + pivot query produces the senoidal artifact.
+   */
+  const loadFromMetricsApiSeries = async (config, begin, end) => {
+    const { metricsDataset, series, groupByPivot } = config.metricsApiSeries
+    if (!metricsDataset) {
+      data.value = []
+      return
+    }
+
+    let query
+
+    if (groupByPivot?.field) {
+      // ── groupByPivot path ──
+      // Single query with groupBy: [ts, <field>], pivoted client-side.
+      // Same approach as Real-Time Metrics (convert-beholder-to-chart.js).
+      const agg = groupByPivot.aggregate || 'sum: requests'
+      const aggReturnField = agg.split(':')[0].trim()
+      const field = groupByPivot.field
+
+      query = {
+        query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
+  ${metricsDataset}(
+    limit: 10000
+    aggregate: { ${agg} }
+    groupBy: [ts, ${field}]
+    orderBy: [ts_ASC]
+    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+  ) { ts ${field} ${aggReturnField} }
+}`,
+        variables: { tsRange_begin: begin, tsRange_end: end }
+      }
+
+      const response = await AxiosHttpClientAdapter.request({
+        baseURL: '/',
+        url: makeBeholderBaseUrl(),
+        method: 'POST',
+        body: JSON.stringify(query)
+      })
+
+      if (response.statusCode !== 200) {
+        throw new MetricsChartError(
+          response.body?.detail || 'The server could not load this chart.',
+          { reason: 'api-error', detail: response.body?.detail || null }
+        )
+      }
+
+      const rows = response.body?.data?.[metricsDataset]
+      if (!Array.isArray(rows) || !rows.length) {
+        data.value = []
+        return
+      }
+
+      // Pivot: convert { ts, <field>: "value", sum: N } rows into
+      // { ts, label1: N, label2: M } using optional labelMap for renaming.
+      const labelMap = groupByPivot.labelMap || {}
+      data.value = pivotGroupedData(
+        rows.map((row) => {
+          const rawKey = String(row[field] ?? 'unknown')
+          const label = labelMap[rawKey] || rawKey
+          return { ts: row.ts, _pivotKey: label, [aggReturnField]: row[aggReturnField] ?? 0 }
+        }),
+        '_pivotKey',
+        aggReturnField
+      )
+      return
+    }
+
+    // ── series path ──
+    // One alias per series, each with its own filter.
+    if (!Array.isArray(series) || !series.length) {
+      data.value = []
+      return
+    }
+
+    // GraphQL aliases cannot contain spaces or special chars. Build a safe
+    // alias for each series and keep a map back to the display name.
+    const aliasToName = new Map()
+    const safeAliases = []
+    const aliases = series.map((entry, index) => {
+      const displayName = entry.name || `series_${index}`
+      const safeAlias = `s${index}`
+      aliasToName.set(safeAlias, displayName)
+      safeAliases.push(safeAlias)
+      const filterPairs = ['tsRange: { begin: $tsRange_begin, end: $tsRange_end }']
+      Object.entries(entry.filters || {}).forEach(([key, value]) => {
+        filterPairs.push(`${key}: ${toGraphQLScalar(value)}`)
+      })
+      const agg = entry.aggregate || 'sum: requests'
+      const aggReturnField = agg.split(':')[0].trim()
+      return `  ${safeAlias}: ${metricsDataset}(
+    limit: 10000
+    aggregate: { ${agg} }
+    groupBy: [ts]
+    orderBy: [ts_ASC]
+    filter: { ${filterPairs.join(', ')} }
+  ) { ts ${aggReturnField} }`
+    })
+
+    query = {
+      query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {\n${aliases.join('\n')}\n}`,
+      variables: { tsRange_begin: begin, tsRange_end: end }
+    }
+
+    const response = await AxiosHttpClientAdapter.request({
+      baseURL: '/',
+      url: makeBeholderBaseUrl(),
+      method: 'POST',
+      body: JSON.stringify(query)
+    })
+
+    if (response.statusCode !== 200) {
+      throw new MetricsChartError(
+        response.body?.detail || 'The server could not load this chart.',
+        { reason: 'api-error', detail: response.body?.detail || null }
+      )
+    }
+
+    const dataByAlias = response.body?.data || {}
+    const perTs = new Map()
+    const displayNames = []
+    for (const safeAlias of safeAliases) {
+      const displayName = aliasToName.get(safeAlias)
+      displayNames.push(displayName)
+      const rows = Array.isArray(dataByAlias[safeAlias]) ? dataByAlias[safeAlias] : []
+      rows.forEach((row) => {
+        if (!row?.ts) return
+        if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
+        const val = row.sum ?? row.count ?? row.avg ?? 0
+        perTs.get(row.ts)[displayName] = val
+      })
+    }
+    // Backfill missing series with 0 so chart builder sees a consistent set.
+    for (const row of perTs.values()) {
+      for (const displayName of displayNames) {
+        if (!(displayName in row)) row[displayName] = 0
+      }
+    }
+    data.value = Array.from(perTs.values()).sort(
+      (left, right) => new Date(left.ts) - new Date(right.ts)
+    )
   }
 
   /**
@@ -351,6 +500,14 @@ export function useMetricsChart(filterData, { onError } = {}) {
       // Configs with `eventsApi` use Events API for short ranges; for longer ranges they fall back
       // to Metrics API via `metricsApiFallback` if defined. If no fallback exists, Events API is
       // always used (no Metrics equivalent available — caller should add metricsApiFallback).
+
+      // Metrics-only series: datasets that only exist in the Metrics API (e.g. botManagerMetrics).
+      // Always routed to the Metrics endpoint regardless of time range.
+      if (config.metricsApiSeries?.series?.length || config.metricsApiSeries?.groupByPivot?.field) {
+        await loadFromMetricsApiSeries(config, begin, end)
+        return
+      }
+
       if (config.eventsApi?.series?.length || config.eventsApi?.groupByPivot?.field) {
         const api = resolveChartApi(begin, end)
         if (api === 'metrics' && config.metricsApiFallback) {
@@ -527,7 +684,7 @@ export function useMetricsChart(filterData, { onError } = {}) {
           })
         }
         data.value = Array.from(perTs.values()).sort(
-          (a, b) => new Date(a.ts) - new Date(b.ts)
+          (rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts)
         )
       } else {
         // Merge per-field aliases into one row per ts.
@@ -660,10 +817,10 @@ export const METRICS_CHART_CONFIGS = {
       fields: ['wafRequestsOthersAttacks']
     }
   },
-  // `wafThreatsByHost`, `botTraffic`, `botCaptcha` keep the Metrics API
-  // path because the `requests` field they aggregate is a basic member of the
-  // `<Dataset>AggregatedFields` enum (confirmed by mirroring RT Metrics'
-  // `reports.js` queries). Filter values are inlined per
+  // `wafThreatsByHost` keeps the Metrics API path because the `requests`
+  // field it aggregates is a basic member of the `<Dataset>AggregatedFields`
+  // enum (confirmed by mirroring RT Metrics' `reports.js` queries). Filter
+  // values are inlined per
   // `src/modules/real-time-metrics/filters/filter-to-graphql-string.js`.
   wafThreatsByHost: {
     metricsDataset: 'httpMetrics',
@@ -678,21 +835,48 @@ export const METRICS_CHART_CONFIGS = {
     dashboardId: '357548675837198933'
   },
   // ── Bot Manager (dashboard 371360344901061482) ──
+  // Bot Manager only has Metrics API (no Events dataset). One alias per
+  // category with its own filter — avoids groupBy + pivot senoidal artifact.
+  // Filter keys use the Metrics API operator convention (e.g. classifiedEq).
   botTraffic: {
-    metricsDataset: 'botManagerMetrics',
-    aggregation: 'requests',
-    groupBy: ['ts', 'classified'],
     chartConfigKey: 'botTraffic',
     label: 'Bot Traffic',
-    dashboardId: '371360344901061482'
+    dashboardId: '371360344901061482',
+    metricsApiSeries: {
+      metricsDataset: 'botManagerMetrics',
+      series: [
+        { name: 'bad bot', aggregate: 'sum: requests', filters: { classifiedEq: 'bad bot' } },
+        { name: 'good bot', aggregate: 'sum: requests', filters: { classifiedEq: 'good bot' } },
+        {
+          name: 'legitimate',
+          aggregate: 'sum: requests',
+          filters: { classifiedEq: 'legitimate' }
+        },
+        {
+          name: 'under evaluation',
+          aggregate: 'sum: requests',
+          filters: { classifiedEq: 'under evaluation' }
+        }
+      ]
+    }
   },
   botCaptcha: {
-    metricsDataset: 'botManagerMetrics',
-    aggregation: 'requests',
-    groupBy: ['ts', 'challengeSolved'],
     chartConfigKey: 'botCaptcha',
     label: 'Bot CAPTCHA',
-    dashboardId: '371360344901061482'
+    dashboardId: '371360344901061482',
+    metricsApiSeries: {
+      metricsDataset: 'botManagerMetrics',
+      groupByPivot: {
+        field: 'challengeSolved',
+        aggregate: 'sum: requests',
+        labelMap: {
+          true: 'Resolved',
+          false: 'Unresolved',
+          1: 'Resolved',
+          0: 'Unresolved'
+        }
+      }
+    }
   },
 
   // ── Performance (dashboard IDs: Data Transferred, Requests, Bandwidth Saving, Tiered Cache) ──
@@ -782,7 +966,9 @@ export const METRICS_CHART_CONFIGS = {
     dashboardId: '357548623571976783',
     eventsApi: {
       dataset: 'workloadEvents',
-      series: [{ name: 'upstreamResponseTime', aggregate: 'avg: upstreamResponseTime', filters: {} }]
+      series: [
+        { name: 'upstreamResponseTime', aggregate: 'avg: upstreamResponseTime', filters: {} }
+      ]
     },
     metricsApiFallback: {
       metricsDataset: 'httpMetrics',

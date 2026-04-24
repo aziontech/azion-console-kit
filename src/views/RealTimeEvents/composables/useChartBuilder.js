@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import {
   aggregateIntoBuckets,
   getBucketInterval,
+  detectNativeInterval,
   niceYMax,
   formatCompact,
   formatDetailed,
@@ -14,10 +15,10 @@ import { CHART_KINDS, resolveChartKind, isStackedKind, isMultiSeriesKind } from 
 
 function formatBytes(bytes) {
   if (bytes === 0) return '0 B'
-  const k = 1024
+  const kilobyte = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k))
-  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i] || 'B'}`
+  const sizeIndex = Math.floor(Math.log(Math.abs(bytes)) / Math.log(kilobyte))
+  return `${(bytes / Math.pow(kilobyte, sizeIndex)).toFixed(2)} ${sizes[sizeIndex] || 'B'}`
 }
 
 /**
@@ -148,7 +149,16 @@ function buildMultiSeries(
 ) {
   // Use the same Kibana-style bucket interval as single-series to avoid
   // "thin" charts when cardinality is high and the server truncates rows.
-  const interval = getBucketInterval(duration)
+  // Also detect the native data interval and use the coarser of the two,
+  // preventing empty slots between real data points (which cause the
+  // senoidal artifact when rendered as splines).
+  const autoBucket = getBucketInterval(duration)
+  const nativeBucket = detectNativeInterval(rawData)
+  // Use the coarser of auto vs native interval, but cap native at the
+  // duration itself to avoid collapsing all data into a single bucket
+  // when the API returns sparse or irregular timestamps.
+  const cappedNative = (nativeBucket > 0 && nativeBucket <= duration) ? nativeBucket : 0
+  const interval = cappedNative > autoBucket ? cappedNative : autoBucket
   const alignedStart = Math.floor(rangeStart / interval) * interval
   const alignedEnd = Math.floor(rangeEnd / interval) * interval
 
@@ -161,8 +171,9 @@ function buildMultiSeries(
     slots[idx] = slot
   }
 
-  // Aggregate raw rows by summing into the aligned slot. `rawData` may contain
-  // multiple rows per slot if the pivot didn't align server-side.
+  // Aggregate raw rows into the aligned slots. When multiple rows fall into
+  // the same slot, sum their values. Track hit counts per slot so we can
+  // average instead of sum when needed (e.g. percentage fields).
   let globalMax = 0
   for (let idx = 0; idx < rawData.length; idx += 1) {
     const item = rawData[idx]
@@ -172,6 +183,8 @@ function buildMultiSeries(
     const slotIdx = Math.floor((tsMs - alignedStart) / interval)
     if (slotIdx < 0 || slotIdx >= slotCount) continue
     const slot = slots[slotIdx]
+    if (slot._hits === undefined) slot._hits = 0
+    slot._hits += 1
     let rowSum = 0
     for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
       const field = seriesFields[sIdx]
@@ -184,8 +197,17 @@ function buildMultiSeries(
     if (rowSum && slot._sum === undefined) slot._sum = 0
     if (rowSum) slot._sum += rowSum
   }
+  // When multiple rows collapsed into one slot, average the values to avoid
+  // inflated sums (critical for percentage/rate fields like requestsOffloaded).
   for (let idx = 0; idx < slotCount; idx += 1) {
-    const sum = slots[idx]._sum || 0
+    const slot = slots[idx]
+    if (slot._hits > 1) {
+      for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
+        slot[seriesFields[sIdx]] /= slot._hits
+      }
+      if (slot._sum) slot._sum /= slot._hits
+    }
+    const sum = slot._sum || 0
     if (sum > globalMax) globalMax = sum
   }
 
@@ -317,7 +339,32 @@ export function buildC3Config({
   const { columns, groups, seriesNames, maxValue } = chartData
   const isStacked = chartKind === CHART_KINDS.STACKED_HISTOGRAM
   const isMulti = isStacked || chartKind === CHART_KINDS.MULTI_SERIES_TIMESERIES
-  const yMax = isMulti ? undefined : niceYMax(maxValue)
+
+  // Chart type by kind:
+  //   - stackedHistogram      → stacked bars (discover-style histogram).
+  //   - multiSeriesTimeseries → config's chartType wins; defaults to spline.
+  //   - singleSeriesHistogram → bars.
+  // When a multi-series config explicitly requests 'bar', the chart renders
+  // as stacked bars (e.g. Bot Traffic, Bot CAPTCHA) — same visual as
+  // stackedHistogram but fed by the metrics pipeline.
+  const configuredType = config?.chartType
+  let chartType
+  if (isStacked) {
+    chartType = 'spline'
+  } else if (chartKind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
+    chartType = configuredType || 'spline'
+  } else {
+    chartType = 'bar'
+  }
+
+  // Multi-series bar charts behave like stacked histograms visually:
+  // series are stacked, Y axis gets a nice max, and order is preserved.
+  const isMultiBar = isMulti && chartType === 'bar'
+  const shouldStack = isStacked || isMultiBar
+  // Use config's explicit maxYAxis if set (e.g. percentage charts capped at 100),
+  // otherwise compute from data for histograms, or let C3 auto-scale for splines.
+  const configMaxY = config?.maxYAxis
+  const yMax = configMaxY !== undefined ? configMaxY : ((isMulti && !isMultiBar) ? undefined : niceYMax(maxValue))
 
   const SERIES_COLORS = {
     // Status buckets
@@ -330,6 +377,15 @@ export function buildC3Config({
     POST: '#3b82f6',
     PUT: '#eab308',
     DELETE: '#ef4444',
+    // Cache status buckets
+    HIT: '#22c55e',
+    MISS: '#ef4444',
+    STALE: '#eab308',
+    BYPASS: '#f97316',
+    EXPIRED: '#8b5cf6',
+    REVALIDATED: '#06b6d4',
+    UPDATING: '#64748b',
+    '-': '#a1a1aa',
     // Fallback bucket for unclassified values
     other: '#737373'
   }
@@ -354,28 +410,6 @@ export function buildC3Config({
     names[name] = label.length > LEGEND_MAX_CHARS ? `${label.slice(0, LEGEND_MAX_CHARS)}…` : label
   })
 
-  // Chart type by kind:
-  //   - stackedHistogram      → stacked bars (discover-style histogram).
-  //   - multiSeriesTimeseries → spline, unless the config opts into a custom
-  //                              type (e.g. WAF uses area-spline + monotone).
-  //   - singleSeriesHistogram → bars.
-  // Chart-config's explicit `chartType` wins over the default *only* for
-  // multi-series time-series; stacked and single histograms stay as bars to
-  // preserve the histogram affordance regardless of chart-config defaults.
-  const configuredType = config?.chartType
-  let chartType
-  if (isStacked) {
-    chartType = 'bar'
-  } else if (chartKind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
-    chartType = configuredType && configuredType !== 'bar' ? configuredType : 'spline'
-  } else {
-    chartType = 'bar'
-  }
-
-  // `null` preserves the column order we built in buildMultiSeries (largest
-  // first = bottom). Setting 'desc'/'asc' here lets c3 re-sort internally,
-  // which caused the visible stack to flip in some builds.
-  const shouldStack = isStacked
   const stackOrder = shouldStack ? null : 'desc'
 
   return {
@@ -396,9 +430,10 @@ export function buildC3Config({
         tick: {
           multiline: false,
           culling: {
-            max: typeof window !== 'undefined' && window.innerWidth < 640
-              ? Math.min(6, Math.max(3, Math.floor((columns[0].length - 1) / 6)))
-              : Math.min(12, Math.max(6, Math.floor((columns[0].length - 1) / 4)))
+            max:
+              typeof window !== 'undefined' && window.innerWidth < 640
+                ? Math.min(6, Math.max(3, Math.floor((columns[0].length - 1) / 6)))
+                : Math.min(12, Math.max(6, Math.floor((columns[0].length - 1) / 4)))
           }
         },
         height: 28
@@ -433,32 +468,9 @@ export function buildC3Config({
           if (unit === 'bitsPerSecond') return `${formatBytes(val)}/s`
           return `${formatDetailed(val)} events`
         }
-      },
-      position: function (data, width, height, element) {
-        const chartRect = chartRef.getBoundingClientRect()
-        const svgEl = typeof element === 'object' && element.getBoundingClientRect
-          ? element
-          : element?.[0]?.[0] ?? element?.[0] ?? null
-        let elLeft = 0
-        let elTop = 0
-        if (svgEl && typeof svgEl.getBoundingClientRect === 'function') {
-          const elRect = svgEl.getBoundingClientRect()
-          elLeft = elRect.left + elRect.width / 2
-          elTop = elRect.top
-        } else {
-          elLeft = chartRect.left + chartRect.width / 2
-          elTop = chartRect.top + chartRect.height / 2
-        }
-        let left = elLeft - width / 2
-        let top = elTop - height - 8
-        // Keep tooltip within viewport
-        if (left < 4) left = 4
-        if (left + width > window.innerWidth - 4) left = window.innerWidth - width - 4
-        if (top < 4) top = elTop + 20
-        return { left, top }
       }
     },
-    bar: isMulti ? {} : { width: { ratio: 0.85 } },
+    bar: (isMulti && !isMultiBar) ? {} : { width: { ratio: 0.85 } },
     ...(config?.splineInterpolation
       ? { spline: { interpolation: { type: config.splineInterpolation } } }
       : {}),

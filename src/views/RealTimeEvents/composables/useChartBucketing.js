@@ -38,7 +38,7 @@ export function getBucketInterval(durationMs) {
  * the smallest gap between consecutive timestamps.
  * Returns 0 if undetectable (≤1 data point).
  */
-function detectNativeInterval(rawData) {
+export function detectNativeInterval(rawData) {
   if (!rawData || rawData.length < 2) return 0
   const sorted = rawData
     .map((item) => new Date(item.ts).getTime())
@@ -105,6 +105,9 @@ export function formatCompact(num) {
   if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B'
   if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M'
   if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K'
+  if (num === 0) return '0'
+  if (Math.abs(num) < 10) return Number(num.toFixed(2)).toString()
+  if (Math.abs(num) < 100) return Number(num.toFixed(1)).toString()
   return String(Math.round(num))
 }
 

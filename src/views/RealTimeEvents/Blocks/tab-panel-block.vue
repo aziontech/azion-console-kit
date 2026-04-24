@@ -795,7 +795,8 @@
                     <span
                       v-if="recordsFound"
                       class="ml-2 px-2 py-0.5 rounded-md text-color discover-docs-badge"
-                    >{{ recordsFound }} Documents found</span>
+                      >{{ recordsFound }} Documents found</span
+                    >
                   </div>
                   <div class="flex gap-2 items-center flex-wrap">
                     <div class="relative hidden md:flex items-center">
