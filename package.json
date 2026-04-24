@@ -146,6 +146,7 @@
     "js-yaml": "^4.1.1",
     "brace-expansion": "^2.0.2",
     "minimatch": "^9.0.7",
+    "test-exclude": "^7.0.0",
     "picomatch": "^2.3.2",
     "uuid": "^14.0.0",
     "diff": "^4.0.4",
