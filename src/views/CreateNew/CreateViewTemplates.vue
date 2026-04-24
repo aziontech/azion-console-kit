@@ -286,7 +286,7 @@
                     'h-8 rounded cursor-pointer transition-colors mb-2',
                     context.item?.active
                       ? ' text-listbox-option-focus-color surface-300 h-full'
-                      : 'text-color-secondary bg-surface-100'
+                      : 'text-color-secondary bg-surface-900 h-full'
                   ]
                 }),
 
@@ -305,7 +305,7 @@
           >
             <!-- Back to Templates Button -->
             <button
-              class="w-64 h-8 px-2.5 py-1.5 rounded surface-border border inline-flex justify-start items-center gap-3 hover:bg-surface-100 transition-colors"
+              class="w-64 h-8 px-2.5 py-1.5 rounded surface-border border inline-flex justify-start items-center gap-3 hover:bg-surface-900 transition-colors"
               @click="goBackToMenu"
             >
               <i class="pi pi-angle-left" />
@@ -350,7 +350,7 @@
                   <div
                     v-for="option in group.options"
                     :key="option.value"
-                    class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:bg-surface-100 transition-colors cursor-pointer"
+                    class="h-8 px-2.5 py-1.5 rounded inline-flex justify-start items-center gap-2 hover:bg-surface-900 transition-colors cursor-pointer"
                     @click="toggleTemplateFilter(group.key, option.value)"
                   >
                     <Checkbox

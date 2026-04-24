@@ -12,10 +12,16 @@
   import Dropdown from 'primevue/dropdown'
   import { useLoadingStore } from '@/stores/loading'
   import { useDeploy } from '@/stores/deploy'
+  import LabelBlock from '@aziontech/webkit/label'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
 
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
+  import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
+  import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
+  import DeployStatusCard from '@/templates/deploy-template/DeployStatusCard.vue'
 
   const props = defineProps({
     repositoryOwner: {
