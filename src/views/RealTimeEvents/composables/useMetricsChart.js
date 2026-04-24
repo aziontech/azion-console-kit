@@ -123,13 +123,39 @@ export function useMetricsChart(filterData, { onError } = {}) {
    * Used as fallback for eventsApi configs when the range exceeds 30 minutes.
    */
   const loadFromMetricsApiFallback = async (config, begin, end) => {
-    const { metricsDataset, fields } = config.metricsApiFallback
+    const fallback = config.metricsApiFallback
+    const { metricsDataset, fields } = fallback
     if (!metricsDataset || !fields?.length) return false
 
-    const returnFields = ['ts', ...fields].join('\n    ')
+    let query
 
-    const query = {
-      query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
+    if (fallback.directFields) {
+      // Direct-column path: one alias per field, no aggregate clause.
+      const aliases = fields
+        .map(
+          (field) => `
+  ${field}: ${metricsDataset} (
+    limit: 10000
+    groupBy: [ts]
+    orderBy: [ts_ASC]
+    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+  ) {
+    ts
+    ${field}
+  }`
+        )
+        .join('')
+
+      query = {
+        query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {${aliases}
+}`,
+        variables: { tsRange_begin: begin, tsRange_end: end }
+      }
+    } else {
+      // Single query with all fields as return columns (legacy WAF path).
+      const returnFields = ['ts', ...fields].join('\n    ')
+      query = {
+        query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
   ${metricsDataset} (
     limit: 10000
     groupBy: [ts]
@@ -139,7 +165,8 @@ export function useMetricsChart(filterData, { onError } = {}) {
     ${returnFields}
   }
 }`,
-      variables: { tsRange_begin: begin, tsRange_end: end }
+        variables: { tsRange_begin: begin, tsRange_end: end }
+      }
     }
 
     const response = await AxiosHttpClientAdapter.request({
@@ -156,16 +183,33 @@ export function useMetricsChart(filterData, { onError } = {}) {
       )
     }
 
-    const rows = response.body?.data?.[metricsDataset]
-    if (!Array.isArray(rows)) {
-      data.value = []
-      return true
+    if (fallback.directFields) {
+      // Merge per-field alias responses into one row per ts.
+      const dataByAlias = response.body?.data || {}
+      const perTs = new Map()
+      for (const field of fields) {
+        const rows = Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
+        rows.forEach((row) => {
+          if (!row?.ts) return
+          if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
+          const val = row[field]
+          perTs.get(row.ts)[field] = typeof val === 'number' ? val : 0
+        })
+      }
+      data.value = Array.from(perTs.values()).sort(
+        (a, b) => new Date(a.ts) - new Date(b.ts)
+      )
+    } else {
+      const rows = response.body?.data?.[metricsDataset]
+      if (!Array.isArray(rows)) {
+        data.value = []
+        return true
+      }
+      // Rows already have { ts, field1, field2, ... } shape — pass through directly.
+      data.value = rows
+        .filter((row) => row?.ts)
+        .sort((left, right) => new Date(left.ts) - new Date(right.ts))
     }
-
-    // Rows already have { ts, field1, field2, ... } shape — pass through directly.
-    data.value = rows
-      .filter((row) => row?.ts)
-      .sort((left, right) => new Date(left.ts) - new Date(right.ts))
     return true
   }
 
@@ -199,13 +243,17 @@ export function useMetricsChart(filterData, { onError } = {}) {
         Object.entries(entry.filters || {}).forEach(([key, value]) => {
           filterPairs.push(`${key}: ${toGraphQLScalar(value)}`)
         })
+        // Support custom aggregate per series (e.g. avg: requestTime for latency charts).
+        // Default to { count: rows } for backwards compatibility (WAF/Bot charts).
+        const agg = entry.aggregate || 'count: rows'
+        const aggReturnField = agg.startsWith('count') ? 'count' : agg.split(':')[0].trim()
         return `  ${alias}: ${dataset}(
     limit: 10000
-    aggregate: { count: rows }
+    aggregate: { ${agg} }
     groupBy: [ts]
     orderBy: [ts_ASC]
     filter: { ${filterPairs.join(', ')} }
-  ) { ts count }`
+  ) { ts ${aggReturnField} }`
       })
       body = aliases.join('\n')
       postProcess = (dataByAlias) => {
@@ -215,7 +263,9 @@ export function useMetricsChart(filterData, { onError } = {}) {
           rows.forEach((row) => {
             if (!row?.ts) return
             if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-            perTs.get(row.ts)[name] = row.count ?? 0
+            // Pick the aggregate return field value (count, avg, sum, etc.)
+            const val = row.count ?? row.avg ?? row.sum ?? 0
+            perTs.get(row.ts)[name] = val
           })
         }
         return Array.from(perTs.values()).sort(
@@ -263,7 +313,16 @@ export function useMetricsChart(filterData, { onError } = {}) {
       )
     }
 
-    data.value = postProcess(response.body?.data || {})
+    let rows = postProcess(response.body?.data || {})
+
+    // Allow configs to supply a custom post-process step (e.g. derive a
+    // percentage from two raw series).  The function receives the merged
+    // rows and must return the final array.
+    if (typeof config.eventsApiPostProcess === 'function') {
+      rows = config.eventsApiPostProcess(rows)
+    }
+
+    data.value = rows
   }
 
   /**
@@ -363,16 +422,48 @@ export function useMetricsChart(filterData, { onError } = {}) {
         }
         responseShape = 'aggregation'
       } else {
-        // Multi-field sum-per-field: one GraphQL alias per field, each with
-        // its own `aggregate: { sum: <field> }`, grouped by ts.
+        // Multi-field query: two shapes depending on whether the fields are
+        // members of the AggregatedFields enum (use aggregate: { sum: <field> })
+        // or pre-calculated scalars returned as direct columns (no aggregate).
+        // Pre-calculated fields (e.g. savedRequests, bandwidthSavedData) use
+        // `directFields: true` in the config to select the direct-column path.
         const fields = Array.isArray(config.fields) ? config.fields : []
         if (!fields.length) {
           data.value = []
           return
         }
-        const aliases = fields
-          .map(
-            (field) => `
+
+        if (config.directFields) {
+          // Direct-column path: fields are pre-calculated scalars returned as
+          // direct columns (not members of AggregatedFields enum). Use one alias
+          // per field so each gets its own groupBy: [ts] query, then merge by ts.
+          // This matches how Real-Time Metrics queries savedRequests, missedRequests, etc.
+          const aliases = fields
+            .map(
+              (field) => `
+  ${field}: ${config.metricsDataset} (
+    limit: 10000
+    groupBy: [ts]
+    orderBy: [ts_ASC]
+    ${filterBlock}
+  ) {
+    ts
+    ${field}
+  }`
+            )
+            .join('')
+
+          query = {
+            query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {${aliases}
+}`,
+            variables
+          }
+          responseShape = 'direct'
+        } else {
+          // Aggregated path: one alias per field with aggregate: { sum: <field> }.
+          const aliases = fields
+            .map(
+              (field) => `
   ${field}: ${config.metricsDataset} (
     limit: 10000
     aggregate: { sum: ${field} }
@@ -383,15 +474,16 @@ export function useMetricsChart(filterData, { onError } = {}) {
     ts
     sum
   }`
-          )
-          .join('')
+            )
+            .join('')
 
-        query = {
-          query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {${aliases}
+          query = {
+            query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {${aliases}
 }`,
-          variables
+            variables
+          }
+          responseShape = 'aliases'
         }
-        responseShape = 'aliases'
       }
 
       const response = await AxiosHttpClientAdapter.request({
@@ -415,14 +507,28 @@ export function useMetricsChart(filterData, { onError } = {}) {
         if (pivotField && rows.length) {
           data.value = pivotGroupedData(rows, pivotField, 'sum', { topN: config.topN })
         } else {
-          // Flatten single-series { ts, sum } rows to the column name the
-          // chart builder expects (use aggregation variable name as the
-          // series label so tooltips/legend read naturally).
           data.value = rows.map((row) => ({
             ts: row.ts,
             [config.aggregation]: row.sum ?? 0
           }))
         }
+      } else if (responseShape === 'direct') {
+        // Direct-column aliases: merge per-field alias responses into one row per ts.
+        // Each alias returns { ts, <fieldName> } rows — merge them by ts key.
+        const dataByAlias = response.body?.data || {}
+        const perTs = new Map()
+        for (const field of config.fields) {
+          const rows = Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
+          rows.forEach((row) => {
+            if (!row?.ts) return
+            if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
+            const val = row[field]
+            perTs.get(row.ts)[field] = typeof val === 'number' ? val : 0
+          })
+        }
+        data.value = Array.from(perTs.values()).sort(
+          (a, b) => new Date(a.ts) - new Date(b.ts)
+        )
       } else {
         // Merge per-field aliases into one row per ts.
         const dataByAlias = response.body?.data || {}
@@ -587,5 +693,173 @@ export const METRICS_CHART_CONFIGS = {
     chartConfigKey: 'botCaptcha',
     label: 'Bot CAPTCHA',
     dashboardId: '371360344901061482'
+  },
+
+  // ── Performance (dashboard IDs: Data Transferred, Requests, Bandwidth Saving, Tiered Cache) ──
+
+  // 2.1 Cache Behavior
+  cacheHitMiss: {
+    chartConfigKey: 'cacheHitMiss',
+    label: 'Cache Hit vs Miss',
+    dashboardId: '357548608166298191',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      groupByPivot: { field: 'upstreamCacheStatus' }
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['requestsOffloaded', 'requestsMissed']
+    }
+  },
+  tieredCacheHitMiss: {
+    chartConfigKey: 'tieredCacheHitMiss',
+    label: 'Tiered Cache Hit vs Miss',
+    dashboardId: '357549371218199219',
+    eventsApi: {
+      dataset: 'tieredCacheEvents',
+      groupByPivot: { field: 'upstreamCacheStatus' }
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['requestsOffloaded', 'requestsMissed']
+    }
+  },
+  cacheHitRate: {
+    chartConfigKey: 'cacheHitRate',
+    label: 'Cache Hit Rate',
+    dashboardId: '357549179454620239',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: '_savedCount',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: '_totalCount',
+          filters: {}
+        }
+      ]
+    },
+    // Derive requestsOffloaded (percentage) from the two raw count series.
+    eventsApiPostProcess(rows) {
+      return rows.map((row) => {
+        const saved = row._savedCount || 0
+        const total = row._totalCount || 0
+        return {
+          ts: row.ts,
+          requestsOffloaded: total > 0 ? (saved / total) * 100 : 0
+        }
+      })
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['requestsOffloaded']
+    }
+  },
+
+  // 2.2 Latency
+  avgRequestTime: {
+    chartConfigKey: 'avgRequestTime',
+    label: 'Avg Request Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'requestTime', aggregate: 'avg: requestTime', filters: {} }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['requestTime']
+    }
+  },
+  avgUpstreamResponseTime: {
+    chartConfigKey: 'avgUpstreamResponseTime',
+    label: 'Avg Upstream Response Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'upstreamResponseTime', aggregate: 'avg: upstreamResponseTime', filters: {} }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['upstreamResponseTime']
+    }
+  },
+  avgConnectTime: {
+    chartConfigKey: 'avgConnectTime',
+    label: 'Avg Connect Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'upstreamConnectTime', aggregate: 'avg: upstreamConnectTime', filters: {} }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['upstreamConnectTime']
+    }
+  },
+
+  // 2.3 Throughput
+  bandwidthSavedMissed: {
+    chartConfigKey: 'bandwidthSavedMissed',
+    label: 'Bandwidth Saved vs Missed',
+    dashboardId: '357549179454620239',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: 'bandwidthSavedData',
+          aggregate: 'sum: bytesSent',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: 'bandwidthMissedData',
+          aggregate: 'sum: bytesSent',
+          filters: {
+            upstreamCacheStatusIn: ['MISS', 'BYPASS', 'UPDATING', '-', '']
+          }
+        }
+      ]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['bandwidthSavedData', 'bandwidthMissedData']
+    }
+  },
+  requestsSavedMissed: {
+    chartConfigKey: 'requestsSavedMissed',
+    label: 'Requests Saved vs Missed',
+    dashboardId: '357548608166298191',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: 'savedRequests',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: 'missedRequests',
+          filters: {
+            upstreamCacheStatusIn: ['MISS', 'BYPASS', 'UPDATING', '-', '']
+          }
+        }
+      ]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['savedRequests', 'missedRequests']
+    }
   }
 }

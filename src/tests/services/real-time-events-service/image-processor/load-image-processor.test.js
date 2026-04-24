@@ -53,7 +53,7 @@ describe('ImageProcessorServices', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imageProcessedEvents: [] } }
+      body: { data: { imagesProcessedEvents: [] } }
     })
     const { sut } = makeSut()
     await sut(fixtures.filter)
@@ -78,7 +78,7 @@ describe('ImageProcessorServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imageProcessedEvents: [fixtures.imageProcessor] } }
+      body: { data: { imagesProcessedEvents: [fixtures.imageProcessor] } }
     })
 
     const { sut } = makeSut()

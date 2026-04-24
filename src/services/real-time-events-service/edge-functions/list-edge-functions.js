@@ -35,7 +35,8 @@ export const listEdgeFunctions = async (filter) => {
 const adapt = (filter, fields) => {
   const table = {
     dataset: DATASET,
-    limit: 10000,
+    limit: filter?.pageSize || 500,
+    ...(filter?.offset && { offset: filter.offset }),
     fields,
     orderBy: 'ts_DESC'
   }

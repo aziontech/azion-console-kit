@@ -22,14 +22,27 @@ export const CHART_KINDS = Object.freeze({
  * Any config key not in this list defaults to Events histogram family.
  */
 const METRICS_CONFIG_KEYS = new Set([
+  // WAF
   'wafThreats',
   'wafXss',
   'wafRfi',
   'wafSql',
   'wafOther',
   'wafThreatsByHost',
+  // Bot Manager
   'botTraffic',
-  'botCaptcha'
+  'botCaptcha',
+  // Performance — Cache Behavior
+  'cacheHitMiss',
+  'tieredCacheHitMiss',
+  'cacheHitRate',
+  // Performance — Latency
+  'avgRequestTime',
+  'avgUpstreamResponseTime',
+  'avgConnectTime',
+  // Performance — Throughput
+  'bandwidthSavedMissed',
+  'requestsSavedMissed'
 ])
 
 /**

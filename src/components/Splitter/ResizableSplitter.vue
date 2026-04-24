@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+  import { ref, computed, onMounted, onActivated, onBeforeUnmount, watch, nextTick } from 'vue'
   const props = defineProps({
     panelSizes: {
       type: Array,
@@ -229,6 +229,12 @@
       })
       resizeObserver.observe(root.value)
     }
+  })
+  // KeepAlive reactivation: the container may have had zero dimensions while
+  // deactivated, so the percentage-to-pixel conversion in panelAStyle would
+  // have produced 0px. Re-apply sizes so the panels regain their widths.
+  onActivated(() => {
+    applyInitialSizes()
   })
   watch(
     () => props.direction,

@@ -59,7 +59,7 @@ const CHART_CONFIGS = {
   },
 
   imageProcessor: {
-    dataset: 'imageProcessedEvents',
+    dataset: 'imagesProcessedEvents',
     aggregation: { count: 'rows' },
     groupBy: ['ts'],
     limit: 10000,
@@ -239,6 +239,101 @@ const CHART_CONFIGS = {
     dataUnit: 'count',
     xAxis: 'ts',
     colors: DEFAULT_COLORS
+  },
+
+  // ── Performance metrics charts ──
+
+  cacheHitMiss: {
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
+    seriesColors: {
+      HIT: '#22c55e',
+      MISS: '#ef4444',
+      EXPIRED: '#eab308',
+      BYPASS: '#6b7280',
+      STALE: '#f97316'
+    },
+    colors: ['#22c55e', '#ef4444', '#eab308', '#6b7280', '#f97316']
+  },
+
+  tieredCacheHitMiss: {
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
+    seriesColors: {
+      HIT: '#22c55e',
+      MISS: '#ef4444',
+      EXPIRED: '#eab308',
+      BYPASS: '#6b7280',
+      STALE: '#f97316'
+    },
+    colors: ['#22c55e', '#ef4444', '#eab308', '#6b7280', '#f97316']
+  },
+
+  cacheHitRate: {
+    chartType: 'spline',
+    dataUnit: 'percentage',
+    xAxis: 'ts',
+    maxYAxis: 100,
+    colors: ['var(--series-two-color)']
+  },
+
+  avgRequestTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-three-color)']
+  },
+
+  avgUpstreamResponseTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-four-color)']
+  },
+
+  avgConnectTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-five-color)']
+  },
+
+  bandwidthSavedMissed: {
+    chartType: 'area-spline',
+    splineInterpolation: 'monotone',
+    areaOpacity: 0.15,
+    dataUnit: 'bytes',
+    xAxis: 'ts',
+    seriesOrder: ['bandwidthSavedData', 'bandwidthMissedData'],
+    seriesLabels: {
+      bandwidthSavedData: 'Saved',
+      bandwidthMissedData: 'Missed'
+    },
+    seriesColors: {
+      bandwidthSavedData: '#22c55e',
+      bandwidthMissedData: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
+  },
+
+  requestsSavedMissed: {
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['savedRequests', 'missedRequests'],
+    seriesLabels: {
+      savedRequests: 'Saved',
+      missedRequests: 'Missed'
+    },
+    seriesColors: {
+      savedRequests: '#22c55e',
+      missedRequests: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
   }
 }
 

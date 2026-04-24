@@ -89,11 +89,18 @@
     white-space: pre-wrap;
     font-family:
       ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+    min-height: 2.25rem;
+    max-height: 6rem;
+    overflow-y: auto;
   }
 
   .contenteditable:empty:before {
     content: attr(placeholder);
     color: var(--input-placeholder-text-color);
     pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 </style>

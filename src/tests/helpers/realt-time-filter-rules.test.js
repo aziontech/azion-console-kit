@@ -105,7 +105,7 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
-          imageProcessedEvents: [
+          imagesProcessedEvents: [
             handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',

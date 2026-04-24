@@ -11,7 +11,7 @@ import { CURATED_DATASET_FIELDS } from '../_shared/dataset-fields'
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-const DATASET = 'imageProcessedEvents'
+const DATASET = 'imagesProcessedEvents'
 
 export const listImageProcessor = async (filter) => {
   const fields = [...CURATED_DATASET_FIELDS[DATASET]]
@@ -35,7 +35,8 @@ export const listImageProcessor = async (filter) => {
 const adapt = (filter, fields) => {
   const table = {
     dataset: DATASET,
-    limit: 10000,
+    limit: filter?.pageSize || 500,
+    ...(filter?.offset && { offset: filter.offset }),
     fields,
     orderBy: 'ts_DESC'
   }

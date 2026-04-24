@@ -326,8 +326,8 @@
       class="flex w-full flex-column md:flex-col items-center"
       :class="{ 'gap-6 md:gap-4': filterData.fields.length }"
     >
-      <div class="flex w-full gap-2 items-start md:flex-row flex-col">
-        <div class="flex-1 flex gap-2 items-start max-md:w-full">
+      <div class="afs-filter-row">
+        <div class="afs-filter-row__query">
           <DialogFilter
             v-model:filterAdvanced="filterData.fields"
             :fieldsInFilter="props.fieldsInFilter"
@@ -343,36 +343,37 @@
             @validation="onAqlValidationChange"
           />
         </div>
-        <DataTimeRange
-          class="max-md:w-full"
-          v-model="filterDataRange"
-          :maxDays="props.filterDateRangeMaxDays"
-          :defaultUtcOffset="userUTC"
-          :userTimezone="userTimezone"
-          :listTimezonesService="listTimezonesService"
-          @select="onDateRangeSelect"
-          @autoRefresh="onAutoRefreshTick"
-        />
-        <PrimeButton
-          v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
-          icon="pi pi-refresh"
-          outlined
-          size="small"
-          label="Refresh"
-          class="w-[5.875rem]"
-          :disabled="isInvalidRange || hasAqlValidationError"
-          @click="applyFilters"
-        />
-        <PrimeButton
-          v-else
-          icon="pi pi-arrow-circle-right"
-          severity="secondary"
-          size="small"
-          label="Update"
-          :disabled="isInvalidRange || hasAqlValidationError"
-          class="w-[5.875rem]"
-          @click="applyFilters"
-        />
+        <div class="afs-filter-row__actions">
+          <DataTimeRange
+            v-model="filterDataRange"
+            :maxDays="props.filterDateRangeMaxDays"
+            :defaultUtcOffset="userUTC"
+            :userTimezone="userTimezone"
+            :listTimezonesService="listTimezonesService"
+            @select="onDateRangeSelect"
+            @autoRefresh="onAutoRefreshTick"
+          />
+          <PrimeButton
+            v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
+            icon="pi pi-refresh"
+            outlined
+            size="small"
+            label="Refresh"
+            class="flex-shrink-0"
+            :disabled="isInvalidRange || hasAqlValidationError"
+            @click="applyFilters"
+          />
+          <PrimeButton
+            v-else
+            icon="pi pi-arrow-circle-right"
+            severity="secondary"
+            size="small"
+            label="Update"
+            :disabled="isInvalidRange || hasAqlValidationError"
+            class="flex-shrink-0"
+            @click="applyFilters"
+          />
+        </div>
       </div>
       <div
         class="flex flex-1 w-full"
@@ -387,3 +388,38 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+  .afs-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .afs-filter-row__query {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+
+  .afs-filter-row__actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .afs-filter-row__query {
+      flex-basis: 100%;
+    }
+
+    .afs-filter-row__actions {
+      width: 100%;
+    }
+  }
+</style>

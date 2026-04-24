@@ -29,7 +29,8 @@ const TABS_EVENTS = {
     stackByOptions: [
       { label: 'Default', value: 'none' },
       { label: 'Status', value: 'status' },
-      { label: 'Request Method', value: 'requestMethod' }
+      { label: 'Request Method', value: 'requestMethod' },
+      { label: 'Cache Status', value: 'upstreamCacheStatus' }
     ],
     customColumnMapper: (rowData) => ({
       tsFormat: rowData.data,
@@ -76,9 +77,9 @@ const TABS_EVENTS = {
     title: 'Image Processor',
     description:
       'Logs of events from requests made to applications that processed images with Image Processor.',
-    dataset: 'imageProcessedEvents',
+    dataset: 'imagesProcessedEvents',
     tabRouter: 'image-processor',
-    availableFields: DATASET_FIELDS.imageProcessedEvents,
+    availableFields: DATASET_FIELDS.imagesProcessedEvents,
     defaultSelectedFields: ['host', 'status', 'requestUri'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
@@ -97,9 +98,13 @@ const TABS_EVENTS = {
     tabRouter: 'tiered-cache',
     availableFields: DATASET_FIELDS.tieredCacheEvents,
     defaultSelectedFields: ['host', 'status', 'upstreamCacheStatus'],
-    // Chart options - volume over time, no stack-by or summary
-    showStackBy: false,
+    // Chart options
+    showStackBy: true,
     showSummary: false,
+    stackByOptions: [
+      { label: 'Default', value: 'none' },
+      { label: 'Cache Status', value: 'upstreamCacheStatus' }
+    ],
     customColumnMapper: (rowData) => ({
       tsFormat: rowData.data,
       summary: rowData.data

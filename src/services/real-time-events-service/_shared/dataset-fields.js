@@ -85,14 +85,14 @@ export const CURATED_DATASET_FIELDS = Object.freeze({
   // ── Functions ──
   functionEvents: Object.freeze([
     'configurationId',
-    'functionsInstanceIdList',
-    'functionsInitiatorTypeList',
-    'functionsList',
-    'functionsSolutionId',
-    'functionsTime',
+    'edgeFunctionsInstanceIdList',
+    'edgeFunctionsInitiatorTypeList',
+    'edgeFunctionsList',
+    'edgeFunctionsSolutionId',
+    'edgeFunctionsTime',
     'functionLanguage',
     'ts',
-    'virtualHostId'
+    'virtualhostid'
   ]),
 
   // ── Azion Runtime ──
@@ -107,8 +107,8 @@ export const CURATED_DATASET_FIELDS = Object.freeze({
     'ts'
   ]),
 
-  // ── Image Processor (renamed from imagesProcessedEvents) ──
-  imageProcessedEvents: Object.freeze([
+  // ── Image Processor ──
+  imagesProcessedEvents: Object.freeze([
     'bytesSent',
     'configurationId',
     'host',
@@ -128,7 +128,7 @@ export const CURATED_DATASET_FIELDS = Object.freeze({
     'sslProtocol',
     'sslSessionReused',
     'status',
-    'tcpInfoRtt',
+    'tcpinfoRtt',
     'ts',
     'upstreamCacheStatus',
     'upstreamResponseTime',
@@ -179,7 +179,7 @@ export const CURATED_DATASET_FIELDS = Object.freeze({
     'solutionId',
     'ts',
     'uuid',
-    'zoneID'
+    'zoneId'
   ]),
 
   // ── Data Stream ──

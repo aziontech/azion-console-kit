@@ -26,7 +26,7 @@ const LEGACY_DATASET_ALIASES = Object.freeze({
   httpEvents: 'workloadEvents',
   edgeFunctionsEvents: 'functionEvents',
   cellsConsoleEvents: 'functionConsoleEvents',
-  imagesProcessedEvents: 'imageProcessedEvents',
+  imageProcessedEvents: 'imagesProcessedEvents',
   l2CacheEvents: 'tieredCacheEvents',
   idnsQueriesEvents: 'edgeDnsQueriesEvents'
 })

@@ -297,4 +297,19 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
+
+  @media (max-width: 480px) {
+    .events-summary-bar__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .events-summary-bar__value {
+      font-size: 18px;
+    }
+
+    .events-summary-bar__inline {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  }
 </style>

@@ -129,7 +129,7 @@ const METRICS_DATASET_MAP = {
   workloadEvents: 'httpMetrics',
   functionEvents: 'edgeFunctionsMetrics',
   functionConsoleEvents: 'edgeFunctionsMetrics',
-  imageProcessedEvents: 'imagesProcessedMetrics',
+  imagesProcessedEvents: 'imagesProcessedMetrics',
   tieredCacheEvents: 'l2CacheMetrics',
   edgeDnsQueriesEvents: 'idnsQueriesMetrics',
   dataStreamedEvents: 'dataStreamedMetrics',
@@ -550,6 +550,12 @@ const STACK_BUCKETS = {
     if (method === 'GET' || method === 'POST' || method === 'PUT' || method === 'DELETE')
       return method
     return 'other'
+  },
+  upstreamCacheStatus: (raw) => {
+    const val = String(raw || '').toUpperCase()
+    if (['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE', 'UPDATING', 'REVALIDATED'].includes(val))
+      return val
+    return val || '-'
   }
 }
 

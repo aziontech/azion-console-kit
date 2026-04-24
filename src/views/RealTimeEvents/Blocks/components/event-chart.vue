@@ -99,7 +99,7 @@
   // decomposition of the same universe, so clicking a legend entry should
   // toggle series visibility (c3 native behavior) instead of trying to
   // apply a nonsensical filter.
-  const PIVOT_METRICS_KEYS = new Set(['wafThreatsByHost', 'botTraffic', 'botCaptcha'])
+  const PIVOT_METRICS_KEYS = new Set(['wafThreatsByHost', 'botTraffic', 'botCaptcha', 'cacheHitMiss', 'tieredCacheHitMiss'])
 
   const handleLegendClick = (bucket) => {
     const isMetrics = typeof props.view === 'string' && props.view.startsWith('metrics:')
@@ -289,10 +289,7 @@
   >
     <!-- Header -->
     <div class="chart-header">
-      <span
-        v-if="showSummary"
-        class="chart-header__count"
-      >
+      <span class="chart-header__count">
         <span class="chart-header__total">{{ formattedTotal }}</span>
         <span class="chart-header__label">events</span>
       </span>
@@ -421,6 +418,8 @@
   .chart-header {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 0.375rem;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--surface-border);
     background: var(--surface-section);
@@ -430,17 +429,22 @@
     display: flex;
     align-items: baseline;
     gap: 0.25rem;
+    min-width: 0;
   }
 
   .chart-header__total {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .chart-header__label {
     font-size: 0.75rem;
     color: var(--text-color-secondary);
+    flex-shrink: 0;
   }
 
   .chart-header__hint {
@@ -454,8 +458,6 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    /* Keep the View dropdown and "Drag to zoom" hint anchored to the right
-       regardless of whether the events total is rendered on the left. */
     margin-left: auto;
   }
 
@@ -480,7 +482,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    min-width: 9.5rem;
+    min-width: 7rem;
+    max-width: 12rem;
     height: 1.75rem;
     padding: 0 0.5rem;
     font-family: var(--font-family);
@@ -620,7 +623,9 @@
 
   /* Tooltip above all chart content */
   :deep(.c3-tooltip-container) {
-    z-index: 9999 !important;
+    position: fixed !important;
+    z-index: 99999 !important;
+    pointer-events: none;
   }
 
   /* Focus line visibility on dark background */
@@ -630,7 +635,7 @@
   }
 
   /* Compact tooltip for the small chart area */
-  :deep(.c3-tooltip-container) {
+  :deep(.c3-tooltip) {
     padding: 10px 12px;
     max-width: 280px;
   }
@@ -669,5 +674,40 @@
   /* Soften horizontal grid lines */
   :deep(.c3-grid line) {
     opacity: 0.15;
+  }
+
+  /* ── Responsive breakpoints ── */
+  @media (max-width: 640px) {
+    .chart-header {
+      padding: 0.375rem 0.5rem;
+    }
+
+    .chart-header__total {
+      font-size: 0.75rem;
+    }
+
+    .chart-header__hint {
+      display: none;
+    }
+
+    .chart-header__view-trigger {
+      min-width: 6rem;
+      font-size: 0.6875rem;
+      height: 1.5rem;
+    }
+
+    .chart-header__view-label {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .chart-header__controls {
+      gap: 0.375rem;
+    }
+
+    .chart-header__view-trigger {
+      min-width: 5rem;
+    }
   }
 </style>

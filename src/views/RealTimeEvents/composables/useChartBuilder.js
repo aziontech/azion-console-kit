@@ -12,6 +12,14 @@ import {
 import { getChartConfig } from '../Blocks/constants/chart-configs'
 import { CHART_KINDS, resolveChartKind, isStackedKind, isMultiSeriesKind } from './chart-kinds'
 
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i] || 'B'}`
+}
+
 /**
  * Composable that transforms raw data into C3.js chart configuration.
  *
@@ -113,10 +121,17 @@ export function useChartBuilder(props) {
 // stack position across re-renders. Prevents c3 from visually reshuffling the
 // stack when totals fluctuate between filter/range changes.
 const SERIES_ORDER_CACHE = new Map()
+const SERIES_ORDER_CACHE_MAX = 50
+
 function cachedOrder(stackKey, seriesFields, computeOrdered) {
   const setKey = `${stackKey}|${[...seriesFields].sort().join(',')}`
   const cached = SERIES_ORDER_CACHE.get(setKey)
   if (cached) return cached
+  // Evict oldest entries when the cache exceeds the limit
+  if (SERIES_ORDER_CACHE.size >= SERIES_ORDER_CACHE_MAX) {
+    const firstKey = SERIES_ORDER_CACHE.keys().next().value
+    SERIES_ORDER_CACHE.delete(firstKey)
+  }
   const ordered = computeOrdered()
   SERIES_ORDER_CACHE.set(setKey, ordered)
   return ordered
@@ -380,7 +395,11 @@ export function buildC3Config({
         type: 'category',
         tick: {
           multiline: false,
-          culling: { max: Math.min(12, Math.max(6, Math.floor((columns[0].length - 1) / 4))) }
+          culling: {
+            max: typeof window !== 'undefined' && window.innerWidth < 640
+              ? Math.min(6, Math.max(3, Math.floor((columns[0].length - 1) / 6)))
+              : Math.min(12, Math.max(6, Math.floor((columns[0].length - 1) / 4)))
+          }
         },
         height: 28
       },
@@ -406,14 +425,49 @@ export function buildC3Config({
       format: {
         title: (idx) => chartData.tooltipLabels?.[idx] || String(idx),
         name: (name) => fullNames[name] || name,
-        value: (val) => `${formatDetailed(val)} events`
+        value: (val) => {
+          const unit = config?.dataUnit
+          if (unit === 'milliseconds') return `${formatDetailed(Math.round(val * 1000) / 1000)} ms`
+          if (unit === 'percentage') return `${(Math.round(val * 100) / 100).toFixed(2)}%`
+          if (unit === 'bytes') return formatBytes(val)
+          if (unit === 'bitsPerSecond') return `${formatBytes(val)}/s`
+          return `${formatDetailed(val)} events`
+        }
+      },
+      position: function (data, width, height, element) {
+        const chartRect = chartRef.getBoundingClientRect()
+        const svgEl = typeof element === 'object' && element.getBoundingClientRect
+          ? element
+          : element?.[0]?.[0] ?? element?.[0] ?? null
+        let elLeft = 0
+        let elTop = 0
+        if (svgEl && typeof svgEl.getBoundingClientRect === 'function') {
+          const elRect = svgEl.getBoundingClientRect()
+          elLeft = elRect.left + elRect.width / 2
+          elTop = elRect.top
+        } else {
+          elLeft = chartRect.left + chartRect.width / 2
+          elTop = chartRect.top + chartRect.height / 2
+        }
+        let left = elLeft - width / 2
+        let top = elTop - height - 8
+        // Keep tooltip within viewport
+        if (left < 4) left = 4
+        if (left + width > window.innerWidth - 4) left = window.innerWidth - width - 4
+        if (top < 4) top = elTop + 20
+        return { left, top }
       }
     },
     bar: isMulti ? {} : { width: { ratio: 0.85 } },
     ...(config?.splineInterpolation
       ? { spline: { interpolation: { type: config.splineInterpolation } } }
       : {}),
-    padding: { left: 50, right: 15, top: 5, bottom: 0 },
+    padding: {
+      left: typeof window !== 'undefined' && window.innerWidth < 640 ? 35 : 50,
+      right: typeof window !== 'undefined' && window.innerWidth < 640 ? 8 : 15,
+      top: 5,
+      bottom: 0
+    },
     grid: { [axisYKey]: { show: true } },
     point: { show: false },
     // Disable entrance/update transitions when rendering large series —

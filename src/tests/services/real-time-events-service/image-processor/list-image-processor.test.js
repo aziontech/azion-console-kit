@@ -78,7 +78,7 @@ describe('ImageProcessorServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { imageProcessedEvents: [fixtures.imageProcessor] } }
+      body: { data: { imagesProcessedEvents: [fixtures.imageProcessor] } }
     })
 
     const { sut } = makeSut()

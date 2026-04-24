@@ -32,6 +32,7 @@
   import { getChartConfig } from './constants/chart-configs'
   import TABS_EVENTS from './constants/tabs-events'
   import { useAccountStore } from '@stores/account'
+  import { resetSeriesOrderCache } from '../composables/useChartBuilder'
 
   // Composables
   import { useQueryHistory } from '../composables/useQueryHistory'
@@ -77,7 +78,7 @@
 
   const filterData = ref(null)
   const selectedFields = ref([])
-  const sidebarVisible = ref(true)
+  const sidebarVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
   const filterSystemRef = ref(null)
   // Unified "View" selection. Encodes both families:
   //   'events:<stackBy>'   → Events histogram ('none' | 'status' | 'requestMethod')
@@ -400,7 +401,9 @@
     wafOther: { wafRequestsOthersAttacks: [{ field: 'wafAttackFamily', value: '$OTHERS' }] },
     wafThreatsByHost: 'pivot-host',
     botTraffic: 'pivot-classified',
-    botCaptcha: 'pivot-challengeSolved'
+    botCaptcha: 'pivot-challengeSolved',
+    cacheHitMiss: 'pivot-upstreamCacheStatus',
+    tieredCacheHitMiss: 'pivot-upstreamCacheStatus'
   }
 
   const handleLegendFilter = ({ bucket, stackBy, metricsKey }) => {
@@ -497,7 +500,10 @@
     filterSystemRef.value?.applyFilters()
     loadData()
   })
-  onBeforeUnmount(() => document.removeEventListener('keydown', onKeyDown))
+  onBeforeUnmount(() => {
+    document.removeEventListener('keydown', onKeyDown)
+    resetSeriesOrderCache()
+  })
   // Re-fetch data when KeepAlive reactivates this component (e.g. switching
   // back from Security/Performance tabs). Ensures chart + fields are fresh.
   onActivated(async () => {
@@ -533,11 +539,11 @@
     :class="{ 'tab-panel-container--fullscreen': isFullscreen }"
   >
     <!-- Filter bar -->
-    <div class="flex flex-col gap-2 border-1 p-3 surface-border rounded-md">
-      <div class="flex items-start gap-3">
+    <div class="filter-bar">
+      <div class="filter-bar__row">
         <div
           v-if="!hideDatasetSelector"
-          class="flex items-center gap-2 flex-shrink-0 self-start"
+          class="filter-bar__dataset"
         >
           <span class="text-xs font-medium text-color-secondary">Dataset</span>
           <Dropdown
@@ -546,13 +552,13 @@
             :options="datasetDropdownOptions"
             optionLabel="label"
             optionValue="value"
-            class="w-52"
+            class="filter-bar__dataset-dropdown"
             @change="onDatasetDropdownChange"
             data-testid="dataset-selector-top"
           />
         </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-start gap-2">
+        <div class="filter-bar__filters">
+          <div class="filter-bar__filters-inner">
             <PrimeButton
               icon="ai ai-filter-alt"
               outlined
@@ -561,7 +567,7 @@
               @click="(e) => savedSearchOverlayRef.toggle(e)"
               v-tooltip.bottom="{ value: 'Saved queries', showDelay: 300 }"
             />
-            <div class="flex-1 min-w-0">
+            <div class="filter-bar__aql">
               <AdvancedFilterSystem
                 ref="filterSystemRef"
                 v-model:filterData="filterData"
@@ -772,9 +778,9 @@
             <div class="discover-table-row">
               <div class="discover-main-content">
                 <div
-                  class="flex gap-2 justify-between items-center mb-2 px-2 pt-1 discover-toolbar"
+                  class="flex gap-2 justify-between items-center mb-2 px-2 pt-1 discover-toolbar flex-wrap"
                 >
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
                     <PrimeButton
                       :icon="sidebarVisible ? 'pi pi-angle-double-left' : 'pi pi-list'"
                       :label="sidebarVisible ? '' : 'Fields'"
@@ -788,11 +794,10 @@
                     />
                     <span
                       v-if="recordsFound"
-                      class="ml-2 px-2 py-0.5 rounded-md text-color"
-                      style="font-size: 0.8125rem; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);"
+                      class="ml-2 px-2 py-0.5 rounded-md text-color discover-docs-badge"
                     >{{ recordsFound }} Documents found</span>
                   </div>
-                  <div class="flex gap-2 items-center">
+                  <div class="flex gap-2 items-center flex-wrap">
                     <div class="relative hidden md:flex items-center">
                       <i class="pi pi-search absolute left-2 text-xs text-color-secondary" />
                       <InputText
@@ -824,6 +829,7 @@
                       size="small"
                       severity="secondary"
                       :outlined="detailViewMode !== 'sidebar'"
+                      class="hidden md:inline-flex"
                       @click="detailViewMode !== 'sidebar' && toggleDetailViewMode()"
                       v-tooltip.top="{ value: 'Show in sidebar', showDelay: 200 }"
                     />
@@ -844,13 +850,13 @@
                       optionLabel="label"
                       optionValue="value"
                       @update:modelValue="handlePageSizeChange"
-                      class="w-28 toolbar-page-size"
+                      class="toolbar-page-size toolbar-page-size--responsive"
                     />
                     <PrimeButton
                       outlined
                       size="small"
                       icon="ai ai-graphql"
-                      class="min-w-max"
+                      class="min-w-max hidden md:inline-flex"
                       @click="eventsPlaygroundOpener"
                       v-tooltip.left="{ value: 'GraphQL Playground', showDelay: 200 }"
                     />
@@ -1075,6 +1081,105 @@
     min-height: 0;
     gap: 0.75rem;
   }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid var(--surface-border);
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+  }
+
+  .filter-bar__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar__dataset {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .filter-bar__dataset-dropdown {
+    width: 13rem;
+  }
+
+  .filter-bar__filters {
+    flex: 1 1 300px;
+    min-width: 0;
+  }
+
+  .filter-bar__filters-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filter-bar__aql {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 768px) {
+    .filter-bar__row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-bar__dataset {
+      width: 100%;
+    }
+
+    .filter-bar__dataset-dropdown {
+      flex: 1;
+      width: auto;
+    }
+
+    .filter-bar__filters {
+      width: 100%;
+      flex-basis: 100%;
+    }
+
+    .discover-layout {
+      min-height: 200px;
+    }
+
+    /* Force sidebar hidden on mobile via splitter collapse */
+    :deep(.resizable-splitter > .panel-a) {
+      display: none !important;
+    }
+    :deep(.resizable-splitter > .handle) {
+      display: none !important;
+    }
+
+    .discover-charts-area {
+      padding: 0.375rem 0;
+    }
+
+    .discover-docs-badge {
+      font-size: 0.6875rem;
+      padding: 0.125rem 0.375rem;
+    }
+
+    .discover-toolbar {
+      gap: 0.25rem;
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .discover-docs-badge {
+      font-size: 0.625rem;
+      max-width: 10rem;
+    }
+  }
   .tab-panel-container--fullscreen {
     position: fixed;
     inset: 0;
@@ -1131,7 +1236,7 @@
     background: var(--surface-card);
     border: 1px solid var(--surface-border);
     border-radius: var(--border-radius);
-    overflow: hidden;
+    overflow: visible;
   }
   .events-chart-group :deep(.event-chart-wrapper) {
     border: none;
@@ -1361,6 +1466,14 @@
   :deep(.toolbar-page-size) {
     min-height: 2rem;
   }
+  .toolbar-page-size--responsive {
+    width: 7rem;
+  }
+  @media (max-width: 768px) {
+    .toolbar-page-size--responsive {
+      width: 5rem;
+    }
+  }
 
   /* Splitter handle: thinner divider, remove redundant sidebar border */
   :deep(.field-sidebar) {
@@ -1455,6 +1568,40 @@
       opacity: 1;
       max-height: 600px;
       transform: translateY(0);
+    }
+  }
+
+  /* Documents found badge */
+  .discover-docs-badge {
+    font-size: 0.8125rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* ── Responsive breakpoints ── */
+  @media (max-width: 768px) {
+    .discover-charts-area {
+      padding: 0.5rem 0;
+    }
+
+    .discover-docs-badge {
+      font-size: 0.6875rem;
+      padding: 0.125rem 0.375rem;
+    }
+
+    .discover-toolbar {
+      gap: 0.25rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .discover-docs-badge {
+      font-size: 0.625rem;
+      max-width: 10rem;
     }
   }
 </style>
