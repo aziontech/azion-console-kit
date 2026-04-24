@@ -43,7 +43,7 @@ describe('ScriptRunnerServices', () => {
     })
   })
 
-  it('should parsed correctly all returned domains', async () => {
+  it('should parsed correctly all returned logs', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: fixtures.logsResult
@@ -56,8 +56,10 @@ describe('ScriptRunnerServices', () => {
       status: fixtures.logsResult.status,
       logs: [
         {
+          id: expect.stringMatching(/^log-0-\d+$/),
           content: fixtures.logsResult.logs[0].content,
-          timeStamp: fixtures.parsedTimeStamp
+          timeStamp: fixtures.parsedTimeStamp,
+          type: 'info'
         }
       ]
     })
@@ -76,5 +78,50 @@ describe('ScriptRunnerServices', () => {
       status: fixtures.noLogsResult.status,
       logs: []
     })
+  })
+
+  it('should detect error type when log contains "Error"', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        status: 'failed',
+        logs: [{ content: 'Error: Something went wrong', timestamp: '2023-11-16 03:16:06.300' }]
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result.logs[0].type).toBe('error')
+  })
+
+  it('should detect warning type when log contains "warning"', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        status: 'succeeded',
+        logs: [{ content: 'Warning: deprecated feature', timestamp: '2023-11-16 03:16:06.300' }]
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result.logs[0].type).toBe('warning')
+  })
+
+  it('should detect info type for regular logs', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        status: 'succeeded',
+        logs: [{ content: 'Build completed', timestamp: '2023-11-16 03:16:06.300' }]
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result.logs[0].type).toBe('info')
   })
 })

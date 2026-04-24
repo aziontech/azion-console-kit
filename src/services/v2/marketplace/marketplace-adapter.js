@@ -7,6 +7,7 @@ export const MarketplaceAdapter = {
       vendor: item.vendor,
       slug: item.slug,
       headline: item.headline,
+      icon: item.icon,
       featured: item.featured,
       released: item.new_release,
       instanceType: {

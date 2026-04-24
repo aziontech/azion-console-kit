@@ -1,20 +1,20 @@
 <script setup>
-  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { inject, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  // import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import FormLoading from '@/templates/template-engine-block/form-loading.vue'
 
   import { useLoadingStore } from '@/stores/loading'
   import { useSolutionStore } from '@/stores/solution-create'
+  import { scriptRunnerService } from '@/services/v2/script-runner'
 
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
@@ -95,12 +95,6 @@
     showDetails.value = true
   }
 
-  const handleInstantiate = ({ result }) => {
-    router.push({
-      path: `/create/deploy/${result.uuid}`
-    })
-  }
-
   const handleSubmitClick = () => {
     tracker.create
       .eventClickedToDeploy({
@@ -117,46 +111,30 @@
     await loadSolutionByVendor()
   })
 
-  watchEffect(() => {
-    if (!route.params.vendor || !route.params.solution) {
-      return
-    }
-    loadSolutionByVendor()
-  })
+  // Only watch route.params changes, not query changes
+  // This prevents reloading when query params change during deploy flow
+  watch(
+    () => ({ vendor: route.params.vendor, solution: route.params.solution }),
+    (newParams, oldParams) => {
+      // Only reload if params actually changed (not on query changes)
+      if (
+        newParams.vendor &&
+        newParams.solution &&
+        (newParams.vendor !== oldParams?.vendor || newParams.solution !== oldParams?.solution)
+      ) {
+        loadSolutionByVendor()
+      }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
       <div
-        class="flex flex-col gap-4"
-        v-if="isLoading"
-      >
-        <div class="flex gap-3">
-          <Skeleton class="h-4 w-10" />
-          <Skeleton class="h-4 w-24" />
-        </div>
-        <Skeleton class="h-9 w-64" />
-        <div class="flex gap-4">
-          <Skeleton class="hidden sm:flex w-10 h-10" />
-          <div class="flex flex-col gap-4 sm:flex-row w-full">
-            <div class="flex items-center gap-3">
-              <Skeleton class="h-4 w-20" />
-              <Skeleton class="h-4 w-20" />
-              <Skeleton class="h-4 w-36" />
-            </div>
-            <Skeleton class="sm:ml-auto h-9 sm:w-28" />
-          </div>
-        </div>
-      </div>
-      <PageHeadingBlock
-        :pageTitle="solution.name"
-        :description="solution.headline"
-        v-if="!isLoading"
-      />
-      <div
-        class="flex flex-col sm:flex-row gap-4 lg:items-center"
-        v-if="!isLoading"
+        class="flex flex-col sm:flex-row gap-4 lg:items-center none"
+        v-if="false"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div
@@ -216,9 +194,9 @@
         <TemplateEngineBlock
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
-          @instantiate="handleInstantiate"
           :getTemplateService="props.getTemplateService"
           :instantiateTemplateService="props.instantiateTemplateService"
+          :getResultsService="scriptRunnerService.loadExecutionResultsService"
           :templateId="solution.referenceId"
         />
       </form>

@@ -6,7 +6,9 @@ export const VcsAdapter = {
         return {
           label: integration.scope,
           value: integration.id,
-          callbackUrl: uri
+          callbackUrl: uri,
+          provider: integration.provider.id,
+          providerName: integration.provider.name
         }
       }) || []
     )
