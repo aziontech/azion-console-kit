@@ -148,6 +148,7 @@
     "**/azion/**/ajv": "^8.18.0",
     "esbuild": "^0.25.0",
     "rollup": "^4.39.0",
+    "postcss": "^8.5.10",
     "prismjs": "^1.30.0",
     "js-yaml": "^4.1.1",
     "brace-expansion": "^2.0.2",
@@ -155,7 +156,11 @@
     "picomatch": "^2.3.2",
     "uuid": "^14.0.0",
     "diff": "^4.0.4",
-    "@tootallnate/once": "^3.0.1"
+    "@tootallnate/once": "^3.0.1",
+    "bn.js": "^5.2.3",
+    "serialize-javascript": "^7.0.5",
+    "mathjs": "^15.2.0",
+    "vite": "^6.4.2"
   },
   "engines": {
     "node": ">=22.18.0",
