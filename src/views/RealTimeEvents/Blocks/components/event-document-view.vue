@@ -79,9 +79,16 @@
   }
 
   const formatDisplayValue = (value) => {
-    if (value === null || value === undefined || value === '-') return '-'
+    if (value === null || value === undefined) return '-'
     const str = String(value)
+    if (str === '' || str === 'null' || str === 'undefined') return '-'
     return str.length > 200 ? `${str.slice(0, 200)}…` : str
+  }
+
+  const isValidValue = (value) => {
+    if (value === null || value === undefined) return false
+    const str = String(value)
+    return str !== '' && str !== '-' && str !== 'null' && str !== 'undefined'
   }
 </script>
 
@@ -158,7 +165,7 @@
             >
             <span class="doc-compact__actions">
               <PrimeButton
-                v-if="onAddFilter && entry.value !== '-'"
+                v-if="onAddFilter && isValidValue(entry.value)"
                 icon="pi pi-plus-circle"
                 text
                 size="small"
@@ -167,7 +174,7 @@
                 @click.stop="handleAddFilter(entry.key, entry.value)"
               />
               <PrimeButton
-                v-if="onExcludeFilter && entry.value !== '-'"
+                v-if="onExcludeFilter && isValidValue(entry.value)"
                 icon="pi pi-minus-circle"
                 text
                 size="small"
@@ -176,7 +183,7 @@
                 @click.stop="handleExcludeFilter(entry.key, entry.value)"
               />
               <PrimeButton
-                v-if="entry.value !== '-'"
+                v-if="isValidValue(entry.value)"
                 icon="pi pi-copy"
                 text
                 size="small"
@@ -203,7 +210,7 @@
               <span class="doc-list__key">{{ entry.key }}</span>
               <div class="doc-list__actions opacity-0 group-hover:opacity-100 transition-opacity">
                 <PrimeButton
-                  v-if="onAddFilter && entry.value !== '-'"
+                  v-if="onAddFilter && isValidValue(entry.value)"
                   icon="pi pi-plus-circle"
                   text
                   rounded
@@ -214,7 +221,7 @@
                   data-testid="event-document-add-filter"
                 />
                 <PrimeButton
-                  v-if="onExcludeFilter && entry.value !== '-'"
+                  v-if="onExcludeFilter && isValidValue(entry.value)"
                   icon="pi pi-minus-circle"
                   text
                   rounded
@@ -225,7 +232,7 @@
                   data-testid="event-document-exclude-filter"
                 />
                 <PrimeButton
-                  v-if="entry.value !== '-'"
+                  v-if="isValidValue(entry.value)"
                   icon="pi pi-copy"
                   text
                   rounded

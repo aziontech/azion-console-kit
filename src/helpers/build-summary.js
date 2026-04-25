@@ -73,7 +73,7 @@ export const buildSummary = (
     if (key === 'ts') {
       return { key, value: value ? getCurrentTimezone(value) : '-' }
     }
-    return { key, value: value ? value : '-' }
+    return { key, value: (value !== null && value !== undefined && value !== '') ? value : '-' }
   }
 
   // Present keys first, then reserve slots for priority fields that the

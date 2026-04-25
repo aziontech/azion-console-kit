@@ -72,7 +72,7 @@
         </template>
       </Column>
       <Column field="tsFormat" header="Time" sortable sortField="ts"
-        :style="{ width: '160px', minWidth: '160px', maxWidth: '160px' }"
+        :style="{ width: '185px', minWidth: '185px', maxWidth: '185px' }"
         frozen>
         <template #body="{ data: rowData }">
           <span class="timestamp-cell" @click="emit('select-row', rowData)">{{ rowData.tsFormat }}</span>
@@ -228,9 +228,9 @@
     overflow: visible;
     text-overflow: clip;
   }
-  /* Remove the white separator line between rows */
+  /* Subtle row divider */
   :deep(.discover-data-table .p-datatable-tbody > tr > td) {
-    border-bottom-color: transparent;
+    border-bottom: 1px solid color-mix(in srgb, var(--surface-border) 50%, transparent);
   }
   /* Frozen columns: keep background consistent */
   :deep(.discover-data-table .p-datatable-tbody > tr:nth-child(even) > td.p-frozen-column) {
@@ -281,6 +281,8 @@
     padding: 2px 4px;
     border-radius: var(--border-radius);
     transition: background-color 0.15s;
+    overflow: visible;
+    text-overflow: unset;
   }
   .timestamp-cell:hover {
     background: var(--surface-hover);

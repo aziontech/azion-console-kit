@@ -690,6 +690,22 @@
     opacity: 0.6;
   }
 
+  /* Area fill: semi-transparent under the line */
+  :deep(.c3-area) {
+    opacity: 0.15 !important;
+  }
+
+  /* Line stroke slightly thicker for readability */
+  :deep(.c3-line) {
+    stroke-width: 2px !important;
+  }
+
+  /* Bar chart: rounded top corners */
+  :deep(.c3-bar) {
+    rx: 2;
+    ry: 2;
+  }
+
   /* Compact tooltip for the small chart area */
   :deep(.c3-tooltip) {
     padding: 10px 12px;

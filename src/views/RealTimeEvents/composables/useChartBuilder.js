@@ -93,17 +93,20 @@ export function useChartBuilder(props) {
 
     const isStackedChart = false // spline charts always render at absolute Y values
 
-    // Metrics API charts (MULTI_SERIES_TIMESERIES) return data at 1-min granularity.
-    // Force minimum bucket of 1 min to avoid empty slots between data points.
-    // Events API charts (STACKED_HISTOGRAM) have per-second data, use standard bucketing.
-    const metricsMinInterval = kind === CHART_KINDS.MULTI_SERIES_TIMESERIES ? 60000 : 0
+    // Metrics API charts (MULTI_SERIES_TIMESERIES) return data already
+    // aggregated at the correct granularity — plot points directly without
+    // re-bucketing. Re-bucketing collapses points and can produce empty slots
+    // when the server timestamps don't align with client-computed bucket edges.
+    if (kind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
+      return buildDirectSeries(props.data, orderedKeys, duration, tz)
+    }
 
     // For percentage/milliseconds data, average instead of sum when multiple
     // rows collapse into the same bucket (summing percentages is nonsensical).
     const dataUnit = config?.dataUnit
     const shouldAverage = dataUnit === 'percentage' || dataUnit === 'milliseconds'
 
-    return buildMultiSeries(props.data, orderedKeys, rangeStart, rangeEnd, duration, tz, stackKey, isStackedChart, metricsMinInterval, shouldAverage)
+    return buildMultiSeries(props.data, orderedKeys, rangeStart, rangeEnd, duration, tz, stackKey, false, 0, shouldAverage)
   })
 
   const totalEvents = computed(() => {
@@ -285,6 +288,63 @@ export function resetSeriesOrderCache() {
   SERIES_ORDER_CACHE.clear()
 }
 
+/**
+ * Plot pre-aggregated Metrics API data directly without re-bucketing.
+ * The server already returns one point per minute/hour/day — collapsing
+ * into client-side buckets loses resolution and can produce empty charts
+ * when server timestamps don't align with client bucket edges.
+ */
+function buildDirectSeries(rawData, seriesFields, duration, tz) {
+  if (!rawData?.length || !seriesFields?.length) {
+    return { columns: [], groups: [], seriesNames: [], maxValue: 0, tooltipLabels: [] }
+  }
+
+  // Sort by ts ascending
+  const sorted = [...rawData].sort((a, b) => new Date(a.ts) - new Date(b.ts))
+
+  // Detect interval from consecutive timestamps for tooltip range
+  let interval = 60 * 1000 // default 1 min
+  if (sorted.length >= 2) {
+    const gaps = []
+    for (let i = 1; i < Math.min(sorted.length, 10); i++) {
+      const gap = new Date(sorted[i].ts) - new Date(sorted[i - 1].ts)
+      if (gap > 0) gaps.push(gap)
+    }
+    if (gaps.length) {
+      gaps.sort((a, b) => a - b)
+      interval = gaps[Math.floor(gaps.length / 2)]
+    }
+  }
+
+  let globalMax = 0
+  const xLabels = []
+  const tooltipLabels = []
+
+  for (const item of sorted) {
+    const date = new Date(item.ts)
+    xLabels.push(formatLabel(date, duration, tz, interval))
+    tooltipLabels.push(formatTooltipRange(date, new Date(date.getTime() + interval), duration, tz))
+
+    for (const field of seriesFields) {
+      const val = typeof item[field] === 'number' ? item[field] : 0
+      if (val > globalMax) globalMax = val
+    }
+  }
+
+  const columns = [['x', ...xLabels]]
+  for (const field of seriesFields) {
+    columns.push([field, ...sorted.map((item) => (typeof item[field] === 'number' ? item[field] : 0))])
+  }
+
+  return {
+    columns,
+    groups: [seriesFields],
+    seriesNames: seriesFields,
+    maxValue: globalMax,
+    tooltipLabels
+  }
+}
+
 function buildSingleSeries(rawData, rangeStart, rangeEnd, duration, tz) {
   const { sortedKeys, bucketMap, bucketMs } = aggregateIntoBuckets(rawData, rangeStart, rangeEnd)
 
@@ -380,9 +440,11 @@ export function buildC3Config({
   const configuredType = config?.chartType
   let chartType
   if (isStacked) {
-    chartType = 'spline'
+    chartType = 'bar'
   } else if (chartKind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
-    chartType = configuredType || 'spline'
+    // Default to area-spline for a richer visual — filled area under the line
+    // makes trends much easier to read than a bare spline.
+    chartType = configuredType || 'area-spline'
   } else {
     chartType = 'bar'
   }
@@ -445,6 +507,8 @@ export function buildC3Config({
 
   const stackOrder = shouldStack ? null : 'desc'
 
+  const isAreaChart = chartType === 'area-spline' || chartType === 'area'
+
   return {
     bindto: chartRef,
     data: {
@@ -474,7 +538,7 @@ export function buildC3Config({
       [axisYKey]: {
         ...(yMax !== undefined ? { max: yMax } : {}),
         min: 0,
-        padding: { top: 10, bottom: 0 },
+        padding: { top: 16, bottom: 0 },
         tick: { count: 5, format: formatCompact }
       }
     },
@@ -482,11 +546,6 @@ export function buildC3Config({
       show: isMulti,
       position: 'bottom',
       equally: true
-      // Legend clicks fall through to c3's native handler: clicking a series
-      // hides it, the remaining series gain focus, and the Y axis rescales
-      // to the visible data; clicking again brings it back. Overriding
-      // `item.onclick` here would disable that default and the chart would
-      // stop reacting — we intentionally avoid it.
     },
     tooltip: {
       grouped: isMulti,
@@ -503,22 +562,29 @@ export function buildC3Config({
         }
       }
     },
-    bar: (isMulti && !isMultiBar) ? {} : { width: { ratio: 0.85 } },
-    ...(config?.splineInterpolation
-      ? { spline: { interpolation: { type: config.splineInterpolation } } }
-      : {}),
+    bar: (isMulti && !isMultiBar) ? {} : { width: { ratio: 0.7 }, zerobased: true },
+    // Smooth monotone interpolation for area/spline charts
+    spline: { interpolation: { type: config?.splineInterpolation || (isAreaChart ? 'monotone' : 'cardinal') } },
+    // Area opacity: semi-transparent fill under the line
+    ...(isAreaChart ? { area: { zerobased: true } } : {}),
     padding: {
       left: typeof window !== 'undefined' && window.innerWidth < 640 ? 35 : 50,
       right: typeof window !== 'undefined' && window.innerWidth < 640 ? 8 : 15,
-      top: 5,
+      top: 8,
       bottom: 0
     },
-    grid: { [axisYKey]: { show: true } },
-    point: { show: false },
-    // Disable entrance/update transitions when rendering large series —
-    // animating hundreds of bars/points dominates the frame budget and is
-    // visually noisy. 150 slots is the heuristic cutoff.
-    transition: { duration: (columns[0]?.length || 0) > 150 ? 0 : 120 },
+    grid: {
+      [axisYKey]: {
+        show: true,
+        lines: []
+      }
+    },
+    // Show points only on hover for cleaner look
+    point: {
+      show: false,
+      focus: { expand: { enabled: true, r: 4 } }
+    },
+    transition: { duration: (columns[0]?.length || 0) > 150 ? 0 : 200 },
     line: { connectNull: true }
   }
 }

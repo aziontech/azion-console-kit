@@ -147,16 +147,29 @@ export const listHttpRequest = async (filter, { onQuery } = {}) => {
 
   // Merge by requestId — both queries use the same filter + ordering so
   // rows arrive in the same order. Build a Map from chunk B for O(1) lookup.
-  const chunkBByRequestId = new Map(rowsB.map((row) => [row.requestId, row]))
+  // Only index rows that have a non-null requestId to avoid false matches.
+  const chunkBByRequestId = new Map(
+    rowsB
+      .filter((row) => row.requestId != null && row.requestId !== '')
+      .map((row) => [row.requestId, row])
+  )
 
   // In-place merge: assign chunk B fields directly onto chunk A row objects
   // to avoid spread-copying every row.
   for (let i = 0; i < rowsA.length; i++) {
     const rowA = rowsA[i]
-    const rowB =
-      rowsB[i]?.requestId === rowA.requestId
+    // Primary: match by requestId. Fallback: match by position (same index).
+    // Position fallback handles cases where requestId is null/empty for all rows.
+    let rowB = null
+    if (rowA.requestId != null && rowA.requestId !== '') {
+      rowB = rowsB[i]?.requestId === rowA.requestId
         ? rowsB[i]
-        : chunkBByRequestId.get(rowA.requestId)
+        : chunkBByRequestId.get(rowA.requestId) || null
+    }
+    // Positional fallback: if no requestId match, use same index
+    if (!rowB && rowsB[i]) {
+      rowB = rowsB[i]
+    }
     if (rowB) {
       for (const key in rowB) {
         if (key !== 'requestId' && key !== 'ts') {

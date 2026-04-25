@@ -77,7 +77,7 @@ export function useFieldStats({
           row.summary.forEach(({ key, value }) => {
             if (!runningCounts[key]) runningCounts[key] = {}
             const strValue = String(value)
-            if (strValue && strValue !== '-') {
+            if (strValue !== '' && strValue !== '-' && strValue !== 'null' && strValue !== 'undefined') {
               runningCounts[key][strValue] = (runningCounts[key][strValue] || 0) + 1
             }
           })

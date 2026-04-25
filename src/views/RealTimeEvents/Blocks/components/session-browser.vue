@@ -131,7 +131,7 @@
           >
             <i class="pi pi-list text-base text-color-secondary" />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-sm font-medium text-color truncate">Log Explorer</span>
+              <span class="text-sm font-medium text-color truncate">Events</span>
               <span class="text-xs text-color-secondary truncate">Default events explorer</span>
             </div>
           </div>

@@ -123,7 +123,7 @@
         v-if="selectedFields.length"
         class="border-b surface-border"
       >
-        <div class="px-3 py-2">
+        <div class="field-sidebar__section-label">
           <span class="text-xs font-medium text-color-secondary uppercase tracking-wide">
             Selected ({{ selectedFields.length }})
           </span>
@@ -132,17 +132,17 @@
           <div
             v-for="fieldName in selectedFields"
             :key="'sel-' + fieldName"
-            class="flex items-center gap-2 px-3 py-1.5 hover:surface-hover cursor-pointer"
+            class="field-sidebar__row"
             data-testid="field-sidebar-selected-item"
           >
             <Checkbox
               :modelValue="true"
               :binary="true"
-              class="!w-4 !h-4"
+              class="!w-4 !h-4 flex-shrink-0"
               @click="toggleField(fieldName)"
             />
             <span
-              class="text-xs text-color flex-1 truncate"
+              class="field-sidebar__row-name field-sidebar__row-name--selected"
               @click="toggleFieldStats(fieldName)"
             >
               {{ fieldName }}
@@ -155,7 +155,7 @@
       <div class="flex-1 overflow-y-auto">
         <!-- Pinned section -->
         <template v-if="pinnedFields.length">
-          <div class="px-3 py-2 flex items-center gap-1.5">
+          <div class="field-sidebar__section-label">
             <i class="pi pi-bookmark-fill field-sidebar__pin-icon" />
             <span class="field-sidebar__pin-label">PINNED</span>
           </div>
@@ -166,25 +166,25 @@
               class="flex flex-col"
             >
               <div
-                class="flex items-center gap-2 px-3 py-1.5 hover:surface-hover cursor-pointer"
+                class="field-sidebar__row"
                 @click="toggleFieldStats(field.value)"
                 data-testid="field-sidebar-pinned-item"
               >
                 <Checkbox
                   :modelValue="isFieldSelected(field.value)"
                   :binary="true"
-                  class="!w-4 !h-4"
+                  class="!w-4 !h-4 flex-shrink-0"
                   @click.stop="toggleField(field.value)"
                 />
                 <span
-                  class="text-xs flex-1 truncate"
-                  :class="isFieldSelected(field.value) ? 'text-color font-medium' : 'text-color'"
+                  class="field-sidebar__row-name"
+                  :class="{ 'field-sidebar__row-name--selected': isFieldSelected(field.value) }"
                 >
                   {{ field.value }}
                 </span>
                 <span
                   v-if="fieldStats[field.value]"
-                  class="text-xs text-color-secondary"
+                  class="field-sidebar__row-count"
                   v-tooltip.top="{
                     value: `${fieldStats[field.value].uniqueCount} unique values in loaded page`,
                     showDelay: 300
@@ -196,49 +196,34 @@
 
               <div
                 v-if="expandedField === field.value && fieldStats[field.value]"
-                class="px-3 pb-2 ml-6"
+                class="field-sidebar__stats"
               >
-                <div class="rounded surface-hover p-2">
-                  <div class="text-xs text-color-secondary mb-1">
-                    Top {{ fieldStats[field.value].topValues.length }} of
-                    {{ fieldStats[field.value].uniqueCount }} values
-                  </div>
-                  <div
-                    v-for="(stat, statIdx) in fieldStats[field.value].topValues"
-                    :key="statIdx"
-                    class="field-sidebar__topvalue-row"
-                    :title="stat.value"
-                    @click="handleAddFilter(field.value, stat.value)"
-                  >
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center justify-between text-xs mb-0.5">
-                        <span class="truncate text-color">
-                          {{ truncateFieldValue(stat.value) }}
-                        </span>
-                        <span class="text-color-secondary ml-1 whitespace-nowrap">
-                          {{ stat.percent }}%
-                        </span>
-                      </div>
-                      <ProgressBar
-                        :value="stat.percent"
-                        :showValue="false"
-                        class="!h-1"
-                      />
-                    </div>
-                  </div>
-                  <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
+                <div class="field-sidebar__stats-title">
+                  Top {{ fieldStats[field.value].topValues.length }} of
+                  {{ fieldStats[field.value].uniqueCount }} values
                 </div>
+                <div
+                  v-for="(stat, statIdx) in fieldStats[field.value].topValues"
+                  :key="statIdx"
+                  class="field-sidebar__topvalue-row"
+                  :title="stat.value"
+                  @click="handleAddFilter(field.value, stat.value)"
+                >
+                  <div class="field-sidebar__topvalue-meta">
+                    <span class="field-sidebar__topvalue-label">{{ truncateFieldValue(stat.value) }}</span>
+                    <span class="field-sidebar__topvalue-pct">{{ stat.percent }}%</span>
+                  </div>
+                  <ProgressBar :value="stat.percent" :showValue="false" class="!h-1" />
+                </div>
+                <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
               </div>
             </div>
           </div>
-          <div
-            v-if="availableFieldsNonPinned.length"
-            class="field-sidebar__divider"
-          />
+          <div v-if="availableFieldsNonPinned.length" class="field-sidebar__divider" />
         </template>
 
         <!-- Available section -->
-        <div class="px-3 py-2">
+        <div class="field-sidebar__section-label">
           <span class="text-xs font-medium text-color-secondary uppercase tracking-wide">
             Available
           </span>
@@ -250,26 +235,23 @@
             class="flex flex-col"
           >
             <div
-              class="flex items-center gap-2 px-3 py-1.5 hover:surface-hover cursor-pointer"
+              class="field-sidebar__row"
               @click="toggleFieldStats(field.value)"
               data-testid="field-sidebar-available-item"
             >
               <Checkbox
                 :modelValue="isFieldSelected(field.value)"
                 :binary="true"
-                class="!w-4 !h-4"
+                class="!w-4 !h-4 flex-shrink-0"
                 @click.stop="toggleField(field.value)"
               />
               <span
-                class="text-xs flex-1 truncate"
-                :class="isFieldSelected(field.value) ? 'text-color font-medium' : 'text-color'"
+                class="field-sidebar__row-name"
+                :class="{ 'field-sidebar__row-name--selected': isFieldSelected(field.value) }"
               >
                 {{ field.value }}
               </span>
-              <span
-                v-if="fieldStats[field.value]"
-                class="text-xs text-color-secondary"
-              >
+              <span v-if="fieldStats[field.value]" class="field-sidebar__row-count">
                 {{ fieldStats[field.value].uniqueCount }}
               </span>
             </div>
@@ -277,44 +259,32 @@
             <!-- Field statistics -->
             <div
               v-if="expandedField === field.value && fieldStats[field.value]"
-              class="px-3 pb-2 ml-6"
+              class="field-sidebar__stats"
             >
-              <div class="rounded surface-hover p-2">
-                <div class="text-xs text-color-secondary mb-1">
-                  Top {{ fieldStats[field.value].topValues.length }} of
-                  {{ fieldStats[field.value].uniqueCount }} values
-                </div>
-                <div
-                  v-for="(stat, statIdx) in fieldStats[field.value].topValues"
-                  :key="statIdx"
-                  class="field-sidebar__topvalue-row"
-                  :title="stat.value"
-                  @click="handleAddFilter(field.value, stat.value)"
-                >
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between text-xs mb-0.5">
-                      <span class="truncate text-color">
-                        {{ truncateFieldValue(stat.value) }}
-                      </span>
-                      <span class="text-color-secondary ml-1 whitespace-nowrap">
-                        {{ stat.percent }}%
-                      </span>
-                    </div>
-                    <ProgressBar
-                      :value="stat.percent"
-                      :showValue="false"
-                      class="!h-1"
-                    />
-                  </div>
-                </div>
-                <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
+              <div class="field-sidebar__stats-title">
+                Top {{ fieldStats[field.value].topValues.length }} of
+                {{ fieldStats[field.value].uniqueCount }} values
               </div>
+              <div
+                v-for="(stat, statIdx) in fieldStats[field.value].topValues"
+                :key="statIdx"
+                class="field-sidebar__topvalue-row"
+                :title="stat.value"
+                @click="handleAddFilter(field.value, stat.value)"
+              >
+                <div class="field-sidebar__topvalue-meta">
+                  <span class="field-sidebar__topvalue-label">{{ truncateFieldValue(stat.value) }}</span>
+                  <span class="field-sidebar__topvalue-pct">{{ stat.percent }}%</span>
+                </div>
+                <ProgressBar :value="stat.percent" :showValue="false" class="!h-1" />
+              </div>
+              <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
             </div>
           </div>
 
           <div
             v-if="!filteredFields.length"
-            class="px-3 py-2 text-sm text-color-secondary"
+            class="px-3 py-3 text-xs text-color-secondary"
           >
             No fields match your search.
           </div>
@@ -325,6 +295,7 @@
 </template>
 
 <style scoped>
+  /* ── Container ─────────────────────────────────────────────────── */
   .field-sidebar {
     display: flex;
     flex-direction: column;
@@ -336,69 +307,154 @@
     background: var(--surface-ground);
   }
 
-  /* Align header with chart header */
+  /* ── Header ─────────────────────────────────────────────────────── */
   .field-sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
     height: 2.25rem;
+    flex-shrink: 0;
     border-bottom: 1px solid var(--surface-border);
     background: var(--surface-section);
   }
 
-  /* Search section with matching padding */
+  /* ── Search ──────────────────────────────────────────────────────── */
   .field-sidebar-search {
-    padding: 0.625rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+    flex-shrink: 0;
     border-bottom: 1px solid var(--surface-border);
   }
 
-  /* Align header border with chart header border */
-  .field-sidebar > .border-b:first-of-type {
-    border-bottom: 1px solid var(--surface-border);
+  /* ── Section labels (PINNED / AVAILABLE / SELECTED) ─────────────── */
+  .field-sidebar__section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem 0.25rem;
   }
 
+  /* ── Field row ───────────────────────────────────────────────────── */
+  .field-sidebar__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    min-height: 2rem;
+    cursor: pointer;
+    transition: background-color 0.1s;
+  }
+
+  .field-sidebar__row:hover {
+    background: var(--surface-hover);
+  }
+
+  .field-sidebar__row-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    color: var(--text-color);
+  }
+
+  .field-sidebar__row-name--selected {
+    font-weight: 600;
+  }
+
+  .field-sidebar__row-count {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    flex-shrink: 0;
+    min-width: 1.5rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Stats panel ─────────────────────────────────────────────────── */
+  .field-sidebar__stats {
+    margin: 0 0.75rem 0.375rem 1.75rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: var(--border-radius);
+    background: var(--surface-hover);
+  }
+
+  .field-sidebar__stats-title {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 0.375rem;
+  }
+
+  .field-sidebar__topvalue-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1875rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: calc(var(--border-radius) - 2px);
+    cursor: pointer;
+    transition: background-color 0.1s;
+  }
+
+  .field-sidebar__topvalue-row:hover {
+    background: var(--surface-card);
+  }
+
+  .field-sidebar__topvalue-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem;
+  }
+
+  .field-sidebar__topvalue-label {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .field-sidebar__topvalue-pct {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .field-sidebar__topvalue-hint {
+    font-size: 0.625rem;
+    color: var(--text-color-secondary);
+    font-style: italic;
+    margin-top: 0.375rem;
+    padding: 0 0.375rem;
+    opacity: 0.75;
+  }
+
+  /* ── Divider ─────────────────────────────────────────────────────── */
+  .field-sidebar__divider {
+    height: 1px;
+    background: var(--surface-border);
+    margin: 0.375rem 0.75rem;
+  }
+
+  /* ── Pin icon / label ────────────────────────────────────────────── */
   .field-sidebar__pin-icon {
-    font-size: 12px;
+    font-size: 0.6875rem;
     color: var(--primary-color);
   }
 
   .field-sidebar__pin-label {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: var(--primary-color);
     text-transform: uppercase;
   }
 
-  .field-sidebar__divider {
-    height: 1px;
-    background: var(--surface-border);
-    margin: 8px 12px;
-  }
-
-  .field-sidebar__topvalue-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 6px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: background-color 0.1s ease;
-  }
-
-  .field-sidebar__topvalue-row:hover {
-    background-color: var(--surface-hover);
-  }
-
-  .field-sidebar__topvalue-hint {
-    font-size: 10px;
-    color: var(--text-color-secondary);
-    font-style: italic;
-    margin-top: 6px;
-    opacity: 0.8;
-  }
-
+  /* ── Slide transition ────────────────────────────────────────────── */
   .slide-sidebar-enter-active,
   .slide-sidebar-leave-active {
     transition: all 0.2s ease;
@@ -408,5 +464,46 @@
   .slide-sidebar-leave-to {
     transform: translateX(-100%);
     opacity: 0;
+  }
+
+  /* ── Responsive ──────────────────────────────────────────────────── */
+  /* Compact on small screens */
+  @media (max-width: 640px) {
+    .field-sidebar__row {
+      padding: 0.25rem 0.625rem;
+      min-height: 1.75rem;
+    }
+
+    .field-sidebar-search {
+      padding: 0.375rem 0.625rem;
+    }
+
+    .field-sidebar__stats {
+      margin: 0 0.625rem 0.25rem 1.5rem;
+    }
+  }
+
+  /* Generous on large screens */
+  @media (min-width: 1920px) {
+    .field-sidebar__row {
+      padding: 0.375rem 1rem;
+      min-height: 2.25rem;
+    }
+
+    .field-sidebar-header {
+      padding: 0 1rem;
+    }
+
+    .field-sidebar-search {
+      padding: 0.625rem 1rem;
+    }
+
+    .field-sidebar__stats {
+      margin: 0 1rem 0.5rem 2rem;
+    }
+
+    .field-sidebar__section-label {
+      padding: 0.5rem 1rem 0.25rem;
+    }
   }
 </style>
