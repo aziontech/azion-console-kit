@@ -136,6 +136,18 @@ const METRICS_DATASET_MAP = {
   activityHistoryEvents: null
 }
 
+// Aggregation field per Metrics dataset.
+// Each Metrics dataset exposes different numeric fields — using the wrong one
+// causes a GraphQL schema error. Defaults to 'count: rows' as safe fallback.
+const METRICS_AGGREGATE_MAP = {
+  httpMetrics: 'sum: requests',
+  edgeFunctionsMetrics: 'count: rows',
+  imagesProcessedMetrics: 'sum: requests',
+  l2CacheMetrics: 'sum: requests',
+  idnsQueriesMetrics: 'sum: requests',
+  dataStreamedMetrics: 'sum: dataStreamed',
+}
+
 const EMPTY_RESULT = Object.freeze({ chartData: [], kpis: null })
 
 const STATUS_METRICS_ALIASES = Object.freeze([
@@ -401,6 +413,89 @@ async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters 
   }
 }
 
+const CACHE_STATUS_BUCKETS = ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE', 'REVALIDATED', 'UPDATING']
+
+/**
+ * Load cache status breakdown using Metrics API with groupBy: [ts, upstreamCacheStatus].
+ * Returns pre-aggregated points — no client-side bucketing needed.
+ */
+async function loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters = {} }) {
+  const metricsDataset = METRICS_DATASET_MAP[dataset]
+  if (!metricsDataset) return EMPTY_RESULT
+
+  const tsRangeBegin = tsRange.tsRangeBegin instanceof Date
+    ? tsRange.tsRangeBegin.toISOString() : String(tsRange.tsRangeBegin)
+  const tsRangeEnd = tsRange.tsRangeEnd instanceof Date
+    ? tsRange.tsRangeEnd.toISOString() : String(tsRange.tsRangeEnd)
+
+  const metricsAggregate = METRICS_AGGREGATE_MAP[metricsDataset] || 'sum: requests'
+  const aggReturnField = metricsAggregate.startsWith('count') ? 'count' : 'sum'
+
+  const extraFilterFragments = []
+  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd }
+  const extraParamDeclarations = []
+  Object.entries(filters?.and || {}).forEach(([key, value]) => {
+    const varName = `filter_${key}`
+    variables[varName] = value
+    extraFilterFragments.push(`${key}: ${varName}`)
+    extraParamDeclarations.push(`${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
+  })
+  const extraFilterStr = extraFilterFragments.length ? `, ${extraFilterFragments.join(', ')}` : ''
+  const extraParamsStr = extraParamDeclarations.length ? `, ${extraParamDeclarations.join(', ')}` : ''
+
+  const query = {
+    query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!${extraParamsStr}) {
+      ${metricsDataset} (
+        limit: 10000
+        aggregate: { ${metricsAggregate} }
+        groupBy: [ts, upstreamCacheStatus]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: { begin: $tsRange_begin, end: $tsRange_end }${extraFilterStr}
+        }
+      ) {
+        ts
+        upstreamCacheStatus
+        ${aggReturnField}
+      }
+    }`,
+    variables
+  }
+
+  const response = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: makeBeholderBaseUrl(),
+    method: 'POST',
+    body: JSON.stringify(query)
+  })
+
+  if (response.statusCode !== 200) throw new Error(response.body?.detail || 'Metrics API error')
+
+  const rawData = response.body?.data?.[metricsDataset]
+  if (!rawData || !Array.isArray(rawData)) return { chartData: [], kpis: null }
+
+  // Pivot: one row per ts, one column per cache status bucket
+  const perTs = new Map()
+  rawData.forEach((item) => {
+    if (!item?.ts) return
+    const status = String(item.upstreamCacheStatus || '-').toUpperCase()
+    const bucket = CACHE_STATUS_BUCKETS.includes(status) ? status : '-'
+    if (!perTs.has(item.ts)) perTs.set(item.ts, { ts: item.ts })
+    const entry = perTs.get(item.ts)
+    entry[bucket] = (entry[bucket] || 0) + (item[aggReturnField] || 0)
+  })
+
+  const chartData = Array.from(perTs.values()).sort(
+    (a, b) => new Date(a.ts) - new Date(b.ts)
+  )
+
+  const total = chartData.reduce((sum, row) => {
+    return sum + CACHE_STATUS_BUCKETS.reduce((s, b) => s + (row[b] || 0), 0)
+  }, 0)
+
+  return { chartData, kpis: { total, clientErrors: null, serverErrors: null, avgRequestTime: null, supportsStatusBreakdown: false, supportsRequestTime: false } }
+}
+
 export const loadEventsChartAggregation = async ({
   dataset,
   tsRange,
@@ -433,6 +528,16 @@ export const loadEventsChartAggregation = async ({
   // Request method breakdown: use Metrics API with groupBy: [ts, requestMethod]
   if (groupByField === 'requestMethod') {
     return loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters })
+  }
+
+  // Cache status breakdown: use Metrics API with groupBy: [ts, upstreamCacheStatus]
+  if (groupByField === 'upstreamCacheStatus') {
+    return loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters })
+  }
+
+  // Any other groupByField not supported by Metrics API — fall back to Events API
+  if (groupByField) {
+    return loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField })
   }
 
   // Normalize tsRange to ISO strings
@@ -475,12 +580,15 @@ export const loadEventsChartAggregation = async ({
   const extraParamsStr =
     extraParamDeclarations.length > 0 ? `, ${extraParamDeclarations.join(', ')}` : ''
 
-  // Build Metrics API query
+  // Build Metrics API query — use the correct aggregate field for this dataset
+  const metricsAggregate = METRICS_AGGREGATE_MAP[metricsDataset] || 'count: rows'
+  const metricsReturnField = metricsAggregate.startsWith('count') ? 'count' : 'sum'
+
   const query = {
     query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!${extraParamsStr}) {
       ${metricsDataset} (
         limit: 10000
-        aggregate: { sum: requests }
+        aggregate: { ${metricsAggregate} }
         groupBy: [ts]
         orderBy: [ts_ASC]
         filter: {
@@ -488,7 +596,7 @@ export const loadEventsChartAggregation = async ({
         }
       ) {
         ts
-        sum
+        ${metricsReturnField}
       }
     }`,
     variables
@@ -508,10 +616,10 @@ export const loadEventsChartAggregation = async ({
   const rawData = response.body?.data?.[metricsDataset]
   if (!rawData || !Array.isArray(rawData)) return { chartData: [], kpis: null }
 
-  // Convert Metrics format { ts, sum } → chart format { ts, count }
+  // Convert Metrics format { ts, sum|count } → chart format { ts, count }
   const chartData = rawData.map((item) => ({
     ts: item.ts,
-    count: item.sum || 0
+    count: item[metricsReturnField] || 0
   }))
 
   // Total is derivable from the chartData sum; status breakdown / requestTime

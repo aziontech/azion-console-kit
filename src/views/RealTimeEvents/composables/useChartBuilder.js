@@ -97,7 +97,8 @@ export function useChartBuilder(props) {
     // aggregated at the correct granularity — plot points directly without
     // re-bucketing. Re-bucketing collapses points and can produce empty slots
     // when the server timestamps don't align with client-computed bucket edges.
-    if (kind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
+    // STACKED_HISTOGRAM with groupBy also returns pre-pivoted data — same treatment.
+    if (kind === CHART_KINDS.MULTI_SERIES_TIMESERIES || kind === CHART_KINDS.STACKED_HISTOGRAM) {
       return buildDirectSeries(props.data, orderedKeys, duration, tz)
     }
 
@@ -338,7 +339,7 @@ function buildDirectSeries(rawData, seriesFields, duration, tz) {
 
   return {
     columns,
-    groups: [seriesFields],
+    groups: [],
     seriesNames: seriesFields,
     maxValue: globalMax,
     tooltipLabels
@@ -440,10 +441,8 @@ export function buildC3Config({
   const configuredType = config?.chartType
   let chartType
   if (isStacked) {
-    chartType = 'bar'
+    chartType = 'area-spline'
   } else if (chartKind === CHART_KINDS.MULTI_SERIES_TIMESERIES) {
-    // Default to area-spline for a richer visual — filled area under the line
-    // makes trends much easier to read than a bare spline.
     chartType = configuredType || 'area-spline'
   } else {
     chartType = 'bar'
@@ -538,7 +537,7 @@ export function buildC3Config({
       [axisYKey]: {
         ...(yMax !== undefined ? { max: yMax } : {}),
         min: 0,
-        padding: { top: 16, bottom: 0 },
+        padding: { top: 24, bottom: 0 },
         tick: { count: 5, format: formatCompact }
       }
     },
@@ -563,8 +562,8 @@ export function buildC3Config({
       }
     },
     bar: (isMulti && !isMultiBar) ? {} : { width: { ratio: 0.7 }, zerobased: true },
-    // Smooth monotone interpolation for area/spline charts
-    spline: { interpolation: { type: config?.splineInterpolation || (isAreaChart ? 'monotone' : 'cardinal') } },
+    // Smooth interpolation for spline charts — linear keeps peaks sharp and Y-axis breathing room
+    spline: { interpolation: { type: config?.splineInterpolation || 'monotone' } },
     // Area opacity: semi-transparent fill under the line
     ...(isAreaChart ? { area: { zerobased: true } } : {}),
     padding: {

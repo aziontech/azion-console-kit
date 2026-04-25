@@ -690,14 +690,14 @@
     opacity: 0.6;
   }
 
-  /* Area fill: semi-transparent under the line */
+  /* Area fill: very subtle, won't obscure other series */
   :deep(.c3-area) {
-    opacity: 0.15 !important;
+    opacity: 0.05 !important;
   }
 
-  /* Line stroke slightly thicker for readability */
+  /* Line stroke — 1.5px, readable without dominating */
   :deep(.c3-line) {
-    stroke-width: 2px !important;
+    stroke-width: 1.5px !important;
   }
 
   /* Bar chart: rounded top corners */
