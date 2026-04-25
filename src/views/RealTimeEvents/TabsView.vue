@@ -57,29 +57,31 @@
       </div>
 
       <!-- Tab contents (KeepAlive preserves per-tab state) -->
-      <KeepAlive>
-        <TabPanelBlock
-          v-if="!activeTabId"
-          key="tab-events"
-          ref="tabPanelBlockRef"
-          :listService="selectedTabProps.listService"
-          :filterFields="generatedFilterFields"
-          :tabSelected="selectedTab"
-          :loadEventsChartAggregation="loadEventsChartAggregation"
-          :initialFilterState="pendingShareViewState?.filters"
-          :initialPageSize="pendingShareViewState?.pageSize"
-          :initialSelectedFields="pendingShareViewState?.selectedFields"
-          @dataset-change="handleDatasetChange"
-        />
-        <DashboardPanel
-          v-else-if="activePanelConfig"
-          :key="`tab-${activeTabId}`"
-          :panelConfig="activePanelConfig"
-          :listEventsService="dashboardListService"
-          :filterFields="generatedFilterFields"
-          :loadEventsChartAggregation="loadEventsChartAggregation"
-        />
-      </KeepAlive>
+      <div class="mt-3">
+        <KeepAlive>
+          <TabPanelBlock
+            v-if="!activeTabId"
+            key="tab-events"
+            ref="tabPanelBlockRef"
+            :listService="selectedTabProps.listService"
+            :filterFields="generatedFilterFields"
+            :tabSelected="selectedTab"
+            :loadEventsChartAggregation="loadEventsChartAggregation"
+            :initialFilterState="pendingShareViewState?.filters"
+            :initialPageSize="pendingShareViewState?.pageSize"
+            :initialSelectedFields="pendingShareViewState?.selectedFields"
+            @dataset-change="handleDatasetChange"
+          />
+          <DashboardPanel
+            v-else-if="activePanelConfig"
+            :key="`tab-${activeTabId}`"
+            :panelConfig="activePanelConfig"
+            :listEventsService="dashboardListService"
+            :filterFields="generatedFilterFields"
+            :loadEventsChartAggregation="loadEventsChartAggregation"
+          />
+        </KeepAlive>
+      </div>
 
       <!-- Session Browser Sidebar (picker) — readOnly while custom sessions
            are disabled; Edit/Delete controls are hidden from the UI. -->

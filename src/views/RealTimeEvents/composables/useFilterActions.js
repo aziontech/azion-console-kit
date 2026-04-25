@@ -1,3 +1,5 @@
+import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system/filterFields/filterRow/component'
+
 /**
  * Composable for filter CRUD and URL hash synchronisation.
  *
@@ -12,7 +14,7 @@
  * @param {Function}                    options.loadData          – triggers a full data reload
  * @param {import('vue').Ref<boolean>} options.initialLoadDone   – guards against premature reloads
  * @param {import('vue').Ref<boolean>} options.isLoading         – current loading state
- * @param {Object}                      options.toast             – PrimeVue toast service
+ * @param {Function}                    options.onError           – error callback (replaces toast)
  * @param {Function}                    options.getFiltersFromHash – from useRouteFilterManager
  * @param {Function}                    options.setFilterInHash    – from useRouteFilterManager
  */
@@ -24,7 +26,7 @@ export function useFilterActions({
   loadData,
   initialLoadDone,
   isLoading,
-  toast,
+  onError,
   getFiltersFromHash,
   setFilterInHash
 }) {
@@ -77,7 +79,7 @@ export function useFilterActions({
   const handleAddFilter = (fieldName, value) => {
     const match = filterFields.value.find((filterField) => filterField.value === fieldName)
     if (!match) {
-      toast.add({
+      onError({
         closable: true,
         severity: 'warn',
         summary: `Field "${fieldName}" not available as filter`
@@ -116,7 +118,7 @@ export function useFilterActions({
   const handleAddRangeFilter = (fieldName, gteValue, ltValue) => {
     const match = filterFields.value.find((filterField) => filterField.value === fieldName)
     if (!match) {
-      toast.add({
+      onError({
         closable: true,
         severity: 'warn',
         summary: `Field "${fieldName}" not available as filter`
@@ -126,7 +128,7 @@ export function useFilterActions({
     const gteOp = match.operator.find((op) => op.value === 'Gte' || op.value === 'Ge')
     const ltOp = match.operator.find((op) => op.value === 'Lt' || op.value === 'Lte')
     if (!gteOp || !ltOp) {
-      toast.add({
+      onError({
         closable: true,
         severity: 'warn',
         summary: `Range filter unavailable for "${fieldName}"`
@@ -213,4 +215,3 @@ export function useFilterActions({
     getHistoryParts
   }
 }
-import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system/filterFields/filterRow/component'

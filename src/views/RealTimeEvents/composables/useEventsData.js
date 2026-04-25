@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, shallowRef, triggerRef } from 'vue'
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000 // 2 hours
 
@@ -13,10 +13,11 @@ export function useEventsData({
   tabSelected,
   pageSize,
   hasChartConfig,
-  toast,
-  stackByField = null
+  onError = () => {},
+  stackByField = null,
+  locale = typeof navigator !== 'undefined' ? navigator.language : 'en'
 }) {
-  const tableData = ref([])
+  const tableData = shallowRef([])
   const chartData = ref([])
   const kpis = ref(null)
   const recordsFound = ref(0)
@@ -105,11 +106,14 @@ export function useEventsData({
     return String(raw)
   }
 
+  let chartLoadToken = 0
+
   const loadChart = () => {
     if (!hasChartConfig.value || !loadChartAggregation.value) {
       isChartLoading.value = false
       return
     }
+    const myToken = ++chartLoadToken
     isChartLoading.value = true
     loadChartAggregation
       .value({
@@ -119,6 +123,7 @@ export function useEventsData({
         groupByField: resolveStackField()
       })
       .then((result) => {
+        if (myToken !== chartLoadToken) return // stale response
         isChartLoading.value = false
         // Support both the new { chartData, kpis } shape and the legacy plain
         // array shape so callers that still return an array keep working.
@@ -131,10 +136,11 @@ export function useEventsData({
         }
       })
       .catch((err) => {
+        if (myToken !== chartLoadToken) return // stale response
         isChartLoading.value = false
         chartData.value = []
         kpis.value = null
-        toast.add({
+        onError({
           closable: true,
           severity: 'warn',
           summary: 'Chart failed',
@@ -186,7 +192,7 @@ export function useEventsData({
       tableData.value = records
       // Fallback: if chart hasn't emitted total-computed yet, use local count
       if (recordsFound.value === '—') {
-        recordsFound.value = new Intl.NumberFormat('pt-BR').format(records.length)
+        recordsFound.value = new Intl.NumberFormat(locale).format(records.length)
       }
       const totalNum =
         typeof recordsFound.value === 'number'
@@ -196,7 +202,7 @@ export function useEventsData({
         ? isNaN(totalNum) || records.length < totalNum
         : currentWindowEnd > originalBegin || isNaN(totalNum) || records.length < totalNum
     } catch (error) {
-      toast.add({ closable: true, severity: 'error', summary: 'Error', detail: error })
+      onError({ closable: true, severity: 'error', summary: 'Error', detail: error })
       recordsFound.value = 0
       tableData.value = []
       chartData.value = []
@@ -232,7 +238,10 @@ export function useEventsData({
           if ((res.data || []).length < remaining) continue
         }
       }
-      if (newRecords.length > 0) tableData.value = [...tableData.value, ...newRecords]
+      if (newRecords.length > 0) {
+        tableData.value.push(...newRecords)
+        triggerRef(tableData)
+      }
       const totalNum =
         typeof recordsFound.value === 'number'
           ? recordsFound.value
@@ -242,14 +251,14 @@ export function useEventsData({
         hasMoreData.value =
           currentWindowEnd > new Date(filterData.value.tsRange.tsRangeBegin).getTime()
     } catch (error) {
-      toast.add({ closable: true, severity: 'error', summary: 'Error loading more', detail: error })
+      onError({ closable: true, severity: 'error', summary: 'Error loading more', detail: error })
     } finally {
       isLoadingMore.value = false
     }
   }
 
   const setRecordsFound = (total) => {
-    recordsFound.value = new Intl.NumberFormat('pt-BR').format(total)
+    recordsFound.value = new Intl.NumberFormat(locale).format(total)
   }
 
   return {

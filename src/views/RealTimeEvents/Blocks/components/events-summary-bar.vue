@@ -193,7 +193,8 @@
 
 <style scoped>
   .events-summary-bar {
-    border-top: 1px solid var(--surface-border);
+    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
     padding: 8px 12px 10px;
     display: flex;
     flex-direction: column;
@@ -217,11 +218,11 @@
   }
 
   .events-summary-bar__header > i {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
 
   .events-summary-bar__title {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--text-color-secondary);
@@ -236,7 +237,7 @@
   }
 
   .events-summary-bar__inline-item {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text-color-secondary);
     display: inline-flex;
     gap: 4px;
@@ -244,7 +245,7 @@
   }
 
   .events-summary-bar__inline-value {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--rte-font-mono);
     font-weight: 600;
     color: var(--text-color);
   }
@@ -258,7 +259,7 @@
   .events-summary-bar__card {
     background: var(--surface-card);
     border: 1px solid var(--surface-border);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     padding: 12px 14px;
     display: flex;
     flex-direction: column;
@@ -267,7 +268,7 @@
   }
 
   .events-summary-bar__label {
-    font-size: 9px;
+    font-size: 0.5625rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -275,8 +276,8 @@
   }
 
   .events-summary-bar__value {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-    font-size: 22px;
+    font-family: var(--rte-font-mono);
+    font-size: 1.375rem;
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.1;
@@ -288,7 +289,7 @@
   }
 
   .events-summary-bar__sub {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text-color-secondary);
   }
 
@@ -304,7 +305,7 @@
     }
 
     .events-summary-bar__value {
-      font-size: 18px;
+      font-size: 1.125rem;
     }
 
     .events-summary-bar__inline {

@@ -1,6 +1,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import EventDocumentView from './event-document-view.vue'
 
   defineOptions({ name: 'DetailSidebarPanel' })
@@ -30,6 +31,7 @@
 
   const emit = defineEmits(['close', 'navigate'])
 
+  const toast = useToast()
   const scrollRef = ref(null)
 
   const title = computed(() => {
@@ -122,6 +124,7 @@
           :onAddFilter="onAddFilter"
           :onExcludeFilter="onExcludeFilter"
           :isLoading="isLoading"
+          @notify="(payload) => toast.add(payload)"
         />
       </div>
     </div>
@@ -131,15 +134,17 @@
 <style scoped>
   /* ── Detail Sidebar Panel ─────────────────────────────────────── */
   .detail-sidebar {
+    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
     display: flex;
     flex-direction: column;
     border-left: 1px solid var(--surface-border);
     background: var(--surface-ground);
     align-self: stretch;
     overflow: hidden;
-    width: 480px;
-    min-width: 360px;
-    max-width: 50vw;
+    width: 380px;
+    min-width: 280px;
+    max-width: 40vw;
     flex-shrink: 0;
   }
 
@@ -147,10 +152,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 0.75rem;
     border-bottom: 1px solid var(--surface-border);
-    gap: 0.75rem;
+    gap: 0.5rem;
     background: var(--surface-card);
+    flex-shrink: 0;
   }
 
   .detail-sidebar__title-group {
@@ -158,11 +164,11 @@
     flex-direction: column;
     min-width: 0;
     flex: 1;
-    gap: 0.25rem;
+    gap: 0.125rem;
   }
 
   .detail-sidebar__title {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text-color);
     white-space: nowrap;
@@ -171,9 +177,9 @@
   }
 
   .detail-sidebar__subtitle {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     color: var(--text-color-secondary);
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--rte-font-mono);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -182,14 +188,15 @@
   .detail-sidebar__nav {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0;
     flex-shrink: 0;
   }
 
   .detail-sidebar__content {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.75rem 0.75rem 0;
+    background: var(--surface-ground);
   }
 
   /* ── Transition ─────────────────────────────────────────────────── */

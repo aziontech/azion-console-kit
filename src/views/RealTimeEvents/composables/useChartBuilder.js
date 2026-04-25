@@ -2,7 +2,6 @@ import { computed } from 'vue'
 import {
   aggregateIntoBuckets,
   getBucketInterval,
-  detectNativeInterval,
   niceYMax,
   formatCompact,
   formatDetailed,
@@ -92,7 +91,19 @@ export function useChartBuilder(props) {
     const stackKey =
       kind === CHART_KINDS.STACKED_HISTOGRAM ? String(props.stackBy || 'default') : 'default'
 
-    return buildMultiSeries(props.data, orderedKeys, rangeStart, rangeEnd, duration, tz, stackKey)
+    const isStackedChart = false // spline charts always render at absolute Y values
+
+    // Metrics API charts (MULTI_SERIES_TIMESERIES) return data at 1-min granularity.
+    // Force minimum bucket of 1 min to avoid empty slots between data points.
+    // Events API charts (STACKED_HISTOGRAM) have per-second data, use standard bucketing.
+    const metricsMinInterval = kind === CHART_KINDS.MULTI_SERIES_TIMESERIES ? 60000 : 0
+
+    // For percentage/milliseconds data, average instead of sum when multiple
+    // rows collapse into the same bucket (summing percentages is nonsensical).
+    const dataUnit = config?.dataUnit
+    const shouldAverage = dataUnit === 'percentage' || dataUnit === 'milliseconds'
+
+    return buildMultiSeries(props.data, orderedKeys, rangeStart, rangeEnd, duration, tz, stackKey, isStackedChart, metricsMinInterval, shouldAverage)
   })
 
   const totalEvents = computed(() => {
@@ -145,27 +156,25 @@ function buildMultiSeries(
   rangeEnd,
   duration,
   tz,
-  stackKey = 'default'
+  stackKey = 'default',
+  stacked = false,
+  minInterval = 0,
+  averageOnCollapse = false
 ) {
-  // Use the same Kibana-style bucket interval as single-series to avoid
-  // "thin" charts when cardinality is high and the server truncates rows.
-  // Also detect the native data interval and use the coarser of the two,
-  // preventing empty slots between real data points (which cause the
-  // senoidal artifact when rendered as splines).
-  const autoBucket = getBucketInterval(duration)
-  const nativeBucket = detectNativeInterval(rawData)
-  // Use the coarser of auto vs native interval, but cap native to at most
-  // 2x the auto bucket. This prevents sparse API data (e.g. hourly points
-  // over a 7-day range) from inflating the interval so much that the last
-  // days of the range get truncated.
-  const maxNative = autoBucket * 2
-  const cappedNative = (nativeBucket > 0 && nativeBucket <= maxNative) ? nativeBucket : 0
-  const interval = cappedNative > autoBucket ? cappedNative : autoBucket
+  // Use the deterministic bucket interval based on the time range.
+  // For Metrics API charts, minInterval = 1 min (data granularity is per-minute).
+  // For Events API charts, minInterval = 0 (use the standard bucketing).
+  const baseBucket = getBucketInterval(duration)
+  const interval = minInterval > baseBucket ? minInterval : baseBucket
   const alignedStart = Math.floor(rangeStart / interval) * interval
-  const alignedEnd = Math.ceil(rangeEnd / interval) * interval
+  // Don't extend past rangeEnd — the last bucket would be incomplete
+  // (data only goes up to "now") causing a visual drop to near-zero.
+  const alignedEnd = rangeEnd
 
-  // Pre-fill all slots from aligned start to aligned end with zeros.
-  const slotCount = Math.max(0, Math.floor((alignedEnd - alignedStart) / interval) + 1)
+  // Pre-fill slots. The last slot must START before rangeEnd.
+  const rawSlotCount = Math.max(0, Math.floor((alignedEnd - alignedStart) / interval))
+  // Ensure at least 1 slot
+  const slotCount = Math.max(1, rawSlotCount)
   const slots = new Array(slotCount)
   for (let idx = 0; idx < slotCount; idx += 1) {
     const slot = { tsMs: alignedStart + idx * interval }
@@ -174,8 +183,8 @@ function buildMultiSeries(
   }
 
   // Aggregate raw rows into the aligned slots. When multiple rows fall into
-  // the same slot, sum their values. Track hit counts per slot so we can
-  // average instead of sum when needed (e.g. percentage fields).
+  // the same slot, sum their values (correct for count-based data).
+  // For percentage/rate fields, track hit counts to average later.
   let globalMax = 0
   for (let idx = 0; idx < rawData.length; idx += 1) {
     const item = rawData[idx]
@@ -185,32 +194,51 @@ function buildMultiSeries(
     const slotIdx = Math.floor((tsMs - alignedStart) / interval)
     if (slotIdx < 0 || slotIdx >= slotCount) continue
     const slot = slots[slotIdx]
-    if (slot._hits === undefined) slot._hits = 0
-    slot._hits += 1
-    let rowSum = 0
+    if (averageOnCollapse) {
+      if (slot._hits === undefined) slot._hits = 0
+      slot._hits += 1
+    }
     for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
       const field = seriesFields[sIdx]
       const value = item[field]
       if (typeof value === 'number') {
         slot[field] += value
-        rowSum += value
       }
     }
-    if (rowSum && slot._sum === undefined) slot._sum = 0
-    if (rowSum) slot._sum += rowSum
   }
-  // When multiple rows collapsed into one slot, average the values to avoid
-  // inflated sums (critical for percentage/rate fields like requestsOffloaded).
+
+  // For percentage/rate fields, average when multiple rows collapsed into one slot.
+  if (averageOnCollapse) {
+    for (let idx = 0; idx < slotCount; idx += 1) {
+      const slot = slots[idx]
+      if (slot._hits > 1) {
+        for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
+          slot[seriesFields[sIdx]] /= slot._hits
+        }
+      }
+    }
+  }
+  // When multiple rows collapsed into one slot, their values were summed.
+  // For count-based data this is correct (total events in the bucket).
+  // For rate/percentage fields, we need to average instead of sum.
+  // The caller signals this via the data unit in the chart config, but
+  // buildMultiSeries doesn't have access to it — so we always sum.
+  // The averaging for percentage fields is handled upstream by the
+  // eventsApiPostProcess callback (e.g. cacheHitRate divides after summing).
   for (let idx = 0; idx < slotCount; idx += 1) {
     const slot = slots[idx]
-    if (slot._hits > 1) {
+    if (stacked) {
+      let sum = 0
       for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
-        slot[seriesFields[sIdx]] /= slot._hits
+        sum += slot[seriesFields[sIdx]] || 0
       }
-      if (slot._sum) slot._sum /= slot._hits
+      if (sum > globalMax) globalMax = sum
+    } else {
+      for (let sIdx = 0; sIdx < seriesFields.length; sIdx += 1) {
+        const val = slot[seriesFields[sIdx]] || 0
+        if (val > globalMax) globalMax = val
+      }
     }
-    const sum = slot._sum || 0
-    if (sum > globalMax) globalMax = sum
   }
 
   // Stable series ordering: largest-at-bottom decided once per stackKey+set.
@@ -362,7 +390,10 @@ export function buildC3Config({
   // Multi-series bar charts behave like stacked histograms visually:
   // series are stacked, Y axis gets a nice max, and order is preserved.
   const isMultiBar = isMulti && chartType === 'bar'
-  const shouldStack = isStacked || isMultiBar
+  // Only stack when explicitly using bar charts. Spline/area-spline charts
+  // render each series at its absolute Y value (no stacking) so the user
+  // can see the real magnitude of each series independently.
+  const shouldStack = isMultiBar
   // Use config's explicit maxYAxis if set (e.g. percentage charts capped at 100),
   // otherwise compute from data for histograms, or let C3 auto-scale for splines.
   const configMaxY = config?.maxYAxis

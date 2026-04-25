@@ -1,7 +1,7 @@
 <template>
   <i
     v-if="!panelOnly"
-    class="pi pi-calendar inline-flex items-center justify-center border-l border-t border-b surface-border rounded-l-md text-muted-color text-sm w-[2.125rem] h-[2.125rem]"
+    class="pi pi-calendar inline-flex items-center justify-center border-l border-t border-b surface-border rounded-l-md text-muted-color text-sm w-[2rem] h-[2rem]"
     aria-hidden="true"
   ></i>
 

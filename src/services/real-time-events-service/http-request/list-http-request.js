@@ -2,8 +2,6 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-// eslint-disable-next-line azion-architecture/services-http-only
-import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
@@ -115,7 +113,7 @@ const adaptMockResponse = (httpResponse) => {
 }
 // ── END DEV MOCK ────────────────────────────────────────────────────────
 
-export const listHttpRequest = async (filter) => {
+export const listHttpRequest = async (filter, { onQuery } = {}) => {
   if (USE_MOCK) {
     const body = await loadMockData()
     return adaptMockResponse(body)
@@ -124,7 +122,9 @@ export const listHttpRequest = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
   const makeRequest = (fields) => {
     const payload = adapt(filter, fields)
-    useGraphQLStore().setQuery(payload)
+    if (typeof onQuery === 'function') {
+      onQuery(payload)
+    }
     return decorator.request({
       baseURL: '/',
       url: makeRealTimeEventsBaseUrl(),
@@ -149,15 +149,24 @@ export const listHttpRequest = async (filter) => {
   // rows arrive in the same order. Build a Map from chunk B for O(1) lookup.
   const chunkBByRequestId = new Map(rowsB.map((row) => [row.requestId, row]))
 
-  const mergedRows = rowsA.map((rowA, index) => {
+  // In-place merge: assign chunk B fields directly onto chunk A row objects
+  // to avoid spread-copying every row.
+  for (let i = 0; i < rowsA.length; i++) {
+    const rowA = rowsA[i]
     const rowB =
-      rowsB[index]?.requestId === rowA.requestId
-        ? rowsB[index]
+      rowsB[i]?.requestId === rowA.requestId
+        ? rowsB[i]
         : chunkBByRequestId.get(rowA.requestId)
-    return { ...rowA, ...(rowB || {}) }
-  })
+    if (rowB) {
+      for (const key in rowB) {
+        if (key !== 'requestId' && key !== 'ts') {
+          rowA[key] = rowB[key]
+        }
+      }
+    }
+  }
 
-  return adaptResponse({ data: { [DATASET]: mergedRows } })
+  return adaptResponse({ data: { [DATASET]: rowsA } })
 }
 
 const adapt = (filter, fields) => {

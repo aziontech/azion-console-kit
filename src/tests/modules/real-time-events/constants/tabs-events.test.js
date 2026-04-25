@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
+import TABS_EVENTS, {
+  defaultColumnMapper
+} from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
 
 describe('RealTimeEventsModule', () => {
   describe('Tabs events constants', () => {
@@ -25,22 +27,19 @@ describe('RealTimeEventsModule', () => {
     it('each tab should have the correct structure', () => {
       Object.values(TABS_EVENTS).forEach((tab) => {
         expect(tab).toHaveProperty('panel')
-        expect(tab).toHaveProperty('index')
         expect(tab).toHaveProperty('title')
         expect(tab).toHaveProperty('description')
         expect(tab).toHaveProperty('dataset')
         expect(tab).toHaveProperty('tabRouter')
         expect(tab).toHaveProperty('availableFields')
         expect(tab).toHaveProperty('defaultSelectedFields')
-        expect(tab).toHaveProperty('customColumnMapper')
       })
     })
 
-    it('customColumnMapper should return the correct structure', () => {
+    it('tabs should not have per-dataset customColumnMapper or index properties', () => {
       Object.values(TABS_EVENTS).forEach((tab) => {
-        const result = tab.customColumnMapper({ data: 'test' })
-        expect(result).toHaveProperty('tsFormat')
-        expect(result).toHaveProperty('summary')
+        expect(tab).not.toHaveProperty('customColumnMapper')
+        expect(tab).not.toHaveProperty('index')
       })
     })
 
@@ -51,7 +50,6 @@ describe('RealTimeEventsModule', () => {
     it('httpRequests tab should have the correct properties', () => {
       const httpRequests = TABS_EVENTS.httpRequests
       expect(httpRequests.panel).toBe('httpRequests')
-      expect(httpRequests.index).toBe(0)
       expect(httpRequests.title).toBe('HTTP Requests')
       expect(httpRequests.dataset).toBe('workloadEvents')
       expect(httpRequests.tabRouter).toBe('http-requests')
@@ -63,6 +61,21 @@ describe('RealTimeEventsModule', () => {
         expect(Array.isArray(tab.availableFields)).toBe(true)
         expect(tab.availableFields.length).toBeGreaterThan(0)
       })
+    })
+  })
+
+  describe('defaultColumnMapper', () => {
+    it('should return the correct structure', () => {
+      const result = defaultColumnMapper({ data: 'test' })
+      expect(result).toHaveProperty('tsFormat')
+      expect(result).toHaveProperty('summary')
+    })
+
+    it('should map rowData.data to both tsFormat and summary', () => {
+      const testData = [{ key: 'host', value: 'example.com' }]
+      const result = defaultColumnMapper({ data: testData })
+      expect(result.tsFormat).toBe(testData)
+      expect(result.summary).toBe(testData)
     })
   })
 })

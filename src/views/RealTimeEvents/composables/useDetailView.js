@@ -51,12 +51,19 @@ export function useDetailView(tableData) {
   }
 
   const selectRow = (row) => {
-    activeRow.value = row
     if (mode.value === 'inline') {
+      activeRow.value = row
       expandedRows.value = isRowExpanded(row) ? [] : [row]
       if (!expandedRows.value.length) activeRow.value = null
     } else {
-      sidebarVisible.value = true
+      // In sidebar mode: if the row is already active, close the sidebar
+      if (sidebarVisible.value && activeRow.value?.id === row.id) {
+        sidebarVisible.value = false
+        activeRow.value = null
+      } else {
+        activeRow.value = row
+        sidebarVisible.value = true
+      }
     }
   }
 

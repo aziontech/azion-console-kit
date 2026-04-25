@@ -92,21 +92,21 @@
       data-testid="field-sidebar"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between p-3 border-b surface-border">
+      <div class="field-sidebar-header">
         <span class="text-sm font-medium text-color">Fields</span>
         <PrimeButton
           icon="pi pi-times"
           text
           rounded
           size="small"
-          class="!w-7 !h-7"
+          class="!w-6 !h-6 !p-0"
           @click="closeSidebar"
           data-testid="field-sidebar-close"
         />
       </div>
 
       <!-- Search fields -->
-      <div class="p-3 border-b surface-border">
+      <div class="field-sidebar-search">
         <span class="p-input-icon-left w-full">
           <i class="pi pi-search" />
           <InputText
@@ -336,6 +336,28 @@
     background: var(--surface-ground);
   }
 
+  /* Align header with chart header */
+  .field-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5rem;
+    height: 2.25rem;
+    border-bottom: 1px solid var(--surface-border);
+    background: var(--surface-section);
+  }
+
+  /* Search section with matching padding */
+  .field-sidebar-search {
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  /* Align header border with chart header border */
+  .field-sidebar > .border-b:first-of-type {
+    border-bottom: 1px solid var(--surface-border);
+  }
+
   .field-sidebar__pin-icon {
     font-size: 12px;
     color: var(--primary-color);
@@ -360,7 +382,7 @@
     align-items: center;
     gap: 8px;
     padding: 4px 6px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: background-color 0.1s ease;
   }

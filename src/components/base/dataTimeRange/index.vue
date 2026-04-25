@@ -298,9 +298,12 @@
   }
 
   const openOverlay = async (payload, tabIndex) => {
-    activeTab.value = tabIndex
-    const event = tabIndex === 0 ? payload : payload?.event
-    const field = tabIndex === 0 ? undefined : payload?.field
+    // When the model has a quick-select label (e.g. "Last 5 minutes"),
+    // default to the Quick tab regardless of which input triggered the open.
+    const effectiveTab = (tabIndex === 1 && model.value?.label) ? 0 : tabIndex
+    activeTab.value = effectiveTab
+    const event = effectiveTab === 0 ? (payload?.event || payload) : payload?.event
+    const field = effectiveTab === 0 ? undefined : payload?.field
 
     if (field === 'start' || field === 'end') editingField.value = field
 

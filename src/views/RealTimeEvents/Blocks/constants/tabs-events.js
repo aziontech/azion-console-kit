@@ -13,10 +13,21 @@ import { CURATED_DATASET_FIELDS } from '@/services/real-time-events-service/_sha
 
 const DATASET_FIELDS = CURATED_DATASET_FIELDS
 
+/**
+ * Shared column mapper used by all datasets for CSV export.
+ * Maps row data to { tsFormat, summary } for the export function.
+ *
+ * @param {{ data: any }} rowData – row data provided by the DataTable export callback
+ * @returns {{ tsFormat: any, summary: any }}
+ */
+export const defaultColumnMapper = (rowData) => ({
+  tsFormat: rowData.data,
+  summary: rowData.data
+})
+
 const TABS_EVENTS = {
   httpRequests: {
     panel: 'httpRequests',
-    index: 0,
     title: 'HTTP Requests',
     description: 'Logs of events from requests made to your applications and firewalls.',
     dataset: 'workloadEvents',
@@ -31,15 +42,10 @@ const TABS_EVENTS = {
       { label: 'Status', value: 'status' },
       { label: 'Request Method', value: 'requestMethod' },
       { label: 'Cache Status', value: 'upstreamCacheStatus' }
-    ],
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    ]
   },
   edgeFunctions: {
     panel: 'edgeFunctions',
-    index: 1,
     title: 'Functions',
     description: 'Logs of events from requests made to your functions.',
     dataset: 'functionEvents',
@@ -48,15 +54,10 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['configurationId', 'functionLanguage'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   },
   edgeFunctionsConsole: {
     panel: 'edgeFunctionsConsole',
-    index: 2,
     title: 'Functions Console',
     description: 'Logs of events from applications using Edge Runtime returned by Cells Console.',
     dataset: 'functionConsoleEvents',
@@ -65,15 +66,10 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['level', 'line'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   },
   imageProcessor: {
     panel: 'imageProcessor',
-    index: 3,
     title: 'Image Processor',
     description:
       'Logs of events from requests made to applications that processed images with Image Processor.',
@@ -83,15 +79,10 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['host', 'status', 'requestUri'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   },
   tieredCache: {
     panel: 'tieredCache',
-    index: 4,
     title: 'Tiered Cache',
     description: 'Logs of events from requests made to applications using Tiered Cache.',
     dataset: 'tieredCacheEvents',
@@ -104,15 +95,10 @@ const TABS_EVENTS = {
     stackByOptions: [
       { label: 'Default', value: 'none' },
       { label: 'Cache Status', value: 'upstreamCacheStatus' }
-    ],
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    ]
   },
   edgeDNS: {
     panel: 'edgeDNS',
-    index: 5,
     title: 'Edge DNS',
     description: 'Logs of events from queries made to Edge DNS.',
     dataset: 'edgeDnsQueriesEvents',
@@ -121,15 +107,10 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['qtype', 'statusCode'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   },
   dataStream: {
     panel: 'dataStream',
-    index: 6,
     title: 'Data Stream',
     description: 'Logs of data sent to endpoints by Data Stream.',
     dataset: 'dataStreamedEvents',
@@ -138,15 +119,10 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['endpointType', 'statusCode'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   },
   activityHistory: {
     panel: 'activityHistory',
-    index: 7,
     title: 'Activity History',
     description:
       'Logs of events from an Azion account regarding activities registered on Activity History. Use the Real-Time Events GraphQL API to query up to 2 years of logs.',
@@ -156,11 +132,7 @@ const TABS_EVENTS = {
     defaultSelectedFields: ['title', 'authorName', 'resourceType'],
     // Chart options - volume over time, no stack-by or summary
     showStackBy: false,
-    showSummary: false,
-    customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data,
-      summary: rowData.data
-    })
+    showSummary: false
   }
 }
 

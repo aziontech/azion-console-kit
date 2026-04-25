@@ -1,16 +1,12 @@
-import { useAccountStore } from '@stores/account'
-
 /**
  * Format timestamp as compact string for RealTimeEvents.
  * Example: "Apr 22, 2026, 18:47:53"
  *
  * @param {string|Date} time - The timestamp to format
+ * @param {string} [timezone='UTC'] - IANA timezone string (e.g. 'America/Sao_Paulo')
  * @returns {string} Formatted timestamp
  */
-export function formatTimestampCompact(time) {
-  const accountStore = useAccountStore()
-  const timezone = accountStore.accountData?.timezone || 'UTC'
-
+export function formatTimestampCompact(time, timezone = 'UTC') {
   const date = new Date(time)
   const options = {
     timeZone: timezone,

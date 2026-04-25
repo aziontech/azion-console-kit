@@ -4,7 +4,6 @@
   import TabPanel from '@aziontech/webkit/tabpanel'
   import PrimeButton from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import { useToast } from '@aziontech/webkit/use-toast'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   defineOptions({ name: 'EventDocumentView' })
@@ -32,7 +31,7 @@
     }
   })
 
-  const toast = useToast()
+  const emit = defineEmits(['notify'])
   const activeTab = ref(0)
 
   const summaryEntries = computed(() => {
@@ -51,7 +50,7 @@
 
   const handleCopy = (value) => {
     clipboardWrite(String(value))
-    toast.add({
+    emit('notify', {
       closable: true,
       severity: 'success',
       summary: 'Copied to clipboard'
@@ -60,7 +59,7 @@
 
   const handleCopyJson = () => {
     clipboardWrite(jsonDocument.value)
-    toast.add({
+    emit('notify', {
       closable: true,
       severity: 'success',
       summary: 'JSON copied to clipboard'
@@ -88,7 +87,7 @@
 
 <template>
   <div
-    class="w-full surface-ground rounded-md border surface-border overflow-hidden"
+    class="event-document-view w-full"
     data-testid="event-document-view"
   >
     <!-- Loading skeleton -->
@@ -271,6 +270,15 @@
 </template>
 
 <style scoped>
+  .event-document-view {
+    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--surface-card);
+    margin-bottom: 0.75rem;
+  }
+
   :deep(.event-document-tabs .p-tabview-panels) {
     padding: 0;
   }
@@ -279,17 +287,14 @@
     padding: 0;
   }
 
-  :deep(.event-document-tabs .p-tabview-nav) {
-    background: transparent;
-  }
-
   :deep(.event-document-tabs .p-tabview-nav-link) {
     padding: 0.4rem 0.75rem;
     font-size: 0.75rem;
   }
 
   :deep(.event-document-tabs .p-tabview-nav-container) {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--surface-border);
   }
 
   /* ── Document list layout ─────────────────────────────────────── */
@@ -303,7 +308,8 @@
     flex-direction: column;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--surface-border);
-    gap: 0.2rem;
+    gap: 0.25rem;
+    transition: background 0.1s;
   }
 
   .doc-list__item:last-child {
@@ -319,33 +325,33 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    min-height: 1.5rem;
+    min-height: 1.25rem;
   }
 
   .doc-list__key {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-    font-size: 0.72rem;
+    font-family: var(--rte-font-mono);
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--series-one-color, #fba86f);
     user-select: all;
     white-space: nowrap;
+    letter-spacing: 0.01em;
   }
 
   .doc-list__actions {
     display: flex;
     align-items: center;
-    gap: 0.125rem;
+    gap: 0;
     flex-shrink: 0;
   }
 
   .doc-list__value {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-    font-size: 0.78rem;
+    font-family: var(--rte-font-mono);
+    font-size: 0.75rem;
     line-height: 1.5;
     color: var(--text-color);
     word-break: break-word;
     overflow-wrap: break-word;
-    padding-left: 0.25rem;
   }
 
   /* ── Compact layout (inline expansion) ─────────────────────── */
@@ -374,7 +380,7 @@
   }
 
   .doc-compact__key {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--rte-font-mono);
     font-size: 0.7rem;
     font-weight: 600;
     color: var(--series-one-color, #fba86f);
@@ -385,7 +391,7 @@
   }
 
   .doc-compact__value {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--rte-font-mono);
     font-size: 0.72rem;
     color: var(--text-color);
     overflow: hidden;
@@ -412,7 +418,6 @@
 
   /* ── JSON pre block ─────────────────────────────────────────── */
   .json-pre {
-    font-family:
-      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--rte-font-mono);
   }
 </style>

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import safeStructuredClone from '@/helpers/structured-clone'
 
 const STORAGE_KEY = 'rte-saved-searches'
 const MAX_SAVED = 50
@@ -41,7 +42,7 @@ export function useSavedSearches() {
     const entry = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: name.trim(),
-      filterData: filterData ? JSON.parse(JSON.stringify(filterData)) : null,
+      filterData: filterData ? safeStructuredClone(filterData) : null,
       selectedColumns: selectedColumns || [],
       dataset: dataset || '',
       createdAt: Date.now()

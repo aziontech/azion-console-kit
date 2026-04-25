@@ -395,13 +395,13 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     width: 100%;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .afs-filter-row__query {
     display: flex;
     gap: 0.5rem;
-    align-items: flex-start;
+    align-items: center;
     flex: 1 1 280px;
     min-width: 0;
   }
@@ -409,8 +409,73 @@
   .afs-filter-row__actions {
     display: flex;
     gap: 0.5rem;
-    align-items: flex-start;
+    align-items: center;
     flex-shrink: 0;
+  }
+
+  /* ── Uniform 2rem height for ALL filterbar elements ── */
+  :deep(.afs-filter-row .p-button),
+  :deep(.afs-filter-row .p-inputtext),
+  :deep(.afs-filter-row .p-dropdown),
+  :deep(.afs-filter-row .p-inputgroup) {
+    height: 2rem !important;
+    min-height: 2rem !important;
+    max-height: 2rem !important;
+    box-sizing: border-box;
+  }
+
+  /* inputgroup children */
+  :deep(.afs-filter-row .p-inputgroup > *) {
+    height: 2rem !important;
+    min-height: 2rem !important;
+    max-height: 2rem !important;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+
+  /* QuickSelect icon override */
+  :deep(.afs-filter-row .p-inputgroup > i) {
+    height: 2rem !important;
+    width: 2rem !important;
+    min-height: 2rem !important;
+    max-height: 2rem !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* InputDateRange inner container */
+  :deep(.afs-filter-row .p-inputgroup > div) {
+    height: 2rem !important;
+    min-height: 2rem !important;
+    max-height: 2rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+  }
+
+  /* InputText inside inputgroup */
+  :deep(.afs-filter-row .p-inputgroup .p-inputtext) {
+    height: 2rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Buttons padding */
+  :deep(.afs-filter-row .p-button) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Dropdown label vertical centering */
+  :deep(.afs-filter-row .p-dropdown .p-dropdown-label) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
   }
 
   @media (max-width: 640px) {

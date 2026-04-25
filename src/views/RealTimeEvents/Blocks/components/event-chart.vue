@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
+  import { onMounted, onBeforeUnmount, onActivated, onDeactivated, ref, watch, nextTick, computed } from 'vue'
   import c3 from 'c3'
   import Skeleton from '@aziontech/webkit/skeleton'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
@@ -166,7 +166,21 @@
         if (!c3Config) return
         chartInstance.value = c3.generate(c3Config)
       })
-    }, 100)
+    }, 50)
+  }
+
+  // Fast resize: just tell C3 to re-fit without full rebuild
+  const resizeChart = () => {
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      resizeTimer = null
+      if (!chartInstance.value || !chartRef.value) return
+      try {
+        chartInstance.value.resize()
+      } catch {
+        initChart()
+      }
+    }, 50)
   }
 
   // Brush selection
@@ -242,16 +256,11 @@
     initChart()
     if ('ResizeObserver' in window && chartRef.value) {
       resizeObserver = new ResizeObserver(() => {
-        // Debounce: only re-render after the container has stopped resizing
-        // (e.g. tab transition animation completes). This avoids dozens of
-        // re-renders during the CSS transition and fixes the Y-axis scale
-        // issue that occurs when C3 measures the container mid-animation.
         clearTimeout(resizeTimer)
         resizeTimer = setTimeout(() => {
-          if (chartInstance.value) {
-            initChart()
-          }
-        }, 150)
+          if (chartInstance.value) resizeChart()
+          else initChart()
+        }, 50)
       })
       resizeObserver.observe(chartRef.value)
     }
@@ -285,7 +294,50 @@
     }
   })
 
-  defineExpose({ refresh: initChart })
+  onDeactivated(() => {
+    clearTimeout(initChartTimer)
+    clearTimeout(resizeTimer)
+    initChartTimer = null
+    resizeTimer = null
+    buildToken += 1
+    document.removeEventListener('mousedown', onViewDocumentClick)
+    document.removeEventListener('keydown', onViewEscape)
+    window.removeEventListener('scroll', onViewportChange, true)
+    window.removeEventListener('resize', onViewportChange)
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
+    if (chartInstance.value) {
+      try {
+        chartInstance.value.destroy()
+      } catch {
+        /* noop */
+      }
+      chartInstance.value = null
+    }
+    closeViewMenu()
+  })
+
+  onActivated(() => {
+    document.addEventListener('mousedown', onViewDocumentClick)
+    document.addEventListener('keydown', onViewEscape)
+    window.addEventListener('scroll', onViewportChange, true)
+    window.addEventListener('resize', onViewportChange)
+    if ('ResizeObserver' in window && chartRef.value) {
+      resizeObserver = new ResizeObserver(() => {
+        clearTimeout(resizeTimer)
+        resizeTimer = setTimeout(() => {
+          if (chartInstance.value) resizeChart()
+          else initChart()
+        }, 50)
+      })
+      resizeObserver.observe(chartRef.value)
+    }
+    initChart()
+  })
+
+  defineExpose({ refresh: initChart, resize: resizeChart })
 </script>
 
 <template>
@@ -415,10 +467,8 @@
 <style scoped>
   .event-chart-wrapper {
     background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: var(--border-radius);
     overflow: visible;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
   }
 
   .chart-header {
@@ -426,7 +476,8 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 0.375rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0 0.5rem;
+    height: 2.25rem;
     border-bottom: 1px solid var(--surface-border);
     background: var(--surface-section);
   }

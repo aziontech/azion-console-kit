@@ -1,10 +1,33 @@
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onBeforeUnmount, onDeactivated } from 'vue'
 
 const DEBOUNCE_MS = 400
 
 /**
- * Composable for debounced document search with pre-built index.
+ * Builds a flat lowercase string for a single row, used for fast indexOf matching.
+ */
+function buildRowEntry(row) {
+  const parts = []
+  for (const val of Object.values(row)) {
+    if (val == null) continue
+    if (Array.isArray(val)) {
+      for (const item of val) {
+        if (item && typeof item === 'object') parts.push(Object.values(item).join(' '))
+        else if (item != null) parts.push(String(item))
+      }
+    } else if (typeof val !== 'object') {
+      parts.push(String(val))
+    }
+  }
+  return parts.join(' ').toLowerCase()
+}
+
+/**
+ * Composable for debounced document search with incrementally-built index.
  * Filters table rows and provides text highlighting without regex.
+ *
+ * The search index is maintained incrementally: on tableData growth (loadMore),
+ * only newly appended rows are indexed. When tableData shrinks (new query),
+ * the index is fully rebuilt.
  */
 export function useDocumentSearch(tableData) {
   const query = ref('')
@@ -18,26 +41,35 @@ export function useDocumentSearch(tableData) {
     }, DEBOUNCE_MS)
   })
 
-  onBeforeUnmount(() => clearTimeout(timer))
+  const clearTimer = () => clearTimeout(timer)
 
-  // Pre-build a flat lowercase string per row for fast indexOf matching
-  const searchIndex = computed(() => {
-    return tableData.value.map((row) => {
-      const parts = []
-      for (const val of Object.values(row)) {
-        if (val == null) continue
-        if (Array.isArray(val)) {
-          for (const item of val) {
-            if (item && typeof item === 'object') parts.push(Object.values(item).join(' '))
-            else if (item != null) parts.push(String(item))
-          }
-        } else if (typeof val !== 'object') {
-          parts.push(String(val))
+  onBeforeUnmount(clearTimer)
+  onDeactivated(clearTimer)
+
+  // Incremental search index: a flat lowercase string per row
+  const searchIndex = ref([])
+  let prevLength = 0
+
+  watch(
+    tableData,
+    (rows) => {
+      const currentLength = rows.length
+
+      if (currentLength < prevLength) {
+        // Data shrunk (new query) — full rebuild
+        searchIndex.value = rows.map(buildRowEntry)
+      } else if (currentLength > prevLength) {
+        // Data grew (loadMore) — only index new rows
+        for (let i = prevLength; i < currentLength; i++) {
+          searchIndex.value.push(buildRowEntry(rows[i]))
         }
       }
-      return parts.join(' ').toLowerCase()
-    })
-  })
+      // If currentLength === prevLength, nothing changed
+
+      prevLength = currentLength
+    },
+    { immediate: true }
+  )
 
   const filteredData = computed(() => {
     const normalizedQuery = debouncedQuery.value?.trim()?.toLowerCase()

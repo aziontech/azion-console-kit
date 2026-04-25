@@ -102,12 +102,10 @@
           <i
             class="pi pi-filter log-badge__action-icon log-badge__action-icon--filter"
             @click.stop="emit('add-filter', item.key, item.value)"
-            title="Filter for value"
           />
           <i
             class="pi pi-filter-slash log-badge__action-icon log-badge__action-icon--exclude"
             @click.stop="emit('exclude-filter', item.key, item.value)"
-            title="Exclude value"
           />
         </span>
       </span>
@@ -125,6 +123,8 @@
 
 <style scoped>
   .log-badges-row {
+    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
     display: flex;
     align-items: flex-start;
     width: 100%;
@@ -235,7 +235,7 @@
     border-radius: 2px;
   }
 
-  /* ── Inline hover action icons ──────────────────────────────── */
+  /* ── Inline hover action buttons ──────────────────────────────── */
   .log-badge__actions {
     display: inline-flex;
     align-items: center;

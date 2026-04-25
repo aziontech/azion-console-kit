@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const DEFAULT_PINNED_FIELDS = Object.freeze([
   'host',
@@ -42,24 +42,62 @@ export function useFieldStats({
   const pinnedList = pinnedFieldsOverride || DEFAULT_PINNED_FIELDS
   const pinnedFieldSet = new Set(pinnedList)
 
-  const fieldStats = computed(() => {
-    const rows = data.value
-    if (!rows?.length) return {}
+  // ── Incremental field stats ──
+  // Running counts map: field → value → count
+  // On tableData growth (loadMore), only newly appended rows are processed.
+  // On tableData shrink (new query), a full rebuild is performed.
+  const runningCounts = {}
+  let prevLength = 0
+  const statsVersion = ref(0)
 
-    const counts = {}
-    rows.forEach((row) => {
-      if (!row?.summary || !Array.isArray(row.summary)) return
-      row.summary.forEach(({ key, value }) => {
-        if (!counts[key]) counts[key] = {}
-        const strValue = String(value)
-        if (strValue && strValue !== '-') {
-          counts[key][strValue] = (counts[key][strValue] || 0) + 1
+  watch(
+    data,
+    (rows) => {
+      if (!rows?.length) {
+        // Data cleared — reset everything
+        for (const key of Object.keys(runningCounts)) delete runningCounts[key]
+        prevLength = 0
+        statsVersion.value++
+        return
+      }
+
+      const currentLength = rows.length
+
+      if (currentLength < prevLength) {
+        // Data shrunk (new query) — full rebuild
+        for (const key of Object.keys(runningCounts)) delete runningCounts[key]
+        prevLength = 0
+      }
+
+      if (currentLength > prevLength) {
+        // Process only new rows
+        for (let i = prevLength; i < currentLength; i++) {
+          const row = rows[i]
+          if (!row?.summary || !Array.isArray(row.summary)) continue
+          row.summary.forEach(({ key, value }) => {
+            if (!runningCounts[key]) runningCounts[key] = {}
+            const strValue = String(value)
+            if (strValue && strValue !== '-') {
+              runningCounts[key][strValue] = (runningCounts[key][strValue] || 0) + 1
+            }
+          })
         }
-      })
-    })
+        prevLength = currentLength
+        statsVersion.value++
+      }
+    },
+    { immediate: true }
+  )
+
+  const fieldStats = computed(() => {
+    // Touch version counter so Vue tracks it as a dependency
+    // eslint-disable-next-line no-unused-expressions
+    statsVersion.value
+
+    if (!Object.keys(runningCounts).length) return {}
 
     const result = {}
-    for (const [field, valueCounts] of Object.entries(counts)) {
+    for (const [field, valueCounts] of Object.entries(runningCounts)) {
       const entries = Object.entries(valueCounts)
         .sort((entrA, entrB) => entrB[1] - entrA[1])
         .slice(0, 5)

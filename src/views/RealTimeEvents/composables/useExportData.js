@@ -1,4 +1,6 @@
 import { ref } from 'vue'
+import { defaultColumnMapper } from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
+import { triggerBlobDownload } from '@/views/RealTimeEvents/helpers/trigger-download'
 
 /**
  * Composable for table data export (CSV and JSON).
@@ -30,18 +32,16 @@ export function useExportData({ tableData, tabSelected }) {
           type: 'application/json'
         })
         const url = URL.createObjectURL(blob)
-        const anchor = document.createElement('a')
-        anchor.href = url
-        anchor.download = `${tabSelected.value?.dataset || 'events'}-export.json`
-        anchor.click()
-        URL.revokeObjectURL(url)
+        triggerBlobDownload({
+          url,
+          filename: `${tabSelected.value?.dataset || 'events'}-export.json`
+        })
       }
     }
   ])
 
   const exportFunctionMapper = (rowData) => {
-    if (!tabSelected.value?.customColumnMapper) return
-    const mappedRow = tabSelected.value.customColumnMapper(rowData)
+    const mappedRow = defaultColumnMapper(rowData)
     if (rowData.field === 'summary') {
       mappedRow.summary = [...mappedRow.summary]
         .map(
