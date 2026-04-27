@@ -1,11 +1,11 @@
 <template>
-  <PrimeDialog
+  <Dialog
     :blockScroll="true"
     modal
     visible
     :closable="false"
     class="max-w-2xl"
-    header="Personal token has been created"
+    :header="dialogTitle"
     data-testid="copy-token-dialog__header"
   >
     <div class="flex flex-col gap-4">
@@ -22,14 +22,13 @@
           class="text-color text-base font-medium"
           data-testid="copy-token-dialog__token-field__label"
         >
-          Personal Token
+          {{ fieldLabel }}
         </label>
 
         <span class="p-input-icon-right w-full flex flex-col items-start gap-2">
-          <PrimePassword
-            id="personalToken"
-            v-model="personalTokenValue"
-            type="text"
+          <InputPassword v-if="mask"
+            id="inputTokenMask"
+            v-model="token"
             class="flex flex-col w-full"
             :pt="{
               input: {
@@ -37,6 +36,21 @@
               }
             }"
             :feedback="false"
+            toggleMask
+            data-sentry-mask
+            data-testid="copy-token-dialog__token-field__password-input"
+          />
+          <InputText v-else
+            id="inputToken"
+            v-model="token"
+            class="flex flex-col w-full"
+            :pt="{
+              input: {
+                readonly: true
+              }
+            }"
+            :feedback="false"
+            readonly
             toggleMask
             data-sentry-mask
             data-testid="copy-token-dialog__token-field__password-input"
@@ -51,19 +65,19 @@
         </span>
       </div>
       <div>
-        <CopyBlock
-          :value="personalTokenValue"
+        <ButtonCopy
+          :value="token"
           label="Copy"
           copiedLabel="Copied"
-          :disabled="!personalTokenValue"
-          aria-label="Copy Personal Token"
+          :disabled="!token"
+          aria-label="Copy Token"
           data-testid="copy-token-dialog__token-field__copy-token-button"
         />
       </div>
     </div>
 
     <template #footer>
-      <PrimeButton
+      <Button
         label="Confirm"
         size="small"
         severity="secondary"
@@ -71,26 +85,47 @@
         data-testid="copy-token-dialog__dialog-footer__confirm-button"
       />
     </template>
-  </PrimeDialog>
+  </Dialog>
 </template>
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeDialog from '@aziontech/webkit/dialog'
+  import Dialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
-  import PrimePassword from '@aziontech/webkit/password'
-  import CopyBlock from '@aziontech/webkit/button-copy'
-  import PrimeButton from '@aziontech/webkit/button'
+  import InputPassword from '@aziontech/webkit/password'
+  import InputText from '@aziontech/webkit/inputtext'
+  import Button from '@aziontech/webkit/button'
+  import ButtonCopy from '@aziontech/webkit/button-copy'
 
-  defineOptions({ name: 'CopyTokenDialog' })
+  defineOptions({ name: 'DialogCopyKey' })
 
   const dialogRef = inject('dialogRef')
 
   const params = dialogRef.value.data
 
-  const personalTokenValue = computed({
-    get: () => params.personalToken
+  const mask = computed(() => {
+    return params.mask
   })
+
+  const dialogTitle = computed(() => {
+    return `${params.title } has been created`
+  })
+
+  const fieldLabel = computed(() => {
+    return params.title
+  })
+
+  const token = computed(() => {
+    console.log('params: ', params)
+    return params.token
+  })
+  
+  // const token = computed({
+  //   get: () => params.key,
+  //   set: () => {
+  //     // Read-only - no setter needed
+  //   }
+  // })
 
   const closeDialog = () => {
     dialogRef.value.close()
