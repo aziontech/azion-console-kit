@@ -1,12 +1,12 @@
 <template>
   <Dialog
-    :blockScroll="true"
     modal
     visible
-    :closable="false"
     class="max-w-2xl"
-    :header="dialogTitle"
     data-testid="copy-token-dialog__header"
+    :blockScroll="true"
+    :closable="false"
+    :header="dialogTitle"
   >
     <div class="flex flex-col gap-4">
       <InlineMessage
@@ -26,34 +26,36 @@
         </label>
 
         <span class="p-input-icon-right w-full flex flex-col items-start gap-2">
-          <InputPassword v-if="mask"
+          <InputPassword
+            v-if="mask"
+            toggleMask
+            data-sentry-mask
             id="inputTokenMask"
             v-model="token"
             class="flex flex-col w-full"
-            :pt="{
-              input: {
-                readonly: true
-              }
-            }"
-            :feedback="false"
-            toggleMask
-            data-sentry-mask
             data-testid="copy-token-dialog__token-field__password-input"
-          />
-          <InputText v-else
-            id="inputToken"
-            v-model="token"
-            class="flex flex-col w-full"
             :pt="{
               input: {
                 readonly: true
               }
             }"
             :feedback="false"
+          />
+          <InputText
+            v-else
             readonly
             toggleMask
             data-sentry-mask
+            id="inputToken"
+            v-model="token"
+            class="flex flex-col w-full"
             data-testid="copy-token-dialog__token-field__password-input"
+            :pt="{
+              input: {
+                readonly: true
+              }
+            }"
+            :feedback="false"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
@@ -67,9 +69,9 @@
       <div>
         <ButtonCopy
           :value="token"
+          :disabled="!token"
           label="Copy"
           copiedLabel="Copied"
-          :disabled="!token"
           aria-label="Copy Token"
           data-testid="copy-token-dialog__token-field__copy-token-button"
         />
@@ -81,8 +83,8 @@
         label="Confirm"
         size="small"
         severity="secondary"
-        @click="closeDialog"
         data-testid="copy-token-dialog__dialog-footer__confirm-button"
+        @click="closeDialog"
       />
     </template>
   </Dialog>
@@ -100,32 +102,12 @@
   defineOptions({ name: 'DialogCopyKey' })
 
   const dialogRef = inject('dialogRef')
-
   const params = dialogRef.value.data
 
-  const mask = computed(() => {
-    return params.mask
-  })
-
-  const dialogTitle = computed(() => {
-    return `${params.title } has been created`
-  })
-
-  const fieldLabel = computed(() => {
-    return params.title
-  })
-
-  const token = computed(() => {
-    console.log('params: ', params)
-    return params.token
-  })
-  
-  // const token = computed({
-  //   get: () => params.key,
-  //   set: () => {
-  //     // Read-only - no setter needed
-  //   }
-  // })
+  const dialogTitle = computed(() => `${params.title} has been created`)
+  const fieldLabel = computed(() => params.title)
+  const mask = computed(() => params.mask)
+  const token = computed(() => params.token)
 
   const closeDialog = () => {
     dialogRef.value.close()
