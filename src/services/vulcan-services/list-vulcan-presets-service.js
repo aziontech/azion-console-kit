@@ -1,30 +1,13 @@
-export const listVulcanPresetsService = async () => {
-  const mockPresets = [
-    {
-      label: 'Next.js',
-      value: 'next'
-    },
-    {
-      label: 'Angular',
-      value: 'angular'
-    },
-    {
-      label: 'Astro',
-      value: 'astro'
-    },
-    {
-      label: 'Hexo',
-      value: 'hexo'
-    },
-    {
-      label: 'React',
-      value: 'react'
-    },
-    {
-      label: 'Vue',
-      value: 'vue'
-    }
-  ]
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import vulcanPresetsApi from './make-vulcan-presets-base-url'
 
-  return Promise.resolve(mockPresets)
+export const listVulcanPresetsService = async () => {
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: '/utils/presets',
+      method: 'GET'
+    },
+    vulcanPresetsApi
+  )
+  return parseHttpResponse(httpResponse)
 }

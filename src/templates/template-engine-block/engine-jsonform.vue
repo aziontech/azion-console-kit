@@ -395,7 +395,7 @@
         const isPublicValue = privacyFieldsState.value[key] ?? true
         data.push(
           parseData({
-            name: `${key}_is_public`,
+            name: `github_is_private`,
             value: isPublicValue,
             instantiationDataPath: field?.is_public_data_path || ''
           })
