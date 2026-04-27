@@ -30,8 +30,8 @@
             v-if="mask"
             toggleMask
             data-sentry-mask
-            id="inputTokenMask"
             v-model="token"
+            id="inputTokenMask"
             class="flex flex-col w-full"
             data-testid="copy-token-dialog__token-field__password-input"
             :pt="{
@@ -46,15 +46,10 @@
             readonly
             toggleMask
             data-sentry-mask
-            id="inputToken"
             v-model="token"
+            id="inputToken"
             class="flex flex-col w-full"
-            data-testid="copy-token-dialog__token-field__password-input"
-            :pt="{
-              input: {
-                readonly: true
-              }
-            }"
+            data-testid="copy-token-dialog__token-field__input-text"
             :feedback="false"
           />
           <small
