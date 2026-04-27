@@ -7,7 +7,7 @@
 
   defineOptions({ name: 'FilterBar' })
 
-  const props = defineProps({
+  defineProps({
     filterData: { type: Object, default: null },
     filterFields: { type: Array, default: () => [] },
     tabSelected: { type: Object, default: null },

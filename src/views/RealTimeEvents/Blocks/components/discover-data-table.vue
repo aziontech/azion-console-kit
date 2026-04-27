@@ -10,7 +10,7 @@
 
   defineOptions({ name: 'DiscoverDataTable' })
 
-  const props = defineProps({
+  defineProps({
     data: { type: Array, default: () => [] },
     selectedFields: { type: Array, default: () => [] },
     expandedRows: { type: Array, default: () => [] },
@@ -22,7 +22,7 @@
     rowClass: { type: Function, default: undefined },
     debouncedSearchQuery: { type: String, default: '' },
     dataset: { type: String, default: '' },
-    highlightText: { type: Function, default: (v) => v },
+    highlightText: { type: Function, default: (value) => value },
     isRowActive: { type: Function, default: () => false },
     getFieldValue: { type: Function, required: true }
   })

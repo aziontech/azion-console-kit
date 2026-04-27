@@ -8,7 +8,7 @@
 
   defineOptions({ name: 'DiscoverToolbar' })
 
-  const props = defineProps({
+  defineProps({
     sidebarVisible: { type: Boolean, default: true },
     recordsFound: { type: [String, Number], default: '' },
     documentSearchQuery: { type: String, default: '' },

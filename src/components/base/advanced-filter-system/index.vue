@@ -292,14 +292,15 @@
     { deep: true }
   )
 
-  const syncDateRangeFromExternal = (startDate, endDate, label = 'Custom Range') => {
+  const syncDateRangeFromExternal = (startDate, endDate, label = '') => {
     filterDataRange.value = {
       ...filterDataRange.value,
       startDate: startDate instanceof Date ? startDate : new Date(startDate),
       endDate: endDate instanceof Date ? endDate : new Date(endDate),
       label,
       labelStart: '',
-      labelEnd: ''
+      labelEnd: '',
+      relative: null
     }
     hasPendingDateUpdate.value = false
   }

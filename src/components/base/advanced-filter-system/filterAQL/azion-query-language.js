@@ -37,7 +37,17 @@ export default class Aql {
 
     const parsedExpressions = expressions
       .map((expr) => {
-        const match = expr.match(expressionRegex)
+        // Strip leading/trailing grouping parentheses that are not part of IN/BETWEEN values
+        let cleanExpr = expr
+        if (cleanExpr.startsWith('(') && !/\bin\b/i.test(cleanExpr) && !/\bbetween\b/i.test(cleanExpr)) {
+          cleanExpr = cleanExpr.replace(/^\(+/, '')
+        }
+        if (cleanExpr.endsWith(')') && !/\bin\b/i.test(cleanExpr) && !/\bbetween\b/i.test(cleanExpr)) {
+          cleanExpr = cleanExpr.replace(/\)+$/, '')
+        }
+        cleanExpr = cleanExpr.trim()
+
+        const match = cleanExpr.match(expressionRegex)
         if (!match) return null
 
         let field = (match[1] || match[2] || match[3]).trim()
@@ -435,15 +445,17 @@ export default class Aql {
     let erros = []
     if (!queryText) return []
 
+    const stripGroupingParens = (str) => str.replace(/^\(+\s*/, '').replace(/\s*\)+$/, '').trim()
     const escapedOperatorsRegex = this.buildOperatorsRegex()
 
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        let match = expression.toLowerCase().match(escapedOperatorsRegex)
+        const cleaned = stripGroupingParens(expression)
+        let match = cleaned.toLowerCase().match(escapedOperatorsRegex)
         let operatorFound = match ? match[0] : null
         if (operatorFound) {
-          let stringBeforeOperator = expression.split(operatorFound)[0].trim()
+          let stringBeforeOperator = cleaned.split(operatorFound)[0].trim()
           if (stringBeforeOperator.includes(' ')) {
             if (
               !(
@@ -457,11 +469,11 @@ export default class Aql {
             }
           }
         } else {
-          if (expression.includes(' ') && /\s+\S+/.test(expression)) {
+          if (cleaned.includes(' ') && /\s+\S+/.test(cleaned)) {
             if (
               !(
-                (expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
-                (expression.trim().startsWith("'") && expression.trim().endsWith("'"))
+                (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+                (cleaned.startsWith("'") && cleaned.endsWith("'"))
               )
             ) {
               if (!erros.includes('quote-error')) {
@@ -472,10 +484,11 @@ export default class Aql {
         }
       })
     } else {
-      let match = queryText.toLowerCase().match(escapedOperatorsRegex)
+      const cleaned = stripGroupingParens(queryText)
+      let match = cleaned.toLowerCase().match(escapedOperatorsRegex)
       let operatorFound = match ? match[0] : null
       if (operatorFound) {
-        let stringBeforeOperator = queryText.split(operatorFound)[0].trim()
+        let stringBeforeOperator = cleaned.split(operatorFound)[0].trim()
         if (stringBeforeOperator.includes(' ')) {
           if (
             !(
@@ -489,11 +502,11 @@ export default class Aql {
           }
         }
       } else {
-        if (queryText.includes(' ') && /\s+\S+/.test(queryText)) {
+        if (cleaned.includes(' ') && /\s+\S+/.test(cleaned)) {
           if (
             !(
-              (queryText.trim().startsWith('"') && queryText.trim().endsWith('"')) ||
-              (queryText.trim().startsWith("'") && queryText.trim().endsWith("'"))
+              (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+              (cleaned.startsWith("'") && cleaned.endsWith("'"))
             )
           ) {
             if (!erros.includes('quote-error')) {
@@ -517,21 +530,25 @@ export default class Aql {
 
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
+      // Strip grouping parentheses before extracting the field name
+      const cleaned = expression.replace(/^\(+\s*/, '').replace(/\s*\)+$/, '').trim()
+      if (!cleaned) return
+
       const operatorFound = this.operators.find((op) =>
-        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression)
+        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(cleaned)
       )
 
       let fieldPart
       if (operatorFound) {
         const regex = new RegExp(`^(.*?)\\s+${operatorFound}\\s+`, 'i')
-        const match = expression.match(regex)
+        const match = cleaned.match(regex)
         if (match) {
           fieldPart = match[1].trim()
         } else {
-          fieldPart = expression.trim()
+          fieldPart = cleaned.trim()
         }
       } else {
-        fieldPart = expression.trim()
+        fieldPart = cleaned.trim()
       }
 
       const fieldName = fieldPart.replace(/^["']|["']$/g, '')

@@ -44,6 +44,7 @@ export function parseViewValue(viewValue) {
  * @param {Function}                           options.reloadListTableWithHash – triggers filter-hash sync + data reload
  * @param {import('vue').ComputedRef<Array>}  [options.eventsStackOptions]    – tab-level stack options (defaults to Default/Status/Request Method)
  * @param {import('vue').ComputedRef<boolean>}[options.supportsStacking]      – whether the active tab supports stack-by (false for Functions/DNS/etc)
+ * @param {import('vue').ComputedRef<string>} [options.accountTimezone]       – IANA timezone of the user account (e.g. 'America/Sao_Paulo')
  */
 export function useChartConfig({
   filterData,
@@ -52,7 +53,8 @@ export function useChartConfig({
   reloadListTableWithHash,
   eventsStackOptions = computed(() => []),
   supportsStacking = computed(() => true),
-  onMetricsError = null
+  onMetricsError = null,
+  accountTimezone = computed(() => 'UTC')
 }) {
   // ── Metrics chart (WAF / dashboard overlay) ──
   const {
@@ -207,15 +209,47 @@ export function useChartConfig({
   })
 
   // ── Brush select (zoom into time range) ──
+  /**
+   * Convert a UTC Date to a "fake local" Date whose getHours/getMinutes/…
+   * return the wall-clock values in the given IANA timezone. This is needed
+   * because InputDateRange formats dates with date.getHours() (browser-local),
+   * but the chart axis uses the account timezone.
+   */
+  const toUserTzDate = (utcDate, tz) => {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      fractionalSecondDigits: 3,
+      hour12: false
+    }).formatToParts(utcDate)
+
+    const get = (type) => {
+      const part = parts.find((part) => part.type === type)
+      return part ? parseInt(part.value, 10) : 0
+    }
+
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  }
+
   const handleBrushSelect = ({ begin, end }) => {
     if (!filterData.value) return
     const tsBegin = begin instanceof Date ? begin.toISOString() : String(begin)
     const tsEnd = end instanceof Date ? end.toISOString() : String(end)
     filterData.value = {
       ...filterData.value,
-      tsRange: { tsRangeBegin: tsBegin, tsRangeEnd: tsEnd, label: 'Custom Range' }
+      tsRange: { tsRangeBegin: tsBegin, tsRangeEnd: tsEnd, label: '', labelStart: '', labelEnd: '' }
     }
-    filterSystemRef.value?.syncDateRangeFromExternal?.(begin, end, 'Custom Range')
+    // Convert UTC dates to user-timezone-local dates so the date range
+    // inputs display the same wall-clock time shown on the chart axis.
+    const tz = accountTimezone.value || 'UTC'
+    const localBegin = toUserTzDate(begin, tz)
+    const localEnd = toUserTzDate(end, tz)
+    filterSystemRef.value?.syncDateRangeFromExternal?.(localBegin, localEnd, '')
     // Reload metrics chart if active
     if (selectedMetricsDashboard.value) {
       const config = METRICS_CHART_CONFIGS[selectedMetricsDashboard.value]

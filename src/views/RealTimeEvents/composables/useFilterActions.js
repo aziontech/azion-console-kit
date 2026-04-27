@@ -181,11 +181,17 @@ export function useFilterActions({
   // ── Query history display helpers ──
   const getHistoryParts = (entry) => {
     if (entry.filterFields?.length) {
-      return entry.filterFields.map((filterField) => ({
-        field: filterField.field || filterField.valueField,
-        operator: OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator,
-        value: String(filterField.value)
-      }))
+      return entry.filterFields.map((filterField) => {
+        let displayValue = filterField.value
+        if (Array.isArray(displayValue)) {
+          displayValue = displayValue.map((item) => item?.label || item?.value || item).join(', ')
+        }
+        return {
+          field: filterField.field || filterField.valueField,
+          operator: OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator,
+          value: String(displayValue)
+        }
+      })
     }
     const operatorKeys = Object.keys(OPERATOR_MAPPING)
     return (entry.query || '').split(' AND ').map((seg) => {

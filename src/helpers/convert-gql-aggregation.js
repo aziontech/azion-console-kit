@@ -45,9 +45,10 @@ function convertGQLAggregation({
     Object.entries(filters.in).forEach(([key, value]) => {
       const varName = `in_${key}`
       variables[varName] = Array.isArray(value)
-        ? value.map((item) => (item.value !== undefined ? item.value : item))
+        ? value.map((item) => String(item.value !== undefined ? item.value : item))
         : value
-      filterLines.push(`${key}: $${varName}`)
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      filterLines.push(`${gqlKey}: $${varName}`)
     })
   }
 

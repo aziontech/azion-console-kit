@@ -147,6 +147,7 @@
     filterSystemRef: computed(() => filterBarRef.value?.filterSystemRef || null),
     reloadListTableWithHash, eventsStackOptions: chartStackByOptions,
     supportsStacking: tabSupportsStacking,
+    accountTimezone,
     onMetricsError: (err) => {
       const detailMap = {
         'schema-mismatch': 'This chart is not available on the current account. Showing events instead.',

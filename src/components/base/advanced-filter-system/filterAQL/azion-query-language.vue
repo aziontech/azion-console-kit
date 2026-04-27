@@ -23,7 +23,7 @@
         />
       </div>
       <div
-        class="flex flex-col mt-2 gap-1"
+        class="aql-errors-tooltip"
         v-if="handleErrorsQuery.length"
       >
         <small
@@ -386,7 +386,11 @@
       .map((filterField) => {
         const fieldLabel = filterField.field || filterField.valueField
         const operatorLabel = OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator
-        return `${fieldLabel} ${operatorLabel} ${filterField.value}`
+        let displayValue = filterField.value
+        if (Array.isArray(displayValue)) {
+          displayValue = displayValue.map((item) => item?.label || item?.value || item).join(', ')
+        }
+        return `${fieldLabel} ${operatorLabel} ${displayValue}`
       })
       .join(' AND ')
 
@@ -409,11 +413,17 @@
 
   const getAqlHistoryParts = (entry) => {
     if (entry.filterFields?.length) {
-      return entry.filterFields.map((filterField) => ({
-        field: filterField.field || filterField.valueField,
-        operator: OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator,
-        value: String(filterField.value)
-      }))
+      return entry.filterFields.map((filterField) => {
+        let displayValue = filterField.value
+        if (Array.isArray(displayValue)) {
+          displayValue = displayValue.map((item) => item?.label || item?.value || item).join(', ')
+        }
+        return {
+          field: filterField.field || filterField.valueField,
+          operator: OPERATOR_MAPPING[filterField.operator]?.label || filterField.operator,
+          value: String(displayValue)
+        }
+      })
     }
     const operatorKeys = Object.keys(OPERATOR_MAPPING)
     const segments = (entry.query || '').split(' AND ')
@@ -490,6 +500,23 @@
 </script>
 
 <style scoped>
+  .aql-errors-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 51;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.25rem;
+    background: var(--overlay-content-bg);
+    border: 1px solid var(--red-400, #f87171);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
   .aql-dropdown-panel {
     position: absolute;
     top: 100%;

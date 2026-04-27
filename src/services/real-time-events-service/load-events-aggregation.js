@@ -7,6 +7,30 @@ import * as Errors from '@/services/axios/errors'
 import { resolveChartApi } from './chart-api-router'
 
 /**
+ * Infer the GraphQL list type for an array of filter values.
+ * Checks the first element to decide between [Int], [Float], or [String].
+ */
+function inferArrayType(arr) {
+  if (!Array.isArray(arr) || !arr.length) return '[String]'
+  const sample = arr[0]
+  if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
+  return '[String]'
+}
+
+/**
+ * Normalize In-filter values: extract `.value` from {label, value} objects
+ * and stringify all values so the GraphQL variable type is always [String],
+ * matching the schema used by both Events and Metrics APIs.
+ */
+function normalizeInFilterValues(values) {
+  if (!Array.isArray(values)) return values
+  return values.map((item) => {
+    const raw = item?.value !== undefined ? item.value : item
+    return String(raw)
+  })
+}
+
+/**
  * Load aggregated event data for chart visualization.
  * Uses GraphQL aggregation with groupBy for time-series data.
  *
@@ -224,9 +248,11 @@ async function loadStatusChartFromMetricsApi({ dataset, tsRange, filters = {} })
   Object.entries(filters?.in || {}).forEach(([key, value]) => {
     if (!key.startsWith('status')) {
       const varName = `in_${key}`
-      extraVariables[varName] = value
-      extraFilterFragments.push(`${key}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: [String]`)
+      const normalized = normalizeInFilterValues(value)
+      extraVariables[varName] = normalized
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      extraFilterFragments.push(`${gqlKey}: $${varName}`)
+      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
     }
   })
   const extraFilterStr =
@@ -330,9 +356,11 @@ async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters 
   })
   Object.entries(filters?.in || {}).forEach(([key, value]) => {
     const varName = `in_${key}`
-    variables[varName] = value
-    extraFilterFragments.push(`${key}: $${varName}`)
-    extraParamDeclarations.push(`$${varName}: [String]`)
+    const normalized = normalizeInFilterValues(value)
+    variables[varName] = normalized
+    const gqlKey = key.endsWith('In') ? key : `${key}In`
+    extraFilterFragments.push(`${gqlKey}: $${varName}`)
+    extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
   })
   const extraFilterStr =
     extraFilterFragments.length > 0 ? `, ${extraFilterFragments.join(', ')}` : ''
@@ -413,8 +441,6 @@ async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters 
   }
 }
 
-const CACHE_STATUS_BUCKETS = ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE', 'REVALIDATED', 'UPDATING']
-
 /**
  * Load cache status breakdown using Metrics API with groupBy: [ts, upstreamCacheStatus].
  * Returns pre-aggregated points — no client-side bucketing needed.
@@ -437,8 +463,16 @@ async function loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters = 
   Object.entries(filters?.and || {}).forEach(([key, value]) => {
     const varName = `filter_${key}`
     variables[varName] = value
-    extraFilterFragments.push(`${key}: ${varName}`)
-    extraParamDeclarations.push(`${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
+    extraFilterFragments.push(`${key}: $${varName}`)
+    extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
+  })
+  Object.entries(filters?.in || {}).forEach(([key, value]) => {
+    const varName = `in_${key}`
+    const normalized = normalizeInFilterValues(value)
+    variables[varName] = normalized
+    const gqlKey = key.endsWith('In') ? key : `${key}In`
+    extraFilterFragments.push(`${gqlKey}: $${varName}`)
+    extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
   })
   const extraFilterStr = extraFilterFragments.length ? `, ${extraFilterFragments.join(', ')}` : ''
   const extraParamsStr = extraParamDeclarations.length ? `, ${extraParamDeclarations.join(', ')}` : ''
@@ -474,23 +508,32 @@ async function loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters = 
   const rawData = response.body?.data?.[metricsDataset]
   if (!rawData || !Array.isArray(rawData)) return { chartData: [], kpis: null }
 
-  // Pivot: one row per ts, one column per cache status bucket
+  // Pivot: one row per ts, one column per cache status value
   const perTs = new Map()
+  const seenStatuses = new Set()
   rawData.forEach((item) => {
     if (!item?.ts) return
     const status = String(item.upstreamCacheStatus || '-').toUpperCase()
-    const bucket = CACHE_STATUS_BUCKETS.includes(status) ? status : '-'
+    seenStatuses.add(status)
     if (!perTs.has(item.ts)) perTs.set(item.ts, { ts: item.ts })
     const entry = perTs.get(item.ts)
-    entry[bucket] = (entry[bucket] || 0) + (item[aggReturnField] || 0)
+    entry[status] = (entry[status] || 0) + (item[aggReturnField] || 0)
   })
 
+  // Backfill missing statuses with 0 for consistent chart series
+  const allStatuses = Array.from(seenStatuses)
+  for (const row of perTs.values()) {
+    for (const status of allStatuses) {
+      if (!(status in row)) row[status] = 0
+    }
+  }
+
   const chartData = Array.from(perTs.values()).sort(
-    (a, b) => new Date(a.ts) - new Date(b.ts)
+    (itemA, itemB) => new Date(itemA.ts) - new Date(itemB.ts)
   )
 
   const total = chartData.reduce((sum, row) => {
-    return sum + CACHE_STATUS_BUCKETS.reduce((s, b) => s + (row[b] || 0), 0)
+    return sum + allStatuses.reduce((statusSum, status) => statusSum + (row[status] || 0), 0)
   }, 0)
 
   return { chartData, kpis: { total, clientErrors: null, serverErrors: null, avgRequestTime: null, supportsStatusBreakdown: false, supportsRequestTime: false } }
@@ -570,9 +613,11 @@ export const loadEventsChartAggregation = async ({
   Object.entries(filters?.in || {}).forEach(([key, value]) => {
     if (!key.startsWith('status')) {
       const varName = `in_${key}`
-      variables[varName] = value
-      extraFilterFragments.push(`${key}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: [String]`)
+      const normalized = normalizeInFilterValues(value)
+      variables[varName] = normalized
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      extraFilterFragments.push(`${gqlKey}: $${varName}`)
+      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
     }
   })
   const extraFilterStr =
@@ -660,10 +705,7 @@ const STACK_BUCKETS = {
     return 'other'
   },
   upstreamCacheStatus: (raw) => {
-    const val = String(raw || '').toUpperCase()
-    if (['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE', 'UPDATING', 'REVALIDATED'].includes(val))
-      return val
-    return val || '-'
+    return String(raw || '-').toUpperCase()
   }
 }
 
@@ -822,16 +864,20 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
   if (filters?.in) {
     Object.entries(filters.in).forEach(([key, value]) => {
       const varName = `in_${key}`
-      variables[varName] = Array.isArray(value)
-        ? value.map((item) => (item?.value !== undefined ? item.value : item))
-        : value
-      extraFilterLines.push(`${key}: $${varName}`)
+      const normalized = normalizeInFilterValues(value)
+      variables[varName] = normalized
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      extraFilterLines.push(`${gqlKey}: $${varName}`)
     })
   }
 
   const paramType = (key, value) => {
     if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
-    if (Array.isArray(value)) return '[String]'
+    if (Array.isArray(value)) {
+      const sample = value[0]
+      if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
+      return '[String]'
+    }
     if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
     return 'String'
   }
