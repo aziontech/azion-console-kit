@@ -69,10 +69,14 @@
     tracker.product.productCreated({
       productName: 'Personal Token'
     })
+
     personalTokenKey.value = token
+    
     dialog.open(DialogCopyKey, {
       data: {
-        personalToken: personalTokenKey.value
+        title: 'Personal Token',
+        token: personalTokenKey.value,
+        mask: true
       },
       onClose: () => {
         router.push({ name: 'list-personal-tokens' })
