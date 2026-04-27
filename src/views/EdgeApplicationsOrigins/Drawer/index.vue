@@ -2,7 +2,7 @@
   import FormFieldsDrawerOrigin from '@/views/EdgeApplicationsOrigins/FormFields/FormFieldsEdgeApplicationsOrigins'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import CopyKeyDialog from '@templates/dialog-copy-key'
+  import DialogCopyKey from '@templates/dialog-copy-key'
   import { refDebounced } from '@vueuse/core'
   import { onMounted } from 'vue'
   import { useAccountStore } from '@/stores/account'
@@ -262,17 +262,18 @@
       .track()
   }
 
-  const handleCreateOrigin = (feedback) => {
+  const handleCreateOrigin = (data) => {
     handleTrackCreation()
 
-    dialog.open(CopyKeyDialog, {
+    dialog.open(DialogCopyKey, {
       data: {
         title: 'Origin Key',
-        key: feedback.originKey
+        token: data.originKey,
+        mask: false
       }
     })
 
-    originKey.value = feedback.originKey
+    originKey.value = data.originKey
     emit('onSuccess')
   }
 
