@@ -71,7 +71,7 @@
     })
 
     personalTokenKey.value = token
-    
+
     dialog.open(DialogCopyKey, {
       data: {
         title: 'Personal Token',
