@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, markRaw, watch, onMounted, defineOptions } from 'vue'
+  import { computed, ref, markRaw, watch, onMounted, defineOptions, provide } from 'vue'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -99,6 +99,15 @@
   const formData = ref({})
   const errors = ref([])
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
+  // Store isPublic values for privacy fields (fieldName -> isPublic)
+  const privacyFieldsState = ref({})
+
+  // Provide a function for privacy renderers to register their isPublic state
+  const updatePrivacyFieldState = (fieldName, isPublic) => {
+    privacyFieldsState.value[fieldName] = isPublic
+  }
+
+  provide('updatePrivacyFieldState', updatePrivacyFieldState)
 
   const customRenderers = [
     {
@@ -137,7 +146,7 @@
 
   /**
    * Repository step form schema
-   * Contains only fields from the first group (repository group)
+   * Contains fields that are NOT marked as isSettingField: true
    * Uses horizontal grid layout (sm:grid-cols-2)
    */
   const repositoryFormSchema = computed(() => {
@@ -147,22 +156,15 @@
     }
 
     const schema = { ...props.schema, type: 'object' }
-    const repositoryGroup = props.schema?.groups?.[0]
+    const allProperties = schema.properties || {}
 
-    if (!repositoryGroup || !repositoryGroup.fields) {
-      // Fallback: if no groups structure, use all properties
-      schema.properties = parsePropertiesSchema(schema.properties || {})
-      return schema
-    }
-
-    // Extract field names from the first group
-    const repositoryFieldNames = repositoryGroup.fields.map((field) => field.name)
-
-    // Filter properties to only include repository fields
+    // Filter properties to only include fields WITHOUT isSettingField: true
     const filteredProperties = {}
-    repositoryFieldNames.forEach((fieldName) => {
-      if (schema.properties?.[fieldName]) {
-        filteredProperties[fieldName] = schema.properties[fieldName]
+    Object.keys(allProperties).forEach((fieldName) => {
+      const field = allProperties[fieldName]
+      const isSetting = field?.isSettingField === true || field?.isSettingField === 'true'
+      if (!isSetting) {
+        filteredProperties[fieldName] = field
       }
     })
 
@@ -172,7 +174,7 @@
 
   /**
    * Settings step form schema
-   * Contains only fields from groups[1+] (settings groups)
+   * Contains fields marked with isSettingField: true
    * Uses full-width layout (each input takes the entire line)
    */
   const settingsFormSchema = computed(() => {
@@ -182,23 +184,15 @@
     }
 
     const schema = { ...props.schema, type: 'object' }
-    const settingsGroups = props.schema?.groups?.slice(1) || []
+    const allProperties = schema.properties || {}
 
-    if (settingsGroups.length === 0) {
-      // No settings groups - return empty schema with valid structure
-      return { type: 'object', properties: {} }
-    }
-
-    // Extract field names from settings groups
-    const settingsFieldNames = settingsGroups.flatMap(
-      (group) => group.fields?.map((field) => field.name) || []
-    )
-
-    // Filter properties to only include settings fields
+    // Filter properties to only include fields WITH isSettingField: true
     const filteredProperties = {}
-    settingsFieldNames.forEach((fieldName) => {
-      if (schema.properties?.[fieldName]) {
-        filteredProperties[fieldName] = schema.properties[fieldName]
+    Object.keys(allProperties).forEach((fieldName) => {
+      const field = allProperties[fieldName]
+      const isSetting = field?.isSettingField === true || field?.isSettingField === 'true'
+      if (isSetting) {
+        filteredProperties[fieldName] = field
       }
     })
 
@@ -220,6 +214,46 @@
    */
   const hasSettingsFormProperties = computed(() => {
     return Object.keys(settingsFormSchema.value?.properties || {}).length > 0
+  })
+
+  /**
+   * Computed property to check if form should be disabled
+   * True when loading or explicitly disabled
+   */
+  const isFormDisabled = computed(() => {
+    return props.loadingDeploy || props.disabledDeploy
+  })
+
+  /**
+   * Repository form schema with readOnly applied when disabled
+   */
+  const repositoryFormSchemaDisabled = computed(() => {
+    if (!isFormDisabled.value) return repositoryFormSchema.value
+
+    const schema = JSON.parse(JSON.stringify(repositoryFormSchema.value))
+    schema.readOnly = true
+    if (schema.properties) {
+      Object.keys(schema.properties).forEach((key) => {
+        schema.properties[key].readOnly = true
+      })
+    }
+    return schema
+  })
+
+  /**
+   * Settings form schema with readOnly applied when disabled
+   */
+  const settingsFormSchemaDisabled = computed(() => {
+    if (!isFormDisabled.value) return settingsFormSchema.value
+
+    const schema = JSON.parse(JSON.stringify(settingsFormSchema.value))
+    schema.readOnly = true
+    if (schema.properties) {
+      Object.keys(schema.properties).forEach((key) => {
+        schema.properties[key].readOnly = true
+      })
+    }
+    return schema
   })
 
   const isVcsRequired = computed(() => {
@@ -264,8 +298,10 @@
     repositoryGroups: repositoryGroups.value,
     settingsGroups: settingsGroups.value,
     // Flow control props
-    // When there are no settings form properties, show Deploy button instead of Next
-    hasSettings: props.hasSettings && hasSettingsFormProperties.value,
+    // hasSettings is derived from fields with isSettingField: true
+    // When true: shows "Next" button → go to settings step
+    // When false: shows "Deploy" button → deploy directly
+    hasSettings: hasSettingsFormProperties.value,
     loadingDeploy: props.loadingDeploy,
     disabledDeploy: props.disabledDeploy,
     // Validation prop
@@ -293,22 +329,35 @@
     errors.value = event.errors
   }
   /**
-   * Validates the entire form including VCS integration
-   * @returns {boolean} Whether the form is valid
+   * Validates form fields based on current step
+   * @param {string} step - Current step ('repository' or 'settings')
+   * @returns {boolean} Whether the form is valid for the current step
    */
-  const validateForm = () => {
-    // For JSON Forms, we validate the entire form
-    // since JSON Forms handles validation internally for all fields
-    const jsonFormErrors = errors.value.filter(
-      (error) => !error.params.missingProperty?.includes(vcsIntegrationFieldName.value)
-    )
+  const validateForm = (step = 'repository') => {
+    // Get field names for the current step
+    const stepProperties =
+      step === 'repository'
+        ? repositoryFormSchema.value?.properties || {}
+        : settingsFormSchema.value?.properties || {}
 
-    const hasJsonFormErrors = jsonFormErrors.length > 0
-    const hasVcsError = isVcsRequired.value && !selectedIntegration.value
+    const stepFieldNames = Object.keys(stepProperties)
 
+    // Filter errors to only include fields from the current step
+    const stepErrors = errors.value.filter((error) => {
+      const missingProperty = error.params?.missingProperty || error.instancePath?.replace('/', '')
+      return (
+        stepFieldNames.includes(missingProperty) ||
+        stepFieldNames.some((name) => error.instancePath?.includes(name))
+      )
+    })
+
+    // For repository step, also check VCS integration
+    const hasVcsError = step === 'repository' && isVcsRequired.value && !selectedIntegration.value
     vcsIntegrationError.value = hasVcsError ? 'Git Scope is required' : ''
 
-    return !hasJsonFormErrors && !hasVcsError
+    const hasStepErrors = stepErrors.length > 0
+
+    return !hasStepErrors && !hasVcsError
   }
 
   /**
@@ -340,6 +389,18 @@
           instantiationDataPath: field?.instantiation_data_path
         })
       )
+
+      // For privacy fields, also include isPublic value
+      if (field?.format === 'privacy') {
+        const isPublicValue = privacyFieldsState.value[key] ?? true
+        data.push(
+          parseData({
+            name: `${key}_is_public`,
+            value: isPublicValue,
+            instantiationDataPath: field?.is_public_data_path || ''
+          })
+        )
+      }
     })
 
     return data
@@ -554,6 +615,7 @@
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
               :loading="slotProps.isIntegrationsLoading"
+              :disabled="isFormDisabled"
               v-model="selectedIntegration"
               :options="slotProps.listOfIntegrations"
               optionLabel="label"
@@ -590,21 +652,21 @@
             v-if="hasRepositoryFormProperties"
             style="display: contents"
             :data="formData"
-            :schema="repositoryFormSchema"
+            :schema="repositoryFormSchemaDisabled"
             :renderers="renderers"
             @change="onChangeAzionForm"
           />
         </div>
       </template>
 
-      <!-- Settings Step - Settings Inputs Slot with full-width layout -->
+      <!-- Settings Step - Settings Inputs Slot with 2-column grid layout -->
       <template #settings-inputs>
-        <div class="w-full">
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
           <JsonForms
             v-if="hasSettingsFormProperties"
-            class="flex flex-col gap-4"
+            style="display: contents"
             :data="formData"
-            :schema="settingsFormSchema"
+            :schema="settingsFormSchemaDisabled"
             :renderers="renderers"
             @change="onChangeAzionForm"
           />

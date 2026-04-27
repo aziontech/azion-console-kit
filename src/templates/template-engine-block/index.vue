@@ -147,7 +147,6 @@
     try {
       if (!props.templateId) return
       const templateData = await props.getTemplateService(templateId)
-
       // Merge template info fields from GitHub template into inputSchema
       // These are displayed in DeployRepositoryCard preview
       inputSchema.value = {

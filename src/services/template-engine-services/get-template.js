@@ -9,61 +9,64 @@ const TEMPLATE_INFO_KEYS = {
 }
 
 /**
- * Parses instantiation_data and extracts template info from envs array
+ * Parses instantiation_data and extracts template info
  * The instantiation_data can be:
- * - A JSON string containing { envs: [...] }
- * - An already parsed object with envs array
- * - An array directly
+ * - A JSON string containing { templateTitle, templateDescription, templatePath, imagePreview, envs: [...] }
+ * - An already parsed object
+ * - An array directly (old format)
+ *
+ * Priority: direct properties > envs array entries
+ *
  * @param {string|Object|Array} instantiationData - The raw instantiation_data
- * @returns {Object} Template info object with title, description, path, url
+ * @returns {Object} Template info object with title, description, path, url, imagePreview
  */
 const extractTemplateInfo = (instantiationData) => {
+  let parsedData = null
   let envsArray = null
 
   // If it's a string, parse it as JSON
   if (typeof instantiationData === 'string') {
     try {
-      const parsed = JSON.parse(instantiationData)
-      envsArray = parsed?.envs ?? null
+      parsedData = JSON.parse(instantiationData)
+      envsArray = parsedData?.envs ?? null
     } catch {
       return {
         templateTitle: '',
         templateDescription: '',
         templatePath: '',
-        templateUrl: ''
+        templateUrl: '',
+        imagePreview: ''
       }
     }
   }
-  // If it's an object with envs property
+  // If it's an object
   else if (instantiationData && typeof instantiationData === 'object') {
     if (Array.isArray(instantiationData)) {
       // Direct array (old format)
       envsArray = instantiationData
-    } else if (instantiationData.envs && Array.isArray(instantiationData.envs)) {
-      // Object with envs array
-      envsArray = instantiationData.envs
+      parsedData = {}
+    } else {
+      // Object with potential direct properties and/or envs array
+      parsedData = instantiationData
+      envsArray = instantiationData.envs ?? null
     }
   }
 
-  if (!envsArray || !Array.isArray(envsArray)) {
-    return {
-      templateTitle: '',
-      templateDescription: '',
-      templatePath: '',
-      templateUrl: ''
-    }
-  }
-
-  const findValue = (key) => {
+  // Helper to find value in envs array
+  const findInEnvs = (key) => {
+    if (!envsArray || !Array.isArray(envsArray)) return ''
     const item = envsArray.find((entry) => entry.key === key)
     return item?.value ?? ''
   }
 
+  // Priority: direct properties > envs array entries
   return {
-    templateTitle: findValue(TEMPLATE_INFO_KEYS.NAME),
-    templateDescription: findValue(TEMPLATE_INFO_KEYS.MESSAGE),
-    templatePath: findValue(TEMPLATE_INFO_KEYS.PATH),
-    templateUrl: findValue(TEMPLATE_INFO_KEYS.URL)
+    templateTitle: parsedData?.templateTitle ?? findInEnvs(TEMPLATE_INFO_KEYS.NAME) ?? '',
+    templateDescription:
+      parsedData?.templateDescription ?? findInEnvs(TEMPLATE_INFO_KEYS.MESSAGE) ?? '',
+    templatePath: parsedData?.templatePath ?? findInEnvs(TEMPLATE_INFO_KEYS.PATH) ?? '',
+    templateUrl: parsedData?.templateUrl ?? findInEnvs(TEMPLATE_INFO_KEYS.URL) ?? '',
+    imagePreview: parsedData?.imagePreview ?? ''
   }
 }
 
@@ -84,7 +87,9 @@ const checkHasSettings = (inputSchema) => {
     const properties = inputSchema.properties
     return Object.values(properties).some(
       (property) =>
-        property.instantiation_data_path !== undefined && property.instantiation_data_path !== ''
+        (property.instantiation_data_path !== undefined &&
+          property.instantiation_data_path !== '') ||
+        property.isSettingField === true
     )
   }
 
@@ -112,7 +117,8 @@ const adapt = (httpResponse) => {
       updatedAt: httpResponse.body.updated_at,
       uuid: httpResponse.body.uuid,
       hasSettings: checkHasSettings(inputSchema),
-      imagePreview: httpResponse.body.imagePreview,
+      // Priority: instantiation_data > API response
+      imagePreview: templateInfo.imagePreview || httpResponse.body.imagePreview || '',
       templateTitle: templateInfo.templateTitle,
       templateDescription: templateInfo.templateDescription,
       templatePath: templateInfo.templatePath,

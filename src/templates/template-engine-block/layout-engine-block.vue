@@ -582,7 +582,7 @@
                 {{ props.templateDescription }}
               </p>
 
-              <div class="flex flex-col gap-1.5">
+              <div class="flex flex-col gap-1.5 mt-auto">
                 <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
                 <div class="flex items-center gap-1">
                   <i class="pi pi-github text-color-secondary text-[14px]" />

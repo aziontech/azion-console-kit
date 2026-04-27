@@ -19,6 +19,7 @@
   const step = computed(() => control.value.schema.multipleOf || 1)
   const showButtons = computed(() => control.value.schema.showButtons ?? true)
   const useGrouping = computed(() => (control.value.schema.type === 'number' ? true : false))
+  const disabled = computed(() => !control.value.enabled || control.value.schema.readOnly)
 
   const onChange = (value) => {
     isChanged.value = true
@@ -46,6 +47,7 @@
       :step="step"
       :showButtons="showButtons"
       :useGrouping="useGrouping"
+      :disabled="disabled"
       @blur="onBlur"
       @input="onChange"
     />

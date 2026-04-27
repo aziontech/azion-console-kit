@@ -14,6 +14,7 @@
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
+  const disabled = computed(() => !control.value.enabled || control.value.schema.readOnly)
 
   const onChange = (value) => {
     isChanged.value = true
@@ -36,6 +37,7 @@
       :description="description"
       :required="required"
       :additionalError="errorMessage"
+      :disabled="disabled"
       @blur="onBlur"
       @input="onChange"
     />

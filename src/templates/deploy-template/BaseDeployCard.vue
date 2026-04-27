@@ -80,7 +80,7 @@
 
     <!-- Footer -->
     <div
-      v-if="$slots.footer && !hideFooter && !loading"
+      v-if="!hideFooter && !loading"
       class="h-14 px-4 sm:px-6 border-t surface-border flex flex-col justify-center"
     >
       <slot name="footer" />
