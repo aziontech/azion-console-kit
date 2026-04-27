@@ -123,7 +123,6 @@ describe('hubspotFormSubmitService', () => {
   })
 
   it('should validate that email is required', async () => {
-
     const result = await hubspotFormSubmitService({
       form_action: 'signup_email',
       user_id__rtm_: 'user-123',
@@ -135,7 +134,6 @@ describe('hubspotFormSubmitService', () => {
   })
 
   it('should validate that form_action is required', async () => {
-
     const result = await hubspotFormSubmitService({
       email: 'test@example.com',
       user_id__rtm_: 'user-123',
@@ -147,7 +145,6 @@ describe('hubspotFormSubmitService', () => {
   })
 
   it('should validate that form_action has valid value', async () => {
-
     const result = await hubspotFormSubmitService({
       email: 'test@example.com',
       form_action: 'invalid_action',
