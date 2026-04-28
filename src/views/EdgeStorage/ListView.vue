@@ -555,7 +555,6 @@
   const renameValue = ref('')
   const isRenaming = ref(false)
 
-  // --- Inlined folder-list state ---
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isFileListLoading = ref(false)
   const fileData = ref([])
@@ -648,7 +647,6 @@
     return specialCharRegex.test(newFolderName.value)
   })
 
-  // --- Checkbox selection ---
   const toggleRowSelection = (rowData) => {
     if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav || rowData.isNewFolder)
       return
@@ -689,13 +687,11 @@
     return ''
   }
 
-  // --- Row icon ---
   const getRowIcon = (rowData) => {
     if (!rowData || !rowData.name) return 'mdi mdi-file text-gray-500'
     return getFileIcon(rowData)
   }
 
-  // --- Actions ---
   const showActions = (rowData) => {
     return (
       !rowData.isFolder &&
@@ -764,7 +760,6 @@
     }
   }
 
-  // --- Item click ---
   const editItemSelected = (item) => {
     if (item.isSkeletonRow || item.isNewFolder) return
 
@@ -776,7 +771,6 @@
     }
   }
 
-  // --- Breadcrumb ---
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
 
@@ -904,7 +898,6 @@
     showEllipsisPopup.value = true
   }
 
-  // --- Data loading ---
   const loadFileData = async () => {
     try {
       isFileListLoading.value = true
@@ -927,7 +920,6 @@
     loadFileData()
   }
 
-  // --- Original business logic ---
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
   })
@@ -1198,14 +1190,9 @@
 
   const handleRouteChange = () => {
     const newId = route.params.id
-    console.log('[ListView] handleRouteChange - route.params:', JSON.stringify(route.params))
-    console.log('[ListView] handleRouteChange - newId:', newId)
-    console.log('[ListView] handleRouteChange - selectedBucket.value before:', selectedBucket.value)
-
+    
     if (!newId) {
-      selectedFiles.value = []
-      folderPath.value = ''
-      selectedBucket.value = null
+      selectBucket(null)
     } else {
       if (selectedBucket.value?.name !== newId) {
         const bucket = buckets.value.find((item) => item.name === newId) || {
@@ -1230,7 +1217,6 @@
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
   }
 
-  // --- Watchers ---
   watch(
     () => route.fullPath,
     () => {
@@ -1252,11 +1238,6 @@
     }
   )
 
-  watch(fileData, () => {
-    // emit on-load-data equivalent
-  })
-
-  // --- Document drag events ---
   const handleDocumentDragOver = (event) => {
     event.preventDefault()
     handleDrag(true)
