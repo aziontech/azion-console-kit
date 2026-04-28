@@ -10,7 +10,7 @@
         "
       >
         <template #default>
-          <DataTable.ActionsButtons
+          <DataTableActionsButtons
             v-if="!selectedBucket"
             size="small"
             label="Bucket"
@@ -190,6 +190,7 @@
                       </DataTable.Header>
                     </div>
                   </template>
+
                   <DataTable.Column headerStyle="width: 3rem">
                     <template #header>
                       <Checkbox
@@ -446,6 +447,7 @@
   import ProgressCard from './components/ProgressCard.vue'
   import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
   import DataTable from '@aziontech/webkit/list-data-table'
+  import { DataTableActionsButtons } from '@/components/list-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
@@ -1196,9 +1198,14 @@
 
   const handleRouteChange = () => {
     const newId = route.params.id
+    console.log('[ListView] handleRouteChange - route.params:', JSON.stringify(route.params))
+    console.log('[ListView] handleRouteChange - newId:', newId)
+    console.log('[ListView] handleRouteChange - selectedBucket.value before:', selectedBucket.value)
 
     if (!newId) {
-      selectBucket(null)
+      selectedFiles.value = []
+      folderPath.value = ''
+      selectedBucket.value = null
     } else {
       if (selectedBucket.value?.name !== newId) {
         const bucket = buckets.value.find((item) => item.name === newId) || {
