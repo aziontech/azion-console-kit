@@ -844,11 +844,11 @@
         <Accordion :active-index="null">
           <AccordionTab
             :pt="{
-              header: { class: 'bg-surface-overlay' },
+              header: { class: 'bg-[var(--card-content-bg))]' },
               headerAction: {
-                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+                class: 'bg-[var(--card-content-bg))] hover:opacity-100 focus:shadow-none'
               },
-              content: { class: '!p-0 bg-surface-overlay' }
+              content: { class: '!p-0 bg-[var(--card-content-bg))]' }
             }"
           >
             <template #header>
@@ -877,7 +877,7 @@
             :pt="{
               header: { class: 'bg-surface-overlay' },
               headerAction: {
-                class: 'bg-surface-overlay hover:bg-surface-100 focus:shadow-none'
+                class: 'bg-surface-overlay hover:opacity-100 focus:shadow-none'
               },
               content: { class: '!p-0 bg-surface-overlay' }
             }"
