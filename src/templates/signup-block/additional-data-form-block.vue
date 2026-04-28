@@ -63,6 +63,24 @@
           />
         </div>
       </Transition>
+      <Transition name="expand-step">
+        <div
+          v-if="showCompanySizeStep"
+          class="flex flex-col gap-2"
+        >
+          <label class="text-xs leading-4 text-color-secondary">
+            Company Website
+            <span class="text-primary">*</span>
+          </label>
+          <FieldText
+            name="companyWebsite"
+            label=""
+            placeholder="https://yourcompany.com"
+            class="w-full"
+            required
+          />
+        </div>
+      </Transition>
 
       <!-- Full Name -->
       <FieldText
@@ -136,6 +154,21 @@
   const toast = useToast()
   const accountStore = useAccountStore()
 
+  const props = defineProps({
+    postAdditionalDataService: {
+      type: Function,
+      required: true
+    },
+    patchFullnameService: {
+      type: Function,
+      required: true
+    },
+    updateAccountInfoService: {
+      type: Function,
+      required: true
+    }
+  })
+
   defineOptions({
     name: 'additional-data-form-block'
   })
@@ -149,14 +182,26 @@
     plan: yup.string().required().oneOf(['hobby', 'pro', 'scale']),
     usageIntent: yup.string().required('Usage intent is required'),
     role: yup.string().required('Role is required'),
-    companySize: yup.string().required('Company size is required'),
+    companySize: yup.string().when('usageIntent', {
+      is: 'work',
+      then: (schema) => schema.required('Company size is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    companyWebsite: yup.string().when('usageIntent', {
+      is: 'work',
+      then: (schema) =>
+        schema
+          .trim()
+          .required('Company website is required')
+          .max(255, 'Company website must be less than 255 characters'),
+      otherwise: (schema) => schema.notRequired()
+    }),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
       .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
-      .required('Your Full Name is required'),
-    termsAccepted: yup.boolean()
+      .required('Your Full Name is required')
   })
 
   const { meta } = useForm({
@@ -167,6 +212,7 @@
   const { value: usageIntent } = useField('usageIntent')
   const { value: role } = useField('role')
   const { value: companySize } = useField('companySize')
+  const { value: companyWebsite } = useField('companyWebsite')
   const { value: fullName } = useField('fullName')
   const { value: termsAccepted } = useField('termsAccepted')
 
@@ -263,7 +309,80 @@
   ]
 
   const showRoleStep = computed(() => Boolean(usageIntent.value))
-  const showCompanySizeStep = computed(() => Boolean(usageIntent.value) && Boolean(role.value))
+  const showCompanySizeStep = computed(
+    () => Boolean(usageIntent.value) && Boolean(role.value) && usageIntent.value === 'work'
+  )
+
+  const additionalDataInfo = computed(() => [
+    {
+      id: 1,
+      key: 'How are you planning to use Azion?',
+      values: [
+        { id: 1, value: 'Personal', other_values: false },
+        { id: 2, value: 'Work', other_values: false },
+        { id: 3, value: 'Study', other_values: false }
+      ]
+    },
+    {
+      id: 2,
+      key: 'What best describes your role?',
+      values: [
+        { id: 4, value: 'Software Developer', other_values: false },
+        { id: 5, value: 'DevOps Engineer', other_values: false },
+        { id: 6, value: 'Infrastructure Analyst', other_values: false },
+        { id: 7, value: 'Network Engineer', other_values: false },
+        { id: 8, value: 'Security Specialist', other_values: false },
+        { id: 9, value: 'Data Engineer', other_values: false },
+        { id: 10, value: 'AI/ML Engineer', other_values: false },
+        { id: 11, value: 'IoT Engineer', other_values: false },
+        { id: 12, value: 'Team Lead', other_values: false },
+        { id: 13, value: 'Other', other_values: true }
+      ]
+    },
+    {
+      id: 3,
+      key: 'How big is your company?',
+      values: [
+        { id: 14, value: 'Just me', other_values: false },
+        { id: 15, value: '2 to 100 employees', other_values: false },
+        { id: 16, value: '101 to 500 employees', other_values: false },
+        { id: 17, value: '501 to 1000 employees', other_values: false },
+        { id: 18, value: '1001+ employees', other_values: false }
+      ]
+    },
+    {
+      id: 999,
+      key: 'Your Full Name',
+      values: []
+    },
+    {
+      id: 4,
+      key: 'Company Website?',
+      values: [{ id: 19, value: '', other_values: true }]
+    },
+    {
+      id: 5,
+      key: 'Do you want to schedule an onboarding session with an Azion expert?',
+      values: [
+        { id: 20, value: 'Yes', other_values: false },
+        { id: 21, value: 'No', other_values: false }
+      ]
+    }
+  ])
+
+  const usageIntentToApiValue = {
+    learn: 'Study',
+    'personal-project': 'Personal',
+    work: 'Work'
+  }
+
+  const companySizeToApiValue = {
+    'just-me': 'Just me',
+    '2-100': '2 to 100 employees',
+    '101-500': '101 to 500 employees',
+    '501-1000': '501 to 1000 employees',
+    '1001+': '1001+ employees'
+  }
   // Map jobRole from kebab-case to title case
   const jobRoleKebabToTitle = (kebabRole) => {
     const roleMap = {
@@ -329,13 +448,53 @@
     setPlanParam('plan', selectedPlan ?? null)
   })
 
+  watch(usageIntent, (selectedUsageIntent) => {
+    if (selectedUsageIntent !== 'work') {
+      companySize.value = undefined
+      companyWebsite.value = undefined
+    }
+  })
+
   const loading = ref(false)
 
   const submitForm = async () => {
     loading.value = true
 
     try {
-      // Emit event to proceed to checkout step
+      const usersPayload = fullName.value
+      const accountPayload = role.value
+      const userId = accountStore.userId
+      const additionalDataPayload = {
+        id: userId,
+        use: usageIntentToApiValue[usageIntent.value],
+        role: role.value,
+        inputRole: undefined,
+        companySize: companySizeToApiValue[companySize.value],
+        onboardingSession: termsAccepted.value,
+        companyWebsite: companyWebsite.value,
+        plan: plan.value,
+        fullName: fullName.value
+      }
+
+      const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
+
+      const patchName = props.patchFullnameService(usersPayload)
+      const postAddData = props.postAdditionalDataService({
+        payload: additionalDataPayload,
+        options: additionalDataInfo.value
+      })
+
+      await patchName
+      await postAddData
+
+      // tracker.signUp
+      //   .submittedAdditionalData({
+      //     plan: plan.value,
+      //     role: role.value,
+      //     fullName: fullName.value
+      //   })
+      //   .track()
       emit('proceedToCheckout')
     } catch (err) {
       const errorMessage = err?.message || err

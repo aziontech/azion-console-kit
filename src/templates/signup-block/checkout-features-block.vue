@@ -69,11 +69,24 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['pro', 'scale'].includes(value)
+      validator: (value) => ['hobby', 'pro', 'scale'].includes(value)
     }
   })
 
   const planInfo = {
+    hobby: {
+      label: 'Hobby',
+      features: [
+        { title: '1 Workload' },
+        { title: '1M Application requests' },
+        { title: '2 hours Function compute time' },
+        { title: '500 MB Real-Time Events Storage' },
+        { title: '5 GB Object Storage' },
+        { title: '200 MB SQL Database Storage' },
+        { title: '1M Firewall requests' },
+        { title: 'DDoS Protection included' }
+      ]
+    },
     pro: {
       label: 'Pro',
       features: [
