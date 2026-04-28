@@ -390,9 +390,11 @@
         <Accordion>
           <AccordionTab
             :pt="{
-              header: { class: 'bg-neutral-950' },
-              headerAction: { class: 'bg-neutral-950 hover:bg-neutral-900 focus:shadow-none' },
-              content: { class: '!p-0 ' }
+              header: { class: 'bg-[var(--surface-ground)]' },
+              headerAction: {
+                class: 'bg-[var(--surface-ground)] hover:opacity-100 focus:shadow-none'
+              },
+              content: { class: '!p-0 bg-[var(--surface-section)]' }
             }"
           >
             <template #header>
@@ -514,7 +516,7 @@
                 />
               </template>
             </div>
-            <div class="bg-neutral-950 h-16 p-4 flex justify-end rounded-b-md">
+            <div class="bg-[var(--surface-ground)] h-16 p-4 flex justify-end rounded-b-md">
               <PrimeButton
                 severity="primary"
                 label="Save"
@@ -538,7 +540,7 @@
           <div
             v-for="(step, index) in nextSteps"
             :key="index"
-            class="h-11 rounded-md border surface-border bg-neutral-950 flex items-center px-3 cursor-pointer hover:border-primary transition-colors"
+            class="h-11 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors"
             @click="handleStepClick(step)"
           >
             <div

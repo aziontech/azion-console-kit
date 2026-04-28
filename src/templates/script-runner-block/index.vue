@@ -1,10 +1,18 @@
 <template>
-  <Accordion :activeIndex="active">
+  <Accordion
+    :activeIndex="active"
+    class="overflow-hidden rounded-md"
+  >
     <AccordionTab
       :header="title"
       ref="accordion"
       :pt="{
-        content: { class: 'p-4' },
+        header: { class: 'bg-[var(--surface-ground)] rounded-t-md' },
+        headerAction: {
+          class:
+            'bg-[var(--surface-ground)] rounded-t-md w-full hover:opacity-100 focus:shadow-none'
+        },
+        content: { class: 'p-4 bg-[var(--surface-section)] rounded-b-md' },
         headerTitle: { class: 'w-full' }
       }"
     >

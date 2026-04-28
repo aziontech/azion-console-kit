@@ -173,6 +173,8 @@
   const step4Ref = ref(null)
   const showNextButton = ref(props.showNextButton)
   const simulationTimerRef = ref(null)
+  // Track when deploy is initiated but waiting for executionId
+  const isDeployInitiated = ref(false)
 
   // VCS Integration State
   const callbackUrl = ref('')
@@ -323,14 +325,11 @@
   }
 
   /**
-   * Navigate to deploying step (step 3)
-   * Called when user clicks Deploy on TemplateSettingsCard
-   * No scroll needed - DeployStatusCard appears right after settings
+   * Navigate to deployment step (step 3)
+   * Called when executionId arrives
    */
-  const goToDeploying = () => {
-    currentStep.value = 'deploying'
-    showNextButton.value = false
-    // No scrollIntoView - card appears in natural flow
+  const goToDeployment = () => {
+    currentStep.value = 'deployment'
   }
 
   /**
@@ -344,14 +343,28 @@
   }
 
   /**
-   * Handle deploy action - validates and navigates to deploying step
+   * Handle deploy action - validates and initiates deploy
+   * Card stays visible with disabled fields and loading button until executionId arrives
    */
   const handleDeploy = async () => {
     const isValid = await validateBeforeProceed()
     if (!isValid) return
 
-    goToDeploying()
+    isDeployInitiated.value = true
     emit('deploy')
+  }
+
+  /**
+   * Scroll to a step element with smooth animation
+   * @param {Object} elementRef - Vue ref to the element
+   */
+  const scrollToElement = (elementRef) => {
+    const element = elementRef?.value?.$el || elementRef?.value
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
   }
 
   /**
@@ -377,7 +390,10 @@
    * Handle retry action
    */
   const handleRetry = () => {
-    currentStep.value = 'settings'
+    // Go back to settings if has settings, otherwise go to repository
+    currentStep.value = props.hasSettings ? 'settings' : 'repository'
+    isDeployInitiated.value = false
+    showNextButton.value = props.showNextButton
     emit('retry')
   }
 
@@ -409,14 +425,19 @@
   /**
    * Handle save domains action
    * Called when user saves domain settings from DeploySuccessCard
+   * Emits event and sets loading state - parent component must call handleSaveDomainsComplete when done
    */
-  const handleSaveDomains = async (values) => {
+  const handleSaveDomains = (values) => {
     isSavingDomains.value = true
-    try {
-      emit('save-domains', values)
-    } finally {
-      isSavingDomains.value = false
-    }
+    emit('save-domains', values)
+  }
+
+  /**
+   * Complete the save domains operation - resets loading state
+   * Called by parent component after save operation completes (success or error)
+   */
+  const handleSaveDomainsComplete = () => {
+    isSavingDomains.value = false
   }
 
   /**
@@ -425,6 +446,8 @@
   const reset = () => {
     currentStep.value = 'repository'
     isTransitioning.value = false
+    isDeployInitiated.value = false
+    showNextButton.value = props.showNextButton
     clearDeploySimulation()
   }
 
@@ -435,8 +458,25 @@
   watch(
     () => props.results,
     (newResults) => {
-      if (newResults && currentStep.value === 'deploying') {
+      if (newResults && currentStep.value === 'deployment') {
         goToSuccess()
+      }
+    }
+  )
+
+  /**
+   * Watch for executionId to arrive
+   * When it does, transition to deployment step and scroll to DeployStatusCard
+   */
+  watch(
+    () => props.executionId,
+    (newExecutionId) => {
+      if (newExecutionId && isDeployInitiated.value) {
+        currentStep.value = 'deployment'
+        isDeployInitiated.value = false
+        showNextButton.value = false
+        // Scroll to DeployStatusCard after it becomes visible
+        scrollToElement(step3Ref)
       }
     }
   )
@@ -470,8 +510,9 @@
     step4Ref,
     reset,
     goToSettings,
-    goToDeploying,
-    goToSuccess
+    goToDeployment,
+    goToSuccess,
+    handleSaveDomainsComplete
   })
 </script>
 
@@ -506,7 +547,9 @@
       v-if="currentStep !== 'success'"
       :title="props.title || 'Start from Template'"
       :step-index="0"
-      :hide-footer="currentStep === 'settings'"
+      :hide-footer="
+        (currentStep === 'settings' && !isDeployInitiated) || currentStep === 'deployment'
+      "
     >
       <template #content>
         <div
@@ -601,7 +644,7 @@
         ></div>
 
         <slot
-          v-if="currentStep === 'repository'"
+          v-if="currentStep === 'repository' || isDeployInitiated"
           name="github-connection"
           :has-integrations-list="hasIntegrationsList"
           :list-of-integrations="listOfIntegrations"
@@ -613,7 +656,7 @@
         />
 
         <div
-          v-if="currentStep === 'repository' && $slots.inputs"
+          v-if="(currentStep === 'repository' || isDeployInitiated) && $slots.inputs"
           class="flex flex-col gap-4"
         >
           <slot
@@ -633,7 +676,7 @@
         </div>
 
         <slot
-          v-if="currentStep === 'repository'"
+          v-if="currentStep === 'repository' || isDeployInitiated"
           name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
@@ -643,7 +686,10 @@
       </template>
 
       <template
-        v-if="showNextButton || $slots['footer-actions']"
+        v-if="
+          currentStep === 'repository' &&
+          (showNextButton || isDeployInitiated || $slots['footer-actions'])
+        "
         #footer
       >
         <slot name="footer-actions">
@@ -662,8 +708,8 @@
             v-else
             class="w-full flex-row-reverse"
             :label="props.deployLabel"
-            :loading="props.loadingDeploy"
-            :disabled="props.disabledDeploy"
+            :loading="props.loadingDeploy || isDeployInitiated"
+            :disabled="props.disabledDeploy || isDeployInitiated"
             severity="primary"
             @click="handleDeploy"
           />
@@ -675,7 +721,7 @@
     <div
       v-if="props.hasSettings"
       ref="step2Ref"
-      v-show="currentStep === 'settings' || currentStep === 'deploying'"
+      v-show="currentStep === 'settings' || currentStep === 'deployment'"
     >
       <TemplateSettingsCard
         :title="'Template Settings'"
@@ -684,8 +730,8 @@
         :template-title="props.templateTitle"
         :template-url="props.templateUrl"
         :github-url="props.githubUrl"
-        :loading-deploy="props.loadingDeploy"
-        :disabled-deploy="props.disabledDeploy || props.loadingDeploy"
+        :loading-deploy="props.loadingDeploy || isDeployInitiated"
+        :disabled-deploy="props.disabledDeploy || props.loadingDeploy || isDeployInitiated"
         :deploy-label="props.deployLabel"
         :hide-footer="!!props.executionId"
         @deploy="handleDeploy"
@@ -706,7 +752,7 @@
 
     <div
       ref="step3Ref"
-      v-show="currentStep === 'deploying' || currentStep === 'success'"
+      v-show="currentStep === 'deployment' || currentStep === 'success'"
     >
       <DeployStatusCard
         v-if="props.executionId"
@@ -717,7 +763,7 @@
         :application-name="props.applicationName"
         :deploy-start-time="props.deployStartTime"
         :next-steps="props.nextSteps"
-        :deploy-started="currentStep === 'deploying' || currentStep === 'success'"
+        :deploy-started="currentStep === 'deployment' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
         @manage="handleManage"

@@ -735,7 +735,7 @@
       :hide-footer="currentStep === 'deploying'"
       withoutBorder
     >
-      <template #header-meta>
+      <template #content>
         <div class="w-full px-4 sm:px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
           <div class="py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-1.5">
@@ -762,9 +762,6 @@
             </div>
           </div>
         </div>
-      </template>
-
-      <template #content>
         <div class="flex flex-col w-full gap-2">
           <FieldText
             label="Domain"
@@ -777,7 +774,7 @@
           />
         </div>
 
-        <div class="flex flex-col w-full gap-2">
+        <div class="flex flex-col w-full sm:max-w-lg gap-2">
           <LabelBlock
             for="preset"
             label="Framework"
@@ -834,6 +831,7 @@
           <FieldText
             label="Root Directory"
             required
+            class="w-full"
             name="rootDirectory"
             placeholder="./"
             :value="rootDirectory"
@@ -841,14 +839,17 @@
           />
         </div>
 
-        <Accordion :active-index="null">
+        <Accordion
+          :active-index="null"
+          class="overflow-hidden rounded-md"
+        >
           <AccordionTab
             :pt="{
-              header: { class: 'bg-[var(--card-content-bg))]' },
+              header: { class: 'bg-[var(--surface-ground)] rounded-t-md' },
               headerAction: {
-                class: 'bg-[var(--card-content-bg))] hover:opacity-100 focus:shadow-none'
+                class: 'bg-[var(--surface-ground)] rounded-t-md hover:opacity-100 focus:shadow-none'
               },
-              content: { class: '!p-0 bg-[var(--card-content-bg))]' }
+              content: { class: '!p-0 bg-[var(--card-content-bg))] rounded-b-md' }
             }"
           >
             <template #header>
@@ -875,11 +876,11 @@
 
           <AccordionTab
             :pt="{
-              header: { class: 'bg-surface-overlay' },
+              header: { class: 'bg-[var(--surface-ground)] rounded-b-md' },
               headerAction: {
-                class: 'bg-surface-overlay hover:opacity-100 focus:shadow-none'
+                class: 'bg-[var(--surface-ground)] rounded-b-md hover:opacity-100 focus:shadow-none'
               },
-              content: { class: '!p-0 bg-surface-overlay' }
+              content: { class: '!p-0 bg-surface-overlay rounded-b-md' }
             }"
           >
             <template #header>

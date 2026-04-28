@@ -157,7 +157,7 @@
                 </div>
               </div>
               <span
-                class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-primary transition-colors underline-offset-2 hover:underline"
+                class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-link transition-colors underline-offset-2 hover:underline"
                 @click="resource.redirect?.()"
               >
                 {{ resource.name }}

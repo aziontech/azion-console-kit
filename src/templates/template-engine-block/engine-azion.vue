@@ -23,10 +23,6 @@
       type: Boolean,
       default: false
     },
-    hasSettings: {
-      type: Boolean,
-      default: true
-    },
     loadingDeploy: {
       type: Boolean,
       default: false
@@ -91,29 +87,52 @@
 
   /**
    * Computed property to determine if inputs should be disabled
-   * True when loadingDeploy is true OR when currentStep is 'deploying'
+   * True when loadingDeploy is true OR when currentStep is 'deployment' or 'success'
    */
   const isDeploying = computed(() => {
     const step = layoutRef.value?.currentStep
-    return props.loadingDeploy || step === 'deploying'
+    return props.loadingDeploy || step === 'deployment' || step === 'success'
   })
 
+  const REPOSITORY_FIELD_NAMES = ['platform_feature__vcs_integration__uuid', 'az_name']
+
   /**
-   * Computed property for repository groups (group[0])
-   * Returns the first group from the schema groups array
+   * Filters fields from a group based on field names
+   * @param {Object} group - Group object containing fields
+   * @param {Array<string>} fieldNames - Array of field names to filter
+   * @returns {Object|null} Group with filtered fields or null if no fields remain
+   */
+  const filterGroupFields = (group, fieldNames) => {
+    const filteredFields = (group.fields || []).filter((field) => fieldNames.includes(field.name))
+    if (filteredFields.length === 0) return null
+    return { ...group, fields: filteredFields }
+  }
+
+  /**
+   * Computed property for repository groups
+   * Returns groups containing only fields with name "platform_feature__vcs_integration__uuid" or "az_name"
    */
   const repositoryGroups = computed(() => {
     const groups = inputSchema.value.groups || []
-    return groups.length > 0 ? [groups[0]] : []
+    return groups.map((group) => filterGroupFields(group, REPOSITORY_FIELD_NAMES)).filter(Boolean)
   })
 
   /**
-   * Computed property for settings groups (group[1+])
-   * Returns all groups except the first one
+   * Computed property for settings groups
+   * Returns groups containing only fields that are NOT "platform_feature__vcs_integration__uuid" or "az_name"
    */
   const settingsGroups = computed(() => {
     const groups = inputSchema.value.groups || []
-    return groups.slice(1)
+    return groups
+      .map((group) =>
+        filterGroupFields(
+          group,
+          (group.fields || [])
+            .map((field) => field.name)
+            .filter((name) => !REPOSITORY_FIELD_NAMES.includes(name))
+        )
+      )
+      .filter((group) => group && group.fields.length > 0)
   })
 
   /**
@@ -168,6 +187,14 @@
   })
 
   /**
+   * Computed property to determine if settings card should be shown
+   * Returns true only if there are fields to display in settings
+   */
+  const hasSettingsFields = computed(() => {
+    return settingsGroups.value.length > 0 && settingsGroupedRows.value.length > 0
+  })
+
+  /**
    * Computes props to pass to LayoutEngineBlock
    */
   const layoutProps = computed(() => ({
@@ -189,8 +216,8 @@
     // Groups for each step
     repositoryGroups: repositoryGroups.value,
     settingsGroups: settingsGroups.value,
-    // Flow control props
-    hasSettings: props.hasSettings,
+    // Flow control props - show settings only if there are fields to display
+    hasSettings: hasSettingsFields.value,
     loadingDeploy: props.loadingDeploy,
     disabledDeploy: props.disabledDeploy,
     // Validation prop
@@ -363,15 +390,6 @@
   }
 
   /**
-   * Gets field names from a specific group
-   * @param {Object} group - Group object containing fields
-   * @returns {Array<string>} Array of field names in the group
-   */
-  const getFieldNamesFromGroup = (group) => {
-    return (group.fields || []).filter((field) => !field.hidden).map((field) => field.name)
-  }
-
-  /**
    * Validates fields for a specific step
    * @param {string} step - The current step ('repository' or 'settings')
    * @returns {Promise<boolean>} Whether the form is valid for the step
@@ -382,23 +400,23 @@
     // Determine which field names to validate based on the current step
     let fieldNamesToValidate = []
 
+    const allFields = (inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+
     if (step === 'repository') {
-      // Repository step: validate group[0] fields and top-level fields
-      const groups = inputSchema.value.groups || []
-      if (groups.length > 0) {
-        fieldNamesToValidate = getFieldNamesFromGroup(groups[0])
-      }
+      // Repository step: validate fields with specific names
+      fieldNamesToValidate = allFields
+        .filter((field) => REPOSITORY_FIELD_NAMES.includes(field.name) && !field.hidden)
+        .map((field) => field.name)
       // Also include top-level fields (not in groups)
       const topLevelFields = (inputSchema.value.fields || [])
         .filter((field) => !field.hidden)
         .map((field) => field.name)
       fieldNamesToValidate = [...fieldNamesToValidate, ...topLevelFields]
     } else if (step === 'settings') {
-      // Settings step: validate group[1+] fields
-      const groups = inputSchema.value.groups || []
-      groups.slice(1).forEach((group) => {
-        fieldNamesToValidate = [...fieldNamesToValidate, ...getFieldNamesFromGroup(group)]
-      })
+      // Settings step: validate fields that are NOT repository fields
+      fieldNamesToValidate = allFields
+        .filter((field) => !REPOSITORY_FIELD_NAMES.includes(field.name) && !field.hidden)
+        .map((field) => field.name)
     }
 
     // Validate only the relevant fields using validateField
@@ -551,6 +569,7 @@
           summary: 'Error',
           detail: 'Workload ID not found'
         })
+        layoutRef.value?.handleSaveDomainsComplete?.()
         return
       }
 
@@ -569,6 +588,8 @@
         summary: 'Error',
         detail: error.message || 'Failed to update domain settings'
       })
+    } finally {
+      layoutRef.value?.handleSaveDomainsComplete?.()
     }
   }
 
@@ -630,8 +651,8 @@
     formTools,
     inputSchema,
     layoutRef,
-    // Expose goToDeploying from LayoutEngineBlock
-    goToDeploying: () => layoutRef.value?.goToDeploying?.(),
+    // Expose goToDeployment from LayoutEngineBlock
+    goToDeployment: () => layoutRef.value?.goToDeployment?.(),
     // Expose goToSuccess from LayoutEngineBlock
     goToSuccess: () => layoutRef.value?.goToSuccess?.(),
     // Expose currentStep from LayoutEngineBlock

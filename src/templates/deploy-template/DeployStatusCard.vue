@@ -160,7 +160,10 @@
 
 <template>
   <div class="flex flex-col w-full gap-8">
-    <BaseDeployCard title="Deployment">
+    <BaseDeployCard
+      title="Deployment"
+      :hide-footer="true"
+    >
       <template #header-right>
         <span v-if="isUnfinished">
           {{ elapsedTime }}

@@ -21,6 +21,10 @@
     withoutBorder: {
       type: Boolean,
       default: false
+    },
+    backgroundcontent: {
+      type: String,
+      default: ''
     }
   })
 </script>
@@ -28,7 +32,9 @@
 <template>
   <div class="flex flex-col w-full max-w-[700px] border surface-border rounded-md">
     <!-- Header -->
-    <div class="h-14 px-4 sm:px-6 border-b surface-border flex items-center justify-between">
+    <div
+      class="h-14 px-4 sm:px-6 border-b bg-[var(--surface-50)] surface-border flex items-center justify-between"
+    >
       <div
         class="text-color font-semibold leading-5"
         :class="titleSize"
@@ -52,14 +58,17 @@
     <!-- Header Meta -->
     <div
       v-if="$slots['header-meta'] && !loading"
-      class="px-6 bg-[var(--surface-50)]"
+      class="px-6 bg-[var(--surface-section)]"
       :class="{ 'border-b surface-border py-4': !withoutBorder, 'pt-4': withoutBorder }"
     >
       <slot name="header-meta" />
     </div>
 
     <!-- Content -->
-    <div class="p-4 sm:p-6 bg-[var(--surface-50)] flex flex-col gap-6">
+    <div
+      class="p-4 sm:p-6 bg-[var(--surface-100)] flex flex-col gap-6"
+      :class="backgroundcontent"
+    >
       <template v-if="loading">
         <!-- Skeleton content placeholder -->
         <div class="flex flex-col gap-4">

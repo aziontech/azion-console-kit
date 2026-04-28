@@ -539,6 +539,7 @@
       title-size="text-sm"
       class="flex-1 min-w-0"
       :loading="isLoading"
+      backgroudcontent="bg-[var(--surface-100)]"
     >
       <template #content>
         <div
@@ -547,7 +548,7 @@
           <article
             v-for="template in limitedTemplates"
             :key="template.id"
-            class="p-3 sm:p-4 surface-50 rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:surface-100 hover:shadow-md"
+            class="p-3 sm:p-4 bg-[var(--surface-50)] rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:surface-100 hover:shadow-md"
             @click="handleTemplateSelect(template)"
           >
             <div class="flex flex-col gap-3 sm:gap-4">
