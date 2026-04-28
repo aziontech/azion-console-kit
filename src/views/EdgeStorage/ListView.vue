@@ -1190,7 +1190,7 @@
 
   const handleRouteChange = () => {
     const newId = route.params.id
-    
+
     if (!newId) {
       selectBucket(null)
     } else {
