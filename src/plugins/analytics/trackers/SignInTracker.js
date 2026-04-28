@@ -1,4 +1,5 @@
 import { hubspotFormSubmitService } from '@/services/hubspot-services'
+import { getHubSpotUtk, getHubSpotContext } from '@/utils/cookies'
 
 /**
  * Maps signin type flags to the appropriate form_action value for HubSpot.
@@ -71,12 +72,13 @@ export class SignInTracker {
         email: payload.email,
         form_action: formAction,
         user_id__rtm_: payload.userId,
-        segment_userid: payload.userId,
         firstname: payload.firstname,
         lastname: payload.lastname,
         mobilephone: payload.phone,
         company: payload.company,
-        github_handle: payload.githubHandle
+        github_handle: payload.githubHandle,
+        utk: payload.utk ?? getHubSpotUtk(),
+        context: getHubSpotContext()
       })
     }
 

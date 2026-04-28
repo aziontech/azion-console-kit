@@ -20,6 +20,17 @@ const VALID_FORM_ACTIONS = [
 ]
 
 /**
+ * Maps form_action to HubSpot event name.
+ * signup_* actions → sign_up event
+ * login_* actions → sign_in event
+ */
+function getEventName(formAction) {
+  if (formAction.startsWith('signup_')) return 'sign_up'
+  if (formAction.startsWith('login_')) return 'sign_in'
+  return formAction
+}
+
+/**
  * Validates the payload for required fields and valid form_action.
  * @param {Object} payload - The form payload
  * @throws {Error} If validation fails
@@ -47,28 +58,31 @@ function validatePayload(payload) {
  * @param {string} payload.email - User email (required)
  * @param {string} payload.form_action - Event name: signup_email | signup_sso_google | signup_sso_github | login_email | login_sso_google | login_sso_github
  * @param {string} payload.user_id__rtm_ - Console user ID
- * @param {string} payload.segment_userid - Console user ID
  * @param {string} [payload.firstname] - User first name
  * @param {string} [payload.lastname] - User last name
  * @param {string} [payload.mobilephone] - User phone
  * @param {string} [payload.company] - Company name
  * @param {string} [payload.github_handle] - GitHub handle
  * @param {string} [payload.utk] - HubSpot user token (optional)
+ * @param {Object} [payload.context] - HubSpot context properties (hs_* properties)
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export const hubspotFormSubmitService = async (payload) => {
   try {
     validatePayload(payload)
 
-    // Build properties object with additional data
+    // Build properties object with user data and context
     const properties = {
       user_id__rtm_: payload.user_id__rtm_,
-      segment_userid: payload.segment_userid,
+      form_action: payload.form_action,
+      // User properties
       ...(payload.firstname && { firstname: payload.firstname }),
       ...(payload.lastname && { lastname: payload.lastname }),
       ...(payload.mobilephone && { mobilephone: payload.mobilephone }),
       ...(payload.company && { company: payload.company }),
-      ...(payload.github_handle && { github_handle: payload.github_handle })
+      ...(payload.github_handle && { github_handle: payload.github_handle }),
+      // HubSpot context properties (hs_*)
+      ...(payload.context || {})
     }
 
     // API endpoint - uses relative path when deployed alongside api-tracker
@@ -80,7 +94,7 @@ export const hubspotFormSubmitService = async (payload) => {
       url,
       method: 'POST',
       body: {
-        eventName: payload.form_action,
+        eventName: getEventName(payload.form_action),
         email: payload.email,
         utk: payload.utk,
         properties

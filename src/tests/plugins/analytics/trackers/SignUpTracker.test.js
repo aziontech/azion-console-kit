@@ -5,6 +5,11 @@ vi.mock('@/services/hubspot-services', () => ({
   hubspotFormSubmitService: vi.fn()
 }))
 
+vi.mock('@/utils/cookies', () => ({
+  getHubSpotUtk: vi.fn(),
+  getHubSpotContext: vi.fn()
+}))
+
 const makeSut = () => {
   const trackerAdapterSpy = {
     addEvent: vi.fn().mockReturnThis()
@@ -19,11 +24,17 @@ const makeSut = () => {
 
 describe('SignUpTracker', () => {
   let hubspotFormSubmitService
+  let getHubSpotUtk
+  let getHubSpotContext
 
   beforeEach(async () => {
     vi.clearAllMocks()
     hubspotFormSubmitService = (await import('@/services/hubspot-services'))
       .hubspotFormSubmitService
+    getHubSpotUtk = (await import('@/utils/cookies')).getHubSpotUtk
+    getHubSpotContext = (await import('@/utils/cookies')).getHubSpotContext
+    getHubSpotUtk.mockReturnValue(undefined)
+    getHubSpotContext.mockReturnValue({})
   })
 
   describe('userSignedUp', () => {
@@ -67,12 +78,13 @@ describe('SignUpTracker', () => {
         email: 'test@example.com',
         form_action: 'signup_email',
         user_id__rtm_: 'user-123',
-        segment_userid: 'user-123',
         firstname: undefined,
         lastname: undefined,
         mobilephone: undefined,
         company: undefined,
-        github_handle: undefined
+        github_handle: undefined,
+        utk: undefined,
+        context: {}
       })
     })
 
@@ -100,25 +112,6 @@ describe('SignUpTracker', () => {
       expect(hubspotFormSubmitService).not.toHaveBeenCalled()
     })
 
-    it('should ensure user_id__rtm_ equals segment_userid', async () => {
-      const { sut } = makeSut()
-
-      sut.userSignedUp({
-        method: 'google',
-        firstSessionUrl: 'https://console.azion.com/signup',
-        signupTypeFlags: { signup_sso_google: true },
-        email: 'test@example.com',
-        userId: 'console-user-456'
-      })
-
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
-        expect.objectContaining({
-          user_id__rtm_: 'console-user-456',
-          segment_userid: 'console-user-456'
-        })
-      )
-    })
-
     it('should pass all optional fields to HubSpot when provided', async () => {
       const { sut } = makeSut()
 
@@ -139,12 +132,13 @@ describe('SignUpTracker', () => {
         email: 'test@example.com',
         form_action: 'signup_sso_github',
         user_id__rtm_: 'user-789',
-        segment_userid: 'user-789',
         firstname: 'John',
         lastname: 'Doe',
         mobilephone: '+1234567890',
         company: 'Acme Inc',
-        github_handle: 'johndoe'
+        github_handle: 'johndoe',
+        utk: undefined,
+        context: {}
       })
     })
 
@@ -466,6 +460,46 @@ describe('SignUpTracker', () => {
       const result = sut.userActivatedAccount()
 
       expect(result).toBe(trackerAdapterSpy)
+    })
+  })
+
+  describe('HubSpot UTK cookie', () => {
+    it('should pass utk to HubSpot when hubspotutk cookie exists', async () => {
+      const { sut } = makeSut()
+      const { getHubSpotUtk } = await import('@/utils/cookies')
+      getHubSpotUtk.mockReturnValue('hubspot-token-from-cookie')
+
+      sut.userSignedUp({
+        method: 'email',
+        signupTypeFlags: { signup_email: true },
+        email: 'test@example.com',
+        userId: 'user-123'
+      })
+
+      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+        expect.objectContaining({
+          utk: 'hubspot-token-from-cookie'
+        })
+      )
+    })
+
+    it('should pass null utk when hubspotutk cookie does not exist', async () => {
+      const { sut } = makeSut()
+      const { getHubSpotUtk } = await import('@/utils/cookies')
+      getHubSpotUtk.mockReturnValue(null)
+
+      sut.userSignedUp({
+        method: 'email',
+        signupTypeFlags: { signup_email: true },
+        email: 'test@example.com',
+        userId: 'user-123'
+      })
+
+      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+        expect.objectContaining({
+          utk: null
+        })
+      )
     })
   })
 })

@@ -19,20 +19,19 @@ describe('hubspotFormSubmitService', () => {
     await hubspotFormSubmitService({
       email: 'test@example.com',
       form_action: 'signup_email',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: '/api/hubspot/events',
       method: 'POST',
       body: {
-        eventName: 'signup_email',
+        eventName: 'sign_up',
         email: 'test@example.com',
         utk: undefined,
         properties: {
           user_id__rtm_: 'user-123',
-          segment_userid: 'user-123'
+          form_action: 'signup_email'
         }
       },
       headers: {
@@ -50,7 +49,6 @@ describe('hubspotFormSubmitService', () => {
       email: 'test@example.com',
       form_action: 'signup_sso_google',
       user_id__rtm_: 'user-456',
-      segment_userid: 'user-456',
       firstname: 'John',
       lastname: 'Doe',
       mobilephone: '+1234567890',
@@ -63,12 +61,12 @@ describe('hubspotFormSubmitService', () => {
       url: '/api/hubspot/events',
       method: 'POST',
       body: {
-        eventName: 'signup_sso_google',
+        eventName: 'sign_up',
         email: 'test@example.com',
         utk: 'hubspot-token-123',
         properties: {
           user_id__rtm_: 'user-456',
-          segment_userid: 'user-456',
+          form_action: 'signup_sso_google',
           firstname: 'John',
           lastname: 'Doe',
           mobilephone: '+1234567890',
@@ -91,8 +89,7 @@ describe('hubspotFormSubmitService', () => {
     await hubspotFormSubmitService({
       email: 'test@example.com',
       form_action: 'signup_email',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(requestSpy).toHaveBeenCalledWith(
@@ -109,8 +106,7 @@ describe('hubspotFormSubmitService', () => {
     const result = await hubspotFormSubmitService({
       email: 'test@example.com',
       form_action: 'signup_email',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(result).toEqual({ success: false, error: 'Network error' })
@@ -125,8 +121,7 @@ describe('hubspotFormSubmitService', () => {
   it('should validate that email is required', async () => {
     const result = await hubspotFormSubmitService({
       form_action: 'signup_email',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(result.success).toBe(false)
@@ -136,8 +131,7 @@ describe('hubspotFormSubmitService', () => {
   it('should validate that form_action is required', async () => {
     const result = await hubspotFormSubmitService({
       email: 'test@example.com',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(result.success).toBe(false)
@@ -148,38 +142,50 @@ describe('hubspotFormSubmitService', () => {
     const result = await hubspotFormSubmitService({
       email: 'test@example.com',
       form_action: 'invalid_action',
-      user_id__rtm_: 'user-123',
-      segment_userid: 'user-123'
+      user_id__rtm_: 'user-123'
     })
 
     expect(result.success).toBe(false)
     expect(result.error).toContain('Invalid form_action')
   })
 
-  it('should use correct eventName for different form_action values', async () => {
+  it('should map signup_* form_actions to sign_up event', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
       statusCode: 200
     })
 
-    const formActions = [
-      'signup_email',
-      'signup_sso_google',
-      'signup_sso_github',
-      'login_email',
-      'login_sso_google',
-      'login_sso_github'
-    ]
+    const signupActions = ['signup_email', 'signup_sso_google', 'signup_sso_github']
 
-    for (const formAction of formActions) {
+    for (const formAction of signupActions) {
       await hubspotFormSubmitService({
         email: 'test@example.com',
         form_action: formAction,
-        user_id__rtm_: 'user-123',
-        segment_userid: 'user-123'
+        user_id__rtm_: 'user-123'
       })
 
       const lastCall = requestSpy.mock.calls[requestSpy.mock.calls.length - 1]
-      expect(lastCall[0].body.eventName).toBe(formAction)
+      expect(lastCall[0].body.eventName).toBe('sign_up')
+      expect(lastCall[0].body.properties.form_action).toBe(formAction)
+    }
+  })
+
+  it('should map login_* form_actions to sign_in event', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
+      statusCode: 200
+    })
+
+    const loginActions = ['login_email', 'login_sso_google', 'login_sso_github']
+
+    for (const formAction of loginActions) {
+      await hubspotFormSubmitService({
+        email: 'test@example.com',
+        form_action: formAction,
+        user_id__rtm_: 'user-123'
+      })
+
+      const lastCall = requestSpy.mock.calls[requestSpy.mock.calls.length - 1]
+      expect(lastCall[0].body.eventName).toBe('sign_in')
+      expect(lastCall[0].body.properties.form_action).toBe(formAction)
     }
   })
 })
