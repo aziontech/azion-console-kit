@@ -105,7 +105,7 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['hobby', 'pro', 'scale'].includes(value)
+      validator: (value) => ['hobby', 'pro'].includes(value)
     }
   })
 
@@ -114,8 +114,7 @@
   const planDisplayName = computed(() => {
     const planNames = {
       hobby: 'Hobby',
-      pro: 'Pro',
-      scale: 'Scale'
+      pro: 'Pro'
     }
     return planNames[props.plan] || props.plan
   })

@@ -128,7 +128,7 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
-   * @param {'hobby'|'pro'|'scale'} payload.plan
+   * @param {'hobby'|'pro'} payload.plan
    *
    * @returns {AnalyticsTrackerAdapter}
    */
@@ -144,7 +144,7 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
-   * @param {'hobby'|'pro'|'scale'} payload.plan
+   * @param {'hobby'|'pro'} payload.plan
    *
    * @returns {AnalyticsTrackerAdapter}
    */

@@ -39,7 +39,7 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['hobby', 'pro', 'scale'].includes(value)
+      validator: (value) => ['hobby', 'pro'].includes(value)
     },
     planData: {
       type: Object,
@@ -64,11 +64,6 @@
       label: 'Pro',
       tagLabel: 'Pro Plan',
       description: 'For professional or commercial workloads.'
-    },
-    scale: {
-      label: 'Scale',
-      tagLabel: 'Scale Plan',
-      description: 'For business with advanced requirements.'
     }
   }
 

@@ -179,7 +179,7 @@
   const isFormReady = computed(() => Boolean(plansData.value))
 
   const validationSchema = yup.object({
-    plan: yup.string().required().oneOf(['hobby', 'pro', 'scale']),
+    plan: yup.string().required().oneOf(['hobby', 'pro']),
     usageIntent: yup.string().required('Usage intent is required'),
     role: yup.string().required('Role is required'),
     companySize: yup.string().when('usageIntent', {
@@ -418,7 +418,7 @@
     initializePlans()
 
     // Pre-fill plan from URL params/storage
-    if (storedPlan.value && ['hobby', 'pro', 'scale'].includes(storedPlan.value)) {
+    if (storedPlan.value && ['hobby', 'pro'].includes(storedPlan.value)) {
       plan.value = storedPlan.value
     }
 

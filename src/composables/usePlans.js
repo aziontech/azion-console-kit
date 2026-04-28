@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 const STORAGE_KEY = 'signup_plan_params'
 const DEFAULT_EXPIRATION_DAYS = 15
 
-const VALID_PLANS = ['hobby', 'scale', 'pro']
+const VALID_PLANS = ['hobby', 'pro']
 const VALID_BILLING_CYCLES = ['monthly', 'yearly']
 
 // Shared state (singleton-style)
@@ -21,7 +21,7 @@ let hasSyncWatcher = false
 
 /**
  * @typedef {Object} PlanParams
- * @property {string|null} plan - The selected plan (hobby, scale, pro)
+ * @property {string|null} plan - The selected plan (hobby, pro)
  * @property {string|null} billingCycle - The billing cycle (monthly, yearly)
  * @property {string|null} cupom - The coupon code
  */
@@ -107,7 +107,7 @@ export function usePlans() {
       }
 
       return {
-        plan: data.plan || null,
+        plan: data.plan && isValidPlan(data.plan) ? data.plan : null,
         billingCycle: data.billingCycle || null,
         cupom: data.cupom || null
       }

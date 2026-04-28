@@ -32,7 +32,7 @@ export function useValidateCoupon() {
 /**
  * Helper to get plan pricing by plan name/sku
  * @param {Array} plans - List of plans from API
- * @param {string} planName - Plan name (pro, scale, hobby)
+ * @param {string} planName - Plan name (pro, hobby)
  * @returns {Object} { monthly: number, yearly: number }
  */
 export function getPlanPricing(plans, planName) {
@@ -55,7 +55,7 @@ export function getPlanPricing(plans, planName) {
 /**
  * Helper to get plan pricing ID by billing cycle
  * @param {Array} plans - List of plans from API
- * @param {string} planName - Plan name (pro, scale, hobby)
+ * @param {string} planName - Plan name (pro, hobby)
  * @param {string} billingCycle - Billing cycle (monthly, yearly)
  * @returns {string|null} planPricingId
  */

@@ -26,7 +26,7 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['pro', 'scale'].includes(value),
+      validator: (value) => ['hobby', 'pro'].includes(value),
       default: 'pro'
     },
     getStripeClientService: {

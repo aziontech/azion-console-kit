@@ -69,7 +69,7 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['hobby', 'pro', 'scale'].includes(value)
+      validator: (value) => ['hobby', 'pro'].includes(value)
     }
   })
 
@@ -98,46 +98,6 @@
         { title: '1 GB SQL Database Storage' },
         { title: '20M Firewall requests' },
         { title: 'DDoS Protection included' }
-      ]
-    },
-    scale: {
-      label: 'Scale',
-      features: [
-        {
-          title: '100 Workloads',
-          description: 'then $0.10 per workload per month'
-        },
-        {
-          title: '10M Application requests',
-          description: 'then as low as $0.90 per 1M'
-        },
-        {
-          title: '50 hours Function compute time',
-          description: 'then $0.18 per hour'
-        },
-        {
-          title: '10 GB Real-Time Events Storage',
-          description: 'then $0.10 per GB-month'
-        },
-        {
-          title: '100 GB Object Storage',
-          description: 'then as low as $0.021 per GB-month'
-        },
-        {
-          title: '1 GB SQL Database Storage',
-          description: 'then $0.75 per GB-month'
-        },
-        {
-          title: '100M Firewall requests',
-          description: 'then as low as $0.30 per 1M'
-        },
-        {
-          title: 'DDoS Protection included',
-          description: 'Always-on network-level protection'
-        },
-        { title: 'PCI DSS 4.0.1 Level 1' },
-        { title: 'SOC 2 Type 2 / SOC 3' },
-        { title: 'Universal Data Migration Service' }
       ]
     }
   }

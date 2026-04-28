@@ -150,7 +150,7 @@
     plan: {
       type: String,
       required: true,
-      validator: (value) => ['pro', 'scale'].includes(value)
+      validator: (value) => value === 'pro'
     }
   })
 
@@ -165,7 +165,7 @@
 
   const planPricing = computed(() => getPlanPricing(plans.value, props.plan))
 
-  const planLabel = computed(() => (props.plan === 'pro' ? 'Pro Plan' : 'Scale Plan'))
+  const planLabel = computed(() => (props.plan === 'pro' ? 'Pro Plan' : props.plan))
 
   const subtotal = computed(() => {
     // Monthly: subtotal = monthly price

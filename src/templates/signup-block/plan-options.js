@@ -3,7 +3,7 @@ export const PLAN_OPTIONS = [
     value: 'hobby',
     label: 'Hobby',
     description: 'Start free for personal projects and learning.',
-    tagLabel: '',
+    buttonLabel: 'Choose Plan',
     features: [
       { label: 'All features available' },
       { label: 'Global infrastructure', icon: 'pi pi-globe' },
@@ -18,6 +18,7 @@ export const PLAN_OPTIONS = [
     label: 'Pro',
     description: 'For professional or commercial workloads.',
     tagLabel: 'Popular',
+    buttonLabel: 'Choose Plan',
     features: [
       { label: 'All Free features, plus' },
       { label: 'Additional workloads', icon: 'ai ai-workloads' },
@@ -31,7 +32,8 @@ export const PLAN_OPTIONS = [
     value: 'enterprise',
     label: 'Enterprise',
     description: 'Optimize costs with commitment-based savings',
-    tagLabel: '',
+    buttonLabel: 'Contact Sales',
+    buttonDisabled: true,
     features: [
       { label: 'Choose your pricing model', isLabel: true },
       { label: 'On-demand pricing', icon: 'pi pi-check-circle' },
