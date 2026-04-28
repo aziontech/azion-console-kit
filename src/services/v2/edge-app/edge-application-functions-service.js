@@ -32,18 +32,46 @@ export class EdgeApplicationFunctionService extends BaseService {
   }
 
   listFunctionsDropdown = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
+    const { runtime, ...requestParams } = params
+
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(edgeApplicationId),
-      params
+      params: requestParams
     })
 
     const { results, count } = data
-    const body = this.adapter?.transformListFunctionsDropdown?.(results) ?? results
+
+    if (!runtime) {
+      const body = this.adapter?.transformListFunctionsDropdown?.(results) ?? results
+
+      return {
+        body,
+        count
+      }
+    }
+
+    if (!count) return { body: [], count: 0 }
+
+    const enrichedFunctions = await enrichByMatchingReference({
+      items: results,
+      fetchReferencePage: this.#listFunctionNames,
+      getReferenceId: (item) => item.function,
+      merge: (item, matchedRef) => ({
+        id: item.id,
+        name: item.name,
+        runtime: matchedRef.runtime
+      }),
+      pageSize: 100
+    })
+
+    const runtimeFilteredFunctions = enrichedFunctions.filter((item) => item.runtime === runtime)
 
     return {
-      body,
-      count
+      body:
+        this.adapter?.transformListFunctionsDropdown?.(runtimeFilteredFunctions) ??
+        runtimeFilteredFunctions,
+      count: runtimeFilteredFunctions.length
     }
   }
 
@@ -58,7 +86,8 @@ export class EdgeApplicationFunctionService extends BaseService {
       getReferenceId: (item) => item.function,
       merge: (item, matchedRef) => ({
         ...item,
-        functionInstanced: matchedRef.name
+        functionInstanced: matchedRef.name,
+        runtime: matchedRef.runtime
       }),
       pageSize: 100
     })
@@ -96,7 +125,7 @@ export class EdgeApplicationFunctionService extends BaseService {
     })
   }
 
-  #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
+  #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name,runtime' }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.functionListEndpoint,

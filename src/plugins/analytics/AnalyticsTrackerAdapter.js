@@ -6,6 +6,7 @@ import {
   WafRulesTracker,
   RealTimeMetricsTracker
 } from './trackers'
+import { cleanObject } from '../../utils/cleanObject.js'
 
 /**
  * @typedef {Object} TrackerEvent
@@ -74,8 +75,7 @@ export class AnalyticsTrackerAdapter {
     if (!this.#hasAnalytics()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
-      props.application = 'console-kit'
-      const propsWithTraits = { ...props, ...this.#traits }
+      const propsWithTraits = cleanObject({ ...props, ...this.#traits, application: 'console-kit' })
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
@@ -88,10 +88,10 @@ export class AnalyticsTrackerAdapter {
    * @return {Promise<void>}
    */
   async identify(id) {
-    const userId = `${id}`
-    if (!userId || !this.#hasAnalytics()) return
+    if (id === undefined || id === null || id === '' || !this.#hasAnalytics()) return
 
-    await this.#analyticsClient.identify(userId, this.#traits)
+    const cleanedTraits = cleanObject(this.#traits)
+    await this.#analyticsClient.identify(String(id), cleanedTraits)
   }
 
   /**
@@ -111,10 +111,10 @@ export class AnalyticsTrackerAdapter {
    */
   assignGroupTraits(traitsToAssign) {
     if (!this.#hasAnalytics()) return
-    if (!traitsToAssign) {
+    if (!traitsToAssign || typeof traitsToAssign !== 'object') {
       throw new Error('Invalid traits provided')
     }
-    this.#traits = { ...traitsToAssign }
+    this.#traits = cleanObject(traitsToAssign)
   }
 
   /**

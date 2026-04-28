@@ -208,11 +208,18 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userSigned when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.signIn.userSignedIn()
+    sut.signIn.userSignedIn({ method: 'email' })
 
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {
+      method: 'email',
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: false,
       application: fixtures.application
     })
   })
@@ -220,11 +227,18 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userFailedSignIn when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.signIn.userFailedSignIn()
+    sut.signIn.userFailedSignIn({ method: 'email' })
 
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {
+      method: 'email',
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: false,
       application: fixtures.application
     })
   })
@@ -251,10 +265,34 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.signUp.userSignedUp({ method: 'email' }).track()
+    const signupTypeFlags = {
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: true,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: true
+    }
+
+    sut.signUp
+      .userSignedUp({
+        method: 'email',
+        firstSessionUrl: 'https://example.com/signup',
+        signupType: 'email',
+        signupTypeFlags
+      })
+      .track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {
       method: 'email',
+      first_session_url: 'https://example.com/signup',
+      signup_type: 'signup_email',
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: true,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: true,
       application: fixtures.application
     })
   })
@@ -262,10 +300,34 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user authorized sso event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.signUp.userAuthorizedSso({ method: 'google' }).track()
+    const signupTypeFlags = {
+      login_sso_google: true,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: true,
+      signup_sso_github: false,
+      signup_email: false
+    }
+
+    sut.signUp
+      .userAuthorizedSso({
+        method: 'google',
+        firstSessionUrl: 'https://example.com/signup',
+        signupType: 'sso',
+        signupTypeFlags
+      })
+      .track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', {
       method: 'google',
+      first_session_url: 'https://example.com/signup',
+      signup_type: 'signup_sso_google',
+      login_sso_google: true,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: true,
+      signup_sso_github: false,
+      signup_email: false,
       application: fixtures.application
     })
   })
