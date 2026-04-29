@@ -10,9 +10,6 @@ export default mergeConfig(
       setupFiles: ['src/tests/setup-tests.js'],
       environment: 'jsdom',
       passWithNoTests: true,
-      deps: {
-        inline: ['@aziontech/webkit']
-      },
       exclude: [
         ...configDefaults.exclude,
         'e2e/*',
@@ -28,7 +25,7 @@ export default mergeConfig(
       ],
       root: fileURLToPath(new URL('./', import.meta.url)),
       transformMode: {
-        web: [/\.[jt]sx$/, /\.vue$/]
+        web: [/\.[jt]sx$/]
       },
       coverage: {
         enabled: true,
