@@ -15,7 +15,6 @@
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
         @additionalErrors="handleAdditionalErrors"
-        :allowedRuntime="allowedRuntime"
       />
     </template>
     <template #actionBar="{ onSubmit, onCancel, loading }">
@@ -80,10 +79,6 @@
     edgeApplicationId: {
       type: String,
       required: true
-    },
-    allowedRuntime: {
-      type: String,
-      default: null // null = all, 'azion_lua' = only Lua
     }
   })
 

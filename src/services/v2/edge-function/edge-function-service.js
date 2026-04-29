@@ -52,28 +52,22 @@ export class EdgeFunctionService extends BaseService {
   listEdgeFunctionsDropdown = async (params = { pageSize: 10, fields: [] }) => {
     if (!params.executionEnvironment) return []
 
-    const { runtime, ...requestParams } = params
-
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(),
-      params: requestParams
+      params
     })
 
     const { results, count } = data
-    const executionEnvironmentFiltered = results?.filter(
+    const dataFiltered = results?.filter(
       (values) => values.execution_environment === params.executionEnvironment
     )
-
-    const dataFiltered = runtime
-      ? executionEnvironmentFiltered?.filter((value) => value.runtime === runtime)
-      : executionEnvironmentFiltered
 
     const transformed =
       this.adapter?.transformEdgeFunctionsDropdown?.(dataFiltered, params.fields) ?? results
 
     return {
-      count: runtime ? dataFiltered.length : count,
+      count,
       body: transformed
     }
   }

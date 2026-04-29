@@ -10,7 +10,7 @@
         "
       >
         <template #default>
-          <DataTableActionsButtons
+          <DataTable.ActionsButtons
             v-if="!selectedBucket"
             size="small"
             label="Bucket"
@@ -190,7 +190,6 @@
                       </DataTable.Header>
                     </div>
                   </template>
-
                   <DataTable.Column headerStyle="width: 3rem">
                     <template #header>
                       <Checkbox
@@ -447,7 +446,6 @@
   import ProgressCard from './components/ProgressCard.vue'
   import MoveObjectDialog from './Dialog/MoveObjectDialog.vue'
   import DataTable from '@aziontech/webkit/list-data-table'
-  import { DataTableActionsButtons } from '@/components/list-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
   import { ref, computed, onMounted, onUnmounted, watch, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
@@ -555,6 +553,7 @@
   const renameValue = ref('')
   const isRenaming = ref(false)
 
+  // --- Inlined folder-list state ---
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isFileListLoading = ref(false)
   const fileData = ref([])
@@ -584,11 +583,11 @@
   })
 
   const totalRecords = computed(() => {
-    return fileData.value?.length
+    return fileData.value.length
   })
 
   const filterData = computed(() => {
-    let filteredData = fileData.value?.filter((item) => {
+    let filteredData = fileData.value.filter((item) => {
       return item.name.toLowerCase().includes(fileSearchTerm.value.toLowerCase())
     })
 
@@ -647,6 +646,7 @@
     return specialCharRegex.test(newFolderName.value)
   })
 
+  // --- Checkbox selection ---
   const toggleRowSelection = (rowData) => {
     if (rowData.isSkeletonRow || rowData.isFolder || rowData.isParentNav || rowData.isNewFolder)
       return
@@ -687,11 +687,13 @@
     return ''
   }
 
+  // --- Row icon ---
   const getRowIcon = (rowData) => {
     if (!rowData || !rowData.name) return 'mdi mdi-file text-gray-500'
     return getFileIcon(rowData)
   }
 
+  // --- Actions ---
   const showActions = (rowData) => {
     return (
       !rowData.isFolder &&
@@ -760,6 +762,7 @@
     }
   }
 
+  // --- Item click ---
   const editItemSelected = (item) => {
     if (item.isSkeletonRow || item.isNewFolder) return
 
@@ -771,6 +774,7 @@
     }
   }
 
+  // --- Breadcrumb ---
   const breadcrumbItems = computed(() => {
     if (!selectedBucket.value) return []
 
@@ -898,6 +902,7 @@
     showEllipsisPopup.value = true
   }
 
+  // --- Data loading ---
   const loadFileData = async () => {
     try {
       isFileListLoading.value = true
@@ -920,6 +925,7 @@
     loadFileData()
   }
 
+  // --- Original business logic ---
   const needFetchToAPI = computed(() => {
     return selectedBucket.value && (!selectedBucket.value.files || filesTableNeedRefresh.value)
   })
@@ -1217,6 +1223,7 @@
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route)
   }
 
+  // --- Watchers ---
   watch(
     () => route.fullPath,
     () => {
@@ -1238,6 +1245,11 @@
     }
   )
 
+  watch(fileData, () => {
+    // emit on-load-data equivalent
+  })
+
+  // --- Document drag events ---
   const handleDocumentDragOver = (event) => {
     event.preventDefault()
     handleDrag(true)
