@@ -75,7 +75,6 @@
       :columns="columns"
       :dataKey="dataKey"
       :emptyBlock="emptyBlock"
-      scrollHeight="auto"
       class="w-full overflow-hidden"
       :resizableColumns="false"
       :pt="{

@@ -19,9 +19,6 @@
     emptyListMessage: {
       type: String,
       default: 'No registers found.'
-    },
-    scrollHeight: {
-      type: String
     }
   })
 </script>
@@ -36,7 +33,6 @@
       :data="data"
       :paginator="false"
       :columns="columns"
-      :scrollHeight="scrollHeight"
       :emptyListMessage="emptyListMessage"
       :rowHover="false"
       :resizableColumns="false"
