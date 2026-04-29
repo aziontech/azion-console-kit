@@ -281,7 +281,7 @@ export const METRICS_CHART_CONFIGS = {
     },
     metricsApiFallback: {
       metricsDataset: 'httpMetrics',
-      fields: ['requestsOffloaded', 'requestsMissed']
+      fields: ['savedRequests', 'missedRequests']
     }
   },
   tieredCacheHitMiss: {
@@ -294,7 +294,7 @@ export const METRICS_CHART_CONFIGS = {
     },
     metricsApiFallback: {
       metricsDataset: 'httpMetrics',
-      fields: ['requestsOffloaded', 'requestsMissed']
+      fields: ['savedRequests', 'missedRequests']
     }
   },
   cacheHitRate: {
@@ -343,10 +343,12 @@ export const METRICS_CHART_CONFIGS = {
       dataset: 'workloadEvents',
       series: [{ name: 'requestTime', aggregate: 'avg: requestTime', filters: {} }]
     },
+    // For ranges > 30 min fall back to Metrics API using avg aggregation,
+    // mirroring how Real-Time Metrics loads this chart.
     metricsApiFallback: {
       metricsDataset: 'httpMetrics',
-      directFields: true,
-      fields: ['requestTime']
+      aggregation: 'requestTime',
+      aggregationType: 'avg'
     }
   },
   avgUpstreamResponseTime: {
@@ -359,10 +361,12 @@ export const METRICS_CHART_CONFIGS = {
         { name: 'upstreamResponseTime', aggregate: 'avg: upstreamResponseTime', filters: {} }
       ]
     },
+    // upstreamResponseTime exists in httpMetrics aggregated fields — use avg aggregation
+    // mirroring the same pattern as avgRequestTime.
     metricsApiFallback: {
       metricsDataset: 'httpMetrics',
-      directFields: true,
-      fields: ['upstreamResponseTime']
+      aggregation: 'upstreamResponseTime',
+      aggregationType: 'avg'
     }
   },
   avgConnectTime: {
@@ -372,12 +376,9 @@ export const METRICS_CHART_CONFIGS = {
     eventsApi: {
       dataset: 'workloadEvents',
       series: [{ name: 'upstreamConnectTime', aggregate: 'avg: upstreamConnectTime', filters: {} }]
-    },
-    metricsApiFallback: {
-      metricsDataset: 'httpMetrics',
-      directFields: true,
-      fields: ['upstreamConnectTime']
     }
+    // No metricsApiFallback: upstreamConnectTime does not exist in httpMetrics aggregated fields.
+    // For ranges > 30 min the Events API is used directly (may return partial data).
   },
 
   // 2.3 Throughput

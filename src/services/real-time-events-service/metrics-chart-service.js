@@ -101,6 +101,46 @@ async function graphqlRequest(url, query) {
 export async function loadMetricsFallback(config, begin, end) {
   const fallback = config.metricsApiFallback
   const { metricsDataset, fields } = fallback
+
+  // ── Aggregation path (e.g. avg: requestTime) ──────────────────────────
+  // Used when the fallback specifies `aggregation` + optional `aggregationType`.
+  // Mirrors how Real-Time Metrics loads avg/sum charts (e.g. Average Request Time).
+  if (fallback.aggregation) {
+    if (!metricsDataset) return { data: null, loaded: false }
+    const aggType = fallback.aggregationType === 'avg' ? 'avg' : 'sum'
+    const aggField = fallback.aggregation
+    const query = {
+      query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
+  ${metricsDataset} (
+    limit: 10000
+    aggregate: { ${aggType}: ${aggField} }
+    groupBy: [ts]
+    orderBy: [ts_ASC]
+    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+  ) {
+    ts
+    ${aggType}
+  }
+}`,
+      variables: { tsRange_begin: begin, tsRange_end: end }
+    }
+    const response = await graphqlRequest(makeBeholderBaseUrl(), query)
+    if (response.statusCode !== 200) {
+      throw {
+        reason: 'api-error',
+        detail: response.body?.detail || 'The server could not load this chart.'
+      }
+    }
+    const rows = response.body?.data?.[metricsDataset]
+    if (!Array.isArray(rows)) return { data: [], loaded: true }
+    const data = rows
+      .filter((row) => row?.ts)
+      .sort((left, right) => new Date(left.ts) - new Date(right.ts))
+      .map((row) => ({ ts: row.ts, [aggField]: row[aggType] ?? 0 }))
+    return { data, loaded: true }
+  }
+
+  // ── Fields path ───────────────────────────────────────────────────────
   if (!metricsDataset || !fields?.length) return { data: null, loaded: false }
 
   let query
@@ -164,24 +204,26 @@ export async function loadMetricsFallback(config, begin, end) {
         perTs.get(row.ts)[field] = typeof val === 'number' ? val : 0
       })
     }
-    return {
-      data: Array.from(perTs.values()).sort(
-        (rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts)
-      ),
-      loaded: true
+    let data = Array.from(perTs.values()).sort(
+      (rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts)
+    )
+    if (typeof fallback.postProcess === 'function') {
+      data = fallback.postProcess(data)
     }
+    return { data, loaded: true }
   }
 
   const rows = response.body?.data?.[metricsDataset]
   if (!Array.isArray(rows)) {
     return { data: [], loaded: true }
   }
-  return {
-    data: rows
-      .filter((row) => row?.ts)
-      .sort((left, right) => new Date(left.ts) - new Date(right.ts)),
-    loaded: true
+  let data = rows
+    .filter((row) => row?.ts)
+    .sort((left, right) => new Date(left.ts) - new Date(right.ts))
+  if (typeof fallback.postProcess === 'function') {
+    data = fallback.postProcess(data)
   }
+  return { data, loaded: true }
 }
 
 /**
@@ -464,13 +506,16 @@ export async function loadMetricsAggregation(config, begin, end, { loadAggregabl
     const groupByFields = config.groupBy || ['ts']
     const groupByStr = groupByFields.join(', ')
     const orderByStr = `${groupByFields[0]}_ASC`
-    const returnFields = ['sum', ...groupByFields].join('\n            ')
+    // Support both sum (default) and avg aggregation types
+    const aggType = config.aggregationType === 'avg' ? 'avg' : 'sum'
+    const aggReturnField = aggType
+    const returnFields = [aggReturnField, ...groupByFields].join('\n            ')
 
     query = {
       query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
   ${config.metricsDataset} (
     limit: 10000
-    aggregate: { sum: ${config.aggregation} }
+    aggregate: { ${aggType}: ${config.aggregation} }
     groupBy: [${groupByStr}]
     orderBy: [${orderByStr}]
     ${filterBlock}
@@ -546,12 +591,13 @@ export async function loadMetricsAggregation(config, begin, end, { loadAggregabl
     const rawData = response.body?.data?.[config.metricsDataset]
     const rows = Array.isArray(rawData) ? rawData : []
     const pivotField = (config.groupBy || ['ts']).find((field) => field !== 'ts')
+    const aggReturnField = config.aggregationType === 'avg' ? 'avg' : 'sum'
     if (pivotField && rows.length) {
-      return pivotGroupedData(rows, pivotField, 'sum', { topN: config.topN })
+      return pivotGroupedData(rows, pivotField, aggReturnField, { topN: config.topN })
     }
     return rows.map((row) => ({
       ts: row.ts,
-      [config.aggregation]: row.sum ?? 0
+      [config.aggregation]: row[aggReturnField] ?? 0
     }))
   }
 

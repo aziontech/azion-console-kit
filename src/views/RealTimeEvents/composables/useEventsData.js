@@ -212,10 +212,8 @@ export function useEventsData({
   let loadDebounceTimer = null
 
   const load = async () => {
-    if (isLoading.value) return
     if (loadDebounceTimer) clearTimeout(loadDebounceTimer)
     await new Promise((resolve) => { loadDebounceTimer = setTimeout(resolve, 50) })
-    if (isLoading.value) return
     if (!filterData.value?.tsRange?.tsRangeBegin || !filterData.value?.tsRange?.tsRangeEnd) return
     const callId = ++loadCallId
     try {
