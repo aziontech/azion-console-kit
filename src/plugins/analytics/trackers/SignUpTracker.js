@@ -1,4 +1,4 @@
-import { hubspotFormSubmitService } from '@/services/hubspot-services'
+import { hubspotService } from '@/services/v2/hubspot'
 import { getHubSpotUtk, getHubSpotContext } from '@/utils/cookies'
 
 const FORM_ACTION_PRIORITY = [
@@ -68,7 +68,7 @@ export class SignUpTracker {
 
     // Submit to HubSpot if email and userId are provided
     if (payload.email && payload.userId) {
-      hubspotFormSubmitService({
+      hubspotService.submitForm({
         email: payload.email,
         form_action: signupType,
         user_id__rtm_: payload.userId,

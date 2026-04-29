@@ -1,4 +1,4 @@
-import { hubspotFormSubmitService } from '@/services/hubspot-services'
+import { hubspotService } from '@/services/v2/hubspot'
 import { getHubSpotUtk, getHubSpotContext } from '@/utils/cookies'
 
 /**
@@ -68,7 +68,7 @@ export class SignInTracker {
 
     // Submit to HubSpot if email and userId are provided
     if (payload.email && payload.userId) {
-      hubspotFormSubmitService({
+      hubspotService.submitForm({
         email: payload.email,
         form_action: formAction,
         user_id__rtm_: payload.userId,

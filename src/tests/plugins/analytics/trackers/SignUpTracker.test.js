@@ -1,8 +1,10 @@
 import { SignUpTracker } from '@/plugins/analytics/trackers/SignUpTracker'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-vi.mock('@/services/hubspot-services', () => ({
-  hubspotFormSubmitService: vi.fn()
+vi.mock('@/services/v2/hubspot', () => ({
+  hubspotService: {
+    submitForm: vi.fn()
+  }
 }))
 
 vi.mock('@/utils/cookies', () => ({
@@ -23,14 +25,13 @@ const makeSut = () => {
 }
 
 describe('SignUpTracker', () => {
-  let hubspotFormSubmitService
+  let hubspotService
   let getHubSpotUtk
   let getHubSpotContext
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    hubspotFormSubmitService = (await import('@/services/hubspot-services'))
-      .hubspotFormSubmitService
+    hubspotService = (await import('@/services/v2/hubspot')).hubspotService
     getHubSpotUtk = (await import('@/utils/cookies')).getHubSpotUtk
     getHubSpotContext = (await import('@/utils/cookies')).getHubSpotContext
     getHubSpotUtk.mockReturnValue(undefined)
@@ -74,7 +75,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith({
+      expect(hubspotService.submitForm).toHaveBeenCalledWith({
         email: 'test@example.com',
         form_action: 'signup_email',
         user_id__rtm_: 'user-123',
@@ -97,7 +98,7 @@ describe('SignUpTracker', () => {
         signupTypeFlags: { signup_email: true }
       })
 
-      expect(hubspotFormSubmitService).not.toHaveBeenCalled()
+      expect(hubspotService.submitForm).not.toHaveBeenCalled()
     })
 
     it('should not call HubSpot when userId is missing', () => {
@@ -109,7 +110,7 @@ describe('SignUpTracker', () => {
         signupTypeFlags: { signup_email: true }
       })
 
-      expect(hubspotFormSubmitService).not.toHaveBeenCalled()
+      expect(hubspotService.submitForm).not.toHaveBeenCalled()
     })
 
     it('should pass all optional fields to HubSpot when provided', async () => {
@@ -128,7 +129,7 @@ describe('SignUpTracker', () => {
         githubHandle: 'johndoe'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith({
+      expect(hubspotService.submitForm).toHaveBeenCalledWith({
         email: 'test@example.com',
         form_action: 'signup_sso_github',
         user_id__rtm_: 'user-789',
@@ -152,7 +153,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'signup_sso_google'
         })
@@ -169,7 +170,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'signup_sso_github'
         })
@@ -186,7 +187,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'login_email'
         })
@@ -203,7 +204,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'login_sso_google'
         })
@@ -220,7 +221,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'login_sso_github'
         })
@@ -236,7 +237,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           form_action: 'signup_email'
         })
@@ -315,7 +316,7 @@ describe('SignUpTracker', () => {
       })
 
       // HubSpot should only be called by userSignedUp, not userAuthorizedSso
-      expect(hubspotFormSubmitService).not.toHaveBeenCalled()
+      expect(hubspotService.submitForm).not.toHaveBeenCalled()
     })
 
     it('should return trackerAdapter for chaining', () => {
@@ -356,7 +357,7 @@ describe('SignUpTracker', () => {
         errorMessage: 'Password too short'
       })
 
-      expect(hubspotFormSubmitService).not.toHaveBeenCalled()
+      expect(hubspotService.submitForm).not.toHaveBeenCalled()
     })
 
     it('should return trackerAdapter for chaining', () => {
@@ -476,7 +477,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           utk: 'hubspot-token-from-cookie'
         })
@@ -495,7 +496,7 @@ describe('SignUpTracker', () => {
         userId: 'user-123'
       })
 
-      expect(hubspotFormSubmitService).toHaveBeenCalledWith(
+      expect(hubspotService.submitForm).toHaveBeenCalledWith(
         expect.objectContaining({
           utk: null
         })
