@@ -101,10 +101,12 @@
   import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
   import { useAccountStore } from '@/stores/account'
   import { useServiceOrders } from '@/composables/useServiceOrders'
+  import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import * as SignupServices from '@/services/signup-services'
   import { getStripeClientService } from '@/services/billing-services'
 
   const router = useRouter()
+  const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
   const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
   const accountStore = useAccountStore()
   const { data: plansData, refetch: loadPlans } = usePlansList({ enabled: false })
@@ -160,13 +162,9 @@
   const onSubmit = async () => {
     const plan = additionalDataRef.value?.plan
     const accountId = accountStore.accountData?.id
-    const hasJobRole = !!accountStore.accountData?.jobRole
     const billingCycle = storedBillingCycle.value || 'yearly'
 
-    if (!hasJobRole) {
-      await additionalDataRef.value?.submitForm()
-      return
-    }
+    await additionalDataRef.value?.submitForm()
 
     // Handle service order (create or update) before proceeding
     if (plan && accountId) {
@@ -206,6 +204,7 @@
   }
 
   const handleStartFromSuccess = () => {
+    clearAdditionalDataFormState()
     router.push({ name: 'home' })
   }
 </script>

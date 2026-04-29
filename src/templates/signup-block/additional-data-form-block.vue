@@ -31,7 +31,7 @@
       </div>
 
       <!-- Role -->
-      <Transition name="expand-step">
+      <Transition :name="skipInitialExpandAnimation ? '' : 'expand-step'">
         <div
           v-if="showRoleStep"
           class="flex flex-col gap-2"
@@ -48,7 +48,7 @@
       </Transition>
 
       <!-- Company Size -->
-      <Transition name="expand-step">
+      <Transition :name="skipInitialExpandAnimation ? '' : 'expand-step'">
         <div
           v-if="showCompanySizeStep"
           class="flex flex-col gap-2"
@@ -63,7 +63,7 @@
           />
         </div>
       </Transition>
-      <Transition name="expand-step">
+      <Transition :name="skipInitialExpandAnimation ? '' : 'expand-step'">
         <div
           v-if="showCompanySizeStep"
           class="flex flex-col gap-2"
@@ -76,6 +76,7 @@
             name="companyWebsite"
             label=""
             placeholder="https://yourcompany.com"
+            :value="companyWebsite"
             class="w-full"
             required
           />
@@ -136,11 +137,12 @@
 </template>
 
 <script setup>
-  import { ref, inject, computed, onMounted, watch } from 'vue'
+  import { ref, inject, computed, onMounted, watch, nextTick } from 'vue'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
   import { usePlans } from '@/composables/usePlans'
+  import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import { usePlansList } from '@/composables/usePlansService'
   import { useToast } from '@aziontech/webkit/use-toast'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
@@ -154,6 +156,8 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
+  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
+    useAdditionalDataFormState()
 
   const props = defineProps({
     postAdditionalDataService: {
@@ -230,6 +234,7 @@
 
   // Plan drawer state
   const showPlanDrawer = ref(false)
+  const skipInitialExpandAnimation = ref(true)
 
   // Get selected plan data from API
   const selectedPlanData = computed(() => {
@@ -415,7 +420,7 @@
   }
 
   // Pre-fill form fields on mount
-  onMounted(() => {
+  onMounted(async () => {
     initializePlans()
 
     // Pre-fill plan from URL params/storage
@@ -428,14 +433,50 @@
       billingCycle.value = storedBillingCycle.value
     }
 
+    hydrateAdditionalDataForm({
+      usageIntent,
+      role,
+      companySize,
+      companyWebsite,
+      fullName,
+      termsAccepted
+    })
+
+    await nextTick()
+    skipInitialExpandAnimation.value = false
+
     // Pre-fill role from accountStore
     const jobRole = accountStore.account?.jobRole
-    if (jobRole) {
+    if (jobRole && !role.value) {
       const roleTitle = jobRoleKebabToTitle(jobRole)
       if (roleTitle) {
         role.value = roleTitle
       }
     }
+  })
+
+  watch(usageIntent, (value) => {
+    setAdditionalDataField('usageIntent', value)
+  })
+
+  watch(role, (value) => {
+    setAdditionalDataField('role', value)
+  })
+
+  watch(companySize, (value) => {
+    setAdditionalDataField('companySize', value)
+  })
+
+  watch(companyWebsite, (value) => {
+    setAdditionalDataField('companyWebsite', value)
+  })
+
+  watch(fullName, (value) => {
+    setAdditionalDataField('fullName', value)
+  })
+
+  watch(termsAccepted, (value) => {
+    setAdditionalDataField('termsAccepted', value)
   })
 
   watch(
@@ -470,6 +511,8 @@
 
     try {
       const usersPayload = fullName.value
+      const [firstName = '', ...lastNameParts] = usersPayload.split(' ')
+      const lastName = lastNameParts.join(' ')
       const accountPayload = role.value
       const userId = accountStore.userId
       const additionalDataPayload = {
@@ -484,18 +527,24 @@
         fullName: fullName.value
       }
 
+      if (!accountStore.accountData?.jobRole) {
+        const postAddData = props.postAdditionalDataService({
+          payload: additionalDataPayload,
+          options: additionalDataInfo.value
+        })
+        await postAddData
+      }
+
       const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
+      await props.patchFullnameService(usersPayload)
 
-      const patchName = props.patchFullnameService(usersPayload)
-      const postAddData = props.postAdditionalDataService({
-        payload: additionalDataPayload,
-        options: additionalDataInfo.value
+      accountStore.setAccountData({
+        jobRole: updatedAccount.jobRole,
+        first_name: firstName,
+        last_name: lastName,
+        firstName,
+        lastName
       })
-
-      await patchName
-      await postAddData
-
       // tracker.signUp
       //   .submittedAdditionalData({
       //     plan: plan.value,
