@@ -25,10 +25,11 @@
     viewOptions: { type: Array, default: () => [] },
     view: { type: String, default: 'events:none' },
     showView: { type: Boolean, default: true },
-    showSummary: { type: Boolean, default: true }
+    showSummary: { type: Boolean, default: true },
+    collapsed: { type: Boolean, default: false }
   })
 
-  const emit = defineEmits(['brush-select', 'total-computed', 'update:view', 'legend-filter'])
+  const emit = defineEmits(['brush-select', 'total-computed', 'update:view', 'legend-filter', 'toggle-collapse'])
 
   const isStacked = computed(() => props.stackBy && props.stackBy !== 'none')
   const viewModel = computed({
@@ -183,6 +184,28 @@
     }, 50)
   }
 
+  // Expanding from collapsed: hide the canvas until c3 has resized to avoid
+  // a visible flick where the chart briefly renders at the wrong width.
+  const isResizing = ref(false)
+  const expandAndResize = () => {
+    isResizing.value = true
+    nextTick(() => {
+      if (chartInstance.value && chartRef.value) {
+        try {
+          chartInstance.value.resize()
+        } catch {
+          initChart()
+        }
+      } else {
+        initChart()
+      }
+      // One extra frame so the browser has painted the resized chart
+      requestAnimationFrame(() => {
+        isResizing.value = false
+      })
+    })
+  }
+
   // Brush selection
   const handleMouseDown = (event) => {
     if (!chartRef.value) return
@@ -246,6 +269,14 @@
     () => props.isLoading,
     (loading, was) => {
       if (was && !loading) initChart()
+    }
+  )
+  // When expanding from collapsed state the chart container goes from
+  // display:none to visible — hide canvas during resize to avoid flick.
+  watch(
+    () => props.collapsed,
+    (isCollapsed) => {
+      if (!isCollapsed) expandAndResize()
     }
   )
 
@@ -347,12 +378,33 @@
   >
     <!-- Header -->
     <div class="chart-header">
-      <span class="chart-header__count">
+      <button
+        type="button"
+        class="chart-header__collapse-btn"
+        :aria-expanded="!collapsed"
+        :aria-label="collapsed ? 'Expand chart' : 'Collapse chart'"
+        @click="emit('toggle-collapse')"
+      >
+        <i
+          class="pi"
+          :class="collapsed ? 'pi-chevron-right' : 'pi-chevron-down'"
+        />
+      </button>
+      <!-- When collapsed show a label so the user knows what is hidden -->
+      <span
+        v-if="collapsed"
+        class="chart-header__collapsed-label"
+      >CHART</span>
+      <!-- Count only shown when expanded — DiscoverToolbar shows it when collapsed -->
+      <span
+        v-if="!collapsed"
+        class="chart-header__count"
+      >
         <span class="chart-header__total">{{ formattedTotal }}</span>
         <span class="chart-header__label">events</span>
       </span>
       <div
-        v-if="showView"
+        v-if="showView && !collapsed"
         class="chart-header__controls"
       >
         <div
@@ -418,7 +470,11 @@
       </div>
     </div>
 
-    <!-- Loading skeleton (GraphsCardBlock pattern) -->
+    <!-- Chart body — v-show preserves the c3 instance across collapse/expand -->
+    <div
+      v-show="!collapsed"
+      :style="isResizing ? 'visibility: hidden' : ''"
+    >
     <div
       v-if="isLoading"
       class="chart-loading"
@@ -461,6 +517,7 @@
       <i class="pi pi-chart-bar" />
       <span>No events in selected time range</span>
     </div>
+    </div>
   </div>
 </template>
 
@@ -480,6 +537,31 @@
     height: 2.25rem;
     border-bottom: 1px solid var(--surface-border);
     background: var(--surface-section);
+  }
+
+  .chart-header__collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+  }
+  .chart-header__collapse-btn > i {
+    font-size: 0.625rem;
+  }
+
+  .chart-header__collapsed-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
   }
 
   .chart-header__count {

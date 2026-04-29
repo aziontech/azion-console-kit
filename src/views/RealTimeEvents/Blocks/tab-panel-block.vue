@@ -218,6 +218,18 @@
 
   const { handleLegendFilter } = useLegendFilter({ handleAddFilter, handleAddRangeFilter })
 
+  // ── Chart collapse (fullscreen mode) ─────────────────────────────────
+  // In fullscreen the chart is collapsed by default to maximise table space.
+  // The user can expand it again via the toggle button in the chart header.
+  const CHART_COLLAPSE_KEY = 'rte:chart-collapsed'
+  const isChartCollapsed = ref(false)
+  try {
+    if (localStorage.getItem(CHART_COLLAPSE_KEY) === '1') isChartCollapsed.value = true
+  } catch { /* ignore */ }
+  watch(isChartCollapsed, (val) => {
+    try { localStorage.setItem(CHART_COLLAPSE_KEY, val ? '1' : '0') } catch { /* ignore */ }
+  })
+  watch(isFullscreen, (val) => { isChartCollapsed.value = val })
   const handleDatasetChange = (dataset) => emit('dataset-change', dataset)
   const datasetDropdownOptions = computed(() =>
     allDatasets.map((ds) => ({ label: ds.title, value: ds.panel }))
@@ -352,30 +364,33 @@
         </template>
         <template #panel-b>
           <div class="flex flex-col h-full w-full min-h-0 min-w-0 overflow-hidden">
-            <div class="shrink-0 w-full" :class="{ '!hidden': isFullscreen }">
-              <div v-if="hasChartConfig || hasMetricsDashboards">
-                <EventChart
-                  :data="isMetricsView ? metricsChartData : chartData"
-                  :configKey="isMetricsView ? metricsChartConfigKey : chartConfigKey"
-                  :tsRangeBegin="tsRangeBegin"
-                  :tsRangeEnd="tsRangeEnd"
-                  :isLoading="isMetricsView ? isLoadingMetricsChart : isChartLoading"
-                  :userTimezone="accountTimezone"
-                  :stackBy="stackByField"
-                  :view="selectedView"
-                  :viewOptions="viewOptions"
-                  :showView="hasMultipleViewOptions"
-                  :showSummary="showChartSummary"
-                  @update:view="selectedView = $event"
-                  @brush-select="handleBrushSelect"
-                  @legend-filter="handleLegendFilter"
-                  @total-computed="setRecordsFound"
-                />
-                <EventsSummaryBar
-                  v-if="showChartSummary && !isMetricsView"
-                  :kpis="summaryKpis"
-                />
-              </div>
+            <div
+              v-if="hasChartConfig || hasMetricsDashboards"
+              class="shrink-0 w-full"
+            >
+              <EventChart
+                :data="isMetricsView ? metricsChartData : chartData"
+                :configKey="isMetricsView ? metricsChartConfigKey : chartConfigKey"
+                :tsRangeBegin="tsRangeBegin"
+                :tsRangeEnd="tsRangeEnd"
+                :isLoading="isMetricsView ? isLoadingMetricsChart : isChartLoading"
+                :userTimezone="accountTimezone"
+                :stackBy="stackByField"
+                :view="selectedView"
+                :viewOptions="viewOptions"
+                :showView="hasMultipleViewOptions"
+                :showSummary="showChartSummary"
+                :collapsed="isChartCollapsed"
+                @update:view="selectedView = $event"
+                @brush-select="handleBrushSelect"
+                @legend-filter="handleLegendFilter"
+                @total-computed="setRecordsFound"
+                @toggle-collapse="isChartCollapsed = !isChartCollapsed"
+              />
+              <EventsSummaryBar
+                v-if="showChartSummary && !isMetricsView && !isChartCollapsed"
+                :kpis="summaryKpis"
+              />
             </div>
             <DiscoverToolbar
               :sidebarVisible="sidebarVisible"
@@ -465,4 +480,6 @@
     :deep(.resizable-splitter > .handle) { display: none !important; }
     .discover-layout { min-height: 200px; }
   }
+
+  /* Chart collapse — same visual pattern as EventsSummaryBar */
 </style>
