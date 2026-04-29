@@ -34,6 +34,7 @@
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
     "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
     "architecture:report": "node scripts/architecture-report/index.cjs",
+    "storybook:install": "cd storybook && yarn install; cd ..",
     "storybook:dev": "cd storybook && yarn dev",
     "storybook:build": "cd storybook && yarn build"
   },
