@@ -91,12 +91,14 @@ function convertGQLAggregation({
   // Build the query - handle case where params might be empty
   const paramsStr = params.length ? `(${params.join(', ')})` : ''
 
+  const orderByStr = orderBy ? `orderBy: [${orderBy}]` : ''
+
   const query = `query ${paramsStr} {
 \t${dataset} (
 \t\tlimit: ${limit}
 \t\t${aggregationStr}
 \t\t${groupByStr}
-\t\torderBy: [${orderBy}]
+\t\t${orderByStr}
 \t\t${filterStr}
 \t) {
 \t\t${returnFields}

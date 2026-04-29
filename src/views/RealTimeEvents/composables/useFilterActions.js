@@ -31,15 +31,23 @@ export function useFilterActions({
   setFilterInHash
 }) {
   // ── Default filter factory ──
-  const defaultFilter = () => ({
-    tsRange: {
-      tsRangeBegin: new Date(Date.now() - 5 * 60 * 1000).toISOString().replace(/\.\d{3}/, ''),
-      tsRangeEnd: new Date().toISOString().replace(/\.\d{3}/, ''),
-      label: 'Last 5 minutes'
-    },
-    fields: [],
-    dataset: ''
-  })
+  // Uses relative label so the AdvancedFilterSystem resolves the actual
+  // timestamps at apply-time using the account timezone offset.
+  // Fallback dates are set to now (UTC) so the date picker initialises
+  // without Invalid Date; they are overwritten by applyFilters().
+  const defaultFilter = () => {
+    const now = new Date()
+    const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000)
+    return {
+      tsRange: {
+        tsRangeBegin: fiveMinAgo.toISOString().replace(/\.\d{3}/, ''),
+        tsRangeEnd: now.toISOString().replace(/\.\d{3}/, ''),
+        label: 'Last 5 minutes'
+      },
+      fields: [],
+      dataset: ''
+    }
+  }
 
   // ── Initialise / refresh filter data from URL hash ──
   const refreshFilterData = () => {
@@ -70,7 +78,7 @@ export function useFilterActions({
   // Query history is persisted by AzionQueryLanguage.markAsApplied (shared across
   // Events and Metrics), so this composable only handles the hash + data reload.
   const reloadListTableWithHash = async () => {
-    if (!initialLoadDone.value || isLoading.value) return
+    if (!initialLoadDone.value) return
     await setFilterInHash({ ...filterData.value, dataset: tabSelected.value?.dataset })
     loadData()
   }

@@ -16,6 +16,7 @@ import { parseViewValue } from './useChartConfig'
  */
 export function useViewSync({ selectedMetricsDashboard, stackByField, reloadListTableWithHash }) {
   const selectedView = ref('events:none')
+  let viewInitialized = false
 
   watch(selectedView, (value) => {
     const { scheme, key } = parseViewValue(value)
@@ -26,9 +27,8 @@ export function useViewSync({ selectedMetricsDashboard, stackByField, reloadList
       stackByField.value = 'none'
       selectedMetricsDashboard.value = key
     }
-    // Re-fetch the events list so the documents table reflects the active
-    // view (stack-by change or metrics chart selection). Keeps the left-side
-    // counter and the table in sync with what the chart is showing.
+    // Skip reload on initial mount — loadData is called by onMounted
+    if (!viewInitialized) { viewInitialized = true; return }
     reloadListTableWithHash()
   })
 

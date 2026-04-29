@@ -1,79 +1,50 @@
 import { ref, shallowRef, triggerRef } from 'vue'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 
-const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000 // 2 hours
+const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
-/**
- * Composable for loading event data with temporal windowing for long ranges.
- * Handles initial load, pagination (load more), and chart aggregation.
- */
 export function useEventsData({
-  filterData,
-  listService,
-  loadChartAggregation,
-  tabSelected,
-  pageSize,
-  hasChartConfig,
-  onError = () => {},
-  stackByField = null,
+  filterData, listService, loadChartAggregation, tabSelected, pageSize,
+  hasChartConfig, onError = () => {}, stackByField = null,
   locale = typeof navigator !== 'undefined' ? navigator.language : 'en'
 }) {
   const tableData = shallowRef([])
   const chartData = ref([])
   const kpis = ref(null)
-  const recordsFound = ref(0)
+  const recordsFound = ref('—')
   const isLoading = ref(false)
   const isChartLoading = ref(false)
   const hasMoreData = ref(false)
   const isLoadingMore = ref(false)
   const initialLoadDone = ref(false)
 
-  // Internal pagination state
   let currentWindowEnd = null
-  let currentOffset = 0
+  let currentWindowOffset = 0
   let isShortRange = false
   let loadCallId = 0
+  let chartLoadToken = 0
+  let countToken = 0
+  let hasAccurateCount = false
 
-  const getListFilter = (windowEnd) => {
+  const getWindowFilter = (windowEnd) => {
     const filter = filterData.value
-    if (!filter?.tsRange?.tsRangeBegin || !filter?.tsRange?.tsRangeEnd) return filter
     const begin = new Date(filter.tsRange.tsRangeBegin).getTime()
-    const end = new Date(filter.tsRange.tsRangeEnd).getTime()
-    if (end - begin <= MAX_LIST_RANGE_MS) return filter
-    const wEnd = windowEnd || end
-    const wBegin = Math.max(wEnd - MAX_LIST_RANGE_MS, begin)
+    const wBegin = Math.max(windowEnd - MAX_LIST_RANGE_MS, begin)
     return {
       ...filter,
-      tsRange: {
-        ...filter.tsRange,
-        tsRangeBegin: new Date(wBegin).toISOString(),
-        tsRangeEnd: new Date(wEnd).toISOString()
-      }
+      tsRange: { ...filter.tsRange, tsRangeBegin: new Date(wBegin).toISOString(), tsRangeEnd: new Date(windowEnd).toISOString() }
     }
   }
 
-  // Coerce a filter value to its declared GraphQL scalar type. Without this
-  // the query builder's typeof inference sees every value as `String` and the
-  // API rejects numeric fields (e.g. `statusEq` expects `Int`).
   const coerceFilterValue = (rawValue, type) => {
-    const normalizedType = String(type || '').toLowerCase()
-    if (Array.isArray(rawValue)) {
-      return rawValue.map((itemValue) =>
-        coerceFilterValue(itemValue?.value !== undefined ? itemValue.value : itemValue, type)
-      )
-    }
-    if (normalizedType === 'int') {
-      const numberValue = parseInt(rawValue, 10)
-      return Number.isFinite(numberValue) ? numberValue : rawValue
-    }
-    if (normalizedType === 'float' || normalizedType === 'number') {
-      const numberValue = parseFloat(rawValue)
-      return Number.isFinite(numberValue) ? numberValue : rawValue
-    }
-    if (normalizedType === 'boolean' || normalizedType === 'bool') {
+    const nt = String(type || '').toLowerCase()
+    if (Array.isArray(rawValue)) return rawValue.map((iv) => coerceFilterValue(iv?.value !== undefined ? iv.value : iv, type))
+    if (nt === 'int') { const nv = parseInt(rawValue, 10); return Number.isFinite(nv) ? nv : rawValue }
+    if (nt === 'float' || nt === 'number') { const nv = parseFloat(rawValue); return Number.isFinite(nv) ? nv : rawValue }
+    if (nt === 'boolean' || nt === 'bool') {
       if (rawValue === true || rawValue === false) return rawValue
-      const normalizedValue = String(rawValue).toLowerCase()
-      if (normalizedValue === 'true') return true
-      if (normalizedValue === 'false') return false
+      const sv = String(rawValue).toLowerCase()
+      if (sv === 'true') return true; if (sv === 'false') return false
       return rawValue
     }
     return rawValue
@@ -82,15 +53,10 @@ export function useEventsData({
   const buildApiFilters = () => {
     const filters = {}
     if (filterData.value?.fields?.length) {
-      filterData.value.fields.forEach((filterField) => {
-        const value = coerceFilterValue(filterField.value, filterField.type)
-        if (filterField.operator === 'In') {
-          filters.in = filters.in || {}
-          filters.in[filterField.valueField] = value
-        } else {
-          filters.and = filters.and || {}
-          filters.and[`${filterField.valueField}${filterField.operator}`] = value
-        }
+      filterData.value.fields.forEach((ff) => {
+        const value = coerceFilterValue(ff.value, ff.type)
+        if (ff.operator === 'In') { filters.in = filters.in || {}; filters.in[ff.valueField] = value }
+        else { filters.and = filters.and || {}; filters.and[ff.valueField + ff.operator] = value }
       })
     }
     return filters
@@ -98,182 +64,212 @@ export function useEventsData({
 
   const resolveStackField = () => {
     if (!stackByField) return null
-    const raw =
-      typeof stackByField === 'object' && 'value' in stackByField
-        ? stackByField.value
-        : stackByField
+    const raw = typeof stackByField === 'object' && 'value' in stackByField ? stackByField.value : stackByField
     if (!raw || raw === 'none') return null
     return String(raw)
   }
 
-  let chartLoadToken = 0
+  const hasActiveFilters = () => {
+    const af = buildApiFilters()
+    return Object.keys(af?.and || {}).length > 0 || Object.keys(af?.in || {}).length > 0
+  }
 
-  const loadChart = () => {
-    if (!hasChartConfig.value || !loadChartAggregation.value) {
-      isChartLoading.value = false
-      return
+  // ── Count (only when filters are active) ─────────────────────────────
+  const loadTotalCount = async () => {
+    const myToken = ++countToken
+    hasAccurateCount = false
+    const dataset = tabSelected.value?.dataset
+    if (!dataset || !filterData.value?.tsRange) return
+    if (!hasActiveFilters()) return
+
+    const beginMs = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
+    const endMs = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
+    const filters = buildApiFilters()
+
+    const extraVarDefs = {}
+    const extraFilterParts = []
+    Object.entries(filters?.and || {}).forEach(([key, val]) => {
+      const varName = 'f_' + key; extraVarDefs[varName] = val; extraFilterParts.push(key + ': $' + varName)
+    })
+    Object.entries(filters?.in || {}).forEach(([key, val]) => {
+      const varName = 'i_' + key
+      extraVarDefs[varName] = Array.isArray(val) ? val.map((item) => String(item?.value !== undefined ? item.value : item)) : val
+      extraFilterParts.push((key.endsWith('In') ? key : key + 'In') + ': $' + varName)
+    })
+    const paramType = (key, value) => {
+      if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
+      if (Array.isArray(value)) return '[String]'
+      if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
+      return 'String'
     }
+    const buildBody = (tsBegin, tsEnd) => {
+      const vars = { tsBegin: tsBegin, tsEnd: tsEnd, ...extraVarDefs }
+      const pStr = Object.entries(vars).map(([key, value]) => '$' + key + ': ' + paramType(key, value)).join(', ')
+      const fStr = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterParts].join(', ')
+      return JSON.stringify({
+        query: 'query (' + pStr + ') { ' + dataset + '(limit: 10000, aggregate: { count: rows }, filter: { ' + fStr + ' }) { count } }',
+        variables: vars
+      })
+    }
+    const doReq = async (body) => {
+      const resp = await AxiosHttpClientAdapter.request({ baseURL: '/', url: 'v4/events/graphql', method: 'POST', body })
+      if (resp.statusCode !== 200) return null
+      const rows = resp.body?.data?.[dataset]
+      if (!Array.isArray(rows) || rows.length === 0) return 0
+      return rows[0]?.count != null ? rows[0].count : 0
+    }
+
+    // 1) Try full range
+    try {
+      const total = await doReq(buildBody(new Date(beginMs).toISOString(), new Date(endMs).toISOString()))
+      if (myToken !== countToken) return
+      if (total != null) { hasAccurateCount = true; recordsFound.value = new Intl.NumberFormat(locale).format(total); return }
+    } catch { /* system limit */ }
+    if (myToken !== countToken) return
+
+    // 2) Fallback: 24h chunks, 2 at a time, newest→oldest, stop on first 0
+    const CHUNK_MS = 24 * 60 * 60 * 1000
+    let grandTotal = 0
+    let cursor = endMs
+    while (cursor > beginMs) {
+      if (myToken !== countToken) return
+      const batch = []
+      for (let bi = 0; bi < 2 && cursor > beginMs; bi++) {
+        const cb = Math.max(cursor - CHUNK_MS, beginMs)
+        batch.push({ begin: new Date(cb).toISOString(), end: new Date(cursor).toISOString() })
+        cursor = cb
+      }
+      const results = await Promise.all(batch.map((ch) => doReq(buildBody(ch.begin, ch.end)).catch(() => 0)))
+      if (myToken !== countToken) return
+      let hitZero = false
+      for (const cnt of results) {
+        if (cnt === null || cnt === 0) { hitZero = true; break }
+        grandTotal += cnt
+      }
+      hasAccurateCount = true
+      recordsFound.value = new Intl.NumberFormat(locale).format(grandTotal)
+      if (hitZero) break
+    }
+  }
+
+  // ── Chart ────────────────────────────────────────────────────────────
+  const loadChart = () => {
+    if (!hasChartConfig.value || !loadChartAggregation.value) { isChartLoading.value = false; return }
     const myToken = ++chartLoadToken
     isChartLoading.value = true
-    loadChartAggregation
-      .value({
-        dataset: tabSelected.value?.dataset,
-        tsRange: filterData.value?.tsRange,
-        filters: buildApiFilters(),
-        groupByField: resolveStackField()
-      })
+    loadChartAggregation.value({
+      dataset: tabSelected.value?.dataset, tsRange: filterData.value?.tsRange,
+      filters: buildApiFilters(), groupByField: resolveStackField()
+    })
       .then((result) => {
-        if (myToken !== chartLoadToken) return // stale response
+        if (myToken !== chartLoadToken) return
         isChartLoading.value = false
-        // Support both the new { chartData, kpis } shape and the legacy plain
-        // array shape so callers that still return an array keep working.
-        if (Array.isArray(result)) {
-          chartData.value = result
-          kpis.value = null
-        } else {
+        if (Array.isArray(result)) { chartData.value = result; kpis.value = null }
+        else {
           chartData.value = result?.chartData || []
-          kpis.value = result?.kpis || null
+          const rk = result?.kpis || null
+          if (rk && result?.partialFilter) rk.partialFilter = true
+          kpis.value = rk
         }
       })
       .catch((err) => {
-        if (myToken !== chartLoadToken) return // stale response
-        isChartLoading.value = false
-        chartData.value = []
-        kpis.value = null
-        onError({
-          closable: true,
-          severity: 'warn',
-          summary: 'Chart failed',
-          detail: String(err).slice(0, 100),
-          life: 5000
-        })
+        if (myToken !== chartLoadToken) return
+        isChartLoading.value = false; chartData.value = []; kpis.value = null
+        onError({ closable: true, severity: 'warn', summary: 'Chart failed', detail: String(err).slice(0, 100), life: 5000 })
       })
   }
 
+  // ── Fetch page with window+offset tracking ──────────────────────────
+  const fetchPage = async (target) => {
+    const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
+    let records = []
+    if (isShortRange) {
+      const res = await listService.value({ ...filterData.value, pageSize: target, offset: currentWindowOffset })
+      records = res.data || []
+      currentWindowOffset += records.length
+      return records
+    }
+    while (records.length < target && currentWindowEnd > originalBegin) {
+      const windowFilter = getWindowFilter(currentWindowEnd)
+      const remaining = target - records.length
+      const res = await listService.value({ ...windowFilter, pageSize: remaining, offset: currentWindowOffset })
+      const batch = res.data || []
+      records = [...records, ...batch]
+      if (batch.length < remaining) {
+        // Window exhausted or empty — move to next window
+        currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
+        currentWindowOffset = 0
+        // If this window returned nothing, stop — older windows won't have data either
+        if (batch.length === 0) break
+      } else {
+        currentWindowOffset += batch.length
+      }
+    }
+    return records
+  }
+
+  // ── Load ─────────────────────────────────────────────────────────────
+  let loadDebounceTimer = null
+
   const load = async () => {
     if (isLoading.value) return
-    // Guard: filterData must have a valid tsRange before we can load
+    if (loadDebounceTimer) clearTimeout(loadDebounceTimer)
+    await new Promise((resolve) => { loadDebounceTimer = setTimeout(resolve, 50) })
+    if (isLoading.value) return
     if (!filterData.value?.tsRange?.tsRangeBegin || !filterData.value?.tsRange?.tsRangeEnd) return
     const callId = ++loadCallId
     try {
-      isLoading.value = true
-      tableData.value = []
-      hasMoreData.value = false
-      chartData.value = []
-      recordsFound.value = '—'
-
+      isLoading.value = true; tableData.value = []; hasMoreData.value = false
+      chartData.value = []; recordsFound.value = '—'; hasAccurateCount = false
       loadChart()
-
+      loadTotalCount().catch(() => {})
       const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
       const originalEnd = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
-      currentWindowEnd = originalEnd
-      currentOffset = 0
+      currentWindowEnd = originalEnd; currentWindowOffset = 0
       isShortRange = originalEnd - originalBegin <= MAX_LIST_RANGE_MS
-
-      const target = pageSize.value
-      let records = []
-
-      if (isShortRange) {
-        const res = await listService.value({ ...filterData.value, pageSize: target, offset: 0 })
-        records = res.data || []
-        currentOffset = records.length
-      } else {
-        while (records.length < target && currentWindowEnd > originalBegin) {
-          if (callId !== loadCallId) return
-          const blockFilter = getListFilter(currentWindowEnd)
-          const remaining = target - records.length
-          const res = await listService.value({ ...blockFilter, pageSize: remaining, offset: 0 })
-          records = [...records, ...(res.data || [])]
-          currentWindowEnd = new Date(blockFilter.tsRange.tsRangeBegin).getTime()
-          if ((res.data || []).length < remaining) continue
-        }
-      }
-
+      const records = await fetchPage(pageSize.value)
+      if (callId !== loadCallId) return
       tableData.value = records
-      // Fallback: if chart hasn't emitted total-computed yet, use local count
-      if (recordsFound.value === '—') {
-        recordsFound.value = new Intl.NumberFormat(locale).format(records.length)
-      }
-      const totalNum =
-        typeof recordsFound.value === 'number'
-          ? recordsFound.value
-          : parseInt(String(recordsFound.value).replace(/\D/g, ''), 10)
-      hasMoreData.value = isShortRange
+      const totalNum = typeof recordsFound.value === 'number'
+        ? recordsFound.value : parseInt(String(recordsFound.value).replace(/\D/g, ''), 10)
+      hasMoreData.value = records.length > 0 && (isShortRange
         ? isNaN(totalNum) || records.length < totalNum
-        : currentWindowEnd > originalBegin || isNaN(totalNum) || records.length < totalNum
+        : currentWindowEnd > originalBegin || records.length >= pageSize.value)
     } catch (error) {
       onError({ closable: true, severity: 'error', summary: 'Error', detail: error })
-      recordsFound.value = 0
-      tableData.value = []
-      chartData.value = []
-      hasMoreData.value = false
+      recordsFound.value = '—'; tableData.value = []; chartData.value = []; hasMoreData.value = false
     } finally {
-      isLoading.value = false
-      initialLoadDone.value = true
+      if (callId === loadCallId) { isLoading.value = false; initialLoadDone.value = true }
     }
   }
 
+  // ── Load More ────────────────────────────────────────────────────────
   const loadMore = async () => {
     if (isLoadingMore.value || !hasMoreData.value) return
     isLoadingMore.value = true
     try {
-      const target = pageSize.value
-      let newRecords = []
-      if (isShortRange) {
-        const res = await listService.value({
-          ...filterData.value,
-          pageSize: target,
-          offset: currentOffset
-        })
-        newRecords = res.data || []
-        currentOffset += newRecords.length
-      } else {
-        const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
-        while (newRecords.length < target && currentWindowEnd > originalBegin) {
-          const blockFilter = getListFilter(currentWindowEnd)
-          const remaining = target - newRecords.length
-          const res = await listService.value({ ...blockFilter, pageSize: remaining, offset: 0 })
-          newRecords = [...newRecords, ...(res.data || [])]
-          currentWindowEnd = new Date(blockFilter.tsRange.tsRangeBegin).getTime()
-          if ((res.data || []).length < remaining) continue
-        }
-      }
-      if (newRecords.length > 0) {
-        tableData.value.push(...newRecords)
-        triggerRef(tableData)
-      }
-      const totalNum =
-        typeof recordsFound.value === 'number'
-          ? recordsFound.value
-          : parseInt(String(recordsFound.value).replace(/\D/g, ''), 10)
-      if (isShortRange) hasMoreData.value = !isNaN(totalNum) && tableData.value.length < totalNum
-      else
-        hasMoreData.value =
-          currentWindowEnd > new Date(filterData.value.tsRange.tsRangeBegin).getTime()
+      const newRecords = await fetchPage(pageSize.value)
+      if (newRecords.length > 0) { tableData.value.push(...newRecords); triggerRef(tableData) }
+      const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
+      hasMoreData.value = newRecords.length > 0 && (isShortRange
+        ? newRecords.length >= pageSize.value
+        : currentWindowEnd > originalBegin || newRecords.length >= pageSize.value)
     } catch (error) {
       onError({ closable: true, severity: 'error', summary: 'Error loading more', detail: error })
-    } finally {
-      isLoadingMore.value = false
-    }
+    } finally { isLoadingMore.value = false }
   }
 
+  // ── setRecordsFound (called by chart @total-computed) ────────────────
   const setRecordsFound = (total) => {
+    if (hasAccurateCount) return
+    if (kpis.value?.partialFilter) return
+    if (total <= 0) return
     recordsFound.value = new Intl.NumberFormat(locale).format(total)
+    hasAccurateCount = true
   }
 
   return {
-    tableData,
-    chartData,
-    kpis,
-    recordsFound,
-    isLoading,
-    isChartLoading,
-    hasMoreData,
-    isLoadingMore,
-    initialLoadDone,
-    load,
-    loadChart,
-    loadMore,
-    setRecordsFound
+    tableData, chartData, kpis, recordsFound, isLoading, isChartLoading,
+    hasMoreData, isLoadingMore, initialLoadDone, load, loadChart, loadMore, setRecordsFound
   }
 }

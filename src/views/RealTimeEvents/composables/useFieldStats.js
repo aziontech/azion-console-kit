@@ -51,8 +51,9 @@ export function useFieldStats({
   const statsVersion = ref(0)
 
   watch(
-    data,
-    (rows) => {
+    () => data.value?.length,
+    () => {
+      const rows = data.value
       if (!rows?.length) {
         // Data cleared — reset everything
         for (const key of Object.keys(runningCounts)) delete runningCounts[key]

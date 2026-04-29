@@ -150,15 +150,20 @@ export default class Aql {
 
       let counter = 0
       let endIndex = -1
+      let inQuotes = false
+      let quoteChar = ''
       // eslint-disable-next-line id-length
       for (let i = startIndex; i < query.length; i++) {
-        if (query[i] === '(') {
-          counter++
-        } else if (query[i] === ')') {
-          counter--
-          if (counter === 0) {
-            endIndex = i
-            break
+        const ch = query[i]
+        if ((ch === '"' || ch === "'")) {
+          if (!inQuotes) { inQuotes = true; quoteChar = ch }
+          else if (ch === quoteChar) { inQuotes = false; quoteChar = '' }
+        }
+        if (!inQuotes) {
+          if (ch === '(') counter++
+          else if (ch === ')') {
+            counter--
+            if (counter === 0) { endIndex = i; break }
           }
         }
       }
@@ -172,20 +177,25 @@ export default class Aql {
       const tokens = []
       let token = ''
       let nesting = 0
+      let inQuotes = false
+      let quoteChar = ''
       // eslint-disable-next-line id-length
       for (let i = 0; i < str.length; i++) {
         const char = str[i]
-        if (char === ',' && nesting === 0) {
+        if ((char === '"' || char === "'") && nesting === 0) {
+          if (!inQuotes) { inQuotes = true; quoteChar = char }
+          else if (char === quoteChar) { inQuotes = false; quoteChar = '' }
+          // Don't add quote chars to token
+          continue
+        }
+        if (char === ',' && nesting === 0 && !inQuotes) {
           const cleaned = token.trim()
           if (cleaned.length > 0) tokens.push(cleaned)
           token = ''
         } else {
           token += char
-          if (char === '(') {
-            nesting++
-          } else if (char === ')') {
-            nesting--
-          }
+          if (char === '(' && !inQuotes) nesting++
+          else if (char === ')' && !inQuotes) nesting--
         }
       }
       if (token.trim().length > 0) {
@@ -214,32 +224,77 @@ export default class Aql {
     const value = String(valueToAdd ?? '').trim()
     if (!value) return query
 
-    const startIndex = query.lastIndexOf('(')
-    if (startIndex === -1) {
-      const trimmed = query.trimEnd()
-      return `${trimmed} (${value})`
+    // Find the opening paren of the IN clause (not one inside a quoted value)
+    let startIndex = -1
+    let inQ = false
+    let qc = ''
+    for (let idx = query.length - 1; idx >= 0; idx--) {
+      const ch = query[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!inQ) { inQ = true; qc = ch } else if (ch === qc) { inQ = false; qc = '' }
+      }
+      if (ch === '(' && !inQ) { startIndex = idx; break }
     }
 
-    const endIndex = query.indexOf(')', startIndex)
+    if (startIndex === -1) {
+      const trimmed = query.trimEnd()
+      const needsQuote = value.includes(',') || value.includes('(') || value.includes(')')
+      const quoted = needsQuote ? '"' + value + '"' : value
+      return trimmed + ' (' + quoted + ')'
+    }
+
+    // Find matching close paren
+    let endIndex = -1
+    let counter = 0
+    inQ = false; qc = ''
+    for (let idx = startIndex; idx < query.length; idx++) {
+      const ch = query[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!inQ) { inQ = true; qc = ch } else if (ch === qc) { inQ = false; qc = '' }
+      }
+      if (!inQ) {
+        if (ch === '(') counter++
+        else if (ch === ')') { counter--; if (counter === 0) { endIndex = idx; break } }
+      }
+    }
+
     const innerRaw = query.slice(startIndex + 1, endIndex === -1 ? query.length : endIndex)
 
-    const tokens = innerRaw
-      .split(',')
-      .map((token) => token.trim())
-      .filter((token) => token.length > 0)
+    // Split by comma respecting quotes
+    const tokens = []
+    let tok = ''
+    let tInQ = false
+    let tQc = ''
+    for (let idx = 0; idx < innerRaw.length; idx++) {
+      const ch = innerRaw[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!tInQ) { tInQ = true; tQc = ch } else if (ch === tQc) { tInQ = false; tQc = '' }
+        continue // strip quotes
+      }
+      if (ch === ',' && !tInQ) {
+        const cleaned = tok.trim()
+        if (cleaned.length > 0) tokens.push(cleaned)
+        tok = ''
+      } else {
+        tok += ch
+      }
+    }
+    if (tok.trim().length > 0) tokens.push(tok.trim())
 
     const alreadyExists = tokens.some((token) => token.toLowerCase() === value.toLowerCase())
     if (!alreadyExists) tokens.push(value)
 
-    const rebuiltInner = tokens.join(', ')
+    // Rebuild with quotes for values containing special chars
+    const quoted = tokens.map((token) => {
+      if (token.includes(',') || token.includes('(') || token.includes(')') || token.includes(' ')) return '"' + token + '"'
+      return token
+    })
+    const rebuiltInner = quoted.join(', ')
     const prefix = query.slice(0, startIndex + 1)
 
-    if (endIndex === -1) {
-      return `${prefix}${rebuiltInner})`
-    }
-
+    if (endIndex === -1) return prefix + rebuiltInner + ')'
     const suffix = query.slice(endIndex)
-    return `${prefix}${rebuiltInner}${suffix}`
+    return prefix + rebuiltInner + suffix
   }
 
   operatorInfo(operators, operator) {
@@ -391,9 +446,17 @@ export default class Aql {
       if (operator === 'between') {
         return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
       } else if (operator === 'in') {
-        return `${formattedField} ${operator} (${filter.value
-          .map((item) => `${item.label}`)
-          .join(', ')})`
+        const values = filter.value
+          .map((item) => {
+            const label = String(item.label || item.value || item)
+            // Wrap in quotes if the value contains special characters
+            if (label.includes(',') || label.includes('(') || label.includes(')') || label.includes(' ')) {
+              return `"${label}"`
+            }
+            return label
+          })
+          .join(', ')
+        return `${formattedField} ${operator} (${values})`
       }
 
       return `${formattedField} ${operator} ${filter.value}`
