@@ -28,6 +28,8 @@
               </PrimeDivider>
 
               <div class="flex flex-col gap-8">
+                <SignupPlanTypeSelector />
+
                 <LoginWithEmailBlock
                   :showLoginFromEmail="showLoginFromEmail"
                   :signupService="props.signupService"
@@ -82,6 +84,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
+  import SignupPlanTypeSelector from '@/templates/signup-block/signup-plan-type-selector.vue'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 

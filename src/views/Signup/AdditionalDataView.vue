@@ -160,7 +160,13 @@
   const onSubmit = async () => {
     const plan = additionalDataRef.value?.plan
     const accountId = accountStore.accountData?.id
+    const hasJobRole = !!accountStore.accountData?.jobRole
     const billingCycle = storedBillingCycle.value || 'yearly'
+
+    if (!hasJobRole) {
+      await additionalDataRef.value?.submitForm()
+      return
+    }
 
     // Handle service order (create or update) before proceeding
     if (plan && accountId) {
@@ -169,10 +175,9 @@
 
       if (planId && planPricingId) {
         await submitServiceOrder({ accountId, planId, planPricingId })
+        handleProceedToCheckout()
       }
     }
-
-    additionalDataRef.value?.submitForm()
   }
 
   const handleProceedToCheckout = () => {

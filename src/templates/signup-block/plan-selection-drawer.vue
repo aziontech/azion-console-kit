@@ -69,9 +69,12 @@
                   class="h-[42px] font-protomono text-sm tracking-[-0.14px]"
                   :label="planOption.buttonLabel"
                   icon="pi pi-chevron-right"
-                  :disabled="isCurrentPlanSelection(planOption.value) "
+                  :disabled="isCurrentPlanSelection(planOption.value)"
                   iconPos="left"
-                  :outlined="isCurrentPlanSelection(planOption.value) || planOption.value.toLowerCase() === 'enterprise'"
+                  :outlined="
+                    isCurrentPlanSelection(planOption.value) ||
+                    planOption.value.toLowerCase() === 'enterprise'
+                  "
                   @click="handleChoosePlan(planOption.value)"
                 />
               </template>

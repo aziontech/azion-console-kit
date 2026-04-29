@@ -88,6 +88,7 @@
         label="Your Full Name"
         placeholder="John Doe"
         class="w-full"
+        :value="fullName"
         required
       />
 
@@ -427,12 +428,6 @@
       billingCycle.value = storedBillingCycle.value
     }
 
-    // Pre-fill fullName from accountStore
-    const { first_name, last_name } = accountStore.account || {}
-    if (first_name || last_name) {
-      fullName.value = `${first_name || ''} ${last_name || ''}`.trim()
-    }
-
     // Pre-fill role from accountStore
     const jobRole = accountStore.account?.jobRole
     if (jobRole) {
@@ -442,6 +437,19 @@
       }
     }
   })
+
+  watch(
+    () => [
+      accountStore.accountData?.first_name ?? accountStore.accountData?.firstName,
+      accountStore.accountData?.last_name ?? accountStore.accountData?.lastName
+    ],
+    ([firstName, lastName]) => {
+      if (!fullName.value && (firstName || lastName)) {
+        fullName.value = `${firstName || ''} ${lastName || ''}`.trim()
+      }
+    },
+    { immediate: true }
+  )
 
   watch(plan, (selectedPlan) => {
     if (selectedPlan === undefined) return
