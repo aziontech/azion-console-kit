@@ -135,13 +135,6 @@
   }
 
   const loadService = ({ id }) => {
-    const cachedBucket = edgeStorageService.getBucketFromCache(id)
-    if (cachedBucket) {
-      return {
-        name: cachedBucket.name,
-        workloads_access: cachedBucket.workloadsAccess
-      }
-    }
     const bucket = findBucketById(id)
 
     return {

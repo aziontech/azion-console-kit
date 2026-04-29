@@ -8,8 +8,7 @@ vi.mock('@/stores/account', () => ({
 
 vi.mock('@/services/v2/base/auth/sessionManager', () => ({
   sessionManager: {
-    switchAccount: vi.fn().mockResolvedValue(undefined),
-    notifySwitchAccountComplete: vi.fn()
+    switchAccount: vi.fn().mockResolvedValue(undefined)
   }
 }))
 
