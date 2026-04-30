@@ -16,34 +16,12 @@
       </template>
 
       <div class="flex flex-col gap-6 min-h-full">
-        <div
-          class="flex items-center gap-1 p-1 bg-[var(--surface-300)] rounded-md w-fit self-center"
-        >
-          <button
-            type="button"
-            class="h-[27px] px-3 py-[5px] text-xs leading-5 font-protomono rounded transition-colors"
-            :class="
-              localBillingCycle === 'monthly'
-                ? 'bg-[var(--surface-0)] text-default'
-                : 'text-muted hover:text-default'
-            "
-            @click="localBillingCycle = 'monthly'"
-          >
-            Monthly
-          </button>
-          <button
-            type="button"
-            class="h-[27px] px-3 py-[5px] text-xs leading-5 font-protomono rounded transition-colors"
-            :class="
-              localBillingCycle === 'yearly'
-                ? 'bg-[var(--surface-0)] text-default'
-                : 'text-muted hover:text-default'
-            "
-            @click="localBillingCycle = 'yearly'"
-          >
-            Yearly
-          </button>
-        </div>
+        <Toggle
+          v-model="billingCycleToggleValue"
+          class="self-center scale-[0.85]"
+          mainLabel="Monthly"
+          alternativeLabel="Yearly"
+        />
 
         <div class="flex gap-3 flex-1 bg-surface-raised h-[200px]">
           <div
@@ -91,6 +69,7 @@
   import Sidebar from '@aziontech/webkit/sidebar'
   import PricingCard from '@aziontech/webkit/pricing-card'
   import Button from '@aziontech/webkit/button'
+  import Toggle from '@aziontech/webkit/toggle'
   import { PLAN_OPTIONS } from '@/templates/signup-block/plan-options'
 
   defineOptions({
@@ -119,6 +98,13 @@
   const emit = defineEmits(['update:visible', 'select'])
 
   const localBillingCycle = ref(props.billingCycle)
+
+  const billingCycleToggleValue = computed({
+    get: () => (localBillingCycle.value === 'yearly' ? 'alternative' : 'main'),
+    set: (value) => {
+      localBillingCycle.value = value === 'alternative' ? 'yearly' : 'monthly'
+    }
+  })
 
   const visibleDrawer = computed({
     get: () => props.visible,
