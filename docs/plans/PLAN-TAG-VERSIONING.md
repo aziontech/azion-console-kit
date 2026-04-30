@@ -98,6 +98,76 @@ chore/docs/style    → NONE         → stays 1.57.0
 - **Hotfix bypass for emergencies** - immediate production releases without pre-release stage
 - Clean git history with proper semantic versioning
 
+## Workflow Diagram
+
+```mermaid
+graph TB
+    subgraph Development["Development Flow"]
+        Dev[Feature Branch] -->|PR| Stage[dev branch]
+        Stage -->|Deploy| StageEnv[Stage Environment]
+        StageEnv -.->|No Version Change| Dev
+    end
+
+    subgraph Production["Production Flow"]
+        Main[main branch] -->|Merge PR| DetectCommit{Commit Type?}
+
+        DetectCommit -->|feat: / fix:| PreRelease[Create Pre-Release RC]
+        DetectCommit -->|hotfix:| ImmediateProd[Create Production Release]
+
+        PreRelease -->|semantic-release| RC[v1.58.0-rc.1]
+        RC -->|Auto Deploy| ProdEnv[Production URL]
+        RC -->|Create| GHReleaseRC[GitHub Pre-Release]
+
+        ProdEnv -->|Test| Validation{QA Tests OK?}
+        Validation -->|Yes| Promote[Trigger Promotion Workflow]
+        Validation -->|No| DontPromote[Don't Promote<br/>Fix in New Branch]
+
+        Promote -->|Remove -rc suffix| Prod[v1.58.0]
+        Prod -->|Create| GHReleaseProd[GitHub Production Release]
+        Prod -->|Deploy| ProdEnv
+
+        ImmediateProd -->|semantic-release| Prod
+        ImmediateProd -->|Bypass RC| DirectDeploy[Direct Deploy]
+        DirectDeploy --> ProdEnv
+
+        GHReleaseProd -->|Mark as| LatestRelease[Latest Release]
+        GHReleaseRC -.->|Delete After<br/>Promotion| GHReleaseProd
+    end
+
+    subgraph Rollback["Rollback Options"]
+        CurrentProd[Current: v1.0.3] -->|Option 1| AutoRollback[Quick Rollback]
+        CurrentProd -->|Option 2| ManualRollback[Manual Rollback]
+
+        AutoRollback -->|Auto-deploy| PreviousStable[v1.0.2]
+        ManualRollback -->|Select Version| AnyVersion[v1.0.1<br/>v1.0.1-rc.1<br/>v1.0.2]
+
+        PreviousStable --> RollbackDeploy[Deploy to Production]
+        AnyVersion --> RollbackDeploy
+    end
+
+    classDef devNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef prodNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef rcNode fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef hotfixNode fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef rollbackNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+
+    class Dev,Stage,StageEnv devNode
+    class Main,Prod,ProdEnv,GHReleaseProd,LatestRelease prodNode
+    class RC,GHReleaseRC,Validation,Promote rcNode
+    class ImmediateProd,DirectDeploy hotfixNode
+    class AutoRollback,ManualRollback,RollbackDeploy rollbackNode
+```
+
+### Workflow Legend
+
+| Color | Meaning | Examples |
+|-------|---------|----------|
+| 🔵 Blue | Development/Stage | Feature branches, dev branch, stage deployment |
+| 🟣 Purple | Production | main branch, production releases, latest releases |
+| 🟠 Orange | Pre-Release Candidate | v1.58.0-rc.1, QA validation, promotion workflow |
+| 🔴 Red | Hotfix/Emergency | hotfix commits, immediate production releases |
+| 🟢 Green | Rollback | Quick rollback, manual rollback, version selection |
+
 ## Implementation Steps
 
 ### Step 1: Install Semantic Release Dependencies
