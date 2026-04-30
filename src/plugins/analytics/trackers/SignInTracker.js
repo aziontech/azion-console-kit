@@ -57,6 +57,7 @@ export class SignInTracker {
       eventName: 'User Signed In',
       props: {
         method: payload.method,
+        account_kind: payload.accountKind,
         login_sso_google: payload.signupTypeFlags?.login_sso_google ?? false,
         login_sso_github: payload.signupTypeFlags?.login_sso_github ?? false,
         login_email: payload.signupTypeFlags?.login_email ?? false,
