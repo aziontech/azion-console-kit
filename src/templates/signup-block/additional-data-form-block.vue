@@ -156,8 +156,11 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
-  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
-    useAdditionalDataFormState()
+  const {
+    setField: setAdditionalDataField,
+    hydrate: hydrateAdditionalDataForm,
+    clear: clearAdditionalDataForm
+  } = useAdditionalDataFormState()
 
   const props = defineProps({
     postAdditionalDataService: {
@@ -552,6 +555,7 @@
       //     fullName: fullName.value
       //   })
       //   .track()
+      clearAdditionalDataForm()
       emit('proceedToCheckout')
     } catch (err) {
       const errorMessage = err?.message || err

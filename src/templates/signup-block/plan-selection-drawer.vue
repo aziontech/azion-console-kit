@@ -18,7 +18,7 @@
       <div class="flex flex-col gap-6 min-h-full">
         <Toggle
           v-model="billingCycleToggleValue"
-          class="self-center scale-[0.85]"
+          class="self-center"
           mainLabel="Monthly"
           alternativeLabel="Yearly"
         />
@@ -32,19 +32,19 @@
             <PricingCard
               :title="planOption.label"
               :subtitle="planOption.description"
-              :features="getNormalizedFeatures(planOption.features)"
+              :features="planOption.features"
               :monthlyPrice="getMonthlyPrice(planOption.value)"
               :annualPrice="getAnnualPrice(planOption.value)"
               :currentPeriod="localBillingCycle === 'yearly' ? 'annual' : 'monthly'"
               :priceLabel="getPriceLabel(planOption.value)"
               :popular="Boolean(planOption.tagLabel)"
-              :pupularText="planOption.tagLabel || 'Popular'"
+              :popularText="planOption.tagLabel || 'Popular'"
               :customPrice="getCustomPrice(planOption.value)"
             >
               <template #button>
                 <Button
                   severity="secondary"
-                  class="h-[42px] font-protomono text-sm tracking-[-0.14px]"
+                  class="h-[42px] font-proto-mono text-sm tracking-[-0.14px]"
                   :label="planOption.buttonLabel"
                   icon="pi pi-chevron-right"
                   :disabled="isCurrentPlanSelection(planOption.value)"
@@ -145,22 +145,8 @@
   }
 
   const getPriceLabel = (planValue) => {
-    if (planValue === 'enterprise' || planValue === 'hobby') return ''
+    if (planValue === 'enterprise') return ''
     return 'started at'
-  }
-
-  const normalizeFeatureIcon = (icon) => {
-    if (!icon) return ''
-    if (icon.startsWith('pi pi-')) return icon.replace('pi ', '')
-    if (icon.startsWith('pi-')) return icon
-    return ''
-  }
-
-  const getNormalizedFeatures = (features = []) => {
-    return features.map((feature) => ({
-      label: feature.label,
-      icon: normalizeFeatureIcon(feature.icon)
-    }))
   }
 
   const isCurrentPlanSelection = (planValue) => {

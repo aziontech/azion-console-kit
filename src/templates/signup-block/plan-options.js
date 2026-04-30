@@ -35,7 +35,7 @@ export const PLAN_OPTIONS = [
     buttonLabel: 'Contact Sales',
     buttonDisabled: true,
     features: [
-      { label: 'Choose your pricing model', isLabel: true },
+      { label: 'Choose your pricing model' },
       { label: 'On-demand pricing', icon: 'pi pi-check-circle' },
       { label: 'Lower costs with commitments', icon: 'pi pi-check-circle' },
       { label: 'Reserved Capacity available', icon: 'pi pi-check-circle' },

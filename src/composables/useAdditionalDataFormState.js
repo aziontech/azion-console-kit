@@ -1,11 +1,69 @@
 import { computed, ref } from 'vue'
 
-const _usageIntent = ref(undefined)
-const _role = ref(undefined)
-const _companySize = ref(undefined)
-const _companyWebsite = ref(undefined)
-const _fullName = ref(undefined)
-const _termsAccepted = ref(undefined)
+const STORAGE_KEY = 'additional-data-form-state:v1'
+const FIELD_KEYS = [
+  'usageIntent',
+  'role',
+  'companySize',
+  'companyWebsite',
+  'fullName',
+  'termsAccepted'
+]
+
+const isStorageAvailable = () => typeof window !== 'undefined' && Boolean(window.localStorage)
+
+const removePersistedState = () => {
+  if (!isStorageAvailable()) return
+  window.localStorage.removeItem(STORAGE_KEY)
+}
+
+const readPersistedState = () => {
+  if (!isStorageAvailable()) return {}
+
+  try {
+    const rawValue = window.localStorage.getItem(STORAGE_KEY)
+    if (!rawValue) return {}
+
+    const parsedValue = JSON.parse(rawValue)
+    if (!parsedValue || typeof parsedValue !== 'object') {
+      removePersistedState()
+      return {}
+    }
+
+    return parsedValue
+  } catch {
+    removePersistedState()
+    return {}
+  }
+}
+
+const writePersistedState = (snapshot) => {
+  if (!isStorageAvailable()) return
+
+  const sanitizedSnapshot = FIELD_KEYS.reduce((acc, key) => {
+    const value = snapshot[key]
+    if (value !== undefined) {
+      acc[key] = value
+    }
+    return acc
+  }, {})
+
+  if (!Object.keys(sanitizedSnapshot).length) {
+    removePersistedState()
+    return
+  }
+
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizedSnapshot))
+}
+
+const initialState = readPersistedState()
+
+const _usageIntent = ref(initialState.usageIntent)
+const _role = ref(initialState.role)
+const _companySize = ref(initialState.companySize)
+const _companyWebsite = ref(initialState.companyWebsite)
+const _fullName = ref(initialState.fullName)
+const _termsAccepted = ref(initialState.termsAccepted)
 
 const setField = (key, value) => {
   switch (key) {
@@ -28,6 +86,8 @@ const setField = (key, value) => {
       _termsAccepted.value = value
       break
   }
+
+  writePersistedState(state.value)
 }
 
 const hydrate = (fields = {}) => {
@@ -46,6 +106,7 @@ const clear = () => {
   _companyWebsite.value = undefined
   _fullName.value = undefined
   _termsAccepted.value = undefined
+  removePersistedState()
 }
 
 const state = computed(() => ({

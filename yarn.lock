@@ -81,14 +81,14 @@
   integrity sha512-V2AQJoY4iV6ZlrcKiCW9pyZeMJXou8cg2sqmsTn3KTH7G/cLiHD0QZG/y8md8rfSSSEvsBzR/82JM45+taaRIQ==
 
 "@aziontech/theme@^1.12.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.12.0.tgz#e79f29f7f792e9cc6261bf6beb9a13fdc5e05455"
-  integrity sha512-t2fmbAZ0Y8dYHikuOpSI8eyZAboQGDZOjgsnStYu6Wbq0wCdp6iVzMaQeVRqP4mrG9lembr+WiDuf9nPFm6yrg==
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.13.0.tgz#1fbbc9a5d13091222035cfa3d28263b21d58e9e9"
+  integrity sha512-7dQiIizv2fAh/6XZ75RBU3agCf+NTgsE193V7r/R6ddAI39ITgwdZ7J93uOIVS6XMQteQ1l6k5upRFnmCk7DkA==
 
-"@aziontech/webkit@^1.26.0":
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.26.0.tgz#ec0e488eb73ec209b86eebf950d18254e9e06c24"
-  integrity sha512-R2/Z+H+rGCw4TQiMyKgphL8s9q4caSxrYDOMAK9w5IaNEipI0m8o4g0LCkp9Osqvr9k0g6PHxFmAH5Dl7aOUuA==
+"@aziontech/webkit@^1.26.1":
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.27.1.tgz#7d8b7fffadd4d266b4d7bf60498ca7963a1ee255"
+  integrity sha512-Aj9xauSgcevMxrdk2/vFuROIbtWIL6YqUPoL+fEspzISRwnyqlrM+Jr5Exjiv2ZAV/tc8/uYTXIF999Nnp89tg==
   dependencies:
     "@vueuse/core" "^10.11.1"
     motion-v "^2.1.0"
