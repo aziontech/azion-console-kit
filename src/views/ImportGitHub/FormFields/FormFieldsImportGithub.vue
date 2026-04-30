@@ -73,7 +73,7 @@
       await loadListIntegrations()
     } catch (error) {
       error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.detail}`,
+        summary: `GitHub integration failed: ${error.message}`,
         severity: 'error'
       }))
     } finally {
@@ -83,8 +83,20 @@
 
   const listenerOnMessage = () => {
     window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin) return
+
       if (event.data.event === 'integration-data') {
         saveIntegration(event.data)
+      }
+      if (event.data.event === 'integration-connected') {
+        loadListIntegrations()
+      }
+      if (event.data.event === 'integration-error') {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'GitHub integration failed'
+        })
       }
     })
   }
