@@ -22,7 +22,7 @@
         :disabled="isSubmitting"
         outlined
         @click="handleBack"
-        label="Cancel"
+        label="Back"
       />
       <Button
         severity="secondary"

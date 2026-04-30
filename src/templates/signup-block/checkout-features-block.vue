@@ -17,10 +17,7 @@
             :key="index"
             class="flex items-start gap-2.5"
           >
-            <i
-              class="pi pi-check mt-1 text-[12px]"
-              :class="{ 'text-orange-500': index === 0, 'text-green-500': index !== 0 }"
-            />
+            <i class="pi pi-check mt-1 text-[12px] text-green-500" />
             <div class="flex flex-col">
               <span class="text-xs leading-5 text-default">{{ feature.title }}</span>
               <span
@@ -45,7 +42,7 @@
           <i class="pi pi-external-link text-[10px]" />
         </a>
         <a
-          href="https://www.azion.com/en/pricing/"
+          href="https://www.azion.com/en/plans/"
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center gap-1 text-xs leading-5 text-[var(--text-color-link)] hover:underline"

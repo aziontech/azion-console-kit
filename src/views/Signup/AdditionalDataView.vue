@@ -77,7 +77,7 @@
 
         <!-- Compare Plans Link (only in step 1) -->
         <a
-          href="https://www.azion.com/en/pricing/"
+          href="https://www.azion.com/en/plans/"
           target="_blank"
           class="text-xs text-[var(--text-color-link)] hover:underline flex items-center gap-1"
         >
