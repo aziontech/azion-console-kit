@@ -17,6 +17,7 @@
   import FieldInputTextPrivacy from '@/templates/form-fields-inputs/filedInputTextPrivacy.vue'
 
   import { vcsService } from '@/services/v2/vcs/vcs-service'
+  import { useVcsOAuth } from '@/composables/useVcsOAuth'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
@@ -82,15 +83,36 @@
   const isSavingDomains = ref(false)
 
   // OAuth and integration state
-  const callbackUrl = ref('')
-  const isGithubConnectLoading = ref(false)
-  const integrationsList = ref([])
   const presetsList = ref([])
   const templateId = ref(null)
   const isInstallCommandEditable = ref(false)
 
+  // Use VCS OAuth composable
+  const {
+    isLoading: isGithubConnectLoading,
+    isRepositoriesLoading: isLoadingRepositories,
+    integrations: integrationsList,
+    repositories: repositoriesListRaw,
+    callbackUrl,
+    listPlatforms,
+    listIntegrations,
+    listRepositories,
+    connect
+  } = useVcsOAuth()
+
+  // GitHub account and repository selection
+  const selectedIntegration = ref(null)
+  const selectedRepository = ref(null)
+
+  // Computed integrations with "Add another account" option
+  const integrationOptions = computed(() => {
+    return integrationsList.value
+  })
+
   // Validation schema
   const validationSchema = yup.object({
+    githubAccount: yup.string().required().label('GitHub Account'),
+    repository: yup.string().required().label('Repository'),
     domain: yup
       .string()
       .required()
@@ -152,6 +174,8 @@
 
   // Initial form values
   const initialValues = {
+    githubAccount: '',
+    repository: '',
     domain: suggestedDomain.value,
     preset: '',
     rootDirectory: '/',
@@ -329,7 +353,7 @@
     try {
       isGithubConnectLoading.value = true
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
-      await loadListIntegrations()
+      await listIntegrations()
     } catch (error) {
       error.showWithOptions(toast, (error) => ({
         summary: `GitHub integration failed: ${error.detail}`,
@@ -354,15 +378,23 @@
     window.removeEventListener('message', handleGithubMessage)
   }
 
-  const loadListIntegrations = async () => {
-    try {
-      isGithubConnectLoading.value = true
-      const data = await vcsService.listIntegrations()
-      integrationsList.value = data
-    } catch (error) {
-      error.showWithOptions(toast, { summary: 'Listing failed' })
-    } finally {
-      isGithubConnectLoading.value = false
+  const handleIntegrationChange = async (integrationId) => {
+    selectedRepository.value = null
+    repositoriesListRaw.value = []
+
+    if (integrationId) {
+      await listRepositories(integrationId)
+    }
+  }
+
+  const handleRepositoryChange = async (repoId) => {
+    const repo = repositoriesListRaw.value.find((repo) => repo.id === repoId)
+    if (repo) {
+      // Update suggested domain based on repository name
+      domain.value = `${repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+
+      // Detect framework automatically
+      await detectAndSetFrameworkPreset(repo.owner?.login, repo.name)
     }
   }
 
@@ -543,7 +575,7 @@
           {
             field: 'platform_feature__vcs_integration__uuid',
             instantiation_data_path: '',
-            value: route.query.gitScope
+            value: selectedIntegration.value
           },
           {
             field: 'az_name',
@@ -553,7 +585,7 @@
           {
             field: 'git_url_external',
             instantiation_data_path: 'envs.[1].value',
-            value: route.query.repository
+            value: selectedRepository.value
           },
           {
             field: 'vulcan_preset',
@@ -681,15 +713,13 @@
     }
   }
   let repositoryOwnerRef = ''
-  let repositoryNameRef = ''
   if (currentStep.value === 'settings') {
     // Repository owner and name from query params (with fallback to props)
     repositoryOwnerRef = route.query.repositoryOwner || props.repositoryOwner
-    repositoryNameRef = route.query.repositoryName || props.repositoryName
   }
 
   onMounted(async () => {
-    await Promise.all([loadSolutionByVendor(), loadListIntegrations()])
+    await Promise.all([loadSolutionByVendor(), listIntegrations(), listPlatforms()])
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
 
@@ -736,7 +766,8 @@
       withoutBorder
     >
       <template #content>
-        <div class="w-full px-4 sm:px-6 bg-[var(--surface-50)] rounded-lg border surface-border">
+        <!-- Commented out: Repository source display section
+        <div class="w-full px-4 sm:px-6 bg-surface-raised rounded-lg border surface-border">
           <div class="py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-1.5">
               <span class="text-[10px] font-normal text-text-color-muted leading-3"
@@ -762,6 +793,105 @@
             </div>
           </div>
         </div>
+        -->
+        <!-- GitHub Account and Repository Selection -->
+        <div class="flex flex-col w-full sm:max-w-lg gap-2">
+          <LabelBlock
+            for="githubAccount"
+            label="Git Scope"
+            isRequired
+          />
+          <Dropdown
+            name="githubAccount"
+            v-model="selectedIntegration"
+            :options="integrationOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a scope"
+            class="w-full"
+            :disabled="isDeploying"
+            :loading="isGithubConnectLoading"
+            @change="handleIntegrationChange($event.value)"
+            appendTo="self"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center gap-2"
+              >
+                <i class="pi pi-github"></i>
+                <span>
+                  {{ integrationsList.find((i) => i.value === slotProps.value)?.label }}
+                </span>
+              </div>
+              <div v-else>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-github"></i>
+                <span>{{ slotProps.option.label }}</span>
+              </div>
+            </template>
+            <template #footer>
+              <div class="p-dropdown-items-wrapper">
+                <ul class="p-dropdown-items">
+                  <li
+                    class="p-dropdown-item flex items-center cursor-pointer"
+                    @click="connect('github')"
+                  >
+                    <i class="pi pi-plus-circle mr-2" />
+                    <div>Add GitHub Account</div>
+                  </li>
+                </ul>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+
+        <div class="flex flex-col w-full sm:max-w-lg gap-2">
+          <LabelBlock
+            for="repository"
+            label="Repository"
+            isRequired
+          />
+          <Dropdown
+            name="repository"
+            v-model="selectedRepository"
+            :options="repositoriesListRaw"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select a repository"
+            class="w-full"
+            :disabled="isDeploying || !selectedIntegration"
+            :loading="isLoadingRepositories"
+            filter
+            @change="handleRepositoryChange($event.value)"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center gap-2"
+              >
+                <i class="pi pi-github"></i>
+                <span>
+                  {{ repositoriesListRaw.find((repo) => repo.id === slotProps.value)?.name }}
+                </span>
+              </div>
+              <div v-else>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-github"></i>
+                <span>{{ slotProps.option.name }}</span>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+
         <div class="flex flex-col w-full gap-2">
           <FieldText
             label="Domain"
@@ -863,6 +993,7 @@
                   label="Install Command"
                   required
                   name="installCommand"
+                  description="This command is automatically set based on your project. Enable custom command to override it."
                   placeholder="npm install"
                   :value="installCommand"
                   :isPublic="isInstallCommandEditable"

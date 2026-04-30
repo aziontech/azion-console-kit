@@ -1,42 +1,147 @@
 <template>
   <PrimeButton
-    @click="handleCreateClick"
+    @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"
-    class="h-8 w-8 md:w-fit text-white border-header bg-header hover:bg-header-button-hover"
+    class="h-8 w-8 md:w-fit text-white border-header"
     size="small"
     :pt="{
       label: { class: 'text-white' },
       icon: { class: 'text-white' }
     }"
+    :class="{
+      'bg-header hover:bg-header-button-hover': !createModalIsOpen,
+      'bg-header-button-enabled': createModalIsOpen
+    }"
     v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
   />
+
+  <PrimeDialog
+    v-if="!isMobile"
+    :draggable="false"
+    v-model:visible="createModalIsOpen"
+    modal
+    header="New"
+    :pt="{
+      root: { class: 'w-full max-w-screen-2xl h-screen flex' },
+      content: { class: 'h-full' },
+      mask: { class: 'flex' }
+    }"
+    position="center"
+    :dismissableMask="true"
+    @update:visible="closeCreateModalStore()"
+  >
+    <div>
+      <MakeCreateModalBlock
+        :solutions="solutions"
+        :loading="loading"
+        @closeModal="closeCreateModalStore()"
+      />
+    </div>
+  </PrimeDialog>
+
+  <Sidebar
+    v-else
+    v-model:visible="createModalIsOpen"
+    position="bottom"
+    headerContent="Create something new"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-[80%] flex p-0' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'flex' }
+    }"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2>Create</h2>
+        <div class="flex gap-2">
+          <ConsoleFeedback />
+          <PrimeButton
+            icon="pi pi-times"
+            @click="closeCreateModalStore()"
+            size="small"
+            class="flex-none surface-border text-sm w-8 h-8"
+            text
+            aria-label="Close create modal"
+          />
+        </div>
+      </div>
+    </template>
+    <MakeCreateModalBlock
+      :solutions="solutions"
+      :loading="loading"
+      @closeModal="closeCreateModalStore()"
+    />
+  </Sidebar>
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { computed, inject, ref } from 'vue'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import { solutionService } from '@/services/v2/marketplace/solution-service'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   import PrimeButton from '@aziontech/webkit/button'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import Sidebar from '@aziontech/webkit/sidebar'
+  import MakeCreateModalBlock from '@/templates/create-modal-block/make-create-modal-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'navbar-create-block' })
 
-  const router = useRouter()
   const route = useRoute()
+  const createModalStore = useCreateModalStore()
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
+  const SCREEN_BREAKPOINT_SM = 640
 
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
+  const recommendedQuery = ref(null)
+  const templatesQuery = ref(null)
+  const githubImportQuery = ref(null)
   const toast = useToast()
 
-  const handleCreateClick = () => {
+  const loadQueries = () => {
+    if (accountData.value.kind !== 'client') return
+
+    recommendedQuery.value = solutionService.useListSolutions({
+      group: 'recommended',
+      type: hasFlagBlockApiV4() ? accountData.value.jobRole : `${accountData.value.jobRole}-v4`
+    })
+
+    templatesQuery.value = solutionService.useListSolutions({
+      group: 'templates',
+      type: hasFlagBlockApiV4() ? 'onboarding' : 'onboarding-v4'
+    })
+
+    githubImportQuery.value = solutionService.useListSolutions({
+      group: 'githubImport',
+      type: 'import-from-github'
+    })
+  }
+
+  const solutions = computed(() => ({
+    recommended: recommendedQuery.value?.data || [],
+    templates: templatesQuery.value?.data || [],
+    githubImport: githubImportQuery.value?.data || []
+  }))
+
+  const loading = computed(() => ({
+    recommended: !accountData.value.jobRole || recommendedQuery.value?.isLoading,
+    templates: templatesQuery.value?.isLoading,
+    githubImport: githubImportQuery.value?.isLoading
+  }))
+
+  const openCreateModalToggle = () => {
     tracker.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
     if (accountData.value.kind !== 'client') {
       toast.add({
@@ -47,7 +152,11 @@
       })
       return
     }
-    router.push({ name: 'create-new-templates' })
+    createModalStore.toggle()
+  }
+
+  const closeCreateModalStore = () => {
+    createModalStore.close()
   }
 
   const currentLabel = computed(() => {
@@ -56,4 +165,14 @@
     }
     return ''
   })
+
+  const isMobile = computed(() => {
+    return currentWidth.value < SCREEN_BREAKPOINT_SM
+  })
+
+  const createModalIsOpen = computed(() => {
+    return createModalStore.isOpen
+  })
+
+  loadQueries()
 </script>

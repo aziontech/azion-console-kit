@@ -30,11 +30,9 @@
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-[700px] border surface-border rounded-md">
+  <div class="flex flex-col w-full max-w-3xl border bg-surface border-default rounded-md">
     <!-- Header -->
-    <div
-      class="h-14 px-4 sm:px-6 border-b bg-[var(--surface-50)] surface-border flex items-center justify-between"
-    >
+    <div class="h-14 px-4 sm:px-6 border-b border-default flex items-center justify-between">
       <div
         class="text-color font-semibold leading-5"
         :class="titleSize"
@@ -66,7 +64,7 @@
 
     <!-- Content -->
     <div
-      class="p-4 sm:p-6 bg-[var(--surface-100)] flex flex-col gap-6"
+      class="p-4 sm:p-6 flex flex-col gap-6"
       :class="backgroundcontent"
     >
       <template v-if="loading">

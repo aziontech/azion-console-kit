@@ -12,7 +12,7 @@
   const { pluralTitle, pluralLabel } = TEXT_DOMAIN_WORKLOAD()
   const accountStore = useAccountStore()
   const createModalStore = useCreateModalStore()
-  const emit = defineEmits('closeModal')
+  const emit = defineEmits(['closeModal'])
   const router = useRouter()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
