@@ -22,6 +22,10 @@ package-lock.json
 /.hypothesis
 /cypress/videos/
 /cypress/screenshots/
+/tests/cypress/videos/
+/tests/cypress/screenshots/
+/tests/cypress/screenshots-debug/
+/tests/cypress/downloads/
 
 # Editor directories and files
 .vscode/*

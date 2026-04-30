@@ -7,7 +7,12 @@ import fs from 'fs'
 export default defineConfig({
   projectId: 'azion-console-kit',
   e2e: {
-    specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
+    specPattern: 'tests/cypress/specs/**/*.cy.{js,ts}',
+    supportFile: 'tests/cypress/support/e2e.js',
+    fixturesFolder: 'tests/cypress/fixtures',
+    screenshotsFolder: 'tests/cypress/screenshots',
+    videosFolder: 'tests/cypress/videos',
+    downloadsFolder: 'tests/cypress/downloads',
     defaultCommandTimeout: 60000,
     chromeWebSecurity: false,
     video: true,
