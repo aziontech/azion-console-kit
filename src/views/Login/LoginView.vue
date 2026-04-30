@@ -67,8 +67,11 @@
     const isActivatedEmail = !!email && !activated
 
     if (isActivatedEmail) {
+      // Set signup_email flag for tracking when user completes email signup
+      const accountStore = useAccountStore()
+      accountStore.setSignupTypeFlag('signup_email')
+
       tracker.signUp.userActivatedAccount().track()
-      tracker.signUp.userSignedUp({ method: 'email' }).track()
 
       const newQuery = { ...route.query, activated: 'true' }
       router.replace({ query: newQuery })

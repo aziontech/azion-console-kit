@@ -2,6 +2,8 @@ import * as SignupService from '@/services/signup-services'
 import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
+import { getFirstSessionUrl } from '@/helpers/first-session-url'
+import { trackSignUpSafely } from '@/helpers/track-auth-event'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
@@ -38,13 +40,22 @@ export const signupRoutes = {
       beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
         const isFirstLogin = accountStore.isFirstLogin
+        const signupTypeFlags = accountStore.getSignupTypeFlags()
 
-        if (isFirstLogin && accountStore.ssoSignUpMethod) {
+        const isEmailSignup = signupTypeFlags.signup_email
+        const isSsoSignup = accountStore.ssoSignUpMethod
+
+        if (isFirstLogin && (isSsoSignup || isEmailSignup)) {
           /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
           const tracker = inject('tracker')
-          const signUpMethod = { method: accountStore.ssoSignUpMethod }
+          const method = isSsoSignup || 'email'
 
-          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
+          trackSignUpSafely({
+            tracker,
+            method,
+            signupTypeFlags,
+            firstSessionUrl: getFirstSessionUrl()
+          })
         }
 
         if (isFirstLogin) {
