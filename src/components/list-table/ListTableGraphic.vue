@@ -22,7 +22,7 @@
     },
     scrollHeight: {
       type: String,
-      default: undefined
+      default: ''
     }
   })
 </script>
