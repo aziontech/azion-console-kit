@@ -26,6 +26,8 @@ package-lock.json
 /tests/cypress/screenshots/
 /tests/cypress/screenshots-debug/
 /tests/cypress/downloads/
+/tests/cypress/fixtures/recorded/
+/tests/cypress/fixtures/scenarios/
 
 # Editor directories and files
 .vscode/*
