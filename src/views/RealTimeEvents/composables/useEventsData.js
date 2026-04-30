@@ -1,5 +1,6 @@
 import { ref, shallowRef, triggerRef } from 'vue'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { useGraphQLStore } from '@/stores/graphql-query'
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
@@ -180,11 +181,21 @@ export function useEventsData({
   }
 
   // ── Fetch page with window+offset tracking ──────────────────────────
+  const graphqlStore = useGraphQLStore()
+  const onQuery = (payload) => {
+    try {
+      // payload is either a { query, variables } object (from convertGQL)
+      // or a JSON string — handle both.
+      const parsed = typeof payload === 'string' ? JSON.parse(payload) : payload
+      if (parsed?.query) graphqlStore.setQuery({ query: parsed.query, variables: parsed.variables ?? {} })
+    } catch { /* ignore */ }
+  }
+
   const fetchPage = async (target) => {
     const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
     let records = []
     if (isShortRange) {
-      const res = await listService.value({ ...filterData.value, pageSize: target, offset: currentWindowOffset })
+      const res = await listService.value({ ...filterData.value, pageSize: target, offset: currentWindowOffset }, { onQuery })
       records = res.data || []
       currentWindowOffset += records.length
       return records
@@ -192,7 +203,7 @@ export function useEventsData({
     while (records.length < target && currentWindowEnd > originalBegin) {
       const windowFilter = getWindowFilter(currentWindowEnd)
       const remaining = target - records.length
-      const res = await listService.value({ ...windowFilter, pageSize: remaining, offset: currentWindowOffset })
+      const res = await listService.value({ ...windowFilter, pageSize: remaining, offset: currentWindowOffset }, { onQuery })
       const batch = res.data || []
       records = [...records, ...batch]
       if (batch.length < remaining) {
