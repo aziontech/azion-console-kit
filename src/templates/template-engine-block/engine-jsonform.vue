@@ -283,10 +283,10 @@
   })
 
   const layoutProps = computed(() => ({
-    title: props.schema?.title || 'Start from Template',
+    title: 'Start from Template',
     previewSrc: props.schema?.imagePreview || props.schema?.previewSrc || '',
     previewAlt: props.schema?.previewAlt || '',
-    templateTitle: props.schema?.templateTitle || props.schema?.name || '',
+    templateTitle: props.schema?.title,
     templateUrl: props.schema?.templateUrl || '',
     templateIcon: props.schema?.templateIcon || '',
     templateDescription: props.schema?.templateDescription || props.schema?.description || '',
@@ -362,7 +362,7 @@
 
   /**
    * Gets all form data as an array of field objects
-   * @returns {Array} Array of field objects with name, value, and instantiation_data_path
+   * @returns {Array} Array of field objects with field, value, and instantiation_data_path
    */
   const getFormData = () => {
     const data = []
@@ -371,7 +371,7 @@
       const vcsField = props.schema?.properties?.[vcsIntegrationFieldName.value]
       data.push(
         parseData({
-          name: vcsIntegrationFieldName.value,
+          field: vcsIntegrationFieldName.value,
           value: selectedIntegration.value,
           instantiationDataPath: vcsField?.instantiation_data_path || ''
         })
@@ -380,24 +380,24 @@
 
     const keys = Object.keys(formData.value)
     keys.forEach((key) => {
-      const field = props.schema?.properties?.[key]
+      const fieldDef = props.schema?.properties?.[key]
 
       data.push(
         parseData({
-          name: key,
+          field: key,
           value: formData.value[key],
-          instantiationDataPath: field?.instantiation_data_path
+          instantiationDataPath: fieldDef?.instantiation_data_path
         })
       )
 
-      // For privacy fields, also include isPublic value
-      if (field?.format === 'privacy') {
+      // For privacy fields, also include isPublic value as vcs_repo_is_public
+      if (fieldDef?.format === 'privacy') {
         const isPublicValue = privacyFieldsState.value[key] ?? true
         data.push(
           parseData({
-            name: `github_is_private`,
+            field: 'vcs_repo_is_public',
             value: isPublicValue,
-            instantiationDataPath: field?.is_public_data_path || ''
+            instantiationDataPath: fieldDef?.is_public_data_path || ''
           })
         )
       }
@@ -408,14 +408,14 @@
 
   /**
    * Parses field data into standard format
-   * @param {Object} field - The field to parse
+   * @param {Object} fieldData - The field data to parse
    * @returns {Object} Parsed field object
    */
-  const parseData = (field) => {
+  const parseData = (fieldData) => {
     return {
-      name: field.name,
-      value: field.value,
-      instantiation_data_path: field.instantiationDataPath
+      field: fieldData.field,
+      value: fieldData.value,
+      instantiation_data_path: fieldData.instantiationDataPath
     }
   }
 

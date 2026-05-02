@@ -3,7 +3,6 @@
   import { useForm, useField } from 'vee-validate'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import { useToast } from '@aziontech/webkit/use-toast'
   import { variablesService } from '@/services/v2/variables'
 
   import Accordion from 'primevue/accordion'
@@ -63,7 +62,6 @@
 
   const loadingStore = useLoadingStore()
   const deployStore = useDeploy()
-  const toast = useToast()
   const route = useRoute()
 
   // Step Navigation State
@@ -355,10 +353,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await listIntegrations()
     } catch (error) {
-      error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.detail}`,
-        severity: 'error'
-      }))
+      //
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -378,7 +373,8 @@
     window.removeEventListener('message', handleGithubMessage)
   }
 
-  const handleIntegrationChange = async (integrationId) => {
+  const handleIntegrationChange = async (event) => {
+    const integrationId = event?.value
     selectedRepository.value = null
     repositoriesListRaw.value = []
 
@@ -387,7 +383,8 @@
     }
   }
 
-  const handleRepositoryChange = async (repoId) => {
+  const handleRepositoryChange = async (event) => {
+    const repoId = event?.value
     const repo = repositoriesListRaw.value.find((repo) => repo.id === repoId)
     if (repo) {
       // Update suggested domain based on repository name
@@ -412,12 +409,7 @@
         packageJsonData.value = result.packageJson
       }
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Setting failed',
-        detail: error
-      })
+      //
     }
   }
 
@@ -476,8 +468,8 @@
     })
   }
 
-  const failMessage =
-    'There was an issue during the deployment. Check the Deploy Log for more details.'
+  // const failMessage =
+  //   'There was an issue during the deployment. Check the Deploy Log for more details.'
 
   const handleFinish = async () => {
     // Skip if we're restoring state from route (results already populated)
@@ -493,12 +485,7 @@
       goToSuccess()
     } catch (error) {
       deployFailed.value = true
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Creation failed',
-        detail: failMessage
-      })
+      //
     } finally {
       deployStore.removeStartTime()
     }
@@ -523,30 +510,15 @@
     try {
       const workloadId = results.value?.domain?.id
       if (!workloadId) {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Workload ID not found'
-        })
+        //
         return
       }
 
       await workloadService.patchWorkloadDomains(workloadId, values)
 
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Domain settings updated successfully'
-      })
+      //
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to update domain settings'
-      })
+      //
     } finally {
       isSavingDomains.value = false
     }
@@ -623,12 +595,7 @@
         emit('deploy', formValues)
       } catch (error) {
         deployFailed.value = true
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Deploy failed',
-          detail: error.message || 'Failed to deploy'
-        })
+        //
       } finally {
         // Only reset isDeploying if we're not in the deploying step
         // When currentStep is 'deploying', the fields should remain disabled
@@ -641,12 +608,7 @@
       // Handle validation errors - show first error to user
       const firstError = Object.values(errors)[0]
       if (firstError) {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Validation Error',
-          detail: firstError
-        })
+        //
       }
     }
   )
@@ -660,12 +622,7 @@
       })
       templateId.value = solution.referenceId
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to load solution'
-      })
+      //
     } finally {
       loadingStore.finishLoading()
     }
@@ -700,12 +657,7 @@
           currentStep.value = 'deploying'
           deployStartTime.value = Date.now()
           isDeploying.value = true
-          toast.add({
-            closable: true,
-            severity: 'warn',
-            summary: 'Could not restore deployment state',
-            detail: 'Showing deployment status instead.'
-          })
+          //
         } finally {
           loadingStore.finishLoading()
         }
@@ -811,7 +763,7 @@
             class="w-full"
             :disabled="isDeploying"
             :loading="isGithubConnectLoading"
-            @change="handleIntegrationChange($event.value)"
+            @change="handleIntegrationChange"
             appendTo="self"
           >
             <template #value="slotProps">
@@ -867,7 +819,7 @@
             :disabled="isDeploying || !selectedIntegration"
             :loading="isLoadingRepositories"
             filter
-            @change="handleRepositoryChange($event.value)"
+            @change="handleRepositoryChange"
           >
             <template #value="slotProps">
               <div

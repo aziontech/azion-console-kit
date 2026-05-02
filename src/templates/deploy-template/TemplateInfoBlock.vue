@@ -59,13 +59,13 @@
         :preview-alt="props.previewAlt"
       >
         <div
-          class="w-full h-48 bg-surface-section rounded-lg flex flex-col justify-center items-center overflow-hidden"
+          class="w-full bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
         >
           <img
             v-if="props.previewSrc"
             :src="props.previewSrc"
             :alt="props.previewAlt || props.templateTitle"
-            class="w-full h-40 object-cover"
+            class="w-full h-full object-cover"
           />
         </div>
       </slot>
@@ -91,7 +91,7 @@
                   :href="props.templateUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-sm font-semibold text-color hover:text-primary transition-colors line-clamp-1"
+                  class="text-sm font-semibold text-color transition-colors line-clamp-1"
                 >
                   {{ props.templateTitle }}
                 </a>

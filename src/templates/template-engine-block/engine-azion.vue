@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, watch, defineOptions, onMounted } from 'vue'
   import { useForm } from 'vee-validate'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
@@ -198,7 +198,8 @@
    * Computes props to pass to LayoutEngineBlock
    */
   const layoutProps = computed(() => ({
-    title: inputSchema.value.title || 'Start from Template',
+    title: 'Start from Template',
+    nameTemplate: inputSchema.value.title,
     previewSrc: inputSchema.value.imagePreview || inputSchema.value.previewSrc || '',
     previewAlt: inputSchema.value.previewAlt || '',
     templateTitle: inputSchema.value.templateTitle || inputSchema.value.name || '',
@@ -433,14 +434,14 @@
 
   /**
    * Gets all form data as an array of field objects
-   * @returns {Array} Array of field objects with name, value, and instantiation_data_path
+   * @returns {Array} Array of field objects with field, value, and instantiation_data_path
    */
   const getFormData = () => {
     const data = []
 
     inputSchema.value.fields?.forEach((field) => {
       data.push({
-        name: field.name,
+        field: field.name,
         value: field.input?.value ?? field.value ?? '',
         instantiation_data_path: field.instantiation_data_path
       })
@@ -449,7 +450,7 @@
     inputSchema.value.groups?.forEach((group) => {
       group.fields.forEach((field) => {
         data.push({
-          name: field.name,
+          field: field.name,
           value: field.input?.value ?? field.value ?? '',
           instantiation_data_path: field.instantiation_data_path
         })

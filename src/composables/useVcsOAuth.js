@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { vcsService } from '@/services/v2/vcs/vcs-service'
-import { useToast } from 'primevue/usetoast'
+import { useToast } from '@aziontech/webkit/use-toast'
 
 /**
  * Composable for handling VCS OAuth connections (GitHub, GitLab, Azure, Bitbucket)

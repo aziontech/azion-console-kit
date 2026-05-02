@@ -31,11 +31,11 @@ const extractTemplateInfo = (instantiationData) => {
       envsArray = parsedData?.envs ?? null
     } catch {
       return {
-        templateTitle: '',
-        templateDescription: '',
+        title: '',
+        description: '',
         templatePath: '',
-        templateUrl: '',
-        imagePreview: ''
+        repository_url: '',
+        preview_image: ''
       }
     }
   }
@@ -60,13 +60,25 @@ const extractTemplateInfo = (instantiationData) => {
   }
 
   // Priority: direct properties > envs array entries
+  // New API fields: description, repository_url, preview_url, preview_image
   return {
     templateTitle: parsedData?.templateTitle ?? findInEnvs(TEMPLATE_INFO_KEYS.NAME) ?? '',
     templateDescription:
-      parsedData?.templateDescription ?? findInEnvs(TEMPLATE_INFO_KEYS.MESSAGE) ?? '',
-    templatePath: parsedData?.templatePath ?? findInEnvs(TEMPLATE_INFO_KEYS.PATH) ?? '',
-    templateUrl: parsedData?.templateUrl ?? findInEnvs(TEMPLATE_INFO_KEYS.URL) ?? '',
-    imagePreview: parsedData?.imagePreview ?? ''
+      parsedData?.templateDescription ??
+      parsedData?.description ??
+      findInEnvs(TEMPLATE_INFO_KEYS.MESSAGE) ??
+      '',
+    templatePath:
+      parsedData?.templatePath ??
+      parsedData?.repository_url ??
+      findInEnvs(TEMPLATE_INFO_KEYS.PATH) ??
+      '',
+    templateUrl:
+      parsedData?.templateUrl ??
+      parsedData?.preview_url ??
+      findInEnvs(TEMPLATE_INFO_KEYS.URL) ??
+      '',
+    imagePreview: parsedData?.imagePreview ?? parsedData?.preview_image ?? ''
   }
 }
 

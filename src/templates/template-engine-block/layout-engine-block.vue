@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, onBeforeUnmount, watch } from 'vue'
+  import { ref, computed, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
@@ -288,6 +288,18 @@
     callbackUrl.value = uri
   }
 
+  const openPreviewTempalte = () => {
+    if (props.templateUrl) {
+      window.open(props.templateUrl, '_blank', 'noopener,noreferrer')
+    }
+  }
+
+  const openGitHub = () => {
+    if (props.githubUrl) {
+      window.open(props.githubUrl, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   /**
    * Loads VCS integrations and sets up event listeners
    * Call this when the form needs to show GitHub integration options
@@ -313,7 +325,7 @@
   /**
    * Navigate to settings step (step 2)
    * Validates form first, then proceeds if valid
-   * No scroll needed - settings card appears right after repository card
+   * Scrolls to settings card after it appears
    */
   const goToSettings = async () => {
     const isValid = await validateBeforeProceed()
@@ -321,7 +333,10 @@
 
     currentStep.value = 'settings'
     emit('next')
-    // No scrollIntoView - card appears in natural flow
+    // Scroll to settings card after it appears
+    nextTick(() => {
+      scrollToElement(step2Ref)
+    })
   }
 
   /**
@@ -370,11 +385,14 @@
   /**
    * Navigate to success step (step 4)
    * Called after deploy finishes successfully
-   * No scroll needed - DeployStatusCard stays in the same position
+   * Scroll to top of page to show success card
    */
   const goToSuccess = () => {
     currentStep.value = 'success'
-    // No scrollIntoView - content is already visible in the same position
+    // Scroll to top for success card
+    setTimeout(() => {
+      window.scrollTo({ behavior: 'smooth', top: 0 })
+    }, 100)
   }
 
   /**
@@ -476,7 +494,9 @@
         isDeployInitiated.value = false
         showNextButton.value = false
         // Scroll to DeployStatusCard after it becomes visible
-        scrollToElement(step3Ref)
+        nextTick(() => {
+          scrollToElement(step3Ref)
+        })
       }
     }
   )
@@ -547,13 +567,11 @@
       v-if="currentStep !== 'success'"
       :title="props.title || 'Start from Template'"
       :step-index="0"
-      :hide-footer="
-        (currentStep === 'settings' && !isDeployInitiated) || currentStep === 'deployment'
-      "
+      :hide-footer="currentStep !== 'repository' || isDeployInitiated"
     >
       <template #content>
         <div
-          class="bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
+          class="bg-[var(--surface-50)] h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >
           <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
             <slot
@@ -562,7 +580,7 @@
               :preview-alt="props.previewAlt"
             >
               <div
-                class="w-full h-48 bg-surface-section rounded-lg flex flex-col justify-center items-center overflow-hidden"
+                class="w-full h-48 bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
               >
                 <img
                   v-if="props.previewSrc"
@@ -601,7 +619,7 @@
                         :href="props.templateUrl"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="text-sm font-semibold text-color hover:text-primary transition-colors line-clamp-1"
+                        class="text-sm font-semibold text-color transition-colors line-clamp-1"
                       >
                         {{ props.templateTitle }}
                       </a>
@@ -613,6 +631,7 @@
                       </span>
                       <div v-if="props.templateUrl">
                         <i
+                          @click="openPreviewTempalte"
                           class="pi pi-external-link text-sm cursor-pointer text-color-secondary"
                         />
                       </div>
@@ -629,7 +648,10 @@
                 <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
                 <div class="flex items-center gap-1">
                   <i class="pi pi-github text-color-secondary text-[14px]" />
-                  <span class="text-[10px] text-color-secondary leading-3 line-clamp-3">
+                  <span
+                    class="text-[10px] text-color-secondary leading-3 line-clamp-3 cursor-pointer"
+                    @click="openGitHub"
+                  >
                     {{ props.githubUrl }}
                   </span>
                 </div>
@@ -644,7 +666,7 @@
         ></div>
 
         <slot
-          v-if="currentStep === 'repository' || isDeployInitiated"
+          v-if="currentStep === 'repository' && !isDeployInitiated"
           name="github-connection"
           :has-integrations-list="hasIntegrationsList"
           :list-of-integrations="listOfIntegrations"
@@ -656,7 +678,7 @@
         />
 
         <div
-          v-if="(currentStep === 'repository' || isDeployInitiated) && $slots.inputs"
+          v-if="currentStep === 'repository' && !isDeployInitiated && $slots.inputs"
           class="flex flex-col gap-4"
         >
           <slot
@@ -676,7 +698,7 @@
         </div>
 
         <slot
-          v-if="currentStep === 'repository' || isDeployInitiated"
+          v-if="currentStep === 'repository' && !isDeployInitiated"
           name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
@@ -688,7 +710,8 @@
       <template
         v-if="
           currentStep === 'repository' &&
-          (showNextButton || isDeployInitiated || $slots['footer-actions'])
+          !isDeployInitiated &&
+          (showNextButton || $slots['footer-actions'])
         "
         #footer
       >
