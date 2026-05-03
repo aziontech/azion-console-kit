@@ -33,15 +33,14 @@ Commit Type         → Bump Type    → Example
 ---------------------------------------------------
 feat:               → MINOR        → 1.57.0 → 1.58.0
 fix:                → PATCH        → 1.57.0 → 1.57.1
-hotfix:             → PATCH        → 1.57.0 → 1.57.1 (IMMEDIATE PRODUCTION)
 BREAKING CHANGE     → MAJOR        → 1.57.0 → 2.0.0
 chore/docs/style    → NONE         → stays 1.57.0
 ```
 
-**Special Case - Hotfix:**
-- Hotfix commits **skip pre-release** validation
-- Merge to main triggers **immediate production release**
-- No -rc suffix, directly creates v1.57.1
+**Hotfix Workflow (Emergency):**
+- Hotfix = regular `fix:` commit merged directly to `main`
+- Bypasses `next` branch and RC validation
+- Immediate production release (no -rc suffix)
 - Used for emergency fixes only
 
 ### Pre-Release Candidate Workflow
@@ -97,23 +96,23 @@ chore/docs/style    → NONE         → stays 1.57.0
 
 ```
 1. Create hotfix branch from main: hotfix/fix-critical-bug
-   OR create a PR from hotfix branch to main
-2. Make fix and commit: git commit -m "hotfix: critical security vulnerability"
-3. Create PR with label "hotfix"
+2. Make fix and commit: git commit -m "fix: critical security vulnerability"
+3. Create PR directly to main (bypass next branch)
 4. Merge PR → IMMEDIATE PRODUCTION RELEASE
-   - Semantic-release detects "hotfix:" commit type
+   - Semantic-release processes fix: commit
    - Creates production release v1.57.1 (NO -rc suffix)
    - Bypasses pre-release candidate stage completely
    - Directly deploys to production
    - Creates GitHub release marked as "latest"
 5. Production is immediately updated with the fix
-6. NO manual promotion needed - already in production
+6. Back-merge workflow propagates fix to next and dev
 ```
 
-**Implementation Note:**
-- Hotfix branch must be named `hotfix` for automatic production release
-- OR use `hotfix-release.yml` workflow to detect hotfix commits merged to main
-- See Step 4.1 for implementation details
+**Key Points:**
+- Uses standard `fix:` commit type (simpler than special `hotfix:` type)
+- Merges directly to main, skipping next branch
+- Uses same approval process as regular PRs
+- Back-merge ensures fix is in all future releases
 
 **Key Benefits:**
 - Clear distinction between release candidates and production releases
@@ -150,6 +149,7 @@ flowchart TD
 
     subgraph Hotfix["Hotfix Flow (Emergency)"]
         HF[hotfix/*] -->|PR fix:| MAIN
+        HF -.->|Bypass next<br/>2 reviewers| MAIN
         MAIN -->|semantic-release<br/>v1.58.1| PROD
     end
 
@@ -256,6 +256,43 @@ flowchart LR
 | 🟢 Green | Production | main branch, v1.58.0, production releases |
 | 🔴 Red | Rollback/Emergency | v1.57.0 redeploy, incident recovery |
 
+## GitHub Repository Configuration
+
+### Required Settings
+
+**Branch Protection:**
+Configure via GitHub UI: Settings → Branches → Branch protection rules
+
+Create separate rules for each branch (`dev`, `next`, `main`) with settings from Section 5.1.
+
+**Secrets Required:**
+Configure via GitHub UI: Settings → Secrets and variables → Actions
+
+| Secret | Used By | Description |
+|--------|---------|-------------|
+| `GITHUB_TOKEN` | All workflows | Auto-provided by GitHub Actions |
+| `PLATFORM_KIT_TOKEN` | Deploy workflows | Azion CLI authentication token |
+| `PROD_STRIPE_TOKEN` | deploy-production.yml | Stripe API token |
+| `PROD_RECAPTCHA_SITE_KEY` | deploy-production.yml | reCAPTCHA site key |
+| `PROD_SEGMENT_TOKEN` | deploy-production.yml | Segment analytics token |
+| `PROD_CROSS_EDGE_SECRET` | deploy-production.yml | Cross-edge authentication |
+| `PROD_SENTRY` | deploy-production.yml | Sentry DSN |
+| `PROD_SENTRY_AUTH_TOKEN` | deploy-production.yml | Sentry auth token |
+| `PROD_SSO_GITHUB` | deploy-production.yml | GitHub SSO config |
+| `PROD_SSO_GOOGLE` | deploy-production.yml | Google SSO config |
+| `APPCUES_ACCOUNT_ID` | deploy-production.yml | Appcues ID |
+
+**Environments:**
+Create environments for deployment tracking:
+- `stage` - For dev branch deployments
+- `preview` - For next branch deployments
+- `production` - For main branch deployments (require approval)
+
+**Workflow Permissions:**
+Via Settings → Actions → General → Workflow permissions:
+- Select "Read and write permissions"
+- Check "Allow GitHub Actions to create and approve pull requests"
+
 ## Implementation Steps
 
 ### Step 1: Install Semantic Release Dependencies
@@ -309,7 +346,6 @@ Configure semantic-release for three-branch strategy:
         "releaseRules": [
           { "type": "feat", "release": "minor" },
           { "type": "fix", "release": "patch" },
-          { "type": "hotfix", "release": "patch" },
           { "type": "perf", "release": "patch" },
           { "breaking": true, "release": "major" }
         ]
@@ -323,7 +359,6 @@ Configure semantic-release for three-branch strategy:
           "types": [
             { "type": "feat", "section": "Features" },
             { "type": "fix", "section": "Bug Fixes" },
-            { "type": "hotfix", "section": "Hotfixes" },
             { "type": "perf", "section": "Performance Improvements" },
             { "type": "chore", "hidden": true },
             { "type": "docs", "hidden": true },
@@ -520,141 +555,21 @@ jobs:
 - Prevents branch divergence
 - Keeps RCs up-to-date with production
 
-### Step 4.1: Configure Hotfix Branch for Immediate Releases
+### Step 4.1: Remove Old Hotfix Configuration
 
-**Semantic-Release Configuration:**
+**Note:** The old approach using `hotfix:` commit type has been simplified. Hotfixes now use standard `fix:` commits merged directly to `main`. This section is kept for reference only.
 
-The `.releaserc.json` already includes the hotfix branch configuration:
+**Previous approach (deprecated):**
 
-```json
-{
-  "branches": [
-    "hotfix",  // This enables immediate production releases from hotfix branch
-    {
-      "name": "main",
-      "prerelease": "rc"
-    }
-  ]
-}
-```
+If you previously used a `hotfix:` commit type, you can remove those references from `.releaserc.json`. The new approach is simpler - just use `fix:` and merge directly to main for emergency fixes.
 
-**How it works:**
+**Why the change:**
+- Simpler workflow - no special commit type needed
+- Uses existing semantic-release configuration
+- Back-merge automatically propagates fixes to next and dev
+- Less cognitive overhead for developers
 
-1. **Hotfix Branch**: When commits with `hotfix:` type are merged to a branch named `hotfix`, semantic-release creates a **production release** directly (no -rc suffix)
-
-2. **Main Branch**: Regular commits (feat/fix) merged to main create **pre-release candidates** (v1.58.0-rc.1)
-
-3. **PR Workflow for Hotfix**:
-   - Create branch: `git checkout -b hotfix/critical-fix main`
-   - Commit: `git commit -m "hotfix: critical security vulnerability"`
-   - Create PR **from `hotfix` branch to `main`**
-   - Merge PR → Immediate production release v1.57.1
-
-**Important**: The hotfix branch must be named exactly `hotfix` to trigger immediate production releases.
-
-**Alternative approach (if you prefer merging hotfix PRs directly to main):**
-
-If you want to merge hotfix branches directly to main (without a separate `hotfix` branch), update the semantic-release configuration to detect hotfix commits:
-
-```json
-{
-  "branches": [
-    {
-      "name": "main",
-      "prerelease": "rc",
-      "prereleaseWithoutPreReleaseBranches": true
-    }
-  ],
-  "plugins": [
-    [
-      "@semantic-release/commit-analyzer",
-      {
-        "preset": "conventionalcommits",
-        "releaseRules": [
-          { "type": "feat", "release": "minor" },
-          { "type": "fix", "release": "patch" },
-          { "type": "hotfix", "release": "patch" },
-          { "type": "perf", "release": "patch" },
-          { "breaking": true, "release": "major" }
-        ]
-      }
-    ]
-  ]
-}
-```
-
-Then create a custom workflow to detect hotfix commits:
-
-**File:** `.github/workflows/hotfix-release.yml`
-
-```yaml
-name: Hotfix Immediate Release
-
-on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-
-permissions:
-  contents: write
-
-jobs:
-  check-hotfix:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    outputs:
-      is_hotfix: ${{ steps.check.outputs.is_hotfix }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check for hotfix commits
-        id: check
-        run: |
-          COMMITS=$(git log --pretty=format:"%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
-
-          if echo "$COMMITS" | grep -q "^hotfix"; then
-            echo "is_hotfix=true" >> $GITHUB_OUTPUT
-            echo "::notice::Hotfix detected - triggering immediate production release"
-          else
-            echo "is_hotfix=false" >> $GITHUB_OUTPUT
-          fi
-
-  trigger-production-release:
-    needs: check-hotfix
-    if: needs.check-hotfix.outputs.is_hotfix == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Create production release
-        run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-**This approach:**
-- Detects when a PR with hotfix commits is merged to main
-- Automatically triggers a production release
-- Bypasses the pre-release candidate stage
-- Used for emergency fixes only
+**Migration:** No migration needed - just start using `fix:` instead of `hotfix:` for emergency fixes.
 
 ```yaml
 name: Release
@@ -883,7 +798,7 @@ Configure GitHub branch protection to enforce quality gates:
 | Rule | `dev` | `next` | `main` |
 |------|-------|--------|--------|
 | Require pull request | ✅ Yes | ✅ Yes | ✅ Yes |
-| Require approvals | 1 | 1 | 2 |
+| Require approvals | 1 | 1 | 1 |
 | Dismiss stale approvals on push | ✅ Yes | ✅ Yes | ✅ Yes |
 | Require status checks to pass | ✅ Yes | ✅ Yes | ✅ Yes |
 | Require branches to be up to date | ✅ Yes | ✅ Yes | ✅ Yes |
@@ -904,7 +819,7 @@ Each promotion between channels must pass specific checks:
 | PR → `dev` | lint, type-check, unit tests, build |
 | PR `dev` → `next` | all above + e2e tests + security scan + bundle size |
 | PR `next` → `main` | all above + smoke tests in preview + human approval |
-| Hotfix → `main` | all PR checks for main + 2 reviewers |
+| Hotfix → `main` | all PR checks for main (same approval process) |
 
 **Implementation:** Configure in `.github/workflows/pre-merge.yml` with conditional checks per target branch.
 
@@ -1032,14 +947,7 @@ Configure `commitlint` + `husky` to enforce commit message format:
 
 ```json
 {
-  "extends": ["@commitlint/config-conventional"],
-  "rules": {
-    "type-enum": [
-      2,
-      "always",
-      ["feat", "fix", "hotfix", "perf", "chore", "docs", "style", "refactor", "test"]
-    ]
-  }
+  "extends": ["@commitlint/config-conventional"]
 }
 ```
 
@@ -1424,59 +1332,53 @@ grep -E "app-version|build-time|git-commit" dist/index.html
 
 1. Create branch from `main`: `git checkout -b hotfix/critical-fix main`
 2. Make fix: `git commit -m "fix: critical security vulnerability"`
-3. Create PR directly to `main` with 2 reviewers
+3. Create PR directly to `main`
 4. Merge PR → **IMMEDIATE** production release (v1.58.1, NO -rc)
 5. Verify GitHub release marked as "latest"
 6. Verify production deployed with v1.58.1
 7. Verify back-merge propagated fix to next and dev
 
-## Pre-Release Candidate Workflow
-
-### Step-by-Step Process
-
-1. **Development**: Work on feature branch, use conventional commits
-2. **Merge**: Merge PR to main with proper commit message
-3. **Automation**: Semantic-release automatically:
-   - Analyzes commits
-   - Bumps version in package.json to v1.58.0-rc.1 (pre-release)
-   - Updates CHANGELOG.md
-   - Creates git tag: v1.58.0-rc.1
-   - Creates GitHub **PRE-RELEASE** (marked as pre-release, not latest)
-   - Commits changes to main
-4. **Deployment**: Production deployment happens with v1.58.0-rc.1
-5. **Validation**: QA team tests the deployed version:
-   - Verify version in HTML meta tags shows v1.58.0-rc.1
-   - Test functionality on production URL
-   - Review pre-release notes on GitHub
-6. **Decision Point**:
-   - IF tests OK → trigger promote-release workflow
-   - IF issues found → don't promote, fix in new branch
-7. **Promotion**: Trigger promote-release workflow:
-   - Specify version to promote: 1.58.0-rc.1
-   - Workflow removes -rc suffix
-   - Creates git tag: v1.58.0
-   - Creates GitHub production release (marked as latest)
-   - Deletes the pre-release
-
-### Benefits
-
-- **Clear Versioning**: v1.58.0-rc.1 vs v1.58.0 distinguishes test from production
-- **Safety**: Manual promotion required after testing
-- **Flexibility**: Test on production URL before official release
-- **Traceability**: Complete audit trail with pre-release tags
-- **Rollback**: Don't promote if issues found, create new pre-release
-- **Professional**: Industry-standard semantic versioning
-
 ## Summary
 
 This implementation provides:
 
+- **Three-Branch Strategy**: Clear separation of development (dev), pre-release (next), and production (main)
 - **Zero Custom Scripts**: Uses semantic-release (industry standard)
-- **Pre-Release Validation**: Draft releases require manual promotion
+- **Pre-Release Validation**: RCs validated in preview before production
 - **Low Complexity**: ~100 lines of config, declarative JSON
 - **High Reliability**: Mature tool with active community
-- **Easy Rollback**: Draft releases + git tags + changelog
+- **Easy Rollback**: Git tags + changelog + automated workflows
 - **Full Traceability**: Version visible in deployed application
+- **Automated Synchronization**: Back-merge prevents branch divergence
 - **Scalable**: Works for any team size or commit frequency
+
+## Implementation Priority
+
+| Improvement | Effort | Priority | Status |
+|-------------|--------|----------|--------|
+| Three-branch strategy (dev → next → main) | medium | high | Planned |
+| Back-merge automation main → next → dev | low | high | Planned |
+| Branch protection rules | low | high | Planned |
+| commitlint + husky | low | high | Planned |
+| Quality gates by stage | medium | high | Planned |
+| Runtime version endpoint | low | medium | Planned |
+| Database migration strategy (expand/contract) | high | high | Planned |
+| Rollback runbook | low | high | Planned |
+| Concurrent RCs strategy | medium | medium | Planned |
+| CHANGELOG plugin configured | low | medium | Planned |
+
+## Key Differences from Original Proposal
+
+| Aspect | Original | Revised |
+|--------|----------|---------|
+| Branch count | 2 (dev, main) | 3 (dev, next, main) |
+| RC location | main branch | next branch |
+| RC version | v1.58.0-rc.1 | v1.58.0-rc.1 (same) |
+| Production version | Manual promotion | Automatic on merge to main |
+| Hotfix type | `hotfix:` commit | Standard `fix:` commit |
+| Back-merge | Manual | Automatic workflow |
+| Branch protection | Not defined | Full matrix per branch |
+| Quality gates | Not defined | Per-stage requirements |
+| Database rollback | Not considered | Expand/contract pattern |
 
 The system integrates seamlessly with existing workflows and provides production-grade semantic versioning without custom bash scripts.
