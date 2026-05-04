@@ -4,6 +4,7 @@
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import { variablesService } from '@/services/v2/variables'
+  import { vulcanService } from '@/services/v2/vulcan'
 
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
@@ -35,10 +36,6 @@
     loading: {
       type: Boolean,
       default: false
-    },
-    listVulcanPresetsService: {
-      type: Function,
-      required: true
     },
     frameworkDetectorService: {
       type: Function,
@@ -673,7 +670,7 @@
   onMounted(async () => {
     await Promise.all([loadSolutionByVendor(), listIntegrations(), listPlatforms()])
     listenerOnMessage()
-    presetsList.value = await props.listVulcanPresetsService()
+    presetsList.value = await vulcanService.listPresetsService()
 
     // Initialize from query params if available
     if (currentStep.value === 'settings') {

@@ -52,7 +52,10 @@
       { '!flex-col': props.resourcesOnly }
     ]"
   >
-    <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
+    <div
+      v-if="props.templateTitle && props.templateDescription && props.githubUrl"
+      class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center"
+    >
       <slot
         name="preview"
         :preview-src="props.previewSrc"

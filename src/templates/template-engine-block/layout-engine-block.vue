@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import PrimeButton from 'primevue/button'
@@ -81,6 +81,10 @@
       type: Boolean,
       default: false
     },
+    loaded: {
+      type: Boolean,
+      default: true
+    },
     showNextButton: {
       type: Boolean,
       default: true
@@ -108,6 +112,10 @@
     deployFailed: {
       type: Boolean,
       default: false
+    },
+    deployError: {
+      type: String,
+      default: ''
     },
     applicationName: {
       type: String,
@@ -175,6 +183,14 @@
   const simulationTimerRef = ref(null)
   // Track when deploy is initiated but waiting for executionId
   const isDeployInitiated = ref(false)
+
+  /**
+   * Check if card has complete template info
+   * Used to determine if inputs should be disabled during processing
+   */
+  const hasCompleteTemplateInfo = computed(() => {
+    return !!(props.templateTitle && props.templateDescription && props.githubUrl)
+  })
 
   // VCS Integration State
   const callbackUrl = ref('')
@@ -470,6 +486,24 @@
   }
 
   /**
+   * Handle deploy error - resets loading state and shows error toast
+   * Called by parent component when deploy fails
+   * @param {string} errorMessage - The error message to display
+   */
+  const handleDeployError = (errorMessage) => {
+    isDeployInitiated.value = false
+
+    if (errorMessage) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Deploy failed',
+        detail: errorMessage
+      })
+    }
+  }
+
+  /**
    * Watch for results prop changes
    * When results are populated (from null to object), navigate to success step
    */
@@ -497,6 +531,28 @@
         nextTick(() => {
           scrollToElement(step3Ref)
         })
+      }
+    }
+  )
+
+  /**
+   * Watch for deploy errors
+   * When deployError or deployFailed changes, reset loading state and show error toast
+   */
+  watch(
+    [() => props.deployError, () => props.deployFailed],
+    ([newDeployError, newDeployFailed]) => {
+      if (isDeployInitiated.value && (newDeployError || newDeployFailed)) {
+        isDeployInitiated.value = false
+
+        if (newDeployError) {
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'Deploy failed',
+            detail: newDeployError
+          })
+        }
       }
     }
   )
@@ -532,12 +588,15 @@
     goToSettings,
     goToDeployment,
     goToSuccess,
-    handleSaveDomainsComplete
+    handleSaveDomainsComplete,
+    handleDeployError,
+    // Computed
+    hasCompleteTemplateInfo
   })
 </script>
 
 <template>
-  <div class="layout-engine-block flex flex-col gap-6 min-w-[672px]">
+  <div class="layout-engine-block flex flex-col gap-6 min-w-[768px]">
     <div
       ref="step4Ref"
       v-show="currentStep === 'success'"
@@ -563,14 +622,22 @@
       </DeploySuccessCard>
     </div>
 
+    <!-- Skeleton loading state -->
     <BaseDeployCard
-      v-if="currentStep !== 'success'"
+      v-if="currentStep !== 'success' && !props.loaded"
+      :title="props.title || 'Start from Template'"
+      :loading="true"
+    />
+
+    <BaseDeployCard
+      v-if="currentStep !== 'success' && props.loaded"
       :title="props.title || 'Start from Template'"
       :step-index="0"
-      :hide-footer="currentStep !== 'repository' || isDeployInitiated"
+      :hide-footer="currentStep !== 'repository'"
     >
       <template #content>
         <div
+          v-if="props.templateTitle && props.templateDescription && props.githubUrl"
           class="bg-[var(--surface-50)] h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >
           <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
@@ -666,7 +733,7 @@
         ></div>
 
         <slot
-          v-if="currentStep === 'repository' && !isDeployInitiated"
+          v-if="currentStep === 'repository'"
           name="github-connection"
           :has-integrations-list="hasIntegrationsList"
           :list-of-integrations="listOfIntegrations"
@@ -675,10 +742,11 @@
           :trigger-connect-with-github="triggerConnectWithGithub"
           :set-callback-url="setCallbackUrl"
           :vcs-integration-field-name="vcsIntegrationFieldName"
+          :disabled="isDeployInitiated"
         />
 
         <div
-          v-if="currentStep === 'repository' && !isDeployInitiated && $slots.inputs"
+          v-if="currentStep === 'repository' && $slots.inputs"
           class="flex flex-col gap-4"
         >
           <slot
@@ -694,25 +762,23 @@
             :trigger-connect-with-github="triggerConnectWithGithub"
             :set-callback-url="setCallbackUrl"
             :vcs-integration-field-name="vcsIntegrationFieldName"
+            :disabled="isDeployInitiated"
           />
         </div>
 
         <slot
-          v-if="currentStep === 'repository' && !isDeployInitiated"
+          v-if="currentStep === 'repository'"
           name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
           :form-data="formData"
           :form-errors="formErrors"
+          :disabled="isDeployInitiated"
         />
       </template>
 
       <template
-        v-if="
-          currentStep === 'repository' &&
-          !isDeployInitiated &&
-          (showNextButton || $slots['footer-actions'])
-        "
+        v-if="currentStep === 'repository' && (showNextButton || $slots['footer-actions'])"
         #footer
       >
         <slot name="footer-actions">
@@ -721,8 +787,8 @@
             v-if="props.hasSettings"
             class="w-full flex-row-reverse"
             :label="props.nextLabel"
-            :loading="props.loading"
-            :disabled="props.disabled"
+            :loading="props.loading || isDeployInitiated"
+            :disabled="props.disabled || isDeployInitiated"
             severity="primary"
             @click="goToSettings"
           />
@@ -767,6 +833,7 @@
             :form-data="formData"
             :form-errors="formErrors"
             :settings-groups="props.settingsGroups"
+            :disabled="isDeployInitiated"
           />
           <slot name="settings-content" />
         </template>
@@ -796,7 +863,7 @@
     </div>
 
     <div
-      v-if="currentStep === 'repository'"
+      v-if="currentStep === 'repository' && props.loaded"
       class="mt-8 flex justify-center text-Global-textSecondaryColor text-xs font-semibold font-['Proto_Mono'] leading-5"
     >
       <span

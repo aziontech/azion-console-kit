@@ -55,6 +55,10 @@
       type: Boolean,
       default: false
     },
+    deployError: {
+      type: String,
+      default: ''
+    },
     applicationName: {
       type: String,
       default: ''
@@ -313,10 +317,13 @@
     // Deploy Status Card props
     executionId: props.executionId,
     deployFailed: props.deployFailed,
+    deployError: props.deployError,
     applicationName: props.applicationName,
     deployStartTime: props.deployStartTime,
     // Results for DeploySuccessCard
-    results: props.results
+    results: props.results,
+    // Only show card when schema is loaded
+    loaded: !!props.schema && Object.keys(props.schema?.properties || {}).length > 0
   }))
 
   /**
@@ -568,7 +575,9 @@
     // Expose goToSuccess from LayoutEngineBlock
     goToSuccess: () => layoutRef.value?.goToSuccess?.(),
     // Expose currentStep from LayoutEngineBlock
-    currentStep: computed(() => layoutRef.value?.currentStep)
+    currentStep: computed(() => layoutRef.value?.currentStep),
+    // Expose handleDeployError from LayoutEngineBlock
+    handleDeployError: (error) => layoutRef.value?.handleDeployError?.(error)
   })
 </script>
 
