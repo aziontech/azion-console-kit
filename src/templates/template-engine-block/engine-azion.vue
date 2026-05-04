@@ -90,10 +90,20 @@
   const isEdgeAppNamePublic = ref(false)
 
   /**
-   * Computed property to determine if inputs should be disabled
-   * True when loadingDeploy is true OR when currentStep is 'deployment' or 'success'
+   * Computed property to determine if repository inputs should be disabled
+   * True when loadingDeploy, deployment/success step, or waiting for template info
    */
-  const isDeploying = computed(() => {
+  const isRepositoryDisabled = computed(() => {
+    const step = layoutRef.value?.currentStep
+    const isWaiting = layoutRef.value?.isWaitingTemplateInfo
+    return props.loadingDeploy || step === 'deployment' || step === 'success' || isWaiting
+  })
+
+  /**
+   * Computed property to determine if settings inputs should be disabled
+   * True when loadingDeploy or deployment/success step (NOT when waiting for template info)
+   */
+  const isSettingsDisabled = computed(() => {
     const step = layoutRef.value?.currentStep
     return props.loadingDeploy || step === 'deployment' || step === 'success'
   })
@@ -717,7 +727,7 @@
                     class="h-8"
                     :description="field.description"
                     :inputClass="renderInvalidClass(formTools.errors[field.name])"
-                    :disabled="isDeploying"
+                    :disabled="isRepositoryDisabled"
                     optionLabel="label"
                     optionValue="value"
                     @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
@@ -767,7 +777,7 @@
                 :description="field.description"
                 :data-testid="`field-${field.name}`"
                 :required="field.attrs?.required"
-                :disabled="isDeploying"
+                :disabled="isRepositoryDisabled"
                 :aditionalError="
                   formTools.errors[field.name]
                     ? unescapeErrorMessage(formTools.errors[field.name])
@@ -793,7 +803,7 @@
                   class="w-full"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                   :feedback="false"
-                  :disabled="isDeploying"
+                  :disabled="isRepositoryDisabled"
                   :pt="{ input: { name: field.name } }"
                 />
                 <InputText
@@ -803,7 +813,7 @@
                   type="text"
                   v-bind="field.input"
                   :name="field.name"
-                  :disabled="isDeploying"
+                  :disabled="isRepositoryDisabled"
                   :class="renderInvalidClass(formTools.errors[field.name])"
                 />
                 <small class="text-xs font-normal text-color-secondary">{{
@@ -867,7 +877,7 @@
                             class="h-8"
                             :description="field.description"
                             :inputClass="renderInvalidClass(formTools.errors[field.name])"
-                            :disabled="isDeploying"
+                            :disabled="isRepositoryDisabled"
                             optionLabel="label"
                             optionValue="value"
                             enableWorkaroundLabelToDisabledOptions
@@ -912,7 +922,7 @@
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
-                        :disabled="isDeploying"
+                        :disabled="isRepositoryDisabled"
                         :aditionalError="
                           formTools.errors[field.name]
                             ? unescapeErrorMessage(formTools.errors[field.name])
@@ -938,7 +948,7 @@
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :feedback="false"
-                          :disabled="isDeploying"
+                          :disabled="isRepositoryDisabled"
                           :pt="{ input: { name: field.name } }"
                         />
                         <InputText
@@ -947,7 +957,7 @@
                           :id="field.name"
                           type="text"
                           v-bind="field.input"
-                          :disabled="isDeploying"
+                          :disabled="isRepositoryDisabled"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :name="field.name"
                         />
@@ -1000,7 +1010,7 @@
                           placeholder="Select a scope"
                           :description="field.description"
                           :inputClass="renderInvalidClass(formTools.errors[field.name])"
-                          :disabled="isDeploying"
+                          :disabled="isRepositoryDisabled"
                           optionLabel="label"
                           optionValue="value"
                           enableWorkaroundLabelToDisabledOptions
@@ -1045,7 +1055,7 @@
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
-                      :disabled="isDeploying"
+                      :disabled="isRepositoryDisabled"
                       :aditionalError="
                         formTools.errors[field.name]
                           ? unescapeErrorMessage(formTools.errors[field.name])
@@ -1071,7 +1081,7 @@
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :feedback="false"
-                        :disabled="isDeploying"
+                        :disabled="isRepositoryDisabled"
                         :pt="{ input: { name: field.name } }"
                       />
                       <InputText
@@ -1080,7 +1090,7 @@
                         :id="field.name"
                         type="text"
                         v-bind="field.input"
-                        :disabled="isDeploying"
+                        :disabled="isRepositoryDisabled"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :name="field.name"
                       />
@@ -1137,7 +1147,7 @@
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
-                        :disabled="isDeploying"
+                        :disabled="isSettingsDisabled"
                         :aditionalError="
                           formTools.errors[field.name]
                             ? unescapeErrorMessage(formTools.errors[field.name])
@@ -1163,7 +1173,7 @@
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :feedback="false"
-                          :disabled="isDeploying"
+                          :disabled="isSettingsDisabled"
                           :pt="{ input: { name: field.name } }"
                         />
                         <InputText
@@ -1172,7 +1182,7 @@
                           :id="field.name"
                           type="text"
                           v-bind="field.input"
-                          :disabled="isDeploying"
+                          :disabled="isSettingsDisabled"
                           :class="renderInvalidClass(formTools.errors[field.name])"
                           :name="field.name"
                         />
@@ -1213,7 +1223,7 @@
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
-                      :disabled="isDeploying"
+                      :disabled="isSettingsDisabled"
                       :aditionalError="
                         formTools.errors[field.name]
                           ? unescapeErrorMessage(formTools.errors[field.name])
@@ -1239,7 +1249,7 @@
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :feedback="false"
-                        :disabled="isDeploying"
+                        :disabled="isSettingsDisabled"
                         :pt="{ input: { name: field.name } }"
                       />
                       <InputText
@@ -1248,7 +1258,7 @@
                         :id="field.name"
                         type="text"
                         v-bind="field.input"
-                        :disabled="isDeploying"
+                        :disabled="isSettingsDisabled"
                         :class="renderInvalidClass(formTools.errors[field.name])"
                         :name="field.name"
                       />

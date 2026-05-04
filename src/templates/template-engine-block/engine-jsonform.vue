@@ -222,9 +222,18 @@
 
   /**
    * Computed property to check if form should be disabled
-   * True when loading or explicitly disabled
+   * True when loading or explicitly disabled or waiting for template info
    */
-  const isFormDisabled = computed(() => {
+  const isRepositoryDisabled = computed(() => {
+    const isWaiting = layoutRef.value?.isWaitingTemplateInfo
+    return props.loadingDeploy || props.disabledDeploy || isWaiting
+  })
+
+  /**
+   * Computed property to check if settings inputs should be disabled
+   * True when loading or explicitly disabled (NOT when waiting for template info)
+   */
+  const isSettingsDisabled = computed(() => {
     return props.loadingDeploy || props.disabledDeploy
   })
 
@@ -232,7 +241,7 @@
    * Repository form schema with readOnly applied when disabled
    */
   const repositoryFormSchemaDisabled = computed(() => {
-    if (!isFormDisabled.value) return repositoryFormSchema.value
+    if (!isRepositoryDisabled.value) return repositoryFormSchema.value
 
     const schema = JSON.parse(JSON.stringify(repositoryFormSchema.value))
     schema.readOnly = true
@@ -248,7 +257,7 @@
    * Settings form schema with readOnly applied when disabled
    */
   const settingsFormSchemaDisabled = computed(() => {
-    if (!isFormDisabled.value) return settingsFormSchema.value
+    if (!isSettingsDisabled.value) return settingsFormSchema.value
 
     const schema = JSON.parse(JSON.stringify(settingsFormSchema.value))
     schema.readOnly = true
@@ -624,7 +633,7 @@
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
               :loading="slotProps.isIntegrationsLoading"
-              :disabled="isFormDisabled"
+              :disabled="isRepositoryDisabled"
               v-model="selectedIntegration"
               :options="slotProps.listOfIntegrations"
               optionLabel="label"

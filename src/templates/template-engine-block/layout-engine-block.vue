@@ -183,6 +183,8 @@
   const simulationTimerRef = ref(null)
   // Track when deploy is initiated but waiting for executionId
   const isDeployInitiated = ref(false)
+  // Track when user clicked Next without template info (only repository inputs should be disabled)
+  const isWaitingTemplateInfo = ref(false)
 
   /**
    * Check if card has complete template info
@@ -190,6 +192,22 @@
    */
   const hasCompleteTemplateInfo = computed(() => {
     return !!(props.templateTitle && props.templateDescription && props.githubUrl)
+  })
+
+  /**
+   * Check if repository inputs should be disabled
+   * True when: deploy initiated OR waiting for template info
+   */
+  const shouldDisableRepositoryInputs = computed(() => {
+    return isDeployInitiated.value || isWaitingTemplateInfo.value
+  })
+
+  /**
+   * Check if settings inputs should be disabled
+   * True only when: deploy initiated
+   */
+  const shouldDisableSettingsInputs = computed(() => {
+    return isDeployInitiated.value
   })
 
   // VCS Integration State
@@ -347,6 +365,11 @@
     const isValid = await validateBeforeProceed()
     if (!isValid) return
 
+    // If no template info, set waiting state (inputs stay disabled, footer stays visible)
+    if (!hasCompleteTemplateInfo.value) {
+      isWaitingTemplateInfo.value = true
+    }
+
     currentStep.value = 'settings'
     emit('next')
     // Scroll to settings card after it appears
@@ -380,6 +403,11 @@
   const handleDeploy = async () => {
     const isValid = await validateBeforeProceed()
     if (!isValid) return
+
+    // If no template info, set waiting state (inputs stay disabled)
+    if (!hasCompleteTemplateInfo.value) {
+      isWaitingTemplateInfo.value = true
+    }
 
     isDeployInitiated.value = true
     emit('deploy')
@@ -481,6 +509,7 @@
     currentStep.value = 'repository'
     isTransitioning.value = false
     isDeployInitiated.value = false
+    isWaitingTemplateInfo.value = false
     showNextButton.value = props.showNextButton
     clearDeploySimulation()
   }
@@ -590,8 +619,11 @@
     goToSuccess,
     handleSaveDomainsComplete,
     handleDeployError,
+    isWaitingTemplateInfo,
     // Computed
-    hasCompleteTemplateInfo
+    hasCompleteTemplateInfo,
+    shouldDisableRepositoryInputs,
+    shouldDisableSettingsInputs
   })
 </script>
 
@@ -733,7 +765,7 @@
         ></div>
 
         <slot
-          v-if="currentStep === 'repository'"
+          v-if="currentStep === 'repository' || isWaitingTemplateInfo"
           name="github-connection"
           :has-integrations-list="hasIntegrationsList"
           :list-of-integrations="listOfIntegrations"
@@ -742,11 +774,11 @@
           :trigger-connect-with-github="triggerConnectWithGithub"
           :set-callback-url="setCallbackUrl"
           :vcs-integration-field-name="vcsIntegrationFieldName"
-          :disabled="isDeployInitiated"
+          :disabled="shouldDisableRepositoryInputs"
         />
 
         <div
-          v-if="currentStep === 'repository' && $slots.inputs"
+          v-if="(currentStep === 'repository' || isWaitingTemplateInfo) && $slots.inputs"
           class="flex flex-col gap-4"
         >
           <slot
@@ -762,18 +794,18 @@
             :trigger-connect-with-github="triggerConnectWithGithub"
             :set-callback-url="setCallbackUrl"
             :vcs-integration-field-name="vcsIntegrationFieldName"
-            :disabled="isDeployInitiated"
+            :disabled="shouldDisableRepositoryInputs"
           />
         </div>
 
         <slot
-          v-if="currentStep === 'repository'"
+          v-if="currentStep === 'repository' || isWaitingTemplateInfo"
           name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
           :form-data="formData"
           :form-errors="formErrors"
-          :disabled="isDeployInitiated"
+          :disabled="shouldDisableRepositoryInputs"
         />
       </template>
 
@@ -787,8 +819,8 @@
             v-if="props.hasSettings"
             class="w-full flex-row-reverse"
             :label="props.nextLabel"
-            :loading="props.loading || isDeployInitiated"
-            :disabled="props.disabled || isDeployInitiated"
+            :loading="props.loading || isWaitingTemplateInfo"
+            :disabled="props.disabled || isWaitingTemplateInfo"
             severity="primary"
             @click="goToSettings"
           />
@@ -797,8 +829,8 @@
             v-else
             class="w-full flex-row-reverse"
             :label="props.deployLabel"
-            :loading="props.loadingDeploy || isDeployInitiated"
-            :disabled="props.disabledDeploy || isDeployInitiated"
+            :loading="props.loadingDeploy || isWaitingTemplateInfo"
+            :disabled="props.disabledDeploy || isWaitingTemplateInfo"
             severity="primary"
             @click="handleDeploy"
           />
