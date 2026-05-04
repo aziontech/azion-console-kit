@@ -455,24 +455,35 @@
    */
   const getFormData = () => {
     const data = []
+    let vcsRepoIsPublic = null
 
-    inputSchema.value.fields?.forEach((field) => {
+    // Helper to add field and check for privacy field
+    const addField = (field) => {
       data.push({
         field: field.name,
         value: field.input?.value ?? field.value ?? '',
         instantiation_data_path: field.instantiation_data_path
       })
+
+      // For Edge Application Name (privacy field), capture vcs_repo_is_public to add first
+      if (field.info === 'Edge Application Name') {
+        vcsRepoIsPublic = {
+          field: 'vcs_repo_is_public',
+          value: isEdgeAppNamePublic.value,
+          instantiation_data_path: field.is_public_data_path || 'envs.[0].value'
+        }
+      }
+    }
+
+    inputSchema.value.fields?.forEach(addField)
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach(addField)
     })
 
-    inputSchema.value.groups?.forEach((group) => {
-      group.fields.forEach((field) => {
-        data.push({
-          field: field.name,
-          value: field.input?.value ?? field.value ?? '',
-          instantiation_data_path: field.instantiation_data_path
-        })
-      })
-    })
+    // Add vcs_repo_is_public at the beginning if it exists
+    if (vcsRepoIsPublic) {
+      data.unshift(vcsRepoIsPublic)
+    }
 
     return data
   }

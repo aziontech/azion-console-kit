@@ -382,6 +382,7 @@
    */
   const getFormData = () => {
     const data = []
+    let vcsRepoIsPublic = null
 
     if (hasIntegrations.value) {
       const vcsField = props.schema?.properties?.[vcsIntegrationFieldName.value]
@@ -406,18 +407,21 @@
         })
       )
 
-      // For privacy fields, also include isPublic value as vcs_repo_is_public
+      // For privacy fields, capture vcs_repo_is_public to add first
       if (fieldDef?.format === 'privacy') {
         const isPublicValue = privacyFieldsState.value[key] ?? true
-        data.push(
-          parseData({
-            field: 'vcs_repo_is_public',
-            value: isPublicValue,
-            instantiationDataPath: fieldDef?.is_public_data_path || ''
-          })
-        )
+        vcsRepoIsPublic = parseData({
+          field: 'vcs_repo_is_public',
+          value: isPublicValue,
+          instantiationDataPath: fieldDef?.is_public_data_path || 'envs.[0].value'
+        })
       }
     })
+
+    // Add vcs_repo_is_public at the beginning if it exists
+    if (vcsRepoIsPublic) {
+      data.unshift(vcsRepoIsPublic)
+    }
 
     return data
   }

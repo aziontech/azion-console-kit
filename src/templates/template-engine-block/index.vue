@@ -192,9 +192,9 @@
       const parsedInputSchema = activeEngine.getFormData()
       const instantiateParsedPayload = parsedInputSchema.map((field) => {
         return {
-          field: field.name,
+          field: field.field,
           instantiation_data_path: field.instantiation_data_path,
-          value: field.input?.value ?? field.value ?? ''
+          value: field.value
         }
       })
 

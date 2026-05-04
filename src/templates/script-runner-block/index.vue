@@ -64,7 +64,7 @@
           </div>
         </div>
         <div
-          class="bg-transparent flex w-full h-60 flex-col overflow-auto pt-1 pb-3"
+          class="bg-transparent flex w-full h-60 flex-col overflow-auto pt-1 pb-3 scrollbar-hide"
           ref="runner"
         >
           <p
@@ -272,5 +272,12 @@
   .highlight-log {
     background-color: rgba(239, 68, 68, 0.2);
     transition: background-color 0.3s ease;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 </style>
