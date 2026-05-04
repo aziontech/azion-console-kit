@@ -130,15 +130,15 @@
   }
 
   const solutions = computed(() => ({
-    recommended: recommendedQuery.value.data || [],
-    templates: templatesQuery.value.data || [],
-    githubImport: githubImportQuery.value.data || []
+    recommended: recommendedQuery.value?.data || [],
+    templates: templatesQuery.value?.data || [],
+    githubImport: githubImportQuery.value?.data || []
   }))
 
   const loading = computed(() => ({
-    recommended: !accountData.value.jobRole || recommendedQuery.value.isLoading,
-    templates: templatesQuery.value.isLoading,
-    githubImport: githubImportQuery.value.isLoading
+    recommended: !accountData.value.jobRole || recommendedQuery.value?.isLoading,
+    templates: templatesQuery.value?.isLoading,
+    githubImport: githubImportQuery.value?.isLoading
   }))
 
   const openCreateModalToggle = () => {

@@ -10,10 +10,6 @@ const fixtures = {
       content: 'encodedPackageJsonContent'
     }
   },
-  mockAdaptedResponse: {
-    body: 'next',
-    statusCode: 200
-  },
   mockPackageJson: {
     dependencies: {
       next: '^17.0.2',
@@ -70,7 +66,10 @@ describe('GithubServices', () => {
 
     const result = await sut({ accountName: 'testAccount', repositoryName: 'testRepo' })
 
-    expect(result).toEqual(fixtures.mockAdaptedResponse.body)
+    expect(result).toEqual({
+      framework: 'next',
+      packageJson: fixtures.mockPackageJson
+    })
   })
 
   afterEach(() => {
