@@ -7,6 +7,7 @@ import { defineConfig, loadEnv } from 'vite'
 import { webkitViteConfig } from '@aziontech/webkit/vite'
 import istanbul from 'vite-plugin-istanbul'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import versionInjectPlugin from './scripts/vite-plugin-version-inject.js'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
@@ -41,11 +42,15 @@ const getConfig = () => {
       sourcemap: IS_SENTRY_UPLOAD ? 'hidden' : 'inline'
     },
     define: {
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
+      __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+      __GIT_COMMIT__: JSON.stringify(process.env.GITHUB_SHA || 'unknown')
     },
     plugins: [
       vue(),
       vueJsx(),
+      versionInjectPlugin(),
       istanbul({
         nycrcPath: '.nycrc'
       }),

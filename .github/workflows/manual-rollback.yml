@@ -1,0 +1,76 @@
+name: Manual Rollback to Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Target version (e.g., v1.57.0, v1.58.0-rc.1)'
+        required: true
+        type: string
+      confirm:
+        description: 'Type "ROLLBACK" to confirm'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'ROLLBACK'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate target version
+        run: |
+          TARGET="${{ github.event.inputs.target_version }}"
+
+          if ! git tag | grep -q "^${TARGET}$"; then
+            echo "Error: Version ${TARGET} not found"
+            echo "Available tags:"
+            git tag -l 'v*' | tail -10
+            exit 1
+          fi
+
+          echo "::notice::Target version ${TARGET} found"
+
+      - name: Checkout target version
+        run: git checkout ${{ github.event.inputs.target_version }}
+
+      - name: Install SO deps
+        run: apk add curl git bash jq
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download Azion CLI
+        run: |
+          wget https://github.com/aziontech/azion/releases/download/4.15.0/azion_4.15.0_linux_amd64.apk
+          apk add --allow-untrusted azion_4.15.0_linux_amd64.apk
+
+      - name: Deploy to production
+        run: |
+          azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+          azion deploy --auto --local --debug --config-dir azion/production
+        env:
+          VITE_ENVIRONMENT: production
+          GITHUB_SHA: ${{ github.event.inputs.target_version }}
+
+      - name: Create rollback record
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ github.event.inputs.target_version }}-manual-rollback-' + Date.now(),
+              name: 'Manual Rollback to ${{ github.event.inputs.target_version }}',
+              body: 'Manual rollback deployed via workflow_dispatch',
+              draft: false,
+              prerelease: false
+            });

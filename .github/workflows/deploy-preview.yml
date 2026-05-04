@@ -1,12 +1,12 @@
-name: Deploy Console Kit (PRODUCTION)
+name: Deploy Preview
 
 on:
   workflow_run:
-    workflows: ["Production Release"]
+    workflows: ["Release Candidate"]
     types:
       - completed
     branches:
-      - main
+      - next
 
 env:
   HUSKY: 0
@@ -16,6 +16,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    concurrency:
+      group: deploy-console
+      cancel-in-progress: false
     container:
       image: node:22-alpine
 
@@ -31,11 +34,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Get version info
-        run: |
-          echo "VITE_APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-          echo "VITE_BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
-
       - name: Download Azion CLI
         run: |
           wget https://github.com/aziontech/azion/releases/download/${CLI_VERSION}/azion_${CLI_VERSION}_linux_amd64.apk
@@ -45,18 +43,20 @@ jobs:
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Build & Deploy
-        run: azion deploy --auto --local --debug --config-dir azion/production
+        run: azion deploy --auto --local --debug --config-dir azion/preview
         env:
-          NODE_ENV: production
+          VITE_STRIPE_TOKEN_STAGE: ${{ secrets.STAGE_STRIPE_TOKEN }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
+          VITE_SEGMENT_TOKEN: ${{ secrets.STAGE_SEGMENT_TOKEN }}
+          CROSS_EDGE_SECRET: ${{ secrets.STAGE_CROSS_EDGE_SECRET }}
+          NODE_ENV: staging
           GITHUB_SHA: ${{ github.sha }}
-          VITE_ENVIRONMENT: production
-          VITE_STRIPE_TOKEN_PROD: ${{ secrets.PROD_STRIPE_TOKEN }}
-          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
-          VITE_SEGMENT_TOKEN: ${{ secrets.PROD_SEGMENT_TOKEN }}
-          CROSS_EDGE_SECRET: ${{ secrets.PROD_CROSS_EDGE_SECRET}}
-          VITE_PROD_SENTRY: ${{ secrets.PROD_SENTRY }}
-          VITE_SSO_GITHUB: ${{ secrets.PROD_SSO_GITHUB }}
-          VITE_SSO_GOOGLE: ${{ secrets.PROD_SSO_GOOGLE }}
-          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
+          VITE_ENVIRONMENT: preview
+          VITE_STAGE_SENTRY: ${{ secrets.STAGE_SENTRY }}
+          VITE_SSO_GITHUB: ${{ secrets.STAGE_SSO_GITHUB }}
+          VITE_SSO_GOOGLE: ${{ secrets.STAGE_SSO_GOOGLE }}
+          VITE_SSO_AZURE: ${{ secrets.STAGE_SSO_AZURE }}
+          VITE_SSO_IDP_SCIM_E2E: ${{ secrets.STAGE_SSO_IDP_SCIM_E2E }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.STAGE_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
           VITE_APPCUES_ACCOUNT_ID: ${{ secrets.APPCUES_ACCOUNT_ID }}
