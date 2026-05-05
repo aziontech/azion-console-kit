@@ -85,10 +85,10 @@
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.13.0.tgz#1fbbc9a5d13091222035cfa3d28263b21d58e9e9"
   integrity sha512-7dQiIizv2fAh/6XZ75RBU3agCf+NTgsE193V7r/R6ddAI39ITgwdZ7J93uOIVS6XMQteQ1l6k5upRFnmCk7DkA==
 
-"@aziontech/webkit@^1.26.1":
-  version "1.27.1"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.27.1.tgz#7d8b7fffadd4d266b4d7bf60498ca7963a1ee255"
-  integrity sha512-Aj9xauSgcevMxrdk2/vFuROIbtWIL6YqUPoL+fEspzISRwnyqlrM+Jr5Exjiv2ZAV/tc8/uYTXIF999Nnp89tg==
+"@aziontech/webkit@^1.28.1":
+  version "1.28.1"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.28.1.tgz#18773afacc98754147840905ee0a68d42b3b5c01"
+  integrity sha512-fvs5kwj4Mni+h9XZpPxDLrZe43xxz+ZSzy3u/0or/KTknQE43EZJ+mKzEk2sco5qEk+GfCKWxVl6eprP1DrhdQ==
   dependencies:
     "@vueuse/core" "^10.11.1"
     motion-v "^2.1.0"
@@ -2268,10 +2268,10 @@
     type-fest "~2.19"
     vue-component-type-helpers latest
 
-"@stripe/stripe-js@^4.10.0":
-  version "4.10.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-4.10.0.tgz"
-  integrity sha512-KrMOL+sH69htCIXCaZ4JluJ35bchuCCznyPyrbN8JXSGQfwBI1SuIEMZNwvy8L8ykj29t6sa5BAAiL7fNoLZ8A==
+"@stripe/stripe-js@9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-9.4.0.tgz#9b05146680baea498a84d1076fcc607269f00095"
+  integrity sha512-zXG86DnoLU5nH2U18tX5ApTE3IAm+txoiPm4YFyEtRS0K5y7ZDH9M8e1Le/cZyI6wvW3BkJn2daZe2FqZOrSSg==
 
 "@tailwindcss/typography@^0.5.10":
   version "0.5.19"

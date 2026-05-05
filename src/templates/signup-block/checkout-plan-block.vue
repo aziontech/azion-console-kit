@@ -5,6 +5,7 @@
         ref="pricingCalculationRef"
         :plan="plan"
         @update:billing-cycle="handleBillingCycleChange"
+        @update:payment-client-secret="handlePaymentClientSecretChange"
       />
 
       <PaymentMethodBlock
@@ -28,7 +29,7 @@
         severity="secondary"
         class="font-protomono flex items-center justify-center text-xs"
         :icon="showLoading ? 'pi pi-spin pi-spinner' : ''"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !paymentClientSecret"
         @click="handleSubmit"
         label="Subscribe"
       />
@@ -42,8 +43,6 @@
   import AddressInformationBlock from './address-information-block.vue'
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
-  import { useServiceOrders } from '@/composables/useServiceOrders'
-  import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -63,11 +62,12 @@
     getStripeClientService: {
       type: Function,
       required: true
+    },
+    paymentClientSecret: {
+      type: String,
+      default: ''
     }
   })
-
-  const { data: plansData } = usePlansList()
-  const { serviceOrder, updatePlanPricing } = useServiceOrders()
 
   const pricingCalculationRef = ref(null)
   const paymentMethodRef = ref(null)
@@ -75,9 +75,14 @@
   const isSubmitting = ref(false)
   const showLoading = ref(false)
   const billingCycle = ref('yearly')
+  const paymentClientSecret = ref(props.paymentClientSecret)
 
   const handleBillingCycleChange = (value) => {
     billingCycle.value = value
+  }
+
+  const handlePaymentClientSecretChange = (value) => {
+    paymentClientSecret.value = value
   }
 
   const couponCode = computed(() => {
@@ -100,26 +105,33 @@
         return
       }
 
-      // 2. Create Stripe token
-      const token = await paymentMethodRef.value?.createToken()
-      if (!token) {
-        throw new Error('Failed to create payment token')
-      }
-
-      // 3. Save/validate address
+      // 2. Save/validate address
       const address = await addressInformationRef.value?.saveAddress()
       if (!address) {
         return
       }
 
+      if (!paymentClientSecret.value) {
+        throw new Error('Payment session is missing. Please try again.')
+      }
+
+      // 3. Confirm Stripe PaymentIntent
+      const paymentIntent = await paymentMethodRef.value?.confirmPayment(
+        paymentClientSecret.value,
+        {
+          line1: address.address,
+          postal_code: address.postalCode
+        }
+      )
+
+      if (paymentIntent?.status !== 'succeeded') {
+        throw new Error('Payment could not be completed. Please try again.')
+      }
+
       // 4. Emit checkout data
       const checkoutData = {
-        stripeToken: token.id,
-        cardHolderName: token.card.name,
-        cardBrand: token.card.brand,
-        cardLast4: token.card.last4,
-        cardExpirationMonth: token.card.exp_month,
-        cardExpirationYear: token.card.exp_year,
+        paymentIntentId: paymentIntent.id,
+        paymentStatus: paymentIntent.status,
         billingCycle: billingCycle.value,
         couponCode: couponCode.value,
         address: {
@@ -148,15 +160,12 @@
     }
   }
 
-  watch(billingCycle, async (newBillingCycle) => {
-    if (!serviceOrder.value?.serviceOrderId) return
-
-    const planPricingId = getPlanPricingId(plansData.value, props.plan, newBillingCycle)
-
-    if (planPricingId) {
-      await updatePlanPricing(planPricingId)
+  watch(
+    () => props.paymentClientSecret,
+    (newPaymentClientSecret) => {
+      paymentClientSecret.value = newPaymentClientSecret
     }
-  })
+  )
 
   defineExpose({
     billingCycle,

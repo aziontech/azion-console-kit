@@ -225,11 +225,18 @@ export function usePlans() {
 
     // Fall back to localStorage
     const storedParams = loadFromStorage()
-    if (storedParams) {
+    if (storedParams?.plan) {
       _plan.value = storedParams.plan
       _billingCycle.value = storedParams.billingCycle
       _cupom.value = storedParams.cupom
+      return
     }
+
+    // Default fallback for signup flow when no plan is provided
+    _plan.value = 'pro'
+    _billingCycle.value = 'monthly'
+    _cupom.value = storedParams?.cupom || null
+    saveToStorage()
   }
 
   /**

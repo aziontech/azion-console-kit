@@ -6,7 +6,10 @@
       :pt="{
         root: { class: 'w-fit border-l surface-border' },
         header: { class: 'h-14 px-8 py-[14px] border-b surface-border' },
-        content: { class: 'px-8 py-6' }
+        content: {
+          class:
+            'px-8 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
+        }
       }"
     >
       <template #header>
@@ -23,11 +26,16 @@
           alternativeLabel="Yearly"
         />
 
-        <div class="flex gap-3 flex-1 bg-surface-raised h-[200px]">
+        <div
+          :class="[
+            'flex flex-col gap-3 flex-1 bg-surface-raised',
+            isHorizontalPricingCard ? '' : 'md:flex-row md:h-[200px]'
+          ]"
+        >
           <div
             v-for="planOption in planOptions"
             :key="planOption.value"
-            class="flex flex-col gap-3 h-fit"
+            class="flex flex-col gap-3 h-fit w-full"
           >
             <PricingCard
               :title="planOption.label"
@@ -70,6 +78,7 @@
   import PricingCard from '@aziontech/webkit/pricing-card'
   import Button from '@aziontech/webkit/button'
   import Toggle from '@aziontech/webkit/toggle'
+  import { useResize } from '@/composables/useResize'
   import { PLAN_OPTIONS } from '@/templates/signup-block/plan-options'
 
   defineOptions({
@@ -96,6 +105,8 @@
   })
 
   const emit = defineEmits(['update:visible', 'select'])
+  const { windowWidth } = useResize()
+  const isHorizontalPricingCard = computed(() => windowWidth.value <= 1000)
 
   const localBillingCycle = ref(props.billingCycle)
 

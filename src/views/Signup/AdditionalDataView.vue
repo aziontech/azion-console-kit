@@ -16,7 +16,6 @@
                 :patchFullnameService="SignupServices.patchFullnameService"
                 :updateAccountInfoService="SignupServices.updateAccountInfoService"
                 ref="additionalDataRef"
-                @proceedToCheckout="handleProceedToCheckout"
               />
             </div>
           </template>
@@ -28,12 +27,19 @@
               :disabled="isDisabledSubmit"
               @click="onSubmit"
             >
-              <Transition
-                name="label-fade"
-                mode="out-in"
-              >
-                <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
-              </Transition>
+              <span class="inline-flex items-center gap-2">
+                <Transition
+                  name="label-fade"
+                  mode="out-in"
+                >
+                  <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
+                </Transition>
+                <i
+                  v-if="isSubmitLoading"
+                  class="pi pi-spinner pi-spin text-xs animate-spin"
+                  aria-hidden="true"
+                />
+              </span>
             </Button>
           </template>
         </CardBox>
@@ -44,6 +50,7 @@
           <!-- Checkout Component -->
           <ChoosingPlanContainer
             :plan="selectedPlan"
+            :paymentClientSecret="paymentClientSecret"
             :getStripeClientService="getStripeClientService"
             ref="checkoutRef"
             @onSuccess="handleCheckoutSuccess"
@@ -117,30 +124,23 @@
     isSubmitting: isSubmittingServiceOrder
   } = useServiceOrders()
 
-  // Helper to resolve planId from plan name
-  const getPlanIdFromName = (planName) => {
-    if (!plansData.value?.length) return null
-    const foundPlan = plansData.value.find(
-      (planItem) => planItem.sku?.toLowerCase() === planName?.toLowerCase()
-    )
-    return foundPlan?.id || null
-  }
-
   const additionalDataRef = ref(null)
-
-  // Step management
   const currentStep = ref('additional-data') // 'additional-data' | 'checkout' | 'success'
   const selectedPlan = ref(null)
+  const paymentClientSecret = ref('')
 
   const isAdditionalDataStep = computed(() => currentStep.value === 'additional-data')
   const isCheckoutStep = computed(() => currentStep.value === 'checkout')
   const isSuccessStep = computed(() => currentStep.value === 'success')
-  // Step 1 state
   const isDisabledSubmit = computed(() => {
     const metaValid = additionalDataRef.value?.meta?.valid
+    return !metaValid || isSubmitLoading.value
+  })
+
+  const isSubmitLoading = computed(() => {
     const formLoading = additionalDataRef.value?.loading
     const serviceOrderLoading = isLoadingServiceOrder.value || isSubmittingServiceOrder.value
-    return !metaValid || formLoading || serviceOrderLoading
+    return formLoading || serviceOrderLoading
   })
 
   const submitButtonLabel = computed(() => {
@@ -148,15 +148,13 @@
     if (plan === 'hobby') return 'Start Deploying'
     return 'Continue'
   })
-
-  onMounted(async () => {
-    initializePlans()
-    await loadPlans()
-    const accountId = accountStore.accountData?.id
-    if (accountId) {
-      await loadServiceOrder(accountId)
-    }
-  })
+  const getPlanIdFromName = (planName) => {
+    if (!plansData.value?.length) return null
+    const foundPlan = plansData.value.find(
+      (planItem) => planItem.sku?.toLowerCase() === planName?.toLowerCase()
+    )
+    return foundPlan?.id || null
+  }
 
   // Handlers
   const onSubmit = async () => {
@@ -172,7 +170,14 @@
       const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
 
       if (planId && planPricingId) {
-        await submitServiceOrder({ accountId, planId, planPricingId })
+        const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
+        paymentClientSecret.value = serviceOrderResponse?.payment?.clientSecret || ''
+
+        if (plan === 'pro' && !paymentClientSecret.value) {
+          // eslint-disable-next-line no-console
+          console.error('Unable to initialize payment. Please try again.')
+        }
+
         handleProceedToCheckout()
       }
     }
@@ -207,6 +212,15 @@
     clearAdditionalDataFormState()
     router.push({ name: 'home' })
   }
+
+  onMounted(async () => {
+    initializePlans()
+    await loadPlans()
+    const accountId = accountStore.accountData?.id
+    if (accountId) {
+      await loadServiceOrder(accountId)
+    }
+  })
 </script>
 
 <style scoped>

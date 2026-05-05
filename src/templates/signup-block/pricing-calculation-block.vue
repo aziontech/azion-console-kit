@@ -7,24 +7,11 @@
     <div class="flex flex-col gap-4 p-6">
       <div class="flex items-center justify-between">
         <span class="text-sm text-muted">Charged</span>
-        <div class="flex gap-1 p-1 bg-[var(--surface-300)] rounded-md">
-          <button
-            class="px-3 py-1.5 text-xs font-protomono rounded transition-colors"
-            :class="
-              billingCycle === 'monthly' ? 'bg-[var(--surface-0)] text-default' : 'text-muted'
-            "
-            @click="setBillingCycle('monthly')"
-          >
-            Monthly
-          </button>
-          <button
-            class="px-3 py-1.5 text-xs font-protomono rounded transition-colors"
-            :class="billingCycle === 'yearly' ? 'bg-[var(--surface-0)] text-default' : 'text-muted'"
-            @click="setBillingCycle('yearly')"
-          >
-            Yearly
-          </button>
-        </div>
+        <Toggle
+          v-model="billingCycleToggleValue"
+          mainLabel="Monthly"
+          alternativeLabel="Yearly"
+        />
       </div>
 
       <div class="flex flex-col gap-5">
@@ -136,15 +123,26 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import Button from '@aziontech/webkit/button'
   import FieldInput from '@aziontech/webkit/field-text'
+  import Toggle from '@aziontech/webkit/toggle'
   import { usePlans } from '@/composables/usePlans'
+  import { useServiceOrders } from '@/composables/useServiceOrders'
   import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
-  import { useValidateCoupon, getPlanPricing } from '@/composables/usePlansService'
+  import {
+    useValidateCoupon,
+    getPlanPricing,
+    getPlanPricingId
+  } from '@/composables/usePlansService'
 
   defineOptions({
     name: 'pricing-calculation-block'
   })
 
-  const emit = defineEmits(['update:billingCycle', 'update:couponCode', 'pricingChange'])
+  const emit = defineEmits([
+    'update:billingCycle',
+    'update:couponCode',
+    'update:paymentClientSecret',
+    'pricingChange'
+  ])
 
   const props = defineProps({
     plan: {
@@ -157,8 +155,9 @@
   const { initialize, billingCycle: sharedBillingCycle, cupom: sharedCupom, setParam } = usePlans()
   const { data: plans } = serviceOrdersService.useListPlansQuery()
   const { mutate: validateCoupon, isPending: isValidatingCoupon } = useValidateCoupon()
+  const { serviceOrder, updatePlanPricing } = useServiceOrders()
 
-  const billingCycle = ref('yearly')
+  const billingCycle = ref('monthly')
   const couponCode = ref('')
   const appliedCoupon = ref(null)
   const couponError = ref('')
@@ -218,6 +217,13 @@
     return billingCycle.value === 'monthly' ? 'month' : 'year'
   })
 
+  const billingCycleToggleValue = computed({
+    get: () => (billingCycle.value === 'yearly' ? 'alternative' : 'main'),
+    set: (value) => {
+      setBillingCycle(value === 'alternative' ? 'yearly' : 'monthly')
+    }
+  })
+
   const formatPrice = (value) => {
     return Number(value).toFixed(2)
   }
@@ -238,13 +244,13 @@
   }
 
   const setCouponCode = (value) => {
-    couponCode.value = value
+    couponCode.value = String(value || '').toUpperCase()
   }
 
   const submitCupom = () => {
     const coupon = couponCode.value.trim()
 
-    if (!coupon || isValidatingCoupon.value) return
+    if (!coupon) return
 
     couponError.value = ''
     const plan = plans.value?.find((item) => item.sku.toLowerCase() === props.plan.toLowerCase())
@@ -277,8 +283,8 @@
   }
 
   initialize()
-  billingCycle.value = sharedBillingCycle.value || 'yearly'
-  couponCode.value = sharedCupom.value || ''
+  billingCycle.value = sharedBillingCycle.value || 'monthly'
+  couponCode.value = String(sharedCupom.value || '').toUpperCase()
 
   onMounted(() => {
     if (couponCode.value.trim()) {
@@ -286,9 +292,18 @@
     }
   })
 
-  watch(billingCycle, (value) => {
+  watch(billingCycle, async (value) => {
     setParam('billingCycle', value)
     emit('update:billingCycle', value)
+
+    if (!serviceOrder.value?.serviceOrderId) return
+
+    const planPricingId = getPlanPricingId(plans.value, props.plan, value)
+    if (!planPricingId) return
+
+    emit('update:paymentClientSecret', '')
+    const response = await updatePlanPricing(planPricingId)
+    emit('update:paymentClientSecret', response?.payment?.clientSecret || '')
   })
 
   watch(couponCode, (value) => {

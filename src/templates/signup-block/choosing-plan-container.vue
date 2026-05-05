@@ -4,6 +4,7 @@
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"
+        :paymentClientSecret="paymentClientSecret"
         :getStripeClientService="getStripeClientService"
         @onBack="emit('onBack')"
         @onSubmit="handleSubmit"
@@ -32,12 +33,15 @@
     getStripeClientService: {
       type: Function,
       required: true
+    },
+    paymentClientSecret: {
+      type: String,
+      default: ''
     }
   })
 
   const emit = defineEmits(['onSuccess', 'onError', 'onBack', 'onSubmit'])
 
-  const planBlockRef = ref(null)
   const isSubmitting = ref(false)
   const showLoading = ref(false)
 
@@ -46,7 +50,10 @@
     showLoading.value = true
 
     try {
-      // Pass checkout data to parent for processing
+      if (checkoutData?.paymentStatus !== 'succeeded') {
+        throw new Error('Payment could not be completed. Please try again.')
+      }
+
       emit('onSuccess', checkoutData)
     } catch (error) {
       emit('onError', error)

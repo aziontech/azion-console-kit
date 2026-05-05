@@ -233,7 +233,7 @@
   } = usePlans()
 
   // Local billing cycle state
-  const billingCycle = ref('yearly')
+  const billingCycle = ref('monthly')
 
   // Plan drawer state
   const showPlanDrawer = ref(false)
@@ -530,16 +530,21 @@
         fullName: fullName.value
       }
 
+      const requests = [
+        props.updateAccountInfoService(accountPayload),
+        props.patchFullnameService(usersPayload)
+      ]
+
       if (!accountStore.accountData?.jobRole) {
-        const postAddData = props.postAdditionalDataService({
-          payload: additionalDataPayload,
-          options: additionalDataInfo.value
-        })
-        await postAddData
+        requests.push(
+          props.postAdditionalDataService({
+            payload: additionalDataPayload,
+            options: additionalDataInfo.value
+          })
+        )
       }
 
-      const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      await props.patchFullnameService(usersPayload)
+      const [updatedAccount] = await Promise.all(requests)
 
       accountStore.setAccountData({
         jobRole: updatedAccount.jobRole,
@@ -556,7 +561,6 @@
       //   })
       //   .track()
       clearAdditionalDataForm()
-      emit('proceedToCheckout')
     } catch (err) {
       const errorMessage = err?.message || err
       const errors = typeof errorMessage === 'string' ? { errorMessage } : errorMessage
@@ -570,8 +574,6 @@
       loading.value = false
     }
   }
-
-  const emit = defineEmits(['proceedToCheckout'])
 
   defineExpose({
     submitForm,

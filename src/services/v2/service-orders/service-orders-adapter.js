@@ -1,5 +1,21 @@
 const pick = (value, fallback) => (value !== undefined ? value : fallback)
 
+const hasServiceOrderData = (data = {}) => {
+  if (!data || typeof data !== 'object') return false
+
+  return Boolean(
+    pick(data.serviceOrderId, data.service_order_id) ||
+      pick(data.accountId, data.account_id) ||
+      pick(data.planId, data.plan_id)
+  )
+}
+
+const getServiceOrderData = (response = {}) => {
+  const data = response.data ?? response.results
+  if (hasServiceOrderData(data)) return data
+  if (hasServiceOrderData(response)) return response
+}
+
 export const ServiceOrdersAdapter = {
   transformPricing(pricing = {}) {
     return {
@@ -126,6 +142,14 @@ export const ServiceOrdersAdapter = {
     }
   },
 
+  transformPayment(response = {}) {
+    return response.payment
+      ? {
+          clientSecret: pick(response.payment.clientSecret, response.payment.client_secret)
+        }
+      : undefined
+  },
+
   transformListResponse(response = {}) {
     return {
       success: response.success,
@@ -137,25 +161,26 @@ export const ServiceOrdersAdapter = {
   },
 
   transformCreateResponse(response = {}) {
+    const serviceOrderData = getServiceOrderData(response)
+
     return {
       success: response.success,
-      data: this.transformServiceOrder(response.data),
+      data: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
       message: response.message,
       meta: this.transformMeta(response.meta),
-      payment: response.payment
-        ? {
-            clientSecret: pick(response.payment.clientSecret, response.payment.client_secret)
-          }
-        : undefined
+      payment: this.transformPayment(response)
     }
   },
 
   transformUpdateResponse(response = {}) {
+    const serviceOrderData = getServiceOrderData(response)
+
     return {
       success: response.success,
-      data: this.transformServiceOrder(response.data),
+      data: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
       message: response.message,
-      meta: this.transformMeta(response.meta)
+      meta: this.transformMeta(response.meta),
+      payment: this.transformPayment(response)
     }
   },
 

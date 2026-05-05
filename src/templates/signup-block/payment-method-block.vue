@@ -285,9 +285,32 @@
     return token
   }
 
+  const confirmPayment = async (clientSecret, billingAddress = {}) => {
+    if (!stripe.value || !cardNumber.value) {
+      throw new Error('Stripe is not initialized')
+    }
+
+    const { paymentIntent, error } = await stripe.value.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardNumber.value,
+        billing_details: {
+          name: cardHolderName.value,
+          address: billingAddress
+        }
+      }
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return paymentIntent
+  }
+
   defineExpose({
     validate,
-    createToken
+    createToken,
+    confirmPayment
   })
 </script>
 
