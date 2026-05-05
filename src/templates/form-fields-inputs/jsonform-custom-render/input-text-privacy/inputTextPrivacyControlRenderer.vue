@@ -12,13 +12,22 @@
 
   // Inject the function to update privacy field state
   const updatePrivacyFieldState = inject('updatePrivacyFieldState', () => {})
+  // Inject validationAttempted to show errors when validation is triggered
+  const validationAttempted = inject('validationAttempted', ref(false))
 
   const description = computed(() => control.value.description)
   const label = computed(() => control.value.schema.label)
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
-  const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
-  const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
+  // Use custom error from schema if available, otherwise use the JSON Forms validation error
+  const error = computed(() => {
+    if (!control.value.errors) return ''
+    return control.value.schema.error || control.value.errors
+  })
+  // Show error when field was changed OR when validation was attempted (e.g., on form submit)
+  const errorMessage = computed(() =>
+    isChanged.value || validationAttempted.value ? error.value : ''
+  )
   const disabled = computed(() => !control.value.enabled || control.value.schema.readOnly)
 
   const onChange = (value) => {

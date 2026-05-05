@@ -105,6 +105,8 @@
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
   // Store isPublic values for privacy fields (fieldName -> isPublic)
   const privacyFieldsState = ref({})
+  // Track if validation has been attempted - used to show errors on untouched fields
+  const validationAttempted = ref(false)
 
   // Provide a function for privacy renderers to register their isPublic state
   const updatePrivacyFieldState = (fieldName, isPublic) => {
@@ -112,6 +114,8 @@
   }
 
   provide('updatePrivacyFieldState', updatePrivacyFieldState)
+  // Provide validationAttempted state for all renderers to show errors when validation is attempted
+  provide('validationAttempted', validationAttempted)
 
   const customRenderers = [
     {
@@ -142,6 +146,15 @@
 
   const renderers = markRaw([...vanillaRenderers, ...customRenderers])
 
+  /**
+   * JSON Forms configuration
+   * ValidateAndShow mode ensures validation errors are computed and available
+   * even for fields that haven't been touched yet
+   */
+  const jsonFormConfig = {
+    validationMode: 'ValidateAndShow'
+  }
+
   const hasIntegrations = computed(() => {
     const githubIntegration = props.schema?.properties?.platform_feature__vcs_integration__uuid
     const hasGithubIntegration = githubIntegration && Object.keys(githubIntegration).length > 0
@@ -164,15 +177,45 @@
 
     // Filter properties to only include fields WITHOUT isSettingField: true
     const filteredProperties = {}
+    const requiredFields = []
+
     Object.keys(allProperties).forEach((fieldName) => {
       const field = allProperties[fieldName]
       const isSetting = field?.isSettingField === true || field?.isSettingField === 'true'
       if (!isSetting) {
         filteredProperties[fieldName] = field
+        // Check if field has required attribute (from attrs.required or required property)
+        if (field?.required === true || field?.attrs?.required === true) {
+          requiredFields.push(fieldName)
+        }
       }
     })
 
     schema.properties = parsePropertiesSchema(filteredProperties)
+
+    // Build required array: combine existing required array with fields marked as required
+    const filteredPropertyNames = Object.keys(schema.properties)
+    let finalRequired = []
+
+    // Start with existing required array if present
+    if (schema.required && Array.isArray(schema.required)) {
+      finalRequired = schema.required.filter((fieldName) =>
+        filteredPropertyNames.includes(fieldName)
+      )
+    }
+
+    // Add fields marked with required property
+    requiredFields.forEach((fieldName) => {
+      if (!finalRequired.includes(fieldName)) {
+        finalRequired.push(fieldName)
+      }
+    })
+
+    // Set required array if we have any required fields
+    if (finalRequired.length > 0) {
+      schema.required = finalRequired
+    }
+
     return schema
   })
 
@@ -192,15 +235,45 @@
 
     // Filter properties to only include fields WITH isSettingField: true
     const filteredProperties = {}
+    const requiredFields = []
+
     Object.keys(allProperties).forEach((fieldName) => {
       const field = allProperties[fieldName]
       const isSetting = field?.isSettingField === true || field?.isSettingField === 'true'
       if (isSetting) {
         filteredProperties[fieldName] = field
+        // Check if field has required attribute (from attrs.required or required property)
+        if (field?.required === true || field?.attrs?.required === true) {
+          requiredFields.push(fieldName)
+        }
       }
     })
 
     schema.properties = parsePropertiesSchema(filteredProperties)
+
+    // Build required array: combine existing required array with fields marked as required
+    const filteredPropertyNames = Object.keys(schema.properties)
+    let finalRequired = []
+
+    // Start with existing required array if present
+    if (schema.required && Array.isArray(schema.required)) {
+      finalRequired = schema.required.filter((fieldName) =>
+        filteredPropertyNames.includes(fieldName)
+      )
+    }
+
+    // Add fields marked with required property
+    requiredFields.forEach((fieldName) => {
+      if (!finalRequired.includes(fieldName)) {
+        finalRequired.push(fieldName)
+      }
+    })
+
+    // Set required array if we have any required fields
+    if (finalRequired.length > 0) {
+      schema.required = finalRequired
+    }
+
     return schema
   })
 
@@ -218,6 +291,25 @@
    */
   const hasSettingsFormProperties = computed(() => {
     return Object.keys(settingsFormSchema.value?.properties || {}).length > 0
+  })
+
+  /**
+   * Track current step from LayoutEngineBlock
+   * Used to prevent rendering settings JsonForms until user reaches that step
+   */
+  const currentFormStep = ref('repository')
+
+  /**
+   * Computed property to check if settings form should be rendered
+   * Only render settings JsonForms when user is on settings step or beyond
+   * This prevents validation errors from settings fields appearing in repository step
+   */
+  const shouldRenderSettingsForm = computed(() => {
+    return (
+      currentFormStep.value === 'settings' ||
+      currentFormStep.value === 'deployment' ||
+      currentFormStep.value === 'success'
+    )
   })
 
   /**
@@ -272,7 +364,13 @@
   const isVcsRequired = computed(() => {
     if (!hasIntegrations.value) return false
     const requiredFields = props.schema?.required || []
-    return requiredFields.includes(vcsIntegrationFieldName.value)
+    // Check if VCS field is in required array
+    if (requiredFields.includes(vcsIntegrationFieldName.value)) {
+      return true
+    }
+    // Also check if VCS field has required property
+    const vcsField = props.schema?.properties?.[vcsIntegrationFieldName.value]
+    return vcsField?.required === true || vcsField?.attrs?.required === true
   })
 
   /**
@@ -350,6 +448,9 @@
    * @returns {boolean} Whether the form is valid for the current step
    */
   const validateForm = (step = 'repository') => {
+    // Mark validation as attempted so renderers show errors on untouched fields
+    validationAttempted.value = true
+
     // Get field names for the current step
     const stepProperties =
       step === 'repository'
@@ -360,11 +461,17 @@
 
     // Filter errors to only include fields from the current step
     const stepErrors = errors.value.filter((error) => {
-      const missingProperty = error.params?.missingProperty || error.instancePath?.replace('/', '')
-      return (
+      // For required errors, the field name is in params.missingProperty
+      const missingProperty = error.params?.missingProperty
+      // For other validation errors, extract field name from instancePath (e.g., "/az_name" -> "az_name")
+      const pathField = error.instancePath?.replace(/^\//, '')
+
+      const matches =
         stepFieldNames.includes(missingProperty) ||
+        stepFieldNames.includes(pathField) ||
         stepFieldNames.some((name) => error.instancePath?.includes(name))
-      )
+
+      return matches
     })
 
     // For repository step, also check VCS integration
@@ -451,9 +558,10 @@
   }
 
   /**
-   * Parses properties schema, removing VCS integration fields
+   * Parses properties schema, removing VCS integration fields and converting
+   * custom validation rules to proper JSON Schema format
    * @param {Object} properties - The schema properties
-   * @returns {Object} Parsed properties without VCS fields
+   * @returns {Object} Parsed properties with JSON Schema validation
    */
   const parsePropertiesSchema = (properties) => {
     const data = {}
@@ -461,7 +569,32 @@
 
     keys.forEach((key) => {
       if (key !== 'platform_feature__vcs_integration__uuid') {
-        data[key] = properties[key]
+        const field = { ...properties[key] }
+
+        // Convert validators array to JSON Schema pattern
+        // The first validator's regex becomes the pattern
+        if (field.validators && field.validators.length > 0) {
+          const validator = field.validators[0]
+          if (validator.regex) {
+            // Convert regex to JSON Schema pattern format
+            // Strip outer parentheses if present: (^...$) -> ^...$
+            let pattern = validator.regex
+            if (pattern.startsWith('(') && pattern.endsWith(')$')) {
+              pattern = pattern.slice(1, -1)
+            }
+            field.pattern = pattern
+          }
+          // Keep the error message for custom renderer to display
+          // The renderer checks for 'error' property, so we use that
+          if (validator.errorMessage) {
+            field.error = validator.errorMessage
+          }
+        }
+
+        // Ensure minLength is set if validators specify it (extract from regex or explicit)
+        // maxLength is already valid JSON Schema
+
+        data[key] = field
       }
     })
 
@@ -590,6 +723,16 @@
     { deep: true }
   )
 
+  // Watch currentStep from LayoutEngineBlock to track which form is active
+  // Fallback to 'repository' if not available
+  watch(
+    () => layoutRef.value?.currentStep,
+    (newStep) => {
+      currentFormStep.value = newStep || 'repository'
+    },
+    { immediate: true }
+  )
+
   // Watch for selectedIntegration changes to clear error when user selects an integration
   watch(selectedIntegration, (newValue) => {
     if (newValue) {
@@ -696,6 +839,7 @@
             :data="formData"
             :schema="repositoryFormSchemaDisabled"
             :renderers="renderers"
+            :config="jsonFormConfig"
             @change="onChangeAzionForm"
           />
         </div>
@@ -705,11 +849,12 @@
       <template #settings-inputs>
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
           <JsonForms
-            v-if="hasSettingsFormProperties"
+            v-if="hasSettingsFormProperties && shouldRenderSettingsForm"
             style="display: contents"
             :data="formData"
             :schema="settingsFormSchemaDisabled"
             :renderers="renderers"
+            :config="jsonFormConfig"
             @change="onChangeAzionForm"
           />
         </div>
