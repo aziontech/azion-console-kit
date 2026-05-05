@@ -1,24 +1,24 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject, watch } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
-  import fieldNumber from '@aziontech/webkit/field-number'
+  import fieldInputTextPrivacy from '@/templates/form-fields-inputs/fieldInputTextPrivacy.vue'
 
   const emit = defineEmits(['change', 'blur'])
   const props = defineProps(rendererProps())
 
   const { control, handleChange } = useJsonFormsControl(props)
   const isChanged = ref(false)
+  const isPublic = ref(true)
+
+  // Inject the function to update privacy field state
+  const updatePrivacyFieldState = inject('updatePrivacyFieldState', () => {})
+
   const description = computed(() => control.value.description)
   const label = computed(() => control.value.schema.label)
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
   const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
-  const min = computed(() => control.value.schema.minimum)
-  const max = computed(() => control.value.schema.maximum)
-  const step = computed(() => control.value.schema.multipleOf || 1)
-  const showButtons = computed(() => control.value.schema.showButtons ?? true)
-  const useGrouping = computed(() => (control.value.schema.type === 'number' ? true : false))
   const disabled = computed(() => !control.value.enabled || control.value.schema.readOnly)
 
   const onChange = (value) => {
@@ -32,24 +32,41 @@
     handleChange(path.value, value)
     emit('blur', value)
   }
+
+  const onUpdateIsPublic = (value) => {
+    isPublic.value = value
+    // Notify parent about isPublic change
+    updatePrivacyFieldState(path.value, value)
+  }
+
+  // Watch for changes and notify parent
+  watch(
+    isPublic,
+    (newValue) => {
+      updatePrivacyFieldState(path.value, newValue)
+    },
+    { immediate: true }
+  )
+
+  // Expose isPublic value for parent to retrieve
+  defineExpose({
+    isPublic: computed(() => isPublic.value)
+  })
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
-    <fieldNumber
+    <fieldInputTextPrivacy
       :name="path"
       :label="label"
       :description="description"
       :required="required"
-      :additionalError="errorMessage"
-      :min="min"
-      :max="max"
-      :step="step"
-      :showButtons="showButtons"
-      :useGrouping="useGrouping"
+      :aditionalError="errorMessage"
+      :isPublic="isPublic"
       :disabled="disabled"
       @blur="onBlur"
       @input="onChange"
+      @update:isPublic="onUpdateIsPublic"
     />
   </div>
 </template>

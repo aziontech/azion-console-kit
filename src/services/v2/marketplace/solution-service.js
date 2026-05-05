@@ -70,20 +70,20 @@ export class SolutionService extends BaseService {
             vendor: element.vendor,
             slug: element.slug,
             headline: element.headline,
+            icon: element.icon,
             featured: element.featured,
             released: element.new_release,
             instanceType: {
               name: element.instance_type.name,
               isTemplate: element.instance_type.is_template
             },
-            category: element.category[0]?.name,
+            category: element.category || [],
             updatedAt: element.updated_at
           }))
         : []
 
     // Sort solutions alphabetically by name
     parsedSolutions.sort((solutionA, solutionB) => solutionA.name.localeCompare(solutionB.name))
-
     return parsedSolutions
   }
   async listTrendingSolutions({ ids = [], limit = 3 } = {}) {

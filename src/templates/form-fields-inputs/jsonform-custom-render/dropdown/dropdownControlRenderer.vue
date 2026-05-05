@@ -17,9 +17,11 @@
   const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
 
   const placeholder = computed(() => control.value.schema.placeholder || '')
-  const disabled = computed(() => control.value.schema.disabled || false)
   const filter = computed(() => control.value.schema.filter || false)
   const loading = computed(() => control.value.schema.loading || false)
+  const disabled = computed(
+    () => !control.value.enabled || control.value.schema.readOnly || control.value.schema.disabled
+  )
 
   const options = computed(() => {
     if (control.value.schema.oneOf) {
