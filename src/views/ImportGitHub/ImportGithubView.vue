@@ -95,9 +95,23 @@
     connect
   } = useVcsOAuth()
 
-  // GitHub account and repository selection
-  const selectedIntegration = ref(null)
-  const selectedRepository = ref(null)
+  // GitHub account and repository selection (using vee-validate fields)
+  const selectedIntegration = computed({
+    get: () => githubAccount.value,
+    set: (val) => {
+      if (val && val !== githubAccount.value) {
+        githubAccount.value = val
+      }
+    }
+  })
+  const selectedRepository = computed({
+    get: () => repository.value,
+    set: (val) => {
+      if (val && val !== repository.value) {
+        repository.value = val
+      }
+    }
+  })
 
   // Computed integrations with "Add another account" option
   const integrationOptions = computed(() => {
@@ -192,10 +206,12 @@
 
   // UseField for individual fields
   const { value: domain } = useField('domain')
-  const { value: preset } = useField('preset')
+  const { value: preset, errorMessage: presetError } = useField('preset')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: installCommand } = useField('installCommand')
   const { value: newVariables } = useField('newVariables')
+  const { value: githubAccount, errorMessage: githubAccountError } = useField('githubAccount')
+  const { value: repository, errorMessage: repositoryError } = useField('repository')
 
   // Methods
   const addVariable = () => {
@@ -256,6 +272,8 @@
     // Use restored values from route if available, otherwise use defaults
     resetForm({
       values: {
+        githubAccount: githubAccount.value || '',
+        repository: repository.value || '',
         domain: domain.value || suggestedDomain.value || '',
         preset: preset.value || '',
         rootDirectory: rootDirectory.value || '/',
@@ -371,12 +389,13 @@
   }
 
   const handleIntegrationChange = async (event) => {
-    const integrationId = event?.value
+    // Note: selectedIntegration is already updated via v-model before this handler runs
+    // This handler is for additional side effects like loading repositories
     selectedRepository.value = null
     repositoriesListRaw.value = []
 
-    if (integrationId) {
-      await listRepositories(integrationId)
+    if (event?.value) {
+      await listRepositories(event.value)
     }
   }
 
@@ -758,6 +777,7 @@
             optionValue="value"
             placeholder="Select a scope"
             class="w-full"
+            :class="{ 'p-invalid': githubAccountError }"
             :disabled="isDeploying"
             :loading="isGithubConnectLoading"
             @change="handleIntegrationChange"
@@ -797,6 +817,12 @@
               </div>
             </template>
           </Dropdown>
+          <small
+            v-if="githubAccountError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ githubAccountError }}
+          </small>
         </div>
 
         <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -813,6 +839,7 @@
             optionValue="id"
             placeholder="Select a repository"
             class="w-full"
+            :class="{ 'p-invalid': repositoryError }"
             :disabled="isDeploying || !selectedIntegration"
             :loading="isLoadingRepositories"
             filter
@@ -839,6 +866,12 @@
               </div>
             </template>
           </Dropdown>
+          <small
+            v-if="repositoryError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ repositoryError }}
+          </small>
         </div>
 
         <div class="flex flex-col w-full gap-2">
@@ -869,6 +902,7 @@
             autoFilterFocus
             placeholder="Select a framework"
             class="w-full"
+            :class="{ 'p-invalid': presetError }"
             :disabled="isDeploying"
           >
             <template #value="slotProps">
@@ -904,6 +938,12 @@
               </div>
             </template>
           </Dropdown>
+          <small
+            v-if="presetError"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ presetError }}
+          </small>
         </div>
 
         <div class="flex flex-col w-full gap-2">

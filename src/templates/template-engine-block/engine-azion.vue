@@ -88,6 +88,8 @@
   const setIntegration = ref('')
   const isInitialized = ref(false)
   const isEdgeAppNamePublic = ref(false)
+  const vcsIntegrationError = ref('')
+  const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
   /**
    * Computed property to determine if repository inputs should be disabled
@@ -109,6 +111,30 @@
   })
 
   const REPOSITORY_FIELD_NAMES = ['platform_feature__vcs_integration__uuid', 'az_name']
+
+  /**
+   * Check if VCS integration field is present in the schema
+   */
+  const hasIntegrations = computed(() => {
+    const allFields = [
+      ...(inputSchema.value.fields || []),
+      ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+    ]
+    return allFields.some((field) => field.name === vcsIntegrationFieldName.value)
+  })
+
+  /**
+   * Check if VCS integration is required (field is marked as required)
+   */
+  const isVcsRequired = computed(() => {
+    if (!hasIntegrations.value) return false
+    const allFields = [
+      ...(inputSchema.value.fields || []),
+      ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+    ]
+    const vcsField = allFields.find((field) => field.name === vcsIntegrationFieldName.value)
+    return vcsField?.attrs?.required === true
+  })
 
   /**
    * Filters fields from a group based on field names
@@ -446,6 +472,22 @@
       }
     }
 
+    // For repository step, also check VCS integration
+    if (step === 'repository' && hasIntegrations.value && isVcsRequired.value) {
+      const hasIntegrationsList = layoutRef.value?.hasIntegrationsList
+      if (!hasIntegrationsList) {
+        // No GitHub account connected
+        vcsIntegrationError.value = 'Connect with GitHub is required'
+        isValid = false
+      } else if (!setIntegration.value) {
+        // Has connected accounts but none selected
+        vcsIntegrationError.value = 'Git Scope is required'
+        isValid = false
+      } else {
+        vcsIntegrationError.value = ''
+      }
+    }
+
     return isValid
   }
 
@@ -534,6 +576,14 @@
   const updateValueOnChange = (fieldName, value) => {
     if (formTools.value.setFieldValue) {
       formTools.value.setFieldValue(fieldName, value)
+    }
+    // Update setIntegration when VCS integration field changes
+    if (fieldName === vcsIntegrationFieldName.value) {
+      setIntegration.value = value
+      // Clear VCS error when user selects an integration
+      if (value) {
+        vcsIntegrationError.value = ''
+      }
     }
   }
 
@@ -669,10 +719,19 @@
     (newList) => {
       if (newList?.value && newList.value.length) {
         setIntegration.value = newList.value[0].value
+        // Clear VCS error when an integration is selected
+        vcsIntegrationError.value = ''
       }
     },
     { deep: true }
   )
+
+  // Watch for setIntegration changes to clear error when user selects an integration
+  watch(setIntegration, (newValue) => {
+    if (newValue) {
+      vcsIntegrationError.value = ''
+    }
+  })
 
   defineExpose({
     validateForm,
@@ -718,12 +777,24 @@
                 v-if="field.name === 'platform_feature__vcs_integration__uuid'"
                 class="flex flex-col gap-2"
               >
+                <label
+                  v-show="!slotProps.hasIntegrationsList"
+                  class="text-xs text-color-secondary"
+                >
+                  GitHub Connection <span class="text-red-500">*</span>
+                </label>
                 <OAuthGithub
                   v-show="!slotProps.hasIntegrationsList"
                   ref="oauthGithubRef"
                   @onCallbackUrl="setCallbackUrl"
                   :loading="slotProps.isIntegrationsLoading"
                 />
+                <small
+                  v-if="vcsIntegrationError && !slotProps.hasIntegrationsList"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ vcsIntegrationError }}
+                </small>
                 <div
                   v-if="slotProps.hasIntegrationsList"
                   class="flex flex-col gap-2"
@@ -737,7 +808,7 @@
                     placeholder="Select a scope"
                     class="h-8"
                     :description="field.description"
-                    :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                    :additionalError="vcsIntegrationError"
                     :disabled="isRepositoryDisabled"
                     optionLabel="label"
                     optionValue="value"
@@ -868,12 +939,24 @@
                         v-if="field.name === 'platform_feature__vcs_integration__uuid'"
                         class="flex flex-col gap-2"
                       >
+                        <label
+                          v-show="!slotProps.hasIntegrationsList"
+                          class="text-xs text-color-secondary"
+                        >
+                          GitHub Connection <span class="text-red-500">*</span>
+                        </label>
                         <OAuthGithub
                           v-show="!slotProps.hasIntegrationsList"
                           ref="oauthGithubRef"
                           @onCallbackUrl="setCallbackUrl"
                           :loading="slotProps.isIntegrationsLoading"
                         />
+                        <small
+                          v-if="vcsIntegrationError && !slotProps.hasIntegrationsList"
+                          class="p-error text-xs font-normal leading-tight"
+                        >
+                          {{ vcsIntegrationError }}
+                        </small>
                         <div
                           v-if="slotProps.hasIntegrationsList"
                           class="flex flex-col gap-2"
@@ -887,7 +970,7 @@
                             placeholder="Select a scope"
                             class="h-8"
                             :description="field.description"
-                            :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                            :additionalError="vcsIntegrationError"
                             :disabled="isRepositoryDisabled"
                             optionLabel="label"
                             optionValue="value"
@@ -1002,12 +1085,24 @@
                       v-if="field.name === 'platform_feature__vcs_integration__uuid'"
                       class="flex flex-col gap-2"
                     >
+                      <label
+                        v-show="!slotProps.hasIntegrationsList"
+                        class="text-xs text-color-secondary"
+                      >
+                        GitHub Connection <span class="text-red-500">*</span>
+                      </label>
                       <OAuthGithub
                         v-show="!slotProps.hasIntegrationsList"
                         ref="oauthGithubRef"
                         @onCallbackUrl="setCallbackUrl"
                         :loading="slotProps.isIntegrationsLoading"
                       />
+                      <small
+                        v-if="vcsIntegrationError && !slotProps.hasIntegrationsList"
+                        class="p-error text-xs font-normal leading-tight"
+                      >
+                        {{ vcsIntegrationError }}
+                      </small>
                       <div
                         v-if="slotProps.hasIntegrationsList"
                         class="flex flex-col gap-2"

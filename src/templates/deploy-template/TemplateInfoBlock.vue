@@ -1,4 +1,6 @@
 <script setup>
+  import { computed } from 'vue'
+
   const props = defineProps({
     previewSrc: {
       type: String,
@@ -43,17 +45,22 @@
       default: false
     }
   })
+
+  const hasPreview = computed(() => {
+    return props.previewSrc || (props.templateTitle && props.templateDescription && props.githubUrl)
+  })
 </script>
 
 <template>
   <div
     :class="[
       'bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden',
-      { '!flex-col': props.resourcesOnly }
+      { '!flex-col': props.resourcesOnly || !hasPreview }
     ]"
   >
+    <!-- Preview section: only show if there's an image OR template info exists -->
     <div
-      v-if="props.templateTitle && props.templateDescription && props.githubUrl"
+      v-if="hasPreview && !props.resourcesOnly"
       class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center"
     >
       <slot
@@ -74,7 +81,12 @@
       </slot>
     </div>
 
-    <div class="flex-1 py-4 pr-4 flex flex-col gap-3">
+    <div
+      :class="[
+        'flex-1 flex flex-col gap-3',
+        hasPreview && !props.resourcesOnly ? 'py-4 pr-4' : 'p-4'
+      ]"
+    >
       <slot
         name="info"
         :template-title="props.templateTitle"
@@ -134,31 +146,29 @@
         <!-- Resources Created Section -->
         <div
           v-if="props.resources && props.resources.length > 0"
-          class="flex flex-col gap-3 pt-2"
+          :class="['flex flex-col', !hasPreview || props.resourcesOnly ? 'gap-2' : 'gap-3 pt-2']"
         >
           <span class="text-xs font-normal font-['Proto_Mono'] text-color-muted leading-4">
             resources created
           </span>
-          <div class="flex flex-col gap-2">
+          <div
+            :class="[
+              'flex flex-wrap gap-x-4 gap-y-1.5',
+              !hasPreview || props.resourcesOnly ? '' : 'flex-col gap-2'
+            ]"
+          >
             <div
               v-for="(resource, index) in props.resources"
               :key="index"
               class="flex items-center gap-1.5"
             >
-              <div class="flex items-center gap-1.5">
-                <i
-                  :class="[resource.icon, 'text-color-secondary', 'text-[14px]']"
-                  style="width: 14px; height: 14px"
-                />
-                <div class="flex items-center gap-0.5">
-                  <span class="text-xs font-normal font-['Sora'] text-color-secondary leading-4">
-                    {{ resource.type }}
-                  </span>
-                  <span class="text-xs font-normal font-['Sora'] text-color-secondary leading-4"
-                    >:</span
-                  >
-                </div>
-              </div>
+              <i
+                :class="[resource.icon, 'text-color-secondary', 'text-[14px]']"
+                style="width: 14px; height: 14px"
+              />
+              <span class="text-xs font-normal font-['Sora'] text-color-secondary leading-4">
+                {{ resource.type }}:
+              </span>
               <span
                 class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-link transition-colors underline-offset-2 hover:underline"
                 @click="resource.redirect?.()"

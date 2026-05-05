@@ -83,8 +83,6 @@
     return listOfIntegrations.value?.length > 0
   })
 
-  const gitDescription = `Configure your Git repository to integrate your codebase and automate deployments directly from your version control system.`
-
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
       const ref = Array.isArray(oauthGithubRef.value)
@@ -203,7 +201,8 @@
         v-if="!props.collapsed"
         class="text-xs text-color-secondary leading-4"
       >
-        {{ gitDescription }}
+        Configure your Git repository to integrate your codebase and automate deployments directly
+        from your version control system.
       </div>
 
       <slot

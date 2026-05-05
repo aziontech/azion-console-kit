@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { reactive, computed } from 'vue'
 import { vcsService } from '@/services/v2/vcs/vcs-service'
 import { useToast } from '@aziontech/webkit/use-toast'
 
@@ -11,34 +11,28 @@ import { useToast } from '@aziontech/webkit/use-toast'
 export function useVcsOAuth() {
   const toast = useToast()
 
-  // State
-  const isLoading = ref(false)
-  const isRepositoriesLoading = ref(false)
-  const platforms = ref([])
-  const integrations = ref([])
-  const repositories = ref([])
-  const callbackUrl = ref('')
-  const selectedIntegration = ref(null)
+  const state = reactive({
+    loading: {
+      main: false,
+      repositories: false
+    },
+    platforms: [],
+    integrations: [],
+    repositories: [],
+    callbackUrl: '',
+    selectedIntegration: null
+  })
 
-  // Computed
-  const hasIntegrations = computed(() => integrations.value?.length > 0)
+  const hasIntegrations = computed(() => state.integrations?.length > 0)
 
-  /**
-   * Returns the list of connected provider IDs
-   * @returns {Array<string>} List of connected provider IDs (e.g., ['github', 'gitlab'])
-   */
   const connectedProviders = computed(() => {
-    const providers = integrations.value.map((integration) => integration.provider)
+    const providers = state.integrations.map((integration) => integration.provider)
     return [...new Set(providers.filter(Boolean))]
   })
 
-  /**
-   * Groups integrations by provider
-   * @returns {Object} Integrations grouped by provider ID
-   */
   const integrationsByProvider = computed(() => {
     const grouped = {}
-    integrations.value.forEach((integration) => {
+    state.integrations.forEach((integration) => {
       const providerId = integration.provider
       if (!grouped[providerId]) {
         grouped[providerId] = []
@@ -48,14 +42,10 @@ export function useVcsOAuth() {
     return grouped
   })
 
-  /**
-   * Loads available VCS platforms (github, gitlab, azure, bitbucket)
-   * @returns {Promise<Array>} List of platforms
-   */
   const listPlatforms = async () => {
     try {
       const data = await vcsService.listPlatforms()
-      platforms.value = data
+      state.platforms = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
@@ -63,48 +53,35 @@ export function useVcsOAuth() {
     }
   }
 
-  /**
-   * Loads user's existing VCS integrations
-   * @returns {Promise<Array>} List of integrations
-   */
   const listIntegrations = async () => {
     try {
-      isLoading.value = true
+      state.loading.main = true
       const data = await vcsService.listIntegrations()
-      integrations.value = data
+      state.integrations = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
       return []
     } finally {
-      isLoading.value = false
+      state.loading.main = false
     }
   }
 
-  /**
-   * Opens the OAuth popup for the specified provider
-   * @param {string} providerKey - The provider key (github, gitlab, azure, bitbucket)
-   * @returns {Promise<void>}
-   */
   const connect = async (providerKey) => {
     try {
-      isLoading.value = true
+      state.loading.main = true
 
-      // Load platforms if not already loaded
-      if (!platforms.value.length) {
+      if (!state.platforms.length) {
         await listPlatforms()
       }
 
-      // Find the provider
-      const provider = platforms.value.find((platform) => platform.id === providerKey)
+      const provider = state.platforms.find((platform) => platform.id === providerKey)
       if (!provider) {
         throw new Error(`Provider "${providerKey}" not found`)
       }
 
-      // Store callback URL for later use
-      callbackUrl.value = provider.callbackUrl
+      state.callbackUrl = provider.callbackUrl
 
-      // Open popup
       window.open(
         provider.installationUrl,
         'vcs-oauth',
@@ -113,15 +90,10 @@ export function useVcsOAuth() {
     } catch (error) {
       error.showErrors?.(toast)
     } finally {
-      isLoading.value = false
+      state.loading.main = false
     }
   }
 
-  /**
-   * Handles postMessage events from OAuth popup
-   * @param {MessageEvent} event - The message event
-   * @param {Function} onSuccess - Optional callback on successful integration
-   */
   const handlePostMessage = async (event, onSuccess) => {
     if (event.data.event === 'integration-data') {
       await saveIntegration(event.data)
@@ -129,16 +101,10 @@ export function useVcsOAuth() {
     }
   }
 
-  /**
-   * Saves the integration after OAuth callback
-   * @param {Object} integration - The integration data from OAuth
-   * @returns {Promise<void>}
-   */
   const saveIntegration = async (integration) => {
     try {
-      isLoading.value = true
-      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
-      // Refresh integrations list
+      state.loading.main = true
+      await vcsService.postCallbackUrl(state.callbackUrl, integration.data)
       await listIntegrations()
     } catch (error) {
       error.showWithOptions?.(toast, (err) => ({
@@ -146,75 +112,46 @@ export function useVcsOAuth() {
         severity: 'error'
       }))
     } finally {
-      isLoading.value = false
+      state.loading.main = false
     }
   }
 
-  /**
-   * Sets up postMessage listener for OAuth callback
-   * @param {Function} onSuccess - Optional callback on successful integration
-   * @returns {Function} Cleanup function to remove listener
-   */
   const setupPostMessageListener = (onSuccess) => {
     const handler = (event) => handlePostMessage(event, onSuccess)
     window.addEventListener('message', handler)
     return () => window.removeEventListener('message', handler)
   }
 
-  /**
-   * Lists repositories for a specific integration
-   * @param {string} integrationId - The integration ID to list repositories for
-   * @param {Object} params - Query parameters (pageSize, ordering, etc.)
-   * @returns {Promise<Array>} List of repositories
-   */
   const listRepositories = async (integrationId, params = { pageSize: 100, ordering: 'name' }) => {
     try {
-      isRepositoriesLoading.value = true
+      state.loading.repositories = true
       const data = await vcsService.listRepositories(integrationId, params)
-      repositories.value = data
+      state.repositories = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
       return []
     } finally {
-      isRepositoriesLoading.value = false
+      state.loading.repositories = false
     }
   }
 
-  /**
-   * Selects an integration and loads its repositories
-   * @param {Object} integration - The integration to select
-   * @returns {Promise<Array>} List of repositories
-   */
   const selectIntegration = async (integration) => {
-    selectedIntegration.value = integration
+    state.selectedIntegration = integration
     if (integration?.value) {
       return await listRepositories(integration.value)
     }
-    repositories.value = []
+    state.repositories = []
     return []
   }
 
-  /**
-   * Initializes the composable with platforms and integrations
-   * Sets up postMessage listener automatically
-   * @param {Function} onSuccess - Optional callback on successful integration
-   * @returns {Promise<void>}
-   */
   const initialize = async (onSuccess) => {
     await Promise.all([listPlatforms(), listIntegrations()])
     setupPostMessageListener(onSuccess)
   }
 
   return {
-    // State
-    isLoading,
-    isRepositoriesLoading,
-    platforms,
-    integrations,
-    repositories,
-    callbackUrl,
-    selectedIntegration,
+    state,
 
     // Computed
     hasIntegrations,

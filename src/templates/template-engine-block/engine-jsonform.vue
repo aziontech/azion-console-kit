@@ -368,10 +368,21 @@
     })
 
     // For repository step, also check VCS integration
-    const hasVcsError = step === 'repository' && isVcsRequired.value && !selectedIntegration.value
-    vcsIntegrationError.value = hasVcsError ? 'Git Scope is required' : ''
+    if (step === 'repository' && hasIntegrations.value && isVcsRequired.value) {
+      const hasIntegrationsList = layoutRef.value?.hasIntegrationsList
+      if (!hasIntegrationsList) {
+        // No GitHub account connected
+        vcsIntegrationError.value = 'Connect with GitHub is required'
+      } else if (!selectedIntegration.value) {
+        // Has connected accounts but none selected
+        vcsIntegrationError.value = 'Git Scope is required'
+      } else {
+        vcsIntegrationError.value = ''
+      }
+    }
 
     const hasStepErrors = stepErrors.length > 0
+    const hasVcsError = vcsIntegrationError.value !== ''
 
     return !hasStepErrors && !hasVcsError
   }
@@ -572,10 +583,19 @@
     (newList) => {
       if (newList?.value && newList.value.length) {
         selectedIntegration.value = newList.value[0].value
+        // Clear VCS error when an integration is selected
+        vcsIntegrationError.value = ''
       }
     },
     { deep: true }
   )
+
+  // Watch for selectedIntegration changes to clear error when user selects an integration
+  watch(selectedIntegration, (newValue) => {
+    if (newValue) {
+      vcsIntegrationError.value = ''
+    }
+  })
 
   defineExpose({
     validateForm,
