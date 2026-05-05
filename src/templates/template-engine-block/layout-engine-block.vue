@@ -854,7 +854,7 @@
         :loading-deploy="props.loadingDeploy || isDeployInitiated"
         :disabled-deploy="props.disabledDeploy || props.loadingDeploy || isDeployInitiated"
         :deploy-label="props.deployLabel"
-        :hide-footer="!!props.executionId"
+        :hide-footer="currentStep === 'deployment' || currentStep === 'success'"
         @deploy="handleDeploy"
       >
         <template #form>
