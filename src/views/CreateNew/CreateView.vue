@@ -8,13 +8,13 @@
   import { useToast } from '@aziontech/webkit/use-toast'
 
   import ContentBlock from '@/templates/content-block'
-  // import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import FormLoading from '@/templates/template-engine-block/form-loading.vue'
 
   import { useLoadingStore } from '@/stores/loading'
   import { useSolutionStore } from '@/stores/solution-create'
   import { scriptRunnerService } from '@/services/v2/script-runner'
+  import { getTemplate, instantiateTemplate } from '@/services/template-engine-services'
 
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
@@ -32,14 +32,6 @@
   const store = useLoadingStore()
 
   const props = defineProps({
-    getTemplateService: {
-      type: Function,
-      required: true
-    },
-    instantiateTemplateService: {
-      type: Function,
-      required: true
-    },
     loadSolutionService: {
       type: Function,
       required: true
@@ -194,8 +186,8 @@
         <TemplateEngineBlock
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
-          :getTemplateService="props.getTemplateService"
-          :instantiateTemplateService="props.instantiateTemplateService"
+          :getTemplateService="getTemplate"
+          :instantiateTemplateService="instantiateTemplate"
           :getResultsService="scriptRunnerService.loadExecutionResultsService"
           :templateId="solution.referenceId"
         />

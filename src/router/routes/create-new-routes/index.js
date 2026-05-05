@@ -1,4 +1,3 @@
-import * as TemplateEngineService from '@/services/template-engine-services'
 import * as MarketplaceService from '@/services/marketplace-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
 import { windowOpen } from '@/helpers/window-open'
@@ -13,9 +12,7 @@ export const createNewRoutes = {
       name: 'create-something-new',
       component: () => import('@views/CreateNew/CreateView.vue'),
       props: {
-        getTemplateService: TemplateEngineService.getTemplate,
         loadSolutionService: MarketplaceService.loadSolutionService,
-        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
         windowOpen
       },
       meta: {
@@ -50,8 +47,6 @@ export const createNewRoutes = {
       component: () => import('@/views/CreateNew/CreateViewTemplates.vue'),
       props: {
         getTemplatesService: MarketplaceService.getTemplatesService,
-        getTemplateService: TemplateEngineService.getTemplate,
-        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
         windowOpen
       },
       meta: {
