@@ -140,7 +140,7 @@
   const emit = defineEmits([
     'update:billingCycle',
     'update:couponCode',
-    'update:paymentClientSecret',
+    'update:checkoutSessionClientSecret',
     'pricingChange'
   ])
 
@@ -301,9 +301,12 @@
     const planPricingId = getPlanPricingId(plans.value, props.plan, value)
     if (!planPricingId) return
 
-    emit('update:paymentClientSecret', '')
+    emit('update:checkoutSessionClientSecret', '')
     const response = await updatePlanPricing(planPricingId)
-    emit('update:paymentClientSecret', response?.payment?.clientSecret || '')
+    emit(
+      'update:checkoutSessionClientSecret',
+      response?.payment?.clientSecret || ''
+    )
   })
 
   watch(couponCode, (value) => {

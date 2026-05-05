@@ -82,7 +82,8 @@ export const useAccountStore = defineStore({
       // true = has contract a plan
       // null = is old account
       const value = state.account?.has_service_order_plan
-      return value === false ? false : true
+      // return value === false ? false : true
+      return false
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'

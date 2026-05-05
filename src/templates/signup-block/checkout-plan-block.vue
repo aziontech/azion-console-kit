@@ -5,15 +5,20 @@
         ref="pricingCalculationRef"
         :plan="plan"
         @update:billing-cycle="handleBillingCycleChange"
-        @update:payment-client-secret="handlePaymentClientSecretChange"
+        @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
       />
 
       <PaymentMethodBlock
         ref="paymentMethodRef"
         :stripeClientService="getStripeClientService"
+        :checkoutSessionClientSecret="checkoutSessionClientSecret"
+        @readiness-change="handlePaymentReadinessChange"
       />
 
-      <AddressInformationBlock ref="addressInformationRef" />
+      <AddressInformationBlock
+        ref="addressInformationRef"
+        @readiness-change="handleAddressReadinessChange"
+      />
     </div>
     <div
       class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-surface px-8 py-4"
@@ -29,7 +34,7 @@
         severity="secondary"
         class="font-protomono flex items-center justify-center text-xs"
         :icon="showLoading ? 'pi pi-spin pi-spinner' : ''"
-        :disabled="isSubmitting || !paymentClientSecret"
+        :disabled="isSubscribeDisabled"
         @click="handleSubmit"
         label="Subscribe"
       />
@@ -63,7 +68,7 @@
       type: Function,
       required: true
     },
-    paymentClientSecret: {
+    checkoutSessionClientSecret: {
       type: String,
       default: ''
     }
@@ -75,14 +80,33 @@
   const isSubmitting = ref(false)
   const showLoading = ref(false)
   const billingCycle = ref('yearly')
-  const paymentClientSecret = ref(props.paymentClientSecret)
+  const checkoutSessionClientSecret = ref(props.checkoutSessionClientSecret)
+  const isPaymentFormReady = ref(false)
+  const isAddressFormReady = ref(false)
+
+  const isSubscribeDisabled = computed(() => {
+    return (
+      isSubmitting.value ||
+      !checkoutSessionClientSecret.value ||
+      !isPaymentFormReady.value ||
+      !isAddressFormReady.value
+    )
+  })
 
   const handleBillingCycleChange = (value) => {
     billingCycle.value = value
   }
 
-  const handlePaymentClientSecretChange = (value) => {
-    paymentClientSecret.value = value
+  const handleCheckoutSessionClientSecretChange = (value) => {
+    checkoutSessionClientSecret.value = value
+  }
+
+  const handlePaymentReadinessChange = (isReady) => {
+    isPaymentFormReady.value = Boolean(isReady)
+  }
+
+  const handleAddressReadinessChange = (isReady) => {
+    isAddressFormReady.value = Boolean(isReady)
   }
 
   const couponCode = computed(() => {
@@ -94,6 +118,10 @@
   }
 
   const handleSubmit = async () => {
+    if (isSubmitting.value) {
+      return
+    }
+
     isSubmitting.value = true
     showLoading.value = true
 
@@ -111,27 +139,24 @@
         return
       }
 
-      if (!paymentClientSecret.value) {
+      if (!checkoutSessionClientSecret.value) {
         throw new Error('Payment session is missing. Please try again.')
       }
 
-      // 3. Confirm Stripe PaymentIntent
-      const paymentIntent = await paymentMethodRef.value?.confirmPayment(
-        paymentClientSecret.value,
-        {
-          line1: address.address,
-          postal_code: address.postalCode
-        }
-      )
+      // 3. Confirm checkout session
+      const checkoutConfirmation = await paymentMethodRef.value?.confirmCheckoutSession()
 
-      if (paymentIntent?.status !== 'succeeded') {
+      if (checkoutConfirmation?.type !== 'success') {
         throw new Error('Payment could not be completed. Please try again.')
       }
 
       // 4. Emit checkout data
       const checkoutData = {
-        paymentIntentId: paymentIntent.id,
-        paymentStatus: paymentIntent.status,
+        paymentIntentId: checkoutConfirmation?.paymentIntent?.id,
+        paymentStatus: checkoutConfirmation?.paymentIntent?.status,
+        checkoutSessionId: checkoutConfirmation?.session?.id,
+        checkoutSessionStatus: checkoutConfirmation?.session?.status,
+        checkoutConfirmationStatus: checkoutConfirmation?.status,
         billingCycle: billingCycle.value,
         couponCode: couponCode.value,
         address: {
@@ -147,11 +172,24 @@
 
       emit('onSubmit', checkoutData)
     } catch (error) {
+      const errorMessage = String(error?.message || error || '')
+      const knownStripeErrorMap = {
+        authentication_required: 'Authentication is required to complete this payment.',
+        card_declined: 'Your card was declined. Please use a different payment method.',
+        expired_card: 'Your card is expired. Please use a different card.',
+        incorrect_cvc: 'The security code is incorrect. Please review your payment details.',
+        processing_error: 'Payment processing failed. Please try again in a few moments.'
+      }
+
+      const mappedErrorMessage =
+        Object.entries(knownStripeErrorMap).find(([code]) => errorMessage.includes(code))?.[1] ||
+        errorMessage
+
       const options = {
         closable: true,
         severity: 'error',
         summary: 'Error',
-        detail: error.message || error
+        detail: mappedErrorMessage || 'Unable to confirm payment. Please try again.'
       }
       toast.add(options)
     } finally {
@@ -161,9 +199,9 @@
   }
 
   watch(
-    () => props.paymentClientSecret,
-    (newPaymentClientSecret) => {
-      paymentClientSecret.value = newPaymentClientSecret
+    () => props.checkoutSessionClientSecret,
+    (newCheckoutSessionClientSecret) => {
+      checkoutSessionClientSecret.value = newCheckoutSessionClientSecret
     }
   )
 

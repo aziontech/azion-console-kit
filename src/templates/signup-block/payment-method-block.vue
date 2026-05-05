@@ -10,8 +10,7 @@
         @submit.prevent
         class="space-y-6"
       >
-        <!-- Card Holder Name -->
-        <div class="flex flex-col gap-2 w-full">
+        <!-- <div class="flex flex-col gap-2 w-full">
           <LabelBlock
             label="Card Holder Name"
             :isRequired="true"
@@ -30,78 +29,30 @@
           >
             {{ displayError.cardHolderName }}
           </small>
-        </div>
+        </div> -->
 
-        <!-- Card Number - Stripe Element -->
         <div
           class="flex flex-col gap-2 w-full"
-          :class="{ 'stripe-input-invalid': displayError.cardNumber }"
+          :class="{ 'stripe-input-invalid': displayError.paymentElement }"
         >
-          <LabelBlock
-            label="Card Number"
+          <!-- <LabelBlock
+            label="Payment Details"
             isRequired
-          />
+          /> -->
           <div
-            id="card-number-element"
-            name="cardNumber"
-            data-testid="payment-method-form__card-number__input"
+            id="payment-element"
+            name="paymentElement"
+            data-testid="payment-method-form__payment-element__input"
             class="stripe-input"
           />
           <small
-            v-if="displayError.cardNumber"
+            v-if="displayError.paymentElement"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ displayError.cardNumber }}
+            {{ displayError.paymentElement }}
           </small>
         </div>
 
-        <!-- Expiry and CVC - Stripe Elements -->
-        <div class="flex gap-6 w-full">
-          <div
-            class="flex flex-col gap-2 flex-1"
-            :class="{ 'stripe-input-invalid': displayError.cardExpiry }"
-          >
-            <LabelBlock
-              label="Expiration Date"
-              isRequired
-            />
-            <div
-              name="cardExpiry"
-              id="card-expiry-element"
-              class="stripe-input"
-              data-testid="payment-method-form__card-expiry__input"
-            />
-            <small
-              v-if="displayError.cardExpiry"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ displayError.cardExpiry }}
-            </small>
-          </div>
-          <div
-            class="flex flex-col gap-2 flex-1"
-            :class="{ 'stripe-input-invalid': displayError.cardCvc }"
-          >
-            <LabelBlock
-              label="Security Code (CVC/CVV)"
-              :isRequired="true"
-            />
-            <div
-              name="cardCvc"
-              id="card-cvc-element"
-              class="stripe-input"
-              data-testid="payment-method-form__card-cvc__input"
-            />
-            <small
-              v-if="displayError.cardCvc"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ displayError.cardCvc }}
-            </small>
-          </div>
-        </div>
-
-        <!-- Info message -->
         <InlineMessage severity="info">
           Sensitive data is handled by a PCI-compliant payment partner.
         </InlineMessage>
@@ -111,242 +62,280 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
-  import InputText from '@aziontech/webkit/inputtext'
-  import LabelBlock from '@aziontech/webkit/label'
+  import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import { useAccountStore } from '@/stores/account'
   import { useThemeStore } from '@/stores/theme'
 
   defineOptions({
     name: 'payment-method-block'
   })
 
+  const emit = defineEmits(['readiness-change'])
+
   const props = defineProps({
     stripeClientService: {
       type: Function,
       required: true
+    },
+    checkoutSessionClientSecret: {
+      type: String,
+      default: ''
     }
   })
 
   const themeStore = useThemeStore()
+  const accountStore = useAccountStore()
 
-  // Stripe refs
   const stripe = ref(null)
-  const stripeElements = ref(null)
-  const cardNumber = ref(null)
-  const cardExpiry = ref(null)
-  const cardCvc = ref(null)
+  const checkout = ref(null)
+  const paymentElement = ref(null)
+  const paymentElementReady = ref(false)
+  const paymentElementComplete = ref(false)
+  const initializationVersion = ref(0)
 
-  // Form state
-  const cardHolderName = ref('')
   const displayError = ref({})
 
-  const MESSAGE_INPUTS_STRIPE = {
-    invalid: {
-      cardNumber: 'Invalid card number',
-      cardExpiry: 'Invalid expiration date',
-      cardCvc: 'Invalid security code'
-    },
-    empty: {
-      cardNumber: 'Card number is required',
-      cardExpiry: 'Expiration date is required',
-      cardCvc: 'Security code is required'
-    }
+  const CHECKOUT_ERROR_MESSAGES = {
+    notReady: 'Payment fields are still loading. Please wait a moment.',
+    required: 'Payment details are required',
+    initialization: 'Unable to initialize payment. Please refresh and try again.'
   }
 
-  onMounted(async () => {
-    await initializeStripeComponents()
-    addStripeComponentsToTemplate()
-  })
+  const resetPaymentElementErrors = () => {
+    delete displayError.value.paymentElement
+  }
 
-  const initializeStripeComponents = async () => {
-    try {
-      stripe.value = await props.stripeClientService()
-      stripeElements.value = stripe.value.elements()
-      const theme = themeStore.currentTheme
-      const inputStyles = {
-        style: {
-          base: {
-            fontFamily: "'Sora', sans-serif",
-            color: theme === 'dark' ? '#ffffff' : '#000000',
-            fontSize: '14px'
-          },
-          '::placeholder': {
-            color: '#ededed'
-          },
-          invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a'
-          }
+  const isPaymentFormReady = () => {
+    return Boolean(
+      props.checkoutSessionClientSecret &&
+        paymentElement.value &&
+        paymentElementReady.value &&
+        paymentElementComplete.value &&
+        !displayError.value.paymentElement
+    )
+  }
+
+  const emitReadinessChange = () => {
+    emit('readiness-change', isPaymentFormReady())
+  }
+
+  const unmountPaymentElement = () => {
+    paymentElement.value?.unmount()
+    paymentElement.value = null
+    checkout.value = null
+    paymentElementReady.value = false
+    paymentElementComplete.value = false
+    emitReadinessChange()
+  }
+
+  const buildCheckoutAppearance = () => {
+    const isDarkTheme = themeStore.currentTheme === 'dark'
+    const rootStyles =
+      typeof window !== 'undefined' ? window.getComputedStyle(document.documentElement) : null
+    const surfaceBackgroundToken =
+      rootStyles?.getPropertyValue('--background-surface')?.trim() ||
+      rootStyles?.getPropertyValue('--surface-100')?.trim()
+    const surfaceBackground =
+      surfaceBackgroundToken || (isDarkTheme ? 'rgb(23, 23, 23)' : 'rgb(255, 255, 255)')
+
+    return {
+      theme: isDarkTheme ? 'night' : 'stripe',
+      variables: {
+        colorPrimary: '#f3652b',
+        colorText: isDarkTheme ? '#ffffff' : '#111827',
+        colorTextPlaceholder: isDarkTheme ? '#94a3b8' : '#6b7280',
+        colorBackground: surfaceBackground,
+        colorDanger: '#ef4444',
+        spacingUnit: '4px',
+        borderRadius: '6px',
+        fontFamily: "'Sora', sans-serif"
+      },
+      rules: {
+        '.Input': {
+          backgroundColor: '#282828',
+          border: '1px solid #353535',
+          boxShadow: 'none'
+        },
+        '.Input:focus': {
+          border: '1px solid #f3652b',
+          boxShadow: '0 0 0 0.2rem rgba(243, 100, 43, 0.62)'
         }
       }
-      cardNumber.value = stripeElements.value.create('cardNumber', {
-        ...inputStyles,
-        showIcon: true
-      })
-      cardExpiry.value = stripeElements.value.create('cardExpiry', inputStyles)
-      cardCvc.value = stripeElements.value.create('cardCvc', inputStyles)
-    } catch (error) {
-      //eslint-disable-next-line no-console
-      console.error('Failed to initialize Stripe:', error)
     }
   }
 
-  const handleError = (event, errorType) => {
-    const { error } = event
-    delete displayError.value[errorType]
+  const initializeCheckoutElements = async (clientSecret) => {
+    initializationVersion.value += 1
+    const currentInitializationVersion = initializationVersion.value
 
-    if (error) {
-      displayError.value[errorType] = error.message
-    }
-  }
+    unmountPaymentElement()
+    resetPaymentElementErrors()
+    emitReadinessChange()
 
-  const handleBlur = (event) => {
-    const element = stripeElements.value.getElement(event.elementType)
-    if (element._empty) {
-      displayError.value[event.elementType] = MESSAGE_INPUTS_STRIPE.empty[event.elementType]
+    const normalizedClientSecret = decodeURIComponent(String(clientSecret || ''))
+
+    if (!normalizedClientSecret) {
+      emitReadinessChange()
       return
     }
-    if (element._invalid) {
-      displayError.value[event.elementType] = MESSAGE_INPUTS_STRIPE.invalid[event.elementType]
-    }
-  }
 
-  const addStripeComponentsToTemplate = () => {
-    cardNumber.value?.mount('#card-number-element')
-    cardNumber.value?.on('change', (event) => handleError(event, 'cardNumber'))
-    cardNumber.value?.on('blur', handleBlur)
+    try {
+      stripe.value = await props.stripeClientService()
+      if (currentInitializationVersion !== initializationVersion.value) {
+        return
+      }
 
-    cardExpiry.value?.mount('#card-expiry-element')
-    cardExpiry.value?.on('change', (event) => handleError(event, 'cardExpiry'))
-    cardExpiry.value?.on('blur', handleBlur)
+      const appearance = buildCheckoutAppearance()
+      const checkoutInstance = await stripe.value.initCheckoutElementsSdk({
+        clientSecret: normalizedClientSecret,
+        elementsOptions: { appearance }
+      })
 
-    cardCvc.value?.mount('#card-cvc-element')
-    cardCvc.value?.on('change', (event) => handleError(event, 'cardCvc'))
-    cardCvc.value?.on('blur', handleBlur)
-  }
+      if (currentInitializationVersion !== initializationVersion.value) {
+        return
+      }
 
-  const validateCardholderName = () => {
-    delete displayError.value.cardHolderName
-    if (!cardHolderName.value || cardHolderName.value.trim() === '') {
-      displayError.value.cardHolderName = 'Card holder name is required'
+      checkout.value = checkoutInstance
+      paymentElement.value = checkout.value.createPaymentElement({
+        layout: 'tabs',
+        fields: {
+          billingDetails: {
+            name: 'never',
+            address: {
+              postalCode: 'never'
+            }
+          }
+        },
+        wallets: {
+          applePay: 'auto',
+          googlePay: 'auto'
+        }
+      })
+
+      paymentElement.value.on('ready', () => {
+        if (currentInitializationVersion !== initializationVersion.value) return
+        paymentElementReady.value = true
+        resetPaymentElementErrors()
+        emitReadinessChange()
+      })
+
+      paymentElement.value.on('change', (event) => {
+        if (currentInitializationVersion !== initializationVersion.value) return
+
+        if (event?.error?.message) {
+          paymentElementComplete.value = false
+          displayError.value.paymentElement = event.error.message
+          emitReadinessChange()
+          return
+        }
+
+        paymentElementComplete.value = Boolean(event?.complete)
+
+        if (paymentElementComplete.value) {
+          resetPaymentElementErrors()
+        }
+
+        emitReadinessChange()
+      })
+
+      paymentElement.value.on('loaderror', (event) => {
+        if (currentInitializationVersion !== initializationVersion.value) return
+        displayError.value.paymentElement =
+          event?.error?.message || 'Unable to load payment fields. Please refresh and try again.'
+        emitReadinessChange()
+      })
+
+      paymentElement.value.mount('#payment-element')
+    } catch (error) {
+      if (currentInitializationVersion !== initializationVersion.value) {
+        return
+      }
+
+      displayError.value.paymentElement = CHECKOUT_ERROR_MESSAGES.initialization
+      emitReadinessChange()
+      // eslint-disable-next-line no-console
+      console.error('Failed to initialize Stripe checkout elements:', error)
     }
   }
 
   const validate = async () => {
     const errors = {}
 
-    // Validate card holder name
-    if (!cardHolderName.value || cardHolderName.value.trim() === '') {
-      errors.cardHolderName = 'Card holder name is required'
-    }
-
-    // Validate Stripe elements
-    const cardNumberElement = stripeElements.value?.getElement('cardNumber')
-    const cardExpiryElement = stripeElements.value?.getElement('cardExpiry')
-    const cardCvcElement = stripeElements.value?.getElement('cardCvc')
-
-    if (cardNumberElement?._empty) {
-      errors.cardNumber = MESSAGE_INPUTS_STRIPE.empty.cardNumber
-    } else if (cardNumberElement?._invalid) {
-      errors.cardNumber = MESSAGE_INPUTS_STRIPE.invalid.cardNumber
-    }
-
-    if (cardExpiryElement?._empty) {
-      errors.cardExpiry = MESSAGE_INPUTS_STRIPE.empty.cardExpiry
-    } else if (cardExpiryElement?._invalid) {
-      errors.cardExpiry = MESSAGE_INPUTS_STRIPE.invalid.cardExpiry
-    }
-
-    if (cardCvcElement?._empty) {
-      errors.cardCvc = MESSAGE_INPUTS_STRIPE.empty.cardCvc
-    } else if (cardCvcElement?._invalid) {
-      errors.cardCvc = MESSAGE_INPUTS_STRIPE.invalid.cardCvc
+    if (!props.checkoutSessionClientSecret) {
+      errors.paymentElement = CHECKOUT_ERROR_MESSAGES.required
+    } else if (!paymentElement.value) {
+      errors.paymentElement = CHECKOUT_ERROR_MESSAGES.initialization
+    } else if (!paymentElementReady.value) {
+      errors.paymentElement = CHECKOUT_ERROR_MESSAGES.notReady
+    } else if (displayError.value.paymentElement) {
+      errors.paymentElement = displayError.value.paymentElement
     }
 
     displayError.value = { ...displayError.value, ...errors }
     return Object.keys(errors).length > 0 ? errors : null
   }
 
-  const createToken = async () => {
-    if (!stripe.value || !cardNumber.value) {
-      throw new Error('Stripe is not initialized')
+  const confirmCheckoutSession = async () => {
+    if (!checkout.value) {
+      throw new Error('Checkout session is not initialized. Please try again.')
     }
 
-    const { token, error } = await stripe.value.createToken(cardNumber.value, {
-      name: cardHolderName.value
+    const checkoutEmail = String(accountStore.accountData?.email || '').trim()
+    if (!checkoutEmail) {
+      throw new Error('Account email is missing. Please reload the page and try again.')
+    }
+
+    const actions = await checkout.value.loadActions()
+    const actionsError = actions?.type === 'error' ? actions.error : null
+
+    if (actionsError?.message) {
+      throw new Error(actionsError.message)
+    }
+
+    const confirmResult = await actions.actions.confirm({
+      redirect: 'if_required',
+      email: checkoutEmail
     })
-
-    if (error) {
-      displayError.value[error.param?.replace('_', '')] = error.message
-      throw new Error(error.message)
+    if (confirmResult?.type === 'error') {
+      throw new Error(confirmResult.error?.message || 'Payment confirmation failed.')
     }
 
-    return token
+    return {
+      type: confirmResult?.type,
+      status: confirmResult?.status,
+      session: confirmResult?.session,
+      paymentIntent: confirmResult?.session?.payment_intent || null
+    }
   }
 
-  const confirmPayment = async (clientSecret, billingAddress = {}) => {
-    if (!stripe.value || !cardNumber.value) {
-      throw new Error('Stripe is not initialized')
+  onMounted(async () => {
+    await initializeCheckoutElements(props.checkoutSessionClientSecret)
+    emitReadinessChange()
+  })
+
+  onBeforeUnmount(() => {
+    initializationVersion.value += 1
+    unmountPaymentElement()
+  })
+
+  watch(
+    () => props.checkoutSessionClientSecret,
+    async (newClientSecret) => {
+      await initializeCheckoutElements(newClientSecret)
     }
+  )
 
-    const { paymentIntent, error } = await stripe.value.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardNumber.value,
-        billing_details: {
-          name: cardHolderName.value,
-          address: billingAddress
-        }
-      }
-    })
-
-    if (error) {
-      throw new Error(error.message)
+  watch(
+    () => themeStore.currentTheme,
+    async () => {
+      if (!props.checkoutSessionClientSecret) return
+      await initializeCheckoutElements(props.checkoutSessionClientSecret)
     }
-
-    return paymentIntent
-  }
+  )
 
   defineExpose({
     validate,
-    createToken,
-    confirmPayment
+    confirmCheckoutSession
   })
 </script>
-
-<style scoped>
-  .stripe-input {
-    @apply py-2 px-2 text-base border border-[var(--surface-border)] rounded-md min-h-[38px];
-  }
-
-  .stripe-input:hover {
-    outline: 0 none;
-    outline-offset: 0;
-    border-color: #f3652b;
-  }
-
-  .stripe-input:enabled:focus,
-  .stripe-input:focus-within {
-    outline: 0 none;
-    outline-offset: 0;
-    box-shadow: 0 0 0 0.2rem rgba(243, 100, 43, 0.6235294118);
-    border-color: #f3652b;
-  }
-
-  .StripeElement--invalid,
-  .stripe-input-invalid .StripeElement--empty {
-    border-color: rgb(239 68 68);
-  }
-
-  .azion-light .stripe-input {
-    @apply bg-[var(--surface-100)];
-  }
-
-  .azion-dark .stripe-input {
-    @apply bg-[var(--surface-300)];
-  }
-
-  :deep(.text-base) {
-    font-size: 12px !important;
-  }
-</style>

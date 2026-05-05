@@ -10,10 +10,11 @@ import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo, accountJobRole] = await Promise.all([
+  const [accountInfo, userInfo, accountJobRole, accountSettingsInfo] = await Promise.all([
     accountService.getAccountInfo(),
     userService.getUserInfo(),
-    accountSettingsService.getAccountJobRole()
+    accountSettingsService.getAccountJobRole(),
+    accountSettingsService.getAccountSettingsInfo().catch(() => null)
   ])
   accountInfo.jobRole = accountJobRole.jobRole
   const userResults = userInfo.results || userInfo
@@ -27,6 +28,15 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.email = userResults.email
   accountInfo.user_id = userResults.id
   accountInfo.isDeveloperSupportPlan = true
+
+  if (accountSettingsInfo) {
+    accountInfo.postalCode = accountSettingsInfo.postalCode
+    accountInfo.country = accountSettingsInfo.country
+    accountInfo.region = accountSettingsInfo.region
+    accountInfo.city = accountSettingsInfo.city
+    accountInfo.address = accountSettingsInfo.address
+    accountInfo.complement = accountSettingsInfo.complement
+  }
 
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)

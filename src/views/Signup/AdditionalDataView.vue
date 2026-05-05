@@ -50,7 +50,7 @@
           <!-- Checkout Component -->
           <ChoosingPlanContainer
             :plan="selectedPlan"
-            :paymentClientSecret="paymentClientSecret"
+            :checkoutSessionClientSecret="checkoutSessionClientSecret"
             :getStripeClientService="getStripeClientService"
             ref="checkoutRef"
             @onSuccess="handleCheckoutSuccess"
@@ -127,7 +127,7 @@
   const additionalDataRef = ref(null)
   const currentStep = ref('additional-data') // 'additional-data' | 'checkout' | 'success'
   const selectedPlan = ref(null)
-  const paymentClientSecret = ref('')
+  const checkoutSessionClientSecret = ref('')
 
   const isAdditionalDataStep = computed(() => currentStep.value === 'additional-data')
   const isCheckoutStep = computed(() => currentStep.value === 'checkout')
@@ -171,9 +171,9 @@
 
       if (planId && planPricingId) {
         const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
-        paymentClientSecret.value = serviceOrderResponse?.payment?.clientSecret || ''
+        checkoutSessionClientSecret.value = serviceOrderResponse?.payment?.clientSecret || ''
 
-        if (plan === 'pro' && !paymentClientSecret.value) {
+        if (plan === 'pro' && !checkoutSessionClientSecret.value) {
           // eslint-disable-next-line no-console
           console.error('Unable to initialize payment. Please try again.')
         }
@@ -199,7 +199,7 @@
     currentStep.value = 'additional-data'
   }
 
-  const handleCheckoutSuccess = () => {
+  const handleCheckoutSuccess = async () => {
     currentStep.value = 'success'
   }
 

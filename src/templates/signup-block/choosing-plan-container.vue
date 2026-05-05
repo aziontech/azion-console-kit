@@ -4,7 +4,7 @@
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"
-        :paymentClientSecret="paymentClientSecret"
+        :checkoutSessionClientSecret="checkoutSessionClientSecret"
         :getStripeClientService="getStripeClientService"
         @onBack="emit('onBack')"
         @onSubmit="handleSubmit"
@@ -34,7 +34,7 @@
       type: Function,
       required: true
     },
-    paymentClientSecret: {
+    checkoutSessionClientSecret: {
       type: String,
       default: ''
     }
@@ -46,14 +46,14 @@
   const showLoading = ref(false)
 
   const handleSubmit = async (checkoutData) => {
+    if (isSubmitting.value) {
+      return
+    }
+
     isSubmitting.value = true
     showLoading.value = true
 
     try {
-      if (checkoutData?.paymentStatus !== 'succeeded') {
-        throw new Error('Payment could not be completed. Please try again.')
-      }
-
       emit('onSuccess', checkoutData)
     } catch (error) {
       emit('onError', error)
