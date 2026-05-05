@@ -10,6 +10,8 @@
   const isChanged = ref(false)
   // Inject validationAttempted to show errors when validation is triggered
   const validationAttempted = inject('validationAttempted', ref(false))
+  // Inject function to check if field is required and empty
+  const isFieldRequiredAndEmpty = inject('isFieldRequiredAndEmpty', () => false)
 
   const description = computed(() => control.value.description)
   const label = computed(() => control.value.schema.label)
@@ -20,10 +22,20 @@
     if (!control.value.errors) return ''
     return control.value.schema.error || control.value.errors
   })
+  // Check if this field is required and empty (for showing "Required" message)
+  const isRequiredAndEmpty = computed(() => {
+    const fieldName = path.value
+    return isFieldRequiredAndEmpty(fieldName)
+  })
   // Show error when field was changed OR when validation was attempted (e.g., on form submit)
-  const errorMessage = computed(() =>
-    isChanged.value || validationAttempted.value ? error.value : ''
-  )
+  const errorMessage = computed(() => {
+    // If field is required and empty, show "Required" message
+    if ((isChanged.value || validationAttempted.value) && isRequiredAndEmpty.value) {
+      return 'Required'
+    }
+    // Otherwise show validation error if any
+    return isChanged.value || validationAttempted.value ? error.value : ''
+  })
 
   const onChange = (value) => {
     isChanged.value = true

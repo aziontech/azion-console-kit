@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { vcsService } from '@/services/v2/vcs/vcs-service'
 import { useToast } from '@aziontech/webkit/use-toast'
 
@@ -11,28 +11,23 @@ import { useToast } from '@aziontech/webkit/use-toast'
 export function useVcsOAuth() {
   const toast = useToast()
 
-  const state = reactive({
-    loading: {
-      main: false,
-      repositories: false
-    },
-    platforms: [],
-    integrations: [],
-    repositories: [],
-    callbackUrl: '',
-    selectedIntegration: null
-  })
+  const isLoading = ref(false)
+  const isRepositoriesLoading = ref(false)
+  const platforms = ref([])
+  const integrations = ref([])
+  const repositories = ref([])
+  const callbackUrl = ref('')
 
-  const hasIntegrations = computed(() => state.integrations?.length > 0)
+  const hasIntegrations = computed(() => integrations.value?.length > 0)
 
   const connectedProviders = computed(() => {
-    const providers = state.integrations.map((integration) => integration.provider)
+    const providers = integrations.value.map((integration) => integration.provider)
     return [...new Set(providers.filter(Boolean))]
   })
 
   const integrationsByProvider = computed(() => {
     const grouped = {}
-    state.integrations.forEach((integration) => {
+    integrations.value.forEach((integration) => {
       const providerId = integration.provider
       if (!grouped[providerId]) {
         grouped[providerId] = []
@@ -45,7 +40,7 @@ export function useVcsOAuth() {
   const listPlatforms = async () => {
     try {
       const data = await vcsService.listPlatforms()
-      state.platforms = data
+      platforms.value = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
@@ -55,32 +50,32 @@ export function useVcsOAuth() {
 
   const listIntegrations = async () => {
     try {
-      state.loading.main = true
+      isLoading.value = true
       const data = await vcsService.listIntegrations()
-      state.integrations = data
+      integrations.value = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
       return []
     } finally {
-      state.loading.main = false
+      isLoading.value = false
     }
   }
 
   const connect = async (providerKey) => {
     try {
-      state.loading.main = true
+      isLoading.value = true
 
-      if (!state.platforms.length) {
+      if (!platforms.value.length) {
         await listPlatforms()
       }
 
-      const provider = state.platforms.find((platform) => platform.id === providerKey)
+      const provider = platforms.value.find((platform) => platform.id === providerKey)
       if (!provider) {
         throw new Error(`Provider "${providerKey}" not found`)
       }
 
-      state.callbackUrl = provider.callbackUrl
+      callbackUrl.value = provider.callbackUrl
 
       window.open(
         provider.installationUrl,
@@ -90,7 +85,7 @@ export function useVcsOAuth() {
     } catch (error) {
       error.showErrors?.(toast)
     } finally {
-      state.loading.main = false
+      isLoading.value = false
     }
   }
 
@@ -103,8 +98,8 @@ export function useVcsOAuth() {
 
   const saveIntegration = async (integration) => {
     try {
-      state.loading.main = true
-      await vcsService.postCallbackUrl(state.callbackUrl, integration.data)
+      isLoading.value = true
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await listIntegrations()
     } catch (error) {
       error.showWithOptions?.(toast, (err) => ({
@@ -112,7 +107,7 @@ export function useVcsOAuth() {
         severity: 'error'
       }))
     } finally {
-      state.loading.main = false
+      isLoading.value = false
     }
   }
 
@@ -124,24 +119,23 @@ export function useVcsOAuth() {
 
   const listRepositories = async (integrationId, params = { pageSize: 100, ordering: 'name' }) => {
     try {
-      state.loading.repositories = true
+      isRepositoriesLoading.value = true
       const data = await vcsService.listRepositories(integrationId, params)
-      state.repositories = data
+      repositories.value = data
       return data
     } catch (error) {
       error.showErrors?.(toast)
       return []
     } finally {
-      state.loading.repositories = false
+      isRepositoriesLoading.value = false
     }
   }
 
   const selectIntegration = async (integration) => {
-    state.selectedIntegration = integration
     if (integration?.value) {
       return await listRepositories(integration.value)
     }
-    state.repositories = []
+    repositories.value = []
     return []
   }
 
@@ -151,7 +145,13 @@ export function useVcsOAuth() {
   }
 
   return {
-    state,
+    // State refs
+    isLoading,
+    isRepositoriesLoading,
+    platforms,
+    integrations,
+    repositories,
+    callbackUrl,
 
     // Computed
     hasIntegrations,

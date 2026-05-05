@@ -117,6 +117,33 @@
   // Provide validationAttempted state for all renderers to show errors when validation is attempted
   provide('validationAttempted', validationAttempted)
 
+  /**
+   * Check if a field is required and empty for the current step
+   * Used by renderers to show "required" error message
+   * @param {string} fieldName - The field name to check
+   * @returns {boolean} True if field is required and empty
+   */
+  const isFieldRequiredAndEmpty = (fieldName) => {
+    const stepProperties = settingsFormSchema.value?.properties || {}
+    const isSettingsField = Object.keys(stepProperties).includes(fieldName)
+
+    if (!isSettingsField) {
+      // Check repository fields
+      const repoProperties = repositoryFormSchema.value?.properties || {}
+      if (!Object.keys(repoProperties).includes(fieldName)) return false
+    }
+
+    const schema = isSettingsField ? settingsFormSchema.value : repositoryFormSchema.value
+    const requiredFields = schema?.required || []
+
+    if (!requiredFields.includes(fieldName)) return false
+
+    const value = formData.value[fieldName]
+    return value === undefined || value === null || value === ''
+  }
+
+  provide('isFieldRequiredAndEmpty', isFieldRequiredAndEmpty)
+
   const customRenderers = [
     {
       tester: InputTextControlTester,
@@ -459,6 +486,18 @@
 
     const stepFieldNames = Object.keys(stepProperties)
 
+    // Check if there are required fields missing for the current step
+    const requiredFields =
+      step === 'repository'
+        ? repositoryFormSchema.value?.required || []
+        : settingsFormSchema.value?.required || []
+
+    // Build a list of missing required fields for this step
+    const missingRequiredFields = requiredFields.filter((fieldName) => {
+      const value = formData.value[fieldName]
+      return value === undefined || value === null || value === ''
+    })
+
     // Filter errors to only include fields from the current step
     const stepErrors = errors.value.filter((error) => {
       // For required errors, the field name is in params.missingProperty
@@ -489,9 +528,10 @@
     }
 
     const hasStepErrors = stepErrors.length > 0
+    const hasMissingRequired = missingRequiredFields.length > 0
     const hasVcsError = vcsIntegrationError.value !== ''
 
-    return !hasStepErrors && !hasVcsError
+    return !hasStepErrors && !hasMissingRequired && !hasVcsError
   }
 
   /**
@@ -725,10 +765,15 @@
 
   // Watch currentStep from LayoutEngineBlock to track which form is active
   // Fallback to 'repository' if not available
+  // Reset validationAttempted when changing steps to prevent showing errors on new step
   watch(
     () => layoutRef.value?.currentStep,
-    (newStep) => {
+    (newStep, oldStep) => {
       currentFormStep.value = newStep || 'repository'
+      // Reset validation state when navigating to a different step
+      if (newStep !== oldStep) {
+        validationAttempted.value = false
+      }
     },
     { immediate: true }
   )
