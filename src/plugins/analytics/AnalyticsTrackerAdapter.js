@@ -8,6 +8,20 @@ import {
 } from './trackers'
 import { cleanObject } from '../../utils/cleanObject.js'
 
+const logTrackerError = (operation, err) => {
+  // eslint-disable-next-line no-console
+  console.warn(
+    JSON.stringify({
+      level: 'warn',
+      tag: 'analytics-tracker',
+      event: 'operation_failed',
+      operation,
+      msg: err?.message,
+      ts: Date.now()
+    })
+  )
+}
+
 /**
  * @typedef {Object} TrackerEvent
  * @property {string} eventName - The name of the event.
@@ -21,7 +35,7 @@ import { cleanObject } from '../../utils/cleanObject.js'
 export class AnalyticsTrackerAdapter {
   /** @type {TrackerEvent[]} */
   #events = []
-  /** @type {import('analytics').AnalyticsInstance} */
+  /** @type {import('@/plugins/factories/analytics-tracking-factory').AnalyticsClient} */
   #analyticsClient = null
   /** @type {Boolean} */
   #hasAnalyticsClient = false
@@ -42,7 +56,7 @@ export class AnalyticsTrackerAdapter {
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
-   * @param {import('analytics').AnalyticsInstance} analyticsClient - The client for tracking.
+   * @param {import('@/plugins/factories/analytics-tracking-factory').AnalyticsClient} analyticsClient - The client for tracking.
    */
   constructor(analyticsClient) {
     this.#hasAnalyticsClient = !!analyticsClient
@@ -73,12 +87,25 @@ export class AnalyticsTrackerAdapter {
    */
   async track() {
     if (!this.#hasAnalytics()) return
-    this.#events.forEach(async (action) => {
-      const { eventName, props } = action
-      const propsWithTraits = cleanObject({ ...props, ...this.#traits, application: 'console-kit' })
-      await this.#analyticsClient.track(eventName, propsWithTraits)
-    })
+    const queued = this.#events
     this.#events = []
+    queued.forEach((action) => {
+      try {
+        const { eventName, props } = action
+        const propsWithTraits = cleanObject({
+          ...props,
+          ...this.#traits,
+          application: 'console-kit'
+        })
+        // Fire-and-forget: the underlying client already handles network
+        // failures internally; we still guard sync errors (cleanObject, etc).
+        Promise.resolve(this.#analyticsClient.track(eventName, propsWithTraits)).catch((err) =>
+          logTrackerError('track', err)
+        )
+      } catch (err) {
+        logTrackerError('track', err)
+      }
+    })
   }
 
   /**
@@ -90,8 +117,12 @@ export class AnalyticsTrackerAdapter {
   async identify(id) {
     if (id === undefined || id === null || id === '' || !this.#hasAnalytics()) return
 
-    const cleanedTraits = cleanObject(this.#traits)
-    await this.#analyticsClient.identify(String(id), cleanedTraits)
+    try {
+      const cleanedTraits = cleanObject(this.#traits)
+      await this.#analyticsClient.identify(String(id), cleanedTraits)
+    } catch (err) {
+      logTrackerError('identify', err)
+    }
   }
 
   /**
@@ -100,8 +131,11 @@ export class AnalyticsTrackerAdapter {
   reset() {
     this.#events = []
     this.#traits = {}
-    if (this.#hasAnalytics()) {
+    if (!this.#hasAnalytics()) return
+    try {
       this.#analyticsClient.reset()
+    } catch (err) {
+      logTrackerError('reset', err)
     }
   }
 

@@ -93,6 +93,12 @@ const config = {
   build: {
     preset: 'vue'
   },
+  functions: [
+    {
+      name: 'signals-proxy',
+      path: './edge-functions/signals-proxy.js'
+    }
+  ],
   origin: [
     ...addStagePrefix([
       {
@@ -336,6 +342,12 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
+            inputValue: '^/signals/'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
           }
@@ -343,6 +355,17 @@ const config = {
         behavior: {
           rewrite: `/index.html`,
           setCache: 'Statics - Cache .html'
+        }
+      },
+      {
+        name: 'Signals Proxy',
+        description:
+          'Routes /signals/{e,i,p} requests to the signals-proxy edge function, which forwards them to the upstream telemetry vendor with the write key injected server-side. Bypass cache and never forward internal cookies.',
+        match: '^/signals/(e|i|p)$',
+        behavior: {
+          runFunction: 'signals-proxy',
+          forwardCookies: false,
+          bypassCache: true
         }
       },
       {
@@ -585,6 +608,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/billing/invoices'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/signals/'
           },
           {
             variable: '${uri}',
