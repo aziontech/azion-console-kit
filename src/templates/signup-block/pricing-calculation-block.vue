@@ -303,10 +303,7 @@
 
     emit('update:checkoutSessionClientSecret', '')
     const response = await updatePlanPricing(planPricingId)
-    emit(
-      'update:checkoutSessionClientSecret',
-      response?.payment?.clientSecret || ''
-    )
+    emit('update:checkoutSessionClientSecret', response?.payment?.clientSecret || '')
   })
 
   watch(couponCode, (value) => {
