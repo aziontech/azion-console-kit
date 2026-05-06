@@ -39,7 +39,8 @@ jobs:
           azion whoami
 
       - name: Install storybook dependencies
-        run: yarn install
+        run: |
+          yarn storybook:install
       
       - name: Building Storybook
         run: |
