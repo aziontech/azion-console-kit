@@ -70,9 +70,8 @@ describe('DomainsServices', () => {
   })
 
   it("should not recreate Let's Encrypt certificate when existing certificate is wildcard and new hostnames are not covered", async () => {
-    const { digitalCertificatesService } = await import(
-      '@/services/v2/digital-certificates/digital-certificates-service'
-    )
+    const { digitalCertificatesService } =
+      await import('@/services/v2/digital-certificates/digital-certificates-service')
 
     digitalCertificatesService.createDigitalCertificateLetEncrypt.mockResolvedValueOnce({ id: 999 })
 
