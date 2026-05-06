@@ -21,13 +21,9 @@ const ENDPOINT = {
 
 const log = (level, event, extra = {}) => {
   const entry = JSON.stringify({ level, tag: 'signals-client', event, ts: Date.now(), ...extra })
-  if (level === 'error') {
-    // eslint-disable-next-line no-console
-    console.error(entry)
-  } else {
-    // eslint-disable-next-line no-console
-    console.warn(entry)
-  }
+  const method = level === 'error' ? 'error' : 'warn'
+  // eslint-disable-next-line no-console
+  console[method](entry)
 }
 
 const post = async (path, body) => {
@@ -76,7 +72,7 @@ export function makeAnalyticsClient() {
     },
 
     async identify(userId, traits = {}) {
-      const id = userId == null ? null : String(userId)
+      const id = userId != null ? String(userId) : null
       if (id) setAzionUserId(id)
       await post(ENDPOINT.identify, {
         ...buildBase(),

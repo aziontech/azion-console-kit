@@ -42,6 +42,9 @@ export const getTracker = () => {
 /**@type {import('vue').Plugin} */
 export default {
   install: (app) => {
+    // getTracker() falls back to a no-op adapter on init failure, but we
+    // still wrap the install path so an unexpected failure here can never
+    // abort the Vue boot — analytics must never block the app from loading.
     try {
       const tracker = getTracker()
       app.config.globalProperties.$tracker = tracker

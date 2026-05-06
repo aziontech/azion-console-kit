@@ -1,4 +1,4 @@
-/* global Azion */
+/* global globalThis */
 
 /**
  * Signals Proxy — Edge Function
@@ -27,33 +27,32 @@ const PATH_MAP = {
 const FORWARD_TIMEOUT_MS = 5000
 const MAX_USER_AGENT_LENGTH = 512
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/**
+ * Reject patterns that indicate the value is not a real user id. Centralised
+ * so we can extend (e.g., reject ids starting with `test_`) in one place.
+ *
+ * Console userIds always come from the account store as numeric DB ids — we
+ * don't validate email here on purpose. If we ever consolidate this proxy
+ * with the marketing site (where users type emails into forms), bring back
+ * an email-rejection pattern.
+ */
+const INVALID_USER_ID_PATTERNS = [
+  (id) => id === 'undefined',
+  (id) => id.startsWith('anon_')
+]
 
 const resolveUserId = (raw) => {
   if (typeof raw !== 'string') return null
   const trimmed = raw.trim()
   if (!trimmed) return null
-  if (EMAIL_RE.test(trimmed)) return null
-  if (trimmed === 'undefined') return null
-  if (trimmed.startsWith('anon_')) return null
-  return trimmed
+  return INVALID_USER_ID_PATTERNS.some((isInvalid) => isInvalid(trimmed)) ? null : trimmed
 }
 
 const log = (level, event, extra = {}) => {
-  const entry = JSON.stringify({
-    level,
-    tag: 'signals-proxy',
-    event,
-    ts: Date.now(),
-    ...extra
-  })
-  if (level === 'error') {
-    // eslint-disable-next-line no-console
-    console.error(entry)
-  } else {
-    // eslint-disable-next-line no-console
-    console.warn(entry)
-  }
+  const entry = JSON.stringify({ level, tag: 'signals-proxy', event, ts: Date.now(), ...extra })
+  const method = level === 'error' ? 'error' : 'warn'
+  // eslint-disable-next-line no-console
+  console[method](entry)
 }
 
 const json = (status, body) =>
@@ -62,23 +61,16 @@ const json = (status, body) =>
     headers: { 'Content-Type': 'application/json' }
   })
 
-const readWriteKey = () => {
-  if (typeof Azion !== 'undefined' && Azion?.env?.get) {
-    return Azion.env.get('SIGNALS_WRITE_KEY') || ''
-  }
-  return ''
-}
+const readWriteKey = () => globalThis.Azion?.env?.get?.('SIGNALS_WRITE_KEY') ?? ''
 
-const resolveRealIp = (request) => {
-  const fromMetadata = request?.metadata?.remote_addr
-  if (fromMetadata) return fromMetadata
-  return (
-    request.headers.get('X-Real-IP') ||
-    request.headers.get('X-Forwarded-For') ||
-    request.headers.get('X-User-Real-IP') ||
-    ''
-  )
-}
+const IP_HEADER_FALLBACKS = ['X-Real-IP', 'X-Forwarded-For', 'X-User-Real-IP']
+
+const resolveRealIp = (request) =>
+  request?.metadata?.remote_addr ||
+  IP_HEADER_FALLBACKS.map((header) => request.headers.get(header)).find(Boolean) ||
+  ''
+
+const isAbortError = (err) => err?.name === 'AbortError'
 
 const handle = async (request) => {
   if (request.method !== 'POST') {
@@ -143,7 +135,7 @@ const handle = async (request) => {
 
     return json(200, { status: 'sent' })
   } catch (forwardError) {
-    if (forwardError?.name === 'AbortError') {
+    if (isAbortError(forwardError)) {
       log('error', 'forward_timeout', { path: upstreamPath })
       return json(502, { error: 'Upstream timeout' })
     }

@@ -1,3 +1,5 @@
+import psl from 'psl'
+
 /**
  * Cookie utilities for cross-domain identity sharing between
  * www.azion.com (site) and console.azion.com (console).
@@ -18,6 +20,13 @@ const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365
 const MAX_USER_ID_LENGTH = 3500
 
 /**
+ * Allowlist of registrable domains where it's safe to widen the cookie scope
+ * via the Domain attribute. Anything outside this list (preview URLs,
+ * customer-owned domains, localhost, IPs) gets a host-only cookie.
+ */
+const ALLOWED_REGISTRABLE_DOMAINS = new Set(['azion.com'])
+
+/**
  * In-memory fallback for the anonymous id when cookies are blocked or rejected
  * by the browser. Without this, every call to getAzionAnonymousId() would
  * return a fresh UUID and break Segment's identity stitching.
@@ -26,13 +35,9 @@ let inMemoryAnonymousId = null
 
 const log = (level, event, extra = {}) => {
   const entry = JSON.stringify({ level, tag: 'cookies', event, ts: Date.now(), ...extra })
-  if (level === 'error') {
-    // eslint-disable-next-line no-console
-    console.error(entry)
-  } else {
-    // eslint-disable-next-line no-console
-    console.warn(entry)
-  }
+  const method = level === 'error' ? 'error' : 'warn'
+  // eslint-disable-next-line no-console
+  console[method](entry)
 }
 
 const cookieRegexCache = Object.create(null)
@@ -44,21 +49,42 @@ const getCookieRegex = (name) => {
   return cookieRegexCache[name]
 }
 
+/**
+ * Resolves the cookie Domain attribute using the Public Suffix List, the
+ * same approach taken by Segment / GA / Mixpanel. The browser silently
+ * rejects cookies whose Domain isn't a suffix of the current host
+ * (RFC 6265), and broad domains can leak identity across unrelated tenants
+ * — so we deliberately:
+ *
+ *  1. Resolve the registrable domain via `psl.get` (handles eTLDs like
+ *     `co.uk` and `com.br` correctly; returns `null` for IPs and localhost).
+ *  2. Only widen the cookie scope when the registrable domain is in our
+ *     allowlist. Preview URLs (`*.azionedge.net`), customer-owned domains
+ *     and any unknown host fall back to a host-only cookie.
+ */
 const getCookieDomain = () => {
   if (typeof window === 'undefined') return
-  const host = window.location.hostname
-  if (host === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(host)) return
-  return '.azion.com'
+  const host = window.location?.hostname
+  if (!host) return
+  try {
+    const registrable = psl.get(host)
+    return ALLOWED_REGISTRABLE_DOMAINS.has(registrable) ? `.${registrable}` : undefined
+  } catch {
+    return
+  }
 }
 
 const writeCookie = (name, value, { maxAgeSeconds, domain } = {}) => {
   if (typeof document === 'undefined') return
-  const parts = [`${name}=${encodeURIComponent(value)}`, 'Path=/', 'SameSite=Lax']
-  if (typeof maxAgeSeconds === 'number') parts.push(`Max-Age=${maxAgeSeconds}`)
-  if (domain) parts.push(`Domain=${domain}`)
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    parts.push('Secure')
-  }
+  const isSecure = window.location?.protocol === 'https:'
+  const parts = [
+    `${name}=${encodeURIComponent(value)}`,
+    'Path=/',
+    'SameSite=Lax',
+    typeof maxAgeSeconds === 'number' && `Max-Age=${maxAgeSeconds}`,
+    domain && `Domain=${domain}`,
+    isSecure && 'Secure'
+  ].filter(Boolean)
   document.cookie = parts.join('; ')
 }
 
@@ -98,13 +124,9 @@ const persistAnonymousId = (id) => {
     // Verify the cookie actually persisted. If browser blocks cookies (strict
     // privacy mode, third-party blocking on cross-domain, etc), fall back to
     // an in-memory singleton so the session at least stays consistent.
-    const persisted = getCookie(ANONYMOUS_ID_COOKIE)
-    if (persisted !== id) {
-      inMemoryAnonymousId = id
-      log('warn', 'cookie_blocked', { cookie: ANONYMOUS_ID_COOKIE })
-    } else {
-      inMemoryAnonymousId = null
-    }
+    const persisted = getCookie(ANONYMOUS_ID_COOKIE) === id
+    inMemoryAnonymousId = persisted ? null : id
+    if (!persisted) log('warn', 'cookie_blocked', { cookie: ANONYMOUS_ID_COOKIE })
   } catch (err) {
     inMemoryAnonymousId = id
     log('error', 'persist_anonymous_id_failed', { msg: err?.message })
