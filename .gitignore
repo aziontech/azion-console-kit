@@ -59,7 +59,9 @@ hooks/
 
 # AI
 CLAUDE.md
+AGENTS.md
 .opencode/
 .claude/
+.gitnexus/
 
 storybook/yarn.lock

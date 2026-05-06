@@ -1,5 +1,6 @@
 import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
+import { environmentRoutes } from '@routes/environment-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { azionAiRoutes } from '@routes/azion-ai-routes'
 
@@ -85,6 +86,7 @@ const router = createRouter({
     switchAccountRoutes,
     marketplaceRoutes,
     accountRoutes,
+    environmentRoutes,
     settingsRoutes,
     wafRulesRoutes,
     realTimeMetricsRoutes,
