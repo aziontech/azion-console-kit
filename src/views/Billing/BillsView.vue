@@ -368,6 +368,7 @@
         label: 'Details',
         icon: 'pi pi-file',
         type: 'action',
+        disabled: (item) => item.isFallback,
         commandAction: (item) => goToEnvoiceDetails(item)
       }
     ]
@@ -377,7 +378,7 @@
         label: 'Download Invoice',
         icon: 'pi pi-download',
         type: 'action',
-        disabled: (item) => item.disabled,
+        disabled: (item) => item.disabled || item.isFallback,
         commandAction: (item) => {
           if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
         }

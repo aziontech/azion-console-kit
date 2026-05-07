@@ -132,6 +132,7 @@ const listPaymentHistoryForRegularAccounts = async (params = {}) => {
 const adaptPaymentHistoryForNotRegularAccounts = (results) => {
   const parseBilling = results?.map((card, index) => {
     const typeCard = card.card_brand?.toLowerCase()
+    const isFallback = !card.invoice_number && !card.payment_intent_id
     const invoiceId =
       card.invoice_number || card.payment_intent_id || `fallback-${index}-${Date.now()}`
 
@@ -148,6 +149,7 @@ const adaptPaymentHistoryForNotRegularAccounts = (results) => {
         value: `${typeCard} ${card.payment_method_details}`
       },
       disabled: !card.invoice_number,
+      isFallback,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
       status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
       paymentDate: formatDateToDayMonthYearHour(card.payment_due)
@@ -164,6 +166,7 @@ const adaptPaymentHistoryForNotRegularAccounts = (results) => {
 const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
   const parseBilling = httpResponse?.body?.data?.accountingDetail?.map((card, index) => {
     const disabledOpenInvoice = true
+    const isFallback = !card.billId
     const id = card.billId || `fallback-${index}-${Date.now()}`
 
     return {
@@ -174,6 +177,7 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
       },
       billId: card.billId,
       disabled: disabledOpenInvoice,
+      isFallback,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
       paymentDate: formatDateToDayMonthYearHour(card.periodTo)
     }
