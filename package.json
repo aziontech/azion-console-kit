@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.57.0",
+  "version": "1.57.1",
   "private": false,
   "type": "module",
   "repository": {
@@ -36,6 +36,7 @@
     "architecture:report": "node scripts/architecture-report/index.cjs",
     "storybook:install": "cd storybook && yarn install; cd ..",
     "storybook:dev": "cd storybook && yarn dev",
+    "storybook:install": "cd storybook && yarn install && cd ..",
     "storybook:build": "cd storybook && yarn build"
   },
   "dependencies": {
