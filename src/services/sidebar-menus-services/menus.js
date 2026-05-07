@@ -19,6 +19,15 @@ function createMarketplaceItem() {
   }
 }
 
+function createDeploymentsItem() {
+  return {
+    label: 'Deployments',
+    icon: 'ai ai-deploy-pillar',
+    to: '/deployments',
+    id: 'deployments'
+  }
+}
+
 function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   const menuOption = {
@@ -33,6 +42,7 @@ function createDomainsItem() {
 
 function createBuildItems() {
   return [
+    createDomainsItem(),
     {
       label: 'Applications',
       icon: 'ai ai-edge-application',
@@ -213,7 +223,7 @@ export function getMenuItens(showMarketplaceProductsItens) {
   const menus = [
     createHomeItem(),
     createMarketplaceItem(),
-    createDomainsItem(),
+    createDeploymentsItem(),
     {
       label: 'Build',
       items: createBuildItems()
