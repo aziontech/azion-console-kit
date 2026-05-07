@@ -68,7 +68,9 @@ const adapt = ({ body, statusCode }) => {
   const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
 
   const filteredProducts = productsGrouped.filter((item) => {
-    return ![BOT_MANAGER_SLUG].includes(item.productSlug)
+    const hasValue = item.accounted > 0
+    const isNotBotManager = ![BOT_MANAGER_SLUG].includes(item.productSlug)
+    return hasValue && isNotBotManager
   })
 
   const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
