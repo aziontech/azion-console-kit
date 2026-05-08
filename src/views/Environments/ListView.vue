@@ -5,7 +5,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { DataTableActionsButtons } from '@/components/list-table'
-  import EnvironmentDrawer from './Drawer/EnvironmentDrawer.vue'
+  import EnvironmentsDrawer from './Drawer'
 
   defineOptions({ name: 'list-environments' })
 
@@ -22,19 +22,12 @@
 
   const listTableRef = ref(null)
   const drawerRef = ref(null)
-  const isEditing = ref(false)
-  const selectedEnvironment = ref(null)
-
   const handleOpenCreateDrawer = () => {
-    isEditing.value = false
-    selectedEnvironment.value = null
-    drawerRef.value?.open()
+    drawerRef.value?.openCreateDrawer()
   }
 
   const handleOpenEditDrawer = (environment) => {
-    isEditing.value = true
-    selectedEnvironment.value = environment
-    drawerRef.value?.open()
+    drawerRef.value?.openEditDrawer(environment.id)
   }
 
   const handleDrawerSave = () => {
@@ -175,10 +168,8 @@
     </template>
   </ContentBlock>
 
-  <EnvironmentDrawer
+  <EnvironmentsDrawer
     ref="drawerRef"
-    :isEditing="isEditing"
-    :environment="selectedEnvironment"
-    @save="handleDrawerSave"
+    @onSuccess="handleDrawerSave"
   />
 </template>
