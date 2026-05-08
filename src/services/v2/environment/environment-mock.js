@@ -21,7 +21,7 @@ const parseStatus = (status) => {
 const formatConfiguration = (config) => {
   return config === 'versioned_urls'
     ? { content: 'Versioned URLs', severity: 'info' }
-    : { content: 'Single Version', severity: 'secondary' }
+    : { content: 'Single Version', severity: 'info' }
 }
 
 // Helper to parse configuration from form data
@@ -43,6 +43,8 @@ let environments = [
     name: 'production',
     status: formatStatus('active'),
     configuration: formatConfiguration('single_version'),
+    globalVariables: [],
+    environmentVariables: {},
     url: 'console.azion.com',
     lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
@@ -52,6 +54,8 @@ let environments = [
     name: 'staging',
     status: formatStatus('active'),
     configuration: formatConfiguration('versioned_urls'),
+    globalVariables: [],
+    environmentVariables: {},
     url: '*.azion.com',
     lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
@@ -73,11 +77,27 @@ export const listEnvironmentsService = async () => {
 export const createEnvironmentService = async (data) => {
   await simulateDelay()
   const timestamp = getCurrentTimestamp()
+
+  let parsedEnvironmentVariables = {}
+  if (typeof data.environmentVariables === 'string' && data.environmentVariables.trim()) {
+    try {
+      parsedEnvironmentVariables = JSON.parse(data.environmentVariables)
+    } catch {
+      parsedEnvironmentVariables = {}
+    }
+  } else if (typeof data.environmentVariables === 'object' && data.environmentVariables !== null) {
+    parsedEnvironmentVariables = data.environmentVariables
+  }
+
   const newEnvironment = {
     id: String(nextId++),
     name: data.name,
     status: formatStatus(parseStatus(data.status) || 'active'),
     configuration: formatConfiguration(parseConfiguration(data.configuration) || 'single_version'),
+    globalVariables: Array.isArray(data.globalVariables)
+      ? data.globalVariables.map((variableId) => variableId.toString())
+      : [],
+    environmentVariables: parsedEnvironmentVariables,
     lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(timestamp)
   }
@@ -91,12 +111,28 @@ export const updateEnvironmentService = async (id, data) => {
   if (index === -1) {
     throw new Error('Environment not found')
   }
+
+  let parsedEnvironmentVariables = {}
+  if (typeof data.environmentVariables === 'string' && data.environmentVariables.trim()) {
+    try {
+      parsedEnvironmentVariables = JSON.parse(data.environmentVariables)
+    } catch {
+      parsedEnvironmentVariables = {}
+    }
+  } else if (typeof data.environmentVariables === 'object' && data.environmentVariables !== null) {
+    parsedEnvironmentVariables = data.environmentVariables
+  }
+
   const timestamp = getCurrentTimestamp()
   environments[index] = {
     ...environments[index],
     name: data.name,
     status: formatStatus(parseStatus(data.status)),
     configuration: formatConfiguration(parseConfiguration(data.configuration)),
+    globalVariables: Array.isArray(data.globalVariables)
+      ? data.globalVariables.map((variableId) => variableId.toString())
+      : [],
+    environmentVariables: parsedEnvironmentVariables,
     lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(timestamp)
   }
