@@ -54,7 +54,7 @@
   const environmentVariablesFormError = ref('')
   const customVariablesFieldErrors = ref({})
   const isSyncingEnvironmentVariables = ref(false)
-  const keyRegex = /^[A-Z0-9_]*$/
+  const keyRegex = /^[A-Z0-9_]+$/
   let customVariableEntryId = 0
 
   const createCustomVariableEntry = (key = '', value = '') => ({
@@ -122,6 +122,10 @@
     return Object.entries(variables).map(([key, value]) => ({
       ...createCustomVariableEntry(key, value)
     }))
+  }
+
+  const getInvalidEnvironmentVariableKeys = (variablesObject) => {
+    return Object.keys(variablesObject).filter((key) => !keyRegex.test(key.trim()))
   }
 
   const ensureCustomVariableEntry = () => {
@@ -260,17 +264,24 @@
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
         environmentVariablesJsonError.value =
           'Environment Variables must be a JSON object with key/value pairs.'
-        environmentVariables.value = value
+        return
+      }
+
+      const normalized = normalizeEnvironmentVariablesObject(parsed)
+      const invalidKeys = getInvalidEnvironmentVariableKeys(normalized)
+
+      if (invalidKeys.length > 0) {
+        environmentVariablesJsonError.value =
+          'Invalid key format. Use only uppercase letters, numbers, and underscore (_).'
         return
       }
 
       environmentVariablesJsonError.value = ''
       environmentVariablesFormError.value = ''
-      environmentVariables.value = normalizeEnvironmentVariablesObject(parsed)
+      environmentVariables.value = normalized
       syncEnvironmentVariablesViews('json')
     } catch {
       environmentVariablesJsonError.value = 'Environment Variables must be valid JSON.'
-      environmentVariables.value = value
     }
   }
 
@@ -296,7 +307,7 @@
     })
 
     if (emptyKeyIndices.size > 0) {
-      environmentVariablesFormError.value = ''
+      environmentVariablesFormError.value = 'Key is required.'
       if (environmentVariables.value !== null) {
         environmentVariables.value = null
       }
@@ -304,7 +315,7 @@
     }
 
     if (emptyValueIndices.size > 0) {
-      environmentVariablesFormError.value = ''
+      environmentVariablesFormError.value = 'Value is required.'
       if (environmentVariables.value !== null) {
         environmentVariables.value = null
       }
@@ -312,7 +323,8 @@
     }
 
     if (invalidKeyFormatIndices.size > 0) {
-      environmentVariablesFormError.value = ''
+      environmentVariablesFormError.value =
+        'Invalid key format. Use only uppercase letters, numbers, and underscore (_).'
       if (environmentVariables.value !== null) {
         environmentVariables.value = null
       }
@@ -320,7 +332,7 @@
     }
 
     if (duplicatedKeys.length > 0) {
-      environmentVariablesFormError.value = ''
+      environmentVariablesFormError.value = `Duplicated key: ${duplicatedKeys.join(', ')}`
       if (environmentVariables.value !== null) {
         environmentVariables.value = null
       }
@@ -395,7 +407,7 @@
         ? trimmedLine.slice(7).trim()
         : trimmedLine
 
-      const match = normalizedLine.match(/^([A-Za-z_][A-Za-z0-9_.-]*)\s*=\s*(.*)$/)
+      const match = normalizedLine.match(/^([A-Z0-9_]+)\s*=\s*(.*)$/)
 
       if (!match) {
         invalidLines.push(index + 1)
@@ -510,6 +522,7 @@
   watch(
     customVariablesEntries,
     () => {
+      if (customVariablesView.value !== 'Form') return
       handleEnvironmentVariablesFormChange()
     },
     { deep: true }
@@ -771,7 +784,7 @@
 
         <template v-else>
           <CodeEditor
-            v-model="environmentVariablesJsonText"
+            :modelValue="environmentVariablesJsonText"
             runtime="json"
             :initialValue="environmentVariablesJsonText"
             :readOnly="props.disabledFields"
@@ -793,6 +806,13 @@
           class="p-error text-xs font-normal leading-tight"
         >
           {{ environmentVariablesJsonError }}
+        </small>
+
+        <small
+          v-if="environmentVariablesFormError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ environmentVariablesFormError }}
         </small>
 
         <small
