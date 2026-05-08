@@ -23,6 +23,7 @@
 
   const loadCreateDrawer = refDebounced(showCreateEnvironmentDrawer, DEBOUNCE_TIME_IN_MS)
   const loadEditDrawer = refDebounced(showEditEnvironmentDrawer, DEBOUNCE_TIME_IN_MS)
+  const keyRegex = /^[A-Z0-9_]+$/
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -46,7 +47,7 @@
 
           return Object.keys(value).every((key) => {
             const itemValue = value[key]
-            return key.trim().length > 0 && typeof itemValue === 'string'
+            return keyRegex.test(key.trim()) && typeof itemValue === 'string'
           })
         }
       )
