@@ -23,7 +23,7 @@ describe('HubspotService', () => {
       })
 
       expect(requestSpy).toHaveBeenCalledWith({
-        url: '/hubspot/events',
+        url: 'https://www.azion.com/api/hubspot/events',
         method: 'POST',
         body: {
           eventName: 'sign_up',
@@ -37,7 +37,7 @@ describe('HubspotService', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        config: { baseURL: '/api' }
+        config: {}
       })
     })
 
@@ -59,7 +59,7 @@ describe('HubspotService', () => {
       })
 
       expect(requestSpy).toHaveBeenCalledWith({
-        url: '/hubspot/events',
+        url: 'https://www.azion.com/api/hubspot/events',
         method: 'POST',
         body: {
           eventName: 'sign_up',
@@ -78,17 +78,21 @@ describe('HubspotService', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        config: { baseURL: '/api' }
+        config: {}
       })
     })
 
     it('should use VITE_HUBSPOT_API_URL as base URL when configured', async () => {
-      vi.stubEnv('VITE_HUBSPOT_API_URL', 'https://api-tracker.azion.com')
+      vi.stubEnv('VITE_HUBSPOT_API_URL', 'https://api-tracker.azion.com/api')
+      // Re-import to pick up new env var
+      const { hubspotService: customService } = await import(
+        '@/services/v2/hubspot/hubspot-service.js?bust=' + Date.now()
+      )
       const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({
         statusCode: 200
       })
 
-      await hubspotService.submitForm({
+      await customService.submitForm({
         email: 'test@example.com',
         form_action: 'signup_email',
         user_id__rtm_: 'user-123'
@@ -96,7 +100,7 @@ describe('HubspotService', () => {
 
       expect(requestSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          url: 'https://api-tracker.azion.com/hubspot/events'
+          url: 'https://api-tracker.azion.com/api/hubspot/events'
         })
       )
     })

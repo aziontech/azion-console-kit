@@ -2,13 +2,11 @@ import { HubspotAdapter } from './hubspot-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 
 export class HubspotService extends BaseService {
+  #baseUrl = import.meta.env.VITE_HUBSPOT_API_URL || 'https://www.azion.com/api'
   #basePath = '/hubspot/events'
 
   #buildUrl() {
-    const baseUrl = import.meta.env.VITE_HUBSPOT_API_URL || ''
-    if (!baseUrl) return { url: this.#basePath, config: { baseURL: '/api' } }
-
-    return { url: `${baseUrl}${this.#basePath}`, config: {} }
+    return { url: `${this.#baseUrl}${this.#basePath}`, config: {} }
   }
 
   submitForm = async (payload) => {
