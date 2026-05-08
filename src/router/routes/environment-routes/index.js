@@ -13,6 +13,7 @@ export const environmentRoutes = {
         listEnvironmentsService
       },
       meta: {
+        title: 'Environments',
         breadCrumbs: [
           {
             label: 'Environments',

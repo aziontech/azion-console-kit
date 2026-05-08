@@ -66,6 +66,35 @@ let nextId = 3
 
 const simulateDelay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
 
+const normalizeEnvironmentVariables = (environmentVariables) => {
+  if (!environmentVariables) return {}
+
+  if (typeof environmentVariables === 'string' && environmentVariables.trim()) {
+    try {
+      const parsed = JSON.parse(environmentVariables)
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+
+      return Object.entries(parsed).reduce((acc, [key, value]) => {
+        if (!key?.trim()) return acc
+        acc[key] = typeof value === 'string' ? value : String(value ?? '')
+        return acc
+      }, {})
+    } catch {
+      return {}
+    }
+  }
+
+  if (typeof environmentVariables === 'object' && !Array.isArray(environmentVariables)) {
+    return Object.entries(environmentVariables).reduce((acc, [key, value]) => {
+      if (!key?.trim()) return acc
+      acc[key] = typeof value === 'string' ? value : String(value ?? '')
+      return acc
+    }, {})
+  }
+
+  return {}
+}
+
 export const listEnvironmentsService = async () => {
   await simulateDelay()
   return {
@@ -78,17 +107,6 @@ export const createEnvironmentService = async (data) => {
   await simulateDelay()
   const timestamp = getCurrentTimestamp()
 
-  let parsedEnvironmentVariables = {}
-  if (typeof data.environmentVariables === 'string' && data.environmentVariables.trim()) {
-    try {
-      parsedEnvironmentVariables = JSON.parse(data.environmentVariables)
-    } catch {
-      parsedEnvironmentVariables = {}
-    }
-  } else if (typeof data.environmentVariables === 'object' && data.environmentVariables !== null) {
-    parsedEnvironmentVariables = data.environmentVariables
-  }
-
   const newEnvironment = {
     id: String(nextId++),
     name: data.name,
@@ -97,7 +115,7 @@ export const createEnvironmentService = async (data) => {
     globalVariables: Array.isArray(data.globalVariables)
       ? data.globalVariables.map((variableId) => variableId.toString())
       : [],
-    environmentVariables: parsedEnvironmentVariables,
+    environmentVariables: normalizeEnvironmentVariables(data.environmentVariables),
     lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(timestamp)
   }
@@ -111,18 +129,6 @@ export const updateEnvironmentService = async (id, data) => {
   if (index === -1) {
     throw new Error('Environment not found')
   }
-
-  let parsedEnvironmentVariables = {}
-  if (typeof data.environmentVariables === 'string' && data.environmentVariables.trim()) {
-    try {
-      parsedEnvironmentVariables = JSON.parse(data.environmentVariables)
-    } catch {
-      parsedEnvironmentVariables = {}
-    }
-  } else if (typeof data.environmentVariables === 'object' && data.environmentVariables !== null) {
-    parsedEnvironmentVariables = data.environmentVariables
-  }
-
   const timestamp = getCurrentTimestamp()
   environments[index] = {
     ...environments[index],
@@ -132,7 +138,7 @@ export const updateEnvironmentService = async (id, data) => {
     globalVariables: Array.isArray(data.globalVariables)
       ? data.globalVariables.map((variableId) => variableId.toString())
       : [],
-    environmentVariables: parsedEnvironmentVariables,
+    environmentVariables: normalizeEnvironmentVariables(data.environmentVariables),
     lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(timestamp)
   }
