@@ -34,18 +34,22 @@
       .label('Configuration'),
     globalVariables: yup.array().of(yup.string()).default([]),
     environmentVariables: yup
-      .string()
+      .object()
       .label('Environment Variables')
-      .test('valid-json', 'Environment Variables must be valid JSON', (value) => {
-        if (!value) return true
+      .default({})
+      .test(
+        'valid-environment-variables',
+        'Environment Variables must be a key/value object with string values',
+        (value) => {
+          if (!value) return true
+          if (typeof value !== 'object' || Array.isArray(value)) return false
 
-        try {
-          JSON.parse(value)
-          return true
-        } catch {
-          return false
+          return Object.keys(value).every((key) => {
+            const itemValue = value[key]
+            return key.trim().length > 0 && typeof itemValue === 'string'
+          })
         }
-      })
+      )
   })
 
   const initialValues = {
@@ -53,7 +57,7 @@
     status: 'active',
     configuration: 'single_version',
     globalVariables: [],
-    environmentVariables: '{}'
+    environmentVariables: {}
   }
 
   const getStatusValue = (status) => {
@@ -86,17 +90,25 @@
   }
 
   const normalizeEnvironmentVariables = (environmentVariables) => {
-    if (!environmentVariables) return '{}'
+    if (!environmentVariables) return {}
 
     if (typeof environmentVariables === 'string') {
-      return environmentVariables
+      try {
+        const parsed = JSON.parse(environmentVariables)
+        return typeof parsed === 'object' && !Array.isArray(parsed) && parsed !== null ? parsed : {}
+      } catch {
+        return {}
+      }
     }
 
-    if (typeof environmentVariables === 'object') {
-      return JSON.stringify(environmentVariables, null, 2)
+    if (typeof environmentVariables === 'object' && !Array.isArray(environmentVariables)) {
+      return Object.entries(environmentVariables).reduce((acc, [key, value]) => {
+        acc[key] = typeof value === 'string' ? value : String(value ?? '')
+        return acc
+      }, {})
     }
 
-    return '{}'
+    return {}
   }
 
   const loadEnvironmentService = async ({ id }) => {
