@@ -31,14 +31,12 @@
 
   const searchTerm = ref('')
   const selectedStatus = ref('all')
-  const selectedResource = ref('all')
   const selectedCurrent = ref('all')
 
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
   const statusAllOption = { label: 'All Status', value: 'all' }
-  const resourceAllOption = { label: 'All Resources', value: 'all' }
   const currentOptions = [
     { label: 'All Versions', value: 'all' },
     { label: 'Only Current', value: 'current' }
@@ -54,18 +52,20 @@
     Canceled: 'pi pi-ban'
   }
 
-  const resourceIconMap = {
-    Application: 'pi pi-globe',
-    Workload: 'pi pi-th-large',
-    Firewall: 'pi pi-shield',
-    WAF: 'pi pi-shield'
-  }
+  const resourcePackTypeMeta = [
+    { key: 'application', label: 'Application', icon: 'ai ai-edge-application' },
+    { key: 'firewall', label: 'Firewall', icon: 'ai ai-edge-firewall' },
+    { key: 'workload', label: 'Workload', icon: 'ai ai-workloads' }
+  ]
 
   const getStatusIcon = (status) => statusIconMap[status] || 'pi pi-info-circle'
-  const getResourceIcon = (resource) => resourceIconMap[resource] || 'pi pi-box'
-  const getStatusClass = (deployment) => `status-pill status-${deployment?.status?.severity || 'secondary'}`
+  const getStatusClass = (deployment) =>
+    `status-pill status-${deployment?.status?.severity || 'secondary'}`
 
-  const normalizeText = (value) => String(value || '').trim().toLowerCase()
+  const normalizeText = (value) =>
+    String(value || '')
+      .trim()
+      .toLowerCase()
 
   const statusOptions = computed(() => {
     const statuses = Array.from(
@@ -81,24 +81,9 @@
     ]
   })
 
-  const resourceOptions = computed(() => {
-    const resources = Array.from(
-      new Set(deployments.value.map((deployment) => deployment.resource).filter(Boolean))
-    )
-
-    return [
-      resourceAllOption,
-      ...resources.map((resource) => ({
-        label: resource,
-        value: resource
-      }))
-    ]
-  })
-
   const filteredDeployments = computed(() => {
     const normalizedSearch = normalizeText(searchTerm.value)
     const normalizedStatus = normalizeText(selectedStatus.value)
-    const normalizedResource = normalizeText(selectedResource.value)
 
     return deployments.value.filter((deployment) => {
       const searchableValues = [
@@ -106,9 +91,7 @@
         deployment.hash,
         deployment.environment,
         deployment.status?.content,
-        deployment.resource,
-        deployment.sourceHash,
-        deployment.sourceDescription,
+        getResourcePackSearchText(deployment),
         deployment.lastEditor,
         deployment.lastModified
       ]
@@ -120,14 +103,99 @@
       const matchesStatus =
         normalizedStatus === 'all' || normalizeText(deployment.status?.content) === normalizedStatus
 
-      const matchesResource =
-        normalizedResource === 'all' || normalizeText(deployment.resource) === normalizedResource
-
       const matchesCurrent = selectedCurrent.value !== 'current' || deployment.isCurrent
 
-      return matchesSearch && matchesStatus && matchesResource && matchesCurrent
+      return matchesSearch && matchesStatus && matchesCurrent
     })
   })
+
+  const resolveResourcePackEntry = (value) => {
+    if (value == null) return null
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      return {
+        name: String(value),
+        hash: ''
+      }
+    }
+
+    if (typeof value !== 'object') return null
+
+    const name =
+      resolvePrimitiveText(value?.name) ||
+      resolvePrimitiveText(value?.label) ||
+      resolvePrimitiveText(value?.resourceName)
+
+    const hash =
+      resolvePrimitiveText(value?.hash) ||
+      resolvePrimitiveText(value?.versionHash) ||
+      resolvePrimitiveText(value?.version) ||
+      resolvePrimitiveText(value?.sourceHash)
+
+    if (!name && !hash) return null
+
+    return {
+      name,
+      hash
+    }
+  }
+
+  const normalizeLegacyResourceType = (resource) => {
+    const value = normalizeText(resource)
+    if (value === 'application') return 'application'
+    if (value === 'firewall' || value === 'waf') return 'firewall'
+    if (value === 'workload') return 'workload'
+    return ''
+  }
+
+  const normalizeResourcePack = (resourcePack, item) => {
+    const normalized = {
+      application: null,
+      firewall: null,
+      workload: null
+    }
+
+    if (resourcePack && typeof resourcePack === 'object') {
+      for (const meta of resourcePackTypeMeta) {
+        normalized[meta.key] = resolveResourcePackEntry(resourcePack?.[meta.key])
+      }
+    }
+
+    if (!normalized.application && !normalized.firewall && !normalized.workload) {
+      const legacyType = normalizeLegacyResourceType(item?.resource)
+      if (legacyType) {
+        normalized[legacyType] = {
+          name: resolvePrimitiveText(item?.resource),
+          hash: resolvePrimitiveText(item?.sourceHash)
+        }
+      }
+    }
+
+    return normalized
+  }
+
+  const getResourcePackRows = (deployment) => {
+    return resourcePackTypeMeta
+      .map((meta) => {
+        const entry = deployment.resourcePack?.[meta.key]
+        if (!entry) return null
+
+        return {
+          key: meta.key,
+          label: meta.label,
+          icon: meta.icon,
+          name: entry.name || '--',
+          hash: entry.hash || '--'
+        }
+      })
+      .filter(Boolean)
+  }
+
+  const getResourcePackSearchText = (deployment) => {
+    return getResourcePackRows(deployment)
+      .map((entry) => `${entry.label} ${entry.name} ${entry.hash}`)
+      .join(' ')
+  }
 
   const resolvePrimitiveText = (value) => {
     if (value == null) return ''
@@ -171,10 +239,7 @@
       environment: resolvePrimitiveText(item?.environment),
       isCurrent: Boolean(item?.isCurrent),
       status: normalizeStatus(item?.status),
-      resource: resolvePrimitiveText(item?.resource),
-      sourceHash: resolvePrimitiveText(item?.sourceHash),
-      sourceDescription:
-        resolvePrimitiveText(item?.sourceDescription) || 'Deployment source revision',
+      resourcePack: normalizeResourcePack(item?.resourcePack, item),
       lastEditor: resolvePrimitiveText(item?.lastEditor),
       lastModified: resolvePrimitiveText(item?.lastModified)
     }))
@@ -294,7 +359,7 @@
     paginatorRows.value = event.rows
   }
 
-  watch([searchTerm, selectedStatus, selectedResource, selectedCurrent], () => {
+  watch([searchTerm, selectedStatus, selectedCurrent], () => {
     paginatorFirst.value = 0
   })
 
@@ -329,14 +394,6 @@
               optionValue="value"
               class="quick-filter"
               placeholder="Status"
-            />
-            <Dropdown
-              v-model="selectedResource"
-              :options="resourceOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="quick-filter"
-              placeholder="Resource"
             />
             <Dropdown
               v-model="selectedCurrent"
@@ -409,8 +466,7 @@
           <div class="deployments-header">
             <span>Deployment</span>
             <span>Status</span>
-            <span>Resource</span>
-            <span>Source</span>
+            <span>Resource Pack</span>
             <span>Last Editor</span>
             <span>Last Modified</span>
             <span class="header-actions" />
@@ -459,22 +515,25 @@
                 </div>
 
                 <div
-                  class="cell resource-cell"
-                  data-label="Resource"
+                  class="cell resource-pack-cell"
+                  data-label="Resource Pack"
                 >
-                  <i :class="getResourceIcon(deployment.resource)" />
-                  <span>{{ deployment.resource || '--' }}</span>
-                </div>
-
-                <div
-                  class="cell source-cell"
-                  data-label="Source"
-                >
-                  <div class="source-hash">
-                    <i class="pi pi-code" />
-                    <span>{{ deployment.sourceHash || '--' }}</span>
+                  <div
+                    v-for="resourceItem in getResourcePackRows(deployment)"
+                    :key="`${deployment.id}-${resourceItem.key}`"
+                    class="resource-pack-item"
+                  >
+                    <i :class="resourceItem.icon" />
+                    <span class="resource-pack-label">{{ resourceItem.label }}:</span>
+                    <span class="resource-pack-value">{{ resourceItem.name }}</span>
+                    <span class="resource-pack-hash-tag">{{ resourceItem.hash }}</span>
                   </div>
-                  <span class="source-description">{{ deployment.sourceDescription }}</span>
+                  <span
+                    v-if="!getResourcePackRows(deployment).length"
+                    class="resource-pack-empty"
+                  >
+                    --
+                  </span>
                 </div>
 
                 <div
@@ -625,8 +684,8 @@
   .deployment-row {
     display: grid;
     grid-template-columns:
-      minmax(170px, 2.1fr) minmax(120px, 1.3fr) minmax(110px, 1fr) minmax(160px, 1.6fr)
-      minmax(180px, 1.5fr) minmax(170px, 1.4fr) 44px;
+      minmax(170px, 2.1fr) minmax(120px, 1.3fr) minmax(320px, 2.5fr) minmax(180px, 1.5fr)
+      minmax(170px, 1.4fr) 44px;
     gap: 0.75rem;
     align-items: center;
     padding: 0.75rem 1rem;
@@ -754,40 +813,53 @@
     color: var(--text-color-secondary);
   }
 
-  .resource-cell,
-  .source-hash {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-
-  .resource-cell i,
-  .source-hash i {
+  .resource-pack-item i {
     color: var(--text-color-secondary);
     font-size: 0.875rem;
   }
 
-  .source-cell {
+  .resource-pack-cell {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.375rem;
     min-width: 0;
   }
 
-  .source-hash span {
+  .resource-pack-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  .resource-pack-label {
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .resource-pack-value {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .source-description {
+  .resource-pack-hash-tag {
+    border: 1px solid var(--surface-border);
+    border-radius: 4px;
+    padding: 0.0625rem 0.375rem;
+    background: var(--surface-ground);
+    color: var(--text-color-secondary);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .resource-pack-empty {
     font-size: 0.75rem;
     line-height: 1.5;
     color: var(--text-color-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .actions-cell {
@@ -904,17 +976,17 @@
     }
 
     .deployment-cell,
-    .source-cell {
+    .resource-pack-cell {
       align-items: flex-start;
     }
 
     .deployment-cell > *,
-    .source-cell > * {
+    .resource-pack-cell > * {
       grid-column: 2;
     }
 
     .deployment-cell::before,
-    .source-cell::before {
+    .resource-pack-cell::before {
       grid-column: 1;
       grid-row: 1 / span 2;
     }
@@ -956,13 +1028,13 @@
 
     .cell::before,
     .deployment-cell::before,
-    .source-cell::before {
+    .resource-pack-cell::before {
       grid-column: 1;
       grid-row: auto;
     }
 
     .deployment-cell > *,
-    .source-cell > * {
+    .resource-pack-cell > * {
       grid-column: 1;
     }
   }

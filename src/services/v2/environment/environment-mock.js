@@ -1,165 +1,219 @@
 // src/services/v2/environment/environment-mock.js
 
-import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+const getCurrentTimestamp = () => new Date().toISOString()
 
-// Helper to format status for display
-const formatStatus = (status) => {
-  return status === 'active'
-    ? { content: 'Active', severity: 'success' }
-    : { content: 'Inactive', severity: 'danger' }
+const simulateDelay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const toStringArray = (value) => {
+  if (!Array.isArray(value)) return []
+  return value.map((item) => String(item))
 }
 
-// Helper to parse status from form data
-const parseStatus = (status) => {
-  if (typeof status === 'string') {
-    return status
+const normalizeProtection = (protection) => {
+  const source = protection && typeof protection === 'object' ? protection : {}
+
+  return {
+    azion_authentication: {
+      enabled: Boolean(source?.azion_authentication?.enabled)
+    },
+    password_protection: {
+      enabled: Boolean(source?.password_protection?.enabled),
+      secret_id: source?.password_protection?.secret_id ?? null
+    },
+    ip_allowlist: {
+      enabled: Boolean(source?.ip_allowlist?.enabled),
+      cidrs: toStringArray(source?.ip_allowlist?.cidrs)
+    },
+    sso_enforcement: {
+      enabled: Boolean(source?.sso_enforcement?.enabled),
+      idp_id: source?.sso_enforcement?.idp_id ?? null,
+      allowed_domains: toStringArray(source?.sso_enforcement?.allowed_domains)
+    }
   }
-  return status?.content?.toLowerCase() === 'active' ? 'active' : 'inactive'
 }
 
-// Helper to format configuration for display
-const formatConfiguration = (config) => {
-  return config === 'versioned_urls'
-    ? { content: 'Versioned URLs', severity: 'info' }
-    : { content: 'Single Version', severity: 'info' }
-}
+const normalizeBranchTracking = (branchTracking) => {
+  const source = branchTracking && typeof branchTracking === 'object' ? branchTracking : {}
 
-// Helper to parse configuration from form data
-const parseConfiguration = (config) => {
-  if (typeof config === 'string') {
-    return config
+  return {
+    enabled: Boolean(source.enabled),
+    mode: source.mode ?? 'branch_is',
+    branch_match: source.branch_match ?? 'main'
   }
-  return config?.content?.toLowerCase().includes('versioned') ? 'versioned_urls' : 'single_version'
 }
 
-// Helper to get current timestamp
-const getCurrentTimestamp = () => {
-  return new Date().toISOString()
+const normalizeEnvironment = (environment) => {
+  const source = environment && typeof environment === 'object' ? environment : {}
+
+  return {
+    id: source.id ?? null,
+    name: source.name ?? '',
+    description: source.description ?? '',
+    active: Boolean(source.active),
+    deployment_version_policy: toStringArray(source.deployment_version_policy),
+    log_verbosity: toStringArray(source.log_verbosity),
+    robots_policy: toStringArray(source.robots_policy),
+    protection: normalizeProtection(source.protection),
+    branch_tracking: normalizeBranchTracking(source.branch_tracking),
+    created_at: source.created_at ?? null,
+    updated_at: source.updated_at ?? null,
+    created_by: source.created_by ?? null,
+    last_editor: source.last_editor ?? null
+  }
 }
 
 let environments = [
-  {
-    id: '1',
-    name: 'production',
-    status: formatStatus('active'),
-    configuration: formatConfiguration('single_version'),
-    globalVariables: [],
-    environmentVariables: {},
-    url: 'console.azion.com',
-    lastEditor: 'guilherme.santana@azion.com',
-    lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
-  },
-  {
-    id: '2',
-    name: 'staging',
-    status: formatStatus('active'),
-    configuration: formatConfiguration('versioned_urls'),
-    globalVariables: [],
-    environmentVariables: {},
-    url: '*.azion.com',
-    lastEditor: 'guilherme.santana@azion.com',
-    lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
-  }
+  normalizeEnvironment({
+    id: 'env_01HXYZABCDEF',
+    name: 'Production',
+    description: 'Primary production environment',
+    active: true,
+    deployment_version_policy: ['SINGLE_VERSION'],
+    log_verbosity: ['normal'],
+    robots_policy: ['index'],
+    protection: {
+      azion_authentication: { enabled: true },
+      password_protection: { enabled: false, secret_id: null },
+      ip_allowlist: { enabled: true, cidrs: ['203.0.113.10/32'] },
+      sso_enforcement: {
+        enabled: false,
+        idp_id: null,
+        allowed_domains: []
+      }
+    },
+    branch_tracking: {
+      enabled: true,
+      mode: 'branch_is',
+      branch_match: 'main'
+    },
+    created_at: '2026-03-26T18:00:00Z',
+    updated_at: '2026-03-26T18:00:00Z',
+    created_by: 'system',
+    last_editor: 'system'
+  }),
+  normalizeEnvironment({
+    id: 'env_01HXYZABCDEG',
+    name: 'Staging',
+    description: 'Pre-production validation environment',
+    active: true,
+    deployment_version_policy: ['VERSIONED_URL'],
+    log_verbosity: ['verbose'],
+    robots_policy: ['noindex'],
+    protection: {
+      azion_authentication: { enabled: false },
+      password_protection: { enabled: false, secret_id: null },
+      ip_allowlist: { enabled: false, cidrs: [] },
+      sso_enforcement: {
+        enabled: false,
+        idp_id: null,
+        allowed_domains: []
+      }
+    },
+    branch_tracking: {
+      enabled: true,
+      mode: 'branch_is',
+      branch_match: 'develop'
+    },
+    created_at: '2026-03-26T18:00:00Z',
+    updated_at: '2026-03-26T18:00:00Z',
+    created_by: 'system',
+    last_editor: 'system'
+  })
 ]
 
 let nextId = 3
 
-const simulateDelay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
-
-const normalizeEnvironmentVariables = (environmentVariables) => {
-  if (!environmentVariables) return {}
-
-  if (typeof environmentVariables === 'string' && environmentVariables.trim()) {
-    try {
-      const parsed = JSON.parse(environmentVariables)
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
-
-      return Object.entries(parsed).reduce((acc, [key, value]) => {
-        if (!key?.trim()) return acc
-        acc[key] = typeof value === 'string' ? value : String(value ?? '')
-        return acc
-      }, {})
-    } catch {
-      return {}
-    }
-  }
-
-  if (typeof environmentVariables === 'object' && !Array.isArray(environmentVariables)) {
-    return Object.entries(environmentVariables).reduce((acc, [key, value]) => {
-      if (!key?.trim()) return acc
-      acc[key] = typeof value === 'string' ? value : String(value ?? '')
-      return acc
-    }, {})
-  }
-
-  return {}
-}
+const createEnvironmentId = () => `env_mock_${String(nextId++).padStart(6, '0')}`
 
 export const listEnvironmentsService = async () => {
   await simulateDelay()
+
   return {
-    data: environments,
-    total: environments.length
+    count: environments.length,
+    body: environments
   }
 }
 
-export const createEnvironmentService = async (data) => {
+export const createEnvironmentService = async (payload = {}) => {
   await simulateDelay()
   const timestamp = getCurrentTimestamp()
 
-  const newEnvironment = {
-    id: String(nextId++),
-    name: data.name,
-    status: formatStatus(parseStatus(data.status) || 'active'),
-    configuration: formatConfiguration(parseConfiguration(data.configuration) || 'single_version'),
-    globalVariables: Array.isArray(data.globalVariables)
-      ? data.globalVariables.map((variableId) => variableId.toString())
-      : [],
-    environmentVariables: normalizeEnvironmentVariables(data.environmentVariables),
-    lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
-    lastModified: formatDateToDayMonthYearHour(timestamp)
-  }
+  const newEnvironment = normalizeEnvironment({
+    id: createEnvironmentId(),
+    name: payload.name,
+    description: payload.description,
+    active: payload.active,
+    deployment_version_policy: payload.deployment_version_policy,
+    log_verbosity: payload.log_verbosity,
+    robots_policy: payload.robots_policy,
+    protection: payload.protection,
+    branch_tracking: payload.branch_tracking,
+    created_at: timestamp,
+    updated_at: timestamp,
+    created_by: payload.created_by ?? 'system',
+    last_editor: payload.last_editor ?? 'system'
+  })
+
   environments.push(newEnvironment)
+
   return { data: newEnvironment }
 }
 
-export const updateEnvironmentService = async (id, data) => {
+export const updateEnvironmentService = async (id, payload = {}) => {
   await simulateDelay()
+
   const index = environments.findIndex((env) => env.id === id)
+
   if (index === -1) {
     throw new Error('Environment not found')
   }
+
+  const current = environments[index]
   const timestamp = getCurrentTimestamp()
-  environments[index] = {
-    ...environments[index],
-    name: data.name,
-    status: formatStatus(parseStatus(data.status)),
-    configuration: formatConfiguration(parseConfiguration(data.configuration)),
-    globalVariables: Array.isArray(data.globalVariables)
-      ? data.globalVariables.map((variableId) => variableId.toString())
-      : [],
-    environmentVariables: normalizeEnvironmentVariables(data.environmentVariables),
-    lastEditor: data.lastEditor || 'guilherme.santana@azion.com',
-    lastModified: formatDateToDayMonthYearHour(timestamp)
-  }
-  return { data: environments[index] }
+
+  const updated = normalizeEnvironment({
+    ...current,
+    name: payload.name ?? current.name,
+    description: payload.description ?? current.description,
+    active: payload.active ?? current.active,
+    deployment_version_policy: current.deployment_version_policy,
+    log_verbosity: payload.log_verbosity ?? current.log_verbosity,
+    robots_policy: payload.robots_policy ?? current.robots_policy,
+    protection: payload.protection ?? current.protection,
+    branch_tracking: payload.branch_tracking ?? current.branch_tracking,
+    created_at: current.created_at,
+    updated_at: timestamp,
+    created_by: current.created_by,
+    last_editor: payload.last_editor ?? 'system'
+  })
+
+  environments[index] = updated
+
+  return { data: updated }
 }
 
 export const deleteEnvironmentService = async (id) => {
   await simulateDelay()
+
   const index = environments.findIndex((env) => env.id === id)
+
   if (index === -1) {
     throw new Error('Environment not found')
   }
+
   environments.splice(index, 1)
+
   return { success: true }
 }
 
 export const getEnvironmentByIdService = async (id) => {
   await simulateDelay()
+
   const environment = environments.find((env) => env.id === id)
+
   if (!environment) {
     throw new Error('Environment not found')
   }
+
   return { data: environment }
 }
