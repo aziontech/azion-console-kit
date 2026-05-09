@@ -27,12 +27,13 @@
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    status: yup.string().required().oneOf(['active', 'inactive']).label('Status'),
-    configuration: yup
+    description: yup.string().nullable().default(''),
+    active: yup.boolean().required().label('Status'),
+    deployment_version_policy: yup
       .string()
       .required()
-      .oneOf(['single_version', 'versioned_urls'])
-      .label('Configuration'),
+      .oneOf(['SINGLE_VERSION', 'VERSIONED_URL'])
+      .label('Deployment Version Policy'),
     globalVariables: yup.array().of(yup.string()).default([]),
     environmentVariables: yup
       .object()
@@ -55,28 +56,29 @@
 
   const initialValues = {
     name: '',
-    status: 'active',
-    configuration: 'single_version',
+    description: '',
+    active: true,
+    deployment_version_policy: 'SINGLE_VERSION',
     globalVariables: [],
     environmentVariables: {}
   }
 
-  const getStatusValue = (status) => {
-    if (typeof status === 'object' && status !== null) {
-      return status.content?.toLowerCase() === 'active' ? 'active' : 'inactive'
+  const getDeploymentVersionPolicyValue = (deploymentVersionPolicy) => {
+    if (Array.isArray(deploymentVersionPolicy) && deploymentVersionPolicy.length > 0) {
+      const value = deploymentVersionPolicy[0]
+      if (value === 'SINGLE_VERSION' || value === 'VERSIONED_URL') {
+        return value
+      }
     }
 
-    return status || 'active'
-  }
-
-  const getConfigurationValue = (configuration) => {
-    if (typeof configuration === 'object' && configuration !== null) {
-      return configuration.content?.toLowerCase().includes('versioned')
-        ? 'versioned_urls'
-        : 'single_version'
+    if (
+      deploymentVersionPolicy === 'SINGLE_VERSION' ||
+      deploymentVersionPolicy === 'VERSIONED_URL'
+    ) {
+      return deploymentVersionPolicy
     }
 
-    return configuration || 'single_version'
+    return 'SINGLE_VERSION'
   }
 
   const openCreateDrawer = () => {
@@ -117,8 +119,11 @@
 
     return {
       name: response.data.name,
-      status: getStatusValue(response.data.status),
-      configuration: getConfigurationValue(response.data.configuration),
+      description: response.data.description ?? '',
+      active: Boolean(response.data.active),
+      deployment_version_policy: getDeploymentVersionPolicyValue(
+        response.data.deployment_version_policy
+      ),
       globalVariables: Array.isArray(response.data.globalVariables)
         ? response.data.globalVariables.map((item) => item?.toString())
         : [],
@@ -126,8 +131,32 @@
     }
   }
 
+  const normalizePayloadToEnvironmentContract = (payload) => {
+    const deploymentVersionPolicy = getDeploymentVersionPolicyValue(
+      payload.deployment_version_policy
+    )
+
+    return {
+      name: payload.name,
+      description: payload.description ?? '',
+      active: Boolean(payload.active),
+      deployment_version_policy: [deploymentVersionPolicy]
+    }
+  }
+
+  const createEnvironmentServiceAdapter = async (payload) => {
+    const normalized = normalizePayloadToEnvironmentContract(payload)
+    return await createEnvironmentService(normalized)
+  }
+
   const editEnvironmentService = async (payload) => {
-    return await updateEnvironmentService(selectedEnvironmentId.value, payload)
+    const normalized = normalizePayloadToEnvironmentContract(payload)
+
+    return await updateEnvironmentService(selectedEnvironmentId.value, {
+      name: normalized.name,
+      description: normalized.description,
+      active: normalized.active
+    })
   }
 
   const handleSuccess = () => {
@@ -144,14 +173,17 @@
   <CreateDrawerBlock
     v-if="loadCreateDrawer"
     v-model:visible="showCreateEnvironmentDrawer"
-    :createService="createEnvironmentService"
+    :createService="createEnvironmentServiceAdapter"
     :schema="validationSchema"
     :initialValues="initialValues"
     title="Create Environment"
     @onSuccess="handleSuccess"
   >
     <template #formFields="{ disabledFields }">
-      <FormFieldsEnvironment :disabledFields="disabledFields" />
+      <FormFieldsEnvironment
+        :disabledFields="disabledFields"
+        :isEdit="false"
+      />
     </template>
   </CreateDrawerBlock>
 
@@ -166,7 +198,10 @@
     @onSuccess="handleSuccess"
   >
     <template #formFields="{ disabledFields }">
-      <FormFieldsEnvironment :disabledFields="disabledFields" />
+      <FormFieldsEnvironment
+        :disabledFields="disabledFields"
+        :isEdit="true"
+      />
     </template>
   </EditDrawerBlock>
 </template>

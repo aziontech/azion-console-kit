@@ -198,6 +198,11 @@ export const queryKeys = {
     all: ['variables'],
     list: () => [...queryKeys.variables.all, 'list']
   },
+  environments: {
+    all: ['environments'],
+    list: (params) => [...queryKeys.environments.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.environments.all, 'detail', id]
+  },
   edgeFunction: {
     all: ['edge-functions'],
     list: (params) => [...queryKeys.edgeFunction.all, 'list', normalizeParams(params)],

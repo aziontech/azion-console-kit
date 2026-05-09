@@ -4,6 +4,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import PickList from '@aziontech/webkit/picklist'
   import SelectButton from '@aziontech/webkit/selectbutton'
   import LabelBlock from '@aziontech/webkit/label'
@@ -19,27 +20,30 @@
     disabledFields: {
       type: Boolean,
       default: false
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
     }
   })
 
   const toast = useToast()
   const { isMobile } = useResize()
   const { value: name } = useField('name')
-  const { value: status } = useField('status')
-  const { value: configuration } = useField('configuration')
+  const { value: description } = useField('description')
+  const { value: deploymentVersionPolicy } = useField('deployment_version_policy')
   const { value: globalVariables, errorMessage: globalVariablesError } = useField('globalVariables')
   const { value: environmentVariables, errorMessage: environmentVariablesError } =
     useField('environmentVariables')
 
-  const statusOptions = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
+  const deploymentVersionPolicyOptions = [
+    { label: 'Single Version', value: 'SINGLE_VERSION' },
+    { label: 'Versioned URL', value: 'VERSIONED_URL' }
   ]
 
-  const configurationOptions = [
-    { label: 'Single Version', value: 'single_version' },
-    { label: 'Versioned URLs', value: 'versioned_urls' }
-  ]
+  const isDeploymentVersionPolicyDisabled = computed(() => {
+    return props.disabledFields || props.isEdit
+  })
 
   const allGlobalVariables = ref([])
   const globalVariablesPickList = ref([[], []])
@@ -569,6 +573,16 @@
           :disabled="props.disabledFields"
           data-testid="environment-form__name-field"
         />
+
+        <FieldText
+          label="Description"
+          name="description"
+          placeholder="Environment purpose and constraints"
+          description="Optional description used for internal identification."
+          :value="description"
+          :disabled="props.disabledFields"
+          data-testid="environment-form__description-field"
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -581,38 +595,39 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldDropdown
-          label="Status"
-          name="status"
+          label="Deployment Version Policy"
+          name="deployment_version_policy"
           required
-          :options="statusOptions"
-          :value="status"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="self"
-          description="Choose whether this environment is currently active."
-          :disabled="props.disabledFields"
-          data-testid="environment-form__status-field"
-        />
-      </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldDropdown
-          label="Configuration"
-          name="configuration"
-          required
-          :options="configurationOptions"
-          :value="configuration"
+          :options="deploymentVersionPolicyOptions"
+          :value="deploymentVersionPolicy"
           optionLabel="label"
           optionValue="value"
           appendTo="self"
           description="Select how environment URLs are organized for deployments."
-          :disabled="props.disabledFields"
+          :disabled="isDeploymentVersionPolicyDisabled"
           data-testid="environment-form__configuration-field"
+        />
+
+        <small
+          v-if="props.isEdit"
+          class="text-xs text-color-secondary font-normal leading-5"
+        >
+          Deployment Version Policy cannot be changed after the environment is created.
+        </small>
+      </div>
+      <div class="flex w-full gap-10">
+        <span class="text-color text-xl font-medium flex gap-2 p-1">Status</span>
+        <FieldSwitchBlock
+          nameField="active"
+          name="active"
+          :isCard="false"
+          title="Active"
+          :disabled="props.disabledFields"
+          data-testid="environment-form__status-field"
         />
       </div>
     </template>
   </FormHorizontal>
-
   <FormHorizontal
     :isDrawer="true"
     title="Environment Variables"

@@ -22,6 +22,23 @@
 
   const listTableRef = ref(null)
   const drawerRef = ref(null)
+
+  const formatActiveTag = (isActive) => {
+    return isActive
+      ? { content: 'Active', severity: 'success' }
+      : { content: 'Inactive', severity: 'danger' }
+  }
+
+  const formatDeploymentPolicyTag = (policy = []) => {
+    const policyValue = Array.isArray(policy) ? policy[0] : policy
+
+    if (policyValue === 'VERSIONED_URL') {
+      return { content: 'Versioned URL', severity: 'info' }
+    }
+
+    return { content: 'Single Version', severity: 'info' }
+  }
+
   const handleOpenCreateDrawer = () => {
     drawerRef.value?.openCreateDrawer()
   }
@@ -63,48 +80,42 @@
         filterPath: 'name'
       },
       {
-        field: 'status',
+        field: 'active',
         header: 'Status',
-        sortField: 'status',
-        filterPath: 'status',
+        sortField: 'active',
+        filterPath: 'active',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
+            data: formatActiveTag(Boolean(columnData)),
             columnAppearance: 'tag'
           })
         }
       },
       {
-        field: 'configuration',
+        field: 'deployment_version_policy',
         header: 'Configuration',
-        sortField: 'configuration',
-        filterPath: 'configuration',
+        sortField: 'deployment_version_policy',
+        filterPath: 'deployment_version_policy',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: columnData,
+            data: formatDeploymentPolicyTag(columnData),
             columnAppearance: 'tag'
           })
         }
       },
       {
-        field: 'url',
-        header: 'URL',
-        sortField: 'url',
-        filterPath: 'url'
-      },
-      {
-        field: 'lastEditor',
+        field: 'last_editor',
         header: 'Last Editor',
-        sortField: 'lastEditor',
-        filterPath: 'lastEditor'
+        sortField: 'last_editor',
+        filterPath: 'last_editor'
       },
       {
-        field: 'lastModified',
+        field: 'updated_at',
         header: 'Last Modified',
-        sortField: 'lastModified',
-        filterPath: 'lastModified'
+        sortField: 'updated_at',
+        filterPath: 'updated_at'
       }
     ]
   })
@@ -118,8 +129,8 @@
   const listServiceAdapter = async (params) => {
     const result = await props.listEnvironmentsService(params)
     return {
-      count: result.total,
-      body: result.data
+      count: result.count,
+      body: result.body
     }
   }
 </script>
