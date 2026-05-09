@@ -26,8 +26,11 @@ let deployments = [
     environment: 'production',
     isCurrent: true,
     status: formatStatus('ready'),
-    resource: 'Application',
-    sourceHash: 'x9y8z7w6',
+    resourcePack: {
+      application: { name: 'Console kit', hash: 'qa1hsa' },
+      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
+      workload: { name: 'Console Domain', hash: 'ad12la' }
+    },
     lastEditor: 'user@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
@@ -37,8 +40,11 @@ let deployments = [
     environment: 'staging',
     isCurrent: false,
     status: formatStatus('building'),
-    resource: 'Workload',
-    sourceHash: 'm3n4o5p6',
+    resourcePack: {
+      application: { name: 'Console kit', hash: 'bn3xpd' },
+      firewall: { name: 'Managed WAF', hash: 'x82lm' },
+      workload: { name: 'Staging Domain', hash: 'wz91ca' }
+    },
     lastEditor: 'admin@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
@@ -48,8 +54,11 @@ let deployments = [
     environment: 'development',
     isCurrent: false,
     status: formatStatus('draft'),
-    resource: 'Firewall',
-    sourceHash: 'q7r8s9t0',
+    resourcePack: {
+      application: { name: 'Dev Console kit', hash: 'dh2svl' },
+      firewall: { name: 'Development Firewall', hash: 'fc45km' },
+      workload: { name: 'Dev Domain', hash: 'nm21qy' }
+    },
     lastEditor: 'dev@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
@@ -59,8 +68,11 @@ let deployments = [
     environment: 'production',
     isCurrent: false,
     status: formatStatus('error'),
-    resource: 'WAF',
-    sourceHash: 'u1v2w3x4',
+    resourcePack: {
+      application: { name: 'Console kit', hash: 'qa1hsa' },
+      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
+      workload: { name: 'Console Domain', hash: 'ad12la' }
+    },
     lastEditor: 'user@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
@@ -70,8 +82,11 @@ let deployments = [
     environment: 'staging',
     isCurrent: false,
     status: formatStatus('canceled'),
-    resource: 'Application',
-    sourceHash: 'y5z6a7b8',
+    resourcePack: {
+      application: { name: 'Console kit', hash: 'tr82mn' },
+      firewall: { name: 'Azion Global Firewall', hash: 'zb55qx' },
+      workload: { name: 'Canary Domain', hash: 'pd39vr' }
+    },
     lastEditor: 'admin@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
@@ -81,8 +96,11 @@ let deployments = [
     environment: 'production',
     isCurrent: true,
     status: formatStatus('ready'),
-    resource: 'Firewall',
-    sourceHash: 'q7r8s9t0',
+    resourcePack: {
+      application: { name: 'Console kit', hash: 'qa1hsa' },
+      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
+      workload: { name: 'Console Domain', hash: 'ad12la' }
+    },
     lastEditor: 'dev@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   }
