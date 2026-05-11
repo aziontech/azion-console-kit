@@ -2,7 +2,7 @@ import { listEnvironmentsService } from '@/services/v2/environment/environment-m
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const environmentRoutes = {
-  path: '/environment',
+  path: '/environments',
   name: 'environment',
   children: [
     {
@@ -17,7 +17,7 @@ export const environmentRoutes = {
         breadCrumbs: [
           {
             label: 'Environments',
-            to: '/environment'
+            to: '/environments'
           }
         ]
       }
