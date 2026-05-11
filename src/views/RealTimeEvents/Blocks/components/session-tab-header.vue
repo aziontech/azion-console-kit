@@ -1,4 +1,6 @@
 <script setup>
+  import { ref, nextTick } from 'vue'
+
   defineOptions({ name: 'SessionTabHeader' })
 
   const props = defineProps({
@@ -9,10 +11,19 @@
     active: {
       type: Boolean,
       default: false
+    },
+    renameable: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const emit = defineEmits(['close'])
+  const emit = defineEmits(['close', 'rename'])
+
+  // ── Rename state ──
+  const isRenaming = ref(false)
+  const renameInputRef = ref(null)
+  const renameValue = ref('')
 
   const handleClose = (event) => {
     event.stopPropagation()
@@ -21,6 +32,38 @@
   }
 
   const displayLabel = () => props.tab.label?.trim() || 'Untitled'
+
+  const startRename = async () => {
+    if (!props.renameable) return
+    renameValue.value = displayLabel()
+    isRenaming.value = true
+    await nextTick()
+    renameInputRef.value?.select()
+  }
+
+  const commitRename = () => {
+    if (!isRenaming.value) return
+    const trimmed = renameValue.value.trim()
+    if (trimmed) {
+      emit('rename', props.tab.id, trimmed)
+    }
+    isRenaming.value = false
+  }
+
+  const cancelRename = () => {
+    isRenaming.value = false
+    renameValue.value = ''
+  }
+
+  const handleRenameKeydown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      commitRename()
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      cancelRename()
+    }
+  }
 </script>
 
 <template>
@@ -28,13 +71,27 @@
     class="session-tab-header"
     :class="{ 'session-tab-header--active': active }"
     :data-testid="`session-tab-header-${tab.id ?? 'events'}`"
+    @dblclick="startRename"
   >
     <i
       v-if="tab.icon"
       :class="tab.icon"
       class="session-tab-header__icon"
     />
+    <!-- Rename input (shown on double-click for renameable tabs) -->
+    <input
+      v-if="isRenaming"
+      ref="renameInputRef"
+      v-model="renameValue"
+      class="session-tab-header__rename-input"
+      :aria-label="`Rename tab ${displayLabel()}`"
+      data-testid="session-tab-rename-input"
+      @keydown="handleRenameKeydown"
+      @blur="commitRename"
+      @click.stop
+    />
     <span
+      v-else
       class="session-tab-header__label"
       :title="displayLabel()"
     >
@@ -79,6 +136,20 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+  }
+
+  .session-tab-header__rename-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid currentColor;
+    color: currentColor;
+    font: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    padding: 0;
+    min-width: 4rem;
+    max-width: 10rem;
+    outline: none;
   }
 
   .session-tab-header__close {

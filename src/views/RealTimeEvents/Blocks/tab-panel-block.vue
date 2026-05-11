@@ -58,7 +58,10 @@
     metricsDashboards: { type: Array, default: () => [] },
     initialFilterState: { type: Object, default: null },
     initialPageSize: { type: [Number, String], default: null },
-    initialSelectedFields: { type: Array, default: null }
+    initialSelectedFields: { type: Array, default: null },
+    tabId: { type: String, default: null },
+    activeTabId: { type: String, default: null },
+    pendingViewState: { type: Object, default: null }
   })
 
   /* ── Composables ── */
@@ -127,9 +130,17 @@
     navigate: navigateRow, getRowClass, handleKeyDown, resetSelection
   } = useDetailView(tableData)
 
+  /* ── Active-tab guard ── */
+  // When tabId is null (pinned tab), it is active when activeTabId is also null/undefined.
+  // When tabId is set, it is active when activeTabId matches.
+  const isActiveTab = computed(() => {
+    if (props.tabId === null) return props.activeTabId === null || props.activeTabId === undefined
+    return String(props.activeTabId ?? '') === String(props.tabId ?? '')
+  })
+
   /* ── Filter actions ── */
   const {
-    refreshFilterData, reloadListTableWithHash, handleAddFilter, handleAddRangeFilter,
+    refreshFilterData, reloadListTableWithHash: _reloadListTableWithHash, handleAddFilter, handleAddRangeFilter,
     handleExcludeFilter, handleRemoveFilter, getHistoryParts
   } = useFilterActions({
     filterData, filterFields: computed(() => props.filterFields),
@@ -137,6 +148,17 @@
     loadData, initialLoadDone, isLoading, onError: (error) => toast.add(error),
     getFiltersFromHash, setFilterInHash
   })
+
+  // Gate: inactive tabs must not rewrite the URL hash.
+  // When the tab is active (or there is no tab isolation), delegate to the
+  // composable's implementation; otherwise just reload data in-memory.
+  const reloadListTableWithHash = async () => {
+    if (isActiveTab.value) {
+      return _reloadListTableWithHash()
+    }
+    // Inactive tab: reload data without touching the URL hash
+    loadData()
+  }
 
   /* ── Chart config ── */
   const {
@@ -242,8 +264,19 @@
   const { dataTableRef, exportMenuItems, exportFunctionMapper } =
     useExportData({ tableData, tabSelected: computed(() => props.tabSelected) })
   const discoverDataTableRef = ref(null)
+  const eventChartRef = ref(null)
   // Sync the dataTableRef from useExportData to the inner DataTable via the sub-component
   watch(() => discoverDataTableRef.value?.dataTableRef, (inner) => { dataTableRef.value = inner ?? null }, { flush: 'post' })
+
+  // When the detail sidebar opens or closes, the chart container width changes.
+  // Trigger a resize after the DOM has settled so C3 fills the new width.
+  watch(detailSidebarVisible, () => {
+    nextTick(() => {
+      setTimeout(() => {
+        eventChartRef.value?.resize()
+      }, 120)
+    })
+  })
 
   const onKeyDown = (event) => {
     if (event.key === 'Escape' && isFullscreen.value) {
@@ -255,8 +288,11 @@
   }
 
   const applyInitialShareState = () => {
-    if (props.initialFilterState && typeof props.initialFilterState === 'object') {
-      try { filterData.value = safeStructuredClone(props.initialFilterState) } catch { /* ignore */ }
+    // pendingViewState takes priority (from useEventsTabs.getPendingViewState — Share_State import
+    // into a new Events tab). Falls back to initialFilterState (direct prop injection).
+    const stateToApply = props.pendingViewState || props.initialFilterState
+    if (stateToApply && typeof stateToApply === 'object') {
+      try { filterData.value = safeStructuredClone(stateToApply) } catch { /* ignore */ }
     }
     if (Array.isArray(props.initialSelectedFields)) selectedFields.value = [...props.initialSelectedFields]
     if (props.initialPageSize) {
@@ -268,7 +304,8 @@
   const getCurrentShareState = () => ({
     filters: filterData.value ? safeStructuredClone(filterData.value) : null,
     dataset: props.tabSelected?.panel || null, pageSize: pageSize.value,
-    selectedFields: [...selectedFields.value], documentQuery: documentSearchQuery.value || ''
+    selectedFields: [...selectedFields.value], documentQuery: documentSearchQuery.value || '',
+    selectedView: selectedView.value || 'events:none'
   })
 
   /* ── Lifecycle ── */
@@ -369,6 +406,7 @@
               class="shrink-0 w-full"
             >
               <EventChart
+                ref="eventChartRef"
                 :data="isMetricsView ? metricsChartData : chartData"
                 :configKey="isMetricsView ? metricsChartConfigKey : chartConfigKey"
                 :tsRangeBegin="tsRangeBegin"
@@ -388,7 +426,7 @@
                 @toggle-collapse="isChartCollapsed = !isChartCollapsed"
               />
               <EventsSummaryBar
-                v-if="showChartSummary && !isMetricsView && !isChartCollapsed"
+                v-if="showChartSummary && !isChartCollapsed"
                 :kpis="summaryKpis"
               />
             </div>

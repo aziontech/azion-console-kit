@@ -130,6 +130,10 @@
   const dragStartX = ref(null)
   const dragEndX = ref(null)
   const selectionOverlay = ref(null)
+  // Track the latest pointer position (viewport coords) so the C3 tooltip
+  // position callback can place the tooltip near the cursor on the opposite
+  // Y side, never covering the hovered bar/line.
+  const pointerPos = ref({ x: 0, y: 0, present: false })
 
   const { chartConfig, chartData, totalEvents, formattedTotal, chartKind } = useChartBuilder(props)
 
@@ -139,6 +143,8 @@
   let buildToken = 0
   // Debounce timer for ResizeObserver to avoid excessive re-renders.
   let resizeTimer = null
+
+  const chartContainerRef = ref(null)
 
   const initChart = () => {
     clearTimeout(initChartTimer)
@@ -157,12 +163,18 @@
       nextTick(() => {
         if (myToken !== buildToken) return
         if (!chartRef.value) return
+        // Resolve the outer .chart-container div for tooltip edge-flip
+        const chartContainer = chartContainerRef.value || chartRef.value.closest('.chart-container') || chartRef.value
         const c3Config = buildC3Config({
           chartRef: chartRef.value,
           chartData: chartData.value,
           chartConfig: chartConfig.value,
           chartKind: chartKind.value,
-          onLegendClick: handleLegendClick
+          onLegendClick: handleLegendClick,
+          chartContainer,
+          // Pass an accessor so the tooltip.position callback reads the
+          // latest pointer position at the moment the tooltip renders.
+          getPointerPos: () => pointerPos.value
         })
         if (!c3Config) return
         chartInstance.value = c3.generate(c3Config)
@@ -216,10 +228,18 @@
   }
 
   const handleMouseMove = (event) => {
+    // Always record the latest pointer position for the tooltip positioner,
+    // independent of the brush-selection drag state.
+    pointerPos.value = { x: event.clientX, y: event.clientY, present: true }
     if (!isDragging.value || !chartRef.value) return
     const rect = chartRef.value.getBoundingClientRect()
     dragEndX.value = Math.max(0, Math.min(event.clientX - rect.left, rect.width))
     updateSelectionOverlay()
+  }
+
+  const handleMouseLeave = () => {
+    pointerPos.value = { x: 0, y: 0, present: false }
+    handleMouseUp()
   }
 
   const handleMouseUp = () => {
@@ -285,15 +305,19 @@
 
   onMounted(() => {
     initChart()
-    if ('ResizeObserver' in window && chartRef.value) {
+    // Observe the outer chart-container so sidebar open/close and splitter
+    // drags are detected — the inner canvas div doesn't change size until
+    // after C3 redraws, so observing it misses the triggering resize.
+    const observeTarget = chartContainerRef.value || chartRef.value
+    if ('ResizeObserver' in window && observeTarget) {
       resizeObserver = new ResizeObserver(() => {
         clearTimeout(resizeTimer)
         resizeTimer = setTimeout(() => {
           if (chartInstance.value) resizeChart()
           else initChart()
-        }, 50)
+        }, 80)
       })
-      resizeObserver.observe(chartRef.value)
+      resizeObserver.observe(observeTarget)
     }
     document.addEventListener('mousedown', onViewDocumentClick)
     document.addEventListener('keydown', onViewEscape)
@@ -355,17 +379,23 @@
     document.addEventListener('keydown', onViewEscape)
     window.addEventListener('scroll', onViewportChange, true)
     window.addEventListener('resize', onViewportChange)
-    if ('ResizeObserver' in window && chartRef.value) {
+    const observeTarget = chartContainerRef.value || chartRef.value
+    if ('ResizeObserver' in window && observeTarget) {
       resizeObserver = new ResizeObserver(() => {
         clearTimeout(resizeTimer)
         resizeTimer = setTimeout(() => {
           if (chartInstance.value) resizeChart()
           else initChart()
-        }, 50)
+        }, 80)
       })
-      resizeObserver.observe(chartRef.value)
+      resizeObserver.observe(observeTarget)
     }
-    initChart()
+    // KeepAlive reactivation: the container may have a new width after a tab
+    // switch or sidebar toggle — always resize before re-rendering data.
+    nextTick(() => {
+      if (chartInstance.value) resizeChart()
+      else initChart()
+    })
   })
 
   defineExpose({ refresh: initChart, resize: resizeChart })
@@ -493,11 +523,12 @@
     <!-- Chart -->
     <div
       v-else-if="chartData.columns.length"
+      ref="chartContainerRef"
       class="chart-container"
       @mousedown="handleMouseDown"
       @mousemove="handleMouseMove"
       @mouseup="handleMouseUp"
-      @mouseleave="handleMouseUp"
+      @mouseleave="handleMouseLeave"
     >
       <div
         ref="chartRef"

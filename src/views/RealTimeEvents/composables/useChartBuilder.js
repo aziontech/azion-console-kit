@@ -11,6 +11,7 @@ import {
 } from './useChartBucketing'
 import { getChartConfig } from '../Blocks/constants/chart-configs'
 import { CHART_KINDS, resolveChartKind, isStackedKind, isMultiSeriesKind } from './chart-kinds'
+import { computeTooltipPosition } from './tooltip-position.js'
 
 function formatBytes(bytes) {
   if (bytes === 0) return '0 B'
@@ -419,7 +420,10 @@ export function buildC3Config({
   chartRef,
   chartData,
   chartConfig,
-  chartKind = CHART_KINDS.SINGLE_SERIES_HISTOGRAM
+  chartKind = CHART_KINDS.SINGLE_SERIES_HISTOGRAM,
+  onLegendClick,
+  chartContainer = null,
+  getPointerPos = null
 }) {
   if (!chartData.columns.length || !chartRef) return null
 
@@ -559,7 +563,46 @@ export function buildC3Config({
           if (unit === 'bitsPerSecond') return `${formatBytes(val)}/s`
           return `${formatDetailed(val)} events`
         }
-      }
+      },
+      // Tooltip positioning — never under the cursor, never covering bars.
+      // Strategy: place the tooltip DIAGONALLY offset from the cursor, with
+      // the cursor always sitting in the gap between tooltip edge and the
+      // hovered bar/line. Cursor is never inside the tooltip bounds.
+      ...(chartContainer
+        ? {
+            position: (data, tooltipWidth, tooltipHeight, element) => {
+              const containerRect = chartContainer.getBoundingClientRect()
+              const pointer = typeof getPointerPos === 'function' ? getPointerPos() : null
+              const padding = 8
+              const OFFSET_X = 32
+              const OFFSET_Y = 28
+
+              const cursorX = pointer && pointer.present
+                ? pointer.x - containerRect.left
+                : containerRect.width / 2
+              const cursorY = pointer && pointer.present
+                ? pointer.y - containerRect.top
+                : containerRect.height / 2
+
+              // Horizontal: prefer RIGHT of cursor, flip LEFT when no room
+              let left = cursorX + OFFSET_X
+              if (left + tooltipWidth > containerRect.width - padding) {
+                left = cursorX - tooltipWidth - OFFSET_X
+              }
+              // Final clamp so it never exits the chart bounds
+              left = Math.max(padding, Math.min(left, containerRect.width - tooltipWidth - padding))
+
+              // Vertical: prefer ABOVE cursor, flip BELOW when no room
+              let top = cursorY - tooltipHeight - OFFSET_Y
+              if (top < padding) {
+                top = cursorY + OFFSET_Y
+              }
+              top = Math.max(padding, Math.min(top, containerRect.height - tooltipHeight - padding))
+
+              return { top, left }
+            }
+          }
+        : {})
     },
     bar: (isMulti && !isMultiBar) ? {} : { width: { ratio: 0.7 }, zerobased: true },
     // Smooth interpolation for spline charts — linear keeps peaks sharp and Y-axis breathing room

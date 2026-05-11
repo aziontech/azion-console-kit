@@ -1,6 +1,7 @@
 import { ref, shallowRef, triggerRef } from 'vue'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { loadSummaryKpis } from '@/services/real-time-events-service/load-events-aggregation'
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
@@ -154,30 +155,63 @@ export function useEventsData({
   }
 
   // ── Chart ────────────────────────────────────────────────────────────
-  const loadChart = () => {
+
+  /**
+   * Wraps loadSummaryKpis with:
+   * - try/catch that swallows errors and returns null (Requirement 6.7)
+   * - token check to cancel superseded requests (Requirement 6.8)
+   */
+  const loadSummaryKpisSafe = async ({ dataset, tsRange, filters, token }) => {
+    try {
+      const result = await loadSummaryKpis({ dataset, tsRange, filters })
+      if (token !== chartLoadToken) return null
+      return result
+    } catch {
+      return null
+    }
+  }
+
+  const loadChart = async () => {
     if (!hasChartConfig.value || !loadChartAggregation.value) { isChartLoading.value = false; return }
     const myToken = ++chartLoadToken
     isChartLoading.value = true
-    loadChartAggregation.value({
-      dataset: tabSelected.value?.dataset, tsRange: filterData.value?.tsRange,
-      filters: buildApiFilters(), groupByField: resolveStackField()
-    })
-      .then((result) => {
-        if (myToken !== chartLoadToken) return
-        isChartLoading.value = false
-        if (Array.isArray(result)) { chartData.value = result; kpis.value = null }
-        else {
-          chartData.value = result?.chartData || []
-          const rk = result?.kpis || null
-          if (rk && result?.partialFilter) rk.partialFilter = true
-          kpis.value = rk
+    try {
+      const result = await loadChartAggregation.value({
+        dataset: tabSelected.value?.dataset, tsRange: filterData.value?.tsRange,
+        filters: buildApiFilters(), groupByField: resolveStackField()
+      })
+      if (myToken !== chartLoadToken) return
+      isChartLoading.value = false
+      if (Array.isArray(result)) { chartData.value = result; kpis.value = null }
+      else {
+        chartData.value = result?.chartData || []
+        const rk = result?.kpis || null
+        if (rk && result?.partialFilter) rk.partialFilter = true
+        kpis.value = rk
+
+        // KPI fallback: when the chart path (Metrics API) did not attach KPIs,
+        // issue a dedicated Events-API KPI request (Requirement 6.1, 6.5, 6.6)
+        const needsKpiFallback =
+          (tabSelected.value?.showSummary ?? false) &&
+          (rk === null || rk === undefined)
+        if (needsKpiFallback) {
+          const fallback = await loadSummaryKpisSafe({
+            dataset: tabSelected.value?.dataset,
+            tsRange: filterData.value?.tsRange,
+            filters: buildApiFilters(),
+            token: myToken
+          })
+          if (myToken !== chartLoadToken) return
+          if (fallback) {
+            kpis.value = { ...fallback, partialFilter: !!result?.partialFilter }
+          }
         }
-      })
-      .catch((err) => {
-        if (myToken !== chartLoadToken) return
-        isChartLoading.value = false; chartData.value = []; kpis.value = null
-        onError({ closable: true, severity: 'warn', summary: 'Chart failed', detail: String(err).slice(0, 100), life: 5000 })
-      })
+      }
+    } catch (err) {
+      if (myToken !== chartLoadToken) return
+      isChartLoading.value = false; chartData.value = []; kpis.value = null
+      onError({ closable: true, severity: 'warn', summary: 'Chart failed', detail: String(err).slice(0, 100), life: 5000 })
+    }
   }
 
   // ── Fetch page with window+offset tracking ──────────────────────────

@@ -1,6 +1,8 @@
 <script setup>
   import { computed } from 'vue'
+  import PrimeButton from '@aziontech/webkit/button'
   import { getSeverity } from '../../composables/useSeverityClassifier'
+  import { useClickToFilter } from '../../composables/useClickToFilter.js'
 
   defineOptions({ name: 'LogFieldBadges' })
 
@@ -28,6 +30,11 @@
   })
 
   const emit = defineEmits(['toggle-expand', 'add-filter', 'exclude-filter'])
+
+  const { onValueMouseDown, onValueMouseUp, onValueClick } = useClickToFilter({
+    onAdd: (key, value) => emit('add-filter', key, value),
+    onExclude: (key, value) => emit('exclude-filter', key, value)
+  })
 
   const highlightSet = computed(() => new Set(props.highlightFields))
 
@@ -96,15 +103,26 @@
         <span
           class="log-badge__value"
           :title="String(item.value)"
+          @mousedown="onValueMouseDown"
+          @mouseup="onValueMouseUp"
+          @click.stop="(e) => onValueClick(e, item.key, item.value)"
           v-html="highlightMatch(truncateValue(item.value))"
         />
         <span class="log-badge__actions">
-          <i
-            class="pi pi-filter log-badge__action-icon log-badge__action-icon--filter"
+          <PrimeButton
+            icon="pi pi-filter"
+            text
+            size="small"
+            class="log-badge__action-btn log-badge__action-btn--filter"
+            aria-label="Filter for value"
             @click.stop="emit('add-filter', item.key, item.value)"
           />
-          <i
-            class="pi pi-filter-slash log-badge__action-icon log-badge__action-icon--exclude"
+          <PrimeButton
+            icon="pi pi-filter-slash"
+            text
+            size="small"
+            class="log-badge__action-btn log-badge__action-btn--exclude"
+            aria-label="Filter out value"
             @click.stop="emit('exclude-filter', item.key, item.value)"
           />
         </span>
@@ -135,28 +153,33 @@
   .log-badges-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 5px 6px;
     cursor: pointer;
-    padding: 2px 0;
+    padding: 0;
     max-width: 100%;
-    max-height: 44px;
+    /* 2 rows: badge 20px × 2 + row-gap 5px = 45px */
+    max-height: 45px;
     overflow: hidden;
   }
 
   .log-badge {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 1px 6px;
+    gap: 3px;
+    padding: 0 6px;
     border-radius: 3px;
     font-size: 0.72rem;
-    line-height: 1.4;
+    line-height: 1;
+    height: 20px;
     font-family: ui-monospace, var(--text-body-xss), 'SF Mono', Menlo, Consolas, monospace;
     background: var(--surface-100);
     border: 1px solid var(--surface-200);
     max-width: 100%;
     position: relative;
     flex-shrink: 0;
+    user-select: text;
     transition:
       background-color 0.12s ease,
       border-color 0.12s ease;
@@ -208,14 +231,19 @@
   /* ── More badge ───────────────────────────────────────────────── */
   .log-badge--more {
     color: var(--text-color-secondary);
-    font-style: italic;
-    border-style: dashed;
+    font-weight: 500;
+    border-style: solid;
     cursor: pointer;
+  }
+
+  .log-badge--more:hover {
+    background: var(--surface-200);
+    color: var(--text-color);
   }
 
   /* ── Badge parts ──────────────────────────────────────────────── */
   .log-badge__key {
-    color: #f5f5f5;
+    color: var(--text-color);
     font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
@@ -231,47 +259,51 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 180px;
+    max-width: 140px;
     border-radius: 2px;
+    user-select: text;
+    cursor: text;
   }
 
   /* ── Inline hover action buttons ──────────────────────────────── */
   .log-badge__actions {
     display: inline-flex;
     align-items: center;
-    gap: 1px;
+    gap: 0;
     margin-left: 2px;
-    visibility: hidden;
+    flex-shrink: 0;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.1s ease;
+    /* Reserve fixed width so badges don't shift on hover */
+    width: 32px;
+    justify-content: flex-end;
   }
 
   .log-badge:hover .log-badge__actions {
-    visibility: visible;
     opacity: 1;
+    pointer-events: auto;
   }
 
-  .log-badge__action-icon {
-    font-size: 0.6rem;
-    padding: 2px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    color: var(--text-color-secondary);
-    transition:
-      color 0.1s ease,
-      background-color 0.1s ease;
+  :deep(.log-badge__action-btn.p-button) {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+    padding: 0 !important;
+    border-radius: 3px !important;
   }
 
-  .log-badge__action-icon:hover {
-    background: var(--surface-hover);
+  :deep(.log-badge__action-btn.p-button .p-button-icon) {
+    font-size: 0.6rem !important;
   }
 
-  .log-badge__action-icon--filter:hover {
-    color: var(--primary-color);
+  :deep(.log-badge__action-btn--filter:hover) {
+    color: var(--primary-color) !important;
   }
 
-  .log-badge__action-icon--exclude:hover {
-    color: var(--red-400, #f87171);
+  :deep(.log-badge__action-btn--exclude:hover) {
+    color: var(--red-400, #f87171) !important;
   }
 
   :deep(.search-highlight) {

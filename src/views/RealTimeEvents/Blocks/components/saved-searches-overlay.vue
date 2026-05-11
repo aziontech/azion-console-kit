@@ -74,7 +74,6 @@
         <PrimeButton
           icon="pi pi-times"
           text
-          rounded
           size="small"
           class="!w-5 !h-5 !p-0 flex-shrink-0"
           @click.stop="emit('delete', entry.id)"

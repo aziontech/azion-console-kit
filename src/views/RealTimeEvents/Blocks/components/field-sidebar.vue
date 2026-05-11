@@ -97,7 +97,6 @@
         <PrimeButton
           icon="pi pi-times"
           text
-          rounded
           size="small"
           class="!w-6 !h-6 !p-0"
           @click="closeSidebar"

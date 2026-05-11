@@ -10,9 +10,10 @@ import {
   filterValidCharts
 } from '@/services/panels-service'
 import REPORTS from '@/modules/real-time-metrics/constants/reports'
+import { MAX_TOTAL_TABS } from './useTabLimit.js'
 
-// Maximum number of simultaneously open tabs (excluding the fixed "Events" tab).
-// Kept as an exported constant for easy tweaking without touching call sites.
+// Kept for backward compatibility — when canOpenNewTab is not injected,
+// fall back to the old per-type limit.
 export const MAX_OPEN_TABS = 5
 
 const TABS_STORAGE_KEY = 'rte:open-tabs'
@@ -57,11 +58,12 @@ export const EVENTS_TAB = Object.freeze({
  * Extracted from TabsView.vue to keep the component thin.
  *
  * @param {Object} options
- * @param {import('vue-router').RouteLocationNormalized} options.route  – current route
- * @param {import('vue-router').Router}                  options.router – router instance
- * @param {Object}                                        options.toast  – PrimeVue toast service
+ * @param {import('vue-router').RouteLocationNormalized} options.route         – current route
+ * @param {import('vue-router').Router}                  options.router        – router instance
+ * @param {Object}                                        options.toast         – PrimeVue toast service
+ * @param {(() => boolean)|null}                          [options.canOpenNewTab=null] – injected from useTabLimit; when provided, replaces the per-type MAX_OPEN_TABS check
  */
-export function useSessionManager({ route, router, toast }) {
+export function useSessionManager({ route, router, toast, canOpenNewTab = null }) {
   const openTabs = ref([EVENTS_TAB])
   const activeTabId = ref(null)
   const panels = ref([])
@@ -172,11 +174,14 @@ export function useSessionManager({ route, router, toast }) {
     const alreadyOpen = openTabs.value.some((tab) => tab.id === panelId)
     if (!alreadyOpen) {
       const extraCount = openTabs.value.filter((tab) => tab.id !== null).length
-      if (extraCount >= MAX_OPEN_TABS) {
+      const limitReached = canOpenNewTab ? !canOpenNewTab() : extraCount >= MAX_OPEN_TABS
+      if (limitReached) {
         toast.add({
           closable: true,
           severity: 'warn',
-          summary: `Tab limit reached (${MAX_OPEN_TABS})`,
+          summary: canOpenNewTab
+            ? `Tab limit reached (${MAX_TOTAL_TABS})`
+            : `Tab limit reached (${MAX_OPEN_TABS})`,
           detail: 'Close a tab before opening another one.',
           life: 4000
         })
@@ -221,6 +226,20 @@ export function useSessionManager({ route, router, toast }) {
 
   // Backwards-compat alias
   const selectPanel = openTab
+
+  // ── Synchronise activeTabId when an additional Events tab is closed externally ──
+  /**
+   * Synchronise activeTabId when an additional Events tab is closed externally.
+   * Called by useEventsTabs.closeEventsTab when the closed tab was active.
+   *
+   * @param {string} tabId - The id of the tab being closed.
+   */
+  const removeEventsTabFromActive = (tabId) => {
+    if (activeTabId.value !== tabId) return
+    // Fall back to the pinned Events tab
+    activeTabId.value = null
+    syncUrlWithPanel()
+  }
 
   // ── Session creator ──
   const openSessionCreator = (panelConfig = null) => {
@@ -291,13 +310,20 @@ export function useSessionManager({ route, router, toast }) {
 
   /**
    * Share the current view (active tab + its filter/dataset state).
-   * @param {object} viewState - { filters, tsRange, dataset, pageSize, documentQuery }
+   * @param {object} [options]
+   * @param {object} [options.viewState] - { filters, tsRange, dataset, pageSize, documentQuery }
+   * @param {object|null} [options.eventsTab] - { label, dataset } for additional Events tabs; null for pinned/Dashboard tabs
    */
-  const shareCurrentView = (viewState = {}) => {
+  const shareCurrentView = ({ viewState = {}, eventsTab = null } = {}) => {
     try {
       const state = {
         tab: activeTabId.value,
         viewState
+      }
+      // Include eventsTab only when it is non-null (backward-compatible: omitting
+      // it keeps the encoded payload byte-identical to the pre-extension output).
+      if (eventsTab !== null && eventsTab !== undefined) {
+        state.eventsTab = eventsTab
       }
       // Include panel config inline for custom tabs so the recipient can open it
       // without needing the originator to have already shared the panel.
@@ -333,6 +359,16 @@ export function useSessionManager({ route, router, toast }) {
   // ── Share state import from URL ──
   // Returns the decoded viewState so callers can apply it to the active panel.
   const pendingShareViewState = ref(null)
+
+  /**
+   * Pending eventsTab state decoded from a Share_State URL.
+   * Set when the decoded payload contains an `eventsTab` field.
+   * TabsView.vue watches this ref and calls openEventsTab / applies viewState
+   * to the pinned tab depending on canOpenNewTab().
+   *
+   * Shape: { label, dataset, viewState } | null
+   */
+  const pendingEventsTabState = ref(null)
 
   const handleShareImport = () => {
     const encoded = route.query.shareState
@@ -376,6 +412,18 @@ export function useSessionManager({ route, router, toast }) {
 
     if (decoded.viewState) {
       pendingShareViewState.value = decoded.viewState
+    }
+
+    // Handle eventsTab from Share_State (Requirement 4.2, 4.3)
+    if (decoded.eventsTab) {
+      // Store the eventsTab info for TabsView to consume.
+      // TabsView decides whether to open a new tab (canOpenNewTab()) or apply
+      // viewState to the pinned Events tab (limit reached). This avoids a
+      // circular dependency between useSessionManager and useEventsTabs.
+      pendingEventsTabState.value = {
+        ...decoded.eventsTab,
+        viewState: decoded.viewState ?? {}
+      }
     }
 
     removeQueryParam('shareState')
@@ -457,11 +505,13 @@ export function useSessionManager({ route, router, toast }) {
     availableReports,
     activePanelConfig,
     pendingShareViewState,
+    pendingEventsTabState,
     // Tab management
     openTab,
     closeTab,
     setActiveTab,
     selectPanel, // alias for openTab
+    removeEventsTabFromActive,
     // Session CRUD
     openSessionCreator,
     handleSessionSave,

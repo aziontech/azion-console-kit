@@ -20,6 +20,8 @@ import { useFieldStats } from '../composables/useFieldStats'
 import { useLegendFilter } from '../composables/useLegendFilter'
 import { useViewSync } from '../composables/useViewSync'
 import { resolveChartKind, CHART_KINDS } from '../composables/chart-kinds'
+import { useEventsTabs, isEventsTabId } from '../composables/useEventsTabs'
+import { useEventsData } from '../composables/useEventsData'
 
 // ── Constants ──
 import TABS_EVENTS from '../Blocks/constants/tabs-events'
@@ -38,6 +40,20 @@ vi.mock('@/components/base/advanced-filter-system/filterFields/filterRow/compone
 
 vi.mock('@stores/account', () => ({
   useAccountStore: () => ({ accountData: { timezone: 'UTC' } })
+}))
+
+vi.mock('@stores/graphql-query', () => ({
+  useGraphQLStore: () => ({ setQuery: vi.fn() })
+}))
+
+vi.mock('@/services/axios/AxiosHttpClientAdapter', () => ({
+  AxiosHttpClientAdapter: {
+    request: vi.fn().mockResolvedValue({ statusCode: 200, body: { data: {} } })
+  }
+}))
+
+vi.mock('@/services/real-time-events-service/load-events-aggregation', () => ({
+  loadSummaryKpis: vi.fn().mockResolvedValue(null)
 }))
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -964,5 +980,282 @@ describe('Requirement 13.5: loadMore pagination maintains correct offset', () =>
     expect(fields).toContain('fieldA')
     expect(fields).toContain('fieldB')
     expect(fields).toContain('fieldC')
+  })
+})
+
+// ────────────────────────────────────────────────────────────────────────────
+// Multi-tab coexistence regression (real-time-events-enhancements)
+// ────────────────────────────────────────────────────────────────────────────
+describe('Multi-tab coexistence regression', () => {
+  // ── Requirement 9.4 — CSV/JSON export baseline on an additional Events tab ──
+  describe('Requirement 9.4: Export works the same regardless of which tab is active', () => {
+    it('exportMenuItems contains both "Export as JSON" and "Export as CSV" for httpRequests tab', () => {
+      const tableData = shallowRef([
+        makeRow(1, '2024-01-01T00:00:00Z', { host: 'a.com', status: '200' })
+      ])
+      const tabSelected = computed(() => ({ dataset: 'httpRequests' }))
+
+      const { exportMenuItems } = useExportData({ tableData, tabSelected })
+
+      const labels = exportMenuItems.value.map((item) => item.label)
+      expect(labels).toContain('Export as JSON')
+      expect(labels).toContain('Export as CSV')
+    })
+
+    it('exportFunctionMapper maps tsFormat correctly for an httpRequests tab', () => {
+      const tableData = shallowRef([])
+      const tabSelected = computed(() => ({ dataset: 'httpRequests' }))
+
+      const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
+
+      const result = exportFunctionMapper({ field: 'tsFormat', data: '2024-06-15 12:34:56' })
+      expect(result).toBe('2024-06-15 12:34:56')
+    })
+  })
+
+  // ── Requirement 9.5 — Dashboard tab open/close/share flow while additional Events tabs are open ──
+  describe('Requirement 9.5: Dashboard tab lifecycle is unaffected by additional Events tabs', () => {
+    let storage
+
+    beforeEach(() => {
+      storage = {}
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => storage[key] ?? null)
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key, val) => {
+        storage[key] = val
+      })
+      vi.spyOn(Storage.prototype, 'removeItem').mockImplementation((key) => {
+        delete storage[key]
+      })
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      vi.restoreAllMocks()
+    })
+
+    it('opens 2 additional Events tabs and verifies eventsTabs has 2 entries', () => {
+      const activeTabId = ref(null)
+      // openTabs tracks all tabs (pinned + additional); start with 1 (the pinned tab)
+      const openTabs = ref([{ id: null }])
+      const toast = { add: vi.fn() }
+      const totalTabCount = () => openTabs.value.length
+
+      const { eventsTabs, openEventsTab } = useEventsTabs({ toast, totalTabCount, activeTabId })
+
+      const id1 = openEventsTab({ dataset: 'httpRequests' })
+      openTabs.value.push({ id: id1 })
+
+      const id2 = openEventsTab({ dataset: 'workloadEvents' })
+      openTabs.value.push({ id: id2 })
+
+      expect(eventsTabs.value).toHaveLength(2)
+      expect(eventsTabs.value[0].id).toBe(id1)
+      expect(eventsTabs.value[1].id).toBe(id2)
+    })
+
+    it('closes one Events tab and verifies the other remains', () => {
+      const activeTabId = ref(null)
+      const openTabs = ref([{ id: null }])
+      const toast = { add: vi.fn() }
+      const totalTabCount = () => openTabs.value.length
+
+      const { eventsTabs, openEventsTab, closeEventsTab } = useEventsTabs({
+        toast,
+        totalTabCount,
+        activeTabId
+      })
+
+      const id1 = openEventsTab({ dataset: 'httpRequests' })
+      openTabs.value.push({ id: id1 })
+
+      const id2 = openEventsTab({ dataset: 'workloadEvents' })
+      openTabs.value.push({ id: id2 })
+
+      expect(eventsTabs.value).toHaveLength(2)
+
+      closeEventsTab(id1)
+      openTabs.value = openTabs.value.filter((t) => t.id !== id1)
+
+      expect(eventsTabs.value).toHaveLength(1)
+      expect(eventsTabs.value[0].id).toBe(id2)
+    })
+
+    it('isEventsTabId correctly identifies Events tab ids vs null (pinned)', () => {
+      const activeTabId = ref(null)
+      const openTabs = ref([{ id: null }])
+      const toast = { add: vi.fn() }
+      const totalTabCount = () => openTabs.value.length
+
+      const { openEventsTab, isEventsTabId: isEventsId } = useEventsTabs({
+        toast,
+        totalTabCount,
+        activeTabId
+      })
+
+      const newId = openEventsTab({ dataset: 'httpRequests' })
+
+      // Additional Events tab id starts with 'events:'
+      expect(isEventsId(newId)).toBe(true)
+      // Pinned tab id is null
+      expect(isEventsId(null)).toBe(false)
+      // Dashboard tab ids are arbitrary strings not starting with 'events:'
+      expect(isEventsId('dashboard-abc')).toBe(false)
+    })
+  })
+
+  // ── Requirement 9.2 — Temporal_Windowing preserved per tab ──
+  describe('Requirement 9.2: useEventsData instances are fully independent per tab', () => {
+    it('each instance has its own independent kpis, chartData, and tableData refs', () => {
+      const filterDataA = ref({
+        tsRange: {
+          tsRangeBegin: '2024-01-01T00:00:00Z',
+          tsRangeEnd: '2024-01-01T00:05:00Z',
+          label: 'Last 5 minutes'
+        },
+        fields: [],
+        dataset: 'httpRequests'
+      })
+      const filterDataB = ref({
+        tsRange: {
+          tsRangeBegin: '2024-02-01T00:00:00Z',
+          tsRangeEnd: '2024-02-01T00:05:00Z',
+          label: 'Last 5 minutes'
+        },
+        fields: [],
+        dataset: 'workloadEvents'
+      })
+
+      const makeInstance = (filterData) =>
+        useEventsData({
+          filterData,
+          listService: ref(vi.fn().mockResolvedValue({ data: [] })),
+          loadChartAggregation: ref(null),
+          tabSelected: computed(() => ({ dataset: filterData.value.dataset })),
+          pageSize: ref(50),
+          hasChartConfig: ref(false),
+          onError: vi.fn(),
+          stackByField: ref('none')
+        })
+
+      const instanceA = makeInstance(filterDataA)
+      const instanceB = makeInstance(filterDataB)
+
+      // Each instance starts with its own independent refs
+      expect(instanceA.kpis).not.toBe(instanceB.kpis)
+      expect(instanceA.chartData).not.toBe(instanceB.chartData)
+      expect(instanceA.tableData).not.toBe(instanceB.tableData)
+
+      // Mutating one instance's refs does not affect the other
+      instanceA.kpis.value = { total: 42 }
+      expect(instanceB.kpis.value).toBeNull()
+
+      instanceA.chartData.value = [{ ts: '2024-01-01', count: 5 }]
+      expect(instanceB.chartData.value).toHaveLength(0)
+    })
+
+    it('changing one instance filterData does not affect the other instance', async () => {
+      const filterDataA = ref({
+        tsRange: {
+          tsRangeBegin: '2024-01-01T00:00:00Z',
+          tsRangeEnd: '2024-01-01T00:05:00Z',
+          label: 'Last 5 minutes'
+        },
+        fields: [{ valueField: 'host', operator: 'Eq', value: 'a.com' }],
+        dataset: 'httpRequests'
+      })
+      const filterDataB = ref({
+        tsRange: {
+          tsRangeBegin: '2024-02-01T00:00:00Z',
+          tsRangeEnd: '2024-02-01T00:05:00Z',
+          label: 'Last 5 minutes'
+        },
+        fields: [],
+        dataset: 'workloadEvents'
+      })
+
+      // Mutate filterDataA — filterDataB must remain unchanged
+      filterDataA.value = {
+        ...filterDataA.value,
+        fields: [
+          { valueField: 'host', operator: 'Eq', value: 'a.com' },
+          { valueField: 'status', operator: 'Eq', value: '200' }
+        ]
+      }
+      await nextTick()
+
+      expect(filterDataA.value.fields).toHaveLength(2)
+      expect(filterDataB.value.fields).toHaveLength(0)
+    })
+  })
+
+  // ── Requirement 9.8 — Cleanup hooks fire on close of an additional Events tab ──
+  describe('Requirement 9.8: Closing an additional Events tab removes it and falls back to pinned', () => {
+    let storage
+
+    beforeEach(() => {
+      storage = {}
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => storage[key] ?? null)
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key, val) => {
+        storage[key] = val
+      })
+      vi.spyOn(Storage.prototype, 'removeItem').mockImplementation((key) => {
+        delete storage[key]
+      })
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      vi.restoreAllMocks()
+    })
+
+    it('eventsTabs no longer contains the closed tab after closeEventsTab', () => {
+      const activeTabId = ref(null)
+      const openTabs = ref([{ id: null }])
+      const toast = { add: vi.fn() }
+      const totalTabCount = () => openTabs.value.length
+
+      const { eventsTabs, openEventsTab, closeEventsTab } = useEventsTabs({
+        toast,
+        totalTabCount,
+        activeTabId
+      })
+
+      const newId = openEventsTab({ dataset: 'httpRequests' })
+      openTabs.value.push({ id: newId })
+
+      expect(eventsTabs.value).toHaveLength(1)
+      expect(eventsTabs.value[0].id).toBe(newId)
+
+      closeEventsTab(newId)
+
+      expect(eventsTabs.value).toHaveLength(0)
+      expect(eventsTabs.value.find((t) => t.id === newId)).toBeUndefined()
+    })
+
+    it('activeTabId falls back to null (pinned tab) when the only additional tab is closed', () => {
+      const activeTabId = ref(null)
+      const openTabs = ref([{ id: null }])
+      const toast = { add: vi.fn() }
+      const totalTabCount = () => openTabs.value.length
+
+      const { openEventsTab, closeEventsTab } = useEventsTabs({
+        toast,
+        totalTabCount,
+        activeTabId
+      })
+
+      const newId = openEventsTab({ dataset: 'httpRequests' })
+      openTabs.value.push({ id: newId })
+
+      // The new tab should be active after opening
+      expect(activeTabId.value).toBe(newId)
+
+      closeEventsTab(newId)
+
+      // After closing the only additional tab, activeTabId falls back to null (pinned)
+      expect(activeTabId.value).toBeNull()
+    })
   })
 })

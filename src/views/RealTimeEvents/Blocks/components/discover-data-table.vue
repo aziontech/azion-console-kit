@@ -56,6 +56,7 @@
       :expandedRows="expandedRows"
       @update:expandedRows="emit('update:expandedRows', $event)"
       removableSort scrollable scrollHeight="flex" resizableColumns columnResizeMode="expand"
+      stripedRows
       :exportFilename="exportFilename"
       :exportFunction="exportFunction"
       :rowClass="rowClass"
@@ -166,13 +167,13 @@
     white-space: nowrap;
   }
   :deep(.discover-data-table .p-datatable-tbody > tr > td) {
-    padding: 0.65rem 0.75rem;
+    padding: 0.6rem 0.75rem;
     vertical-align: top;
     border-bottom: 1px solid var(--surface-border);
     font-size: 0.8rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background-color 0.15s, box-shadow 0.15s;
+    transition: background-color 0.15s;
   }
   :deep(.discover-data-table .p-datatable-tbody > tr:nth-child(even) > td) {
     background: var(--table-body-row-even-bg);
@@ -228,9 +229,12 @@
     overflow: visible;
     text-overflow: clip;
   }
-  /* Subtle row divider */
-  :deep(.discover-data-table .p-datatable-tbody > tr > td) {
-    border-bottom: 1px solid color-mix(in srgb, var(--surface-border) 50%, transparent);
+  /* Force square (not circular) shape on all text icon-only buttons
+     inside the data table. PrimeVue's default icon-only hover background
+     is circular; the DS calls for rectangle buttons everywhere. */
+  :deep(.discover-data-table .p-button.p-button-text.p-button-icon-only),
+  :deep(.discover-data-table .p-button.p-button-text) {
+    border-radius: 4px !important;
   }
   /* Frozen columns: keep background consistent */
   :deep(.discover-data-table .p-datatable-tbody > tr:nth-child(even) > td.p-frozen-column) {
@@ -283,6 +287,7 @@
     transition: background-color 0.15s;
     overflow: visible;
     text-overflow: unset;
+    line-height: 20px;
   }
   .timestamp-cell:hover {
     background: var(--surface-hover);
@@ -325,12 +330,13 @@
     opacity: 1;
   }
   .expansion-content {
-    padding: 1rem 2rem 1rem 3rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
     border-left: 3px solid var(--series-one-color, #fba86f);
-    animation: expandIn 0.25s ease-out;
+    background: var(--surface-ground);
+    animation: expandIn 0.2s ease-out;
   }
   @keyframes expandIn {
-    from { opacity: 0; max-height: 0; transform: translateY(-8px); }
-    to { opacity: 1; max-height: 600px; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>

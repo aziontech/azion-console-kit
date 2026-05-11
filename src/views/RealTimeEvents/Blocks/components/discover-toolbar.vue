@@ -70,7 +70,6 @@
           v-if="documentSearchQuery"
           icon="pi pi-times"
           text
-          rounded
           size="small"
           class="!w-5 !h-5 !p-0 absolute right-1"
           @click="emit('update:documentSearchQuery', '')"

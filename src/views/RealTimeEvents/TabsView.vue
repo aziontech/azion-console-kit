@@ -19,7 +19,7 @@
           @tab-click="onTabClick"
         >
           <TabPanel
-            v-for="tab in openTabs"
+            v-for="tab in combinedOpenTabs"
             :key="tab.id ?? 'events'"
             :pt="{
               root: { 'data-testid': `rte-tab-${tab.id ?? 'events'}` }
@@ -29,7 +29,9 @@
               <SessionTabHeader
                 :tab="tab"
                 :active="(tab.id ?? null) === (activeTabId ?? null)"
+                :renameable="isEventsTabId(tab.id)"
                 @close="handleCloseTab"
+                @rename="(tabId, label) => renameEventsTab(tabId, label)"
               />
             </template>
           </TabPanel>
@@ -38,7 +40,6 @@
           <PrimeButton
             icon="pi pi-folder"
             text
-            rounded
             aria-label="Add to tabs"
             data-testid="open-session-browser-button"
             v-tooltip.bottom="{ value: 'Add session to tabs', showDelay: 300 }"
@@ -47,7 +48,6 @@
           <PrimeButton
             icon="pi pi-share-alt"
             text
-            rounded
             aria-label="Share current view"
             data-testid="share-current-view-button"
             v-tooltip.bottom="{ value: 'Copy share link', showDelay: 300 }"
@@ -67,9 +67,24 @@
             :filterFields="generatedFilterFields"
             :tabSelected="selectedTab"
             :loadEventsChartAggregation="loadEventsChartAggregation"
+            :tabId="null"
+            :activeTabId="activeTabId"
             :initialFilterState="pendingShareViewState?.filters"
             :initialPageSize="pendingShareViewState?.pageSize"
             :initialSelectedFields="pendingShareViewState?.selectedFields"
+            @dataset-change="handleDatasetChange"
+          />
+          <TabPanelBlock
+            v-else-if="isEventsTabId(activeTabId)"
+            :key="`tab-${activeTabId}`"
+            ref="tabPanelBlockRef"
+            :listService="selectedTabProps.listService"
+            :filterFields="generatedFilterFields"
+            :tabSelected="selectedTab"
+            :loadEventsChartAggregation="loadEventsChartAggregation"
+            :tabId="activeTabId"
+            :activeTabId="activeTabId"
+            :pendingViewState="getPendingViewState(activeTabId)"
             @dataset-change="handleDatasetChange"
           />
           <DashboardPanel
@@ -123,6 +138,8 @@
   import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
   import { loadEventsFilterFields } from '@/modules/filter-loaders'
   import { useSessionManager } from '@/views/RealTimeEvents/composables/useSessionManager'
+  import { useTabLimit } from '@/views/RealTimeEvents/composables/useTabLimit'
+  import { useEventsTabs } from '@/views/RealTimeEvents/composables/useEventsTabs'
 
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
@@ -176,10 +193,6 @@
   const selectedDatasetKey = ref(null)
 
   // ── Session management (composable) ──
-  // `localStorageAvailable` / `openSessionCreator` are no longer consumed in
-  // the template now that creating custom sessions is disabled, but they stay
-  // available from the composable for when the feature is re-enabled. They're
-  // omitted from the destructure to keep the lint clean.
   const {
     activeTabId,
     openTabs,
@@ -190,6 +203,7 @@
     availableReports,
     activePanelConfig,
     pendingShareViewState,
+    pendingEventsTabState,
     openTab,
     closeTab,
     setActiveTab,
@@ -203,13 +217,52 @@
   // Backwards-compat alias for watchers below
   const activePanel = activeTabId
 
+  // ── Additional Events tabs ──
+  const {
+    eventsTabs,
+    openEventsTab,
+    closeEventsTab,
+    renameEventsTab,
+    restoreEventsTabs,
+    getPendingViewState,
+    isEventsTabId
+  } = useEventsTabs({
+    toast,
+    totalTabCount: () => {
+      // Count: 1 (pinned) + additional Events tabs + Dashboard tabs
+      return 1 + eventsTabs.value.length + openTabs.value.filter((t) => t.id !== null).length
+    },
+    activeTabId
+  })
+
+  // ── Tab limit (shared across all tab kinds) ──
+  const { MAX_TOTAL_TABS, canOpenNewTab } = useTabLimit({
+    openTabs: computed(() => [
+      { id: null },
+      ...eventsTabs.value,
+      ...openTabs.value.filter((t) => t.id !== null)
+    ])
+  })
+
+  // ── Combined tab list for the tab bar ──
+  const combinedOpenTabs = computed(() => [
+    { id: null, label: 'Events', icon: 'pi pi-list', closable: false },
+    ...eventsTabs.value.map((t) => ({
+      id: t.id,
+      label: t.label,
+      icon: 'pi pi-list',
+      closable: true
+    })),
+    ...openTabs.value.filter((t) => t.id !== null)
+  ])
+
   // ── Tab UI helpers ──
   const activeIndex = computed(() =>
-    openTabs.value.findIndex((tab) => (tab.id ?? null) === (activeTabId.value ?? null))
+    combinedOpenTabs.value.findIndex((tab) => (tab.id ?? null) === (activeTabId.value ?? null))
   )
 
   const onTabClick = ({ index }) => {
-    const tab = openTabs.value[index]
+    const tab = combinedOpenTabs.value[index]
     if (!tab) return
     if (tab.id === null) {
       setActiveTab(null)
@@ -218,26 +271,81 @@
     }
   }
 
-  const handleCloseTab = (tabId) => closeTab(tabId)
+  const handleCloseTab = (tabId) => {
+    if (isEventsTabId(tabId)) {
+      closeEventsTab(tabId)
+    } else {
+      closeTab(tabId)
+    }
+  }
 
   const handleBrowserSelect = (panelId) => {
-    openTab(panelId)
+    if (panelId === null) {
+      // "Events" item selected from the drawer — open a new Events tab
+      openNewEventsTab()
+    } else {
+      openTab(panelId)
+    }
     sessionBrowserVisible.value = false
   }
 
+  // ── New Events tab button handler ──
+  const openNewEventsTab = () => {
+    const defaultDataset = Object.values(TABS_EVENTS)[0]?.panel || 'httpRequests'
+    openEventsTab({ dataset: defaultDataset })
+  }
+
+  // ── Share ──
   const handleShare = () => {
     let viewState = {}
-    if (!activeTabId.value && tabPanelBlockRef.value?.getCurrentShareState) {
+    let eventsTab = null
+
+    if (tabPanelBlockRef.value?.getCurrentShareState) {
       viewState = tabPanelBlockRef.value.getCurrentShareState()
     }
-    shareCurrentView(viewState)
+
+    if (activeTabId.value && isEventsTabId(activeTabId.value)) {
+      const tab = eventsTabs.value.find((t) => t.id === activeTabId.value)
+      if (tab) {
+        eventsTab = { id: tab.id, label: tab.label, dataset: tab.dataset }
+      }
+    }
+
+    shareCurrentView({ viewState, eventsTab })
   }
+
+  // ── Watch pendingEventsTabState from useSessionManager (Share_State import) ──
+  watch(pendingEventsTabState, (state) => {
+    if (!state) return
+    if (canOpenNewTab()) {
+      openEventsTab({ label: state.label, dataset: state.dataset, viewState: state.viewState })
+    } else {
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: `Tab limit reached (${MAX_TOTAL_TABS}). Close a tab before opening another one.`,
+        life: 4000
+      })
+      // Apply viewState to pinned tab as fallback
+      if (tabPanelBlockRef.value?.applyInitialShareState) {
+        tabPanelBlockRef.value.applyInitialShareState()
+      }
+    }
+    pendingEventsTabState.value = null
+  })
 
   // All available datasets
   const allDatasets = Object.values(TABS_EVENTS)
 
   // Currently selected tab/dataset (for Log Explorer)
   const selectedTab = computed(() => {
+    // When an additional Events tab is active, use its dataset
+    if (activeTabId.value && isEventsTabId(activeTabId.value)) {
+      const evTab = eventsTabs.value.find((t) => t.id === activeTabId.value)
+      if (evTab) {
+        return allDatasets.find((tab) => tab.panel === evTab.dataset) || allDatasets[0]
+      }
+    }
     return allDatasets.find((tab) => tab.panel === selectedDatasetKey.value) || allDatasets[0]
   })
 
@@ -248,7 +356,6 @@
   })
 
   // ── Dashboard panel service resolution ──
-  // Resolve the correct list/load services for the active dashboard panel's dataset
   const dashboardListService = computed(() => {
     if (!activePanelConfig.value?.eventsConfig?.dataset) return () => Promise.resolve({ data: [] })
     const dataset = activePanelConfig.value.eventsConfig.dataset
@@ -300,8 +407,26 @@
     generatedFilterFields.value = await loadEventsFilterFields(tabSelected.dataset)
   }
 
+  // ── Task 16.5: Watch activeTabId to sync URL hash / reload filter fields ──
+  watch(activeTabId, async (newId) => {
+    if (!newId || !isEventsTabId(newId)) return
+    // When switching to an additional Events tab, reload filter fields
+    // for the tab's dataset
+    const tab = eventsTabs.value.find((t) => t.id === newId)
+    if (tab) {
+      const tabConfig = Object.values(TABS_EVENTS).find((t) => t.panel === tab.dataset)
+      if (tabConfig) {
+        await reloadFilterFields(tabConfig)
+      }
+    }
+  })
+
   // ── Watch activePanel to load filter fields when switching tabs ──
   watch(activePanel, async (newPanelId) => {
+    if (newPanelId && isEventsTabId(newPanelId)) {
+      // Handled by the activeTabId watcher above
+      return
+    }
     if (newPanelId && activePanelConfig.value?.eventsConfig?.dataset) {
       // Switching to a dashboard panel
       const dataset = activePanelConfig.value.eventsConfig.dataset
@@ -319,6 +444,7 @@
   // ── Initialize ──
   onMounted(async () => {
     initializePanels()
+    restoreEventsTabs()
     await initializeTabSelection()
     reloadFilterFields(selectedTab.value)
   })
@@ -338,5 +464,12 @@
   :deep(.rte-events-tabview .p-tabview-nav-link:focus:not(:focus-visible)) {
     box-shadow: none;
     outline: none;
+  }
+
+  /* Force square (not circular) shape on all text icon-only buttons
+     in the toolbar. PrimeVue's default icon-only hover renders a circle. */
+  :deep([data-testid="session-toolbar"] .p-button.p-button-text.p-button-icon-only),
+  :deep([data-testid="session-toolbar"] .p-button.p-button-text) {
+    border-radius: 4px !important;
   }
 </style>

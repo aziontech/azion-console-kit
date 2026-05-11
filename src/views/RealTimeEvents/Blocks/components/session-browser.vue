@@ -121,18 +121,17 @@
       </div>
 
       <div class="flex-1 overflow-y-auto">
-        <!-- Log Explorer option -->
+        <!-- New Events tab option -->
         <div class="px-3 py-2 border-b surface-border">
           <div
             class="session-browser__item"
-            :class="{ 'session-browser__item--active': activePanel === null }"
-            data-testid="session-item-log-explorer"
+            data-testid="session-item-new-events-tab"
             @click="selectPanel(null)"
           >
-            <i class="pi pi-list text-base text-color-secondary" />
+            <i class="pi pi-plus text-base text-color-secondary" />
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-sm font-medium text-color truncate">Events</span>
-              <span class="text-xs text-color-secondary truncate">Default events explorer</span>
+              <span class="text-sm font-medium text-color truncate">New Events tab</span>
+              <span class="text-xs text-color-secondary truncate">Open a new log explorer tab</span>
             </div>
           </div>
         </div>
@@ -196,7 +195,6 @@
                 v-if="!readOnly"
                 icon="pi pi-ellipsis-v"
                 text
-                rounded
                 size="small"
                 class="!w-7 !h-7 flex-shrink-0"
                 aria-label="Session actions"

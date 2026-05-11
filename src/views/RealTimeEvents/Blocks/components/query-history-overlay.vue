@@ -33,7 +33,6 @@
         v-if="history.length"
         icon="pi pi-trash"
         text
-        rounded
         severity="danger"
         size="small"
         class="!w-6 !h-6"
@@ -75,7 +74,6 @@
         <PrimeButton
           icon="pi pi-times"
           text
-          rounded
           size="small"
           class="!w-5 !h-5 !p-0 flex-shrink-0"
           @click.stop="emit('remove', idx)"

@@ -56,6 +56,10 @@
       }
     }
   )
+
+  const onResetScroll = () => {
+    if (scrollRef.value) scrollRef.value.scrollTop = 0
+  }
 </script>
 
 <template>
@@ -85,7 +89,6 @@
           <PrimeButton
             icon="pi pi-chevron-up"
             text
-            rounded
             size="small"
             class="!w-8 !h-8"
             v-tooltip.top="{ value: 'Previous', showDelay: 300 }"
@@ -95,7 +98,6 @@
           <PrimeButton
             icon="pi pi-chevron-down"
             text
-            rounded
             size="small"
             class="!w-8 !h-8"
             v-tooltip.top="{ value: 'Next', showDelay: 300 }"
@@ -105,7 +107,6 @@
           <PrimeButton
             icon="pi pi-times"
             text
-            rounded
             size="small"
             class="!w-8 !h-8"
             @click="emit('close')"
@@ -124,7 +125,9 @@
           :onAddFilter="onAddFilter"
           :onExcludeFilter="onExcludeFilter"
           :isLoading="isLoading"
+          :grow-json-to-fit="true"
           @notify="(payload) => toast.add(payload)"
+          @reset-scroll="onResetScroll"
         />
       </div>
     </div>
@@ -142,7 +145,7 @@
     background: var(--surface-ground);
     align-self: stretch;
     overflow: hidden;
-    width: 380px;
+    width: 360px;
     min-width: 280px;
     max-width: 40vw;
     flex-shrink: 0;
@@ -157,6 +160,9 @@
     gap: 0.5rem;
     background: var(--surface-card);
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   .detail-sidebar__title-group {
@@ -165,24 +171,27 @@
     min-width: 0;
     flex: 1;
     gap: 0.125rem;
+    line-height: 1.3;
   }
 
   .detail-sidebar__title {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.3;
   }
 
   .detail-sidebar__subtitle {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     color: var(--text-color-secondary);
     font-family: var(--rte-font-mono);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.3;
   }
 
   .detail-sidebar__nav {
@@ -195,8 +204,31 @@
   .detail-sidebar__content {
     flex: 1;
     overflow-y: auto;
-    padding: 0.75rem 0.75rem 0;
+    overflow-x: hidden;
+    padding: 0;
     background: var(--surface-ground);
+  }
+
+  /* Nav buttons: compact square */
+  .detail-sidebar__nav :deep(.p-button) {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .detail-sidebar {
+      width: 320px;
+      min-width: 260px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .detail-sidebar {
+      width: 300px;
+      min-width: 240px;
+      max-width: 50vw;
+    }
   }
 
   /* ── Transition ─────────────────────────────────────────────────── */

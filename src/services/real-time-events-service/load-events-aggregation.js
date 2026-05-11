@@ -481,6 +481,22 @@ function mergeChartBucketAliases(data, aliasConfig) {
   return result.sort((left, right) => new Date(left.ts) - new Date(right.ts))
 }
 
+/**
+ * Build the KPI alias fragments for the Events-API query.
+ * Returns empty strings for non-HTTP-like datasets.
+ *
+ * @param {{ dataset: string, filterBlock: string }} args
+ * @returns {{ kpiStatusAlias: string, kpiAvgAlias: string }}
+ */
+function buildKpiAliases({ dataset, filterBlock }) {
+  const isHttpLike = HTTP_LIKE_DATASETS.has(dataset)
+  const kpiStatusAlias = isHttpLike ? `
+    kpiByStatus: ${dataset}( limit: 10000, aggregate: { count: rows }, groupBy: [status], filter: { ${filterBlock} } ) { count, status }` : ''
+  const kpiAvgAlias = isHttpLike ? `
+    kpiAvgRt: ${dataset}( limit: 1, aggregate: { avg: requestTime }, filter: { ${filterBlock} } ) { avg }` : ''
+  return { kpiStatusAlias, kpiAvgAlias }
+}
+
 async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField = null }) {
   const normalizedTsRange = {
     tsRangeBegin: tsRange.tsRangeBegin instanceof Date ? tsRange.tsRangeBegin.toISOString() : String(tsRange.tsRangeBegin),
@@ -523,10 +539,7 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
     chart: ${dataset}( limit: 10000, aggregate: { count: rows }, groupBy: [${chartGroupBy.join(', ')}], orderBy: [ts_ASC], filter: { ${filterBlock} } ) {
       ${['count', ...chartGroupBy].join('\n      ')}
     }`
-  const kpiStatusAlias = isHttpLike ? `
-    kpiByStatus: ${dataset}( limit: 10000, aggregate: { count: rows }, groupBy: [status], filter: { ${filterBlock} } ) { count, status }` : ''
-  const kpiAvgAlias = isHttpLike ? `
-    kpiAvgRt: ${dataset}( limit: 1, aggregate: { avg: requestTime }, filter: { ${filterBlock} } ) { avg }` : ''
+  const { kpiStatusAlias, kpiAvgAlias } = buildKpiAliases({ dataset, filterBlock })
   const query = { query: `query (${paramsStr}) {${chartAlias}${kpiStatusAlias}${kpiAvgAlias}\n}`, variables }
   const decorator = new AxiosHttpClientSignalDecorator()
   const httpResponse = await decorator.request({ baseURL: '/', url: makeRealTimeEventsBaseUrl(), method: 'POST', body: JSON.stringify(query) })
@@ -570,6 +583,116 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
     kpis.supportsRequestTime = kpis.avgRequestTime !== null
   }
   return { chartData, kpis }
+}
+
+/**
+ * Fallback KPI loader used ONLY when the chart request routed through the
+ * Metrics API (i.e. when resolveChartApi returned 'metrics'). In that case
+ * loadEventsChartAggregation cannot attach the Events-API KPI aliases to its
+ * query, so this function issues a dedicated kpi-only Events-API request for
+ * kpiByStatus + kpiAvgRt.
+ *
+ * When the chart request goes through the Events API, this function is NOT
+ * called — KPIs are already merged into the chart payload via the default
+ * path, guaranteeing Chart_View invariance (Property 9).
+ *
+ * Returns null for datasets that do not declare showSummary: true or for
+ * non-HTTP-like datasets.
+ *
+ * @param {{ dataset: string, tsRange: object, filters?: object, signal?: AbortSignal }} args
+ * @returns {Promise<{total: number, clientErrors: number, serverErrors: number, avgRequestTime: number|null, supportsStatusBreakdown: boolean, supportsRequestTime: boolean}|null>}
+ */
+export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }) {
+  // Only HTTP-like datasets support KPI breakdown
+  if (!HTTP_LIKE_DATASETS.has(dataset)) return null
+  if (!tsRange?.tsRangeBegin || !tsRange?.tsRangeEnd) return null
+
+  const normalizedTsRange = {
+    tsRangeBegin: tsRange.tsRangeBegin instanceof Date ? tsRange.tsRangeBegin.toISOString() : String(tsRange.tsRangeBegin),
+    tsRangeEnd: tsRange.tsRangeEnd instanceof Date ? tsRange.tsRangeEnd.toISOString() : String(tsRange.tsRangeEnd)
+  }
+
+  const variables = { tsBegin: normalizedTsRange.tsRangeBegin, tsEnd: normalizedTsRange.tsRangeEnd }
+  const extraFilterLines = []
+
+  if (filters?.and) {
+    Object.entries(filters.and).forEach(([key, value]) => {
+      const varName = `and_${key}`
+      variables[varName] = value
+      extraFilterLines.push(`${key}: ${varName}`)
+    })
+  }
+  if (filters?.in) {
+    Object.entries(filters.in).forEach(([key, value]) => {
+      const varName = `in_${key}`
+      const normalized = normalizeInFilterValues(value)
+      variables[varName] = normalized
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      extraFilterLines.push(`${gqlKey}: ${varName}`)
+    })
+  }
+
+  const paramType = (key, value) => {
+    if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
+    if (Array.isArray(value)) {
+      const sample = value[0]
+      if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
+      return '[String]'
+    }
+    if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
+    return 'String'
+  }
+
+  const paramsStr = Object.entries(variables).map(([key, value]) => `${key}: ${paramType(key, value)}`).join(', ')
+  const filterBlock = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterLines].join(', ')
+
+  const { kpiStatusAlias, kpiAvgAlias } = buildKpiAliases({ dataset, filterBlock })
+
+  const query = {
+    query: `query (${paramsStr}) {${kpiStatusAlias}${kpiAvgAlias}\n}`,
+    variables
+  }
+
+  const decorator = new AxiosHttpClientSignalDecorator(signal)
+  const httpResponse = await decorator.request({
+    baseURL: '/',
+    url: makeRealTimeEventsBaseUrl(),
+    method: 'POST',
+    body: JSON.stringify(query)
+  })
+
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(httpResponse.body?.detail || 'KPI API error')
+  }
+
+  const data = httpResponse.body?.data || {}
+
+  let total = 0
+  let clientErrors = 0
+  let serverErrors = 0
+  let avgRequestTime = null
+  let supportsStatusBreakdown = false
+  let supportsRequestTime = false
+
+  if (Array.isArray(data.kpiByStatus)) {
+    const classify = STACK_BUCKETS.status
+    data.kpiByStatus.forEach((row) => {
+      const bucket = classify(row?.status)
+      const count = row?.count || 0
+      total += count
+      if (bucket === '4xx') clientErrors += count
+      else if (bucket === '5xx') serverErrors += count
+    })
+    supportsStatusBreakdown = true
+  }
+
+  if (Array.isArray(data.kpiAvgRt) && data.kpiAvgRt[0]?.avg !== undefined) {
+    const avg = Number(data.kpiAvgRt[0].avg)
+    avgRequestTime = Number.isFinite(avg) ? avg : null
+    supportsRequestTime = avgRequestTime !== null
+  }
+
+  return { total, clientErrors, serverErrors, avgRequestTime, supportsStatusBreakdown, supportsRequestTime }
 }
 
 export default loadEventsAggregation
