@@ -2,11 +2,8 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DataView from 'primevue/dataview'
-  import PrimeButton from '@aziontech/webkit/button'
-  import Dropdown from '@aziontech/webkit/dropdown'
   import Menu from '@aziontech/webkit/menu'
-  import Skeleton from '@aziontech/webkit/skeleton'
+  import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'list-deployments' })
@@ -30,26 +27,78 @@
   const paginatorRows = ref(10)
 
   const searchTerm = ref('')
-  const selectedStatus = ref('all')
-  const selectedCurrent = ref('all')
+  const filterValues = ref({
+    status: 'all',
+    environment: 'all',
+    current: 'all'
+  })
 
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
   const statusAllOption = { label: 'All Status', value: 'all' }
+  const environmentAllOption = { label: 'All Environments', value: 'all' }
   const currentOptions = [
     { label: 'All Versions', value: 'all' },
     { label: 'Only Current', value: 'current' }
   ]
 
+  const columns = [
+    {
+      key: 'deployment',
+      label: 'Deployment',
+      headerClass: 'min-w-[170px] flex-[2_1_170px]',
+      cellClass:
+        'min-w-[170px] flex-[2_1_170px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+    },
+    {
+      key: 'environment',
+      label: 'Environment',
+      headerClass: 'min-w-[130px] flex-[1.1_1_130px]',
+      cellClass:
+        'min-w-[130px] flex-[1.1_1_130px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      field: 'environment'
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      headerClass: 'min-w-[120px] flex-[1.25_1_120px]',
+      cellClass:
+        'min-w-[120px] flex-[1.25_1_120px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+    },
+    {
+      key: 'resource-pack',
+      label: 'Resource Pack',
+      headerClass: 'min-w-[320px] flex-[2.5_1_320px]',
+      cellClass:
+        'min-w-[320px] flex-[2.5_1_320px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+    },
+    {
+      key: 'lastEditor',
+      label: 'Last Editor',
+      headerClass: 'min-w-[180px] flex-[1.4_1_180px]',
+      cellClass:
+        'min-w-[180px] flex-[1.4_1_180px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      field: 'lastEditor'
+    },
+    {
+      key: 'lastModified',
+      label: 'Last Modified',
+      headerClass: 'min-w-[170px] flex-[1.4_1_170px]',
+      cellClass:
+        'min-w-[170px] flex-[1.4_1_170px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      field: 'lastModified'
+    }
+  ]
+
   const textKeys = ['text', 'content', 'value', 'label', 'name', 'email']
 
   const statusIconMap = {
-    Ready: 'pi pi-check-circle',
-    Building: 'pi pi-spin pi-spinner',
-    Draft: 'pi pi-clock',
-    Error: 'pi pi-times-circle',
-    Canceled: 'pi pi-ban'
+    ready: 'pi pi-check-circle',
+    building: 'pi pi-spinner',
+    draft: 'pi pi-clock',
+    error: 'pi pi-times-circle',
+    canceled: 'pi pi-ban'
   }
 
   const resourcePackTypeMeta = [
@@ -58,9 +107,15 @@
     { key: 'workload', label: 'Workload', icon: 'ai ai-workloads' }
   ]
 
-  const getStatusIcon = (status) => statusIconMap[status] || 'pi pi-info-circle'
-  const getStatusClass = (deployment) =>
-    `status-pill status-${deployment?.status?.severity || 'secondary'}`
+  const getStatusIcon = (status) => {
+    const normalizedStatus = String(status || '')
+      .trim()
+      .toLowerCase()
+    const baseIcon = statusIconMap[normalizedStatus] || 'pi pi-info-circle'
+
+    return normalizedStatus === 'building' ? `${baseIcon} animate-spin` : baseIcon
+  }
+  const getStatusClass = (deployment) => `status-${deployment?.status?.severity || 'secondary'}`
 
   const normalizeText = (value) =>
     String(value || '')
@@ -81,10 +136,78 @@
     ]
   })
 
+  const environmentOptions = computed(() => {
+    const environments = Array.from(
+      new Set(deployments.value.map((deployment) => deployment.environment).filter(Boolean))
+    )
+
+    return [
+      environmentAllOption,
+      ...environments.map((environment) => ({
+        label: formatEnvironment(environment),
+        value: environment
+      }))
+    ]
+  })
+
+  const filters = computed(() => [
+    {
+      key: 'status',
+      field: 'status.content',
+      placeholder: 'Status',
+      options: statusOptions.value,
+      optionLabel: 'label',
+      optionValue: 'value',
+      defaultValue: 'all',
+      allValue: 'all'
+    },
+    {
+      key: 'current',
+      field: 'isCurrent',
+      placeholder: 'Current',
+      options: currentOptions,
+      optionLabel: 'label',
+      optionValue: 'value',
+      defaultValue: 'all',
+      allValue: 'all',
+      matcher: (itemValue, selectedValue) => selectedValue !== 'current' || itemValue
+    },
+    {
+      key: 'environment',
+      field: 'environment',
+      placeholder: 'Environment',
+      options: environmentOptions.value,
+      optionLabel: 'label',
+      optionValue: 'value',
+      defaultValue: 'all',
+      allValue: 'all'
+    }
+  ])
+
+  const getValueByPath = (item, path) => {
+    if (!path) return undefined
+
+    return path.split('.').reduce((value, key) => value?.[key], item)
+  }
+
+  const matchesDropdownFilters = (deployment) => {
+    return filters.value.every((filter) => {
+      const selectedValue = filterValues.value?.[filter.key] ?? filter.defaultValue
+
+      if (selectedValue === filter.allValue) return true
+
+      const itemValue = getValueByPath(deployment, filter.field)
+
+      if (typeof filter.matcher === 'function') {
+        return filter.matcher(itemValue, selectedValue, deployment)
+      }
+
+      return normalizeText(itemValue) === normalizeText(selectedValue)
+    })
+  }
+
   const filteredDeployments = computed(() => {
     const normalizedSearch = normalizeText(searchTerm.value)
-    const normalizedStatus = normalizeText(selectedStatus.value)
-
     return deployments.value.filter((deployment) => {
       const searchableValues = [
         deployment.id,
@@ -100,12 +223,7 @@
         !normalizedSearch ||
         searchableValues.some((value) => normalizeText(value).includes(normalizedSearch))
 
-      const matchesStatus =
-        normalizedStatus === 'all' || normalizeText(deployment.status?.content) === normalizedStatus
-
-      const matchesCurrent = selectedCurrent.value !== 'current' || deployment.isCurrent
-
-      return matchesSearch && matchesStatus && matchesCurrent
+      return matchesSearch && matchesDropdownFilters(deployment)
     })
   })
 
@@ -359,9 +477,13 @@
     paginatorRows.value = event.rows
   }
 
-  watch([searchTerm, selectedStatus, selectedCurrent], () => {
-    paginatorFirst.value = 0
-  })
+  watch(
+    [searchTerm, filterValues],
+    () => {
+      paginatorFirst.value = 0
+    },
+    { deep: true }
+  )
 
   onMounted(loadDeployments)
 </script>
@@ -376,195 +498,114 @@
       />
     </template>
     <template #content>
-      <div class="deployments-wrapper">
-        <div class="deployments-toolbar">
-          <div class="toolbar-left">
-            <span class="search-shell">
-              <i class="pi pi-search" />
-              <input
-                v-model="searchTerm"
-                type="text"
-                placeholder="Search deployments"
+      <GenericDataView
+        :items="filteredDeployments"
+        :hasDeployments="Boolean(deployments.length)"
+        :loading="loading"
+        :columns="columns"
+        v-model:searchTerm="searchTerm"
+        v-model:filterValues="filterValues"
+        :filters="filters"
+        :paginatorFirst="paginatorFirst"
+        :paginatorRows="paginatorRows"
+        searchPlaceholder="Search deployments"
+        refreshAriaLabel="Refresh deployments"
+        exportAriaLabel="Export deployments"
+        selectColumnsAriaLabel="Select deployment columns"
+        emptyTitle="No Deployments yet"
+        emptyDescription="Deployments will appear here once you deploy your resources."
+        filteredEmptyTitle="No deployments found"
+        filteredEmptyDescription="Try changing your search or filters."
+        rowActionsAriaLabel="Deployment actions"
+        @refresh="loadDeployments"
+        @page="onPage"
+        @open-row-menu="({ event, deployment }) => openRowMenu(event, deployment)"
+      >
+        <template #cell-deployment="{ item: deployment }">
+          <div class="min-w-0 flex-1">
+            <p
+              class="m-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-sm font-normal leading-6 text-[var(--text-color)]"
+            >
+              {{ deployment.hash || '--' }}
+            </p>
+            <div
+              v-if="deployment.isCurrent"
+              class="mt-1 inline-flex items-center gap-2 text-xs leading-6 text-[var(--text-color-secondary)]"
+            >
+              <span
+                class="current-badge inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium leading-6"
+              >
+                <i class="pi pi-arrow-up" />
+                Current
+              </span>
+            </div>
+          </div>
+        </template>
+
+        <template #cell-environment="{ item: deployment }">
+          <span
+            class="environment-tag inline-flex items-center whitespace-nowrap rounded border border-[var(--surface-border)] px-2 py-0.5 text-xs font-medium leading-6 text-[var(--text-color)]"
+          >
+            {{ formatEnvironment(deployment.environment) }}
+          </span>
+        </template>
+
+        <template #cell-status="{ item: deployment }">
+          <span
+            :class="[
+              'inline-flex w-fit items-center gap-1.5 rounded px-2 py-0.5 text-xs font-medium leading-6',
+              getStatusClass(deployment)
+            ]"
+          >
+            <i :class="[getStatusIcon(deployment.status?.content), 'text-xs']" />
+            {{ deployment.status?.content || 'Unknown' }}
+          </span>
+        </template>
+
+        <template #cell-resource-pack="{ item: deployment }">
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <div
+              v-for="resourceItem in getResourcePackRows(deployment)"
+              :key="`${deployment.id}-${resourceItem.key}`"
+              class="inline-flex min-w-0 items-center gap-1.5"
+            >
+              <i
+                :class="resourceItem.icon"
+                class="text-sm text-[var(--text-color-secondary)]"
               />
+              <span class="text-xs leading-6 text-[var(--text-color-secondary)]"
+                >{{ resourceItem.label }}:</span
+              >
+              <span class="overflow-hidden text-ellipsis whitespace-nowrap">{{
+                resourceItem.name
+              }}</span>
+              <span
+                class="resource-hash-tag whitespace-nowrap rounded border border-[var(--surface-border)] px-1.5 py-px font-mono text-[0.6875rem] leading-6 text-[var(--text-color-secondary)]"
+              >
+                {{ resourceItem.hash }}
+              </span>
+            </div>
+            <span
+              v-if="!getResourcePackRows(deployment).length"
+              class="text-xs leading-6 text-[var(--text-color-secondary)]"
+            >
+              --
             </span>
-            <Dropdown
-              v-model="selectedStatus"
-              :options="statusOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="quick-filter"
-              placeholder="Status"
-            />
-            <Dropdown
-              v-model="selectedCurrent"
-              :options="currentOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="quick-filter"
-              placeholder="Current"
-            />
           </div>
+        </template>
 
-          <div class="toolbar-right">
-            <PrimeButton
-              icon="pi pi-refresh"
-              outlined
-              size="small"
-              aria-label="Refresh deployments"
-              @click="loadDeployments"
-            />
-            <PrimeButton
-              icon="pi pi-download"
-              outlined
-              size="small"
-              disabled
-              aria-label="Export deployments"
-            />
-            <PrimeButton
-              icon="ai ai-column"
-              outlined
-              size="small"
-              disabled
-              aria-label="Select deployment columns"
-            />
-          </div>
-        </div>
+        <template #cell-lastEditor="{ item: deployment }">
+          <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+            {{ deployment.lastEditor || '--' }}
+          </span>
+        </template>
 
-        <div
-          v-if="loading"
-          class="deployments-loading"
-        >
-          <div
-            v-for="item in 5"
-            :key="item"
-            class="loading-row"
-          >
-            <Skeleton class="h-16 w-full" />
-          </div>
-        </div>
-
-        <div
-          v-else-if="!deployments.length"
-          class="deployments-empty"
-        >
-          <h3>No Deployments yet</h3>
-          <p>Deployments will appear here once you deploy your resources.</p>
-        </div>
-
-        <div
-          v-else-if="!filteredDeployments.length"
-          class="deployments-empty"
-        >
-          <h3>No deployments found</h3>
-          <p>Try changing your search or filters.</p>
-        </div>
-
-        <div
-          v-else
-          class="deployments-table"
-        >
-          <div class="deployments-header">
-            <span>Deployment</span>
-            <span>Status</span>
-            <span>Resource Pack</span>
-            <span>Last Editor</span>
-            <span>Last Modified</span>
-            <span class="header-actions" />
-          </div>
-
-          <DataView
-            :value="filteredDeployments"
-            dataKey="id"
-            paginator
-            :rows="paginatorRows"
-            :first="paginatorFirst"
-            :rowsPerPageOptions="[10, 20, 50]"
-            paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
-            current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
-            @page="onPage"
-          >
-            <template #list="{ data: deployment }">
-              <div class="deployment-row">
-                <div
-                  class="cell deployment-cell"
-                  data-label="Deployment"
-                >
-                  <p class="hash">{{ deployment.hash || '--' }}</p>
-                  <div class="deployment-meta">
-                    <span>{{ formatEnvironment(deployment.environment) }}</span>
-                    <span
-                      v-if="deployment.isCurrent"
-                      class="current-badge"
-                    >
-                      <i class="pi pi-arrow-up" /> Current
-                    </span>
-                  </div>
-                </div>
-
-                <div
-                  class="cell status-cell"
-                  data-label="Status"
-                >
-                  <span :class="getStatusClass(deployment)">
-                    <i
-                      :class="getStatusIcon(deployment.status?.content)"
-                      class="status-icon"
-                    />
-                    {{ deployment.status?.content || 'Unknown' }}
-                  </span>
-                </div>
-
-                <div
-                  class="cell resource-pack-cell"
-                  data-label="Resource Pack"
-                >
-                  <div
-                    v-for="resourceItem in getResourcePackRows(deployment)"
-                    :key="`${deployment.id}-${resourceItem.key}`"
-                    class="resource-pack-item"
-                  >
-                    <i :class="resourceItem.icon" />
-                    <span class="resource-pack-label">{{ resourceItem.label }}:</span>
-                    <span class="resource-pack-value">{{ resourceItem.name }}</span>
-                    <span class="resource-pack-hash-tag">{{ resourceItem.hash }}</span>
-                  </div>
-                  <span
-                    v-if="!getResourcePackRows(deployment).length"
-                    class="resource-pack-empty"
-                  >
-                    --
-                  </span>
-                </div>
-
-                <div
-                  class="cell editor-cell"
-                  data-label="Last Editor"
-                >
-                  <span>{{ deployment.lastEditor || '--' }}</span>
-                </div>
-
-                <div
-                  class="cell modified-cell"
-                  data-label="Last Modified"
-                >
-                  <span>{{ deployment.lastModified || '--' }}</span>
-                </div>
-
-                <div class="cell actions-cell">
-                  <PrimeButton
-                    icon="pi pi-ellipsis-v"
-                    text
-                    rounded
-                    size="small"
-                    aria-label="Deployment actions"
-                    @click="openRowMenu($event, deployment)"
-                  />
-                </div>
-              </div>
-            </template>
-          </DataView>
-        </div>
-      </div>
+        <template #cell-lastModified="{ item: deployment }">
+          <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+            {{ deployment.lastModified || '--' }}
+          </span>
+        </template>
+      </GenericDataView>
 
       <Menu
         ref="rowMenuRef"
@@ -576,216 +617,9 @@
 </template>
 
 <style scoped>
-  .deployments-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    color: var(--text-color);
-  }
-
-  .deployments-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .toolbar-left,
-  .toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .search-shell {
-    min-height: 2.5rem;
-    min-width: 20rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    padding: 0.25rem 0.75rem;
-    background: var(--surface-section);
-    color: var(--text-color);
-    transition: border-color 0.15s ease;
-  }
-
-  .search-shell:focus-within {
-    border-color: var(--primary-color);
-  }
-
-  .quick-filter {
-    min-width: 9.5rem;
-  }
-
-  .quick-filter:deep(.p-dropdown) {
-    min-height: 2.5rem;
-  }
-
-  .search-shell input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    outline: none;
-    font: inherit;
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .search-shell input::placeholder {
-    color: var(--text-color-secondary);
-  }
-
-  .deployments-loading {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .loading-row :deep(.p-skeleton) {
-    border-radius: 0.375rem;
-  }
-
-  .deployments-empty {
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    padding: 1.5rem;
-    background: var(--surface-section);
-    text-align: center;
-    color: var(--text-color-secondary);
-  }
-
-  .deployments-empty h3 {
-    margin: 0;
-    color: var(--text-color);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.5;
-  }
-
-  .deployments-empty p {
-    margin: 0.5rem 0 0;
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .deployments-table {
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    background: var(--surface-section);
-    overflow: hidden;
-  }
-
-  .deployments-header,
-  .deployment-row {
-    display: grid;
-    grid-template-columns:
-      minmax(170px, 2.1fr) minmax(120px, 1.3fr) minmax(320px, 2.5fr) minmax(180px, 1.5fr)
-      minmax(170px, 1.4fr) 44px;
-    gap: 0.75rem;
-    align-items: center;
-    padding: 0.75rem 1rem;
-  }
-
-  .deployments-header {
-    background: var(--table-header-color, var(--surface-section));
-    border-bottom: 1px solid var(--surface-border);
-    font-family: 'Proto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--text-color-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.0625rem;
-  }
-
-  .deployment-row {
-    border-bottom: 1px solid var(--surface-border);
-    min-height: 4.5rem;
-    background: var(--surface-section);
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .deployment-row:hover {
-    background: var(--table-body-row-hover-bg, var(--surface-ground));
-  }
-
-  .deployment-row:last-child {
-    border-bottom: none;
-  }
-
-  .cell {
-    min-width: 0;
-  }
-
-  .hash {
-    margin: 0;
-    font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .deployment-meta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-    color: var(--text-color-secondary);
-    font-size: 0.75rem;
-    line-height: 1.5;
-  }
-
-  .current-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    border-radius: 0.25rem;
-    padding: 0.125rem 0.375rem;
-    background: #092435d9;
-    color: #2287c5;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.5;
-  }
-
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    gap: 0.375rem;
-    border-radius: 0.25rem;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.5;
-  }
-
-  .status-pill i {
-    font-size: 0.75rem;
-  }
-
-  .status-icon.pi-spinner {
-    animation: status-icon-rotate 1s linear infinite;
-  }
-
-  @keyframes status-icon-rotate {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
+  .environment-tag,
+  .resource-hash-tag {
+    background: var(--surface-ground);
   }
 
   .status-success {
@@ -813,229 +647,8 @@
     color: var(--text-color-secondary);
   }
 
-  .resource-pack-item i {
-    color: var(--text-color-secondary);
-    font-size: 0.875rem;
-  }
-
-  .resource-pack-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    min-width: 0;
-  }
-
-  .resource-pack-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    min-width: 0;
-  }
-
-  .resource-pack-label {
-    color: var(--text-color-secondary);
-    font-size: 0.75rem;
-    line-height: 1.5;
-  }
-
-  .resource-pack-value {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .resource-pack-hash-tag {
-    border: 1px solid var(--surface-border);
-    border-radius: 4px;
-    padding: 0.0625rem 0.375rem;
-    background: var(--surface-ground);
-    color: var(--text-color-secondary);
-    font-size: 0.6875rem;
-    line-height: 1.5;
-    white-space: nowrap;
-    font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
-
-  .resource-pack-empty {
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: var(--text-color-secondary);
-  }
-
-  .actions-cell {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .deployments-table :deep(.p-dataview-content) {
-    background: transparent;
-    color: var(--text-color);
-  }
-
-  .deployments-table :deep(.p-dataview-emptymessage) {
-    color: var(--text-color-secondary);
-  }
-
-  .deployments-table :deep(.p-paginator) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    border: 0;
-    border-top: 1px solid var(--surface-border);
-
-    background: var(--surface-section);
-    border-radius: 0;
-    color: var(--text-color-secondary);
-    min-height: 3rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .deployments-table :deep(.p-paginator .p-paginator-current) {
-    margin: 0 0.5rem 0 0;
-    color: var(--text-color-secondary);
-    font-weight: 400;
-  }
-
-  .deployments-table :deep(.p-paginator .p-paginator-page),
-  .deployments-table :deep(.p-paginator .p-paginator-first),
-  .deployments-table :deep(.p-paginator .p-paginator-prev),
-  .deployments-table :deep(.p-paginator .p-paginator-next),
-  .deployments-table :deep(.p-paginator .p-paginator-last) {
-    min-width: 2rem;
-    width: 2rem;
-    height: 2rem;
-    margin: 0;
-    border: 0;
-    border-radius: 0.375rem;
-    background: transparent;
-    color: var(--text-color-secondary);
-  }
-
-  .deployments-table :deep(.p-paginator .p-highlight) {
-    background: var(--surface-hover);
-    color: var(--text-color);
-  }
-
-  .deployments-table :deep(.p-dropdown) {
-    height: 2rem;
-    margin-left: 0.25rem;
-    border-color: var(--surface-border);
-    border-radius: 0.375rem;
-    background: var(--surface-section);
-    color: var(--text-color);
-  }
-
-  .deployments-table :deep(.p-dropdown .p-dropdown-label) {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  .deployments-table :deep(.p-paginator .p-inputtext) {
-    width: 2rem;
-    height: 2rem;
-    padding: 0.25rem;
-    border-color: var(--surface-border);
-    border-radius: 0.375rem;
-    background: var(--surface-section);
-    color: var(--text-color);
-    text-align: center;
-  }
-
-  @media (max-width: 1024px) {
-    .deployments-header {
-      display: none;
-    }
-
-    .deployment-row {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-      padding: 1rem;
-      min-height: auto;
-    }
-
-    .cell {
-      display: grid;
-      grid-template-columns: minmax(7.5rem, 35%) 1fr;
-      justify-content: space-between;
-      align-items: start;
-      gap: 1rem;
-    }
-
-    .cell::before {
-      content: attr(data-label);
-      font-family: 'Proto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.625rem;
-      font-weight: 400;
-      line-height: 1.5;
-      letter-spacing: 0.0625rem;
-      text-transform: uppercase;
-      color: var(--text-color-secondary);
-    }
-
-    .deployment-cell,
-    .resource-pack-cell {
-      align-items: flex-start;
-    }
-
-    .deployment-cell > *,
-    .resource-pack-cell > * {
-      grid-column: 2;
-    }
-
-    .deployment-cell::before,
-    .resource-pack-cell::before {
-      grid-column: 1;
-      grid-row: 1 / span 2;
-    }
-
-    .actions-cell {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .actions-cell::before {
-      content: none;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .search-shell {
-      min-width: 0;
-      width: 100%;
-    }
-
-    .quick-filter {
-      width: 100%;
-      min-width: 0;
-    }
-
-    .toolbar-left,
-    .toolbar-right {
-      width: 100%;
-    }
-
-    .toolbar-right {
-      justify-content: flex-end;
-    }
-
-    .cell {
-      grid-template-columns: 1fr;
-      gap: 0.25rem;
-    }
-
-    .cell::before,
-    .deployment-cell::before,
-    .resource-pack-cell::before {
-      grid-column: 1;
-      grid-row: auto;
-    }
-
-    .deployment-cell > *,
-    .resource-pack-cell > * {
-      grid-column: 1;
-    }
+  .current-badge {
+    background: color-mix(in srgb, var(--blue-500, #3b82f6) 15%, transparent);
+    color: var(--blue-500, #3b82f6);
   }
 </style>
