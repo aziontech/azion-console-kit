@@ -37,8 +37,8 @@
     useField('environmentVariables')
 
   const deploymentVersionPolicyOptions = [
-    { label: 'Single Version', value: 'SINGLE_VERSION' },
-    { label: 'Versioned URL', value: 'VERSIONED_URL' }
+    { label: 'Single Version', value: 'single_version' },
+    { label: 'Versioned URL', value: 'versioned_urls' }
   ]
 
   const isDeploymentVersionPolicyDisabled = computed(() => {

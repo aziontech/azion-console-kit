@@ -31,7 +31,7 @@ const parseItemResponse = (data) => {
 }
 
 export class EnvironmentService extends BaseService {
-  #baseURL = 'v1/environments'
+  #baseURL = 'v4/environments'
 
   #fetchList = async (params = {}) => {
     const { data } = await this.http.request({
