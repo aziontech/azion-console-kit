@@ -108,6 +108,20 @@ let deployments = [
 
 const simulateDelay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
 
+const findDeploymentIndexOrThrow = (id) => {
+  const index = deployments.findIndex((dep) => dep.id === id)
+  if (index === -1) {
+    throw new Error('Deployment not found')
+  }
+
+  return index
+}
+
+const updateDeploymentTimestamp = (deployment) => ({
+  ...deployment,
+  lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
+})
+
 export const listDeploymentsService = async () => {
   await simulateDelay()
   // Return deployments sorted by most recent first (reverse order)
@@ -119,32 +133,148 @@ export const listDeploymentsService = async () => {
 
 export const cancelDeploymentService = async (id) => {
   await simulateDelay()
-  const index = deployments.findIndex((dep) => dep.id === id)
-  if (index === -1) {
-    throw new Error('Deployment not found')
+  const index = findDeploymentIndexOrThrow(id)
+
+  if (deployments[index].status?.content !== 'Building') {
+    throw new Error('Only building deployments can be canceled')
   }
+
   deployments[index] = {
-    ...deployments[index],
-    status: formatStatus('canceled'),
-    lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
+    ...updateDeploymentTimestamp(deployments[index]),
+    status: formatStatus('canceled')
   }
+
   return { data: deployments[index] }
 }
 
-export const redeployDeploymentService = async (id) => {
+export const cloneDeploymentToDraftService = async (id) => {
   await simulateDelay()
-  const index = deployments.findIndex((dep) => dep.id === id)
-  if (index === -1) {
-    throw new Error('Deployment not found')
+  const index = findDeploymentIndexOrThrow(id)
+
+  if (deployments[index].status?.content !== 'Ready') {
+    throw new Error('Only ready deployments can be cloned to draft')
   }
-  // Reset all isCurrent to false
-  deployments = deployments.map((dep) => ({ ...dep, isCurrent: false }))
-  // Set this deployment as current and status to ready
-  deployments[index] = {
+
+  const clonedDeployment = {
     ...deployments[index],
-    isCurrent: true,
-    status: { content: 'Ready', severity: 'info' },
-    lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
+    id: String(Date.now()),
+    hash: `${deployments[index].hash}-draft`,
+    isCurrent: false,
+    status: formatStatus('draft')
   }
+
+  deployments = [updateDeploymentTimestamp(clonedDeployment), ...deployments]
+
+  return { data: deployments[0] }
+}
+
+export const buildDeploymentService = async (id) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(id)
+
+  if (deployments[index].status?.content !== 'Draft') {
+    throw new Error('Only draft deployments can be built')
+  }
+
+  deployments[index] = {
+    ...updateDeploymentTimestamp(deployments[index]),
+    status: formatStatus('building')
+  }
+
   return { data: deployments[index] }
+}
+
+export const deleteDeploymentService = async (id) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(id)
+
+  if (deployments[index].status?.content !== 'Draft') {
+    throw new Error('Only draft deployments can be deleted')
+  }
+
+  const [deletedDeployment] = deployments.splice(index, 1)
+
+  return { data: deletedDeployment }
+}
+
+export const reopenDeploymentService = async (id) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(id)
+
+  const currentStatus = deployments[index].status?.content
+  if (currentStatus !== 'Error' && currentStatus !== 'Canceled') {
+    throw new Error('Only errored or canceled deployments can be reopened')
+  }
+
+  deployments[index] = {
+    ...updateDeploymentTimestamp(deployments[index]),
+    status: formatStatus('draft')
+  }
+
+  return { data: deployments[index] }
+}
+
+export const rollbackDeploymentService = async (id) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(id)
+  const selected = deployments[index]
+
+  if (selected.status?.content !== 'Ready' || !selected.isCurrent) {
+    throw new Error('Only current ready deployments can be rolled back')
+  }
+
+  const previousReady = deployments.find(
+    (deployment) =>
+      deployment.id !== selected.id &&
+      deployment.environment === selected.environment &&
+      deployment.status?.content === 'Ready' &&
+      !deployment.isCurrent
+  )
+
+  if (!previousReady) {
+    throw new Error('No previous ready deployment available for rollback')
+  }
+
+  deployments = deployments.map((deployment) => {
+    if (deployment.id === selected.id) {
+      return updateDeploymentTimestamp({
+        ...deployment,
+        isCurrent: false
+      })
+    }
+
+    if (deployment.id === previousReady.id) {
+      return updateDeploymentTimestamp({
+        ...deployment,
+        isCurrent: true
+      })
+    }
+
+    return deployment
+  })
+
+  return { data: deployments.find((deployment) => deployment.id === previousReady.id) }
+}
+
+export const promoteDeploymentService = async (id) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(id)
+  const selected = deployments[index]
+
+  if (selected.status?.content !== 'Ready' || selected.isCurrent) {
+    throw new Error('Only non-current ready deployments can be promoted')
+  }
+
+  deployments = deployments.map((deployment) => {
+    if (deployment.environment !== selected.environment) {
+      return deployment
+    }
+
+    return updateDeploymentTimestamp({
+      ...deployment,
+      isCurrent: deployment.id === selected.id
+    })
+  })
+
+  return { data: deployments.find((deployment) => deployment.id === selected.id) }
 }

@@ -116,6 +116,7 @@
     return normalizedStatus === 'building' ? `${baseIcon} animate-spin` : baseIcon
   }
   const getStatusClass = (deployment) => `status-${deployment?.status?.severity || 'secondary'}`
+  const getDeploymentStatus = (deployment) => normalizeText(deployment?.status?.content)
 
   const normalizeText = (value) =>
     String(value || '')
@@ -417,45 +418,186 @@
     }
   }
 
-  const handleRedeployDeployment = async (deployment) => {
+  const handleCloneToDraftDeployment = async (deployment) => {
     try {
-      const { redeployDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await redeployDeploymentService(deployment.id)
+      const { cloneDeploymentToDraftService } =
+        await import('@/services/v2/deployment/deployment-mock')
+      await cloneDeploymentToDraftService(deployment.id)
       toast.add({
         severity: 'success',
         summary: 'Success',
-        detail: 'Deployment re-deployed successfully'
+        detail: 'Deployment cloned to draft successfully'
       })
       await loadDeployments()
     } catch (error) {
       toast.add({
         severity: 'error',
         summary: 'Error',
-        detail: error.message || 'Failed to re-deploy'
+        detail: error.message || 'Failed to clone deployment to draft'
+      })
+    }
+  }
+
+  const handleBuildDeployment = async (deployment) => {
+    try {
+      const { buildDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
+      await buildDeploymentService(deployment.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Deployment build started successfully'
+      })
+      await loadDeployments()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to start deployment build'
+      })
+    }
+  }
+
+  const handleDeleteDeployment = async (deployment) => {
+    try {
+      const { deleteDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
+      await deleteDeploymentService(deployment.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Deployment deleted successfully'
+      })
+      await loadDeployments()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to delete deployment'
+      })
+    }
+  }
+
+  const handleReopenDeployment = async (deployment) => {
+    try {
+      const { reopenDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
+      await reopenDeploymentService(deployment.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Deployment reopened as draft successfully'
+      })
+      await loadDeployments()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to reopen deployment'
+      })
+    }
+  }
+
+  const handleRollbackDeployment = async (deployment) => {
+    try {
+      const { rollbackDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
+      await rollbackDeploymentService(deployment.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Deployment rolled back successfully'
+      })
+      await loadDeployments()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to rollback deployment'
+      })
+    }
+  }
+
+  const handlePromoteDeployment = async (deployment) => {
+    try {
+      const { promoteDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
+      await promoteDeploymentService(deployment.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Deployment promoted successfully'
+      })
+      await loadDeployments()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'Failed to promote deployment'
       })
     }
   }
 
   const getActions = (deployment) => {
-    const actions = []
+    const status = getDeploymentStatus(deployment)
 
-    if (deployment.status?.content === 'Building') {
-      actions.push({
-        label: 'Cancel',
-        icon: 'pi pi-times',
-        commandAction: () => handleCancelDeployment(deployment)
-      })
+    if (status === 'ready') {
+      const actions = [
+        {
+          label: 'Clone to draft',
+          icon: 'pi pi-copy',
+          commandAction: () => handleCloneToDraftDeployment(deployment)
+        }
+      ]
+
+      actions.push(
+        deployment.isCurrent
+          ? {
+              label: 'Rollback',
+              icon: 'pi pi-undo',
+              commandAction: () => handleRollbackDeployment(deployment)
+            }
+          : {
+              label: 'Promote',
+              icon: 'pi pi-arrow-up',
+              commandAction: () => handlePromoteDeployment(deployment)
+            }
+      )
+
+      return actions
     }
 
-    if (!deployment.isCurrent) {
-      actions.push({
-        label: 'Re-deploy',
-        icon: 'pi pi-refresh',
-        commandAction: () => handleRedeployDeployment(deployment)
-      })
+    if (status === 'draft') {
+      return [
+        {
+          label: 'Build',
+          icon: 'pi pi-play',
+          commandAction: () => handleBuildDeployment(deployment)
+        },
+        {
+          label: 'Delete',
+          icon: 'pi pi-trash',
+          commandAction: () => handleDeleteDeployment(deployment)
+        }
+      ]
     }
 
-    return actions
+    if (status === 'error' || status === 'canceled') {
+      return [
+        {
+          label: 'Reopen in draft',
+          icon: 'pi pi-refresh',
+          commandAction: () => handleReopenDeployment(deployment)
+        }
+      ]
+    }
+
+    if (status === 'building') {
+      return [
+        {
+          label: 'Cancel',
+          icon: 'pi pi-times',
+          commandAction: () => handleCancelDeployment(deployment)
+        }
+      ]
+    }
+
+    return []
   }
 
   const openRowMenu = (event, deployment) => {
