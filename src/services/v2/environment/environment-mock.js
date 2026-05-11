@@ -50,7 +50,7 @@ const normalizeEnvironment = (environment) => {
     name: source.name ?? '',
     description: source.description ?? '',
     active: Boolean(source.active),
-    deployment_version_policy: toStringArray(source.deployment_version_policy),
+    deployment_version_policy: source.deployment_version_policy,
     log_verbosity: toStringArray(source.log_verbosity),
     robots_policy: toStringArray(source.robots_policy),
     protection: normalizeProtection(source.protection),
@@ -68,7 +68,7 @@ let environments = [
     name: 'Production',
     description: 'Primary production environment',
     active: true,
-    deployment_version_policy: ['SINGLE_VERSION'],
+    deployment_version_policy: 'single_version',
     log_verbosity: ['normal'],
     robots_policy: ['index'],
     protection: {
@@ -89,14 +89,14 @@ let environments = [
     created_at: '2026-03-26T18:00:00Z',
     updated_at: '2026-03-26T18:00:00Z',
     created_by: 'system',
-    last_editor: 'system'
+    last_editor: 'guilherme.santana@azion.com'
   }),
   normalizeEnvironment({
     id: 'env_01HXYZABCDEG',
     name: 'Staging',
     description: 'Pre-production validation environment',
     active: true,
-    deployment_version_policy: ['VERSIONED_URL'],
+    deployment_version_policy: 'versioned_urls',
     log_verbosity: ['verbose'],
     robots_policy: ['noindex'],
     protection: {
@@ -117,7 +117,7 @@ let environments = [
     created_at: '2026-03-26T18:00:00Z',
     updated_at: '2026-03-26T18:00:00Z',
     created_by: 'system',
-    last_editor: 'system'
+    last_editor: 'guilherme.santana@azion.com'
   })
 ]
 
@@ -151,7 +151,7 @@ export const createEnvironmentService = async (payload = {}) => {
     created_at: timestamp,
     updated_at: timestamp,
     created_by: payload.created_by ?? 'system',
-    last_editor: payload.last_editor ?? 'system'
+    last_editor: payload.last_editor ?? 'guilherme.santana@azion.com'
   })
 
   environments.push(newEnvironment)
@@ -184,7 +184,7 @@ export const updateEnvironmentService = async (id, payload = {}) => {
     created_at: current.created_at,
     updated_at: timestamp,
     created_by: current.created_by,
-    last_editor: payload.last_editor ?? 'system'
+    last_editor: payload.last_editor ?? 'guilherme.santana@azion.com'
   })
 
   environments[index] = updated

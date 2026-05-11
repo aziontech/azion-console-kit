@@ -32,7 +32,7 @@
     deployment_version_policy: yup
       .string()
       .required()
-      .oneOf(['SINGLE_VERSION', 'VERSIONED_URL'])
+      .oneOf(['single_version', 'versioned_urls'])
       .label('Deployment Version Policy'),
     globalVariables: yup.array().of(yup.string()).default([]),
     environmentVariables: yup
@@ -58,27 +58,27 @@
     name: '',
     description: '',
     active: true,
-    deployment_version_policy: 'SINGLE_VERSION',
+    deployment_version_policy: 'single_version',
     globalVariables: [],
     environmentVariables: {}
   }
 
   const getDeploymentVersionPolicyValue = (deploymentVersionPolicy) => {
-    if (Array.isArray(deploymentVersionPolicy) && deploymentVersionPolicy.length > 0) {
-      const value = deploymentVersionPolicy[0]
-      if (value === 'SINGLE_VERSION' || value === 'VERSIONED_URL') {
-        return value
-      }
+    const value = Array.isArray(deploymentVersionPolicy)
+      ? deploymentVersionPolicy[0]
+      : deploymentVersionPolicy
+
+    if (typeof value !== 'string') {
+      return 'single_version'
     }
 
-    if (
-      deploymentVersionPolicy === 'SINGLE_VERSION' ||
-      deploymentVersionPolicy === 'VERSIONED_URL'
-    ) {
-      return deploymentVersionPolicy
+    const normalized = value.trim().toLowerCase()
+
+    if (normalized === 'versioned_url' || normalized === 'versioned_urls') {
+      return 'versioned_urls'
     }
 
-    return 'SINGLE_VERSION'
+    return 'single_version'
   }
 
   const openCreateDrawer = () => {
@@ -140,7 +140,7 @@
       name: payload.name,
       description: payload.description ?? '',
       active: Boolean(payload.active),
-      deployment_version_policy: [deploymentVersionPolicy]
+      deployment_version_policy: deploymentVersionPolicy
     }
   }
 

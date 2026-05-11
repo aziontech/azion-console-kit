@@ -395,7 +395,7 @@
   const profileMenuDefault = [
     {
       label: 'Environments',
-      to: '/environment'
+      to: '/environments'
     },
     {
       label: 'Account Settings',

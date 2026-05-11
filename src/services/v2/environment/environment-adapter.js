@@ -54,7 +54,7 @@ const normalizeEnvironment = (environment) => {
     name: source.name ?? '',
     description: source.description ?? '',
     active: Boolean(source.active),
-    deployment_version_policy: toStringArray(source.deployment_version_policy),
+    deployment_version_policy: source.deployment_version_policy,
     log_verbosity: toStringArray(source.log_verbosity),
     robots_policy: toStringArray(source.robots_policy),
     protection: normalizeProtection(source.protection),

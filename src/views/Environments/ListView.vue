@@ -6,6 +6,7 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import { DataTableActionsButtons } from '@/components/list-table'
   import EnvironmentsDrawer from './Drawer'
+  import { environmentService } from '@/services/v2/environment/environment-service'
 
   defineOptions({ name: 'list-environments' })
 
@@ -29,10 +30,10 @@
       : { content: 'Inactive', severity: 'danger' }
   }
 
-  const formatDeploymentPolicyTag = (policy = []) => {
-    const policyValue = Array.isArray(policy) ? policy[0] : policy
+  const formatDeploymentPolicyTag = (policy = 'single_version') => {
+    const policyValue = typeof policy === 'string' ? policy.toLowerCase() : 'single_version'
 
-    if (policyValue === 'VERSIONED_URL') {
+    if (policyValue === 'versioned_urls') {
       return { content: 'Versioned URL', severity: 'info' }
     }
 
@@ -63,11 +64,7 @@
       label: 'Delete',
       title: 'Environment',
       icon: 'pi pi-trash',
-      service: async (id) => {
-        const { deleteEnvironmentService } =
-          await import('@/services/v2/environment/environment-mock')
-        return deleteEnvironmentService(id)
-      }
+      service: environmentService.deleteEnvironmentService
     }
   ]
 
